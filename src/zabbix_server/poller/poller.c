@@ -45,6 +45,7 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
+#include "../availability/avail_protocol.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -65,23 +66,15 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
  *               FAIL    - no changes in availability data were detected      *
  *                                                                            *
  ******************************************************************************/
-static int	db_host_update_availability(const zbx_host_availability_t *ha)
+static int	db_host_update_availability(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_host_availability_t *ha)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
+	if (FAIL == zbx_host_availability_is_set(ha))
+		return FAIL;
 
-	if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, ha))
-	{
-		DBbegin();
-		DBexecute("%s", sql);
-		DBcommit();
+	zbx_avail_serialize(data, data_alloc, data_offset, ha);
 
-		zbx_free(sql);
-
-		return SUCCEED;
-	}
-
-	return FAIL;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -229,7 +222,8 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 	}
 }
 
-void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
+void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset)
 {
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
@@ -249,7 +243,7 @@ void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (FAIL == DChost_activate(item->host.hostid, agent_type, ts, &in.agents[agent_type], &out.agents[agent_type]))
 		goto out;
 
-	if (FAIL == db_host_update_availability(&out))
+	if (FAIL == db_host_update_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
 	host_set_availability(&item->host, agent_type, &out);
@@ -271,7 +265,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
+void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset, const char *error)
 {
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
@@ -294,7 +289,7 @@ void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *err
 		goto out;
 	}
 
-	if (FAIL == db_host_update_availability(&out))
+	if (FAIL == db_host_update_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
 	host_set_availability(&item->host, agent_type, &out);
@@ -852,6 +847,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_timespec_t		timespec;
 	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -880,7 +877,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case AGENT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
 				{
-					zbx_activate_item_host(&items[i], &timespec);
+					zbx_activate_item_host(&items[i], &timespec, &data, &data_alloc, &data_offset);
 					last_available = HOST_AVAILABLE_TRUE;
 				}
 				break;
@@ -889,7 +886,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
 				{
-					zbx_deactivate_item_host(&items[i], &timespec, results[i].msg);
+					zbx_deactivate_item_host(&items[i], &timespec, &data, &data_alloc, &data_offset,
+							results[i].msg);
 					last_available = HOST_AVAILABLE_FALSE;
 				}
 				break;
@@ -960,6 +958,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	DCconfig_clean_items(items, NULL, num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
+	if (NULL != data)
+		availability_send(data, data_offset);
+	zbx_free(data);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 

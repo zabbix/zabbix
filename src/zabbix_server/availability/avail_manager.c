@@ -26,7 +26,10 @@
 #include "daemon.h"
 
 extern unsigned char	process_type, program_type;
-extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
+extern int		server_num, process_num;
+
+#define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
+#define ZBX_IPC_AVAILABILITY_REQUEST	1
 
 #define ZBX_AVAILABILITY_MANAGER_DELAY			1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
@@ -93,6 +96,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 		if (NULL != message)
 		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "got message..");
 			zbx_ipc_message_free(message);
 		}
 
@@ -110,4 +114,27 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
+}
+
+void	availability_send(unsigned char *data, zbx_uint32_t size)
+{
+	static zbx_ipc_socket_t	socket;
+
+	/* each process has a permanent connection to availability manager */
+	if (0 == socket.fd)
+	{
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_AVAILABILITY, SEC_PER_MIN, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_AVAILABILITY_REQUEST, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
+		exit(EXIT_FAILURE);
+	}
 }

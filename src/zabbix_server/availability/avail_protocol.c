@@ -22,7 +22,7 @@
 #include "db.h"
 #include "avail_protocol.h"
 #include "dbcache.h"
-
+#include "log.h"
 void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_host_availability_t *ha)
 {
@@ -30,9 +30,6 @@ void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_
 	int		error_lens[ZBX_AGENT_MAX];
 	int		i;
 	unsigned char	*ptr;
-
-	if (FAIL == zbx_host_availability_is_set(ha))
-		return;
 
 	zbx_serialize_prepare_value(data_len, ha->hostid);
 
@@ -63,7 +60,7 @@ void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_
 		ptr += zbx_serialize_value(ptr, ha->agents[i].available);
 		ptr += zbx_serialize_value(ptr, ha->agents[i].errors_from);
 		ptr += zbx_serialize_value(ptr, ha->agents[i].disable_until);
-		(void)zbx_serialize_str(ptr, ha->agents[i].error, error_lens[i]);
+		ptr += zbx_serialize_str(ptr, ha->agents[i].error, error_lens[i]);
 	}
 }
 
