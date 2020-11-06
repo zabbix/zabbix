@@ -126,25 +126,42 @@ type Metric struct {
 	varParam    bool
 }
 
+// ordinalize convert a given number to an ordinal numeral.
 func ordinalize(num int) string {
-	var ordinalDictionary = map[int]string{
-		0: "th",
-		1: "st",
-		2: "nd",
-		3: "rd",
-		4: "th",
-		5: "th",
-		6: "th",
-		7: "th",
-		8: "th",
-		9: "th",
+	var ordinals = map[int]string{
+		1:  "first",
+		2:  "second",
+		3:  "third",
+		4:  "fourth",
+		5:  "fifth",
+		6:  "sixth",
+		7:  "seventh",
+		8:  "eighth",
+		9:  "ninth",
+		10: "tenth",
 	}
 
-	if ((num % 100) >= 11) && ((num % 100) <= 13) {
-		return strconv.Itoa(num) + "th"
+	if num >= 1 && num <= 10 {
+		return ordinals[num]
 	}
 
-	return strconv.Itoa(num) + ordinalDictionary[num]
+	suffix := "th"
+	switch num % 10 {
+	case 1:
+		if num%100 != 11 {
+			suffix = "st"
+		}
+	case 2:
+		if num%100 != 12 {
+			suffix = "nd"
+		}
+	case 3:
+		if num%100 != 13 {
+			suffix = "rd"
+		}
+	}
+
+	return strconv.Itoa(num) + suffix
 }
 
 // New creates an instance of a Metric and returns a pointer to it.
