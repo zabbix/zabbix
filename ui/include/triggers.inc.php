@@ -699,12 +699,16 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 				$triggers_by_name[$trigger_name] = [];
 			}
 
-			if (count($triggers_by_name) >= (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE)) {
-				$exceeded_trigs = true;
-				break 2;
+			if (count($triggers_by_name) < (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE)) {
+				if (!array_key_exists($trigger_name, $triggers_by_name)) {
+					$triggers_by_name[$trigger_name] = [];
+				}
+
+				$triggers_by_name[$trigger_name][$host['hostid']] = $trigger['triggerid'];
 			}
 			else {
-				$triggers_by_name[$trigger_name][$host['hostid']] = $trigger['triggerid'];
+				$exceeded_trigs = true;
+				break 2;
 			}
 		}
 	}
