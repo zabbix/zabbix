@@ -1008,7 +1008,7 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
  *
  * @return array
  */
-function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$items_by_key, int $show_suppressed): array {
+function getDataOverviewCellData(array $db_hosts, array $db_items, array &$items_by_key, int $show_suppressed): array {
 	$visible_items = [];
 	foreach ($items_by_key as $key => $hostid_to_itemids) {
 		foreach ($hostid_to_itemids as $itemid) {
