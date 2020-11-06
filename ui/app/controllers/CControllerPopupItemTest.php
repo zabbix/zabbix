@@ -184,6 +184,8 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'parameters' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
