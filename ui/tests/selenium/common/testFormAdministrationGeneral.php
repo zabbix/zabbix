@@ -51,7 +51,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	public function executeSimpleUpdate() {
 		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_path)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 		$values = $form->getFields()->asValues();
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -73,21 +73,20 @@ class testFormAdministrationGeneral extends CWebTest {
 	 */
 	public function executeResetButtonTest($other = false) {
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_path)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 		// Reset form in case of some previous scenario.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults', $other);
 		$default_sql = CDBHelper::getRow('SELECT * FROM config');
 
 		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		foreach (['Reset defaults', 'Cancel'] as $action) {
+		foreach (['Cancel','Reset defaults'] as $action) {
 			// Fill form with custom data.
 			$form->fill($this->custom);
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
 			// Check custom data in form.
-			$this->page->refresh();
-			$this->page->waitUntilReady();
+			$this->page->refresh()->waitUntilReady();
 			$form->invalidate();
 			$form->checkValue($this->custom);
 			$this->resetConfiguration($form, $this->default, $action, $other, $this->custom);
@@ -102,11 +101,12 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param element  $form      Settings configuration form
 	 * @param array    $default   Default form values
 	 * @param string   $action    Reset defaults or Cancel
+	 * @param boolean  $other     Is this Other parameters form or not
 	 * @param array    $custom    Custom values for filling into settings form
 	 */
 	public function resetConfiguration($form, $default, $action, $other = false, $custom = null) {
 		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
+		COverlayDialogElement::find()->waitUntilReady()->one()->query('button', $action)->one()->click();
 		switch ($action) {
 			case 'Reset defaults':
 				if ($other) {
@@ -132,6 +132,7 @@ class testFormAdministrationGeneral extends CWebTest {
 				// Check reset form.
 				$form->checkValue($default);
 				break;
+
 			case 'Cancel':
 				$form->checkValue($custom);
 				break;
@@ -146,29 +147,29 @@ class testFormAdministrationGeneral extends CWebTest {
 	 */
 	public function executeCheckForm($data, $other = false) {
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_path)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults', $other);
 		// Fill form with new data.
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
+		$message = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
 			? 'Configuration updated'
 			: 'Cannot update configuration';
 		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
 		// Check saved configuration in frontend.
-		$this->page->open($this->config_link);
+		$this->page->refresh();
 		$form->invalidate();
 		// Check trimming symbols in Login attempts field.
-		if ((CTestArrayHelper::get($data['fields'], 'Login attempts')) === '3M') {
+		if (CTestArrayHelper::get($data['fields'], 'Login attempts') === '3M') {
 			$data['fields']['Login attempts'] = '3';
 		}
 		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
 		$form->checkValue($values);
 		// Check saved configuration in database.
 		$sql = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
+		$db = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
 			? CTestArrayHelper::get($data, 'db', [])
 			: $this->db_default;
 		foreach ($db as $key => $value) {

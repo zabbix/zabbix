@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -105,7 +104,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Other configuration parameters');
 		$this->assertPageHeader('Other configuration parameters');
-		$form = $this->query($this->form_path)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 
 		foreach (['Authorization', 'Security', 'Communication with Zabbix server'] as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());

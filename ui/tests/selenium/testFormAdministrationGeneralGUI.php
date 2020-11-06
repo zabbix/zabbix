@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -978,7 +977,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	 */
 	public function testFormAdministrationGeneralGUI_CheckSavedValues($data) {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults');
 		// Fill nesessary settings.
@@ -1006,7 +1005,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 			case 'Max count of elements to show inside table cell':
 					$element_count = $table->findRow('Name', 'Template Module Cisco CISCO-ENVMON-MIB SNMP')
-						->getColumn('Linked to templates')->query('xpath://a[@class="link-alt grey"]')->all()->count();
+							->getColumn('Linked to templates')->query('xpath://a[@class="link-alt grey"]')->all()->count();
 					$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
 				break;
 

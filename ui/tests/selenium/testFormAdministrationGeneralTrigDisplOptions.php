@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -116,10 +115,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * Test for checking form layout.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=trigdisplay.edit');
+		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Configuration of trigger displaying options');
 		$this->assertPageHeader('Trigger displaying options');
-		$form = $this->query('xpath://form[contains(@action, "trigdisplay.update")]')->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 
 		$limits = [
 			'problem_unack_color' => 6,
@@ -175,19 +174,19 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		foreach ($colorpickers as $colorpicker) {
 			$this->query('id', $colorpicker)->one()->click();
 			$overlay = $this->query('id:color_picker')->waitUntilVisible()->asOverlayDialog()->one();
-			$this->assertTrue($overlay->isPresent());
 			$overlay->close();
 		}
+
+		$event_colors = [
+			'problem_unack_color',
+			'problem_ack_color',
+			'ok_unack_color',
+			'ok_ack_color'
+		];
 
 		foreach ([true, false] as $status) {
 			$form->fill(['Use custom event status colours' => $status]);
 
-			$event_colors = [
-				'problem_unack_color',
-				'problem_ack_color',
-				'ok_unack_color',
-				'ok_ack_color'
-			];
 			foreach ($event_colors as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
@@ -823,7 +822,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
-			],
+			]
 		];
 	}
 

@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -105,46 +104,51 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	 * Test for checking form layout.
 	 */
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=housekeeping.edit');
+		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Configuration of housekeeping');
 		$this->assertPageHeader('Housekeeping');
-		$form = $this->query('id:housekeeping')->waitUntilPresent()->asForm()->one();
+		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
 
 		$headers = ['Events and alerts', 'Services', 'Audit', 'User sessions', 'History', 'Trends'];
 		foreach ($headers as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
 		}
 
+		$checkboxes = [
+			'hk_events_mode',
+			'hk_services_mode',
+			'hk_audit_mode',
+			'hk_sessions_mode',
+			'hk_history_mode',
+			'hk_history_global',
+			'hk_trends_mode',
+			'hk_trends_global'
+		];
+
+		$inputs = [
+			'hk_events_trigger',
+			'hk_events_internal',
+			'hk_events_discovery',
+			'hk_events_autoreg',
+			'hk_services',
+			'hk_audit',
+			'hk_sessions',
+			'hk_history',
+			'hk_trends'
+		];
+
 		foreach ([true, false] as $status) {
-			$checkboxes = [
-				'hk_events_mode',
-				'hk_services_mode',
-				'hk_audit_mode',
-				'hk_sessions_mode',
-				'hk_history_mode',
-				'hk_history_global',
-				'hk_trends_mode',
-				'hk_trends_global'
-			];
+
 			foreach ($checkboxes as $checkbox) {
-				$this->assertTrue($this->query('id', $checkbox)->one()->isEnabled());
-				$form->getField('id:'.$checkbox)->fill($status);
+				$checkbox = $form->getField('id:'.$checkbox);
+				$this->assertTrue($checkbox->isEnabled());
+				$checkbox->fill($status);
 			}
 
-			$inputs = [
-				'hk_events_trigger',
-				'hk_events_internal',
-				'hk_events_discovery',
-				'hk_events_autoreg',
-				'hk_services',
-				'hk_audit',
-				'hk_sessions',
-				'hk_history',
-				'hk_trends'
-			];
 			foreach ($inputs as $input) {
-				$this->assertEquals(32, $this->query('id', $input)->one()->getAttribute('maxlength'));
-				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
+				$input = $this->query('id', $input)->one();
+				$this->assertEquals(32, $input->getAttribute('maxlength'));
+				$this->assertTrue($input->isEnabled($status));
 			}
 		}
 
@@ -1141,7 +1145,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 					]
 				]
 			],
-			// Minimal invalid values in seconds with 's'.
+			// Minimal invalid values in seconds without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
