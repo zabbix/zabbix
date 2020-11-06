@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # A script to generate SQL from PNG images
-# depends on hexdump
+# depends on hexdump  and base64
 
 scriptdir="$(dirname $0)"
 pngdir="${1:-png_modern}"
@@ -13,9 +13,9 @@ imagefile_pgsql="$sqlbasedir/postgresql/$imagefile"
 imagefile_sqlite3="$sqlbasedir/sqlite3/$imagefile"
 imagefile_oracle="$sqlbasedir/oracle/$imagefile"
 
-oracle_sring_max=2048
+oracle_string_max=2048
 oracle_line_max=15
-base64tmp=tmp_b64
+oracle_base64tmp=tmp_b64
 
 for imagefile in "$imagefile_mysql" "$imagefile_pgsql" "$imagefile_sqlite3" "$imagefile_oracle"; do
 	[[ -s "$imagefile" ]] && {
@@ -36,22 +36,22 @@ for imagefile in $pngdir/*.png; do
 	((imagesdone++))
 	imagename="$(basename "${imagefile%.png}")"
 	image_data=$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")
-	base64 -w$oracle_sring_max "$imagefile" > $base64tmp
-	split -l$oracle_line_max $base64tmp $base64tmp
-	rm -rf $base64tmp
 
 	# ----- MySQL
 	echo "INSERT INTO \`images\` (\`imageid\`,\`imagetype\`,\`name\`,\`image\`) VALUES ($imagesdone,1,'$imagename',0x$image_data);" >> "$imagefile_mysql"
 	# ----- PostgreSQL
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$image_data','hex'));" >> "$imagefile_pgsql"
 	# ----- Oracle
+	base64 -w$oracle_string_max "$imagefile" > $oracle_base64tmp
+	split -l$oracle_line_max $oracle_base64tmp $oracle_base64tmp
+	rm -f $oracle_base64tmp
 	echo -e "\tl_clob := EMPTY_CLOB();" >> "$imagefile_oracle"
-	for oracle_imagefile in $base64tmp*; do
-		image_data_oracle=$(cat "$oracle_imagefile")
+	for oracle_imagefile in $oracle_base64tmp*; do
+		image_data_oracle=$(grep "" "$oracle_imagefile")
 		echo -e "\tl_clob := l_clob || '$image_data_oracle';" >> "$imagefile_oracle"
 		rm -rf $oracle_imagefile
 	done
-	echo -e "\tINSERT INTO images VALUES ($imagesdone,1,'$imagename',base64decode(l_clob));"  >> "$imagefile_oracle"
+	echo -e "\tINSERT INTO images VALUES ($imagesdone,1,'$imagename',base64_decode(l_clob));"  >> "$imagefile_oracle"
 	# ----- SQLite
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$image_data');" >> "$imagefile_sqlite3"
 
