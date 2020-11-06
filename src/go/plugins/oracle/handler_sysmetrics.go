@@ -34,9 +34,10 @@ const (
 )
 
 func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var sysmetrics string
-
-	var groupID = duration60sec
+	var (
+		sysmetrics string
+		groupID    = duration60sec
+	)
 
 	if len(params) > sysMetricsMaxParams {
 		return nil, zbxerr.ErrorTooManyParameters
@@ -55,7 +56,10 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 
 	row, err := conn.Query(ctx, `
 		SELECT
-		JSON_OBJECTAGG( METRIC_NAME VALUE ROUND(VALUE, 3) RETURNING CLOB )
+			JSON_OBJECTAGG(
+				METRIC_NAME VALUE ROUND(VALUE, 3) 
+				RETURNING CLOB
+			)
 		FROM
 			V$SYSMETRIC
 		WHERE
