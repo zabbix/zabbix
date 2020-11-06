@@ -119,22 +119,22 @@ zabbix_export:
                           url: '{$AMI.URL}',
                           trunk: '{$AMI.TRUNK_REGEXP}'
                       },
-                      api_request: new CurlHttpRequest(),
+                      api_request: new HttpRequest(),
                   
                       request: function (url, action) {
                           url += action;
-                          Zabbix.Log(4, '[ Asterisk ] Sending request: ' + url);
+                          Zabbix.log(4, '[ Asterisk ] Sending request: ' + url);
                           try {
-                              response = Ami.api_request.Get(url);
+                              response = Ami.api_request.get(url);
                           } catch (error) {
-                              Zabbix.Log(4, '[ Asterisk ] Get request returned error ' + error);
+                              Zabbix.log(4, '[ Asterisk ] Get request returned error ' + error);
                               throw 'Get request returned error ' + error + '. Check debug log for more information.';
                           }
-                          Zabbix.Log(4, '[ Asterisk ] Received response with status code ' +
-                              Ami.api_request.Status() + '\n' + response);
+                          Zabbix.log(4, '[ Asterisk ] Received response with status code ' +
+                              Ami.api_request.getStatus() + '\n' + response);
                   
-                          if (Ami.api_request.Status() !== 200) {
-                              var message = 'Request failed with status code ' + Ami.api_request.Status();
+                          if (Ami.api_request.getStatus() !== 200) {
+                              var message = 'Request failed with status code ' + Ami.api_request.getStatus();
                               if (response !== null) {
                                   if (typeof response.message === 'string') {
                                       message += ': ' + response.message;
@@ -157,7 +157,7 @@ zabbix_export:
                           }
                   
                           return {
-                              status: Ami.api_request.Status(),
+                              status: Ami.api_request.getStatus(),
                               body: response
                           };
                       }
@@ -227,7 +227,7 @@ zabbix_export:
                   
                   var url = Ami.params.url.split('?')[0] + '?action=';
                   
-                  Ami.api_request.AddHeader('Cookie: mansession_id="' + cookie[1] + '"');
+                  Ami.api_request.addHeader('Cookie: mansession_id="' + cookie[1] + '"');
                   
                   var response = Ami.request(url, 'CoreSettings');
                   var coreSettings = block2Object(response.body);

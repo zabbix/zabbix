@@ -2995,7 +2995,6 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char 
 						else
 							*replace_to = zbx_strdcat(*replace_to, STR_UNKNOWN_VARIABLE);
 					}
-
 					ZBX_FALLTHROUGH;
 				case ZBX_TOKEN_USER_MACRO:
 				case ZBX_TOKEN_SIMPLE_MACRO:
@@ -3074,9 +3073,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_LLD_MACRO:
-				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				/* neither lld nor {123123} macros are processed by this function, skip them */
 				pos = token.loc.r + 1;
@@ -3127,7 +3124,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				m = NULL;
 				break;
 			case ZBX_TOKEN_REFERENCE:
-				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_EXPRESSION_MACRO:
 				/* These macros (and probably all other in the future) must be resolved using only */
 				/* information stored in token.data union. For now, force crash if they rely on m. */
