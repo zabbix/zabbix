@@ -1,0 +1,1817 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-10-22T11:21:21Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template APP Apache Kafka by JMX</template>
+         <name>Template APP Apache Kafka by JMX</name>
+         <description>Official JMX Template for Apache Kafka.&#13;
+  The metrics are collected by JMX.&#13;
+  You can set {$KAFKA.USER} and {$KAFKA.PASSWORD} macros in the template for using on the host level.&#13;
+&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Kafka</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Kafka: Leader election per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of leader elections per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Unclean leader election per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of “unclean” elections per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&gt;0</expression>
+                     <name>Kafka: Unclean leader election detected</name>
+                     <priority>AVERAGE</priority>
+                     <description>Unclean leader elections occur when there is no qualified partition leader among Kafka brokers. If Kafka is configured to allow an unclean leader election, a leader is chosen from the out-of-sync replicas, and any messages that were not synced prior to the loss of the former leader are lost forever. Essentially, unclean leader elections sacrifice consistency for availability.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Controller state on broker</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=KafkaController,name=ActiveControllerCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>One indicates that the broker is the controller for the cluster.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Kafka controller state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Offline partitions count</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=KafkaController,name=OfflinePartitionsCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of partitions that don't have an active leader.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()} &gt; 0</expression>
+                     <name>Kafka: One or more partitions have no leader</name>
+                     <priority>WARNING</priority>
+                     <description>Any partition without an active leader will be completely inaccessible, and both consumers and producers of that partition will be blocked until a leader becomes available.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Ineligible pending replica deletes</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=KafkaController,name=ReplicasIneligibleToDeleteCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of ineligible pending replica deletes.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Pending replica deletes</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=KafkaController,name=ReplicasToDeleteCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of pending replica deletes.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Ineligible pending topic deletes</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=KafkaController,name=TopicsIneligibleToDeleteCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of ineligible pending topic deletes.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Pending topic deletes</name>
+               <type>JMX</type>
+               <key>jmx["kafka.controller:type=KafkaController,name=TopicsToDeleteCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of pending topic deletes.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Offline log directory count</name>
+               <type>JMX</type>
+               <key>jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of offline log directories (for example, after a hardware failure).</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()} &gt; 0</expression>
+                     <name>Kafka: There are offline log directories</name>
+                     <priority>WARNING</priority>
+                     <description>The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer response send time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The time taken, in milliseconds, to send the response for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer response send time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The time taken, in milliseconds, to send the response for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer response send time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time taken, in milliseconds, to send the response.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Follower response send time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The time taken, in milliseconds, to send the response for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Follower response send time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The time taken, in milliseconds, to send the response for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Follower response send time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time taken, in milliseconds, to send the response.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce response send time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The time taken, in milliseconds, to send the response for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce response send time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The time taken, in milliseconds, to send the response for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce response send time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time taken, in milliseconds, to send the response.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Temporary memory size in bytes (Fetch), max</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Max"]</key>
+               <history>7d</history>
+               <units>B</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The maximum of temporary memory used for converting message formats and decompressing messages.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Temporary memory size in bytes (Fetch), avg</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Mean"]</key>
+               <history>7d</history>
+               <units>B</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The amount of temporary memory used for converting message formats and decompressing messages.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Temporary memory size in bytes (Fetch), min</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Mean"]</key>
+               <history>7d</history>
+               <units>B</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The minimum of temporary memory used for converting message formats and decompressing messages.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Temporary memory size in bytes (Produce), max</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Max"]</key>
+               <history>7d</history>
+               <units>B</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The maximum of temporary memory used for converting message formats and decompressing messages.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Temporary memory size in bytes (Produce), avg</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Mean"]</key>
+               <history>7d</history>
+               <units>B</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The amount of temporary memory used for converting message formats and decompressing messages.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Temporary memory size in bytes (Produce), min</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Min"]</key>
+               <history>7d</history>
+               <units>B</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The minimum of temporary memory used for converting message formats and decompressing messages.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer request total time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time in ms to serve the Fetch-Consumer request for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer request total time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time in ms to serve the specified Fetch-Consumer for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer request total time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time in ms to serve the Fetch-Consumer request.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Follower request total time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time in ms to serve the Fetch-Follower request for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Follower request total time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time in ms to serve the Fetch-Follower request for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Follower request total time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time in ms to serve the Fetch-Follower request.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce request total time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time in ms  to serve the Produce requests for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce request total time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time in ms  to serve the Produce requests for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce request total time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time in ms to serve the Produce request.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: UpdateMetadata request total time, p95</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","95thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time for update metadata requests for 95th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: UpdateMetadata request total time, p99</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","99thPercentile"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Time for update metadata requests for 99th percentile.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Fetch-Consumer request total time, mean</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","Mean"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Average time for a request to update metadata.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Network processor average idle percent</name>
+               <type>JMX</type>
+               <key>jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The average percentage of time that the network processors are idle.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>100</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{max(15m)}&lt;{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}</expression>
+                     <name>Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)</name>
+                     <priority>AVERAGE</priority>
+                     <description>The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(15m)}=1</expression>
+                     <name>Kafka: Failed to fetch info data (or no data for 15m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 15 minutes</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Uptime</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=app-info","start-time-ms"]</key>
+               <history>7d</history>
+               <units>s</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Service uptime in seconds.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return (Math.floor((Date.now()-Number(value))/1000))</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Kafka: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Version</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=app-info","version"]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Current version of brocker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Kafka: Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Kafka version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Bytes in per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The rate at which data sent from producers is consumed by the broker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Bytes out per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The rate at which data is fetched and read from the broker by consumers.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Bytes rejected per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The rate at which bytes rejected per second by the broker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Client fetch request failed per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of client fetch request failures per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Produce requests failed per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of failed produce requests per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Messages in per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The rate at which individual messages are consumed by the broker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Requests in producer purgatory</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Fetch","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of requests waiting in producer purgatory.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Requests in fetch purgatory</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Produce","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Number of requests waiting in fetch purgatory.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Request handler average idle percent</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Indicates the percentage of time that the request handler (IO) threads are not in use.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>100</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{max(15m)}&lt;{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}</expression>
+                     <name>Kafka: Request handler average idle percent is too low (under {$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN} for 15m)</name>
+                     <priority>AVERAGE</priority>
+                     <description>The request handler idle ratio metric indicates the percentage of time the request handlers are not in use. The lower this number, the more loaded the broker is.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Replication maximum lag</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaFetcherManager,name=MaxLag,clientId=Replica","Value"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The maximum lag between the time that messages are received by the leader replica and by the follower replicas.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ISR expands per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=IsrExpandsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The rate at which the number of ISRs in the broker increases.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ISR shrink per second</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=IsrShrinksPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Rate of replicas leaving the ISR pool.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Leader count</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=LeaderCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of replicas for which this broker is the leader.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Partition count</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=PartitionCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of partitions in the broker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Number of reassigning partitions</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=ReassigningPartitions","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of reassigning leader partitions on a broker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: Under minimum ISR partition count</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=UnderMinIsrPartitionCount","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of partitions under the minimum In-Sync Replica (ISR) count.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&gt;0</expression>
+                     <name>Kafka: There are partitions under the min ISR</name>
+                     <priority>AVERAGE</priority>
+                     <description>The Under min ISR partitions metric displays the number of partitions, where the number of In-Sync Replicas (ISR) is less than the minimum number of in-sync replicas specified. The two most common causes of under-min ISR partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers are falling behind.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Under replicated partitions</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions","Value"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The number of partitions that have not been fully replicated in the follower replicas (the number of non-reassigning replicas - the number of ISR &gt; 0).</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&gt;0</expression>
+                     <name>Kafka: There are under replicated partitions</name>
+                     <priority>AVERAGE</priority>
+                     <description>The Under replicated partitions metric displays the number of partitions that do not have enough replicas to meet the desired replication factor. A partition will also be considered under-replicated if the correct number of replicas exist, but one or more of the replicas have fallen significantly behind the partition leader. The two most common causes of under-replicated partitions are that one or more brokers is unresponsive, or the cluster is experiencing performance issues and one or more brokers have fallen behind.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: Request queue size</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=Request","queue-size"]</key>
+               <history>7d</history>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>The size of the delay queue.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ZooKeeper connection status</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Connection status of broker's ZooKeeper session.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{regexp("CONNECTED")}=0</expression>
+                     <name>Kafka: Broker is not connected to ZooKeeper</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Kafka: ZooKeeper disconnect rate</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>rps</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>ZooKeeper client disconnect per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ZooKeeper session expiration rate</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>rps</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>ZooKeeper client session expiration  per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ZooKeeper readonly rate</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>rps</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>ZooKeeper client readonly  per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ZooKeeper sync rate</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>rps</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>ZooKeeper client sync  per second.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+            <item>
+               <name>Kafka: ZooKeeper client request latency</name>
+               <type>JMX</type>
+               <key>jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"]</key>
+               <history>7d</history>
+               <units>ms</units>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <description>Latency in millseconds for ZooKeeper requests from broker.</description>
+               <applications>
+                  <application>
+                     <name>Kafka</name>
+                  </application>
+               </applications>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Topic Metrics  (read)</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]</key>
+               <delay>1h</delay>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXTOPIC}</macro>
+                        <value>{$KAFKA.TOPIC.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXTOPIC}</macro>
+                        <value>{$KAFKA.TOPIC.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Kafka {#JMXTOPIC}: Bytes out per second</name>
+                     <type>JMX</type>
+                     <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic={#JMXTOPIC}","Count"]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>Bps</units>
+                     <username>{$KAFKA.USER}</username>
+                     <password>{$KAFKA.PASSWORD}</password>
+                     <description>The rate at which data is fetched and read from the broker by consumers (by topic).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Kafka topic [{#JMXTOPIC}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Topic Metrics (errors)</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic=*"]</key>
+               <delay>1h</delay>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXTOPIC}</macro>
+                        <value>{$KAFKA.TOPIC.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXTOPIC}</macro>
+                        <value>{$KAFKA.TOPIC.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Kafka {#JMXTOPIC}: Bytes rejected per second</name>
+                     <type>JMX</type>
+                     <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic={#JMXTOPIC}","Count"]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <username>{$KAFKA.USER}</username>
+                     <password>{$KAFKA.PASSWORD}</password>
+                     <description>Rejected bytes rate by topic.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Kafka topic [{#JMXTOPIC}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Topic Metrics (write)</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]</key>
+               <delay>1h</delay>
+               <username>{$KAFKA.USER}</username>
+               <password>{$KAFKA.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXTOPIC}</macro>
+                        <value>{$KAFKA.TOPIC.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXTOPIC}</macro>
+                        <value>{$KAFKA.TOPIC.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Kafka {#JMXTOPIC}: Bytes in per second</name>
+                     <type>JMX</type>
+                     <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic={#JMXTOPIC}","Count"]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>Bps</units>
+                     <username>{$KAFKA.USER}</username>
+                     <password>{$KAFKA.PASSWORD}</password>
+                     <description>The rate at which data sent from producers is consumed by topic.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Kafka topic [{#JMXTOPIC}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Kafka {#JMXTOPIC}: Messages in per second</name>
+                     <type>JMX</type>
+                     <key>jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic={#JMXTOPIC}","Count"]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <username>{$KAFKA.USER}</username>
+                     <password>{$KAFKA.PASSWORD}</password>
+                     <description>The rate at which individual messages are consumed by topic.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Kafka topic [{#JMXTOPIC}]</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}</macro>
+               <value>30</value>
+               <description>The minimum Network processor average idle percent for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$KAFKA.PASSWORD}</macro>
+               <value>zabbix</value>
+            </macro>
+            <macro>
+               <macro>{$KAFKA.REQUEST_HANDLER_AVG_IDLE.MIN.WARN}</macro>
+               <value>30</value>
+               <description>The minimum Request handler average idle percent for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$KAFKA.TOPIC.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable topics</description>
+            </macro>
+            <macro>
+               <macro>{$KAFKA.TOPIC.NOT_MATCHES}</macro>
+               <value>__consumer_offsets</value>
+               <description>Filter to exclude discovered topics</description>
+            </macro>
+            <macro>
+               <macro>{$KAFKA.USER}</macro>
+               <value>zabbix</value>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>Kafka: Broker throughput</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec","Count"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: ISR shrinks/expands rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=ReplicaManager,name=IsrShrinksPerSec","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=ReplicaManager,name=IsrExpandsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: Leader electoin rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: Pending deletes</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.controller:type=KafkaController,name=TopicsIneligibleToDeleteCount","Value"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.controller:type=KafkaController,name=TopicsToDeleteCount","Value"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.controller:type=KafkaController,name=ReplicasIneligibleToDeleteCount","Value"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.controller:type=KafkaController,name=ReplicasToDeleteCount","Value"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: Purgatory size</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Fetch","Value"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Produce","Value"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: Requests failed rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: Requests performance</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","95thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","99thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","Mean"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","95thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","99thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","Mean"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>6</sortorder>
+               <color>AC8C14</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","95thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>7</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>611F27</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","99thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>8</sortorder>
+               <color>F230E0</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","Mean"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>9</sortorder>
+               <color>FFAD40</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","95thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>10</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>40CDFF</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","99thPercentile"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>11</sortorder>
+               <color>40FFA0</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","Mean"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: Temporary memory size</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Min"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Mean"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Max"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Mean"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Mean"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Max"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Kafka: ZooKeeper connections rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template APP Apache Kafka by JMX</host>
+                  <key>jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>Kafka controller state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Inactive</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Active</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

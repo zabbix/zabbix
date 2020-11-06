@@ -183,7 +183,7 @@ final class CModuleManager {
 	/**
 	 * Check, instantiate and initialize all added modules.
 	 *
-	 * @return array  List of initalized modules.
+	 * @return array  List of initialized modules.
 	 */
 	public function initModules(): array {
 		[

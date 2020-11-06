@@ -148,8 +148,10 @@ class CControllerScriptEdit extends CController {
 		$usergroups = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name']
 		]);
-		order_result($usergroups, 'name');
-		$data['usergroups'] = $usergroups;
+
+		CArrayHelper::sort($usergroups, ['name']);
+
+		$data['usergroups'] = array_column($usergroups, 'name', 'usrgrpid');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));

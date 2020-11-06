@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-29T09:23:37Z</date>
+   <date>2020-09-14T08:53:21Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -24,7 +24,7 @@ The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -47,49 +47,40 @@ Template tooling version used: 0.37</description>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT object_name, counter_name, instance_name, cntr_value
-FROM sys.dm_os_performance_counters 
-UNION 
-SELECT '{$MSSQL.INSTANCE}' as object_name, 'Version' as counter_name, @@version as instance_name, 0 as cntr_value
-UNION 
-SELECT '{$MSSQL.INSTANCE}' as object_name, 'Uptime' as counter_name, '' as instance_name, 
-DATEDIFF(second, sqlserver_start_time, GETDATE()) as cntr_value
+               <params>SELECT object_name,counter_name,instance_name,cntr_value
+FROM sys.dm_os_performance_counters
+UNION
+SELECT '{$MSSQL.INSTANCE}' as object_name,'Version' as counter_name,@@version as instance_name,0 as cntr_value
+UNION
+SELECT '{$MSSQL.INSTANCE}' as object_name,'Uptime' as counter_name,'' as instance_name,DATEDIFF(second,sqlserver_start_time,GETDATE()) as cntr_value
 FROM sys.dm_os_sys_info
 UNION
-SELECT '{$MSSQL.INSTANCE}:Databases' as object_name, 'State' as counter_name, name as instance_name, state as cntr_value
+SELECT '{$MSSQL.INSTANCE}:Databases' as object_name,'State' as counter_name,name as instance_name,state as cntr_value
 FROM sys.databases
 UNION
-SELECT a.object_name, 'BufferCacheHitRatio' as counter_name, '' as instance_name, 
-cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters  a
-JOIN  (SELECT cntr_value,OBJECT_NAME 
-  FROM sys.dm_os_performance_counters  
-    WHERE counter_name = 'Buffer cache hit ratio base'
-        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME
-WHERE a.counter_name = 'Buffer cache hit ratio'
-AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Buffer Manager'
+SELECT a.object_name,'BufferCacheHitRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters a
+JOIN (SELECT cntr_value,OBJECT_NAME
+FROM sys.dm_os_performance_counters
+WHERE counter_name='Buffer cache hit ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager') b
+ON a.OBJECT_NAME=b.OBJECT_NAME
+WHERE a.counter_name='Buffer cache hit ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Buffer Manager'
 UNION
-SELECT a.object_name, 'WorktablesFromCacheRatio' as counter_name, '' as instance_name, 
-cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters  a
-JOIN  (SELECT cntr_value,OBJECT_NAME 
-  FROM sys.dm_os_performance_counters  
-    WHERE counter_name = 'Worktables From Cache Base'
-        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods') b ON  a.OBJECT_NAME = b.OBJECT_NAME
-WHERE a.counter_name = 'Worktables From Cache Ratio'
-AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Access Methods'
+SELECT a.object_name,'WorktablesFromCacheRatio' as counter_name,'' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters a
+JOIN (SELECT cntr_value,OBJECT_NAME
+FROM sys.dm_os_performance_counters
+WHERE counter_name='Worktables From Cache Base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods') b
+ON a.OBJECT_NAME=b.OBJECT_NAME
+WHERE a.counter_name='Worktables From Cache Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Access Methods'
 UNION
-SELECT a.object_name, 'CacheHitRatio' as counter_name, '_Total' as instance_name, 
-cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
-FROM sys.dm_os_performance_counters  a
-JOIN  (SELECT cntr_value,OBJECT_NAME 
-  FROM sys.dm_os_performance_counters  
-    WHERE counter_name = 'Cache Hit Ratio base'
-        AND OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
-        AND instance_name = '_Total') b ON  a.OBJECT_NAME = b.OBJECT_NAME
-WHERE a.counter_name = 'Cache Hit Ratio'
-  AND a.OBJECT_NAME = '{$MSSQL.INSTANCE}:Plan Cache'
-  AND instance_name = '_Total'</params>
+SELECT a.object_name,'CacheHitRatio' as counter_name,'_Total' as instance_name,cast(a.cntr_value*100.0/b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters a
+JOIN (SELECT cntr_value,OBJECT_NAME
+FROM sys.dm_os_performance_counters
+WHERE counter_name='Cache Hit Ratio base' AND OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total') b
+ON a.OBJECT_NAME=b.OBJECT_NAME
+WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan Cache' AND instance_name='_Total'</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <description>The item gets server global status information.</description>

@@ -103,7 +103,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_VALUECACHE_SIMPLE | ZBX_DIAG_VALUECACHE_MEMORY},
+					{"", ZBX_DIAG_VALUECACHE_SIMPLE | ZBX_DIAG_VALUECACHE_MEMORY},
 					{"items", ZBX_DIAG_VALUECACHE_ITEMS},
 					{"values", ZBX_DIAG_VALUECACHE_VALUES},
 					{"mode", ZBX_DIAG_VALUECACHE_MODE},
@@ -246,7 +246,7 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_LLD_SIMPLE},
+					{"", ZBX_DIAG_LLD_SIMPLE},
 					{"rules", ZBX_DIAG_LLD_RULES},
 					{"values", ZBX_DIAG_LLD_VALUES},
 					{NULL, 0}
@@ -407,7 +407,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_ALERTING_SIMPLE},
+					{"", ZBX_DIAG_ALERTING_SIMPLE},
 					{"alerts", ZBX_DIAG_ALERTING_ALERTS},
 					{NULL, 0}
 					};
@@ -532,6 +532,11 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 		ret = diag_add_lld_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
 		ret = diag_add_alerting_info(jp, json, error);
+	else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
+	{
+		diag_add_locks_info(json);
+		ret = SUCCEED;
+	}
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 

@@ -176,8 +176,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestMultiselectClear('filter_userids_');
-		$this->zbxTestDropdownSelect('filter_action', $this->actions[$action]);
-		$this->zbxTestDropdownSelect('filter_resourcetype', $this->resourcetypes[$resourcetype]);
+		$this->zbxTestDropdownSelectWait('filter_action', $this->actions[$action]);
+		$this->zbxTestDropdownSelectWait('filter_resourcetype', $this->resourcetypes[$resourcetype]);
 
 		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
 		$this->zbxTestCheckHeader('Audit log');
