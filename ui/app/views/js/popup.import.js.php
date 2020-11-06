@@ -84,6 +84,7 @@ function submitPopup(overlay) {
 		if ('errors' in response) {
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
+			form.querySelector('#import_file').value = '';
 		}
 		else {
 			postMessageOk(response['message']);
