@@ -29,5 +29,5 @@ func getSwap() (uint64, uint64, error) {
 		return 0, 0, err
 	}
 
-	return info.Totalswap, info.Freeswap, nil
+	return uint64(info.Totalswap), uint64(info.Freeswap), nil
 }

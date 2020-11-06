@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-04T23:48:14Z</date>
+   <date>2020-10-20T10:51:36Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 IDRAC-MIB-SMIv2&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -228,7 +228,6 @@ This attribute defines the name of the operating system that the hostis running.
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Operating system description has changed</name>
                      <priority>INFO</priority>
                      <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -312,6 +311,7 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -392,6 +392,7 @@ coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</des
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Array Controller Discovery</name>
@@ -482,6 +483,7 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Physical Disk Discovery</name>
@@ -676,6 +678,7 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -727,6 +730,7 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Ambient Discovery</name>
@@ -801,6 +805,7 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
@@ -912,6 +917,7 @@ or&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
@@ -1122,6 +1128,7 @@ Possible values:&#13;
                      </valuemap>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

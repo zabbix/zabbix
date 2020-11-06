@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:17Z</date>
+   <date>2020-10-20T07:14:16Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -18,7 +18,7 @@ TIMETRA-CHASSIS-MIB&#13;
 TIMETRA-SYSTEM-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -139,7 +139,6 @@ The value of sgiCpuUsage indicates the current CPU utilization for the system.</
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Operating system description has changed</name>
                      <priority>INFO</priority>
                      <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -277,6 +276,7 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -324,6 +324,7 @@ Current status of the Fan tray.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -397,6 +398,7 @@ A value of 'deviceStateFailed' represents a condition where at least one monitor
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -467,6 +469,7 @@ The current temperature reading in degrees celsius from this hardware component'
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
