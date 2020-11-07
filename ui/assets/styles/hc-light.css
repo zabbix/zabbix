@@ -2017,6 +2017,9 @@ form.is-loading {
   padding: 5px;
   position: relative; }
 
+.border-left {
+  border-left: 1px solid #888888; }
+
 .margin-top {
   display: block;
   margin: 4px 0 0; }

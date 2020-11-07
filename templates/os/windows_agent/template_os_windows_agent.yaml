@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:38Z'
+  date: '2020-10-23T10:19:46Z'
   groups:
     -
       name: Templates/Modules
@@ -1026,6 +1026,10 @@ zabbix_export:
                     - |
                       return (value=='9223372036854775807' ? 0 : value)
                       
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
             -
@@ -1046,6 +1050,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.Name == "{#IFNAME}")].NetConnectionStatus.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
               master_item:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
               trigger_prototypes:
@@ -1083,26 +1091,18 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.Name == "{#IFNAME}")].AdapterTypeId.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
               master_item:
                 key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
           trigger_prototypes:
             -
               expression: |
-                {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}<0 and {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}>0
-                and (
-                {Windows network by Zabbix agent:net.if.type["{#IFNAME}"].last()}=6 or
-                {Windows network by Zabbix agent:net.if.type["{#IFNAME}"].last()}=7 or
-                {Windows network by Zabbix agent:net.if.type["{#IFNAME}"].last()}=11 or
-                {Windows network by Zabbix agent:net.if.type["{#IFNAME}"].last()}=62 or
-                {Windows network by Zabbix agent:net.if.type["{#IFNAME}"].last()}=69 or
-                {Windows network by Zabbix agent:net.if.type["{#IFNAME}"].last()}=117
-                )
-                and
-                ({Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}<>2)
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: |
-                ({Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}>0 and {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].prev()}>0) or
-                ({Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2)
+                {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}<0 and
+                {Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}>0 and
+                {Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO

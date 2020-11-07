@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:41Z'
+  date: '2020-10-23T09:12:39Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -184,7 +184,6 @@ zabbix_export:
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
-              recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -657,9 +656,9 @@ zabbix_export:
               expression: |
                 {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}
+                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
@@ -670,7 +669,7 @@ zabbix_export:
               expression: |
                 {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"Ambient"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"Ambient"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
@@ -683,9 +682,9 @@ zabbix_export:
                   expression: |
                     {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}
+                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
                   recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
         -
           name: 'Temperature CPU Discovery'
@@ -751,9 +750,9 @@ zabbix_export:
               expression: |
                 {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}
+                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
@@ -764,7 +763,7 @@ zabbix_export:
               expression: |
                 {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"CPU"}
                 or
-                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+                {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"CPU"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
@@ -777,9 +776,9 @@ zabbix_export:
                   expression: |
                     {Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                     or
-                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}
+                    {Dell iDRAC SNMP:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
                   recovery_expression: '{Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
         -
           name: 'Virtual Disk Discovery'
