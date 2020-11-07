@@ -25,9 +25,9 @@ ROW   |3     |Super Admin role|3   |1       |
 ROW   |4     |Guest role      |1   |0       |
 
 TABLE |users
-FIELDS|userid|alias|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|
-ROW   |1     |Admin|Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |
-ROW   |2     |guest|      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|    |0        |15m       |30s    |50           |4     |
+FIELDS|userid|alias|name  |surname      |passwd                                                      |url|autologin|autologout|refresh|rows_per_page|roleid|
+ROW   |1     |Admin|Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|   |1        |0         |30s    |50           |3     |
+ROW   |2     |guest|      |             |$2y$10$89otZrRNmde97rIyzclecuk6LwKAsHN0BcvoOKGjbT.BwMBfm7G06|   |0        |15m       |30s    |50           |4     |
 
 TABLE |hstgrp
 FIELDS|groupid|name                       |internal|flags|
@@ -648,10 +648,10 @@ ROW   |11      |Enabled debug mode       |0         |0           |1         |
 ROW   |12      |No access to the frontend|3         |0           |0         |
 
 TABLE |users_groups
-FIELDS|id  |usrgrpid|userid|
-ROW   |2   |8       |2     |
-ROW   |3   |9       |2     |
-ROW   |4   |7       |1     |
+FIELDS|id|usrgrpid|userid|
+ROW   |2 |8       |2     |
+ROW   |3 |9       |2     |
+ROW   |4 |7       |1     |
 
 TABLE |scripts
 FIELDS|scriptid|name                   |command                                                       |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
