@@ -35,41 +35,6 @@ static sigset_t		orig_mask;
 
 /******************************************************************************
  *                                                                            *
- * Function: block_signals                                                    *
- *                                                                            *
- * Purpose: block signals to avoid interruption                               *
- *                                                                            *
- ******************************************************************************/
-static	void	block_signals(void)
-{
-	sigset_t	mask;
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGINT);
-	sigaddset(&mask, SIGQUIT);
-
-	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal");
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: unblock_signals                                                  *
- *                                                                            *
- * Purpose: unblock signals after blocking                                    *
- *                                                                            *
- ******************************************************************************/
-static	void	unblock_signals(void)
-{
-	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_db_flush_timer_queue                                         *
  *                                                                            *
  * Purpose: flush timer queue to the database                                 *
@@ -149,13 +114,13 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	zbx_strcpy_alloc(&stats, &stats_alloc, &stats_offset, "started");
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
-	block_signals();
+	block_signals(&orig_mask);
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (1 == process_num)
 		db_trigger_queue_cleanup();
 
-	unblock_signals();
+	unblock_signals(&orig_mask);
 
 	if (SUCCEED == zbx_is_export_enabled())
 	{
@@ -176,13 +141,13 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			zbx_log_sync_history_cache_progress();
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
-		block_signals();
+		block_signals(&orig_mask);
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();
 
-		unblock_signals();
+		unblock_signals(&orig_mask);
 
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
@@ -222,14 +187,14 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "exitting");
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
-	block_signals();
+	block_signals(&orig_mask);
 	if (SUCCEED != zbx_db_trigger_queue_locked())
 		zbx_db_flush_timer_queue();
 
 	DBclose();
-	unblock_signals();
+	unblock_signals(&orig_mask);
 
 	zbx_log_sync_history_cache_progress();
 

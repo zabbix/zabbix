@@ -33,6 +33,8 @@ void	daemon_stop(void);
 
 int	zbx_sigusr_send(int flags);
 void	zbx_set_sigusr_handler(void (*handler)(int flags));
+void	block_signals(sigset_t *orig_mask);
+void	unblock_signals(const sigset_t *orig_mask);
 
 #define ZBX_IS_RUNNING()	(0 == sig_exiting)
 #define ZBX_DO_EXIT()

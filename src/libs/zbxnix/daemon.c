@@ -441,3 +441,38 @@ int	zbx_sigusr_send(int flags)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: block_signals                                                    *
+ *                                                                            *
+ * Purpose: block signals to avoid interruption                               *
+ *                                                                            *
+ ******************************************************************************/
+void	block_signals(sigset_t *orig_mask)
+{
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: unblock_signals                                                  *
+ *                                                                            *
+ * Purpose: unblock signals after blocking                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	unblock_signals(const sigset_t *orig_mask)
+{
+	if (0 > sigprocmask(SIG_SETMASK, orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
+}

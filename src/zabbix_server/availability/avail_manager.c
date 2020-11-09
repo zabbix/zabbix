@@ -30,6 +30,7 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+static sigset_t		orig_mask;
 
 #define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
 #define ZBX_IPC_AVAILABILITY_REQUEST	1
@@ -130,20 +131,48 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				continue;
 
 			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-			zbx_sql_add_host_availabilities(&host_availabilities);	// todo process termination
+			block_signals(&orig_mask);
+			zbx_sql_add_host_availabilities(&host_availabilities);
+			unblock_signals(&orig_mask);
 			processed_num = host_availabilities.values_num;
 			zbx_vector_ptr_clear_ext(&host_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
 		}
 	}
 
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
+	block_signals(&orig_mask);
+	zbx_sql_add_host_availabilities(&host_availabilities);
+	DBclose();
+	unblock_signals(&orig_mask);
+	zabbix_log(LOG_LEVEL_INFORMATION, "EXITTING");
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
 
 void	availability_send(unsigned char *data, zbx_uint32_t size)
+{
+	static zbx_ipc_socket_t	socket;
+
+	/* each process has a permanent connection to availability manager */
+	if (0 == socket.fd)
+	{
+		char	*error = NULL;
+
+		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_AVAILABILITY, SEC_PER_MIN, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_AVAILABILITY_REQUEST, data, size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void	availability_stop(unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
 
