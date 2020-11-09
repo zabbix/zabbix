@@ -125,6 +125,10 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		if (ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
 		{
 			time_flush = time_now;
+
+			if (0 == host_availabilities.values_num)
+				continue;
+
 			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
 			zbx_sql_add_host_availabilities(&host_availabilities);	// todo process termination
 			processed_num = host_availabilities.values_num;
