@@ -39,7 +39,7 @@
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		(new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', null, null, $data['icon_list']))
 			->setId('iconmap_mappings_#{iconmappingid}_iconid')
-			->addClass('mappingIcon'),
+			->addClass('js-mapping-icon'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['default_imageid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 				'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
@@ -129,7 +129,7 @@
 				}
 				recalculateSortOrder();
 			})
-			.on('change', 'select.mappingIcon, select#iconmap_default_iconid', function() {
+			.on('change', 'z-select.js-mapping-icon, z-select#iconmap_default_iconid', function() {
 				$(this).closest('tr').find('.preview')
 					.attr('src', 'imgstore.php?&width=<?= ZBX_ICON_PREVIEW_WIDTH ?>&height=<?= ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + $(this).val())
 					.data('imageFull', 'imgstore.php?iconid=' + $(this).val());
