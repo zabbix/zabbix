@@ -412,7 +412,7 @@ if ($data['prototype']) {
 					'name' => 'application_prototypes[]',
 					'object_name' => 'application_prototypes',
 					'add_new' => true,
-					'data' => $data['application_prototypes'],
+					'data' => [],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'application_prototypes',

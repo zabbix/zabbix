@@ -593,7 +593,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				$data['hosts'] = reset($data['hosts']);
 
 				// Sort interfaces to be listed starting with one selected as 'main'.
-				if (is_array($data['hosts']['interface'])) {
+				if (array_key_exists('interface', $data['hosts']) && is_array($data['hosts']['interface'])) {
 					CArrayHelper::sort($data['hosts']['interfaces'], [
 						['field' => 'main', 'order' => ZBX_SORT_DOWN]
 					]);
