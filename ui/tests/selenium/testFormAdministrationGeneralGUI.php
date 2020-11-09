@@ -986,27 +986,23 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 		// Check saved settings.
 		$this->page->open($data['link']);
 
-		switch (array_keys($data['field'])) {
+		switch ((array_keys($data['field']))[0]) {
 			case 'Default theme':
 				$this->assertEquals($data['color'], $this->query('button:Import')->waitUntilPresent()
-					->one()->getCSSValue('background-color'));
+						->one()->getCSSValue('background-color'));
 				break;
 
 			case 'Limit for search and filter results':
 			case 'Max number of columns and rows in overview tables':
-			case 'Max count of elements to show inside table cell':
 				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-				break;
-
-			case 'Limit for search and filter results':
-			case 'Max number of columns and rows in overview tables':
 				$this->assertEquals($data['row_count'], $table->getRows()->count());
 				break;
 
 			case 'Max count of elements to show inside table cell':
-					$element_count = $table->findRow('Name', 'Template Module Cisco CISCO-ENVMON-MIB SNMP')
-							->getColumn('Linked to templates')->query('xpath://a[@class="link-alt grey"]')->all()->count();
-					$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
+				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
+				$element_count = $table->findRow('Name', 'Alcatel Timetra TiMOS SNMP')->getColumn('Linked templates')
+						->query('xpath:.//a[@class="link-alt grey"]')->all()->count();
+				$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
 				break;
 
 			case 'Time filter default period':
@@ -1017,7 +1013,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				$this->query('id:from')->one()->fill('now-5y');
 				$this->query('button:Apply')->one()->click();
 				$this->assertEquals('Maximum time period to display is 366 days.',
-						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+				$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
 				break;
 		}
 	}
