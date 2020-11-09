@@ -41,7 +41,7 @@ func ASMDiskGroupsDiscovery(ctx context.Context, conn OraClient, params []string
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
 					'{#DGNAME}' VALUE NAME
-				)
+				) RETURNING CLOB 
 			) LLD
 		FROM
 			V$ASM_DISKGROUP
