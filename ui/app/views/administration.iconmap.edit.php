@@ -72,8 +72,10 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 				->setAttribute('maxlength', 64),
-			(new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid'], null, $data['icon_list']))
-				->addClass('mappingIcon'),
+			(new CSelect('iconmap[mappings]['.$i.'][iconid]'))
+				->setValue($mapping['iconid'])
+				->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
+				->addClass('js-mapping-icon'),
 			(new CCol(
 				(new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 					'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
@@ -104,8 +106,10 @@ $table
 	]))->setId('iconMapListFooter'))
 	->addRow([
 		(new CCol(_('Default')))->setColSpan(4),
-		(new CComboBox('iconmap[default_iconid]', $data['iconmap']['default_iconid'], null, $data['icon_list']))
-			->addClass('mappingIcon'),
+		(new CSelect('iconmap[default_iconid]'))
+			->setValue($data['iconmap']['default_iconid'])
+			->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
+			->addClass('js-mapping-icon'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].
 				'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
