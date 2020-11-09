@@ -22,7 +22,7 @@
 #include "db.h"
 #include "avail_protocol.h"
 #include "dbcache.h"
-#include "log.h"
+
 void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_host_availability_t *ha)
 {
@@ -92,3 +92,4 @@ void	zbx_avail_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vec
 		}
 	}
 }
+

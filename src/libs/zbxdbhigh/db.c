@@ -3344,6 +3344,41 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 	return (0 != ids->values_num ? SUCCEED : FAIL);
 }
 
+int	zbx_sql_add_availabilities(zbx_vector_ptr_t *hosts)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int	i;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	DBbegin();
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
+				(zbx_host_availability_t *)hosts->values[i]))
+		{
+			continue;
+		}
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+		DBexecute("%s", sql);
+
+	DBcommit();
+
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sql_add_host_availability                                    *

@@ -24,6 +24,9 @@
 #include "zbxipcservice.h"
 #include "avail_manager.h"
 #include "daemon.h"
+#include "dbcache.h"
+#include "zbxalgo.h"
+#include "avail_protocol.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -40,8 +43,9 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			ret;
+	int			ret, processed_num;
 	double			time_stat, time_idle = 0, time_now, time_flush, sec;
+	zbx_vector_ptr_t	am_availabilities;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -50,10 +54,12 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+				server_num, get_process_type_string(process_type), process_num);
+
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -68,6 +74,8 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	time_stat = zbx_time();
 	time_flush = time_stat;
 
+	zbx_vector_ptr_create(&am_availabilities);
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	while (ZBX_IS_RUNNING())
@@ -76,13 +84,14 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-//			zbx_setproctitle("%s #%d [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
-//					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
-//					get_process_type_string(process_type), process_num,
-//					manager.queued_num, manager.processed_num, time_idle, time_now - time_stat);
+			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle "
+					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
+					get_process_type_string(process_type), process_num,
+					am_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
+			processed_num = 0;
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
@@ -96,7 +105,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 		if (NULL != message)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "got message..");
+			zbx_avail_deserialize(message->data, message->size, &am_availabilities);
 			zbx_ipc_message_free(message);
 		}
 
@@ -106,6 +115,9 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		if (ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
 		{
 			time_flush = time_now;
+			zbx_sql_add_availabilities(&am_availabilities); // todo restart tx, todo stopping flush
+			processed_num = am_availabilities.values_num;
+			zbx_vector_ptr_clear_ext(&am_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
 		}
 	}
 

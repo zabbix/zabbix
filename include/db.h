@@ -737,6 +737,7 @@ zbx_host_availability_t;
 
 int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha);
+int	zbx_sql_add_availabilities(zbx_vector_ptr_t *hosts);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 typedef struct
