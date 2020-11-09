@@ -4,7 +4,7 @@ This guide describes how to integrate Zabbix 5.X installation with iTop using th
 Please note that recovery and update operations are supported only for trigger-based events.
 
 ## Setting up iTop
-1\. Create a user for API with profile "REST Services User" or use existing. Make sure the user is able to create tickets in the required ticketing module.
+1\. Create a user for API with profile "REST Services User" or use existing. Make sure the user is able to create tickets in the required ticketing module.<br>
 2\. Get the organization's ID. You can obtain it from URL of organization's profile in *Data administration > Catalog > Organizations*.<br>
 *&lt;itop_url&gt;/pages/UI.php?operation=details&class=Organization&**id=1**&c\[menu\]=Organization*
 
