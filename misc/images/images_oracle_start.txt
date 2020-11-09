@@ -1,4 +1,4 @@
--- this function is taken from https://stackoverflow.com/questions/19539408/error-when-decoding-base-64-to-blob
+-- https://stackoverflow.com/questions/19539408/error-when-decoding-base-64-to-blob
 CREATE OR REPLACE FUNCTION base64_decode(p_content CLOB) RETURN BLOB
 	IS
 		C_CHUNK_SIZE CONSTANT INTEGER := 12000; -- should be a multiple of 4

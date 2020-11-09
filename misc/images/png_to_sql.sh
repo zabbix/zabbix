@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # A script to generate SQL from PNG images
-# depends on hexdump  and base64
+# depends on hexdump and base64
 
 scriptdir="$(dirname $0)"
 pngdir="${1:-png_modern}"
@@ -47,9 +47,8 @@ for imagefile in $pngdir/*.png; do
 	rm -f $oracle_base64tmp
 	echo -e "\tl_clob := EMPTY_CLOB();" >> "$imagefile_oracle"
 	for oracle_imagefile in $oracle_base64tmp*; do
-		image_data_oracle=$(grep "" "$oracle_imagefile")
-		echo -e "\tl_clob := l_clob || '$image_data_oracle';" >> "$imagefile_oracle"
-		rm -rf $oracle_imagefile
+		echo -e "\tl_clob := l_clob || '$(<$oracle_imagefile)';" >> "$imagefile_oracle"
+		rm -f $oracle_imagefile
 	done
 	echo -e "\tINSERT INTO images VALUES ($imagesdone,1,'$imagename',base64_decode(l_clob));"  >> "$imagefile_oracle"
 	# ----- SQLite
