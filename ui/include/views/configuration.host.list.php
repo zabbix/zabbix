@@ -486,7 +486,6 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			// 'host.massupdateform' => ['name' => _('Mass update')],
 			'popup.massupdate.host' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")

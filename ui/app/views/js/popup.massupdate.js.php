@@ -27,6 +27,10 @@
 // Initialized massupdate form tabs.
 $('#tabs').tabs();
 
+$('#tabs').on('tabsactivate', (event, ui) => {
+	$('#tabs').resize();
+});
+
 // Host groups.
 <?php if (CWebUser:: getType() == USER_TYPE_SUPER_ADMIN): ?>
 (() => {

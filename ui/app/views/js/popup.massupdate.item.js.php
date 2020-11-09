@@ -46,11 +46,14 @@
 			return organizeInterfaces(interface_ids_by_types, item_interface_types, <?= json_encode($data['initial_item_type']) ?>);
 		}
 
-		return organizeInterfaces(interface_ids_by_types, item_interface_types, obj.value);
+		return organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(obj.value));
 	};
 
 	obj.addEventListener('change', cb);
 	obj.dispatchEvent(new CustomEvent('change', {}));
+
+	document.querySelector('#visible_type').addEventListener('click', cb);
+	document.querySelector('#visible_interfaceid').addEventListener('click', cb);
 })();
 
 // History mode.
