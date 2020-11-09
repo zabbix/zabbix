@@ -64,7 +64,7 @@ type unitJson struct {
 	JobID         uint32 `json:"{#UNIT.JOBID}"`
 	JobType       string `json:"{#UNIT.JOBTYPE}"`
 	JobPath       string `json:"{#UNIT.JOBPATH}"`
-	UnitFileState string `json:"{#UNIT.FILESTATE}"`
+	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
 }
 
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
