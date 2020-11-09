@@ -278,7 +278,7 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_HV_IP(nicType, addr)									\
 	ZBX_XPATH_PROP_NAME("config.virtualNicManagerInfo.netConfig")					\
 		"/*[local-name()='VirtualNicManagerNetConfig'][*[local-name()='nicType'][text()='"	\
-		nicType "']]//*[local-name()='" addr "']"
+		nicType "']]//*[local-name()='ip']/*[local-name()='" addr "']"
 
 #define ZBX_XPATH_EVT_INFO(param)									\
 	"*[local-name()='" param "']/*[local-name()='name']"
@@ -354,7 +354,11 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_PROPMAP("summary.storage.committed"),		/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
 	ZBX_PROPMAP("summary.storage.unshared"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
 	ZBX_PROPMAP("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
-	ZBX_PROPMAP("summary.quickStats.uptimeSeconds")		/* ZBX_VMWARE_VMPROP_UPTIME */
+	ZBX_PROPMAP("summary.quickStats.uptimeSeconds"),	/* ZBX_VMWARE_VMPROP_UPTIME */
+	ZBX_PROPMAP("guest.ipAddress"),				/* ZBX_VMWARE_VMPROP_IPADDRESS */
+	ZBX_PROPMAP("guest.hostName"),				/* ZBX_VMWARE_VMPROP_GUESTHOSTNAME */
+	ZBX_PROPMAP("guest.guestFamily"),			/* ZBX_VMWARE_VMPROP_GUESTFAMILY */
+	ZBX_PROPMAP("guest.guestFullName")			/* ZBX_VMWARE_VMPROP_GUESTFULLNAME */
 };
 
 /* hypervisor hashset support */
