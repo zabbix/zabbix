@@ -439,6 +439,7 @@ class CControllerPopupMassupdateItem extends CController {
 				'hostid' => $this->getInput('hostid', 0),
 				'delay_flex' => [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]],
 				'multiple_interface_types' => false,
+				'initial_item_type' => null,
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 				'preprocessing_types' => CItem::$supported_preprocessing_types,
 				'displayApplications' => true,
@@ -516,6 +517,7 @@ class CControllerPopupMassupdateItem extends CController {
 				}
 
 					$data['type'] = $this->hasInput('type') ? $data['type'] : $initial_type;
+					$data['initial_item_type'] = $initial_type;
 					$data['multiple_interface_types'] = (count(array_unique($used_interface_types)) > 1);
 				}
 			}
