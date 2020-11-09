@@ -33,6 +33,8 @@
 #include "zbxlld.h"
 #include "events.h"
 #include "zbxvault.h"
+#include "../../zabbix_server/availability/availability.h"
+#include "../../zabbix_server/availability/avail_protocol.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
