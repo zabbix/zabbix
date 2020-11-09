@@ -294,7 +294,6 @@ class CRouter {
 		'map.import.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'overview.php'					=> ['CLegacyAction', null, null],
-		'queue.php'						=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],
 		'screen.import.php'				=> ['CLegacyAction', null, null],
