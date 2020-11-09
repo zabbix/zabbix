@@ -200,6 +200,7 @@ class CRouter {
 		'user.delete'					=> ['CControllerUserDelete',						null,					null],
 		'user.edit'						=> ['CControllerUserEdit',							'layout.htmlpage',		'administration.user.edit'],
 		'user.list'						=> ['CControllerUserList',							'layout.htmlpage',		'administration.user.list'],
+		'queue.details'					=> ['CControllerQueueDetails',						'layout.htmlpage',		'administration.queue.details'],
 		'user.unblock'					=> ['CControllerUserUnblock',						null,					null],
 		'user.update'					=> ['CControllerUserUpdate',						null,					null],
 		'usergroup.create'				=> ['CControllerUsergroupCreate',					null,					null],
