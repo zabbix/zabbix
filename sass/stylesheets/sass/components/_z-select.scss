@@ -12,13 +12,13 @@ z-select,
 		padding: 3px 18px 3px 4px;
 		overflow: hidden;
 		font-size: $font-form-size;
+		line-height: initial;
 		text-align: left;
 		text-overflow: ellipsis;
 		word-break: break-all;
 		white-space: pre;
 		cursor: default;
 		border-radius: 0;
-		line-height: initial;
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
@@ -59,6 +59,8 @@ z-select,
 		li {
 			display: block;
 			height: inherit;
+			box-sizing: border-box;
+			min-height: 24px;
 			padding: 5px;
 			line-height: normal;
 			color: $font-color;
@@ -66,8 +68,6 @@ z-select,
 			word-break: break-all;
 			white-space: pre-wrap;
 			user-select: none;
-			min-height: 24px;
-			box-sizing: border-box;
 
 			&.hover {
 				background-color: $action-hover-color;
