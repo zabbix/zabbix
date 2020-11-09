@@ -54,7 +54,7 @@ switch ($data['type']) {
 		);
 
 		$inline_js .= '$(() => $("#condition-type").on("change",'
-			.'e => reloadPopup($(e.target).closest("form").get(0), "popup.condition.event.corr")));';
+			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.event.corr")));';
 
 		switch ($condition_type) {
 			// Old|New event tag form elements.
@@ -166,7 +166,7 @@ switch ($data['type']) {
 		);
 
 		$inline_js .= '$(() => $("#condition-type").on("change",'
-			.'e => reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")));';
+			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.actions")));';
 
 		switch ($condition_type) {
 			// Trigger form elements.
@@ -645,7 +645,7 @@ switch ($data['type']) {
 		);
 
 		$inline_js .= '$(() => $("#condition-type").on("change",'
-			.'e => reloadPopup($(e.target).closest("form").get(0), "popup.condition.operations")));';
+			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.operations")));';
 
 		// Acknowledge form elements.
 		$operators_options = [];
