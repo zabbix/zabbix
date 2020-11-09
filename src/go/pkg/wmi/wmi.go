@@ -21,6 +21,7 @@ package wmi
 
 import (
 	"errors"
+	"regexp"
 	"runtime"
 
 	"github.com/go-ole/go-ole"
@@ -43,7 +44,7 @@ func (e stopError) Error() string {
 }
 
 type resultWriter interface {
-	write(v *ole.IDispatch) error
+	write(v *ole.IDispatch, query string) error
 }
 
 type valueResult struct {
@@ -99,7 +100,7 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 // * only Key Qualifier column is returned - it means Key Qualifier was explicitly selected and must be returned
 // * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
 //   its Qualifiers_ property list
-func (r *valueResult) write(rs *ole.IDispatch) (err error) {
+func (r *valueResult) write(rs *ole.IDispatch, _ string) (err error) {
 	var propertyKeyFieldValue interface{}
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
@@ -170,43 +171,79 @@ func variantToValue(v *ole.VARIANT) (result interface{}) {
 	return v.ToArray().ToValueArray()
 }
 
-func (r *tableResult) write(rs *ole.IDispatch) (err error) {
+func starPresentInQuery(query string) bool {
+	re := regexp.MustCompile(`[Ss][Ee][Ll][Ee][Cc][Tt][\s]+(.+)[\s]+[Ff][Rr][Oo][Mm]`)
+	match := re.FindStringSubmatch(query)
+	starMatchRegex := regexp.MustCompile(`\*`)
+	starMatches := starMatchRegex.FindAllStringIndex(match[1], -1)
+
+	return 0 < len(starMatches)
+}
+
+// Key Qualifier is always appended to the result from ole, so it gets manually erased
+// from the final result unless 1) star(all elements) was queried or 2) it was explicitly
+// listed in the query
+func (r *tableResult) write(rs *ole.IDispatch, query string) (err error) {
+	var propertyKeyFieldName string
+	var propertyKeyFieldValue interface{}
 	r.data = make([]map[string]interface{}, 0)
+
 	oleErr := oleutil.ForEach(rs, func(v *ole.VARIANT) (err error) {
 		rsRow := make(map[string]interface{})
 		row := v.ToIDispatch()
 		defer row.Release()
 
-		raw, err := row.GetProperty("Properties_")
+		rawProps, err := row.GetProperty("Properties_")
 		if err != nil {
 			return
 		}
-		defer raw.Clear()
-		props := raw.ToIDispatch()
+		defer clearOle(rawProps)
+
+		props := rawProps.ToIDispatch()
 		defer props.Release()
 		err = oleutil.ForEach(props, func(v *ole.VARIANT) (err error) {
-			col := v.ToIDispatch()
-			defer col.Release()
+			propsCol := v.ToIDispatch()
+			defer propsCol.Release()
 
-			name, err := oleutil.GetProperty(col, "Name")
+			propsName, err := oleutil.GetProperty(propsCol, "Name")
 			if err != nil {
 				return
 			}
-			defer name.Clear()
-			val, err := oleutil.GetProperty(col, "Value")
+			defer clearOle(propsName)
+
+			propsVal, err := oleutil.GetProperty(propsCol, "Value")
 			if err != nil {
 				return
 			}
-			defer val.Clear()
-			rsRow[name.ToString()] = variantToValue(val)
+			defer clearOle(propsVal)
+
+			isKeyProperty, err := isPropertyKeyProperty(propsCol)
+			if err != nil {
+				return
+			}
+			if !isKeyProperty {
+				rsRow[propsName.ToString()] = variantToValue(propsVal)
+			} else {
+				propertyKeyFieldName = propsName.ToString()
+				propertyKeyFieldValue = variantToValue(propsVal)
+			}
+
 			return
 		})
+
+		keyFieldNameMatchRegex := regexp.MustCompile(propertyKeyFieldName)
+		keyFieldNameMatches := keyFieldNameMatchRegex.FindAllStringIndex(query, -1)
+
+		if starPresentInQuery(query) || 0 < len(keyFieldNameMatches) {
+			rsRow[propertyKeyFieldName] = propertyKeyFieldValue
+		}
 		r.data = append(r.data, rsRow)
 		return
 	})
 	if _, ok := oleErr.(stopError); !ok {
 		return oleErr
 	}
+
 	return
 }
 
@@ -258,7 +295,8 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 	if count == 0 {
 		return
 	}
-	return w.write(result)
+
+	return w.write(result, query)
 }
 
 // QueryValue returns the value of the first column of the first row returned by the query.
