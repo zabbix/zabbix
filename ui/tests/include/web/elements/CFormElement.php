@@ -102,8 +102,7 @@ class CFormElement extends CElement {
 		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT.'/label')->all();
 
 		foreach ($labels as $key => $label) {
-			$text = $label->getText();
-			if ($text === '') {
+			if ($label->getText() === '') {
 				$element = $this->getFieldByLabelElement($label);
 				if ($element->isValid() && get_class($element) === CCheckboxElement::class) {
 					$labels->set($key, $element->parents()->query('tag:label')->one(false));
@@ -182,7 +181,7 @@ class CFormElement extends CElement {
 	public function getFields() {
 		$fields = [];
 
-		foreach ($this->getLabels($this->filter) as $label) {
+		foreach ($this->getLabels() as $label) {
 			$element = $this->getFieldByLabelElement($label);
 			if ($this->filter !== null && !$this->filter->match($element)) {
 				$element = new CNullElement();

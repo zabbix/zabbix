@@ -151,7 +151,7 @@ class testFormHost extends CWebTest {
 				'interfaces' => $interfaces,
 				'groups' => $groups,
 				'proxy_hostid' => 20001,
-				'status' => HOST_STATUS_MONITORED,
+				'status' => HOST_STATUS_MONITORED
 			],
 			[
 				'host' => 'testFormHost with items',
@@ -203,9 +203,9 @@ class testFormHost extends CWebTest {
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asInterfaceElement();
 		$this->assertEquals(['', 'Type', 'IP address', 'DNS name', 'Connect to', 'Port', 'Default'], $interfaces_form->getHeadersText());
 
-		// "Remove" button disabled for Agent (0th row) and JMX (2th row) interfaces.
 		foreach ($interfaces_form->getRows() as $i => $row) {
-			$enabled = ($i === 0 || $i === 2) ? false : true;
+			$enabled = ($i !== 0 && $i !== 2);
+			// "Remove" button is disabled (in the 7th column) for Agent (in 0th row) and JMX (in 2th row) interfaces.
 			$this->assertTrue($row->getColumn(7)->query('tag:button')->one()->isEnabled($enabled));
 		}
 		// Interface fields maxlength attribute.
@@ -214,7 +214,7 @@ class testFormHost extends CWebTest {
 					->query('tag:input')->one()->getAttribute('maxlength'));
 		}
 
-		// The SNMP interface has specific fields depending on the SNMP version and protocol.
+		// Click the "expand" icon (in the 0th column) for the SNMP interface (1th row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath://ul[@class="table-forms"]')->asForm(['normalized' => true])->one();
 		$data = [
@@ -225,6 +225,7 @@ class testFormHost extends CWebTest {
 				'Authentication protocol', 'Authentication passphrase', 'Use bulk requests'
 			]
 		];
+		// The SNMP interface has specific fields depending on the SNMP version and protocol.
 		foreach ($data as $field => $labels) {
 			$select = ($field === 'authNoPriv') ? 'Security level' : 'SNMP version';
 			$form->fill([$select => $field]);
@@ -1581,7 +1582,8 @@ class testFormHost extends CWebTest {
 		$this->query('button', $type)->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		if ($full_clone) {
-			$original_items = CDBHelper::getAll('SELECT name FROM items WHERE itemid IN ('.CDBHelper::escape(array_values(self::$itemids)).')');
+			$original_items = CDBHelper::getAll('SELECT name FROM items WHERE itemid '
+					. 'IN ('.CDBHelper::escape(array_values(self::$itemids)).') ORDER BY name');
 			$cloned_items = $form->getField('Items')->getOptions()->asText();
 			$this->assertEquals(array_column($original_items, 'name'), $cloned_items);
 		}

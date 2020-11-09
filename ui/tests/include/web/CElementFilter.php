@@ -124,7 +124,7 @@ class CElementFilter {
 	/**
 	 * Determine whether this element matches the filter or not.
 	 *
-	 * @param CElement $element		element to be filtered
+	 * @param CElement $element		element to be checked
 	 *
 	 * @return boolean
 	 */

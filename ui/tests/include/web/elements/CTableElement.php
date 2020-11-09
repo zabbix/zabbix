@@ -35,7 +35,7 @@ class CTableElement extends CElement {
 	protected $selectors = [
 		'header' => 'xpath:./thead/tr/th',
 		'row' => 'xpath:./tbody/tr',
-		'column' => 'xpath:./td'
+		'column' => 'xpath:./td|./th'
 	];
 
 	/**
@@ -134,7 +134,7 @@ class CTableElement extends CElement {
 		$table = [];
 		foreach ($this->getRows() as $row) {
 			$data = [];
-			foreach ($row->query($this->selectors['column'].'|./th')->all() as $i => $column) {
+			foreach ($row->query($this->selectors['column'])->all() as $i => $column) {
 				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
 			}
 

@@ -26,23 +26,9 @@ use \Facebook\WebDriver\Remote\RemoteWebElement;
 use \Facebook\WebDriver\Exception\UnrecognizedExceptionException;
 
 /**
- * Interface element.
+ * Host interface element.
  */
 class CInterfaceElement extends CMultifieldTableElement {
-
-	/**
-	 * Interface element selectors.
-	 *
-	 * @var array
-	 */
-	protected $selectors;
-
-	/**
-	 * Field mapping.
-	 *
-	 * @var array
-	 */
-	protected $mapping;
 
 	/**
 	 * @inheritdoc
@@ -82,15 +68,14 @@ class CInterfaceElement extends CMultifieldTableElement {
 		$interface_rows = array_combine($interfaces, $interface_rows);
 
 		// Set the index of row to update.
+		$index = 0;
 		switch ($values['type']) {
-			case 'Agent':
-				$index = $interface_rows['agent'];
-				break;
-			case 'SNMP':
-				$index = $interface_rows['agent'] + $interface_rows['SNMP'];
-				break;
 			case 'JMX':
-				$index = $interface_rows['agent'] + $interface_rows['SNMP'] + $interface_rows['JMX'];
+				$index += $interface_rows['JMX'];
+			case 'SNMP':
+				$index += $interface_rows['SNMP'];
+			case 'Agent':
+				$index += $interface_rows['agent'];
 				break;
 			case 'IPMI':
 				$index = $rows;
@@ -174,7 +159,7 @@ class CInterfaceElement extends CMultifieldTableElement {
 		if ($form->isValid()) {
 			// Expand row for SNMP interface.
 			$button = $row->getColumn(0)->query('tag:button')->one();
-			if ($button->getAttribute('title') === 'Expand' || $button->getAttribute('title') === '') {
+			if (in_array($button->getAttribute('title'), ['', 'Expand'])) {
 				$button->click();
 			}
 
