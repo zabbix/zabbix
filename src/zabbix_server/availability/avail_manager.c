@@ -115,7 +115,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		if (ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
 		{
 			time_flush = time_now;
-			zbx_sql_add_availabilities(&am_availabilities); // todo restart tx, todo stopping flush
+			zbx_sql_add_availabilities(&am_availabilities);	// todo restart tx, todo stopping flush
 			processed_num = am_availabilities.values_num;
 			zbx_vector_ptr_clear_ext(&am_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
 		}
