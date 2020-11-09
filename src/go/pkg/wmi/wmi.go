@@ -172,8 +172,11 @@ func variantToValue(v *ole.VARIANT) (result interface{}) {
 }
 
 func starPresentInQuery(query string) bool {
-	re := regexp.MustCompile(`[Ss][Ee][Ll][Ee][Cc][Tt][\s]+(.+)[\s]+[Ff][Rr][Oo][Mm]`)
+	re := regexp.MustCompile(`[Ss][Ee][Ll][Ee][Cc][Tt][\s]*(.+)[\s]*[Ff][Rr][Oo][Mm]`)
 	match := re.FindStringSubmatch(query)
+	if nil == match {
+		return false
+	}
 	starMatchRegex := regexp.MustCompile(`\*`)
 	starMatches := starMatchRegex.FindAllStringIndex(match[1], -1)
 
@@ -221,11 +224,15 @@ func (r *tableResult) write(rs *ole.IDispatch, query string) (err error) {
 			if err != nil {
 				return
 			}
-			if !isKeyProperty {
-				rsRow[propsName.ToString()] = variantToValue(propsVal)
-			} else {
-				propertyKeyFieldName = propsName.ToString()
-				propertyKeyFieldValue = variantToValue(propsVal)
+
+			variantValue := variantToValue(propsVal)
+			if variantValue != nil {
+				if !isKeyProperty {
+					rsRow[propsName.ToString()] = variantValue
+				} else {
+					propertyKeyFieldName = propsName.ToString()
+					propertyKeyFieldValue = variantValue
+				}
 			}
 
 			return
@@ -237,9 +244,17 @@ func (r *tableResult) write(rs *ole.IDispatch, query string) (err error) {
 		if starPresentInQuery(query) || 0 < len(keyFieldNameMatches) {
 			rsRow[propertyKeyFieldName] = propertyKeyFieldValue
 		}
-		r.data = append(r.data, rsRow)
+		if 0 < len(rsRow) {
+			r.data = append(r.data, rsRow)
+		}
+
 		return
 	})
+
+	if 0 == len(r.data) {
+		return errors.New("No data available.")
+	}
+
 	if _, ok := oleErr.(stopError); !ok {
 		return oleErr
 	}
