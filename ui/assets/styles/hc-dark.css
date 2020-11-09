@@ -861,13 +861,13 @@ z-select,
     padding: 3px 18px 3px 4px;
     overflow: hidden;
     font-size: 1em;
+    line-height: initial;
     text-align: left;
     text-overflow: ellipsis;
     word-break: break-all;
     white-space: pre;
     cursor: default;
-    border-radius: 0;
-    line-height: initial; }
+    border-radius: 0; }
     z-select .focusable::after,
     .z-select .focusable::after {
       content: '';
@@ -899,15 +899,15 @@ z-select,
     .z-select .list li {
       display: block;
       height: inherit;
+      box-sizing: border-box;
+      min-height: 24px;
       padding: 5px;
       line-height: normal;
       color: #ffffff;
       text-overflow: ellipsis;
       word-break: break-all;
       white-space: pre-wrap;
-      user-select: none;
-      min-height: 24px;
-      box-sizing: border-box; }
+      user-select: none; }
       z-select .list li.hover,
       .z-select .list li.hover {
         background-color: #454545; }
