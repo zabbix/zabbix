@@ -65,11 +65,9 @@ function submitPopup(overlay) {
 	formData.append('import_file', file.files.length ? file.files[0] : '');
 
 	// Append all checkboxes to form.
-	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map((elem) => {
-		const name = elem.name;
-		const value = elem.value;
-		formData.append(name, value);
-	});
+	[...form.querySelectorAll('input[type=checkbox]:checked, input[type=hidden]')].map(
+		(elem) => formData.append(elem.name, elem.value)
+	);
 
 	url = new Curl('zabbix.php', false),
 	url.setArgument('action', 'popup.import');

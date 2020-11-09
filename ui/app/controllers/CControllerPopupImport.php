@@ -154,6 +154,8 @@ class CControllerPopupImport extends CController {
 			}
 			unset($rule);
 
+			$result = false;
+
 			if (!isset($_FILES['import_file'])) {
 				error(_('No file was uploaded.'));
 			} else {
@@ -161,7 +163,7 @@ class CControllerPopupImport extends CController {
 				try {
 					$file = new CUploadFile($_FILES['import_file']);
 
-					API::Configuration()->import([
+					$result = API::Configuration()->import([
 						'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
 						'source' => $file->getContent(),
 						'rules' => $request_rules
@@ -174,11 +176,13 @@ class CControllerPopupImport extends CController {
 
 			$output = [];
 
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+			if ($result) {
+				$output = ['message' => _('Imported successfully')];
 			}
 			else {
-				$output = ['message' => _('Imported successfully')];
+				if (($messages = getMessages()) !== null) {
+					$output['errors'] = $messages->toString();
+				}
 			}
 
 			$this->setResponse(
