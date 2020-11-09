@@ -227,7 +227,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 .object-group {
 	margin-bottom: -1px;
 
-	li {
+	>li {
 		float: left;
 		margin-right: 5px;
 

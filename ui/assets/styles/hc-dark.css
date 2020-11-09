@@ -906,8 +906,6 @@ z-select,
       word-break: break-all;
       white-space: pre-wrap;
       user-select: none;
-      float: none;
-      margin-right: 0px;
       min-height: 24px;
       box-sizing: border-box; }
       z-select .list li.hover,
@@ -1080,19 +1078,19 @@ pre, pre a, pre td, pre span {
 
 .object-group {
   margin-bottom: -1px; }
-  .object-group li {
+  .object-group > li {
     float: left;
     margin-right: 5px; }
-    .object-group li span {
+    .object-group > li span {
       display: inline-block;
       padding: 0 7px; }
-    .object-group li .status-container,
-    .object-group li .rel-container {
+    .object-group > li .status-container,
+    .object-group > li .rel-container {
       margin: 0 5px 0 0; }
-      .object-group li .status-container span,
-      .object-group li .rel-container span {
+      .object-group > li .status-container span,
+      .object-group > li .rel-container span {
         padding: 2px 3px 1px; }
-    .object-group li .rel-container {
+    .object-group > li .rel-container {
       margin: 0; }
   .object-group .selected {
     background-color: #000000;
