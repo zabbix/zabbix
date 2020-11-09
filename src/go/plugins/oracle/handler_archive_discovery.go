@@ -41,7 +41,7 @@ func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []strin
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
 					'{#DEST_NAME}' VALUE d.DEST_NAME
-				)
+				) RETURNING CLOB 
 			) LLD
 		FROM
 			V$ARCHIVE_DEST d,
