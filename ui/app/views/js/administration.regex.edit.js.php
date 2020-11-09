@@ -27,7 +27,7 @@
 <script type="text/x-jquery-tmpl" id="row_expr">
 	<?= (new CRow([
 			(new CSelect('expressions[#{rowNum}][expression_type]'))
-				->addClass('expression-type-select')
+				->addClass('js-expression-type-select')
 				->setId('expressions_#{rowNum}_expression_type')
 				->addOptions(CSelect::createOptionsFromArray(expression_type2str())),
 			(new CTextBox('expressions[#{rowNum}][expression]', '', false, 255))
@@ -36,7 +36,7 @@
 			(new CSelect('expressions[#{rowNum}][exp_delimiter]'))
 				->addOptions(CSelect::createOptionsFromArray(expressionDelimiters()))
 				->setId('expressions_#{rowNum}_exp_delimiter')
-				->addClass('expression-delimiter-select')
+				->addClass('js-expression-delimiter-select')
 				->addStyle('display: none;'),
 			new CCheckBox('expressions[#{rowNum}][case_sensitive]'),
 			(new CCol(
@@ -233,10 +233,10 @@
 			.dynamicRows({
 				template: '#row_expr'
 			})
-			.on('change', '.expression-type-select', (e) => {
+			.on('change', '.js-expression-type-select', (e) => {
 				$(e.target)
 					.closest('[data-index]')
-					.find('.expression-delimiter-select')
+					.find('.js-expression-delimiter-select')
 					.toggle(e.target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>');
 			});
 

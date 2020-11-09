@@ -75,7 +75,7 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 			(new CSelect('iconmap[mappings]['.$i.'][iconid]'))
 				->setValue($mapping['iconid'])
 				->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
-				->addClass('mappingIcon'),
+				->addClass('js-mapping-icon'),
 			(new CCol(
 				(new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 					'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
@@ -109,7 +109,7 @@ $table
 		(new CSelect('iconmap[default_iconid]'))
 			->setValue($data['iconmap']['default_iconid'])
 			->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
-			->addClass('mappingIcon'),
+			->addClass('js-mapping-icon'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].
 				'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
