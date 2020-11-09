@@ -37,15 +37,25 @@ extern int		server_num, process_num;
 #define ZBX_AVAILABILITY_MANAGER_DELAY			1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
 
+static int	host_availability_compare(const void *d1, const void *d2)
+{
+	const zbx_host_availability_t	*ha1 = *(const zbx_host_availability_t **)d1;
+	const zbx_host_availability_t	*ha2 = *(const zbx_host_availability_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ha1->hostid, ha2->hostid);
+
+	return ha1->id - ha2->id;
+}
+
 ZBX_THREAD_ENTRY(availability_manager_thread, args)
 {
 	zbx_ipc_service_t	service;
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			ret, processed_num;
+	int			ret, processed_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_flush, sec;
-	zbx_vector_ptr_t	am_availabilities;
+	zbx_vector_ptr_t	host_availabilities;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -74,7 +84,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	time_stat = zbx_time();
 	time_flush = time_stat;
 
-	zbx_vector_ptr_create(&am_availabilities);
+	zbx_vector_ptr_create(&host_availabilities);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -87,7 +97,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
-					am_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
+					host_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
@@ -105,7 +115,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 		if (NULL != message)
 		{
-			zbx_avail_deserialize(message->data, message->size, &am_availabilities);
+			zbx_avail_deserialize(message->data, message->size, &host_availabilities);
 			zbx_ipc_message_free(message);
 		}
 
@@ -115,9 +125,10 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		if (ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
 		{
 			time_flush = time_now;
-			zbx_sql_add_availabilities(&am_availabilities);	// todo restart tx, todo stopping flush
-			processed_num = am_availabilities.values_num;
-			zbx_vector_ptr_clear_ext(&am_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
+			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
+			zbx_sql_add_host_availabilities(&host_availabilities);	// todo process termination
+			processed_num = host_availabilities.values_num;
+			zbx_vector_ptr_clear_ext(&host_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
 		}
 	}
 

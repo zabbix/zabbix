@@ -24,14 +24,7 @@
 #include "db.h"
 #include "zbxalgo.h"
 
-typedef struct
-{
-	zbx_host_availability_t	ha;
-	int			id;	/* ensure chronological order in case of flapping host availability */
-}
-zbx_am_availability_t;
-
 void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_host_availability_t *ha);
-void	zbx_avail_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *am_availabilities);
+void	zbx_avail_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *availabilities);
 #endif

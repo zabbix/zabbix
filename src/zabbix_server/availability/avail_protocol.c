@@ -64,31 +64,31 @@ void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_
 	}
 }
 
-void	zbx_avail_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *am_availabilities)
+void	zbx_avail_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *availabilities)
 {
 	const unsigned char	*end = data + size;
 
 	while (data < end)
 	{
-		zbx_am_availability_t	*am_availability;
+		zbx_host_availability_t	*availability;
 		int			i;
 
-		am_availability = (zbx_am_availability_t *)zbx_malloc(NULL, sizeof(zbx_am_availability_t));
+		availability = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
 
-		zbx_vector_ptr_append(am_availabilities, am_availability);
+		zbx_vector_ptr_append(availabilities, availability);
 
-		am_availability->id = am_availabilities->values_num;
+		availability->id = availabilities->values_num;
 
-		data += zbx_deserialize_value(data, &am_availability->ha.hostid);
+		data += zbx_deserialize_value(data, &availability->hostid);
 		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
 			zbx_uint32_t	len;
 
-			data += zbx_deserialize_value(data, &am_availability->ha.agents[i].flags);
-			data += zbx_deserialize_value(data, &am_availability->ha.agents[i].available);
-			data += zbx_deserialize_value(data, &am_availability->ha.agents[i].errors_from);
-			data += zbx_deserialize_value(data, &am_availability->ha.agents[i].disable_until);
-			data += zbx_deserialize_str(data, &am_availability->ha.agents[i].error, len);
+			data += zbx_deserialize_value(data, &availability->agents[i].flags);
+			data += zbx_deserialize_value(data, &availability->agents[i].available);
+			data += zbx_deserialize_value(data, &availability->agents[i].errors_from);
+			data += zbx_deserialize_value(data, &availability->agents[i].disable_until);
+			data += zbx_deserialize_str(data, &availability->agents[i].error, len);
 		}
 	}
 }
