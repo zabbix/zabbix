@@ -3879,13 +3879,11 @@ $form-icon-btn: (
 	}
 
 	z-select {
-		ul {
-			&.list {
-				li {
-					float: none;
-					line-height: normal;
-					padding: 5px;
-				}
+		.list {
+			li {
+				float: none;
+				line-height: normal;
+				padding: 5px;
 			}
 		}
 	}

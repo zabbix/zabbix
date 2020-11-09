@@ -3498,7 +3498,7 @@ z-select[disabled] button,
       padding: 0; }
       .dashbrd-widget-head ul li select {
         margin: 4px 0; }
-  .dashbrd-widget-head z-select ul.list li {
+  .dashbrd-widget-head z-select .list li {
     float: none;
     line-height: normal;
     padding: 5px; }
