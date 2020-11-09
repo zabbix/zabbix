@@ -229,7 +229,9 @@ foreach ($data['hosts'] as $host) {
 
 	if ($host['discoveryRule']) {
 		$description[] = (new CLink(CHtml::encode($host['discoveryRule']['name']),
-			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
+			(new CUrl('host_prototypes.php'))
+				->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
+				->setArgument('context', 'host')
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -421,6 +423,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('items.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['items'])
 		],
@@ -429,6 +432,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('triggers.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['triggers'])
 		],
@@ -437,6 +441,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('graphs.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['graphs'])
 		],
@@ -445,6 +450,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('host_discovery.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['discoveries'])
 		],
@@ -453,6 +459,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('httpconf.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],

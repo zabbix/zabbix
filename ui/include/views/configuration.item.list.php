@@ -34,6 +34,7 @@ $widget = (new CWidget())
 					? new CRedirectButton(_('Create item'), (new CUrl('items.php'))
 						->setArgument('form', 'create')
 						->setArgument('hostid', $data['hostid'])
+						->setArgument('context', $data['context'])
 						->getUrl()
 					)
 					: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
@@ -46,14 +47,18 @@ if ($data['hostid'] != 0) {
 }
 $widget->addItem($data['main_filter']);
 
+$url = (new CUrl('items.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$itemForm = (new CForm())->setName('items');
-$itemForm->addVar('checkbox_hash', $data['checkbox_hash']);
+$itemForm = (new CForm('post', $url))
+	->setName('items')
+	->addVar('checkbox_hash', $data['checkbox_hash']);
+
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
 }
-
-$url = (new CUrl('items.php'))->getUrl();
 
 // create table
 $itemTable = (new CTableInfo())
@@ -79,7 +84,8 @@ $current_time = time();
 
 $data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
 	'html' => true,
-	'sources' => ['expression', 'recovery_expression']
+	'sources' => ['expression', 'recovery_expression'],
+	'context' => $data['context']
 ]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
@@ -88,12 +94,14 @@ foreach ($data['items'] as $item) {
 	// description
 	$description = [];
 	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
-		$data['allowed_ui_conf_templates']
+		$data['allowed_ui_conf_templates'], $data['context']
 	);
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
-			(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+			(new CUrl('disc_prototypes.php'))
+				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+				->setArgument('context', $data['context'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -106,7 +114,11 @@ foreach ($data['items'] as $item) {
 		}
 		else {
 			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-				'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
+				(new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', $item['hostid'])
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->setArgument('context', $data['context'])
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL);
@@ -116,15 +128,23 @@ foreach ($data['items'] as $item) {
 	}
 
 	$description[] = new CLink(CHtml::encode($item['name_expanded']),
-		'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
+		(new CUrl('items.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $item['hostid'])
+			->setArgument('itemid', $item['itemid'])
+			->setArgument('context', $data['context'])
 	);
 
 	// status
 	$status = new CCol((new CLink(
-		itemIndicator($item['status'], $item['state']),
-		'?group_itemid[]='.$item['itemid'].
-			'&hostid='.$item['hostid'].
-			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
+			itemIndicator($item['status'], $item['state']),
+			(new CUrl('items.php'))
+				->setArgument('group_itemid[]', $item['itemid'])
+				->setArgument('hostid', $item['hostid'])
+				->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED) ? 'item.massenable' : 'item.massdisable')
+				->setArgument('context', $data['context'])
+				->getUrl()
+		))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status'], $item['state']))
 		->addSID()
@@ -150,7 +170,7 @@ foreach ($data['items'] as $item) {
 
 		$trigger_description = [];
 		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
-			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
+			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates'], $data['context']
 		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
@@ -161,7 +181,11 @@ foreach ($data['items'] as $item) {
 		else {
 			$trigger_description[] = new CLink(
 				CHtml::encode($trigger['description']),
-				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+				(new CUrl('triggers.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', key($trigger['hosts']))
+					->setArgument('triggerid', $trigger['triggerid'])
+					->setArgument('context', $data['context'])
 			);
 		}
 
@@ -203,7 +227,7 @@ foreach ($data['items'] as $item) {
 	$wizard = (new CSpan(
 		(new CButton(null))
 			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
+			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]))
 	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {

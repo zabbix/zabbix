@@ -29,8 +29,12 @@ if ($data['hostid'] != 0) {
 	$widget->addItem(get_header_host_table('items', $data['hostid']));
 }
 
+$url = (new CUrl('items.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $data['itemids'])
@@ -510,7 +514,7 @@ $tabs = (new CTabView())
 	->addTab('preprocessingTab', _('Preprocessing'), $preprocessing_form_list)
 	->setFooter(makeFormFooter(
 		new CSubmit('massupdate', _('Update')),
-		[new CButtonCancel(url_param('hostid'))]
+		[new CButtonCancel(url_params(['hostid', 'context']))]
 	));
 
 if (!hasRequest('massupdate')) {

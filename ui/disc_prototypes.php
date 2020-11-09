@@ -237,6 +237,7 @@ $fields = [
 										_('Password')
 									],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'context' =>					[T_ZBX_STR, O_MAND, null,	null,		null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"itemprototype.massdelete","itemprototype.massdisable",'.
@@ -1325,7 +1326,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
-		'timeout' =>  getRequest('timeout', DB::getDefault('items', 'timeout'))
+		'timeout' =>  getRequest('timeout', DB::getDefault('items', 'timeout')),
+		'context' => getRequest('context')
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1529,7 +1531,8 @@ else {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => $discoveryRule['hostid'],
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'context' => getRequest('context')
 	];
 
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
@@ -1575,7 +1578,9 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder,
-		(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		(new CUrl('disc_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);

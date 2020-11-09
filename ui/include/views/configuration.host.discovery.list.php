@@ -35,6 +35,7 @@ $widget = (new CWidget())
 						(new CUrl('host_discovery.php'))
 							->setArgument('form', 'create')
 							->setArgument('hostid', $data['hostid'])
+							->setArgument('context', $data['context'])
 							->getUrl()
 					)
 					: (new CButton('form', _('Create discovery rule (select host first)')))->setEnabled(false)
@@ -47,9 +48,10 @@ if ($data['hostid'] != 0) {
 }
 
 // Add filter tab.
-$filter = (new CFilter(new CUrl('host_discovery.php')))
+$filter = (new CFilter((new CUrl('host_discovery.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])
-	->setActiveTab($data['active_tab']);
+	->setActiveTab($data['active_tab'])
+	->addvar('context', $data['context']);
 
 $filter_column1 = (new CFormList())
 	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
@@ -155,14 +157,16 @@ $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_co
 
 $widget->addItem($filter);
 
+$url = (new CUrl('host_discovery.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$discoveryForm = (new CForm())->setName('discovery');
+$discoveryForm = (new CForm('post', $url))->setName('discovery');
 
 if ($data['hostid'] != 0) {
 	$discoveryForm->addVar('hostid', $data['hostid']);
 }
-
-$url = (new CUrl('host_discovery.php'))->getUrl();
 
 // create table
 $discoveryTable = (new CTableInfo())
@@ -189,7 +193,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
 	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
-		$data['allowed_ui_conf_templates']
+		$data['allowed_ui_conf_templates'], $data['context']
 	);
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
@@ -201,6 +205,7 @@ foreach ($data['discoveries'] as $discovery) {
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $discovery['master_item']['itemid'])
+					->setArgument('context', $data['context'])
 					->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
@@ -210,18 +215,27 @@ foreach ($data['discoveries'] as $discovery) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
+	$description[] = new CLink(
+		CHtml::encode($discovery['name_expanded']),
+		(new CUrl('host_discovery.php'))
+			->setArgument('form', 'update')
+			->setArgument('itemid', $discovery['itemid'])
+			->setArgument('context', $data['context'])
+	);
 
 	// status
 	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
-		'?hostid='.$discovery['hostid'].
-			'&g_hostdruleid[]='.$discovery['itemid'].
-			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
+		(new CUrl('host_discovery.php'))
+			->setArgument('hostid', $discovery['hostid'])
+			->setArgument('g_hostdruleid[]', $discovery['itemid'])
+			->setArgument('action', ($discovery['status'] == ITEM_STATUS_DISABLED)
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
-			))
-		)
+			)
+			->setArgument('context', $data['context'])
+			->getUrl()
+		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
 			->addSID();
@@ -248,30 +262,35 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['hosts'][0]['name'],
 		$description,
 		[
-			new CLink(
-				_('Item prototypes'),
-				'disc_prototypes.php?parent_discoveryid='.$discovery['itemid']
+			new CLink(_('Item prototypes'),
+				(new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
 			),
 			CViewHelper::showNum($discovery['items'])
 		],
 		[
-			new CLink(
-				_('Trigger prototypes'),
-				'trigger_prototypes.php?parent_discoveryid='.$discovery['itemid']
+			new CLink(_('Trigger prototypes'),
+				(new CUrl('trigger_prototypes.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
 			),
 			CViewHelper::showNum($discovery['triggers'])
 		],
 		[
-			new CLink(
-				_('Graph prototypes'),
-				(new CUrl('graphs.php'))->setArgument('parent_discoveryid', $discovery['itemid'])
+			new CLink(_('Graph prototypes'),
+				(new CUrl('graphs.php'))
+					->setArgument('parent_discoveryid', $discovery['itemid'])
+					->setArgument('context', $data['context'])
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
 		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
 			? [
 				new CLink(_('Host prototypes'),
-					(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $discovery['itemid'])
+					(new CUrl('host_prototypes.php'))
+						->setArgument('parent_discoveryid', $discovery['itemid'])
+						->setArgument('context', $data['context'])
 				),
 				CViewHelper::showNum($discovery['hostPrototypes'])
 			]

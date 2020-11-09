@@ -61,6 +61,7 @@ $fields = [
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
+	'context' =>			[T_ZBX_STR, O_MAND, null,		null,			null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -491,7 +492,8 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', []),
 		'hostid' => $hostid,
-		'normal_only' => getRequest('normal_only')
+		'normal_only' => getRequest('normal_only'),
+		'context' => getRequest('context')
 	];
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
@@ -549,7 +551,7 @@ elseif (isset($_REQUEST['form'])) {
 		// templates
 		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
 		);
 
 		// items
@@ -670,7 +672,8 @@ else {
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
 		'profileIdx' => 'web.graphs.filter',
-		'active_tab' => CProfile::get('web.graphs.filter.active', 1)
+		'active_tab' => CProfile::get('web.graphs.filter.active', 1),
+		'context' => getRequest('context')
 	];
 
 	// Select graphs.
@@ -708,7 +711,13 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, new CUrl('graphs.php'));
+	$url = (new CUrl('graphs.php'))->setArgument('context', $data['context']);
+
+	if (hasRequest('parent_discoveryid')) {
+		$url->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+	}
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, $url);
 
 	// Get graphs after paging.
 	$options = [

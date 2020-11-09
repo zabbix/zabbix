@@ -194,6 +194,7 @@ $fields = [
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'context' =>				[T_ZBX_STR, O_MAND, null,		null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -788,9 +789,7 @@ if (hasRequest('form')) {
 		}
 	}
 
-	$data = getItemFormData($form_item, [
-		'is_discovery_rule' => true
-	]);
+	$data = getItemFormData($form_item, ['is_discovery_rule' => true]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
@@ -801,7 +800,8 @@ if (hasRequest('form')) {
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
 	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
-			|| $host['status'] == HOST_STATUS_NOT_MONITORED);
+		|| $host['status'] == HOST_STATUS_NOT_MONITORED
+	);
 
 	if (!hasRequest('form_refresh')) {
 		foreach ($data['preprocessing'] as &$step) {
@@ -857,7 +857,8 @@ else {
 		'profileIdx' => 'web.host_discovery.filter',
 		'active_tab' => CProfile::get('web.host_discovery.filter.active', 1),
 		'checkbox_hash' => $checkbox_hash,
-		'is_template' => true
+		'is_template' => true,
+		'context' => getRequest('context')
 	];
 
 	// Select LLD rules.
@@ -981,7 +982,7 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sort_order,
-		new CUrl('host_discovery.php')
+		(new CUrl('host_discovery.php'))->setArgument('context', $data['context'])
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);

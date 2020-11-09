@@ -77,7 +77,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	return $output;
 }
 
-function getItemFilterForm(&$items) {
+function getItemFilterForm(&$data) {
 	$filter_groupids			= $_REQUEST['filter_groupids'];
 	$filter_hostids				= $_REQUEST['filter_hostids'];
 	$filter_application			= $_REQUEST['filter_application'];
@@ -107,7 +107,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$filter = (new CFilter(new CUrl('items.php')))
+	$filter = (new CFilter((new CUrl('items.php'))->setArgument('context', $data['context'])))
 		->setProfile('web.items.filter')
 		->setActiveTab(CProfile::get('web.items.filter.active', 1))
 		->addVar('subfilter_hosts', $subfilter_hosts)
@@ -121,7 +121,8 @@ function getItemFilterForm(&$items) {
 		->addVar('subfilter_discovery', $subfilter_discovery)
 		->addVar('subfilter_history', $subfilter_history)
 		->addVar('subfilter_trends', $subfilter_trends)
-		->addVar('subfilter_interval', $subfilter_interval);
+		->addVar('subfilter_interval', $subfilter_interval)
+		->addvar('context', $data['context']);
 
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();
@@ -328,7 +329,7 @@ function getItemFilterForm(&$items) {
 	$simple_interval_parser = new CSimpleIntervalParser();
 
 	// generate array with values for subfilters of selected items
-	foreach ($items as $item) {
+	foreach ($data['items'] as $item) {
 		// hosts
 		if ($filter_hostids) {
 			$host = reset($item['hosts']);
@@ -816,9 +817,9 @@ function prepareScriptItemFormData(array $item): array {
 /**
  * Get data for item edit page.
  *
- * @param array $item                          Item, item prototype, LLD rule or LLD item to take the data from.
- * @param array $options
- * @param bool  $options['is_discovery_rule']
+ * @param array  $item                          Item, item prototype, LLD rule or LLD item to take the data from.
+ * @param array  $options
+ * @param bool   $options['is_discovery_rule']
  *
  * @return array
  */
@@ -888,7 +889,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'http_username' => getRequest('http_username', ''),
 		'http_password' => getRequest('http_password', ''),
 		'preprocessing' => getRequest('preprocessing', []),
-		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
+		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
+		'context' => getRequest('context')
 	];
 
 	if ($data['parent_discoveryid'] != 0) {
@@ -1008,7 +1010,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
 		);
 	}
 
@@ -1624,7 +1626,8 @@ function getTriggerMassupdateFormData() {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'g_triggerid' => getRequest('g_triggerid', []),
 		'priority' => getRequest('priority', 0),
-		'hostid' => getRequest('hostid', 0)
+		'hostid' => getRequest('hostid', 0),
+		'context' => getRequest('context')
 	];
 
 	if ($data['dependencies']) {
@@ -1697,6 +1700,7 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['correlation_mode']                 Trigger correlation mode.
  * @param string      $data['correlation_tag']                  Trigger correlation tag.
  * @param string      $data['manual_close']                     Trigger manual close.
+ * @param string      $data['context']                          Additional parameter in URL to identify main section.
  *
  * @return array
  */
@@ -1741,7 +1745,7 @@ function getTriggerFormData(array $data) {
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
 		);
 
 		if ($data['show_inherited_tags']) {

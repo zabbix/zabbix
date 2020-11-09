@@ -30,8 +30,12 @@ $widget = (new CWidget())->setTitle(_('Trigger prototypes'));
 // Append host summary to widget header.
 $widget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
+$url = (new CUrl('trigger_prototypes.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
@@ -108,12 +112,19 @@ foreach ($data['dependencies'] as $dependency) {
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$description = (new CLink($dependency_description,
-			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
+			(new CUrl('trigger_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				->setArgument('triggerid', $dependency['triggerid'])
+				->setArgument('context', $data['context'])
 		))->setAttribute('target', '_blank');
 	}
 	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = (new CLink($dependency_description,
-			'triggers.php?form=update&triggerid='.$dependency['triggerid']
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('triggerid', $dependency['triggerid'])
+				->setArgument('context', $data['context'])
 		))->setAttribute('target', '_blank');
 	}
 

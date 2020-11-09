@@ -32,8 +32,12 @@ if ($data['hostid'] != 0) {
 	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
+$url = (new CUrl('triggers.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('hostid', $data['hostid'])
@@ -110,7 +114,10 @@ foreach ($data['dependencies'] as $dependency) {
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = (new CLink($dependency_description,
-			'triggers.php?form=update&triggerid='.$dependency['triggerid']
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('triggerid', $dependency['triggerid'])
+				->setArgument('context', $data['context'])
 		))->setAttribute('target', '_blank');
 	}
 	else {
@@ -171,7 +178,7 @@ if (!hasRequest('massupdate') && !hasRequest('add_dependency')) {
 // Append buttons to the form.
 $tabs->setFooter(makeFormFooter(
 	new CSubmit('massupdate', _('Update')),
-	[new CButtonCancel(url_param('hostid'))]
+	[new CButtonCancel(url_params(['hostid', 'context']))]
 ));
 
 $form->addItem($tabs);

@@ -229,6 +229,7 @@ $fields = [
 											')',
 										_('Password')
 									],
+	'context' =>					[T_ZBX_STR, O_MAND, null,		null,	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -1600,7 +1601,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 		'preprocessing_types' => CItem::$supported_preprocessing_types,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
-		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+		'context' => getRequest('context')
 	];
 
 	foreach ($data['preprocessing'] as &$step) {
@@ -1788,7 +1790,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $hostid,
-		'is_template' => true
+		'is_template' => true,
+		'context' => getRequest('context')
 	];
 
 	// items
@@ -2035,7 +2038,7 @@ else {
 		}
 	}
 
-	$data['main_filter'] = getItemFilterForm($data['items']);
+	$data['main_filter'] = getItemFilterForm($data);
 
 	// Remove subfiltered items.
 	foreach ($data['items'] as $number => $item) {
@@ -2095,7 +2098,9 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder, new CUrl('items.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder,
+		(new CUrl('items.php'))->setArgument('context', $data['context'])
+	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 

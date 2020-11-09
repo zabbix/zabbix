@@ -32,6 +32,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 					(new CUrl('graphs.php'))
 						->setArgument('form', 'create')
 						->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+						->setArgument('context', $data['context'])
 						->getUrl()
 				))
 			))->setAttribute('aria-label', _('Content controls'))
@@ -47,6 +48,7 @@ else {
 				: new CRedirectButton(_('Create graph'), (new CUrl('graphs.php'))
 					->setArgument('hostid', $data['hostid'])
 					->setArgument('form', 'create')
+					->setArgument('context', $data['context'])
 					->getUrl()
 				)
 			))
@@ -59,9 +61,10 @@ else {
 
 	// Add filter tab.
 	$widget->addItem(
-		(new CFilter(new CUrl('graphs.php')))
+		(new CFilter((new CUrl('graphs.php'))->setArgument('context', $data['context'])))
 			->setProfile($data['profileIdx'])
 			->setActiveTab($data['active_tab'])
+			->addvar('context', $data['context'])
 			->addFilterTab(_('Filter'), [
 				(new CFormList())
 					->addRow(
@@ -107,16 +110,20 @@ else {
 	);
 }
 
+$url = (new CUrl('graphs.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$graphForm = (new CForm())
+$graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->addVar('hostid', $this->data['hostid']);
+	->addVar('hostid', $data['hostid']);
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
 
 // create table
-$url = (new CUrl('graphs.php'))->getUrl();
 $discover = null;
 $info_column = null;
 
@@ -159,13 +166,16 @@ foreach ($data['graphs'] as $graph) {
 
 	$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 	$name = [];
-	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates'],
+		$data['context']
+	);
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
 		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
+				->setArgument('context', $data['context'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -175,7 +185,8 @@ foreach ($data['graphs'] as $graph) {
 	$url = (new CUrl('graphs.php'))
 		->setArgument('form', 'update')
 		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-		->setArgument('graphid', $graphid);
+		->setArgument('graphid', $graphid)
+		->setArgument('context', $data['context']);
 
 	if ($data['parent_discoveryid'] === null) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
@@ -193,6 +204,7 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->setArgument('graphid', $graphid)
 					->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+					->setArgument('context', $data['context'])
 					->getUrl()
 			))
 				->addSID()
@@ -228,11 +240,11 @@ $buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->
 // append table to form
 $graphForm->addItem([
 	$graphTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_graphid', $buttonsArray,
-		$this->data['parent_discoveryid']
-			? $this->data['parent_discoveryid']
-			: $this->data['hostid']
+		$data['parent_discoveryid']
+			? $data['parent_discoveryid']
+			: $data['hostid']
 	)
 ]);
 

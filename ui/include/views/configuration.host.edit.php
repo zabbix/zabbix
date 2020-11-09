@@ -64,6 +64,7 @@ if ($data['readonly']) {
 				->setArgument('form', 'update')
 				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
+				->setArgument('context', 'host')
 		)
 		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY)
 	);
@@ -670,8 +671,13 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	if (array_key_exists($inventoryNo, $data['inventory_items'])) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
-		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
-			->setTitle(_s('This field is automatically populated by item "%1$s".', $name));
+		$link = (new CLink($name,
+			(new CUrl('items.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $data['inventory_items'][$inventoryNo]['itemid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))->setTitle(_s('This field is automatically populated by item "%1$s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {

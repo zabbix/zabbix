@@ -83,6 +83,7 @@ $fields = [
 	'ssl_cert_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_password'	=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'],
+	'context' =>			[T_ZBX_STR, O_MAND, null,	null,		null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -544,7 +545,8 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
-		'templates' => []
+		'templates' => [],
+		'context' => getRequest('context')
 	];
 
 	$host = API::Host()->get([
@@ -575,7 +577,8 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
 		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			$data['context']
 		);
 
 		$data['agent'] = ZBX_AGENT_OTHER;
@@ -803,7 +806,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'profileIdx' => 'web.httpconf.filter',
-		'active_tab' => CProfile::get('web.httpconf.filter.active', 1)
+		'active_tab' => CProfile::get('web.httpconf.filter.active', 1),
+		'context' => getRequest('context')
 	];
 
 	// show the error column only for hosts
@@ -858,7 +862,9 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder, new CUrl('httpconf.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder,
+		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
+	);
 
 	if($data['showInfoColumn']) {
 		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));

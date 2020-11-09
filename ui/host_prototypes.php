@@ -53,6 +53,7 @@ $fields = [
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
+	'context' =>				[T_ZBX_STR, O_MAND, null,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
@@ -394,6 +395,7 @@ if (hasRequest('form')) {
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,
+		'context' => getRequest('context'),
 		// Parent discovery rules.
 		'templates' => []
 	];
@@ -494,7 +496,7 @@ if (hasRequest('form')) {
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],
-		getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates']
+		getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates'], $data['context']
 	);
 
 	// Select writable templates
@@ -558,7 +560,8 @@ else {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'discovery_rule' => $discoveryRule,
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'context' => getRequest('context')
 	];
 
 	// get items
@@ -589,7 +592,9 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['hostPrototypes'], $sortOrder,
-		(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		(new CUrl('host_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
 	);
 
 	$data['parent_templates'] = getHostPrototypeParentTemplates($data['hostPrototypes']);

@@ -77,6 +77,7 @@ $fields = [
 													]),
 													null
 												],
+	'context' =>								[T_ZBX_STR, O_MAND, null,	null,			null],
 	// Filter related fields.
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
@@ -666,7 +667,8 @@ elseif (isset($_REQUEST['form'])) {
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
+		'context' => getRequest('context')
 	];
 
 	// render view
@@ -850,7 +852,13 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$paging = CPagerHelper::paginate($page_num, $prefetched_triggers, $sortorder, new CUrl('triggers.php'));
+	$data = [
+		'context' => getRequest('context')
+	];
+
+	$paging = CPagerHelper::paginate($page_num, $prefetched_triggers, $sortorder,
+		(new CUrl('triggers.php'))->setArgument('context', $data['context'])
+	);
 
 	// fetch triggers
 	$triggers = [];
@@ -1015,7 +1023,7 @@ else {
 	sort($filter_hostids);
 	$checkbox_hash = crc32(implode('', $filter_hostids));
 
-	$data = [
+	$data += [
 		'triggers' => $triggers,
 		'profileIdx' => 'web.triggers.filter',
 		'active_tab' => $active_tab,

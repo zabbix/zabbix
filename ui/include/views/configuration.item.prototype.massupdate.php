@@ -27,7 +27,11 @@ $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
 	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
 
-$form = (new CForm())
+$url = (new CUrl('disc_prototypes.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
+$form = (new CForm('post', $url))
 	->setName('item_prototype_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $data['item_prototypeids'])
@@ -534,7 +538,7 @@ $tabs = (new CTabView())
 	// Append buttons to form.
 	->setFooter(makeFormFooter(
 		new CSubmit('massupdate', _('Update')),
-		[new CButtonCancel(url_params(['hostid', 'parent_discoveryid']))]
+		[new CButtonCancel(url_params(['hostid', 'parent_discoveryid', 'context']))]
 	));
 
 if (!hasRequest('massupdate')) {

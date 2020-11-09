@@ -126,6 +126,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? [new CLink(_('Items'), (new CUrl('items.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $item_count]
 		: [_('Items'), $item_count];
 
@@ -134,6 +135,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $trigger_count]
 		: [_('Triggers'), $trigger_count];
 
@@ -142,6 +144,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $graph_count]
 		: [_('Graphs'), $graph_count];
 
@@ -150,6 +153,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $discovery_count]
 		: [_('Discovery'), $discovery_count];
 
@@ -158,6 +162,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $httptest_count]
 		: [_('Web'), $httptest_count];
 
@@ -294,6 +299,7 @@ if ($data['admin']) {
 			? [new CLink(_('Items'), (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $item_count]
 			: [_('Items'), $item_count];
 
@@ -301,6 +307,7 @@ if ($data['admin']) {
 			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $trigger_count]
 			: [_('Triggers'), $trigger_count];
 
@@ -308,6 +315,7 @@ if ($data['admin']) {
 			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $graph_count]
 			: [_('Graphs'), $graph_count];
 
@@ -326,6 +334,7 @@ if ($data['admin']) {
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $discovery_count]
 			: [_('Discovery'), $discovery_count];
 
@@ -333,6 +342,7 @@ if ($data['admin']) {
 			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $httptest_count]
 			: [_('Web'), $httptest_count];
 

@@ -816,10 +816,11 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array|null
  */
-function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates, bool $provide_links) {
+function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates, bool $provide_links, $context) {
 	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
 		return null;
 	}
@@ -834,6 +835,7 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 		$name = (new CLink(CHtml::encode($template['name']),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
+				->setArgument('context', $context)
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
@@ -849,10 +851,11 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array
  */
-function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates, bool $provide_links) {
+function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates, bool $provide_links, $context) {
 	$list = [];
 
 	while (array_key_exists($host_prototypeid, $parent_templates['links'])) {
@@ -864,6 +867,7 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
+					->setArgument('context', $context)
 			);
 		}
 		else {

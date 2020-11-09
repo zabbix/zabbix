@@ -41,7 +41,11 @@ if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
-$frmHost = (new CForm())
+$url = (new CUrl('host_prototypes.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
+$frmHost = (new CForm('post', $url))
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -210,7 +214,9 @@ if ($hostPrototype['templateid']) {
 		if ($data['allowed_ui_conf_templates']
 				&& array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
-				'templates.php?form=update&templateid='.$template['templateid']
+				(new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $template['templateid'])
 			))->setTarget('_blank');
 		}
 		else {
@@ -240,7 +246,9 @@ else {
 		if ($data['allowed_ui_conf_templates']
 				&& array_key_exists($template['templateid'], $hostPrototype['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
-				'templates.php?form=update&templateid='.$template['templateid']
+				(new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $template['templateid'])
 			))->setTarget('_blank');
 		}
 		else {
@@ -409,7 +417,7 @@ $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_IN
 if ($hostPrototype['hostid'] != 0) {
 	$btnDelete = new CButtonDelete(
 		_('Delete selected host prototype?'),
-		url_param('form').url_param('hostid').url_param('parent_discoveryid')
+		url_params(['form', 'hostid', 'parent_discoveryid', 'context']), 'context'
 	);
 	$btnDelete->setEnabled($hostPrototype['templateid'] == 0);
 
@@ -418,14 +426,14 @@ if ($hostPrototype['hostid'] != 0) {
 		[
 			new CSubmit('clone', _('Clone')),
 			$btnDelete,
-			new CButtonCancel(url_param('parent_discoveryid'))
+			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid'))]
+		[new CButtonCancel(url_params(['parent_discoveryid', 'context']))]
 	));
 }
 

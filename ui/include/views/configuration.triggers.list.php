@@ -156,9 +156,10 @@ $filter_column2 = (new CFormList())
 			->setModern(true)
 	);
 
-$filter = (new CFilter(new CUrl('triggers.php')))
+$filter = (new CFilter((new CUrl('triggers.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
+	->addvar('context', $data['context'])
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
@@ -168,6 +169,7 @@ $widget = (new CWidget())
 			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
 				->setArgument('hostid', $data['single_selected_hostid'])
 				->setArgument('form', 'create')
+				->setArgument('context', $data['context'])
 				->getUrl()
 			)
 			: (new CButton('form', _('Create trigger (select host first)')))->setEnabled(false)
@@ -180,12 +182,14 @@ if ($data['single_selected_hostid'] != 0) {
 
 $widget->addItem($filter);
 
+$url = (new CUrl('triggers.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$triggers_form = (new CForm())
+$triggers_form = (new CForm('post', $url))
 	->addVar('checkbox_hash', $data['checkbox_hash'])
 	->setName('triggersForm');
-
-$url = (new CUrl('triggers.php'))->getUrl();
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([
@@ -206,7 +210,8 @@ $triggers_table = (new CTableInfo())->setHeader([
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
-	'sources' => ['expression', 'recovery_expression']
+	'sources' => ['expression', 'recovery_expression'],
+	'context' => $data['context']
 ]);
 
 foreach ($data['triggers'] as $tnum => $trigger) {
@@ -215,7 +220,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	// description
 	$description = [];
 	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
+		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates'], $data['context']
 	);
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
@@ -223,7 +228,9 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
 			CHtml::encode($trigger['discoveryRule']['name']),
-			(new CUrl('trigger_prototypes.php'))->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
+			(new CUrl('trigger_prototypes.php'))
+				->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
+				->setArgument('context', $data['context'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -235,6 +242,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		(new CUrl('triggers.php'))
 			->setArgument('form', 'update')
 			->setArgument('triggerid', $triggerid)
+			->setArgument('context', $data['context'])
 	);
 
 	if ($trigger['dependencies']) {
@@ -249,7 +257,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			);
 
 			$trigger_deps[] = (new CLink($dep_trigger_desc,
-				'triggers.php?form=update&triggerid='.$dep_trigger['triggerid']
+				(new CUrl('triggers.php'))
+					->setArgument('form', 'update')
+					->setArgument('triggerid', $dep_trigger['triggerid'])
+					->setArgument('context', $data['context'])
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(triggerIndicatorStyle($dep_trigger['status']));
@@ -277,12 +288,15 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	// status
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
-		'triggers.php?'.
-			'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
+		(new CUrl('triggers.php'))
+			->setArgument('g_triggerid', $triggerid)
+			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
-			).
-			'&g_triggerid='.$triggerid))
+			)
+			->setArgument('context', $data['context'])
+			->getUrl()
+		))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		->addSID();

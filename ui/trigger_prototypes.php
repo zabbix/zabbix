@@ -69,6 +69,7 @@ $fields = [
 													]),
 													null
 												],
+	'context' =>								[T_ZBX_STR, O_MAND, null,	null,		null],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -136,7 +137,6 @@ if (hasRequest('triggerid')) {
 		access_deny();
 	}
 }
-
 
 $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {
@@ -582,7 +582,8 @@ elseif (isset($_REQUEST['form'])) {
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
+		'context' => getRequest('context')
 	]);
 
 	// render view
@@ -602,7 +603,8 @@ else {
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'dependencyTriggers' => []
+		'dependencyTriggers' => [],
+		'context' => getRequest('context')
 	];
 
 	// get triggers
@@ -631,7 +633,9 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['triggers'], $sortOrder,
-		(new CUrl('trigger_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
 	);
 
 	$data['triggers'] = API::TriggerPrototype()->get([

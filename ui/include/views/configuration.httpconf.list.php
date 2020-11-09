@@ -23,9 +23,10 @@
  * @var CView $this
  */
 
-$filter = (new CFilter(new CUrl('httpconf.php')))
+$filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
+	->addvar('context', $data['context'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(
@@ -83,6 +84,7 @@ $widget = (new CWidget())
 			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
 				->setArgument('form', 'create')
 				->setArgument('hostid', $data['hostid'])
+				->setArgument('context', $data['context'])
 				->getUrl()
 			)
 			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
@@ -95,12 +97,14 @@ if (!empty($this->data['hostid'])) {
 
 $widget->addItem($filter);
 
+$url = (new CUrl('httpconf.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$httpForm = (new CForm())
+$httpForm = (new CForm('post', $url))
 	->setName('scenarios')
 	->addVar('hostid', $this->data['hostid']);
-
-$url = (new CUrl('httpconf.php'))->getUrl();
 
 $httpTable = (new CTableInfo())
 	->setHeader([
@@ -126,12 +130,15 @@ $httpTests = $this->data['httpTests'];
 
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
-	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
+	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates'],
+		$data['context']
+	);
 	$name[] = new CLink(CHtml::encode($httpTest['name']),
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
 			->setArgument('hostid', $httpTest['hostid'])
 			->setArgument('httptestid', $httpTestId)
+			->setArgument('context', $data['context'])
 	);
 
 	if ($this->data['showInfoColumn']) {
@@ -169,6 +176,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
 				'&hostid='.$httpTest['hostid'].
+				'&context='.$data['context'].
 				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
@@ -184,7 +192,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 // append table to form
 $httpForm->addItem([
 	$httpTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_httptestid',
 		[
 			'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
