@@ -2251,34 +2251,14 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		unsigned char	*data = NULL;
+		size_t		data_alloc = 0, data_offset = 0;
 
 		for (i = 0; i < hosts.values_num; i++)
-		{
-			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
-					(zbx_host_availability_t *)hosts.values[i]))
-			{
-				continue;
-			}
+			zbx_avail_serialize(&data, &data_alloc, &data_offset, (zbx_host_availability_t *)hosts.values[i]);
 
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		DBcommit();
-
-		zbx_free(sql);
+		availability_send(data, data_offset);
+		zbx_free(data);
 	}
 
 	ret = SUCCEED;

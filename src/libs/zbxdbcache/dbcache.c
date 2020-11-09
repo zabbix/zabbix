@@ -4558,8 +4558,8 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 void	DCupdate_hosts_availability(void)
 {
 	zbx_vector_ptr_t	hosts;
-	char			*sql_buf = NULL;
-	size_t			sql_buf_alloc = 0, sql_buf_offset = 0;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -4569,29 +4569,11 @@ void	DCupdate_hosts_availability(void)
 	if (SUCCEED != DCreset_hosts_availability(&hosts))
 		goto out;
 
-	DBbegin();
-	DBbegin_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-
 	for (i = 0; i < hosts.values_num; i++)
-	{
-		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
-				(zbx_host_availability_t *)hosts.values[i]))
-		{
-			continue;
-		}
+		zbx_avail_serialize(&data, &data_alloc, &data_offset, (zbx_host_availability_t *)hosts.values[i]);
 
-		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
-		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-	}
-
-	DBend_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-
-	if (16 < sql_buf_offset)
-		DBexecute("%s", sql_buf);
-
-	DBcommit();
-
-	zbx_free(sql_buf);
+	availability_send(data, data_offset);
+	zbx_free(data);
 out:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
 	zbx_vector_ptr_destroy(&hosts);

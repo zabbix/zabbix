@@ -46,6 +46,7 @@
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "../availability/avail_protocol.h"
+#include "../availability/availability.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
