@@ -73,7 +73,7 @@ static int	db_host_update_availability(unsigned char **data, size_t *data_alloc,
 	if (FAIL == zbx_host_availability_is_set(ha))
 		return FAIL;
 
-	zbx_avail_serialize(data, data_alloc, data_offset, ha);
+	zbx_availability_serialize(data, data_alloc, data_offset, ha);
 
 	return SUCCEED;
 }
@@ -960,7 +960,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 	if (NULL != data)
-		availability_send(data, data_offset);
+		zbx_availability_flush(data, data_offset);
 	zbx_free(data);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);

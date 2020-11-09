@@ -20,6 +20,6 @@
 #ifndef ZABBIX_AVAILABILITY_H
 #define ZABBIX_AVAILABILITY_H
 
-void	availability_send(unsigned char *data, zbx_uint32_t size);
+void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size);
 
 #endif /* ZABBIX_AVAILABILITY_H */

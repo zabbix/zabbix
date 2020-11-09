@@ -116,7 +116,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 		if (NULL != message)
 		{
-			zbx_avail_deserialize(message->data, message->size, &host_availabilities);
+			zbx_availability_deserialize(message->data, message->size, &host_availabilities);
 			zbx_ipc_message_free(message);
 		}
 
@@ -131,25 +131,25 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				continue;
 
 			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-			block_signals(&orig_mask);
+			zbx_block_signals(&orig_mask);
 			zbx_sql_add_host_availabilities(&host_availabilities);
-			unblock_signals(&orig_mask);
+			zbx_unblock_signals(&orig_mask);
 			processed_num = host_availabilities.values_num;
 			zbx_vector_ptr_clear_ext(&host_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
 		}
 	}
 
 	zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-	block_signals(&orig_mask);
+	zbx_block_signals(&orig_mask);
 	zbx_sql_add_host_availabilities(&host_availabilities);
 	DBclose();
-	unblock_signals(&orig_mask);
-	zabbix_log(LOG_LEVEL_INFORMATION, "EXITTING");
+	zbx_unblock_signals(&orig_mask);
+
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
 
-void	availability_send(unsigned char *data, zbx_uint32_t size)
+void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
 

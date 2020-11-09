@@ -2255,9 +2255,9 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 		size_t		data_alloc = 0, data_offset = 0;
 
 		for (i = 0; i < hosts.values_num; i++)
-			zbx_avail_serialize(&data, &data_alloc, &data_offset, (zbx_host_availability_t *)hosts.values[i]);
+			zbx_availability_serialize(&data, &data_alloc, &data_offset, (zbx_host_availability_t *)hosts.values[i]);
 
-		availability_send(data, data_offset);
+		zbx_availability_flush(data, data_offset);
 		zbx_free(data);
 	}
 

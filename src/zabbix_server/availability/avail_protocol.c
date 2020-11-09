@@ -23,23 +23,23 @@
 #include "avail_protocol.h"
 #include "dbcache.h"
 
-void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_host_availability_t *ha)
+void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_host_availability_t *host_availability)
 {
 	zbx_uint32_t	data_len = 0;
 	int		error_lens[ZBX_AGENT_MAX];
 	int		i;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, ha->hostid);
+	zbx_serialize_prepare_value(data_len, host_availability->hostid);
 
 	for (i = 0; i < ZBX_AGENT_MAX; i++)
 	{
-		zbx_serialize_prepare_value(data_len, ha->agents[i].flags);
-		zbx_serialize_prepare_value(data_len, ha->agents[i].available);
-		zbx_serialize_prepare_value(data_len, ha->agents[i].errors_from);
-		zbx_serialize_prepare_value(data_len, ha->agents[i].disable_until);
-		zbx_serialize_prepare_str_len(data_len, ha->agents[i].error, error_lens[i]);
+		zbx_serialize_prepare_value(data_len, host_availability->agents[i].flags);
+		zbx_serialize_prepare_value(data_len, host_availability->agents[i].available);
+		zbx_serialize_prepare_value(data_len, host_availability->agents[i].errors_from);
+		zbx_serialize_prepare_value(data_len, host_availability->agents[i].disable_until);
+		zbx_serialize_prepare_str_len(data_len, host_availability->agents[i].error, error_lens[i]);
 	}
 
 	if (NULL == *data)
@@ -53,42 +53,43 @@ void	zbx_avail_serialize(unsigned char **data, size_t *data_alloc, size_t *data_
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 
-	ptr += zbx_serialize_value(ptr, ha->hostid);
+	ptr += zbx_serialize_value(ptr, host_availability->hostid);
 	for (i = 0; i < ZBX_AGENT_MAX; i++)
 	{
-		ptr += zbx_serialize_value(ptr, ha->agents[i].flags);
-		ptr += zbx_serialize_value(ptr, ha->agents[i].available);
-		ptr += zbx_serialize_value(ptr, ha->agents[i].errors_from);
-		ptr += zbx_serialize_value(ptr, ha->agents[i].disable_until);
-		ptr += zbx_serialize_str(ptr, ha->agents[i].error, error_lens[i]);
+		ptr += zbx_serialize_value(ptr, host_availability->agents[i].flags);
+		ptr += zbx_serialize_value(ptr, host_availability->agents[i].available);
+		ptr += zbx_serialize_value(ptr, host_availability->agents[i].errors_from);
+		ptr += zbx_serialize_value(ptr, host_availability->agents[i].disable_until);
+		ptr += zbx_serialize_str(ptr, host_availability->agents[i].error, error_lens[i]);
 	}
 }
 
-void	zbx_avail_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *availabilities)
+void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_ptr_t *host_availabilities)
 {
 	const unsigned char	*end = data + size;
 
 	while (data < end)
 	{
-		zbx_host_availability_t	*availability;
+		zbx_host_availability_t	*host_availability;
 		int			i;
 
-		availability = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
+		host_availability = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
 
-		zbx_vector_ptr_append(availabilities, availability);
+		zbx_vector_ptr_append(host_availabilities, host_availability);
 
-		availability->id = availabilities->values_num;
+		host_availability->id = host_availabilities->values_num;
 
-		data += zbx_deserialize_value(data, &availability->hostid);
+		data += zbx_deserialize_value(data, &host_availability->hostid);
 		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
 			zbx_uint32_t	len;
 
-			data += zbx_deserialize_value(data, &availability->agents[i].flags);
-			data += zbx_deserialize_value(data, &availability->agents[i].available);
-			data += zbx_deserialize_value(data, &availability->agents[i].errors_from);
-			data += zbx_deserialize_value(data, &availability->agents[i].disable_until);
-			data += zbx_deserialize_str(data, &availability->agents[i].error, len);
+			data += zbx_deserialize_value(data, &host_availability->agents[i].flags);
+			data += zbx_deserialize_value(data, &host_availability->agents[i].available);
+			data += zbx_deserialize_value(data, &host_availability->agents[i].errors_from);
+			data += zbx_deserialize_value(data, &host_availability->agents[i].disable_until);
+			data += zbx_deserialize_str(data, &host_availability->agents[i].error, len);
 		}
 	}
 }

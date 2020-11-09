@@ -4570,9 +4570,9 @@ void	DCupdate_hosts_availability(void)
 		goto out;
 
 	for (i = 0; i < hosts.values_num; i++)
-		zbx_avail_serialize(&data, &data_alloc, &data_offset, (zbx_host_availability_t *)hosts.values[i]);
+		zbx_availability_serialize(&data, &data_alloc, &data_offset, (zbx_host_availability_t *)hosts.values[i]);
 
-	availability_send(data, data_offset);
+	zbx_availability_flush(data, data_offset);
 	zbx_free(data);
 out:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);

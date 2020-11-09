@@ -444,12 +444,12 @@ int	zbx_sigusr_send(int flags)
 
 /******************************************************************************
  *                                                                            *
- * Function: block_signals                                                    *
+ * Function: zbx_block_signals                                                    *
  *                                                                            *
  * Purpose: block signals to avoid interruption                               *
  *                                                                            *
  ******************************************************************************/
-void	block_signals(sigset_t *orig_mask)
+void	zbx_block_signals(sigset_t *orig_mask)
 {
 	sigset_t	mask;
 
@@ -466,12 +466,12 @@ void	block_signals(sigset_t *orig_mask)
 
 /******************************************************************************
  *                                                                            *
- * Function: unblock_signals                                                  *
+ * Function: zbx_unblock_signals                                                  *
  *                                                                            *
  * Purpose: unblock signals after blocking                                    *
  *                                                                            *
  ******************************************************************************/
-void	unblock_signals(const sigset_t *orig_mask)
+void	zbx_unblock_signals(const sigset_t *orig_mask)
 {
 	if (0 > sigprocmask(SIG_SETMASK, orig_mask, NULL))
 		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
