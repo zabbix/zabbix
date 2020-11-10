@@ -222,4 +222,11 @@ trait WaitableTrait {
 	public function getAttributesNotPresentCondition($attributes) {
 		return $this->getReversedCondition($this->getAttributesPresentCondition($attributes));
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getNotSelectedCondition() {
+		return $this->getReversedCondition($this->getSelectedCondition());
+	}
 }

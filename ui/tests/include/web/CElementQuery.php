@@ -45,7 +45,7 @@ require_once dirname(__FILE__).'/elements/CCompositeInputElement.php';
 require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
 require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 require_once dirname(__FILE__).'/elements/CInputGroupElement.php';
-require_once dirname(__FILE__).'/elements/CInterfaceElement.php';
+require_once dirname(__FILE__).'/elements/CHostInterfaceElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -448,6 +448,17 @@ class CElementQuery implements IWaitable {
 
 		return function () use ($target) {
 			return $target->one(false)->isVisible();
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getSelectedCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->one(false)->isSelected();
 		};
 	}
 

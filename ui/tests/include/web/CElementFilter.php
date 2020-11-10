@@ -41,6 +41,8 @@ class CElementFilter {
 	const ATTRIBUTES_NOT_PRESENT = 'attributes_not_present';
 	const NOT_VISIBLE = 'not visible';
 	const NOT_CLICKABLE = 'not clickable';
+	const SELECTED = 'selected';
+	const NOT_SELECTED = 'not selected';
 
 	private $type;
 	private $params = [];
@@ -111,7 +113,9 @@ class CElementFilter {
 			static::VISIBLE => 'getVisibleCondition',
 			static::NOT_VISIBLE => 'getNotVisibleCondition',
 			static::CLICKABLE => 'getClickableCondition',
-			static::NOT_CLICKABLE => 'getNotClickableCondition'
+			static::NOT_CLICKABLE => 'getNotClickableCondition',
+			static::SELECTED => 'getSelectedCondition',
+			static::NOT_SELECTED => 'getNotSelectedCondition'
 		];
 
 		if (!array_key_exists($condition, $conditions)) {

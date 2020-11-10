@@ -84,7 +84,7 @@ class CTableRowElement extends CElement {
 			$column = $index;
 		}
 
-		return $this->query($this->column_selector.'['.((int)$column + 1).']')->one();
+		return $this->query('xpath:.//'.CXPathHelper::fromSelector($this->column_selector).'['.((int)$column + 1).']')->one();
 	}
 
 	/**

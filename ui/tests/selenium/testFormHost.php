@@ -200,7 +200,7 @@ class testFormHost extends CWebTest {
 			$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));
 		}
 
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asInterfaceElement();
+		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement();
 		$this->assertEquals(['', 'Type', 'IP address', 'DNS name', 'Connect to', 'Port', 'Default'], $interfaces_form->getHeadersText());
 
 		foreach ($interfaces_form->getRows() as $i => $row) {
@@ -689,7 +689,7 @@ class testFormHost extends CWebTest {
 
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => $names]);
+		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 		$interfaces = CTestArrayHelper::get($data, 'interfaces', []);
 		$interfaces_form->fill($interfaces);
 		$form->submit();
@@ -739,7 +739,7 @@ class testFormHost extends CWebTest {
 				$this->assertDatabaseFields($data);
 
 				// Check interfaces field values.
-				$form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => $names])->checkValue($data['interfaces']);
+				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])->checkValue($data['interfaces']);
 				break;
 
 			case TEST_BAD:
@@ -1343,7 +1343,7 @@ class testFormHost extends CWebTest {
 
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => $names]);
+		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
 		$form->submit();
 
@@ -1436,7 +1436,7 @@ class testFormHost extends CWebTest {
 				$this->assertDatabaseFields($source);
 
 				// Check interfaces field values.
-				$form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => $names])->checkValue($source['interfaces']);
+				$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names])->checkValue($source['interfaces']);
 				break;
 
 			case TEST_BAD:
@@ -1574,7 +1574,7 @@ class testFormHost extends CWebTest {
 		$original = $form->getFields()->asValues();
 		// Get values from interface fields.
 		$container_names = ['1' => 'default'];
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => $container_names]);
+		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names]);
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
 		$original_interfaces = $interfaces_form->getValue();
 
@@ -1595,7 +1595,7 @@ class testFormHost extends CWebTest {
 		$cloned_form = $form;
 		$form->invalidate();
 		$cloned_form->checkValue($original);
-		$cloned_form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => $container_names])->checkValue($original_interfaces);
+		$cloned_form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $container_names])->checkValue($original_interfaces);
 	}
 
 	public static function getСancelData() {
@@ -1660,7 +1660,7 @@ class testFormHost extends CWebTest {
 		// Change the host data to make sure that the changes are not saved to the database after cancellation.
 		$form = $this->query('id:hostsForm')->asForm()->one()->waitUntilVisible();
 		$form->fill(['Host name' => $new_name]);
-		$interfaces_form = $form->getFieldContainer('Interfaces')->asInterfaceElement(['names' => ['1' => 'default']]);
+		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Full clone', 'Delete'])) {

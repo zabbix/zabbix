@@ -28,7 +28,7 @@ use \Facebook\WebDriver\Exception\UnrecognizedExceptionException;
 /**
  * Host interface element.
  */
-class CInterfaceElement extends CMultifieldTableElement {
+class CHostInterfaceElement extends CMultifieldTableElement {
 
 	/**
 	 * @inheritdoc
@@ -85,7 +85,7 @@ class CInterfaceElement extends CMultifieldTableElement {
 		$this->query('button:Add')->one()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->fill($values['type']);
 		// Wait until new table row appears.
-		$this->query($this->selectors['row'].'['.($rows + 1).']')->waitUntilPresent();
+		$this->query('xpath:'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();
 		unset($values['type']);
 		return $this->updateRow($index, $values);
 	}

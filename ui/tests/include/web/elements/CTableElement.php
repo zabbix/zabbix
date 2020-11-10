@@ -134,7 +134,7 @@ class CTableElement extends CElement {
 		$table = [];
 		foreach ($this->getRows() as $row) {
 			$data = [];
-			foreach ($row->query($this->selectors['column'].'|./th')->all() as $i => $column) {
+			foreach ($row->query('xpath:.//'.CXPathHelper::fromSelector($this->selectors['column']).'|./th')->all() as $i => $column) {
 				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
 			}
 

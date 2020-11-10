@@ -281,9 +281,9 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CInterfaceElement
+	 * @return CHostInterfaceElement
 	 */
-	public function asInterfaceElement($options = []) {
-		return $this->cast(CInterfaceElement::class, $options);
+	public function asHostInterfaceElement($options = []) {
+		return $this->cast(CHostInterfaceElement::class, $options);
 	}
 }

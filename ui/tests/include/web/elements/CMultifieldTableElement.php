@@ -305,7 +305,7 @@ class CMultifieldTableElement extends CTableElement {
 		$this->query('button:Add')->one()->click();
 
 		// Wait until new table row appears.
-		$this->query($this->selectors['row'].'['.($rows + 1).']')->waitUntilPresent();
+		$this->query('xpath:.//'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();
 		return $this->updateRow($rows, $values);
 	}
 

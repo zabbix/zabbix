@@ -42,13 +42,24 @@ class CSegmentedRadioElement extends CElement {
 	 * @return string
 	 */
 	public function getText() {
-		foreach ($this->query('xpath:.//input[@type="radio"]')->all() as $radio) {
-			if ($radio->isSelected()) {
-				return $radio->parents('tag:li')->query('tag:label')->one()->getText();
+		$radio = $this->query('xpath:.//input[@type="radio"]')->all()->filter(new CElementFilter(CElementFilter::SELECTED));
+
+		if ($radio->isEmpty()) {
+			throw new Exception('Failed to find selected element.');
+		}
+		if ($radio->count() > 1) {
+			$radio = $radio->filter(new CElementFilter(CElementFilter::VISIBLE));
+
+			if ($radio->isEmpty()) {
+				throw new Exception('Failed to find visible selected element.');
+			}
+
+			if ($radio->count() > 1) {
+				CTest::addWarning('Selected element is not one.');
 			}
 		}
 
-		return null;
+		return $radio->first()->parents('tag:li')->query('tag:label')->one()->getText();
 	}
 
 	/**
