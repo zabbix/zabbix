@@ -159,6 +159,20 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	[...obj.querySelectorAll('[name=inventory_mode]')].map((elem) => elem.addEventListener('change', cb));
 
+	document
+		.querySelector('#visible_inventory_mode')
+		.addEventListener('click',
+			() => cb({
+				currentTarget: {
+					value: (!document.querySelector('#visible_inventory_mode:checked'))
+						? '<?php echo HOST_INVENTORY_DISABLED; ?>'
+						: document
+							.querySelector('[name=inventory_mode]:checked')
+							.value
+				}
+			})
+		);
+
 	obj
 		.querySelector('[name=inventory_mode]')
 		.dispatchEvent(new CustomEvent('change', {}));
