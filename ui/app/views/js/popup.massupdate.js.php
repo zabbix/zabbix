@@ -152,6 +152,9 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		const value = event.currentTarget.value;
 
 		$('.formrow-inventory').toggle(value !== '<?php echo HOST_INVENTORY_DISABLED; ?>');
+
+		// Update popup size.
+		$('#tabs').resize();
 	};
 
 	[...obj.querySelectorAll('[name=inventory_mode]')].map((elem) => elem.addEventListener('change', cb));
