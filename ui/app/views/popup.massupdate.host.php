@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -217,7 +217,6 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 $encryption_form_list = new CFormList('encryption');
 
 $encryption_table = (new CTable())
-	->addStyle('width:100%;')
 	->addRow([_('Connections to host'),
 		(new CRadioButtonList('tls_connect', HOST_ENCRYPTION_NONE))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
@@ -255,7 +254,6 @@ $encryption_form_list->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))->setLabel(_('Connections')),
 	(new CDiv($encryption_table))
 		->setId('encryption_div')
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // append tabs to form
