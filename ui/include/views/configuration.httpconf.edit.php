@@ -109,7 +109,7 @@ foreach ($user_agents_all as $user_agent_group => $user_agents) {
 	);
 }
 
-$http_form_list->addRow(new CLabel(_('Agent'), 'label-agent'), $agent_select);
+$http_form_list->addRow(new CLabel(_('Agent'), $agent_select->getFocusableElementId()), $agent_select);
 
 $http_form_list->addRow(_('User agent string'),
 	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
