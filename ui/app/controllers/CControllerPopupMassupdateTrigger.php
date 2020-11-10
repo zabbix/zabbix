@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -89,7 +89,11 @@ class CControllerPopupMassupdateTrigger extends CController {
 			$output = [];
 			$triggerids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
-			$tags = $this->getInput('tags', []);
+			$tags = array_filter($this->getInput('tags', []),
+				function ($tag) {
+					return $tag['tag'] !== '' && $tag['value'] !== '';
+				}
+			);
 
 			foreach ($tags as $key => $tag) {
 				// remove empty new tag lines

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -98,8 +98,18 @@ class CControllerPopupMassupdateHost extends CController {
 			$output = [];
 			$hostids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
-			$macros = cleanInheritedMacros($this->getInput('macros', []));
-			$tags = $this->getInput('tags', []);
+			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
+				function($macro) {
+					return (bool) array_filter(
+						array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))
+					);
+				}
+			);
+			$tags = array_filter($this->getInput('tags', []),
+				function ($tag) {
+					return $tag['tag'] !== '' && $tag['value'] !== '';
+				}
+			);
 
 			try {
 				DBstart();
