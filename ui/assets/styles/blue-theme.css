@@ -5969,4 +5969,4 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   position: sticky;
   top: 0;
   background: #ffffff;
-  z-index: 1; }
+  z-index: 3; }

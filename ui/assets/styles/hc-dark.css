@@ -5924,7 +5924,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   position: sticky;
   top: 0;
   background: #070707;
-  z-index: 1; }
+  z-index: 3; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }

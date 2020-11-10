@@ -5980,7 +5980,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   position: sticky;
   top: 0;
   background: #2b2b2b;
-  z-index: 1; }
+  z-index: 3; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
