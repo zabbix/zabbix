@@ -690,28 +690,21 @@ function replace_template_dependencies($deps, $hostid) {
  */
 function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): array {
 	// Prepare triggers to show in results table.
-	$exceeded_trigs = false;
 	$triggers_by_name = [];
 	foreach ($db_triggers as $trigger) {
-		$trigger_name = $trigger['description'];
-
 		foreach ($trigger['hosts'] as $host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {
 				continue;
 			}
 
-			if (count($triggers_by_name) < ZBX_MAX_TABLE_COLUMNS) {
-				if (!array_key_exists($trigger_name, $triggers_by_name)) {
-					$triggers_by_name[$trigger_name] = [];
-				}
-
-				$triggers_by_name[$trigger_name][$host['hostid']] = $trigger['triggerid'];
-			}
-			else {
-				$exceeded_trigs = true;
-				break 2;
-			}
+			$triggers_by_name[$trigger['description']][$host['hostid']] = $trigger['triggerid'];
 		}
+	}
+
+	$exceeded_trigs = (count($triggers_by_name) > ZBX_MAX_TABLE_COLUMNS);
+	$triggers_by_name = array_slice($triggers_by_name, 0, ZBX_MAX_TABLE_COLUMNS);
+	foreach ($triggers_by_name as $name => $triggers) {
+		$triggers_by_name[$name] = array_slice($triggers, 0, ZBX_MAX_TABLE_COLUMNS, true);
 	}
 
 	// Prepare hosts to show in results table.
