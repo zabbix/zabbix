@@ -91,7 +91,7 @@ $item_form_list
 		(new CVisibilityBox('visible[post_type]', 'post_type_container', _('Original')))
 			->setLabel(_('Request body type')),
 		(new CDiv(
-			(new CRadioButtonList('post_type', DB::getDefault('items', 'post_type')))
+			(new CRadioButtonList('post_type', (int) DB::getDefault('items', 'post_type')))
 				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
