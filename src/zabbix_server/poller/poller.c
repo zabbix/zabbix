@@ -57,7 +57,7 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 
 /******************************************************************************
  *                                                                            *
- * Function: db_host_update_availability                                      *
+ * Function: update_host_availability                                         *
  *                                                                            *
  * Purpose: write host availability changes into database                     *
  *                                                                            *
@@ -67,7 +67,7 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
  *               FAIL    - no changes in availability data were detected      *
  *                                                                            *
  ******************************************************************************/
-static int	db_host_update_availability(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+static int	update_host_availability(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_host_availability_t *ha)
 {
 	if (FAIL == zbx_host_availability_is_set(ha))
@@ -244,7 +244,7 @@ void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts, unsigned char **d
 	if (FAIL == DChost_activate(item->host.hostid, agent_type, ts, &in.agents[agent_type], &out.agents[agent_type]))
 		goto out;
 
-	if (FAIL == db_host_update_availability(data, data_alloc, data_offset, &out))
+	if (FAIL == update_host_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
 	host_set_availability(&item->host, agent_type, &out);
@@ -290,7 +290,7 @@ void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, unsigned char *
 		goto out;
 	}
 
-	if (FAIL == db_host_update_availability(data, data_alloc, data_offset, &out))
+	if (FAIL == update_host_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
 	host_set_availability(&item->host, agent_type, &out);
