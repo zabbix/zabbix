@@ -1461,7 +1461,8 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
  *                                                                            *
  * Purpose: copies vmware hypervisor object into shared memory                *
  *                                                                            *
- * Parameters: src   - [IN] the vmware hypervisor object                      *
+ * Parameters: dst - [OUT] the vmware hypervisor object into shared memory    *
+ *             src - [IN] the vmware hypervisor object                        *
  *                                                                            *
  * Return value: a duplicated vmware hypervisor object                        *
  *                                                                            *
@@ -1482,8 +1483,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	dst->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_HVPROPS_NUM);
 	dst->datacenter_name = vmware_shared_strdup(src->datacenter_name);
 	dst->parent_name = vmware_shared_strdup(src->parent_name);
-	dst->parent_type= vmware_shared_strdup(src->parent_type);
-	dst->ip= vmware_shared_strdup(src->ip);
+	dst->parent_type = vmware_shared_strdup(src->parent_type);
+	dst->ip = vmware_shared_strdup(src->ip);
 
 	for (i = 0; i < src->ds_names.values_num; i++)
 		zbx_vector_str_append(&dst->ds_names, vmware_shared_strdup(src->ds_names.values[i]));
@@ -3217,9 +3218,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		hv->clusterid = value;
 
 	if (NULL != (value = zbx_xml_read_doc_value(details, ZBX_XPATH_HV_IPV4("management"))))
-	{
 		hv->ip = value;
-	}
 
 	if (SUCCEED != vmware_hv_get_parent_data(service, easyhandle, hv, error))
 		goto out;
