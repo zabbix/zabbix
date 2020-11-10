@@ -1072,6 +1072,25 @@ function getDataOverviewCellData(array $db_hosts, array $db_items, array &$items
 }
 
 /**
+ * Map item keys to expanded and resolved item names.
+ *
+ * @param array $items_by_key  List of itemids mapped by keys.
+ * @param array $db_items      List of items.
+ *
+ * @return array
+ */
+function resolveDataOverviewItemNames(array $items_by_key, array $db_items): array {
+	$item_names_by_key = array_map(function($itemid) use ($db_items) {
+		return $db_items[reset($itemid)];
+	}, $items_by_key);
+	$item_names_by_key = array_map(function($item) {
+		return $item['name_expanded'];
+	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
+
+	return $item_names_by_key;
+}
+
+/**
  * @param array  $groupids
  * @param array  $hostids
  * @param string $application
