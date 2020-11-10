@@ -951,7 +951,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#HV.UUID}", hv->uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NAME}", name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "{#HV.IP}", hv->ip, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#HV.IP}", NULL != hv->ip ? hv->ip : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
