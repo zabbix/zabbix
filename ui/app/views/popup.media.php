@@ -67,7 +67,7 @@ foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
 
 // Create media form.
 $media_form = (new CFormList(_('Media')))
-	->addRow(new CLabel(_('Type'), 'label-mediatypeid'), $type_select)
+	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select)
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
 		(new CTextBox('sendto', $options['sendto'], false, 1024))

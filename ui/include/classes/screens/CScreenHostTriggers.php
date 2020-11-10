@@ -139,9 +139,13 @@ class CScreenHostTriggers extends CScreenBase {
 				(new CForm('get', $this->pageFile))
 					->addItem(
 						(new CList())
-							->addItem([new CLabel(_('Group'), 'label-group'), '&nbsp;', $groups_select])
+							->addItem([new CLabel(_('Group'), $groups_select->getFocusableElementId()), '&nbsp;',
+								$groups_select
+							])
 							->addItem('&nbsp;')
-							->addItem([new CLabel(_('Host'), 'label-host'), '&nbsp;', $hosts_select])
+							->addItem([new CLabel(_('Host'), $hosts_select->getFocusableElementId()), '&nbsp;',
+								$hosts_select
+							])
 					)
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}

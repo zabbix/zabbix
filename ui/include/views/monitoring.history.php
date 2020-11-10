@@ -187,7 +187,7 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 					]));
 			}
 
-			$filterColumn1->addRow(new CLabel(_('Selected'), 'label-selected'), $tasks);
+			$filterColumn1->addRow(new CLabel(_('Selected'), $tasks[0]->getFocusableElementId()), $tasks);
 			$filter_tab[] = $filterColumn1;
 		}
 	}

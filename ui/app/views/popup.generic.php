@@ -131,7 +131,7 @@ if ($data['popup_type'] === 'help_items') {
 	}
 
 	$controls[] = [
-		new CLabel(_('Type'), 'label-itemtype'),
+		new CLabel(_('Type'), $types_select->getFocusableElementId()),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$types_select
 	];

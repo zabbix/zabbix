@@ -827,8 +827,8 @@ else {
 		}
 	}
 
-	$form_list->addRow(new CLabel(_('Populates host inventory field'), 'label-host-inventory'), $host_inventory_select,
-		'row_inventory_link'
+	$form_list->addRow(new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()),
+		$host_inventory_select, 'row_inventory_link'
 	);
 }
 
