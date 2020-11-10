@@ -20,6 +20,9 @@
 #ifndef ZABBIX_AVAILABILITY_H
 #define ZABBIX_AVAILABILITY_H
 
+#include "zbxalgo.h"
+
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size);
+void	zbx_availabilities_flush(const zbx_vector_ptr_t *host_availabilities);
 
 #endif /* ZABBIX_AVAILABILITY_H */

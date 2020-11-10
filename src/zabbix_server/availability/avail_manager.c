@@ -131,9 +131,11 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				continue;
 
 			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
+
 			zbx_block_signals(&orig_mask);
 			zbx_sql_add_host_availabilities(&host_availabilities);
 			zbx_unblock_signals(&orig_mask);
+
 			processed_num = host_availabilities.values_num;
 			zbx_vector_ptr_clear_ext(&host_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
 		}
@@ -170,5 +172,21 @@ void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
 		exit(EXIT_FAILURE);
 	}
+}
+
+void	zbx_availabilities_flush(const zbx_vector_ptr_t *host_availabilities)
+{
+	unsigned char	*data = NULL;
+	size_t		data_alloc = 0, data_offset = 0;
+	int		i;
+
+	for (i = 0; i < host_availabilities->values_num; i++)
+	{
+		zbx_availability_serialize(&data, &data_alloc, &data_offset,
+				(zbx_host_availability_t *)host_availabilities->values[i]);
+	}
+
+	zbx_availability_flush(data, data_offset);
+	zbx_free(data);
 }
 
