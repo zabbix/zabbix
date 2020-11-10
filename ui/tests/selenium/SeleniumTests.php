@@ -96,9 +96,9 @@ require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
-require_once dirname(__FILE__).'/testFormHostMacros.php';
+
 require_once dirname(__FILE__).'/testFormHostPrototype.php';
-require_once dirname(__FILE__).'/testFormHostPrototypeMacros.php';
+
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
 require_once dirname(__FILE__).'/testFormItemPreprocessing.php';
@@ -111,6 +111,9 @@ require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryPreprocessing.php';
+require_once dirname(__FILE__).'/testFormMacrosHost.php';
+require_once dirname(__FILE__).'/testFormMacrosHostPrototype.php';
+require_once dirname(__FILE__).'/testFormMacrosTemplate.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
@@ -124,7 +127,6 @@ require_once dirname(__FILE__).'/testFormTagsTrigger.php';
 require_once dirname(__FILE__).'/testFormTagsTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
-require_once dirname(__FILE__).'/testFormTemplateMacros.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormUser.php';
 require_once dirname(__FILE__).'/testFormUserMedia.php';
@@ -244,9 +246,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
-		$suite->addTestSuite('testFormHostMacros');
+
 		$suite->addTestSuite('testFormHostPrototype');
-		$suite->addTestSuite('testFormHostPrototypeMacros');
+
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
 		$suite->addTestSuite('testFormItemPreprocessing');
@@ -259,6 +261,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormLowLevelDiscoveryPreprocessing');
+		$suite->addTestSuite('testFormMacrosHost');
+		$suite->addTestSuite('testFormMacrosHostPrototype');
+		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormNetworkDiscovery');
@@ -271,7 +276,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTagsTrigger');
 		$suite->addTestSuite('testFormTagsTriggerPrototype');
 		$suite->addTestSuite('testFormTemplate');
-		$suite->addTestSuite('testFormTemplateMacros');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUser');
