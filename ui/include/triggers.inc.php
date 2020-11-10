@@ -685,39 +685,29 @@ function replace_template_dependencies($deps, $hostid) {
  */
 function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): array {
 	// Prepare triggers to show in results table.
-	$exceeded_trigs = false;
 	$triggers_by_name = [];
 	foreach ($db_triggers as $trigger) {
-		$trigger_name = $trigger['description'];
-
 		foreach ($trigger['hosts'] as $host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {
 				continue;
 			}
 
-			if (!array_key_exists($trigger_name, $triggers_by_name)) {
-				$triggers_by_name[$trigger_name] = [];
-			}
-
-			if (count($triggers_by_name) < (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE)) {
-				if (!array_key_exists($trigger_name, $triggers_by_name)) {
-					$triggers_by_name[$trigger_name] = [];
-				}
-
-				$triggers_by_name[$trigger_name][$host['hostid']] = $trigger['triggerid'];
-			}
-			else {
-				$exceeded_trigs = true;
-				break 2;
-			}
+			$triggers_by_name[$trigger['description']][$host['hostid']] = $trigger['triggerid'];
 		}
+	}
+
+	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+	$exceeded_trigs = (count($triggers_by_name) > $limit);
+	$triggers_by_name = array_slice($triggers_by_name, 0, $limit);
+	foreach ($triggers_by_name as $name => $triggers) {
+		$triggers_by_name[$name] = array_slice($triggers, 0, $limit, true);
 	}
 
 	// Prepare hosts to show in results table.
 	$exceeded_hosts = false;
 	$hosts_by_name = [];
 	foreach ($db_hosts as $host) {
-		if (count($hosts_by_name) >= (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE)) {
+		if (count($hosts_by_name) >= $limit) {
 			$exceeded_hosts = true;
 			break;
 		}
