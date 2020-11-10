@@ -68,11 +68,11 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_AVAILABILITY, &error))
 	{
@@ -130,9 +130,8 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 			if (0 == host_availabilities.values_num)
 				continue;
 
-			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-
 			zbx_block_signals(&orig_mask);
+			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
 			zbx_sql_add_host_availabilities(&host_availabilities);
 			zbx_unblock_signals(&orig_mask);
 
@@ -141,9 +140,12 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		}
 	}
 
-	zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
 	zbx_block_signals(&orig_mask);
-	zbx_sql_add_host_availabilities(&host_availabilities);
+	if (0 != host_availabilities.values_num)
+	{
+		zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
+		zbx_sql_add_host_availabilities(&host_availabilities);
+	}
 	DBclose();
 	zbx_unblock_signals(&orig_mask);
 
