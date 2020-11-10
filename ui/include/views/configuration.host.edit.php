@@ -581,8 +581,8 @@ if ($data['readonly']) {
 	];
 }
 else {
-	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
-	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
+	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, ipmiAuthTypes());
+	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, ipmiPrivileges());
 }
 
 $divTabs->addTab('ipmiTab', _('IPMI'),
