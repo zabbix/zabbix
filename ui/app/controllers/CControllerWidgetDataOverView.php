@@ -38,11 +38,11 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$hostids = $fields['hostids'] ? $fields['hostids'] : null;
 
 		if ($fields['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data)
+			list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
 				= getDataOverviewTop($groupids, $hostids, $fields['application']);
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data)
+			list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
 				= getDataOverviewLeft($groupids, $hostids, $fields['application']);
 		}
 
@@ -57,7 +57,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'visible_items' => $visible_items,
 			'db_hosts' => $db_hosts,
 			'items_by_key' => $items_by_key,
-			'item_names_by_key' => $item_names_by_key,
+			'item_names_by_key' => resolveDataOverviewItemNames($items_by_key, $db_items),
 			'has_hidden_data' => $has_hidden_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

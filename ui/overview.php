@@ -267,16 +267,9 @@ else {
 		$data['filter']['show_suppressed']
 	);
 
-	$item_names_by_key = array_map(function($itemid) use ($db_items) {
-		return $db_items[reset($itemid)];
-	}, $items_by_key);
-	$item_names_by_key = array_map(function($item) {
-		return $item['name_expanded'];
-	}, CMacrosResolverHelper::resolveItemNames($item_names_by_key));
-
 	$data['db_hosts'] = $db_hosts;
 	$data['items_by_key'] = $items_by_key;
-	$data['item_names_by_key'] = $item_names_by_key;
+	$data['item_names_by_key'] = resolveDataOverviewItemNames($items_by_key, $db_items);
 	$data['has_hidden_data'] = $has_hidden_data;
 
 	// Render view.

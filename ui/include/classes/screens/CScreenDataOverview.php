@@ -42,7 +42,7 @@ class CScreenDataOverview extends CScreenBase {
 
 		$data = [];
 		if ($this->screenitem['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data)
+			list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
 				= getDataOverviewTop((array) $groupid, null, $this->screenitem['application']);
 
 			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_key,
@@ -51,12 +51,12 @@ class CScreenDataOverview extends CScreenBase {
 			$data['db_hosts'] = $db_hosts;
 			$data['items_by_key'] = $items_by_key;
 			$data['has_hidden_data'] = $has_hidden_data;
-			$data['item_names_by_key'] = $item_names_by_key;
+			$data['item_names_by_key'] = resolveDataOverviewItemNames($items_by_key, $db_items);
 
 			$table = new CPartial('dataoverview.table.top', $data);
 		}
 		else {
-			list($db_items, $db_hosts, $items_by_key, $item_names_by_key, $has_hidden_data)
+			list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
 				= getDataOverviewLeft((array) $groupid, null, $this->screenitem['application']);
 
 			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_key,
@@ -64,7 +64,7 @@ class CScreenDataOverview extends CScreenBase {
 			);
 			$data['db_hosts'] = $db_hosts;
 			$data['items_by_key'] = $items_by_key;
-			$data['item_names_by_key'] = $item_names_by_key;
+			$data['item_names_by_key'] = resolveDataOverviewItemNames($items_by_key, $db_items);
 			$data['has_hidden_data'] = $has_hidden_data;
 
 			$table = new CPartial('dataoverview.table.left', $data);
