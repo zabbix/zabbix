@@ -38,7 +38,6 @@
 #include "zbxhistory.h"
 #include "daemon.h"
 #include "../../zabbix_server/availability/availability.h"
-#include "../../zabbix_server/availability/avail_protocol.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
