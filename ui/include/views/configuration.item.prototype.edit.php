@@ -168,6 +168,7 @@ $form_list
 			->setFocusableElementId('label-request-method')
 			->setId('request_method')
 			->setValue($data['request_method'])
+			->setReadonly($readonly)
 			->addOptions(CSelect::createOptionsFromArray([
 				HTTPCHECK_REQUEST_GET => 'GET',
 				HTTPCHECK_REQUEST_POST => 'POST',
