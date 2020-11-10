@@ -713,6 +713,9 @@ static void	ipmi_manager_deactivate_host(zbx_ipmi_manager_t *manager, zbx_uint64
 	ipmi_manager_update_host(manager, &item.host);
 
 	DCconfig_clean_items(&item, &errcode, 1);
+	if (NULL != data)
+		zbx_availability_flush(data, data_offset);
+	zbx_free(data);
 }
 
 /******************************************************************************
