@@ -67,6 +67,20 @@ type unitJson struct {
 	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
 }
 
+type state struct {
+	State int    `json:"state"`
+	Text  string `json:"text"`
+}
+
+type get struct {
+	Description   string `json:"Description"`
+	LoadState     state  `json:"LoadState"`
+	ActiveState   state  `json:"ActiveState"`
+	UnitFileState state  `json:"UnitFileState"`
+	SubState      string `json:"SubState"`
+	Job           uint32 `json:"Job"`
+}
+
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
 	var err error
 	var conn *dbus.Conn
@@ -123,6 +137,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	defer p.releaseConnection(conn)
 
 	switch key {
+	case "systemd.unit.get":
+		return p.get(params, conn)
 	case "systemd.unit.discovery":
 		return p.discovery(params, conn)
 	case "systemd.unit.info":
@@ -130,6 +146,146 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
+}
+
+func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
+	var property, unitType string
+	var value interface{}
+
+	if len(params) > 2 {
+		return nil, fmt.Errorf("Too many parameters.")
+	}
+
+	if len(params) < 1 {
+		return nil,
+			fmt.Errorf("Too few parameters.")
+	}
+
+	if len(params) < 2 || len(params[1]) == 0 {
+		unitType = "Unit"
+	} else {
+		unitType = params[1]
+	}
+
+	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
+	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot get unit property: %s", err)
+	}
+
+	v, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("Cannot format unit properties for a response.")
+	}
+
+	out := get{}
+	for k, val := range v {
+		switch k {
+		case "Description":
+			description, ok := val.(string)
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			out.Description = description
+			continue
+		case "SubState":
+			subState, ok := val.(string)
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			out.SubState = subState
+			continue
+		case "Job":
+			jobSlice, ok := val.([]interface{})
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			if len(jobSlice) < 1 {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			job, ok := jobSlice[0].(uint32)
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			out.Job = job
+			continue
+		case "LoadState":
+			loadState, ok := val.(string)
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			switch loadState {
+			case "loaded":
+				out.LoadState = state{1, "loaded"}
+			case "masked":
+				out.LoadState = state{3, "masked"}
+			default:
+				out.LoadState = state{2, "error"}
+			}
+			continue
+		case "ActiveState":
+			activeState, ok := val.(string)
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			switch activeState {
+			case "active":
+				out.ActiveState = state{1, "active"}
+			case "reloading":
+				out.ActiveState = state{2, "reloading"}
+			case "inactive":
+				out.ActiveState = state{3, "inactive"}
+			case "activating":
+				out.ActiveState = state{5, "activating"}
+			case "deactivating":
+				out.ActiveState = state{6, "deactivating"}
+			default:
+				out.ActiveState = state{4, "failed"}
+			}
+			continue
+		case "UnitFileState":
+			unitFileState, ok := val.(string)
+			if !ok {
+				return nil, fmt.Errorf("Cannot format unit properties for a response.")
+			}
+
+			switch unitFileState {
+			case "enabled":
+				out.UnitFileState = state{1, "enabled"}
+			case "enabled-runtime":
+				out.UnitFileState = state{2, "enabled-runtime"}
+			case "linked":
+				out.UnitFileState = state{3, "linked"}
+			case "linked-runtime":
+				out.UnitFileState = state{4, "linked-runtime"}
+			case "masked":
+				out.UnitFileState = state{5, "masked"}
+			case "masked-runtime":
+				out.UnitFileState = state{6, "masked-runtime"}
+			case "static":
+				out.UnitFileState = state{7, "static"}
+			case "disabled":
+				out.UnitFileState = state{8, "disabled"}
+			default:
+				out.UnitFileState = state{9, "invalid"}
+			}
+			continue
+		}
+	}
+
+	ret, err := json.Marshal(out)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+	}
+
+	return string(ret), nil
 }
 
 func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error) {
@@ -218,27 +374,7 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 		unitType = params[2]
 	}
 
-	name := params[0]
-
-	nameEsc := make([]byte, len(name)*3)
-	j := 0
-	for i := 0; i < len(name); i++ {
-		if (name[i] >= 'A' && name[i] <= 'Z') ||
-			(name[i] >= 'a' && name[i] <= 'z') ||
-			((name[i] >= '0' && name[i] <= '9') && i != 0) {
-			nameEsc[j] = name[i]
-			j++
-			continue
-		}
-		nameEsc[j] = '_'
-		j++
-		nameEsc[j] = zbxNum2hex((name[i] >> 4) & 0xf)
-		j++
-		nameEsc[j] = zbxNum2hex(name[i] & 0xf)
-		j++
-	}
-
-	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+string(nameEsc[:j])))
+	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
 	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
 
 	if nil != err {
@@ -261,8 +397,31 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 	return value, nil
 }
 
+func getName(name string) string {
+	nameEsc := make([]byte, len(name)*3)
+	j := 0
+	for i := 0; i < len(name); i++ {
+		if (name[i] >= 'A' && name[i] <= 'Z') ||
+			(name[i] >= 'a' && name[i] <= 'z') ||
+			((name[i] >= '0' && name[i] <= '9') && i != 0) {
+			nameEsc[j] = name[i]
+			j++
+			continue
+		}
+		nameEsc[j] = '_'
+		j++
+		nameEsc[j] = zbxNum2hex((name[i] >> 4) & 0xf)
+		j++
+		nameEsc[j] = zbxNum2hex(name[i] & 0xf)
+		j++
+	}
+	return string(nameEsc[:j])
+}
+
 func init() {
 	plugin.RegisterMetrics(&impl, "Systemd",
+		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
 		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
-		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].")
+		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
+	)
 }
