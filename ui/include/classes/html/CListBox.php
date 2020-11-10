@@ -23,14 +23,11 @@ class CListBox extends CTag {
 
 	public $value;
 
-	public function __construct($name = 'listbox', $value = null, $size = 5, $action = null, array $items = []) {
+	public function __construct($name = 'listbox', $value = null, $size = 5, array $items = []) {
 		parent::__construct('select', true);
 		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->value = $value;
-		if ($action !== null) {
-			$this->onChange($action);
-		}
 		$this->addItems($items);
 
 		// Prevent Firefox remembering selected option on page refresh.
