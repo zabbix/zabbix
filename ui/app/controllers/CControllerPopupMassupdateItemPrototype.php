@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -560,6 +560,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'hostid' => $this->getInput('hostid', 0),
 				'delay_flex' => [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]],
 				'multiple_interface_types' => false,
+				'initial_item_type' => null,
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 				'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
 				'displayApplications' => true,
@@ -624,6 +625,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				}
 
 				$data['type'] = $this->hasInput('type') ? $data['type'] : $initial_type;
+				$data['initial_item_type'] = $initial_type;
 				$data['multiple_interface_types'] = (count(array_unique($used_interface_types)) > 1);
 			}
 
