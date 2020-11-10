@@ -22,45 +22,38 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormTags.php';
 
 /**
- * @backup hosts
+ * @backup triggers
  */
-class testFormTagsTemplate extends testFormTags {
+class testFormTagsTrigger extends testFormTags {
 
-	public $update_name = 'A template with tags for updating';
-	public $clone_name = 'A template with tags for cloning';
-	public $link = 'templates.php';
-	public $saved_link = 'templates.php?form=update&templateid=';
+	public $update_name = 'Trigger with tags for updating';
+	public $clone_name = 'Trigger with tags for cloning';
+	public $link = 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001';
+	public $saved_link = 'triggers.php?form=update&triggerid=';
 
 	/**
-	 * Test creating of Template with tags
+	 * Test creating of Trigger with tags.
 	 *
 	 * @dataProvider getCreateData
-	 *
 	 */
-	public function testFormTagsTemplate_Create($data) {
-		$this->checkTagsCreate($data, 'template');
+	public function testFormTagsTrigger_Create($data) {
+		$expression = '{Simple form test host:test-item-reuse.last()}=0';
+		$this->checkTagsCreate($data, 'trigger', $expression);
 	}
 
 	/**
-	 * Test update of Template with tags
+	 * Test update of Trigger with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormTagsTemplate_Update($data) {
-		$this->checkTagsUpdate($data, 'template');
+	public function testFormTagsTrigger_Update($data) {
+		$this->checkTagsUpdate($data, 'trigger');
 	}
 
 	/**
-	 * Test cloning of Template with tags.
+	 * Test cloning of Trigger with tags.
 	 */
-	public function testFormTagsTemplate_Clone() {
-		$this->executeCloning('template', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Template with tags.
-	 */
-	public function testFormTagsTemplate_FullClone() {
-		$this->executeCloning('template', 'Full clone');
+	public function testFormTagsTrigger_Clone() {
+		$this->executeCloning('trigger', 'Clone');
 	}
 }

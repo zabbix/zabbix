@@ -22,45 +22,38 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormTags.php';
 
 /**
- * @backup hosts
+ * @backup triggers
  */
-class testFormTagsTemplate extends testFormTags {
+class testFormTagsTriggerPrototype extends testFormTags {
 
-	public $update_name = 'A template with tags for updating';
-	public $clone_name = 'A template with tags for cloning';
-	public $link = 'templates.php';
-	public $saved_link = 'templates.php?form=update&templateid=';
+	public $update_name = 'Trigger prototype with tags for updating';
+	public $clone_name = 'Trigger prototype with tags for cloning';
+	public $link = 'trigger_prototypes.php?parent_discoveryid=33800';
+	public $saved_link = 'trigger_prototypes.php?form=update&parent_discoveryid=33800&triggerid=';
 
 	/**
-	 * Test creating of Template with tags
+	 * Test creating of Trigger prototype with tags.
 	 *
 	 * @dataProvider getCreateData
-	 *
 	 */
-	public function testFormTagsTemplate_Create($data) {
-		$this->checkTagsCreate($data, 'template');
+	public function testFormTagsTriggerPrototype_Create($data) {
+		$expression = '{Simple form test host:item-prototype-form1.last()}=0';
+		$this->checkTagsCreate($data, 'trigger prototype', $expression);
 	}
 
 	/**
-	 * Test update of Template with tags
+	 * Test update of Trigger prototype with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormTagsTemplate_Update($data) {
-		$this->checkTagsUpdate($data, 'template');
+	public function testFormTagsTriggerPrototype_Update($data) {
+		$this->checkTagsUpdate($data, 'trigger prototype');
 	}
 
 	/**
-	 * Test cloning of Template with tags.
+	 * Test cloning of Trigger prototype with tags.
 	 */
-	public function testFormTagsTemplate_Clone() {
-		$this->executeCloning('template', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Template with tags.
-	 */
-	public function testFormTagsTemplate_FullClone() {
-		$this->executeCloning('template', 'Full clone');
+	public function testFormTagsTriggerPrototype_Clone() {
+		$this->executeCloning('trigger prototype', 'Clone');
 	}
 }
