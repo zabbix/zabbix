@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-11T14:09:26Z</date>
+   <date>2020-11-11T14:23:08Z</date>
    <groups>
       <group>
-         <name>Templates/Telephony</name>
+         <name>Templates/Applications</name>
       </group>
    </groups>
    <templates>
@@ -19,7 +19,7 @@ You can discuss this template or leave feedback on our forum https://www.zabbix.
 Template tooling version used: 0.38</description>
          <groups>
             <group>
-               <name>Templates/Telephony</name>
+               <name>Templates/Applications</name>
             </group>
          </groups>
          <applications>
