@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-30 19:58+0200\n"
-"PO-Revision-Date: 2020-10-29 15:36+0300\n"
+"PO-Revision-Date: 2020-11-02 22:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1603978567.000000\n"
+"X-POOTLE-MTIME: 1604349189.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -2119,7 +2119,7 @@ msgstr "Не удалось удалить изображение"
 #: include/classes/api/services/CHostInterface.php:622
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Невозможно удалить интерфейс у обнаруженного узла сети \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1211
 msgid "Cannot delete inventory."
@@ -3308,11 +3308,11 @@ msgstr "Проверка доступности DNS сервиса. Возвра
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:659
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr ""
+msgstr "Проверяется существование файла. Возвращает 0 - не найден; 1 - файл указанного типа существует"
 
 #: include/classes/items/CHelpItems.php:751
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Проверяется доступен ли узел сети по ICMP. 0 - ICMP ping неудачный. 1 - ICMP ping успешный."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:467
@@ -4101,11 +4101,11 @@ msgstr "Количество совпадающих строк в монитор
 
 #: include/classes/items/CHelpItems.php:1123
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr ""
+msgstr "Количество значений в очереди низкоуровневого обнаружения на обработку."
 
 #: include/classes/items/CHelpItems.php:1127
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr ""
+msgstr "Количество значений в очереди на предварительную обработку."
 
 #: include/views/configuration.action.list.php:54
 msgid "Create action"
@@ -5374,19 +5374,19 @@ msgstr "Объект обнаружения"
 
 #: include/classes/items/CHelpItems.php:779
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Обнаружение VMware кластеров, <url> - URL службы VMware. Возвращает JSON"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Обнаружение VMware хранилищ данных, <url> - URL службы VMware. Возвращает JSON"
 
 #: include/classes/items/CHelpItems.php:831
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Обнаружение хранилищ данных гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware. Возвращает JSON"
 
 #: include/classes/items/CHelpItems.php:851
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Обнаружение VMware гипервизоров, <url> - URL службы VMware. Возвращает JSON"
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
