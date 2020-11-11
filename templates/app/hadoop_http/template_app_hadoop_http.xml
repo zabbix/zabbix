@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-11T10:52:36Z</date>
+   <date>2020-11-11T14:09:26Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -12,7 +12,7 @@
          <template>Template App Hadoop by HTTP</template>
          <name>Template App Hadoop by HTTP</name>
          <description>The template gets the Hadoop metrics from cluster's hosts (ResourceManager, NodeManagers, NameNode, DataNodes) by HTTP agent.&#13;
-You should define the IP address (or FQDN) and TCP port of ResourceManager and NameNode in macros in the template to use on the host level.&#13;
+You should define the IP address (or FQDN) and Web-UI port of ResourceManager and NameNode in macros in the template to use on the host level.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
@@ -77,6 +77,117 @@ catch (error) {
                <url>{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo</url>
             </item>
             <item>
+               <name>NameNode: Blocks allocable</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.block_capacity</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Maximum number of blocks allocable.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].BlockCapacity.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Total blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.blocks_total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of blocks tracked by NameNode.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].BlocksTotal.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Capacity remaining</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.capacity_remaining</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>Available capacity.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].CapacityRemaining.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Corrupt blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.corrupt_blocks</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of corrupt blocks.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].CorruptBlocks.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Total files</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.files_total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Total count of files tracked by the NameNode.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].FilesTotal.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
                <name>Get NameNode stats</name>
                <type>HTTP_AGENT</type>
                <key>hadoop.namenode.get</key>
@@ -89,6 +200,114 @@ catch (error) {
                   </application>
                </applications>
                <url>{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx</url>
+            </item>
+            <item>
+               <name>NameNode: Missing blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.missing_blocks</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of missing blocks.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].MissingBlocks.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)}&gt;0</expression>
+                     <name>NameNode: Cluster has missing blocks</name>
+                     <priority>AVERAGE</priority>
+                     <description>A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Dead DataNodes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.num_dead_data_nodes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of dead DataNodes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumDeadDataNodes.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;0</expression>
+                     <name>NameNode: Cluster has DataNodes in Dead state</name>
+                     <priority>AVERAGE</priority>
+                     <description>The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Alive DataNodes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.num_live_data_nodes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of alive DataNodes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumLiveDataNodes.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Stale DataNodes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.num_stale_data_nodes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].StaleDataNodes.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
             </item>
             <item>
                <name>NameNode: Block Pool Renaming</name>
@@ -111,6 +330,42 @@ catch (error) {
                <master_item>
                   <key>hadoop.namenode.get</key>
                </master_item>
+            </item>
+            <item>
+               <name>NameNode: Percent capacity remaining</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.percent_remaining</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Available capacity in percent.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=NameNodeInfo')].PercentRemaining.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(15m)}&lt;{$HADOOP.CAPACITY_REMAINING.MIN.WARN}</expression>
+                     <name>NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)</name>
+                     <priority>WARNING</priority>
+                     <description>It is good practice to ensure that disk use never exceeds 80 percent capacity.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>NameNode: RPC queue &amp; processing time</name>
@@ -136,6 +391,28 @@ catch (error) {
                </master_item>
             </item>
             <item>
+               <name>NameNode: Total load</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.total_load</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The current number of concurrent file accesses (read/write) across all DataNodes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].TotalLoad.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
                <name>NameNode: Transactions since last checkpoint</name>
                <type>DEPENDENT</type>
                <key>hadoop.namenode.transactions_since_last_checkpoint</key>
@@ -150,6 +427,28 @@ catch (error) {
                   <step>
                      <type>JSONPATH</type>
                      <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].TransactionsSinceLastCheckpoint.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Under-replicated blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.under_replicated_blocks</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of blocks with insufficient replication.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].UnderReplicatedBlocks.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -206,308 +505,9 @@ catch (error) {
                </triggers>
             </item>
             <item>
-               <name>NameNode: Blocks allocable</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.block_capacity</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Maximum number of blocks allocable.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].BlockCapacity.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Total blocks</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.blocks_total</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Count of blocks tracked by NameNode.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].BlocksTotal.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Capacity remaining</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.capacity_remaining</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <units>B</units>
-               <description>Available capacity.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].CapacityRemaining.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Corrupt blocks</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.corrupt_blocks</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Number of corrupt blocks.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].CorruptBlocks.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Total files</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.files_total</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Total count of files tracked by the NameNode.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].FilesTotal.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Missing blocks</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.missing_blocks</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Number of missing blocks.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].MissingBlocks.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-               <triggers>
-                  <trigger>
-                     <expression>{min(15m)}&gt;0</expression>
-                     <name>NameNode: Cluster has missing blocks</name>
-                     <priority>AVERAGE</priority>
-                     <description>A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.</description>
-                  </trigger>
-               </triggers>
-            </item>
-            <item>
-               <name>NameNode: Dead DataNodes</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.num_dead_data_nodes</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Count of dead DataNodes.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumDeadDataNodes.first()</params>
-                  </step>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>6h</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-               <triggers>
-                  <trigger>
-                     <expression>{min(5m)}&gt;0</expression>
-                     <name>NameNode: Cluster has DataNodes in Dead state</name>
-                     <priority>AVERAGE</priority>
-                     <description>The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.</description>
-                  </trigger>
-               </triggers>
-            </item>
-            <item>
-               <name>NameNode: Alive DataNodes</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.num_live_data_nodes</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Count of alive DataNodes.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumLiveDataNodes.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Stale DataNodes</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.num_stale_data_nodes</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].StaleDataNodes.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Percent capacity remaining</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.percent_remaining</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>%</units>
-               <description>Available capacity in percent.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=NameNodeInfo')].PercentRemaining.first()</params>
-                  </step>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>6h</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-               <triggers>
-                  <trigger>
-                     <expression>{max(15m)}&lt;{$HADOOP.CAPACITY_REMAINING.MIN.WARN}</expression>
-                     <name>NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)</name>
-                     <priority>WARNING</priority>
-                     <description>It is good practice to ensure that disk use never exceeds 80 percent capacity.</description>
-                  </trigger>
-               </triggers>
-            </item>
-            <item>
-               <name>NameNode: Total load</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.total_load</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>The current number of concurrent file accesses (read/write) across all DataNodes.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].TotalLoad.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
-               <name>NameNode: Under-replicated blocks</name>
-               <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.under_replicated_blocks</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>The number of blocks with insufficient replication.</description>
-               <applications>
-                  <application>
-                     <name>Hadoop</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].UnderReplicatedBlocks.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>hadoop.namenode.get</key>
-               </master_item>
-            </item>
-            <item>
                <name>NameNode: Failed volumes</name>
                <type>DEPENDENT</type>
-               <key>hadoop.nodemanager.volume_failures_total</key>
+               <key>hadoop.namenode.volume_failures_total</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of failed volumes.</description>
@@ -663,20 +663,6 @@ catch (error) {
                <master_item>
                   <key>hadoop.resourcemanager.get</key>
                </master_item>
-               <triggers>
-                  <trigger>
-                     <expression>{min(5m)}&gt;0</expression>
-                     <name>ResourceManager: Cluster has the lost NodeManagers</name>
-                     <priority>WARNING</priority>
-                     <description>Cluster lost some NodeManagers.</description>
-                     <dependencies>
-                        <dependency>
-                           <name>ResourceManager: Cluster has no active NodeManagers</name>
-                           <expression>{Template App Hadoop by HTTP:hadoop.resourcemanager.num_active_nm.max(5m)}=0</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>ResourceManager: Rebooted NMs</name>
@@ -946,7 +932,6 @@ catch (error) {
                <key>hadoop.datanode.discovery</key>
                <delay>1h</delay>
                <url>{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo</url>
-               <lifetime>0</lifetime>
                <item_prototypes>
                   <item_prototype>
                      <name>{#HOSTNAME}: Admin state</name>
@@ -1303,7 +1288,6 @@ catch (error) {
                <key>hadoop.nodemanager.discovery</key>
                <delay>1h</delay>
                <url>{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo</url>
-               <lifetime>0</lifetime>
                <item_prototypes>
                   <item_prototype>
                      <name>{#HOSTNAME}: Available memory</name>
@@ -1649,13 +1633,13 @@ catch (error) {
             </macro>
             <macro>
                <macro>{$HADOOP.NAMENODE.HOST}</macro>
-               <value>192.168.7.123</value>
+               <value>NameNode</value>
                <description>The Hadoop NameNode host IP address or FQDN.</description>
             </macro>
             <macro>
                <macro>{$HADOOP.NAMENODE.PORT}</macro>
                <value>9870</value>
-               <description>The Hadoop NameNode TCP port.</description>
+               <description>The Hadoop NameNode Web-UI port.</description>
             </macro>
             <macro>
                <macro>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}</macro>
@@ -1664,13 +1648,13 @@ catch (error) {
             </macro>
             <macro>
                <macro>{$HADOOP.RESOURCEMANAGER.HOST}</macro>
-               <value>192.168.7.123</value>
+               <value>ResourceManager</value>
                <description>The Hadoop ResourceManager host IP address or FQDN.</description>
             </macro>
             <macro>
                <macro>{$HADOOP.RESOURCEMANAGER.PORT}</macro>
                <value>8088</value>
-               <description>The Hadoop ResourceManager TCP port.</description>
+               <description>The Hadoop ResourceManager Web-UI port.</description>
             </macro>
             <macro>
                <macro>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}</macro>
