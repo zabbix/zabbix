@@ -5121,8 +5121,8 @@ svg {
   .preprocessing-list .on-fail-options > .radio-segmented {
     padding: 5px 5px 5px 0; }
   .preprocessing-list .step-name {
-    flex: 0 0 290px;
-    max-width: 290px; }
+    flex: 0 0 295px;
+    max-width: 295px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
   .preprocessing-list .step-on-fail {
