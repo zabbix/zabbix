@@ -227,10 +227,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 .object-group {
 	margin-bottom: -1px;
 
-	li {
+	> li {
 		float: left;
 		margin-right: 5px;
+	}
 
+	li {
 		span {
 			display: inline-block;
 			padding: 0 7px;
@@ -295,6 +297,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 		line-height: 14px;
 		vertical-align: top;
 		float: none;
+		margin-right: 5px;
 		display: inline-block;
 
 		.status-container {
