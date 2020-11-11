@@ -105,10 +105,7 @@ void	drop_pid_file(const char *pidfile)
 
 	/* unlock file */
 	if (-1 != fdpid && -1 == fcntl(fdpid, F_SETLK, &fl))
-	{
 		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
-		exit(EXIT_FAILURE);
-	}
 
 	/* close pid file */
 	zbx_fclose(fpid);

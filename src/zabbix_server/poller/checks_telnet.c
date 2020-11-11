@@ -49,7 +49,6 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in getting the status flag: %s",
 				zbx_strerror(errno)));
-		goto tcp_close;
 	}
 
 	if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))

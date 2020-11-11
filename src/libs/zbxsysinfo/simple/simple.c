@@ -216,10 +216,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 #else
 		flags = fcntl(s.socket, F_GETFL);
 		if (-1 == flags)
-		{
 			zabbix_log(LOG_LEVEL_DEBUG, " error in getting the status flag: %s", zbx_strerror(errno));
-			goto tcp_close;
-		}
 
 		if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
 		{
