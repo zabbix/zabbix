@@ -8,10 +8,6 @@
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
-                    <name>action_name</name>
-                    <value>{ACTION.NAME}</value>
-                </parameter>
-                <parameter>
                     <name>alert_message</name>
                     <value>{ALERT.MESSAGE}</value>
                 </parameter>
@@ -42,6 +38,10 @@
                 <parameter>
                     <name>itop_class</name>
                     <value>UserRequest</value>
+                </parameter>
+                <parameter>
+                    <name>itop_comment</name>
+                    <value>Created by Zabbix action {ACTION.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>itop_id</name>
@@ -86,7 +86,7 @@
                 Itop.params.url += '/';
             }
 
-            Itop.params.url += 'webservices/rest.php?version=' + Itop.params.api_version;
+            Itop.params.url += 'webservices/rest.php?version=' + encodeURIComponent(Itop.params.api_version);
         }
     },
 
@@ -106,15 +106,14 @@
         json_data.key = Itop.params.id;
         json_data.fields.title = params.alert_subject;
         json_data.fields[Itop.params.log] = {
-            add_item:
-               {
+            add_item: {
                    message: params.alert_subject + '\n' + params.alert_message,
                    format: 'text'
                }
         };
     },
 
-    request: function (method, data) {
+    request: function (data) {
         ['url', 'user', 'password', 'organization_id', 'class', 'api_version'].forEach(function (field) {
             if (typeof Itop.params !== 'object' || typeof Itop.params[field] === 'undefined'
                 || Itop.params[field] === '' ) {
@@ -125,13 +124,12 @@
         var response,
             url = Itop.params.url,
             request = new CurlHttpRequest(),
-            object,
-            message;
+            object;
 
         request.AddHeader('Content-Type: multipart/form-data');
         request.AddHeader('Authorization: Basic ' + btoa(Itop.params.user + ':' + Itop.params.password));
 
-        if (typeof Itop.HTTPProxy !== 'undefined' &amp;&amp; Itop.HTTPProxy !== '') {
+        if (Itop.HTTPProxy) {
             request.SetProxy(Itop.HTTPProxy);
         }
 
@@ -141,13 +139,8 @@
 
         Zabbix.Log(4, '[ iTop Webhook ] Sending request: ' + url + '&amp;json_data=' + data);
 
-        switch (method) {
-            case 'post':
                 response = request.Post(url + '&amp;json_data=' + encodeURIComponent(data));
-                break;
-            default:
-                throw 'Unsupported HTTP request method: ' + method + '. Only POST is allowed.';
-        }
+
 
         Zabbix.Log(4, '[ iTop Webhook ] Received response with status code ' + request.Status() + '\n' + response);
 
@@ -157,22 +150,19 @@
             }
             catch (error) {
                 Zabbix.Log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
-                response = null;
+                throw 'Failed to parse response received from iTop.\nRequest status code ' +
+                    request.Status() + '. Check debug log for more information.';
             }
         }
 
         if (request.Status() &lt; 200 || request.Status() &gt;= 300) {
-            message = 'Request failed with status code ' + request.Status();
-
-            throw message + '. Check debug log for more information.';
+            throw 'Request failed with status code ' + request.Status() + '. Check debug log for more information.';
         }
-        else if (response !== null &amp;&amp; typeof response.code !== 'undefined' &amp;&amp; response.code !== 0) {
-            message = 'Request failed with iTop code ' + response.code + ': ' +
-                JSON.stringify(response.message);
-
-            throw message + '. Check debug log for more information.';
+        else if (typeof response.code !== 'undefined' &amp;&amp; response.code !== 0) {
+            throw 'Request failed with iTop code ' + response.code + ': ' +
+                JSON.stringify(response.message) + '. Check debug log for more information.';
         }
-
+        else {
         Object.keys(response.objects)
             .forEach(function (key) {
                 object = response.objects[key];
@@ -182,6 +172,7 @@
             status: request.Status(),
             response: object.fields
         };
+    }
     }
 };
 
@@ -229,7 +220,7 @@ try {
 
     json_data.operation = '';
     json_data.class = Itop.params.class;
-    json_data.comment = 'By Zabbix action &quot;' + params.action_name + '&quot;';
+    json_data.comment = Itop.params.comment;
     json_data.output_fields = 'id, friendlyname';
     json_data.fields = {};
 
@@ -237,24 +228,25 @@ try {
     // Create issue for non trigger-based events.
     if (params.event_source !== '0' &amp;&amp; params.event_recovery_value !== '0') {
         Itop.setCreatePayload();
-        Itop.request('post', json_data);
+        Itop.request(json_data);
     }
     // Create issue for trigger-based events.
     else if (params.event_value === '1' &amp;&amp; params.event_update_status === '0'
             &amp;&amp; Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}') {
         Itop.setCreatePayload();
 
-        var response = Itop.request('post', json_data);
+        var response = Itop.request(json_data);
 
         result.tags.__zbx_itop_id = response.response.id;
         result.tags.__zbx_itop_key = response.response.friendlyname;
         result.tags.__zbx_itop_link = params.itop_url + (params.itop_url.endsWith('/') ? '' : '/') +
-            'pages/UI.php?operation=details&amp;class=' + Itop.params.class + '&amp;id=' + response.response.id;
+            'pages/UI.php?operation=details&amp;class=' + encodeURIComponent(Itop.params.class) + '&amp;id=' +
+                encodeURIComponent(response.response.id);
     }
     // Update created issue for trigger-based event.
     else {
         Itop.setUpdatePayload();
-        Itop.request('post', json_data);
+        Itop.request(json_data);
     }
 
     return JSON.stringify(result);

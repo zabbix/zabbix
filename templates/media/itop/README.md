@@ -28,4 +28,4 @@ Make sure this user has access to all hosts for which you would like problem not
 For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [iTop](https://www.itophub.io/wiki/page) documentations.
 
 ## Supported Versions
-Zabbix 5.0
+Zabbix 5.0 and higer
