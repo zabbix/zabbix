@@ -21,7 +21,6 @@ package wmi
 
 import (
 	"errors"
-	"regexp"
 	"runtime"
 
 	"github.com/go-ole/go-ole"
@@ -44,7 +43,7 @@ func (e stopError) Error() string {
 }
 
 type resultWriter interface {
-	write(v *ole.IDispatch, query string) error
+	write(v *ole.IDispatch) error
 }
 
 type valueResult struct {
@@ -100,7 +99,7 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 // * only Key Qualifier column is returned - it means Key Qualifier was explicitly selected and must be returned
 // * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
 //   its Qualifiers_ property list
-func (r *valueResult) write(rs *ole.IDispatch, _ string) (err error) {
+func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 	var propertyKeyFieldValue interface{}
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
@@ -171,24 +170,19 @@ func variantToValue(v *ole.VARIANT) (result interface{}) {
 	return v.ToArray().ToValueArray()
 }
 
-func starPresentInQuery(query string) bool {
-	re := regexp.MustCompile(`[Ss][Ee][Ll][Ee][Cc][Tt][\s]*(.+)[\s]*[Ff][Rr][Oo][Mm]`)
-	match := re.FindStringSubmatch(query)
-	if nil == match {
-		return false
-	}
-	starMatchRegex := regexp.MustCompile(`\*`)
-	starMatches := starMatchRegex.FindAllStringIndex(match[1], -1)
-
-	return 0 < len(starMatches)
-}
-
-// Key Qualifier is always appended to the result from ole, so it gets manually erased
-// from the final result unless 1) star(all elements) was queried or 2) it was explicitly
-// listed in the query
-func (r *tableResult) write(rs *ole.IDispatch, query string) (err error) {
-	var propertyKeyFieldName string
-	var propertyKeyFieldValue interface{}
+// Key Qualifier is always appended to the result from ole library. This behavior is different from agent 1 which
+// uses the wmi enumerator and can set the WBEM_FLAG_NONSYSTEM_ONLY flag that would filter it. Ole library has only
+// the basic enumerator that cannot set any flags.
+// So that, we end up with these results for wmi.getAll where cases 1 and 2 are inconsistent with agent 1:
+//   1) 1 non-Key qualifier field selected 	- key qualifier attached to the result, 2 elements are returned
+//   2) N non-Key qualifier fields selected	- key qualifier attached to the result, N+1 elements are returned
+//   3) Key qualifier field selected 		- single key qualifier element is returned
+//   4) 1 non-Key qualifier and 1 Key qualifier elements selected
+//						- 2 elements are returned
+//   5) N fields selected and one of them is a Key-qualifier
+//						- N elements are returned
+//   6) * is selected				- all elements are returned (including the Key-qualifier)
+func (r *tableResult) write(rs *ole.IDispatch) (err error) {
 	r.data = make([]map[string]interface{}, 0)
 
 	oleErr := oleutil.ForEach(rs, func(v *ole.VARIANT) (err error) {
@@ -220,30 +214,14 @@ func (r *tableResult) write(rs *ole.IDispatch, query string) (err error) {
 			}
 			defer clearOle(propsVal)
 
-			isKeyProperty, err := isPropertyKeyProperty(propsCol)
-			if err != nil {
-				return
-			}
-
 			variantValue := variantToValue(propsVal)
 			if variantValue != nil {
-				if !isKeyProperty {
-					rsRow[propsName.ToString()] = variantValue
-				} else {
-					propertyKeyFieldName = propsName.ToString()
-					propertyKeyFieldValue = variantValue
-				}
+				rsRow[propsName.ToString()] = variantValue
 			}
 
 			return
 		})
 
-		keyFieldNameMatchRegex := regexp.MustCompile(propertyKeyFieldName)
-		keyFieldNameMatches := keyFieldNameMatchRegex.FindAllStringIndex(query, -1)
-
-		if starPresentInQuery(query) || 0 < len(keyFieldNameMatches) {
-			rsRow[propertyKeyFieldName] = propertyKeyFieldValue
-		}
 		if 0 < len(rsRow) {
 			r.data = append(r.data, rsRow)
 		}
@@ -311,7 +289,7 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 		return
 	}
 
-	return w.write(result, query)
+	return w.write(result)
 }
 
 // QueryValue returns the value of the first column of the first row returned by the query.
