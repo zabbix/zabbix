@@ -318,7 +318,8 @@ foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
 
 $item_form_list
 	->addRow(
-		(new CVisibilityBox('visible[status]', 'status', _('Original')))->setLabel(_('Create enabled')),
+		(new CVisibilityBox('visible[status]', 'status', _('Original')))
+			->setLabel($data['prototype'] ? _('Create enabled') : _('Status')),
 		$status_combo_box
 	);
 
