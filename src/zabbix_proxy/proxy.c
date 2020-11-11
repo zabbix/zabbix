@@ -861,7 +861,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"StartPreprocessors",		&CONFIG_PREPROCESSOR_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,			TYPE_INT,
+		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{NULL}
 	};

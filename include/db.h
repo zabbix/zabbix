@@ -736,7 +736,7 @@ typedef struct
 }
 zbx_host_availability_t;
 
-void	zbx_sql_add_host_availabilities(const zbx_vector_ptr_t *host_availabilities);
+void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 typedef struct

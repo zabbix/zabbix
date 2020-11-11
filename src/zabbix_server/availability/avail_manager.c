@@ -132,7 +132,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 			zbx_block_signals(&orig_mask);
 			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-			zbx_sql_add_host_availabilities(&host_availabilities);
+			zbx_db_update_host_availabilities(&host_availabilities);
 			zbx_unblock_signals(&orig_mask);
 
 			processed_num = host_availabilities.values_num;
@@ -144,7 +144,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	if (0 != host_availabilities.values_num)
 	{
 		zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-		zbx_sql_add_host_availabilities(&host_availabilities);
+		zbx_db_update_host_availabilities(&host_availabilities);
 	}
 	DBclose();
 	zbx_unblock_signals(&orig_mask);

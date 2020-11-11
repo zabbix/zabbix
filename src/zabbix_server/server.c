@@ -854,7 +854,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			100},
 		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,			TYPE_INT,
+		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{NULL}
 	};

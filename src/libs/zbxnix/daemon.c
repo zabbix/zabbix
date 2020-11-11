@@ -444,7 +444,7 @@ int	zbx_sigusr_send(int flags)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_block_signals                                                    *
+ * Function: zbx_block_signals                                                *
  *                                                                            *
  * Purpose: block signals to avoid interruption                               *
  *                                                                            *
@@ -466,7 +466,7 @@ void	zbx_block_signals(sigset_t *orig_mask)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_unblock_signals                                                  *
+ * Function: zbx_unblock_signals                                              *
  *                                                                            *
  * Purpose: unblock signals after blocking                                    *
  *                                                                            *

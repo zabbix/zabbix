@@ -3410,7 +3410,16 @@ static int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *
 	return SUCCEED;
 }
 
-void	zbx_sql_add_host_availabilities(const zbx_vector_ptr_t *host_availabilities)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_update_host_availabilities                                *
+ *                                                                            *
+ * Purpose: sync host availabilities updates into database                    *
+ *                                                                            *
+ * Parameters: host_availabilities [IN] the host availability data            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities)
 {
 	int	txn_error;
 

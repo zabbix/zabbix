@@ -61,7 +61,10 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
  *                                                                            *
  * Purpose: write host availability changes into database                     *
  *                                                                            *
- * Parameters: ha    - [IN] the host availability data                        *
+ * Parameters: data        - [IN/OUT] the serialized availability data        *
+ *             data_alloc  - [IN/OUT] the serialized availability data size   *
+ *             data_alloc  - [IN/OUT] the serialized availability data offset *
+ *             ha          - [IN] the host availability data                  *
  *                                                                            *
  * Return value: SUCCEED - the availability changes were written into db      *
  *               FAIL    - no changes in availability data were detected      *
