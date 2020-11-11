@@ -22,6 +22,7 @@
 /**
  * @var CView $this
  */
+$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
 
 $filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])
@@ -44,22 +45,22 @@ $filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data[
 							'with_hosts_and_templates' => 1,
 							'editable' => 1,
 							'enrich_parent_groups' => true
-						]
+						] + $hg_ms_params
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
-				(new CLabel(_('Hosts'), 'filter_hosts__ms')),
+				(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_hostids[]',
-					'object_name' => 'host_templates',
+					'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'data' => $data['filter']['hosts'],
 					'popup' => [
 						'filter_preselect_fields' => [
 							'hostgroups' => 'filter_groups_'
 						],
 						'parameters' => [
-							'srctbl' => 'host_templates',
+							'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',

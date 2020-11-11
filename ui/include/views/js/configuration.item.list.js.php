@@ -25,26 +25,45 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function() {
-		// disable the status filter when using the state filter
-		jQuery('#filter_state').change(function(event, saveValue) {
-			var stateObj = jQuery(this),
-				statusObj = jQuery('#filter_status'),
-				saveValue = (saveValue === undefined) ? true : saveValue;
+	jQuery(function($) {
+		// Disable the status filter when using the state filter.
+		$('#filter_state').change(function(event, save_value) {
+			var $state_obj = $(this).find('[name="filter_state"]:checked'),
+				$status_obj = $('#filter_status [name="filter_status"]:checked'),
+				$status_buttons = $('#filter_status [name="filter_status"]'),
+				save_value = (save_value === undefined) ? true : save_value;
 
-			if (stateObj.val() == -1) {
-				// restore the last remembered status filter value
-				if (statusObj.prop('disabled') && statusObj.data('last-value') !== undefined) {
-					statusObj.val(statusObj.data('last-value'));
+			if ($state_obj.val() == -1) {
+				// Restore the last remembered status filter value.
+				if ($status_buttons.prop('disabled') && typeof $status_buttons.data('last-value') !== 'undefined') {
+					for (var i = 0; i < $status_buttons.length; i++) {
+						if ($($status_buttons[i]).val() == $status_buttons.data('last-value')) {
+							$($status_buttons[i]).prop('checked', true);
+						}
+						else {
+							$($status_buttons[i]).prop('checked', false);
+						}
+					}
 				}
-				statusObj.prop('disabled', false);
+
+				$status_buttons.prop('disabled', false);
 			}
 			else {
-				// remember the last status filter value
-				if (!statusObj.prop('disabled') && saveValue) {
-					statusObj.data('last-value', statusObj.val());
+				// Remember the last status filter value.
+				if (!$status_buttons.prop('disabled') && save_value) {
+					$status_buttons.data('last-value', $status_obj.val());
 				}
-				statusObj.prop('disabled', true).val(<?php echo ITEM_STATUS_ACTIVE ?>);
+
+				for (var i = 0; i < $status_buttons.length; i++) {
+					if ($($status_buttons[i]).val() == <?= ITEM_STATUS_ACTIVE ?>) {
+						$($status_buttons[i]).prop('checked', true);
+					}
+					else {
+						$($status_buttons[i]).prop('checked', false);
+					}
+				}
+
+				$status_buttons.prop('disabled', true);
 			}
 		})
 		.trigger('change', false);

@@ -25,6 +25,8 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
+$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+
 $filter_column1 = (new CFormList())
 	->addRow((new CLabel(_('Host groups'), 'filter_groupids')),
 		(new CMultiSelect([
@@ -38,21 +40,21 @@ $filter_column1 = (new CFormList())
 					'dstfrm' => 'groupids',
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true
-				]
+				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('Hosts'), 'filter_hostids')),
+	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'host_templates',
+			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 			'data' => $data['filter_hostids_ms'],
 			'popup' => [
 				'filter_preselect_fields' => [
 					'hostgroups' => 'filter_groupids_'
 				],
 				'parameters' => [
-					'srctbl' => 'host_templates',
+					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'hostids',
 					'dstfld1' => 'filter_hostids_',
@@ -64,28 +66,35 @@ $filter_column1 = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Severity'),	(new CSeverityCheckBoxList('filter_priority'))->setChecked($data['filter_priority']))
-	->addRow(_('State'),
+	->addRow(_('Severity'),	(new CSeverityCheckBoxList('filter_priority'))->setChecked($data['filter_priority']));
+
+if ($data['context'] === 'host') {
+	$filter_column1->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
 			->addValue(_('all'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
 			->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
 			->setModern(true)
-	)
-	->addRow(_('Status'),
-		(new CRadioButtonList('filter_status', (int) $data['filter_status']))
-			->addValue(_('all'), -1)
-			->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
-			->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
-			->setModern(true)
-	)
-	->addRow(_('Value'),
+	);
+}
+
+$filter_column1->addRow(_('Status'),
+	(new CRadioButtonList('filter_status', (int) $data['filter_status']))
+		->addValue(_('all'), -1)
+		->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
+		->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
+		->setModern(true)
+);
+
+if ($data['context'] === 'host') {
+	$filter_column1->addRow(_('Value'),
 		(new CRadioButtonList('filter_value', (int) $data['filter_value']))
 			->addValue(_('all'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
 			->addValue(_('Problem'), TRIGGER_VALUE_TRUE)
 			->setModern(true)
 	);
+}
 
 $filter_tags = $data['filter_tags'];
 if (!$filter_tags) {
@@ -140,21 +149,25 @@ $filter_column2 = (new CFormList())
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern(true)
-	)
-	->addRow(_('Discovered'),
+	);
+
+if ($data['context'] === 'host') {
+	$filter_column2->addRow(_('Discovered'),
 		(new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern(true)
-	)
-	->addRow(_('With dependencies'),
-		(new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
-			->addValue(_('all'), -1)
-			->addValue(_('Yes'), 1)
-			->addValue(_('No'), 0)
-			->setModern(true)
 	);
+}
+
+$filter_column2->addRow(_('With dependencies'),
+	(new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
+		->addValue(_('all'), -1)
+		->addValue(_('Yes'), 1)
+		->addValue(_('No'), 0)
+		->setModern(true)
+);
 
 $filter = (new CFilter((new CUrl('triggers.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])

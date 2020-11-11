@@ -742,6 +742,10 @@ if (isset($_REQUEST['form'])) {
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
 }
 else {
+	$data = [
+		'context' => getRequest('context')
+	];
+
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
 	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
@@ -784,18 +788,28 @@ else {
 		$filter_groupids = getSubGroups($filter_groupids);
 	}
 
-	// Get hosts.
-	$filter['hosts'] = $filter['hosts']
-		? CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $filter['hosts'],
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]), ['hostid' => 'id'])
-		: [];
+	if ($data['context'] === 'host') {
+		$filter['hosts'] = $filter['hosts']
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter['hosts'],
+				'editable' => true,
+				'preservekeys' => true
+			]), ['hostid' => 'id'])
+			: [];
+	}
+	else {
+		$filter['hosts'] = $filter['hosts']
+			? CArrayHelper::renameObjectsKeys(API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter['hosts'],
+				'editable' => true,
+				'preservekeys' => true
+			]), ['templateid' => 'id'])
+			: [];
+	}
 
-	$data = [
+	$data += [
 		'hostid' => (count($filter['hosts']) == 1)
 			? reset($filter['hosts'])['id']
 			: getRequest('hostid', 0),
@@ -806,8 +820,7 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'profileIdx' => 'web.httpconf.filter',
-		'active_tab' => CProfile::get('web.httpconf.filter.active', 1),
-		'context' => getRequest('context')
+		'active_tab' => CProfile::get('web.httpconf.filter.active', 1)
 	];
 
 	// show the error column only for hosts

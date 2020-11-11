@@ -28,26 +28,41 @@
 	jQuery(function($) {
 		// Disable the status filter when using the state filter.
 		$('#filter_state').on('change', (event, save_value = true) => {
-			const $state = $(event.currentTarget);
-			const $status = $('#filter_status');
+			var $state_obj = $(this).find('[name="filter_state"]:checked'),
+				$status_obj = $('#filter_status [name="filter_status"]:checked'),
+				$status_buttons = $('#filter_status [name="filter_status"]');
 
-			if ($state.val() == -1) {
+			if ($state_obj.val() == -1) {
 				// Restore the last remembered status filter value.
-				if ($status.prop('disabled') && typeof $status.data('last-value') !== 'undefined') {
-					$status.val($status.data('last-value'));
+				if ($status_buttons.prop('disabled') && typeof $status_buttons.data('last-value') !== 'undefined') {
+					for (var i = 0; i < $status_buttons.length; i++) {
+						if ($($status_buttons[i]).val() == $status_buttons.data('last-value')) {
+							$($status_buttons[i]).prop('checked', true);
+						}
+						else {
+							$($status_buttons[i]).prop('checked', false);
+						}
+					}
 				}
 
-				$status.prop('disabled', false);
+				$status_buttons.prop('disabled', false);
 			}
 			else {
 				// Remember the last status filter value.
-				if (!$status.prop('disabled') && save_value) {
-					$status.data('last-value', $status.val());
+				if (!$status_buttons.prop('disabled') && save_value) {
+					$status_buttons.data('last-value', $status_obj.val());
 				}
 
-				$status
-					.prop('disabled', true)
-					.val(<?= ITEM_STATUS_ACTIVE ?>);
+				for (var i = 0; i < $status_buttons.length; i++) {
+					if ($($status_buttons[i]).val() == <?= ITEM_STATUS_ACTIVE ?>) {
+						$($status_buttons[i]).prop('checked', true);
+					}
+					else {
+						$($status_buttons[i]).prop('checked', false);
+					}
+				}
+
+				$status_buttons.prop('disabled', true);
 			}
 		})
 		.trigger('change', false);

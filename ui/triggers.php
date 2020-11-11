@@ -682,6 +682,10 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 else {
+	$data = [
+		'context' => getRequest('context')
+	];
+
 	$filter_groupids_ms = [];
 	$filter_hostids_ms = [];
 
@@ -754,14 +758,27 @@ else {
 	}
 
 	if ($filter_hostids) {
-		$filter_hostids = API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostids,
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-		$filter_hostids_ms = CArrayHelper::renameObjectsKeys($filter_hostids, ['hostid' => 'id']);
+		if ($data['context'] === 'host') {
+			$filter_hostids = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter_hostids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$filter_hostids_ms = CArrayHelper::renameObjectsKeys($filter_hostids, ['hostid' => 'id']);
+		}
+		else {
+			$filter_hostids = API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter_hostids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$filter_hostids_ms = CArrayHelper::renameObjectsKeys($filter_hostids, ['templateid' => 'id']);
+		}
+
 		$filter_hostids = array_keys($filter_hostids_ms);
 	}
 
@@ -851,10 +868,6 @@ else {
 	}
 
 	CPagerHelper::savePage($page['file'], $page_num);
-
-	$data = [
-		'context' => getRequest('context')
-	];
 
 	$paging = CPagerHelper::paginate($page_num, $prefetched_triggers, $sortorder,
 		(new CUrl('triggers.php'))->setArgument('context', $data['context'])

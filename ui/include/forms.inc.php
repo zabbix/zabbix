@@ -90,22 +90,25 @@ function getItemFilterForm(&$data) {
 	$filter_history				= $_REQUEST['filter_history'];
 	$filter_trends				= $_REQUEST['filter_trends'];
 	$filter_status				= $_REQUEST['filter_status'];
-	$filter_state				= $_REQUEST['filter_state'];
 	$filter_templated_items		= $_REQUEST['filter_templated_items'];
 	$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
-	$filter_discovery           = $_REQUEST['filter_discovery'];
 	$subfilter_hosts			= $_REQUEST['subfilter_hosts'];
 	$subfilter_apps				= $_REQUEST['subfilter_apps'];
 	$subfilter_types			= $_REQUEST['subfilter_types'];
 	$subfilter_value_types		= $_REQUEST['subfilter_value_types'];
 	$subfilter_status			= $_REQUEST['subfilter_status'];
-	$subfilter_state			= $_REQUEST['subfilter_state'];
 	$subfilter_templated_items	= $_REQUEST['subfilter_templated_items'];
 	$subfilter_with_triggers	= $_REQUEST['subfilter_with_triggers'];
-	$subfilter_discovery        = $_REQUEST['subfilter_discovery'];
 	$subfilter_history			= $_REQUEST['subfilter_history'];
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
+
+	if ($data['context'] === 'host') {
+		$filter_state =  getRequest('filter_state');
+		$filter_discovery = getRequest('filter_discovery');
+		$subfilter_state = getRequest('subfilter_state');
+		$subfilter_discovery = getRequest('subfilter_discovery');
+	}
 
 	$filter = (new CFilter((new CUrl('items.php'))->setArgument('context', $data['context'])))
 		->setProfile('web.items.filter')
@@ -115,14 +118,18 @@ function getItemFilterForm(&$data) {
 		->addVar('subfilter_types', $subfilter_types)
 		->addVar('subfilter_value_types', $subfilter_value_types)
 		->addVar('subfilter_status', $subfilter_status)
-		->addVar('subfilter_state', $subfilter_state)
 		->addVar('subfilter_templated_items', $subfilter_templated_items)
 		->addVar('subfilter_with_triggers', $subfilter_with_triggers)
-		->addVar('subfilter_discovery', $subfilter_discovery)
 		->addVar('subfilter_history', $subfilter_history)
 		->addVar('subfilter_trends', $subfilter_trends)
 		->addVar('subfilter_interval', $subfilter_interval)
 		->addvar('context', $data['context']);
+
+	if ($data['context'] === 'host') {
+		$filter
+			->addVar('subfilter_state', $subfilter_state)
+			->addVar('subfilter_discovery', $subfilter_discovery);
+	}
 
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();
@@ -161,6 +168,8 @@ function getItemFilterForm(&$data) {
 		]), ['groupid' => 'id'])
 		: [];
 
+	$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+
 	$filterColumn1->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
@@ -173,7 +182,7 @@ function getItemFilterForm(&$data) {
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true
-				]
+				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
@@ -189,35 +198,47 @@ function getItemFilterForm(&$data) {
 			ITEM_VALUE_TYPE_TEXT => _('Text')
 		])
 	);
-	$filterColumn4->addRow(_('State'),
-		new CComboBox('filter_state', $filter_state, null, [
-			-1 => _('all'),
-			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
-			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
-		])
-	);
+
+	if ($data['context'] === 'host') {
+		$filterColumn4->addRow(_('State'),
+			(new CRadioButtonList('filter_state', (int) $filter_state))
+				->addValue(_('all'), -1)
+				->addValue(_('Normal'), ITEM_STATE_NORMAL)
+				->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
+				->setModern(true)
+		);
+
+		$host_template_filter = $filter_hostids
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter_hostids,
+				'editable' => true
+			]), ['hostid' => 'id'])
+			: [];
+	}
+	else {
+		$host_template_filter = $filter_hostids
+			? CArrayHelper::renameObjectsKeys(API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter_hostids,
+				'editable' => true
+			]), ['templateid' => 'id'])
+			: [];
+	}
 
 	// row 2
-	$host_filter = !empty($filter_hostids)
-		? CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $filter_hostids,
-			'templated_hosts' => true,
-			'editable' => true
-		]), ['hostid' => 'id'])
-		: [];
-
-	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
-		(new CMultiSelect([
+	$filterColumn1->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'),
+		'filter_hostid_ms'
+	)), (new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'host_templates',
-			'data' => $host_filter,
+			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+			'data' => $host_template_filter,
 			'popup' => [
 				'filter_preselect_fields' => [
 					'hostgroups' => 'filter_groupids_'
 				],
 				'parameters' => [
-					'srctbl' => 'host_templates',
+					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostids_',
@@ -232,11 +253,11 @@ function getItemFilterForm(&$data) {
 		'filter_delay_row'
 	);
 	$filterColumn4->addRow(_('Status'),
-		new CComboBox('filter_status', $filter_status, null, [
-			-1 => _('all'),
-			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
-			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
-		])
+		(new CRadioButtonList('filter_status', (int) $filter_status))
+			->addValue(_('all'), -1)
+			->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
+			->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+			->setModern(true)
 	);
 
 	// row 3
@@ -262,12 +283,12 @@ function getItemFilterForm(&$data) {
 	$filterColumn3->addRow(_('History'),
 		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn4->addRow(_('Triggers'),
-		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
-			-1 => _('all'),
-			1 => _('With triggers'),
-			0 => _('Without triggers')
-		])
+	$filterColumn4->addRow(_('With triggers'),
+		(new CRadioButtonList('filter_with_triggers', (int) $filter_with_triggers))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
 	);
 
 	// row 4
@@ -281,25 +302,28 @@ function getItemFilterForm(&$data) {
 	$filterColumn3->addRow(_('Trends'),
 		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn4->addRow(_('Template'),
-		new CComboBox('filter_templated_items', $filter_templated_items, null, [
-			-1 => _('all'),
-			1 => _('Inherited items'),
-			0 => _('Not inherited items'),
-		])
+	$filterColumn4->addRow(_('Inherited'),
+		(new CRadioButtonList('filter_templated_items', (int) $filter_templated_items))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
 	);
 
 	// row 5
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn4->addRow(_('Discovery'),
-		new CComboBox('filter_discovery', $filter_discovery, null, [
-			-1 => _('all'),
-			ZBX_FLAG_DISCOVERY_CREATED => _('Discovered items'),
-			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
-		])
-	);
+
+	if ($data['context'] === 'host') {
+		$filterColumn4->addRow(_('Discovered'),
+			(new CRadioButtonList('filter_discovery', (int) $filter_discovery))
+				->addValue(_('all'), -1)
+				->addValue(_('Yes'), ZBX_FLAG_DISCOVERY_CREATED)
+				->addValue(_('No'), ZBX_FLAG_DISCOVERY_NORMAL)
+				->setModern(true)
+		);
+	}
 
 	// subfilters
 	$table_subfilter = (new CTableInfo())
@@ -440,7 +464,7 @@ function getItemFilterForm(&$data) {
 		}
 
 		// state
-		if ($filter_state == -1) {
+		if ($data['context'] === 'host' && $filter_state == -1) {
 			if (!isset($item_params['state'][$item['state']])) {
 				$item_params['state'][$item['state']] = [
 					'name' => itemState($item['state']),
@@ -510,7 +534,7 @@ function getItemFilterForm(&$data) {
 		}
 
 		// discovery
-		if ($filter_discovery == -1) {
+		if ($data['context'] === 'host' && $filter_discovery == -1) {
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && !isset($item_params['discovery'][0])) {
 				$item_params['discovery'][0] = ['name' => _('Regular'), 'count' => 0];
 			}
@@ -669,7 +693,7 @@ function getItemFilterForm(&$data) {
 		$table_subfilter->addRow([$status_output]);
 	}
 
-	if ($filter_state == -1 && count($item_params['state']) > 1) {
+	if ($data['context'] === 'host' && $filter_state == -1 && count($item_params['state']) > 1) {
 		$state_output = prepareSubfilterOutput(_('State'), $item_params['state'], $subfilter_state, 'subfilter_state');
 		$table_subfilter->addRow([$state_output]);
 	}
@@ -684,7 +708,7 @@ function getItemFilterForm(&$data) {
 		$table_subfilter->addRow([$with_triggers_output]);
 	}
 
-	if ($filter_discovery == -1 && count($item_params['discovery']) > 1) {
+	if ($data['context'] === 'host' && $filter_discovery == -1 && count($item_params['discovery']) > 1) {
 		$discovery_output = prepareSubfilterOutput(_('Discovery'), $item_params['discovery'], $subfilter_discovery, 'subfilter_discovery');
 		$table_subfilter->addRow([$discovery_output]);
 	}

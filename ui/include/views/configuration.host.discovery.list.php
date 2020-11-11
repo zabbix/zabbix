@@ -53,6 +53,8 @@ $filter = (new CFilter((new CUrl('host_discovery.php'))->setArgument('context', 
 	->setActiveTab($data['active_tab'])
 	->addvar('context', $data['context']);
 
+$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+
 $filter_column1 = (new CFormList())
 	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 		(new CMultiSelect([
@@ -66,21 +68,21 @@ $filter_column1 = (new CFormList())
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true
-				]
+				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
+	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'host_templates',
+			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 			'data' => $data['filter']['hosts'],
 			'popup' => [
 				'filter_preselect_fields' => [
 					'hostgroups' => 'filter_groupids_'
 				],
 				'parameters' => [
-					'srctbl' => 'host_templates',
+					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostids_',
@@ -137,21 +139,25 @@ $filter_column2 = (new CFormList())
 		'filter_snmp_oid_row'
 	);
 
-$filter_column3 = (new CFormList())
-	->addRow(_('State'),
-		new CComboBox('filter_state', $data['filter']['state'], null, [
-			-1 => _('all'),
-			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
-			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
-		])
-	)
-	->addRow(_('Status'),
-		new CComboBox('filter_status', $data['filter']['status'], null, [
-			-1 => _('all'),
-			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
-			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
-		])
+$filter_column3 = (new CFormList());
+
+if ($data['context'] === 'host') {
+	$filter_column3->addRow(_('State'),
+		(new CRadioButtonList('filter_state', (int) $data['filter']['state']))
+			->addValue(_('all'), -1)
+			->addValue(_('Normal'), ITEM_STATE_NORMAL)
+			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
+			->setModern(true)
 	);
+}
+
+$filter_column3->addRow(_('Status'),
+	(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+		->addValue(_('all'), -1)
+		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
+		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+		->setModern(true)
+);
 
 $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
 

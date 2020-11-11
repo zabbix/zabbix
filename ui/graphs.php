@@ -462,15 +462,26 @@ if ($filter_groupids) {
 }
 
 // Get hosts.
-$filter['hosts'] = $filter['hosts']
-	? CArrayHelper::renameObjectsKeys(API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'hostids' => $filter['hosts'],
-		'templated_hosts' => true,
-		'editable' => true,
-		'preservekeys' => true
-	]), ['hostid' => 'id'])
-	: [];
+if (getRequest('context') === 'host') {
+	$filter['hosts'] = $filter['hosts']
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $filter['hosts'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['hostid' => 'id'])
+		: [];
+}
+else {
+	$filter['hosts'] = $filter['hosts']
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $filter['hosts'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['templateid' => 'id'])
+		: [];
+}
 
 // Get hostid.
 if ($hostid == 0 && count($filter['hosts']) == 1) {
