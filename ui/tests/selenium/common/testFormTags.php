@@ -32,6 +32,7 @@ class testFormTags extends CWebTest {
 	public $clone_name;
 	public $link;
 	public $saved_link;
+	public $new_name;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -162,9 +163,9 @@ class testFormTags extends CWebTest {
 	 * @param string   $expression   trigger or trigger prototype expression
 	 */
 	public function checkTagsCreate($data, $object, $expression = null) {
-		$sql = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-			? 'SELECT * FROM hosts ORDER BY hostid'
-			: 'SELECT * FROM triggers ORDER BY triggerid';
+		$sql = ($object === 'trigger' || $object === 'trigger prototype')
+			? 'SELECT * FROM triggers ORDER BY triggerid'
+			: 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open($this->link);
@@ -207,9 +208,9 @@ class testFormTags extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, ucfirst($object).' added');
 
-				$success_sql = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-					? 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name'])
-					: 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name']);
+				$success_sql = ($object === 'trigger' || $object === 'trigger prototype')
+					? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name'])
+					: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
 
 				$this->assertEquals(1, CDBHelper::getCount($success_sql));
 				// Check the results in form.
@@ -315,9 +316,9 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger or prototype
 	 */
 	public function checkTagsUpdate($data, $object) {
-		$sql = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-			? 'SELECT * FROM hosts ORDER BY hostid'
-			: 'SELECT * FROM triggers ORDER BY triggerid';
+		$sql = ($object === 'trigger' || $object === 'trigger prototype')
+			? 'SELECT * FROM triggers ORDER BY triggerid'
+			: 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql);
 
 		$data['name'] = $this->update_name;
@@ -348,9 +349,9 @@ class testFormTags extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, ucfirst($object).' updated');
 
-				$success_sql = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-					? 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_name)
-					: 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name']);
+				$success_sql = ($object === 'trigger' || $object === 'trigger prototype')
+					? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name'])
+					: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_name);
 
 				$this->assertEquals(1, CDBHelper::getCount($success_sql));
 				// Check the results in form.
@@ -385,9 +386,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $action   clone or full clone
 	 */
 	public function executeCloning($object, $action) {
-		$new_name = ($object === 'host prototype')
-			? 'A '.$object.$action.'{#KEY}'
-			: 'A '.$object.$action;
+		$new_name = $this->new_name.$action;
 
 		$this->page->login()->open($this->link);
 		$this->query('link', $this->clone_name)->waitUntilPresent()->one()->click();
@@ -431,15 +430,15 @@ class testFormTags extends CWebTest {
 		$this->assertMessage(TEST_GOOD, ucfirst($object).' added');
 
 		// Check the results in DB.
-		$sql_old_name = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-			? 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name)
-			: 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name);
+		$sql_old_name = ($object === 'trigger' || $object === 'trigger prototype')
+			? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name)
+			: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 
 		$this->assertEquals(1, CDBHelper::getCount($sql_old_name));
 
-		$sql_new_name = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-			? 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name)
-			: 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name);
+		$sql_new_name = ($object === 'trigger' || $object === 'trigger prototype')
+			? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name)
+			: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 
 		$this->assertEquals(1, CDBHelper::getCount($sql_new_name));
 
@@ -473,9 +472,9 @@ class testFormTags extends CWebTest {
 	 * @param string   $form     object configuration form
 	 */
 	private function checkTagFields($data, $object, $form) {
-		$id = ($object === 'host' || $object === 'template' || $object === 'host prototype')
-			? CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']))
-			: CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['name']));
+		$id = ($object === 'trigger' || $object === 'trigger prototype')
+			? CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['name']))
+			: CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 
 		$this->page->open($this->saved_link.$id);
 		$form->selectTab('Tags');

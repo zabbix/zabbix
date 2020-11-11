@@ -30,6 +30,7 @@ class testFormTagsTrigger extends testFormTags {
 	public $clone_name = 'Trigger with tags for cloning';
 	public $link = 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001';
 	public $saved_link = 'triggers.php?form=update&triggerid=';
+	public $new_name = 'Cloned Trigger';
 
 	/**
 	 * Test creating of Trigger with tags.

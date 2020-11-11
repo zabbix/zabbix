@@ -30,6 +30,7 @@ class testFormTagsHostPrototype extends testFormTags {
 	public $clone_name = '{#HOST} prototype with tags for cloning';
 	public $link = 'host_prototypes.php?parent_discoveryid=90001';
 	public $saved_link = 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=';
+	public $new_name = 'Cloned Host prototype {#KEY}';
 
 	/**
 	 * Test creating of Host prototype with tags.

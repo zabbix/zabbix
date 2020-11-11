@@ -30,6 +30,7 @@ class testFormTagsTemplate extends testFormTags {
 	public $clone_name = 'A template with tags for cloning';
 	public $link = 'templates.php';
 	public $saved_link = 'templates.php?form=update&templateid=';
+	public $new_name = 'Cloned Template';
 
 	/**
 	 * Test creating of Template with tags
