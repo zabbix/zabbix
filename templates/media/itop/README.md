@@ -19,7 +19,7 @@ The following parameters are required:<br>
 **itop_password** - user's password.<br>
 **itop_organization_id** - ID of organization.<br>
 **itop_class** - name of the class to be used when creating new tickets from Zabbix notifications. *UserRequest* or *Problem* for example.<br>
-**itop_log** - the type of log section in ticket for posting problem's updates from Zabbix. Must be *Private* or *Public*.
+**itop_log** - the type of log section in ticket for posting problem's updates from Zabbix. Must be *Private* or *Public*.<br>
 **itop_comment** - the comment that will be posted to ticket's history.
 
 3\. Create a **Zabbix user** and add **Media** with the **iTop** media type. 
