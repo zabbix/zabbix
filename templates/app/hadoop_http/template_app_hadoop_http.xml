@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-11T10:28:50Z</date>
+   <date>2020-11-11T10:52:36Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -1138,19 +1138,6 @@ catch (error) {
                            <priority>AVERAGE</priority>
                            <description>The state is different from normal.</description>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{nodata(30m)}=1</expression>
-                           <name>{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)</name>
-                           <priority>WARNING</priority>
-                           <description>Zabbix has not received data for items for the last 30 minutes.</description>
-                           <manual_close>YES</manual_close>
-                           <dependencies>
-                              <dependency>
-                                 <name>{#HOSTNAME}: DataNode has state {ITEM.VALUE}.</name>
-                                 <expression>{Template App Hadoop by HTTP:hadoop.datanode.oper_state[{#HOSTNAME}].last()}&lt;&gt;"Live"</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -1209,6 +1196,19 @@ catch (error) {
                            <priority>INFO</priority>
                            <description>Uptime is less than 10 minutes</description>
                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{nodata(30m)}=1</expression>
+                           <name>{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)</name>
+                           <priority>WARNING</priority>
+                           <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#HOSTNAME}: DataNode has state {ITEM.VALUE}.</name>
+                                 <expression>{Template App Hadoop by HTTP:hadoop.datanode.oper_state[{#HOSTNAME}].last()}&lt;&gt;"Live"</expression>
+                              </dependency>
+                           </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1511,19 +1511,6 @@ catch (error) {
                            <priority>AVERAGE</priority>
                            <description>The state is different from normal.</description>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{nodata(30m)}=1</expression>
-                           <name>{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)</name>
-                           <priority>WARNING</priority>
-                           <description>Zabbix has not received data for items for the last 30 minutes.</description>
-                           <manual_close>YES</manual_close>
-                           <dependencies>
-                              <dependency>
-                                 <name>{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.</name>
-                                 <expression>{Template App Hadoop by HTTP:hadoop.nodemanager.state[{#HOSTNAME}].last()}&lt;&gt;"RUNNING"</expression>
-                              </dependency>
-                           </dependencies>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -1559,6 +1546,19 @@ catch (error) {
                            <priority>INFO</priority>
                            <description>Uptime is less than 10 minutes</description>
                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{nodata(30m)}=1</expression>
+                           <name>{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)</name>
+                           <priority>WARNING</priority>
+                           <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.</name>
+                                 <expression>{Template App Hadoop by HTTP:hadoop.nodemanager.state[{#HOSTNAME}].last()}&lt;&gt;"RUNNING"</expression>
+                              </dependency>
+                           </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
