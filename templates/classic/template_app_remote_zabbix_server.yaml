@@ -125,7 +125,7 @@ zabbix_export:
               name: 'Zabbix alert syncer processes more than 75% busy'
               priority: AVERAGE
         -
-          name: 'Utilization of availability manager internal process, in %'
+          name: 'Utilization of availability manager internal processes, in %'
           type: DEPENDENT
           key: process.availability_manager.avg.busy
           delay: '0'
