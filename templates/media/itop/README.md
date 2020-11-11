@@ -1,6 +1,6 @@
 # iTop webhook
 
-This guide describes how to integrate Zabbix 5.X installation with iTop using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 5.4 installation with iTop using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations are supported only for trigger-based events.
 
 ## Setting up iTop
@@ -19,7 +19,8 @@ The following parameters are required:<br>
 **itop_password** - user's password.<br>
 **itop_organization_id** - ID of organization.<br>
 **itop_class** - name of the class to be used when creating new tickets from Zabbix notifications. *UserRequest* or *Problem* for example.<br>
-**itop_log** - the type of log section in ticket for posting problem's updates from Zabbix. Must be *Private* or *Public*.
+**itop_log** - the type of log section in ticket for posting problem's updates from Zabbix. Must be *Private* or *Public*.<br>
+**itop_comment** - the comment that will be posted to ticket's history.
 
 3\. Create a **Zabbix user** and add **Media** with the **iTop** media type. 
 Though a "Send to" field is not used in iTop webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
@@ -28,4 +29,4 @@ Make sure this user has access to all hosts for which you would like problem not
 For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [iTop](https://www.itophub.io/wiki/page) documentations.
 
 ## Supported Versions
-Zabbix 5.4
+Zabbix 5.4 and higer
