@@ -136,6 +136,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		// Work with preprocessing steps.
 		$preprocessing_steps = $this->getInput('steps', []);
+		usort($preprocessing_steps, function () {
+			return (func_get_arg(1)['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 1 : 0;
+		});
 		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
