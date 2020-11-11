@@ -124,7 +124,7 @@ const char	*help_message[] = {
 	"                                 preprocessing worker, proxy poller,",
 	"                                 self-monitoring, snmp trapper, task manager,",
 	"                                 timer, trapper, unreachable poller,",
-	"                                 vmware collector)",
+	"                                 vmware collector, history poller, availability manager)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier, up to 65535. For larger",
 	"                                 values specify target as \"process-type,N\"",
