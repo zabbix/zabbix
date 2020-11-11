@@ -1464,8 +1464,6 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
  * Parameters: dst - [OUT] the vmware hypervisor object into shared memory    *
  *             src - [IN] the vmware hypervisor object                        *
  *                                                                            *
- * Return value: a duplicated vmware hypervisor object                        *
- *                                                                            *
  ******************************************************************************/
 static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *src)
 {
