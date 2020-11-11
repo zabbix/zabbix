@@ -18,7 +18,7 @@ This template was tested on:
 
 Metrics are collected by JMX.
 
-1. Enable and configure JMX access to Apache cassandra. See documentation for [instructions](https://kafka.apache.org/documentation/#remote_jmx).
+1. Enable and configure JMX access to Apache Kafka. See documentation for [instructions](https://kafka.apache.org/documentation/#remote_jmx).
 2. Set the user name and password in host macros {$KAFKA.USER} and {$KAFKA.PASSWORD}.
 
 
