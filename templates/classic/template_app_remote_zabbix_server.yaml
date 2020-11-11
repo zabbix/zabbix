@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-11T10:31:32Z'
+  date: '2020-11-11T10:56:02Z'
   groups:
     -
       name: Templates/Applications
@@ -147,7 +147,7 @@ zabbix_export:
               expression: '{avg(10m)}>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{avg(10m)}<65'
-              name: 'Zabbix availability manager process more than 75% busy'
+              name: 'Zabbix availability manager processes more than 75% busy'
               priority: AVERAGE
         -
           name: 'Utilization of configuration syncer internal processes, in %'
@@ -418,6 +418,13 @@ zabbix_export:
                 - '$.data.process[''java poller''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix java poller processes more than 75% busy'
+              priority: AVERAGE
         -
           name: 'Utilization of LLD manager internal processes, in %'
           type: DEPENDENT
@@ -511,6 +518,13 @@ zabbix_export:
                 - '$.data.process[''preprocessing manager''].busy.avg'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix preprocessing manager processes more than 75% busy'
+              priority: AVERAGE
         -
           name: 'Utilization of preprocessing worker internal processes, in %'
           type: DEPENDENT
