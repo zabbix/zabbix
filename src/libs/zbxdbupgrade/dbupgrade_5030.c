@@ -29,10 +29,48 @@
 
 extern unsigned char	program_type;
 
-/*static int	DBpatch_5030000(void)
+static int	DBpatch_5030000(void)
 {
-	*** put the first upgrade patch here ***
-}*/
+	const ZBX_TABLE table =
+		{"token", "tokenid", 0,
+			{
+				{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR	, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, 0, 0},
+				{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"create_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"creator_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030001(void)
+{
+	return DBcreate_index("token", "token_1", "name", 0);
+}
+
+static int	DBpatch_5030002(void)
+{
+	return DBcreate_index("token", "token_2", "userid,name", 1);
+}
+
+static int	DBpatch_5030003(void)
+{
+	return DBcreate_index("token", "token_3", "token", 0);
+}
+
+static int	DBpatch_5030004(void)
+{
+	return DBcreate_index("token", "token_4", "creator_userid", 0);
+}
 
 #endif
 
@@ -40,6 +78,10 @@ DBPATCH_START(5030)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(5030000, 0, 1)*/
+DBPATCH_ADD(5030000, 0, 1)
+DBPATCH_ADD(5030001, 0, 1)
+DBPATCH_ADD(5030002, 0, 1)
+DBPATCH_ADD(5030003, 0, 1)
+DBPATCH_ADD(5030004, 0, 1)
 
 DBPATCH_END()
