@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-30T08:16:50Z</date>
+   <date>2020-11-11T09:51:35Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -206,7 +206,9 @@ return res;</params>
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>var metrics = JSON.parse(value);
-if (metrics.server_state == "standalone") { return 0 }
+if (metrics.server_state === "standalone") { 
+    return 0 
+    }
 else {
     return metrics.cnt_election_time || metrics.election_time_count
 }</params>
@@ -777,7 +779,7 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <name>Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
-                     <description>Zookeeper state has changed. Ack to close.</description>
+                     <description>Zookeeper node state has changed. Ack to close.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -946,9 +948,9 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
 Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Latency, avg</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency, avg</name>
                      <type>DEPENDENT</type>
-                     <key>zookeeper.avg_latency[{#CLIENT}]</key>
+                     <key>zookeeper.avg_latency[{#TYPE},{#CLIENT}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -956,7 +958,7 @@ Note, depending on the number of client connections this operation may be expens
                      <description>The average amount of time it takes for the server to respond to a client request.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Zookeeper.{#TYPE} {#CLIENT}</name>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -970,9 +972,9 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Latency, max</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency, max</name>
                      <type>DEPENDENT</type>
-                     <key>zookeeper.max_latency[{#CLIENT}]</key>
+                     <key>zookeeper.max_latency[{#TYPE},{#CLIENT}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -980,7 +982,7 @@ Note, depending on the number of client connections this operation may be expens
                      <description>The maximum amount of time it takes for the server to respond to a client request.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Zookeeper.{#TYPE} {#CLIENT}</name>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -994,9 +996,9 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Latency, min</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency, min</name>
                      <type>DEPENDENT</type>
-                     <key>zookeeper.min_latency[{#CLIENT}]</key>
+                     <key>zookeeper.min_latency[{#TYPE},{#CLIENT}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1004,7 +1006,7 @@ Note, depending on the number of client connections this operation may be expens
                      <description>The minimum amount of time it takes for the server to respond to a client request.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Zookeeper.{#TYPE} {#CLIENT}</name>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1018,15 +1020,15 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Outstanding requests</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Outstanding requests</name>
                      <type>DEPENDENT</type>
-                     <key>zookeeper.outstanding_requests[{#CLIENT}]</key>
+                     <key>zookeeper.outstanding_requests[{#TYPE},{#CLIENT}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>The number of queued requests when the server is under load and is receiving more sustained requests than it can process.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Zookeeper.{#TYPE} {#CLIENT}</name>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1040,16 +1042,16 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Packets received per sec</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Packets received per sec</name>
                      <type>DEPENDENT</type>
-                     <key>zookeeper.packets_received[{#CLIENT}]</key>
+                     <key>zookeeper.packets_received[{#TYPE},{#CLIENT}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <description>The number of packets received.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Zookeeper.{#TYPE} {#CLIENT}</name>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1067,16 +1069,16 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Packets sent per sec</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Packets sent per sec</name>
                      <type>DEPENDENT</type>
-                     <key>zookeeper.packets_sent[{#CLIENT}]</key>
+                     <key>zookeeper.packets_sent[{#TYPE},{#CLIENT}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <description>The number of packets sent.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Zookeeper.{#TYPE} {#CLIENT}</name>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1097,13 +1099,13 @@ Note, depending on the number of client connections this operation may be expens
                <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Latency</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Zookeeper by HTTP</host>
-                              <key>zookeeper.max_latency[{#CLIENT}]</key>
+                              <key>zookeeper.max_latency[{#TYPE},{#CLIENT}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1111,7 +1113,7 @@ Note, depending on the number of client connections this operation may be expens
                            <color>2774A4</color>
                            <item>
                               <host>Template App Zookeeper by HTTP</host>
-                              <key>zookeeper.min_latency[{#CLIENT}]</key>
+                              <key>zookeeper.min_latency[{#TYPE},{#CLIENT}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1120,19 +1122,19 @@ Note, depending on the number of client connections this operation may be expens
                            <color>F63100</color>
                            <item>
                               <host>Template App Zookeeper by HTTP</host>
-                              <key>zookeeper.avg_latency[{#CLIENT}]</key>
+                              <key>zookeeper.avg_latency[{#TYPE},{#CLIENT}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
-                     <name>Zookeeper client [{#CLIENT}]: Packets</name>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Packets</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Zookeeper by HTTP</host>
-                              <key>zookeeper.packets_sent[{#CLIENT}]</key>
+                              <key>zookeeper.packets_sent[{#TYPE},{#CLIENT}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1140,7 +1142,7 @@ Note, depending on the number of client connections this operation may be expens
                            <color>2774A4</color>
                            <item>
                               <host>Template App Zookeeper by HTTP</host>
-                              <key>zookeeper.packets_received[{#CLIENT}]</key>
+                              <key>zookeeper.packets_received[{#TYPE},{#CLIENT}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1155,7 +1157,7 @@ Note, depending on the number of client connections this operation may be expens
 source.connections.forEach(function(v){
     data.push({
         "{#ADDRESS}": v.remote_socket_address,
-        "{#CLIENT}":v.remote_socket_address.split(':')[0],
+        "{#CLIENT}": v.remote_socket_address.split(':')[0],
         "{#TYPE}": "connections"})
 });
 
