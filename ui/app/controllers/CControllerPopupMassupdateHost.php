@@ -457,17 +457,6 @@ class CControllerPopupMassupdateHost extends CController {
 				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
 
-			// if (($messages = getMessages()) !== null) {
-			// 	$output['errors'] = $messages->toString();
-			// }
-
-			// if (($messages = filter_messages()) !== null) {
-			// 	$output['errors'] = array_column($messages, 'message');
-			// }
-			// else {
-			// 	$output = ['message' => _('Hosts updated')];
-			// }
-
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
 			);

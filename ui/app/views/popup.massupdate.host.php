@@ -82,7 +82,6 @@ $hostFormList->addRow(
 $proxyComboBox = new CComboBox('proxy_hostid', 0);
 $proxyComboBox->addItem(0, _('(no proxy)'));
 foreach ($data['proxies'] as $proxie) {
-	// $proxyComboBox->addItem($proxie['hostid'], $proxie['host']);
 	$proxyComboBox->addItem($proxie['proxyid'], $proxie['host']);
 }
 $hostFormList->addRow(

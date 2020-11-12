@@ -347,13 +347,15 @@ class CControllerPopupMassupdateItem extends CController {
 									if ($item) {
 										if (array_key_exists('applications', $visible)) {
 											if ($applicationids) {
-												$db_applicationids = zbx_objectValues($items[$itemid]['applications'],
+												$db_applicationids = array_column($items[$itemid]['applications'],
 													'applicationid'
 												);
 
 												switch ($massupdate_app_action) {
 													case ZBX_ACTION_ADD:
-														$upd_applicationids = array_merge($applicationids, $db_applicationids);
+														$upd_applicationids = array_merge($applicationids,
+															$db_applicationids
+														);
 														break;
 
 													case ZBX_ACTION_REPLACE:
@@ -361,7 +363,9 @@ class CControllerPopupMassupdateItem extends CController {
 														break;
 
 													case ZBX_ACTION_REMOVE:
-														$upd_applicationids = array_diff($db_applicationids, $applicationids);
+														$upd_applicationids = array_diff($db_applicationids,
+															$applicationids
+														);
 														break;
 												}
 
@@ -403,25 +407,28 @@ class CControllerPopupMassupdateItem extends CController {
 						}
 						unset($update_item);
 
-						$result = API::Item()->update($items_to_update);
+						if (!API::Item()->update($items_to_update)) {
+							throw new Exception();
+						}
 					}
 				}
 				catch (Exception $e) {
 					$result = false;
+					CMessageHelper::setErrorTitle(_('Cannot update items'));
 				}
 
 				$result = DBend($result);
 			}
 
-			if (!$result) {
-				error(_('Cannot update items'));
-			}
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+			if ($result) {
+				$messages = CMessageHelper::getMessages();
+				$output = ['title' => _('Items updated')];
+				if (count($messages)) {
+					$output['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				$output = ['message' => _('Items updated')];
+				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
 
 			$this->setResponse(

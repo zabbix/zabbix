@@ -209,16 +209,23 @@ class CControllerPopupMassupdateTrigger extends CController {
 			}
 
 			if (!$result) {
-				error($this->hasInput('prototype') ? _('Cannot update trigger prototypes') : _('Cannot update trigger'));
+				CMessageHelper::setErrorTitle(
+					$this->hasInput('prototype') ? _('Cannot update trigger prototypes') : _('Cannot update trigger')
+				);
 			}
 
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+			if ($result) {
+				$messages = CMessageHelper::getMessages();
+				$output = ['title' => $this->hasInput('prototype')
+					? _('Trigger prototypes updated')
+					: _('Trigger updated')
+				];
+				if (count($messages)) {
+					$output['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				$output = ['message' => $this->hasInput('prototype')
-					? _('Trigger prototypes updated')
-					: _('Trigger updated')];
+				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
 
 			$this->setResponse(

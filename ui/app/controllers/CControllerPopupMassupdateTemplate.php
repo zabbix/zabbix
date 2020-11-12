@@ -92,6 +92,8 @@ class CControllerPopupMassupdateTemplate extends CController {
 				}
 			);
 
+			$result = true;
+
 			try {
 				DBstart();
 
@@ -184,7 +186,7 @@ class CControllerPopupMassupdateTemplate extends CController {
 				foreach ($templates as &$template) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-							$current_groupids = zbx_objectValues($template['groups'], 'groupid');
+							$current_groupids = array_column($template['groups'], 'groupid');
 							$template['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 								'groupid'
 							);
@@ -193,17 +195,17 @@ class CControllerPopupMassupdateTemplate extends CController {
 							$template['groups'] = zbx_toObject($new_groupids, 'groupid');
 						}
 						elseif ($remove_groupids) {
-							$current_groupids = zbx_objectValues($template['groups'], 'groupid');
+							$current_groupids = array_column($template['groups'], 'groupid');
 							$template['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 						}
 					}
 
 					if (array_key_exists('linked_templates', $visible)) {
 						$parent_templateids = array_key_exists('parentTemplates', $template)
-							? zbx_objectValues($template['parentTemplates'], 'templateid')
+							? array_column($template['parentTemplates'], 'templateid')
 							: [];
 
-						switch ($this->getInput('mass_action_tpls')) {
+						switch ($this->hasInput('mass_action_tpls')) {
 							case ZBX_ACTION_ADD:
 								$template['templates'] = array_unique(
 									array_merge($parent_templateids, $this->getInput('linked_templates', []))
@@ -314,7 +316,8 @@ class CControllerPopupMassupdateTemplate extends CController {
 
 									foreach ($template['macros'] as $template_macro) {
 										if ((!$except_selected && in_array($template_macro['macro'], $macro_names))
-												|| ($except_selected && !in_array($template_macro['macro'], $macro_names))) {
+												|| ($except_selected
+													&& !in_array($template_macro['macro'], $macro_names))) {
 											$template_macros_remove[] = $template_macro['hostmacroid'];
 										}
 									}
@@ -366,20 +369,23 @@ class CControllerPopupMassupdateTemplate extends CController {
 						throw new Exception();
 					}
 				}
-
-				DBend(true);
 			}
 			catch (Exception $e) {
-				DBend(false);
-
-				error(_('Cannot update templates'));
+				$result = false;
+				CMessageHelper::setErrorTitle(_('Cannot update templates'));
 			}
 
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+			DBend($result);
+
+			if ($result) {
+				$messages = CMessageHelper::getMessages();
+				$output = ['title' => _('Templates updated')];
+				if (count($messages)) {
+					$output['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				$output = ['message' => _('Templates updated')];
+				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
 
 			$this->setResponse(

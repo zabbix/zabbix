@@ -377,7 +377,6 @@ function submitPopup(overlay) {
 			postMessageOk(response['title']);
 			if ('messages' in response) {
 				postMessageDetails('success', response.messages);
-				console.log('1');
 			}
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location.href;
