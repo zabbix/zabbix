@@ -258,7 +258,8 @@ $form_list->addRow(
 $form_list->addRow((new CLabel(_('User name'), 'operation_opcommand_username'))->setAsteriskMark(),
 	(new CTextBox('operation[opcommand][username]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableAutocomplete(),
 	'operation-command-username'
 );
 
@@ -286,7 +287,8 @@ $form_list->addRow((new CLabel(_('Private key file'), 'operation_opcommand_priva
  * Command password row.
  */
 $form_list->addRow(_('Password'), (new CTextBox('operation[opcommand][password]'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->disableAutocomplete(),
 	'operation-command-password'
 );
 
@@ -295,7 +297,8 @@ $form_list->addRow(_('Password'), (new CTextBox('operation[opcommand][password]'
  */
 $form_list->addRow(_('Key passphrase'), (new CTextBox('operation[opcommand][password]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setId('opcommand_passphrase'),
+		->setId('opcommand_passphrase')
+		->disableAutocomplete(),
 	'operation-command-passphrase'
 );
 
