@@ -32,9 +32,6 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 static sigset_t		orig_mask;
 
-#define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
-#define ZBX_IPC_AVAILABILITY_REQUEST	1
-
 #define ZBX_AVAILABILITY_MANAGER_DELAY			1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
 
@@ -151,44 +148,5 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
-}
-
-void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
-{
-	static zbx_ipc_socket_t	socket;
-
-	/* each process has a permanent connection to availability manager */
-	if (0 == socket.fd)
-	{
-		char	*error = NULL;
-
-		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_AVAILABILITY, SEC_PER_MIN, &error))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_AVAILABILITY_REQUEST, data, size))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
-		exit(EXIT_FAILURE);
-	}
-}
-
-void	zbx_availabilities_flush(const zbx_vector_ptr_t *host_availabilities)
-{
-	unsigned char	*data = NULL;
-	size_t		data_alloc = 0, data_offset = 0;
-	int		i;
-
-	for (i = 0; i < host_availabilities->values_num; i++)
-	{
-		zbx_availability_serialize(&data, &data_alloc, &data_offset,
-				(zbx_host_availability_t *)host_availabilities->values[i]);
-	}
-
-	zbx_availability_flush(data, data_offset);
-	zbx_free(data);
 }
 
