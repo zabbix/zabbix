@@ -440,7 +440,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_BAD:
-				$message = $dialog->query('tag:output')->waitUntilPresent()->asMessage()->one();
+				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
 
 				// Workaround for single step which has different message.
@@ -455,7 +455,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				break;
 
 			case TEST_GOOD:
-				$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
+				$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
 				$this->assertEquals('Test item', $dialog->getTitle());
 
 				$time = $dialog->query('id:time')->one();
@@ -467,7 +467,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				$this->assertTrue($prev_value->isEnabled($prev_enabled));
 				$this->assertTrue($prev_time->isEnabled($prev_enabled));
 
-				$radio = $form->getField('End of line sequence');
+				$radio = $form->query('id:eol')->one()->waitUntilPresent();
 				$this->assertTrue($radio->isEnabled());
 
 				$macros = [
@@ -478,7 +478,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				];
 
 				if ($macros['expected']) {
-					foreach ($form->getField('Macros')->asTable()->getRows() as $row) {
+					foreach ($form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:
@@ -500,7 +500,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					$this->assertEquals($macros['expected'], $macros['actual']);
 				}
 
-				$table = $form->getField('Preprocessing steps')->asTable();
+				$table = $form->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
 
 				if ($id === null) {
 					foreach ($data['preprocessing'] as $i => $step) {
@@ -518,23 +518,23 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 	private function chooseDialogActions($data) {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
 		switch ($data['action']) {
 			case 'Test':
 				$value_string = '123';
 				$prev_value_string = '100';
 				$prev_time_string  = 'now-1s';
 
-				$form->getField('Value')->fill('$value_string');
-				$prev_value = $form->getField('Previous value');
-				$prev_time = $form->getField('Prev. time');
+				$form->query('id:value')->asMultiline()->waitUntilPresent()->one()->fill($value_string);
+				$prev_value = $form->query('id:prev_value')->asMultiline()->waitUntilPresent()->one();
+				$prev_time = $form->query('id:prev_time')->waitUntilPresent()->one();
 
 				if ($prev_value->isEnabled(true) && $prev_time->isEnabled(true)) {
 					$prev_value->fill($prev_value_string);
 					$prev_time->fill($prev_time_string);
 				}
-				$form->getField('End of line sequence')->fill('CRLF');
-				$form->submit();
+				$form->query('id:eol')->asSegmentedRadio()->waitUntilPresent()->one()->fill('CRLF');
+				$dialog->query('button:Test')->one()->waitUntilVisible()->click();
 
 				// Check Zabbix server down message.
 				$message = $form->getOverlayMessage();

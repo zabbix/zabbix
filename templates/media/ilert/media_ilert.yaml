@@ -142,11 +142,11 @@ zabbix_export:
         try {
             var result = { tags: {} },
                 params = JSON.parse(value),
-                req = new CurlHttpRequest(),
+                req = new HttpRequest(),
                 resp = '';
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.SetProxy(params.HTTPProxy);
+                req.setProxy(params.HTTPProxy);
             }
             var alertSourceKey = params['.ILERT.ALERT.SOURCE.KEY'];
             if (!alertSourceKey || (typeof alertSourceKey === 'string' && alertSourceKey.trim() === '')) {
@@ -160,12 +160,12 @@ zabbix_export:
             var incidentKey = "zabbix-" + params['EVENT.ID'];
             var incidentViewURL = ilertApiBaseURL + "/api/v1/incidents/resolve-ik/" + alertSourceKey + "/" + incidentKey;
         
-            req.AddHeader('Accept: application/json');
-            req.AddHeader('Content-Type: application/json');
+            req.addHeader('Accept: application/json');
+            req.addHeader('Content-Type: application/json');
         
-            Zabbix.Log(4, '[iLert Webhook] Sending request:' + JSON.stringify(params));
-            resp = req.Post(reqURL, JSON.stringify(params));
-            Zabbix.Log(4, '[iLert Webhook] Receiving response:' + resp);
+            Zabbix.log(4, '[iLert Webhook] Sending request:' + JSON.stringify(params));
+            resp = req.post(reqURL, JSON.stringify(params));
+            Zabbix.log(4, '[iLert Webhook] Receiving response:' + resp);
         
             try {
                 resp = JSON.parse(resp);
@@ -174,12 +174,12 @@ zabbix_export:
                 throw 'incorrect response. iLert returned a non-JSON object.';
             }
         
-            if (req.Status() == 200) {
+            if (req.getStatus() == 200) {
                 result.tags.__ilert_incident_url = incidentViewURL;
                 return JSON.stringify(result);
             }
         
-            if (req.Status() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
+            if (req.getStatus() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
                 if (resp.code === 'NO_OPEN_INCIDENT_WITH_KEY') {
                   return JSON.stringify(result);
                 }
@@ -197,7 +197,7 @@ zabbix_export:
             }
         }
         catch (error) {
-            Zabbix.Log(3, '[iLert Webhook] Notification failed : ' + error);
+            Zabbix.log(3, '[iLert Webhook] Notification failed : ' + error);
             throw 'iLert notification failed : ' + error;
         }
       process_tags: 'YES'

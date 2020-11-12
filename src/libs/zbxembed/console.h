@@ -17,34 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#ifndef ZABBIX_CONSOLE_H
+#define ZABBIX_CONSOLE_H
 
-#ifndef ZABBIX_ZBXKSTAT_H
-#define ZABBIX_ZBXKSTAT_H
-
-#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
-
-#include "zbxtypes.h"
-
-typedef struct
-{
-	zbx_uint64_t	freemem;
-	zbx_uint64_t	updates;
-}
-zbx_kstat_vminfo_t;
-
-typedef struct
-{
-	zbx_kstat_vminfo_t	vminfo[2];
-	int			vminfo_index;
-}
-zbx_kstat_t;
-
-int	zbx_kstat_init(zbx_kstat_t *kstat, char **error);
-void	zbx_kstat_destroy(void);
-void	zbx_kstat_collect(zbx_kstat_t *kstat);
-int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error);
-
-#endif
+int	zbx_es_init_console(zbx_es_t *es, char **error);
 
 #endif
