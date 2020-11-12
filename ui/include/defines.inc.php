@@ -1687,6 +1687,7 @@ define('ZBX_STYLE_OVERRIDES_OPTIONS_LIST', 'overrides-options-list');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
+define('ZBX_STYLE_TABLE_LEFT_BORDER', 'border-left');
 define('ZBX_STYLE_TIME_INPUT', 'time-input');
 define('ZBX_STYLE_TIME_INPUT_ERROR', 'time-input-error');
 define('ZBX_STYLE_TIME_QUICK', 'time-quick');

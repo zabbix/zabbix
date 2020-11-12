@@ -644,18 +644,26 @@ class CControllerMenuPopup extends CController {
 			$menu_data['params'] = $data['params'];
 		}
 
-		if ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('graphid', $data) && $data['graphid']) {
-			$menu_data['download'] = (bool) API::Graph()->get([
-				'output' => ['graphid'],
-				'graphids' => $data['graphid']
-			]);
-		}
-		elseif ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('itemid', $data) && $data['itemid']) {
-			$menu_data['download'] = (bool) API::Item()->get([
-				'output' => ['itemid'],
-				'itemids' => $data['itemid'],
-				'webitems' => true
-			]);
+		if ($data['widgetType'] == WIDGET_GRAPH) {
+			$options = [];
+
+			if (array_key_exists('dynamic_hostid', $data)) {
+				$options['hostids'] = $data['dynamic_hostid'];
+			}
+
+			if (array_key_exists('graphid', $data) && $data['graphid']) {
+				$menu_data['download'] = (bool) API::Graph()->get($options + [
+					'output' => ['graphid'],
+					'graphids' => $data['graphid']
+				]);
+			}
+			elseif (array_key_exists('itemid', $data) && $data['itemid']) {
+				$menu_data['download'] = (bool) API::Item()->get($options + [
+					'output' => ['itemid'],
+					'itemids' => $data['itemid'],
+					'webitems' => true
+				]);
+			}
 		}
 
 		return $menu_data;

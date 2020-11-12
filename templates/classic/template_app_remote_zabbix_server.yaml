@@ -775,6 +775,42 @@ zabbix_export:
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
         -
+          name: 'Trend function cache, % unique requests'
+          type: DEPENDENT
+          key: tcache.pitems
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.tcache.pitems
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
+          name: 'Trend function cache, % misses'
+          type: DEPENDENT
+          key: tcache.pmisses
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.tcache.pmisses
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+        -
           name: 'Value cache, % used'
           type: DEPENDENT
           key: vcache.buffer.pused
@@ -1289,6 +1325,21 @@ zabbix_export:
                     name: 'Zabbix internal queues'
                     host: 'Remote Zabbix server'
   graphs:
+    -
+      name: 'Trend function cache effectiveness'
+      graph_items:
+        -
+          sortorder: '1'
+          color: C80000
+          item:
+            host: 'Remote Zabbix server'
+            key: tcache.pmisses
+        -
+          sortorder: '2'
+          color: 00C800
+          item:
+            host: 'Remote Zabbix server'
+            key: tcache.pitems
     -
       name: 'Value cache effectiveness'
       type: STACKED

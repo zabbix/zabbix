@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 20:10+0200\n"
-"PO-Revision-Date: 2020-11-04 06:15+0300\n"
+"POT-Creation-Date: 2020-11-06 19:56+0200\n"
+"PO-Revision-Date: 2020-11-06 04:46+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1604463353.000000\n"
+"X-POOTLE-MTIME: 1604630810.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -1132,10 +1132,10 @@ msgstr "applicationid \"%1$s\"のアプリケーションが存在しません�
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/views/configuration.application.edit.php:29
-#: app/views/configuration.application.list.php:169 app/views/search.php:38
-#: app/views/search.php:117 app/views/search.php:122 app/views/search.php:264
-#: app/views/search.php:286 app/views/search.php:291 include/forms.inc.php:652
-#: include/html.inc.php:346 include/views/configuration.host.edit.php:228
+#: app/views/configuration.application.list.php:169 app/views/search.php:117
+#: app/views/search.php:122 app/views/search.php:304 app/views/search.php:309
+#: include/forms.inc.php:652 include/html.inc.php:346
+#: include/views/configuration.host.edit.php:228
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:411
 #: include/views/configuration.item.edit.php:885
@@ -3606,6 +3606,7 @@ msgstr "実行条件"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "相関関係\"%1$s\"の実行条件が重複しています。"
 
+#: app/views/search.php:37 app/views/search.php:200 app/views/search.php:280
 #: include/classes/helpers/CMenuHelper.php:185
 #: include/classes/helpers/CRoleHelper.php:351
 #: include/views/inventory.host.view.php:224 jsLoader.php:278
@@ -4091,11 +4092,11 @@ msgstr "ログの一致行数。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:1135
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr ""
+msgstr "ローレベルディスカバリ処理キュー内にキューイングされた値の数。"
 
 #: include/classes/items/CHelpItems.php:1139
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr ""
+msgstr "保存前処理キュー内にキューイングされた値の数。"
 
 #: include/views/configuration.action.list.php:54
 msgid "Create action"
@@ -4494,10 +4495,9 @@ msgstr "ダッシュボードを更新しました"
 #: app/views/configuration.dashboard.edit.php:36
 #: app/views/configuration.dashboard.list.php:74
 #: app/views/monitoring.dashboard.list.php:35
-#: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:36
-#: app/views/search.php:99 app/views/search.php:104 app/views/search.php:265
-#: app/views/search.php:316 app/views/search.php:323 include/html.inc.php:403
-#: include/views/configuration.template.edit.php:309
+#: app/views/monitoring.host.dashboard.view.php:32 app/views/search.php:99
+#: app/views/search.php:104 app/views/search.php:336 app/views/search.php:343
+#: include/html.inc.php:403 include/views/configuration.template.edit.php:309
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:273
 #: include/views/inventory.host.view.php:168
@@ -5403,9 +5403,8 @@ msgstr "発見されたデバイス"
 msgid "Discovered items"
 msgstr "ディスカバリされたアイテム"
 
-#: app/views/popup.mediatype.message.php:55 app/views/search.php:42
-#: app/views/search.php:150 app/views/search.php:154 app/views/search.php:265
-#: app/views/search.php:326 app/views/search.php:330
+#: app/views/popup.mediatype.message.php:55 app/views/search.php:152
+#: app/views/search.php:156 app/views/search.php:346 app/views/search.php:350
 #: include/classes/helpers/CMediatypeHelper.php:93
 #: include/classes/helpers/CMenuHelper.php:73
 #: include/classes/helpers/CMenuHelper.php:175
@@ -5447,31 +5446,31 @@ msgstr "ディスカバリオブジェクト"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareクラスターのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:799
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareデータストアのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:843
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのデータストアのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:863
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのディスクデバイスのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのファイルシステムのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: app/controllers/CControllerAuditLogList.php:206
 #: app/views/monitoring.discovery.view.php:49
@@ -5584,7 +5583,7 @@ msgstr "障害数の表示"
 msgid "Display stacked graph"
 msgstr "積算グラフ表示"
 
-#: app/views/search.php:187 app/views/search.php:260 app/views/search.php:356
+#: app/views/search.php:189 app/views/search.php:273 app/views/search.php:376
 #: include/actions.inc.php:1723 include/actions.inc.php:1794
 #: include/actions.inc.php:1884 include/classes/helpers/CPagerHelper.php:147
 #: jsLoader.php:346 queue.php:316
@@ -7184,10 +7183,9 @@ msgstr "同じ名前で異なるタイプのグラフが存在します。"
 #: app/partials/monitoring.host.view.html.php:141
 #: app/views/monitoring.charts.view.php:39
 #: app/views/monitoring.charts.view.php:107
-#: app/views/monitoring.charts.view.php:135 app/views/search.php:35
-#: app/views/search.php:41 app/views/search.php:89 app/views/search.php:96
-#: app/views/search.php:142 app/views/search.php:146 app/views/search.php:264
-#: app/views/search.php:308 app/views/search.php:312 graphs.php:480
+#: app/views/monitoring.charts.view.php:135 app/views/search.php:89
+#: app/views/search.php:96 app/views/search.php:144 app/views/search.php:148
+#: app/views/search.php:328 app/views/search.php:332 graphs.php:480
 #: include/html.inc.php:389 include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:43
 #: include/views/configuration.host.discovery.list.php:177
@@ -7653,7 +7651,7 @@ msgstr[0] "ホストを有効にしました"
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
-#: app/views/search.php:192 include/actions.inc.php:48
+#: app/views/search.php:194 include/actions.inc.php:48
 #: include/blocks.inc.php:354 include/maps.inc.php:25
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
@@ -7711,7 +7709,7 @@ msgstr "ID \"%1$s\"のホストグループは使用できません。"
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.web.view.php:48
 #: app/views/popup.condition.common.php:98
-#: app/views/popup.condition.common.php:269 app/views/search.php:258
+#: app/views/popup.condition.common.php:269 app/views/search.php:271
 #: hostinventoriesoverview.php:159 include/classes/helpers/CMenuHelper.php:147
 #: include/classes/helpers/CRoleHelper.php:425
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
@@ -7909,8 +7907,8 @@ msgstr "同じホストの表示名\"%1$s\"を持つホストがすでに存在�
 #: app/views/monitoring.host.view.php:38
 #: app/views/monitoring.latest.view.php:66
 #: app/views/monitoring.web.view.php:67
-#: app/views/popup.condition.common.php:238 app/views/search.php:185
-#: app/views/search.php:196 app/views/search.php:208 app/views/search.php:212
+#: app/views/popup.condition.common.php:238 app/views/search.php:187
+#: app/views/search.php:215 app/views/search.php:219
 #: include/classes/helpers/CMenuHelper.php:44
 #: include/classes/helpers/CMenuHelper.php:98
 #: include/classes/helpers/CMenuHelper.php:157
@@ -10289,9 +10287,8 @@ msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2
 #: app/controllers/CControllerPopupGeneric.php:261
 #: app/partials/dataoverview.table.top.php:29
 #: app/views/configuration.application.list.php:93
-#: app/views/configuration.application.list.php:141 app/views/search.php:39
-#: app/views/search.php:126 app/views/search.php:130 app/views/search.php:264
-#: app/views/search.php:294 app/views/search.php:298
+#: app/views/configuration.application.list.php:141 app/views/search.php:128
+#: app/views/search.php:132 app/views/search.php:314 app/views/search.php:318
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
 #: include/html.inc.php:361 include/views/configuration.graph.edit.php:445
 #: include/views/configuration.host.discovery.list.php:175
@@ -10646,9 +10643,8 @@ msgstr "最新1週間のグラフ"
 #: app/partials/monitoring.host.view.html.php:35
 #: app/partials/monitoring.host.view.html.php:111
 #: app/partials/monitoring.host.view.html.php:117
-#: app/views/monitoring.latest.view.php:35 app/views/search.php:33
-#: app/views/search.php:71 app/views/search.php:77 app/views/search.php:193
-#: app/views/search.php:227 app/views/search.php:233
+#: app/views/monitoring.latest.view.php:35 app/views/search.php:69
+#: app/views/search.php:75 app/views/search.php:232 app/views/search.php:238
 #: include/classes/helpers/CMenuHelper.php:55
 #: include/classes/helpers/CRoleHelper.php:379
 #: include/views/inventory.host.view.php:143
@@ -10810,37 +10806,37 @@ msgstr "リストがありません"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:643
 msgid "List of block devices and their type. Returns JSON"
-msgstr ""
+msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:551
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr ""
+msgstr "検出されたCPUコアのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:695
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr ""
+msgstr "マウントされたファイルシステムとそのタイプのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:699
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr ""
+msgstr "マウントされたファイルシステムのリスト、それらのタイプ、ディスクスペースとiノードの統計のリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:455
 msgid "List of network interfaces. Returns JSON"
-msgstr ""
+msgstr "ネットワークインターフェースのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:507
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr ""
+msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスの英語でのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:503
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr ""
+msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONで返す"
 
 #: app/views/dashboard.share.edit.php:84
 #: include/views/monitoring.screen.edit.php:197
@@ -11738,6 +11734,7 @@ msgstr "プロキシによる監視"
 msgid "Monitored host"
 msgstr "監視中のホスト"
 
+#: app/views/search.php:33 app/views/search.php:195
 #: include/classes/helpers/CMenuHelper.php:85
 #: include/classes/helpers/CRoleHelper.php:345
 #: include/views/inventory.host.view.php:133
@@ -14264,10 +14261,9 @@ msgstr "子に一つでも障害があった場合に障害として検知"
 #: app/partials/monitoring.problem.filter.php:30
 #: app/views/monitoring.problem.view.php:95 app/views/report.services.php:72
 #: app/views/report.services.php:73 app/views/report.services.php:74
-#: app/views/report.services.php:75 app/views/search.php:34
-#: app/views/search.php:80 app/views/search.php:86 app/views/search.php:194
-#: app/views/search.php:235 app/views/search.php:241 chart4.php:168
-#: include/classes/helpers/CMenuHelper.php:39
+#: app/views/report.services.php:75 app/views/search.php:80
+#: app/views/search.php:86 app/views/search.php:248 app/views/search.php:254
+#: chart4.php:168 include/classes/helpers/CMenuHelper.php:39
 #: include/classes/helpers/CRoleHelper.php:376
 #: include/classes/widgets/CWidgetConfig.php:59
 #: include/classes/widgets/forms/CWidgetFormProblems.php:35
@@ -15669,7 +15665,7 @@ msgid "Scripts"
 msgstr "スクリプト"
 
 #: app/controllers/CControllerSearch.php:100
-#: app/partials/layout.htmlpage.aside.php:60 app/views/search.php:361
+#: app/partials/layout.htmlpage.aside.php:60 app/views/search.php:381
 msgid "Search"
 msgstr "検索"
 
@@ -16573,7 +16569,7 @@ msgstr "固定"
 
 #: include/classes/items/CHelpItems.php:1207
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
-msgstr ""
+msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmodesは(all, float, uint, str, log, text, not supported)から、casheがhistoryならmodesは(pfree, free, total, used, pused)から、cacheがindexならmodesは(pfree, free, total, used, pused)から、cacheがtrendならmodesは(pfree, free, total, used, pused)から選択。"
 
 #: app/controllers/CControllerPopupGeneric.php:217
 #: app/controllers/CControllerPopupGeneric.php:231
@@ -17026,7 +17022,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: app/controllers/CControllerAuditLogList.php:213
-#: app/views/administration.mediatype.edit.php:276 app/views/search.php:264
+#: app/views/administration.mediatype.edit.php:276 app/views/search.php:279
 #: include/actions.inc.php:49 include/forms.inc.php:283
 #: include/forms.inc.php:677 include/views/configuration.template.edit.php:46
 #: include/views/configuration.template.edit.php:337
@@ -17122,8 +17118,8 @@ msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在し�
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/partials/popup.operations.php:348
-#: app/views/popup.condition.common.php:344 app/views/search.php:197
-#: app/views/search.php:215 app/views/search.php:219 app/views/search.php:354
+#: app/views/popup.condition.common.php:344 app/views/search.php:224
+#: app/views/search.php:228 app/views/search.php:374
 #: include/classes/helpers/CMenuHelper.php:150
 #: include/classes/helpers/CRoleHelper.php:426
 #: include/views/configuration.copy.elements.php:63
@@ -17867,10 +17863,9 @@ msgstr "トリガーを更新しました"
 #: app/controllers/CControllerPopupGeneric.php:207
 #: app/partials/monitoring.problem.filter.php:83
 #: app/partials/trigoverview.table.top.php:29
-#: app/views/popup.condition.common.php:193 app/views/search.php:40
-#: app/views/search.php:134 app/views/search.php:138 app/views/search.php:264
-#: app/views/search.php:301 app/views/search.php:305 include/forms.inc.php:264
-#: include/html.inc.php:375
+#: app/views/popup.condition.common.php:193 app/views/search.php:136
+#: app/views/search.php:140 app/views/search.php:321 app/views/search.php:325
+#: include/forms.inc.php:264 include/html.inc.php:375
 #: include/views/configuration.host.discovery.list.php:176
 #: include/views/configuration.host.edit.php:279
 #: include/views/configuration.host.list.php:186
@@ -18885,7 +18880,7 @@ msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサ�
 
 #: include/classes/items/CHelpItems.php:839
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータセンターの名前、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。文字列値を返す"
 
 #: include/classes/items/CHelpItems.php:851
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18901,7 +18896,7 @@ msgstr "VMwareハイパーバイザーのデータストアのリスト、<url> 
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "VMwareハイパーバイザーの稼働状態ロールアップセンサー、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。0 - 灰; 1 - 緑; 2 - 黄; 3 - 赤を返す"
 
 #: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18981,7 +18976,7 @@ msgstr "VMware仮想マシンの圧縮されたメモリサイズ、<url> - VMwa
 
 #: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
-msgstr ""
+msgstr "VMware仮想マシンデータセンターの名前、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。文字列値を返す"
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -19206,7 +19201,7 @@ msgstr "MQTTトピックの値。返却されるデータフォーマットは�
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:515
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "英語でWindowsパフォーマンスカウンターの値。数値、文字列値、テキスト値で返す(リクエストに依存)"
 
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:511
@@ -19368,12 +19363,10 @@ msgstr "要素を保存できる最大値に達しました"
 
 #: app/partials/monitoring.host.view.html.php:39
 #: app/partials/monitoring.host.view.html.php:154
-#: app/partials/monitoring.host.view.html.php:162 app/views/search.php:37
-#: app/views/search.php:43 app/views/search.php:107 app/views/search.php:113
-#: app/views/search.php:158 app/views/search.php:162 app/views/search.php:195
-#: app/views/search.php:243 app/views/search.php:249 app/views/search.php:265
-#: app/views/search.php:333 app/views/search.php:337
-#: include/views/configuration.host.list.php:189
+#: app/partials/monitoring.host.view.html.php:162 app/views/search.php:107
+#: app/views/search.php:113 app/views/search.php:160 app/views/search.php:164
+#: app/views/search.php:256 app/views/search.php:262 app/views/search.php:353
+#: app/views/search.php:357 include/views/configuration.host.list.php:189
 #: include/views/configuration.host.list.php:452
 #: include/views/configuration.template.list.php:157
 #: include/views/configuration.template.list.php:288

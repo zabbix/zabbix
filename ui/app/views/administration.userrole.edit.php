@@ -50,12 +50,17 @@ $form_grid->addItem([
 	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 ]);
 
-if ($data['readonly']) {
+if ($data['readonly'] || $data['is_own_role']) {
 	$form_grid->addItem([
 		(new CLabel(_('User type'), 'type')),
-		(new CFormField(
-			(new CTextBox('type', user_type2str()[$data['type']]))->setAttribute('readonly', true)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		(new CFormField([
+			(new CTextBox('type', user_type2str()[$data['type']]))->setAttribute('readonly', true),
+			new CVar('type', $data['type']),
+			' ',
+			$data['is_own_role']
+				? new CSpan(_('User cannot change the user type of own role.'))
+				: null
+		]))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
 }
 else {
