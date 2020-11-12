@@ -172,7 +172,9 @@ class CMenuHelper {
 				? (new CMenuItem(_('Event correlation')))->setUrl(new CUrl('correlation.php'), 'correlation.php')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
-				? (new CMenuItem(_('Discovery')))->setUrl(new CUrl('discoveryconf.php'), 'discoveryconf.php')
+				? (new CMenuItem(_('Discovery')))
+					->setAction('discovery.list')
+					->setAliases(['discoveryconf.php'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
 				? (new CMenuItem(_('Services')))->setUrl(new CUrl('services.php'), 'services.php')

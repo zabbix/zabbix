@@ -34,7 +34,7 @@ $widget = (new CWidget())
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter(new CUrl('discoveryconf.php')))
+	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'discovery.list')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -50,7 +50,7 @@ $widget = (new CWidget())
 					->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
 					->setModern(true)
 			)
-		])
+		])->addVar('action', 'discovery.list')
 	);
 
 // create form
@@ -62,7 +62,10 @@ $discoveryTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'discoveryconf.php'),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'discovery.list')
+			->getUrl()
+		),
 		_('IP range'),
 		_('Proxy'),
 		_('Interval'),
@@ -84,7 +87,7 @@ foreach ($data['drules'] as $drule) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
-		new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']),
+		new CLink($drule['name'], 'discoveryconf.php?form=update&druleid='.$drule['druleid']),
 		$drule['iprange'],
 		$drule['proxy'],
 		$drule['delay'],
