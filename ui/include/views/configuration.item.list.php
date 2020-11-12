@@ -266,35 +266,40 @@ foreach ($data['items'] as $item) {
 	]);
 }
 
-$massclearhistory = [
-	'name' => _('Clear history'),
-	'confirm' => _('Delete history of selected items?'),
-	'disabled' => $data['is_template']
+$button_list = [
+	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
+	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')]
 ];
 
-if ($data['config']['compression_status']) {
-	unset($massclearhistory['confirm']);
+if ($data['context'] === 'host') {
+	$massclearhistory = [
+		'name' => _('Clear history'),
+		'confirm' => _('Delete history of selected items?'),
+		'disabled' => $data['is_template']
+	];
+
+	if ($data['config']['compression_status']) {
+		unset($massclearhistory['confirm']);
+	}
+
+	$button_list += [
+		'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
+		'item.massclearhistory' => $massclearhistory
+	];
 }
 
-// append table to form
-$itemForm->addItem([
-	$itemTable,
-	$data['paging'],
-	new CActionButtonList('action', 'group_itemid',
-		[
-			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
-			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
-			'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
-			'item.massclearhistory' => $massclearhistory,
-			'item.masscopyto' => ['name' => _('Copy')],
-			'item.massupdateform' => ['name' => _('Mass update')],
-			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
-		],
-		$data['checkbox_hash']
-	)
-]);
+$button_list += [
+	'item.masscopyto' => ['name' => _('Copy')],
+	'item.massupdateform' => ['name' => _('Mass update')],
+	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
+];
 
-// append form to widget
+// Append table to form.
+$itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action', 'group_itemid', $button_list,
+	$data['checkbox_hash']
+)]);
+
+// Append form to widget.
 $widget->addItem($itemForm);
 
 $widget->show();

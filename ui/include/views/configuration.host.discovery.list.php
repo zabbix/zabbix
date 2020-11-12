@@ -311,28 +311,25 @@ foreach ($data['discoveries'] as $discovery) {
 	]);
 }
 
-// append table to form
-$discoveryForm->addItem([
-	$discoveryTable,
-	$data['paging'],
-	new CActionButtonList('action', 'g_hostdruleid',
-		[
-			'discoveryrule.massenable' => ['name' => _('Enable'),
-				'confirm' =>_('Enable selected discovery rules?')
-			],
-			'discoveryrule.massdisable' => ['name' => _('Disable'),
-				'confirm' =>_('Disable selected discovery rules?')
-			],
-			'discoveryrule.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
-			'discoveryrule.massdelete' => ['name' => _('Delete'),
-				'confirm' =>_('Delete selected discovery rules?')
-			]
-		],
-		$data['checkbox_hash']
-	)
-]);
+$button_list = [
+	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?')],
+	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')],
+];
 
-// append form to widget
+if ($data['context'] === 'host') {
+	$button_list += ['discoveryrule.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']]];
+}
+
+$button_list += [
+	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?')]
+];
+
+// Append table to form.
+$discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList('action', 'g_hostdruleid',
+	$button_list, $data['checkbox_hash']
+)]);
+
+// Append form to widget.
 $widget->addItem($discoveryForm);
 
 $widget->show();

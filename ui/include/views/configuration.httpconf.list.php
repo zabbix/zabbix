@@ -177,13 +177,15 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		(new CLink(
 			httptest_status2str($httpTest['status']),
-			'?group_httptestid[]='.$httpTest['httptestid'].
-				'&hostid='.$httpTest['hostid'].
-				'&context='.$data['context'].
-				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
+			(new CUrl('httpconf.php'))
+				->setArgument('group_httptestid[]', $httpTest['httptestid'])
+				->setArgument('hostid', $httpTest['hostid'])
+				->setArgument('action', ($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
 				)
+				->setArgument('context', $data['context'])
+				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status']))
@@ -192,24 +194,30 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	]);
 }
 
-// append table to form
-$httpForm->addItem([
-	$httpTable,
-	$data['paging'],
-	new CActionButtonList('action', 'group_httptestid',
-		[
-			'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
-			'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')],
-			'httptest.massclearhistory' => ['name' => _('Clear history'),
-				'confirm' => _('Delete history of selected web scenarios?')
-			],
-			'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
-		],
-		$this->data['hostid']
-	)
-]);
+$button_list = [
+	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
+	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')]
+];
 
-// append form to widget
+if ($data['context'] === 'host') {
+	$button_list += [
+		'httptest.massclearhistory' => [
+			'name' => _('Clear history'),
+			'confirm' => _('Delete history of selected web scenarios?')
+		]
+	];
+}
+
+$button_list += [
+	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+];
+
+// Append table to form.
+$httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action', 'group_httptestid', $button_list,
+	$data['hostid']
+)]);
+
+// Append form to widget.
 $widget->addItem($httpForm);
 
 $widget->show();
