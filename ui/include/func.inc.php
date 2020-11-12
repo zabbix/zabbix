@@ -1804,7 +1804,11 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages of the current request.
 
 	if ($options['with_current_messages']) {
-		show_messages(true);
+		show_messages(
+			CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+			CMessageHelper::getTitle(),
+			CMessageHelper::getTitle()
+		);
 
 		$messages_current = $ZBX_MESSAGES_PREPARED;
 		$restore_messages = [];
@@ -1833,7 +1837,11 @@ function get_prepared_messages(array $options = []): ?string {
 			$failed_attempts
 		));
 
-		show_messages();
+		show_messages(
+			CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+			CMessageHelper::getTitle(),
+			CMessageHelper::getTitle()
+		);
 
 		CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 	}

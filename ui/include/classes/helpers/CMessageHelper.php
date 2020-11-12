@@ -141,6 +141,7 @@ class CMessageHelper {
 	 * Clear messages.
 	 */
 	public static function clear(): void {
+		self::$title = null;
 		self::$messages = [];
 	}
 
