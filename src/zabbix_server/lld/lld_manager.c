@@ -329,8 +329,6 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 	zbx_lld_deserialize_item_value(message->data, &itemid, &data->value, &data->ts, &data->meta, &data->lastlogsize,
 			&data->mtime, &data->error);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "queuing discovery rule:" ZBX_FS_UI64, itemid);
-
 	if (NULL == (rule = zbx_hashset_search(&manager->rule_index, &itemid)))
 	{
 		zbx_lld_rule_t	rule_local = {itemid, 0, data, data};
@@ -340,13 +338,23 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 	}
 	else
 	{
+		if (0 == strcmp(data->value, rule->tail->value))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "skip repeating discovery rule values: " ZBX_FS_UI64, itemid);
+
+			lld_data_free(data);
+			goto out;
+		}
+
 		rule->tail->next = data;
 		rule->tail = data;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "queuing discovery rule: " ZBX_FS_UI64, itemid);
+
 	rule->values_num++;
 	manager->queued_num++;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

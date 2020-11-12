@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:22Z</date>
+   <date>2020-10-20T11:01:52Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -17,7 +17,7 @@ MIBs used:&#13;
 FASTPATH-SWITCHING-MIB&#13;
 FASTPATH-BOXSERVICES-PRIVATE-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -166,7 +166,6 @@ Operating System running on this unit</description>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Operating system description has changed</name>
                      <priority>INFO</priority>
                      <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -266,6 +265,7 @@ The status of fan</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -304,6 +304,7 @@ The status of power supply</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -359,6 +360,7 @@ The temperature value reported by sensor</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}&#13;

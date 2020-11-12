@@ -21,7 +21,6 @@ package oracle
 
 import (
 	"context"
-	"encoding/json"
 
 	"zabbix.com/pkg/zbxerr"
 )
@@ -35,7 +34,10 @@ const (
 )
 
 func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var groupID = duration60sec
+	var (
+		sysmetrics string
+		groupID    = duration60sec
+	)
 
 	if len(params) > sysMetricsMaxParams {
 		return nil, zbxerr.ErrorTooManyParameters
@@ -52,10 +54,9 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 		}
 	}
 
-	rows, err := conn.Query(ctx, `
+	row, err := conn.Query(ctx, `
 		SELECT
-			METRIC_NAME AS METRIC,
-			ROUND(VALUE, 3) AS VALUE
+			JSON_OBJECTAGG(METRIC_NAME VALUE ROUND(VALUE, 3) RETURNING CLOB)
 		FROM
 			V$SYSMETRIC
 		WHERE
@@ -64,26 +65,11 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	defer rows.Close()
 
-	var metric, value string
-
-	res := make(map[string]string)
-
-	for rows.Next() {
-		err = rows.Scan(&metric, &value)
-		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-		}
-
-		res[metric] = value
-	}
-
-	// Manually marshall JSON due to get around the problem with VARCHAR2 limit (ORA-40478, maximum: 4000)
-	jsonRes, err := json.Marshal(res)
+	err = row.Scan(&sysmetrics)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return string(jsonRes), nil
+	return sysmetrics, nil
 }
