@@ -116,7 +116,7 @@
     request: function (data) {
         ['url', 'user', 'password', 'organization_id', 'class', 'api_version'].forEach(function (field) {
             if (typeof Itop.params !== 'object' || typeof Itop.params[field] === 'undefined'
-                || Itop.params[field] === '' ) {
+                    || Itop.params[field] === '' ) {
                 throw 'Required Itop param is not set: &quot;' + field + '&quot;.';
             }
         });
@@ -139,8 +139,7 @@
 
         Zabbix.Log(4, '[ iTop Webhook ] Sending request: ' + url + '&amp;json_data=' + data);
 
-                response = request.Post(url + '&amp;json_data=' + encodeURIComponent(data));
-
+        response = request.Post(url + '&amp;json_data=' + encodeURIComponent(data));
 
         Zabbix.Log(4, '[ iTop Webhook ] Received response with status code ' + request.Status() + '\n' + response);
 
