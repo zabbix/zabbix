@@ -23,7 +23,7 @@ import (
 	"zabbix.com/pkg/pdh"
 )
 
-func getUsersNum() (num int, err error) {
+func (p *Plugin) getUsersNum() (num int, err error) {
 	var value *int64
 	value, err = pdh.GetCounterInt64(pdh.CounterPath(pdh.ObjectTerminalServices, pdh.CounterTotalSessions))
 	if err != nil || value == nil {
