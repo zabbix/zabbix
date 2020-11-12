@@ -274,11 +274,13 @@ static zbx_uint64_t	evt_req_chunk_size;
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
-#define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
 #define ZBX_XPATH_HV_IP(nicType, addr)									\
 	ZBX_XPATH_PROP_NAME("config.virtualNicManagerInfo.netConfig")					\
 		"/*[local-name()='VirtualNicManagerNetConfig'][*[local-name()='nicType'][text()='"	\
 		nicType "']]//*[local-name()='ip']/*[local-name()='" addr "']"
+#define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
+#define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")				\
+		"/*[local-name()='ipV6Address']/*[local-name()='ipAddress']"
 
 #define ZBX_XPATH_EVT_INFO(param)									\
 	"*[local-name()='" param "']/*[local-name()='name']"
@@ -3215,8 +3217,11 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	if (NULL != (value = zbx_xml_read_doc_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
 
-	if (NULL != (value = zbx_xml_read_doc_value(details, ZBX_XPATH_HV_IPV4("management"))))
+	if (NULL != (value = zbx_xml_read_doc_value(details, ZBX_XPATH_HV_IPV4("management"))) ||
+			NULL != (value = zbx_xml_read_doc_value(details, ZBX_XPATH_HV_IPV6("management"))))
+	{
 		hv->ip = value;
+	}
 
 	if (SUCCEED != vmware_hv_get_parent_data(service, easyhandle, hv, error))
 		goto out;
