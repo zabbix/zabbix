@@ -192,6 +192,14 @@ abstract class CControllerPopupItemTest extends CController {
 		'password' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
+		],
+		'http_username' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'http_password' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		]
 	];
 
