@@ -1804,7 +1804,7 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages of the current request.
 
 	if ($options['with_current_messages']) {
-		show_messages();
+		show_messages(true);
 
 		$messages_current = $ZBX_MESSAGES_PREPARED;
 		$restore_messages = [];

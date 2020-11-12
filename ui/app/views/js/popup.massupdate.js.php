@@ -374,7 +374,11 @@ function submitPopup(overlay) {
 			$(response.errors).insertBefore(form);
 		}
 		else {
-			postMessageOk(response['message']);
+			postMessageOk(response['title']);
+			if ('messages' in response) {
+				postMessageDetails('success', response.messages);
+				console.log('1');
+			}
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location.href;
 		}

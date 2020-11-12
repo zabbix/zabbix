@@ -82,7 +82,8 @@ $hostFormList->addRow(
 $proxyComboBox = new CComboBox('proxy_hostid', 0);
 $proxyComboBox->addItem(0, _('(no proxy)'));
 foreach ($data['proxies'] as $proxie) {
-	$proxyComboBox->addItem($proxie['hostid'], $proxie['host']);
+	// $proxyComboBox->addItem($proxie['hostid'], $proxie['host']);
+	$proxyComboBox->addItem($proxie['proxyid'], $proxie['host']);
 }
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))->setLabel(_('Monitored by proxy')),

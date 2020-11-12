@@ -99,17 +99,19 @@ class CControllerPopupMassupdateHost extends CController {
 			$hostids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
-				function($macro) {
+				function(array $macro): bool {
 					return (bool) array_filter(
 						array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))
 					);
 				}
 			);
 			$tags = array_filter($this->getInput('tags', []),
-				function ($tag) {
+				function (array $tag): bool {
 					return $tag['tag'] !== '' && $tag['value'] !== '';
 				}
 			);
+
+			$result = true;
 
 			try {
 				DBstart();
@@ -193,8 +195,8 @@ class CControllerPopupMassupdateHost extends CController {
 					}
 				}
 
-				$properties = [
-					'description', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'
+				$properties = ['description', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+					'ipmi_password'
 				];
 
 				$new_values = [];
@@ -241,7 +243,7 @@ class CControllerPopupMassupdateHost extends CController {
 				foreach ($hosts as &$host) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-							$current_groupids = zbx_objectValues($host['groups'], 'groupid');
+							$current_groupids = array_column($host['groups'], 'groupid');
 							$host['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 								'groupid'
 							);
@@ -250,24 +252,26 @@ class CControllerPopupMassupdateHost extends CController {
 							$host['groups'] = zbx_toObject($new_groupids, 'groupid');
 						}
 						elseif ($remove_groupids) {
-							$current_groupids = zbx_objectValues($host['groups'], 'groupid');
+							$current_groupids = array_column($host['groups'], 'groupid');
 							$host['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 						}
 					}
 
 					if (array_key_exists('templates', $visible)) {
 						$host_templateids = array_key_exists('parentTemplates', $host)
-							? zbx_objectValues($host['parentTemplates'], 'templateid')
+							? array_column($host['parentTemplates'], 'templateid')
 							: [];
 
 						switch ($this->getInput('mass_action_tpls')) {
 							case ZBX_ACTION_ADD:
-								$host['templates'] = array_unique(array_merge($host_templateids, $this->getInput('templates', [])));
+								$host['templates'] = array_unique(
+									array_merge($host_templateids, $this->getInput('templates', []))
+								);
 								break;
 
 							case ZBX_ACTION_REPLACE:
 								$host['templates'] = $this->getInput('templates', []);
-								if ($this->getInput('mass_clear_tpls')) {
+								if ($this->hasInput('mass_clear_tpls')) {
 									$host['templates_clear'] = array_unique(
 										array_diff($host_templateids, $this->getInput('templates', []))
 									);
@@ -275,8 +279,10 @@ class CControllerPopupMassupdateHost extends CController {
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								$host['templates'] = array_unique(array_diff($host_templateids, $this->getInput('templates', [])));
-								if ($this->getInput('mass_clear_tpls')) {
+								$host['templates'] = array_unique(
+									array_diff($host_templateids, $this->getInput('templates', []))
+								);
+								if ($this->hasInput('mass_clear_tpls')) {
 									$host['templates_clear'] = array_unique($this->getInput('templates', []));
 								}
 								break;
@@ -435,15 +441,32 @@ class CControllerPopupMassupdateHost extends CController {
 			catch (Exception $e) {
 				DBend(false);
 
-				error(_('Cannot update hosts'));
+				CMessageHelper::setErrorTitle(_('Cannot update hosts'));
+
+				$result = false;
 			}
 
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+			if ($result) {
+				$messages = CMessageHelper::getMessages();
+				$output = ['title' => _('Hosts updated')];
+				if (count($messages)) {
+					$output['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				$output = ['message' => _('Hosts updated')];
+				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
+
+			// if (($messages = getMessages()) !== null) {
+			// 	$output['errors'] = $messages->toString();
+			// }
+
+			// if (($messages = filter_messages()) !== null) {
+			// 	$output['errors'] = array_column($messages, 'message');
+			// }
+			// else {
+			// 	$output = ['message' => _('Hosts updated')];
+			// }
 
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
@@ -459,13 +482,13 @@ class CControllerPopupMassupdateHost extends CController {
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field')
 			];
 
-			// Get proxies.
-			$data['proxies'] = DBfetchArray(DBselect(
-				'SELECT h.hostid,h.host'.
-				' FROM hosts h'.
-				' WHERE h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'
-			));
-			order_result($data['proxies'], 'host');
+			$data['proxies'] = API::Proxy()->get([
+				'output' => ['hostid', 'host'],
+				'filter' => [
+					'status' => [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]
+				],
+				'sortfield' => 'host'
+			]);
 
 			$this->setResponse(new CControllerResponseData($data));
 		}
