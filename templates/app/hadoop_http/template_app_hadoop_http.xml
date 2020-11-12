@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-11T14:23:08Z</date>
+   <date>2020-11-12T13:23:15Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -375,6 +375,7 @@ catch (error) {
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
+               <description>Average time spent on processing RPC requests.</description>
                <applications>
                   <application>
                      <name>Hadoop</name>
@@ -418,6 +419,7 @@ catch (error) {
                <key>hadoop.namenode.transactions_since_last_checkpoint</key>
                <delay>0</delay>
                <history>7d</history>
+               <description>Total number of transactions since last checkpoint.</description>
                <applications>
                   <application>
                      <name>Hadoop</name>
@@ -746,6 +748,7 @@ catch (error) {
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
+               <description>Average time spent on processing RPC requests.</description>
                <applications>
                   <application>
                      <name>Hadoop</name>
@@ -1446,6 +1449,7 @@ catch (error) {
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
+                     <description>Average time spent on processing RPC requests.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Hadoop NodeManager {#HOSTNAME}</name>
