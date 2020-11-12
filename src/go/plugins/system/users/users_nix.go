@@ -30,7 +30,7 @@ import (
 
 func (p *Plugin) getUsersNum() (num int, err error) {
 	var out string
-	out, err = zbxcmd.Execute("who | wc -l", time.Second*time.Duration(p.options.Timeout))
+	out, err = zbxcmd.Execute("who | wc -l", time.Second*time.Duration(p.options.Timeout), "")
 	if err != nil {
 		return
 	}
