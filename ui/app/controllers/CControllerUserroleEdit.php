@@ -181,6 +181,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['rules'] = array_merge($data['rules'], $this->getRulesValue((int) $this->role['roleid']));
 		}
 
+		$data['is_own_role'] = ($data['roleid'] == CWebUser::$data['roleid']);
 		$data = $this->overwriteInputs($data);
 
 		$response = new CControllerResponseData($data);
