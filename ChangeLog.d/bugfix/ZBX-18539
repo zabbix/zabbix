@@ -1,1 +1,1 @@
-..F....... [ZBX-18539] fixed acknowledge status being displayed as link even if problem cannot be closed manually (agriscenko)
+A.F.I..... [ZBX-18539] fixed acknowledge status being displayed as link even if problem cannot be closed manually; fixed order of role actions and few messages used in user roles functionality (agriscenko)
