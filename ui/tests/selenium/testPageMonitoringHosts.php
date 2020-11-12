@@ -54,8 +54,8 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 
 		// Check fields maximum length.
-		foreach(['Name', 'IP', 'DNS', 'Port', 'tags_0_tag', 'tags_0_value'] as $field) {
-			$this->assertEquals(255, $form->query('xpath:.//input[@id="filter_'.strtolower($field).'"]')
+		foreach(['name', 'ip', 'dns', 'port', 'tags_0_tag', 'tags_0_value'] as $field) {
+			$this->assertEquals(255, $form->query('xpath:.//input[@id="filter_'.$field.'"]')
 				->one()->getAttribute('maxlength'));
 		}
 
@@ -683,16 +683,15 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_HostContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', $data['name']);
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
 		$row->query('xpath://a[@class="link-action" and text()="'.$data['name'].'"]')->one()->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
 		$this->assertTrue($popup->hasItems($data['titles']));
 		foreach ($data['disabled'] as $disabled) {
-			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '
-					.$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
+					$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
 		}
 	}
 
@@ -710,12 +709,12 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
-		$table = $this->query('class:list-table')->asTable()->one();
-		$rows_count = $table->getRows()->count();
+		$rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
 		foreach (['Name', 'Status'] as $listing) {
-			$this->query('xpath://a[@href and text()="'.$listing.'"]')->one()->click();
+			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
+			$query->one()->click();
 			$after_listing = $this->getTableResult($rows_count, $listing);
-			$this->query('xpath://a[@href and text()="'.$listing.'"]')->one()->click();
+			$query->one()->click();
 			$this->assertEquals(array_reverse($after_listing), $this->getTableResult($rows_count, $listing));
 		}
 	}
@@ -739,17 +738,16 @@ class testPageMonitoringHosts extends CWebTest {
 			$this->page->waitUntilReady();
 
 			$row = $table->findRow('Name', $host);
-			// Counting problems icon amount from first Problems column.
-			$icon_count = $row->query('xpath://td/div[@class="problem-icon-list"]/span')->count();
-			$result = [];
-			for ($i = 1; $i <= $icon_count; $i ++) {
-				$result[] = $table->query('xpath://td/div[@class="problem-icon-list"]/span['.$i.']')->one()->getText();
+			$icons = $row->query('xpath://td/div[@class="problem-icon-list"]/span')->all();
+			$result = 0;
+			foreach ($icons as $icon) {
+				$result += intval($icon->getText());
 			}
 
 			// Getting problems amount from second Problems column and then comparing with summarized first column.
 			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')
 					->one()->getText();
-			$this->assertEquals((int)$problems, array_sum(array_map('intval', $result)));
+			$this->assertEquals((int)$problems, $result);
 		}
 	}
 
@@ -762,8 +760,8 @@ class testPageMonitoringHosts extends CWebTest {
 	private function getTableResult($rows_count, $column) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$result = [];
-		for ($i = 0; $i < $rows_count; $i ++) {
-			$result[] = $table->getRow($i)->getColumn($column)->getText();
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
 		}
 		return $result;
 	}
@@ -775,10 +773,9 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @param string $column		Column name
 	 * @param string $page_header	Page header name
 	 */
-	private function selectLink($host_name, $column, $page_header = null) {
+	private function selectLink($host_name, $column, $page_header) {
 		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', $host_name);
-		$row->getColumn($column)->click();
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->getColumn($column)->click();
 		$this->page->waitUntilReady();
 		if ($page_header != null) {
 			$this->assertPageHeader($page_header);
