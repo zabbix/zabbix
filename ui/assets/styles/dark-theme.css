@@ -3647,7 +3647,8 @@ z-select[disabled] button, z-select[readonly] button,
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 -10px 10px;
-      padding: 0 10px; }
+      padding: 0 10px;
+      position: relative; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
