@@ -1826,21 +1826,21 @@ class testUsers extends CAPITest {
 					'user' => '',
 					'password' => 'zabbix'
 				],
-				'expected_error' => 'Login name or password is incorrect.'
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
 					'user' => 'Unknown user',
 					'password' => 'zabbix'
 				],
-				'expected_error' => 'Login name or password is incorrect.'
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
 					'user' => '!@#$%^&\\\'\"""\;:',
 					'password' => 'zabbix'
 				],
-				'expected_error' => 'Login name or password is incorrect.'
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			// Check password
 			[
@@ -1854,21 +1854,21 @@ class testUsers extends CAPITest {
 					'user' => 'Admin',
 					'password' => ''
 				],
-				'expected_error' => 'Login name or password is incorrect.'
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
 					'user' => 'Admin',
 					'password' => 'wrong password'
 				],
-				'expected_error' => 'Login name or password is incorrect.'
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
 					'user' => 'Admin',
 					'password' => '!@#$%^&\\\'\"""\;:'
 				],
-				'expected_error' => 'Login name or password is incorrect.'
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			// Check disabled user.
 			[
@@ -1921,7 +1921,9 @@ class testUsers extends CAPITest {
 			$result = $this->call('user.login', ['user' => 'Admin', 'password' => 'attempt '.$i], true);
 		}
 
-		$this->assertRegExp('/Account is blocked for (2[5-9]|30) seconds./', $result['error']['data']);
+		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
+			$result['error']['data']
+		);
 	}
 
 	/**
