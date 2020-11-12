@@ -798,7 +798,7 @@ else {
 		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
 		'editable' => true,
 		'dependent' => ($filter_dependent != -1) ? $filter_dependent : null,
-		'templated' => ($filter_value != -1) ? false : null,
+		'templated' => ($filter_value != -1) ? false : ($data['context'] === 'template'),
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null,
 		'preservekeys' => true,
 		'sortfield' => $sort,
@@ -931,12 +931,15 @@ else {
 
 	$show_info_column = false;
 	$show_value_column = false;
-	foreach ($triggers as $trigger) {
-		foreach ($trigger['hosts'] as $trigger_host) {
-			if (in_array($trigger_host['status'], [HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED])) {
-				$show_value_column = true;
-				$show_info_column = true;
-				break 2;
+
+	if ($data['context'] === 'host') {
+		foreach ($triggers as $trigger) {
+			foreach ($trigger['hosts'] as $trigger_host) {
+				if (in_array($trigger_host['status'], [HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED])) {
+					$show_value_column = true;
+					$show_info_column = true;
+					break 2;
+				}
 			}
 		}
 	}

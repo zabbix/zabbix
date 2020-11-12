@@ -823,21 +823,11 @@ else {
 		'active_tab' => CProfile::get('web.httpconf.filter.active', 1)
 	];
 
-	// show the error column only for hosts
-	if (getRequest('hostid') != 0) {
-		$data['showInfoColumn'] = (bool) API::Host()->get([
-			'hostids' => getRequest('hostid'),
-			'output' => ['status']
-		]);
-	}
-	else {
-		$data['showInfoColumn'] = true;
-	}
-
 	$options = [
 		'output' => ['httptestid', $sortField],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids,
+		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
@@ -879,7 +869,8 @@ else {
 		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
 	);
 
-	if($data['showInfoColumn']) {
+	// Get the error column data only for hosts.
+	if ($data['context'] === 'host') {
 		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
 		foreach ($httpTestsLastData as $httpTestId => &$lastData) {

@@ -879,6 +879,7 @@ else {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'editable' => true,
+		'templated' => ($data['context'] === 'template'),
 		'filter' => [],
 		'search' => [],
 		'sortfield' => $sort_field,

@@ -67,7 +67,7 @@ $itemTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
-		($data['hostid'] == 0) ? _('Host') : null,
+		($data['hostid'] == 0) ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -77,7 +77,7 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		_('Info')
+		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $current_time = time();
@@ -149,18 +149,6 @@ foreach ($data['items'] as $item) {
 		->addClass(itemIndicatorStyle($item['status'], $item['state']))
 		->addSID()
 	);
-
-	// info
-	$info_icons = [];
-
-	if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-		$info_icons[] = makeErrorIcon($item['error']);
-	}
-
-	// discovered item lifetime indicator
-	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
-	}
 
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -247,6 +235,20 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
+	// info
+	if ($data['context'] === 'host') {
+		$info_icons = [];
+
+		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+			$info_icons[] = makeErrorIcon($item['error']);
+		}
+
+		// discovered item lifetime indicator
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
+		}
+	}
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
@@ -260,7 +262,7 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
-		makeInformationList($info_icons)
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 

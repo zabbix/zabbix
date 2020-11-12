@@ -133,7 +133,7 @@ if ($data['parent_discoveryid']) {
 	$discover = make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url);
 }
 else {
-	$info_column = _('Info');
+	$info_column = ($data['context'] === 'host') ? _('Info') : null;
 }
 
 $graphTable = (new CTableInfo())
@@ -141,7 +141,7 @@ $graphTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_graphs'))->onClick("checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		!empty($this->data['hostid']) ? null : _('Hosts'),
+		($data['hostid'] == 0) ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Width'),
 		_('Height'),

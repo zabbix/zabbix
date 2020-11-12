@@ -1801,6 +1801,7 @@ else {
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
 			'templateid', 'flags', 'state', 'master_itemid'
 		],
+		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTriggers' => ['triggerid'],

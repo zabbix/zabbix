@@ -212,7 +212,7 @@ $triggers_table = (new CTableInfo())->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
-	$data['single_selected_hostid'] == 0 ? _('Host') : null,
+	($data['single_selected_hostid'] == 0) ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Operational data'),
 	_('Expression'),

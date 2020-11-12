@@ -112,8 +112,10 @@ $httpTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		($this->data['hostid'] == 0)
-			? make_sorting_header(_('Host'), 'hostname', $data['sort'], $data['sortorder'], $url)
+		($data['hostid'] == 0)
+			? make_sorting_header(($data['context'] === 'host') ? _('Host') : _('Template'), 'hostname', $data['sort'],
+				$data['sortorder'], $url
+			)
 			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Number of steps'),
@@ -123,7 +125,7 @@ $httpTable = (new CTableInfo())
 		_('HTTP proxy'),
 		_('Application'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		$this->data['showInfoColumn'] ? _('Info') : null
+		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
@@ -142,7 +144,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->setArgument('context', $data['context'])
 	);
 
-	if ($this->data['showInfoColumn']) {
+	if ($data['context'] === 'host') {
 		$info_icons = [];
 		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
 			$lastData = $httpTestsLastData[$httpTestId];
@@ -186,7 +188,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status']))
 			->addSID(),
-		$this->data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 

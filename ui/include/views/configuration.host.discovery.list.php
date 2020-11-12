@@ -180,7 +180,7 @@ $discoveryTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_('Host'),
+		($data['context'] === 'host') ? _('Host') : _('Template'),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Items'),
 		_('Triggers'),
@@ -190,7 +190,7 @@ $discoveryTable = (new CTableInfo())
 		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		_('Info')
+		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
@@ -246,13 +246,6 @@ foreach ($data['discoveries'] as $discovery) {
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
 			->addSID();
 
-	// info
-	$info_icons = [];
-
-	if ($discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['error'] !== '') {
-		$info_icons[] = makeErrorIcon($discovery['error']);
-	}
-
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
 			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
@@ -261,6 +254,15 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {
 		$discovery['delay'] = $update_interval_parser->getDelay();
+	}
+
+	// info
+	if ($data['context'] === 'host') {
+		$info_icons = [];
+
+		if ($discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['error'] !== '') {
+			$info_icons[] = makeErrorIcon($discovery['error']);
+		}
 	}
 
 	$discoveryTable->addRow([
@@ -305,7 +307,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		makeInformationList($info_icons)
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
