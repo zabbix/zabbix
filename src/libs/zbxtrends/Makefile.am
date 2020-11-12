@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxtrends.a  
 
 libzbxtrends_a_SOURCES = \
-	trends.c
+	trends.c \
+	cache.c

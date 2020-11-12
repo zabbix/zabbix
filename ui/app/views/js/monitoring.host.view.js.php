@@ -81,7 +81,9 @@
 							this.filter.updateCounters(json.filter_counters);
 						}
 					}).always(() => {
-						this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
+						if (this.refresh_interval > 0) {
+							this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
+						}
 					});
 			},
 			getCurrentForm: function() {
@@ -157,10 +159,13 @@
 			},
 			scheduleRefresh: function() {
 				this.unscheduleRefresh();
-				this.timeout = setTimeout((function() {
-					this.timeout = null;
-					this.refresh();
-				}).bind(this), this.refresh_interval);
+
+				if (this.refresh_interval > 0) {
+					this.timeout = setTimeout((function() {
+						this.timeout = null;
+						this.refresh();
+					}).bind(this), this.refresh_interval);
+				}
 			},
 			unscheduleRefresh: function() {
 				if (this.timeout !== null) {
@@ -173,10 +178,8 @@
 				}
 			},
 			start: function() {
-				if (this.refresh_interval != 0) {
-					this.running = true;
-					this.refresh();
-				}
+				this.running = true;
+				this.refresh();
 			}
 		};
 

@@ -624,8 +624,13 @@ class CHostInterface extends CApiService {
 	}
 
 	protected function validateMassRemove(array $data) {
-		// check permissions
+		// Check permissions.
 		$this->checkHostPermissions($data['hostids']);
+
+		// Check interfaces.
+		$this->checkValidator($data['hostids'], new CHostNormalValidator([
+			'message' => _('Cannot delete interface for discovered host "%1$s".')
+		]));
 
 		// check interfaces
 		foreach ($data['interfaces'] as $interface) {
@@ -650,7 +655,7 @@ class CHostInterface extends CApiService {
 				'filter' => $filter
 			]);
 			if ($interfacesToRemove) {
-				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
+				$this->checkMainInterfacesOnDelete(array_column($interfacesToRemove, 'interfaceid'));
 			}
 		}
 	}
@@ -865,21 +870,31 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkHostInterfaces(array $interfaces, $hostid) {
-		$interfacesWithMissingData = [];
+		$interfaces_with_missing_data = [];
 
 		foreach ($interfaces as $interface) {
-			if (!isset($interface['type'], $interface['main'])) {
-				$interfacesWithMissingData[] = $interface['interfaceid'];
+			if (array_key_exists('interfaceid', $interface)) {
+				if (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+					$interfaces_with_missing_data[$interface['interfaceid']] = true;
+				}
+			}
+			elseif (!array_key_exists('type', $interface) || !array_key_exists('main', $interface)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 		}
 
-		if ($interfacesWithMissingData) {
+		if ($interfaces_with_missing_data) {
 			$dbInterfaces = API::HostInterface()->get([
-				'interfaceids' => $interfacesWithMissingData,
 				'output' => ['main', 'type'],
+				'interfaceids' => array_keys($interfaces_with_missing_data),
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
+			if (count($interfaces_with_missing_data) != count($dbInterfaces)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		foreach ($interfaces as $id => $interface) {

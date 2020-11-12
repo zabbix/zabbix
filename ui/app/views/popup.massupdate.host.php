@@ -154,12 +154,16 @@ $ipmiFormList->addRow(
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))->setLabel(_('Username')),
-	(new CTextBox('ipmi_username', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	(new CTextBox('ipmi_username', ''))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->disableAutocomplete()
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))->setLabel(_('Password')),
-	(new CTextBox('ipmi_password', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	(new CTextBox('ipmi_password', ''))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->disableAutocomplete()
 );
 
 $inventoryFormList = new CFormList('inventoryFormList');
@@ -242,6 +246,7 @@ $encryption_table = (new CTable())
 		(new CTextBox('tls_psk', '', false, 512))
 			->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
+			->disableAutocomplete()
 	])
 	->addRow([_('Issuer'),
 		(new CTextBox('tls_issuer', '', false, 1024))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)

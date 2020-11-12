@@ -25,26 +25,25 @@
 #include "duktape.h"
 #include "zabbix.h"
 
-#define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
-
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_dtor                                              *
+ * Function: es_zabbix_dtor                                                   *
  *                                                                            *
- * Purpose: Curlzabbix destructor                                        *
+ * Purpose: Zabbix destructor                                                 *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_dtor(duk_context *ctx)
 {
 	ZBX_UNUSED(ctx);
+
 	return 0;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_ctor                                              *
+ * Function: es_zabbix_ctor                                                   *
  *                                                                            *
- * Purpose: Curlzabbix constructor                                       *
+ * Purpose: Zabbix constructor                                                *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
@@ -56,6 +55,7 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
 
 	duk_push_c_function(ctx, es_zabbix_dtor, 1);
 	duk_set_finalizer(ctx, -2);
+
 	return 0;
 }
 
@@ -63,7 +63,7 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
  *                                                                            *
  * Function: es_zabbix_status                                                 *
  *                                                                            *
- * Purpose: Curlzabbix.Status method                                          *
+ * Purpose: Zabbix.Status method                                              *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_log(duk_context *ctx)
@@ -111,7 +111,8 @@ out:
 }
 
 static const duk_function_list_entry	zabbix_methods[] = {
-	{"Log",			es_zabbix_log,		2},
+	{"Log", es_zabbix_log, 2},
+	{"log", es_zabbix_log, 2},
 	{NULL, NULL, 0}
 };
 

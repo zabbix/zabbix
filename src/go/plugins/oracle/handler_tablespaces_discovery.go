@@ -42,7 +42,7 @@ func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []s
 				JSON_OBJECT(
 					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
 					'{#CONTENTS}'   VALUE CONTENTS
-				)
+				) RETURNING CLOB 
 			) LLD
 		FROM
 			DBA_TABLESPACES

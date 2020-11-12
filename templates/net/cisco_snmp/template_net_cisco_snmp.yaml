@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:29Z'
+  date: '2020-10-23T09:27:00Z'
   groups:
     -
       name: Templates/Modules
@@ -159,9 +159,9 @@ zabbix_export:
               expression: |
                 {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"{#SNMPVALUE}"}
                 or
-                {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                 or
-                {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}
+                {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
@@ -172,7 +172,7 @@ zabbix_export:
               expression: |
                 {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:"{#SNMPVALUE}"}
                 or
-                {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}
+                {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
               name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
@@ -185,9 +185,9 @@ zabbix_export:
                   expression: |
                     {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"{#SNMPVALUE}"}
                     or
-                    {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}
+                    {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
                     or
-                    {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}
+                    {Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}].last()}={$TEMP_DISASTER_STATUS}
                   recovery_expression: '{Cisco CISCO-ENVMON-MIB SNMP:sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
       macros:
         -
@@ -559,7 +559,6 @@ zabbix_export:
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
-              recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

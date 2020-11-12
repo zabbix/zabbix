@@ -175,7 +175,9 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name')),
-		(new CTextBox('username', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('username', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete()
 	)
 	// Append publickey to form list.
 	->addRow(
@@ -190,7 +192,9 @@ $item_form_list
 	// Append password to form list.
 	->addRow(
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))->setLabel(_('Password')),
-		(new CTextBox('password', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('password', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete()
 	);
 
 // Create preprocessing form list.

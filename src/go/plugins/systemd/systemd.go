@@ -41,16 +41,30 @@ type Plugin struct {
 var impl Plugin
 
 type unit struct {
-	Name        string `json:"{#UNIT.NAME}"`
-	Description string `json:"{#UNIT.DESCRIPTION}"`
-	LoadState   string `json:"{#UNIT.LOADSTATE}"`
-	ActiveState string `json:"{#UNIT.ACTIVESTATE}"`
-	SubState    string `json:"{#UNIT.SUBSTATE}"`
-	Followed    string `json:"{#UNIT.FOLLOWED}"`
-	Path        string `json:"{#UNIT.PATH}"`
-	JobID       uint32 `json:"{#UNIT.JOBID}"`
-	JobType     string `json:"{#UNIT.JOBTYPE}"`
-	JobPath     string `json:"{#UNIT.JOBPATH}"`
+	Name        string
+	Description string
+	LoadState   string
+	ActiveState string
+	SubState    string
+	Followed    string
+	Path        string
+	JobID       uint32
+	JobType     string
+	JobPath     string
+}
+
+type unitJson struct {
+	Name          string `json:"{#UNIT.NAME}"`
+	Description   string `json:"{#UNIT.DESCRIPTION}"`
+	LoadState     string `json:"{#UNIT.LOADSTATE}"`
+	ActiveState   string `json:"{#UNIT.ACTIVESTATE}"`
+	SubState      string `json:"{#UNIT.SUBSTATE}"`
+	Followed      string `json:"{#UNIT.FOLLOWED}"`
+	Path          string `json:"{#UNIT.PATH}"`
+	JobID         uint32 `json:"{#UNIT.JOBID}"`
+	JobType       string `json:"{#UNIT.JOBTYPE}"`
+	JobPath       string `json:"{#UNIT.JOBPATH}"`
+	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
 }
 
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
@@ -110,118 +124,141 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	switch key {
 	case "systemd.unit.discovery":
-		var ext string
+		return p.discovery(params, conn)
+	case "systemd.unit.info":
+		return p.info(params, conn)
+	default:
+		return nil, plugin.UnsupportedMetricError
+	}
+}
 
-		if len(params) > 1 {
-			return nil, fmt.Errorf("Too many parameters.")
+func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error) {
+	var ext string
+
+	if len(params) > 1 {
+		return nil, fmt.Errorf("Too many parameters.")
+	}
+
+	if len(params) == 0 || len(params[0]) == 0 {
+		ext = ".service"
+	} else {
+		switch params[0] {
+		case "service", "target", "automount", "device", "mount", "path", "scope", "slice", "snapshot", "socket", "swap", "timer":
+			ext = "." + params[0]
+		case "all":
+			ext = ""
+		default:
+			return nil, fmt.Errorf("Invalid first parameter.")
+		}
+	}
+
+	var units []unit
+	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1"))
+	err := obj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store(&units)
+
+	if nil != err {
+		return nil, fmt.Errorf("Cannot retrieve list of units: %s", err)
+	}
+
+	var array []unitJson
+	for _, u := range units {
+		if len(ext) != 0 && ext != filepath.Ext(u.Name) {
+			continue
 		}
 
-		if len(params) == 0 || len(params[0]) == 0 {
-			ext = ".service"
-		} else {
-			switch params[0] {
-			case "service", "target", "automount", "device", "mount", "path", "scope", "slice", "snapshot", "socket", "swap", "timer":
-				ext = "." + params[0]
-			case "all":
-				ext = ""
-			default:
-				return nil, fmt.Errorf("Invalid first parameter.")
-			}
+		UnitFileState, err := p.info([]string{u.Name, "UnitFileState"}, conn)
+		if err != nil {
+			p.Debugf("Failed to retrieve unit file state for %s, err:", u.Name, err.Error())
+			continue
 		}
 
-		var units []unit
-		obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1"))
-		err := obj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store(&units)
-
-		if nil != err {
-			return nil, fmt.Errorf("Cannot retrieve list of units: %s", err)
+		var state string
+		switch reflect.TypeOf(UnitFileState).Kind() {
+		case reflect.String:
+			state = UnitFileState.(string)
+		default:
+			p.Debugf("Unit file state is not string for %s", u.Name)
+			continue
 		}
 
-		array := make([]*unit, len(units))
-		j := 0
-		for i := 0; i < len(units); i++ {
-			if len(ext) != 0 && ext != filepath.Ext(units[i].Name) {
-				continue
-			}
-			array[j] = &units[i]
+		array = append(array, unitJson{u.Name, u.Description, u.LoadState, u.ActiveState,
+			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state,
+		})
+	}
+
+	jsonArray, err := json.Marshal(array)
+	if nil != err {
+		return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+	}
+
+	return string(jsonArray), nil
+}
+
+func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
+	var property, unitType string
+	var value interface{}
+
+	if len(params) > 3 {
+		return nil, fmt.Errorf("Too many parameters.")
+	}
+
+	if len(params) < 1 || len(params[0]) == 0 {
+		return nil, fmt.Errorf("Invalid first parameter.")
+	}
+
+	if len(params) < 2 || len(params[1]) == 0 {
+		property = "ActiveState"
+	} else {
+		property = params[1]
+	}
+
+	if len(params) < 3 || len(params[2]) == 0 || params[2] == "Unit" {
+		unitType = "Unit"
+	} else {
+		unitType = params[2]
+	}
+
+	name := params[0]
+
+	nameEsc := make([]byte, len(name)*3)
+	j := 0
+	for i := 0; i < len(name); i++ {
+		if (name[i] >= 'A' && name[i] <= 'Z') ||
+			(name[i] >= 'a' && name[i] <= 'z') ||
+			((name[i] >= '0' && name[i] <= '9') && i != 0) {
+			nameEsc[j] = name[i]
 			j++
+			continue
 		}
+		nameEsc[j] = '_'
+		j++
+		nameEsc[j] = zbxNum2hex((name[i] >> 4) & 0xf)
+		j++
+		nameEsc[j] = zbxNum2hex(name[i] & 0xf)
+		j++
+	}
 
-		jsonArray, err := json.Marshal(array[:j])
+	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+string(nameEsc[:j])))
+	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
+
+	if nil != err {
+		return nil, fmt.Errorf("Cannot get unit property: %s", err)
+	}
+
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.Slice:
+		fallthrough
+	case reflect.Array:
+		ret, err := json.Marshal(value)
 
 		if nil != err {
 			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
 		}
 
-		return string(jsonArray), nil
-	case "systemd.unit.info":
-		var property, unitType string
-		var value interface{}
-
-		if len(params) > 3 {
-			return nil, fmt.Errorf("Too many parameters.")
-		}
-
-		if len(params) < 1 || len(params[0]) == 0 {
-			return nil, fmt.Errorf("Invalid first parameter.")
-		}
-
-		if len(params) < 2 || len(params[1]) == 0 {
-			property = "ActiveState"
-		} else {
-			property = params[1]
-		}
-
-		if len(params) < 3 || len(params[2]) == 0 || params[2] == "Unit" {
-			unitType = "Unit"
-		} else {
-			unitType = params[2]
-		}
-
-		name := params[0]
-
-		nameEsc := make([]byte, len(name)*3)
-		j := 0
-		for i := 0; i < len(name); i++ {
-			if (name[i] >= 'A' && name[i] <= 'Z') ||
-				(name[i] >= 'a' && name[i] <= 'z') ||
-				((name[i] >= '0' && name[i] <= '9') && i != 0) {
-				nameEsc[j] = name[i]
-				j++
-				continue
-			}
-			nameEsc[j] = '_'
-			j++
-			nameEsc[j] = zbxNum2hex((name[i] >> 4) & 0xf)
-			j++
-			nameEsc[j] = zbxNum2hex(name[i] & 0xf)
-			j++
-		}
-
-		obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+string(nameEsc[:j])))
-		err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
-
-		if nil != err {
-			return nil, fmt.Errorf("Cannot get unit property: %s", err)
-		}
-
-		switch reflect.TypeOf(value).Kind() {
-		case reflect.Slice:
-			fallthrough
-		case reflect.Array:
-			ret, err := json.Marshal(value)
-
-			if nil != err {
-				return nil, fmt.Errorf("Cannot create JSON array: %s", err)
-			}
-
-			return string(ret), nil
-		}
-
-		return value, nil
-	default:
-		return nil, plugin.UnsupportedMetricError
+		return string(ret), nil
 	}
+
+	return value, nil
 }
 
 func init() {

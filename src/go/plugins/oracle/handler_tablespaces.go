@@ -49,7 +49,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 						'used_pct'   VALUE USED_PCT, 
 						'status'     VALUE STATUS 
 					) 
-				) 
+				) RETURNING CLOB 
 			)
 		FROM
 			(
@@ -149,8 +149,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 					dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
 			GROUP BY
 				Y.NAME, Y.CONTENTS, Y.TBS_STATUS
-			ORDER BY
-				TABLESPACE_NAME 
+
 			)
 	`)
 	if err != nil {
