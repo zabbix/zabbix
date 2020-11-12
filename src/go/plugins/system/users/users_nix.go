@@ -1,3 +1,5 @@
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -20,45 +22,18 @@
 package users
 
 import (
-	"errors"
-	"fmt"
+	"strconv"
+	"time"
 
-	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/zbxcmd"
 )
 
-type Plugin struct {
-	plugin.Base
-	options Options
-}
-
-type Options struct {
-	Timeout int `conf:"optional,range=1:30"`
-}
-
-var impl Plugin
-
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	p.options.Timeout = global.Timeout
-}
-
-func (p *Plugin) Validate(options interface{}) error {
-	return nil
-}
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters.")
-	}
-
-	result, err = p.getUsersNum()
+func (p *Plugin) getUsersNum() (num int, err error) {
+	var out string
+	out, err = zbxcmd.Execute("who | wc -l", time.Second*time.Duration(p.options.Timeout))
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get logged in user count: %s.", err.Error())
+		return
 	}
 
-	return
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+	return strconv.Atoi(out)
 }
