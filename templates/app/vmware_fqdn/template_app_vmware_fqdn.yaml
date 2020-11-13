@@ -1,13 +1,13 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-12T14:22:58Z'
+  date: '2020-11-12T14:28:31Z'
   groups:
     -
       name: Templates/Applications
   templates:
     -
-      template: VMware
-      name: VMware
+      template: 'VMware FQDN'
+      name: 'VMware FQDN'
       description: |
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -187,16 +187,24 @@ zabbix_export:
                 -
                   ip: '{#HV.IP}'
         -
-          name: 'Discover VMware VMs'
+          name: 'Discover VMware VMs FQDN'
           type: SIMPLE
           key: 'vmware.vm.discovery[{$VMWARE.URL}]'
           delay: 1h
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#VM.DNS}'
+                value: ^$
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
           description: 'Discovery of guest virtual machines.'
           host_prototypes:
             -
-              host: '{#VM.UUID}'
+              host: '{#VM.DNS}'
               name: '{#VM.NAME}'
               group_links:
                 -
