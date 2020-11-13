@@ -194,7 +194,7 @@ $fields = [
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'context' =>				[T_ZBX_STR, O_MAND, null,		null,	null],
+	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -240,6 +240,14 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
+
+$active_role_check = (getRequest('context') === 'host')
+	? CRoleHelper::UI_CONFIGURATION_HOSTS
+	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
+
+if (!CWebUser::checkAccess($active_role_check)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);

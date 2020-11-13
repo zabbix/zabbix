@@ -61,7 +61,7 @@ $fields = [
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
-	'context' =>			[T_ZBX_STR, O_MAND, null,		null,			null],
+	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -95,6 +95,14 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 check_fields($fields);
+
+$active_role_check = (getRequest('context') === 'host')
+	? CRoleHelper::UI_CONFIGURATION_HOSTS
+	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
+
+if (!CWebUser::checkAccess($active_role_check)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
 
 $gitems = [];
 foreach (getRequest('items', []) as $gitem) {

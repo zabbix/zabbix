@@ -83,7 +83,7 @@ $fields = [
 	'ssl_cert_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_password'	=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'],
-	'context' =>			[T_ZBX_STR, O_MAND, null,	null,		null],
+	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -113,6 +113,14 @@ $fields = [
 ];
 
 check_fields($fields);
+
+$active_role_check = (getRequest('context') === 'host')
+	? CRoleHelper::UI_CONFIGURATION_HOSTS
+	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
+
+if (!CWebUser::checkAccess($active_role_check)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
 
 if (!empty($_REQUEST['steps'])) {
 	order_result($_REQUEST['steps'], 'no');

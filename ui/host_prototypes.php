@@ -53,7 +53,7 @@ $fields = [
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
-	'context' =>				[T_ZBX_STR, O_MAND, null,	null,	null],
+	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
@@ -73,6 +73,14 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
+
+$active_role_check = (getRequest('context') === 'host')
+	? CRoleHelper::UI_CONFIGURATION_HOSTS
+	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
+
+if (!CWebUser::checkAccess($active_role_check)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
 
 $hostid = getRequest('hostid', 0);
 

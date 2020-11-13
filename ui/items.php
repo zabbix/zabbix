@@ -229,7 +229,7 @@ $fields = [
 											')',
 										_('Password')
 									],
-	'context' =>					[T_ZBX_STR, O_MAND, null,		null,	null],
+	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -307,6 +307,14 @@ $fields = [
 ];
 
 $valid_input = check_fields($fields);
+
+$active_role_check = (getRequest('context') === 'host')
+	? CRoleHelper::UI_CONFIGURATION_HOSTS
+	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
+
+if (!CWebUser::checkAccess($active_role_check)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
