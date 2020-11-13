@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-11T10:45:39Z'
+  date: '2020-11-13T12:19:08Z'
   groups:
     -
       name: Templates/Applications
@@ -39,7 +39,8 @@ zabbix_export:
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
-              params: 1d
+              parameters:
+                - 1d
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           triggers:
             -
@@ -81,7 +82,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
-                  params: 1h
+                  parameters:
+                    - 1h
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               trigger_prototypes:
                 -
@@ -127,7 +129,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
-                  params: ''
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: '{#JMXNAME}: Bytes sent per second'
@@ -144,7 +147,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
-                  params: ''
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: '{#JMXNAME}: Errors per second'
@@ -160,7 +164,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
-                  params: ''
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: '{#JMXNAME}: Requests processing time'
@@ -177,7 +182,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: MULTIPLIER
-                  params: '0.001'
+                  parameters:
+                    - '0.001'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: '{#JMXNAME}: Requests per second'
@@ -193,7 +199,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
-                  params: ''
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           graph_prototypes:
             -
@@ -285,7 +292,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
-                  params: ''
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions created per second'
@@ -301,7 +309,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
-                  params: ''
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           graph_prototypes:
             -
@@ -370,7 +379,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
-                  params: 10m
+                  parameters:
+                    - 10m
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
             -
               name: '{#JMXNAME}: Threads busy'
@@ -398,7 +408,8 @@ zabbix_export:
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
-                  params: 10m
+                  parameters:
+                    - 10m
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           trigger_prototypes:
             -
