@@ -221,40 +221,52 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 // Encryption
 $encryption_form_list = new CFormList('encryption');
 
-$encryption_table = (new CTable())
-	->addRow([_('Connections to host'),
+$encryption_table = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
 		(new CRadioButtonList('tls_connect', HOST_ENCRYPTION_NONE))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
 			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 			->setModern(true)
-	])
-	->addRow([_('Connections from host'),
+			->setEnabled(true)
+	)
+	->addRow(_('Connections from host'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('tls_in_none'))->setLabel(_('No encryption')))
-			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
-			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
-	])
-	->addRow([
+			->addItem((new CCheckBox('tls_in_none'))
+				->setLabel(_('No encryption'))
+				->setEnabled(true)
+			)
+			->addItem((new CCheckBox('tls_in_psk'))
+				->setLabel(_('PSK'))
+				->setEnabled(true)
+			)
+			->addItem((new CCheckBox('tls_in_cert'))
+				->setLabel(_('Certificate'))
+				->setEnabled(true)
+			)
+	)
+	->addRow(
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', '', false, 128))
 			->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
-	])
-	->addRow([
+	)
+	->addRow(
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', '', false, 512))
 			->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
 			->disableAutocomplete()
-	])
-	->addRow([_('Issuer'),
-		(new CTextBox('tls_issuer', '', false, 1024))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
-	])
-	->addRow([_x('Subject', 'encryption certificate'),
-		(new CTextBox('tls_subject', '', false, 1024))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
-	]);
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', '', false, 1024))
+			->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_x('Subject', 'encryption certificate'),
+		(new CTextBox('tls_subject', '', false, 1024))
+			->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
 
 $encryption_form_list->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))->setLabel(_('Connections')),

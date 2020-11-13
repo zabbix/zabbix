@@ -197,24 +197,24 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 					|| obj.querySelector('#tls_in_cert').checked) {
 				obj
 					.querySelector('#tls_issuer')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = '';
 				obj
 					.querySelector('#tls_subject')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = '';
 			}
 			else {
 				obj
 					.querySelector('#tls_issuer')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = 'none';
 				obj
 					.querySelector('#tls_subject')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = 'none';
 			}
@@ -224,24 +224,24 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 					|| obj.querySelector('#tls_in_psk').checked) {
 				obj
 					.querySelector('#tls_psk')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = '';
 				obj
 					.querySelector('#tls_psk_identity')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = '';
 			}
 			else {
 				obj
 					.querySelector('#tls_psk')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = 'none';
 				obj
 					.querySelector('#tls_psk_identity')
-					.closest('tr')
+					.closest('li')
 					.style
 					.display = 'none';
 			}
