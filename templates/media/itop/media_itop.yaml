@@ -205,7 +205,6 @@ zabbix_export:
             json_data.output_fields = 'id, friendlyname';
             json_data.fields = {};
         
-        
             // Create issue for non trigger-based events.
             if (params.event_source !== '0' && params.event_recovery_value !== '0') {
                 Itop.setCreatePayload();
