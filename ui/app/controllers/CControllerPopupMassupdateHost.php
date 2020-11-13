@@ -468,7 +468,8 @@ class CControllerPopupMassupdateHost extends CController {
 					'debug_mode' => $this->getDebugMode()
 				],
 				'ids' => $this->getInput('ids', []),
-				'inventories' => zbx_toHash(getHostInventories(), 'db_field')
+				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
+				'location_url' => 'hosts.php'
 			];
 
 			$data['proxies'] = API::Proxy()->get([

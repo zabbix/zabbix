@@ -36,6 +36,7 @@ $form = (new CForm())
 	->addVar('ids', $data['ids'])
 	->addVar('tls_accept', HOST_ENCRYPTION_NONE)
 	->addVar('update', '1')
+	->addVar('location_url', $data['location_url'])
 	->disablePasswordAutofill();
 
 // create form list

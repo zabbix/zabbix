@@ -35,6 +35,7 @@ $form = (new CForm())
 	->addVar('action', 'popup.massupdate.template')
 	->addVar('update', '1')
 	->addVar('ids', $data['ids'])
+	->addVar('location_url', $data['location_url'])
 	->disablePasswordAutofill();
 
 /*

@@ -309,6 +309,7 @@ if (!CR && !GK) {
 function submitPopup(overlay) {
 	const form = document.querySelector('#massupdate-form');
 	const action = form.querySelector('#action').value;
+	const location_url = form.querySelector('#location_url').value;
 
 	// Check "remove all" checkbox in macro tab.
 	const macro_tab_visible = form.querySelector('#visible_macros');
@@ -379,7 +380,7 @@ function submitPopup(overlay) {
 				postMessageDetails('success', response.messages);
 			}
 			overlayDialogueDestroy(overlay.dialogueid);
-			location.href = location.href;
+			location.href = location_url;
 		}
 	});
 }

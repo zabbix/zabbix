@@ -399,6 +399,7 @@ class CControllerPopupMassupdateTemplate extends CController {
 					'debug_mode' => $this->getDebugMode()
 				],
 				'ids' => $this->getInput('ids'),
+				'location_url' => 'templates.php'
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

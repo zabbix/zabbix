@@ -542,7 +542,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				}
 				catch (Exception $e) {
 					$result = false;
-					CMessageHelper::setErrorTitle('Cannot update item prototypes');
+					CMessageHelper::setErrorTitle(_('Cannot update item prototypes'));
 				}
 
 				$result = DBend($result);
@@ -580,7 +580,8 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
 				'displayApplications' => true,
 				'display_interfaces' => true,
-				'displayMasteritems' => true
+				'displayMasteritems' => true,
+				'location_url' => 'disc_prototypes.php?parent_discoveryid='.$this->getInput('parent_discoveryid', 0)
 			];
 
 			// hosts

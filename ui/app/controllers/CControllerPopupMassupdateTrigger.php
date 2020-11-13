@@ -240,7 +240,8 @@ class CControllerPopupMassupdateTrigger extends CController {
 				],
 				'prototype' => $this->hasInput('prototype'),
 				'ids' => $this->getInput('ids', []),
-				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0)
+				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
+				'location_url' => 'trigger_prototypes.php?parent_discoveryid='.$this->getInput('parent_discoveryid', 0)
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

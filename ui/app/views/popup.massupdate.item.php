@@ -35,6 +35,7 @@ $form = (new CForm())
 	->addVar('ids', $data['ids'])
 	->addVar('action', $data['prototype'] ? 'popup.massupdate.itemprototype' : 'popup.massupdate.item')
 	->addVar('update', '1')
+	->addVar('location_url', $data['location_url'])
 	->disablePasswordAutofill();
 
 if ($data['prototype']) {

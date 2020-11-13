@@ -451,7 +451,8 @@ class CControllerPopupMassupdateItem extends CController {
 				'preprocessing_types' => CItem::$supported_preprocessing_types,
 				'displayApplications' => true,
 				'display_interfaces' => true,
-				'displayMasteritems' => true
+				'displayMasteritems' => true,
+				'location_url' => 'items.php'
 			];
 
 			// hosts
