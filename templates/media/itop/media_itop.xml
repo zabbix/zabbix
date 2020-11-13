@@ -107,9 +107,9 @@
         json_data.fields.title = params.alert_subject;
         json_data.fields[Itop.params.log] = {
             add_item: {
-                   message: params.alert_subject + '\n' + params.alert_message,
-                   format: 'text'
-               }
+                message: params.alert_subject + '\n' + params.alert_message,
+                format: 'text'
+            }
         };
     },
 
@@ -150,7 +150,7 @@
             catch (error) {
                 Zabbix.Log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
                 throw 'Failed to parse response received from iTop.\nRequest status code ' +
-                    request.Status() + '. Check debug log for more information.';
+                        request.Status() + '. Check debug log for more information.';
             }
         }
 
@@ -159,7 +159,7 @@
         }
         else if (typeof response.code !== 'undefined' &amp;&amp; response.code !== 0) {
             throw 'Request failed with iTop code ' + response.code + ': ' +
-                JSON.stringify(response.message) + '. Check debug log for more information.';
+                    JSON.stringify(response.message) + '. Check debug log for more information.';
         }
         else {
         Object.keys(response.objects)
@@ -201,7 +201,7 @@ try {
 
     // Check {EVENT.VALUE} for trigger-based and internal events.
     if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'
-        &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {
+            &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {
         throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';
     }
 
@@ -239,7 +239,7 @@ try {
         result.tags.__zbx_itop_id = response.response.id;
         result.tags.__zbx_itop_key = response.response.friendlyname;
         result.tags.__zbx_itop_link = params.itop_url + (params.itop_url.endsWith('/') ? '' : '/') +
-            'pages/UI.php?operation=details&amp;class=' + encodeURIComponent(Itop.params.class) + '&amp;id=' +
+                'pages/UI.php?operation=details&amp;class=' + encodeURIComponent(Itop.params.class) + '&amp;id=' +
                 encodeURIComponent(response.response.id);
     }
     // Update created issue for trigger-based event.
