@@ -1,8 +1,48 @@
-Changes for 5.2.1rc1
+Changes for 5.2.2rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.2.1
+
+5.2.1rc3 was released as 5.2.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.2.1rc3
+
+Bug fixes:
+..F....... [ZBX-18608] fixed refresh of monitoring problems and monitoring hosts pages when refresh interval is set to zero (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.1rc2
+
+Bug fixes:
+..F....... [ZBX-18601] fixed dashboard widget to be updated continuously when 'No refresh' interval is specified (miks)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.1rc1
+
+New features:
+.........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
+........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
+.........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
+
+Bug fixes:
+...G...... [ZBX-18591] fixed active Zabbix Agent v2 5.0 doesn't work with Server v5.2.0 (akozlovs)
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18538] fixed API role.update rules validation (gcalenko)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts (Ivo)
+...G...... [ZBX-18505] fixed build failing to compile for Zabbix agent 2 on ARM/v7 and ARM/v6 (esneiders)
+.........T [ZBX-18380] changed trigger of the net.if.speed item in the Windows network module template (mchudinov)
+.........T [ZBX-18494] removed recovery mode NONE in trigger "Operating system description has changed" (mchudinov)
+.......PS. [ZBX-18546] fixed "Something impossible" bug in server and proxy when diaginfo is requested (Andris)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
+.........T [ZBX-18531] fixed template "Ceph by Zabbix Agent2" pool discovery (ychukina)
+.........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
+.........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.0
@@ -204,8 +244,21 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.6rc1
 
 New features:
+.........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
+........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
+.........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
+...G...... [ZBX-18505] fixed build failing to compile for Zabbix agent 2 on ARM/v7 and ARM/v6 (esneiders)
+.........T [ZBX-18380] changed trigger of the net.if.speed item in the Windows network module template (mchudinov)
+.........T [ZBX-18494] removed recovery mode NONE in trigger "Operating system description has changed" (mchudinov)
+.........T [ZBX-18531] fixed "Template App Ceph by Zabbix Agent2" pool discovery (ychukina)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
+.........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
+.........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.5
@@ -2012,6 +2065,10 @@ Changes for 4.0.27rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.26
