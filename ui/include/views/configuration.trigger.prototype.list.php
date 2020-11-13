@@ -136,10 +136,10 @@ foreach ($this->data['triggers'] as $trigger) {
 			(new CUrl('trigger_prototypes.php'))
 				->setArgument('g_triggerid[]', $triggerid)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', 'triggerprototype.massupdate')
-				->setArgument('visible[discover]', '1')
-				->setArgument('massupdate', 'discover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('action', $nodiscover
+					? 'triggerprototype.discover.enable'
+					: 'triggerprototype.discover.disable'
+				)
 				->setArgumentSID()
 				->getUrl()
 		))

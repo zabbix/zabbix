@@ -68,7 +68,8 @@ $fields = [
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
-														'"triggerprototype.massenable"'
+														'"triggerprototype.massenable","triggerprototype.discover.enable",'.
+														'"triggerprototype.discover.disable"'
 													),
 													null
 												],
@@ -419,6 +420,46 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massd
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
+}
+elseif (getRequest('action') && hasRequest('g_triggerid')
+		&& in_array(getRequest('action'), ['triggerprototype.discover.enable', 'triggerprototype.discover.disable'])) {
+	$triggerids = getRequest('g_triggerid');
+	$discover = (getRequest('action') === 'triggerprototype.discover.enable')
+		? TRIGGER_DISCOVER
+		: TRIGGER_NO_DISCOVER;
+	$update = [];
+
+	// Get requested triggers with permission check.
+	$db_trigger_prototypes = API::TriggerPrototype()->get([
+		'output' => [],
+		'triggerids' => getRequest('g_triggerid'),
+		'editable' => true
+	]);
+
+	if ($db_trigger_prototypes) {
+		foreach ($db_trigger_prototypes as $db_trigger_prototype) {
+			$update[] = [
+				'triggerid' => $db_trigger_prototype['triggerid'],
+				'discover' => $discover
+			];
+		}
+
+		$result = API::TriggerPrototype()->update($update);
+	}
+	else {
+		$result = true;
+	}
+
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
+
+	$updated = count($update);
+
+	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
+	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*

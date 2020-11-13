@@ -158,9 +158,10 @@ foreach ($data['items'] as $item) {
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('group_itemid[]', $item['itemid'])
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('visible[discover]', '1')
-				->setArgument('massupdate', 'discover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('action', $nodiscover
+					? 'itemprototype.massdiscover.enable'
+					: 'itemprototype.massdiscover.disable'
+				)
 				->setArgumentSID()
 				->getUrl()
 		))

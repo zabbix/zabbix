@@ -232,7 +232,8 @@ $fields = [
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"itemprototype.massdelete","itemprototype.massdisable",'.
-											'"itemprototype.massenable"'
+											'"itemprototype.massenable","itemprototype.massdiscover.enable",'.
+											'"itemprototype.massdiscover.disable"'
 										),
 										null
 									],
@@ -703,6 +704,29 @@ elseif (hasRequest('action') && getRequest('action') === 'itemprototype.massdele
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
+}
+elseif (hasRequest('action') && hasRequest('group_itemid')
+		&& in_array(getRequest('action'), ['itemprototype.massdiscover.enable', 'itemprototype.massdiscover.disable'])) {
+	$itemids = getRequest('group_itemid');
+	$discover = (getRequest('action') == 'itemprototype.massdiscover.enable') ? ITEM_DISCOVER : ITEM_NO_DISCOVER;
+
+	$item_prototypes = [];
+	foreach ($itemids as $itemid) {
+		$item_prototypes[] = ['itemid' => $itemid, 'discover' => $discover];
+	}
+
+	$result = (bool) API::ItemPrototype()->update($item_prototypes);
+
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
+	}
+
+	$updated = count($itemids);
+
+	$messageSuccess = _n('Item prototype updated', 'Item prototypes updated', $updated);
+	$messageFailed = _n('Cannot update item prototype', 'Cannot update item prototypes', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
