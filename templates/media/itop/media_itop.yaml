@@ -127,15 +127,13 @@ zabbix_export:
         
                 Zabbix.log(4, '[ iTop Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
-                        throw 'Failed to parse response received from iTop.\nRequest status code ' +
-                                request.getStatus() + '. Check debug log for more information.';
-                    }
+                try {
+                    response = JSON.parse(response);
+                }
+                catch (error) {
+                    Zabbix.log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
+                    throw 'Failed to parse response received from iTop.\nRequest status code ' +
+                            request.getStatus() + '. Check debug log for more information.';
                 }
         
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
