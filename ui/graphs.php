@@ -96,14 +96,6 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$active_role_check = (getRequest('context') === 'host')
-	? CRoleHelper::UI_CONFIGURATION_HOSTS
-	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
-
-if (!CWebUser::checkAccess($active_role_check)) {
-	access_deny(ACCESS_DENY_PAGE);
-}
-
 $gitems = [];
 foreach (getRequest('items', []) as $gitem) {
 	$gitems[] = json_decode($gitem, true);

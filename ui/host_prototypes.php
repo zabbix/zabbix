@@ -74,14 +74,6 @@ $fields = [
 ];
 check_fields($fields);
 
-$active_role_check = (getRequest('context') === 'host')
-	? CRoleHelper::UI_CONFIGURATION_HOSTS
-	: CRoleHelper::UI_CONFIGURATION_TEMPLATES;
-
-if (!CWebUser::checkAccess($active_role_check)) {
-	access_deny(ACCESS_DENY_PAGE);
-}
-
 $hostid = getRequest('hostid', 0);
 
 // permissions
