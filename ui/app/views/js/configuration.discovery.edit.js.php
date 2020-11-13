@@ -226,8 +226,9 @@
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(<?= json_encode(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'});
+				.text(t('Add'))
+				.val('discovery.create')
+				.attr({id: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
@@ -432,4 +433,9 @@
 
 		return false;
 	}
+
+	$(() => {
+		const $form = $(document.forms['discoveryForm']);
+		$form.on('submit', () => $form.trimValues(['#name', '#iprange', '#delay']));
+	});
 </script>
