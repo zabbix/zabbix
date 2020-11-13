@@ -26,8 +26,23 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.2rc1
 
 New features:
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
+...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
+..F....... [ZBX-18575] added clone and delete buttons to user role update form (vmaksimovs)
+A.F....... [ZBX-18549] fixed error when user was able to change the user type of own role (gcalenko, vmaksimovs)
+..F....... [ZBX-18518] fixed characters counter which were removed in script modal window (gcalenko)
+..F....... [ZBX-18414] fixed override be saved with custom expression even when all rows are removed (miks)
+..F....... [ZBX-18497] fixed macro resolving in http basic authentication username and macros fields (miks)
+..F....... [ZBX-18143] fixed ability to download image of non-existent graph (agriscenko)
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
+...G...... [ZBX-18581] fixed ORA-40478 exception in queries (ychukina)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.1
