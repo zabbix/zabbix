@@ -91,9 +91,9 @@ zabbix_export:
                 json_data.fields.title = params.alert_subject;
                 json_data.fields[Itop.params.log] = {
                     add_item: {
-                           message: params.alert_subject + '\n' + params.alert_message,
-                           format: 'text'
-                       }
+                        message: params.alert_subject + '\n' + params.alert_message,
+                        format: 'text'
+                    }
                 };
             },
         
@@ -134,7 +134,7 @@ zabbix_export:
                     catch (error) {
                         Zabbix.log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
                         throw 'Failed to parse response received from iTop.\nRequest status code ' +
-                            request.getStatus() + '. Check debug log for more information.';
+                                request.getStatus() + '. Check debug log for more information.';
                     }
                 }
         
@@ -143,7 +143,7 @@ zabbix_export:
                 }
                 else if (typeof response.code !== 'undefined' && response.code !== 0) {
                     throw 'Request failed with iTop code ' + response.code + ': ' +
-                        JSON.stringify(response.message) + '. Check debug log for more information.';
+                            JSON.stringify(response.message) + '. Check debug log for more information.';
                 }
                 else {
                     Object.keys(response.objects)
@@ -185,7 +185,7 @@ zabbix_export:
         
             // Check {EVENT.VALUE} for trigger-based and internal events.
             if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
+                    && (params.event_source === '0' || params.event_source === '3')) {
                 throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
             }
         
@@ -223,7 +223,7 @@ zabbix_export:
                 result.tags.__zbx_itop_id = response.response.id;
                 result.tags.__zbx_itop_key = response.response.friendlyname;
                 result.tags.__zbx_itop_link = params.itop_url + (params.itop_url.endsWith('/') ? '' : '/') +
-                    'pages/UI.php?operation=details&class=' + encodeURIComponent(Itop.params.class) + '&id=' +
+                        'pages/UI.php?operation=details&class=' + encodeURIComponent(Itop.params.class) + '&id=' +
                         encodeURIComponent(response.response.id);
             }
             // Update created issue for trigger-based event.
