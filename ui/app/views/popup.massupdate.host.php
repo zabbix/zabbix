@@ -272,6 +272,7 @@ $encryption_form_list->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))->setLabel(_('Connections')),
 	(new CDiv($encryption_table))
 		->setId('encryption_div')
+		->addStyle('margin-top: -5px;')
 );
 
 // append tabs to form
