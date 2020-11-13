@@ -99,7 +99,7 @@ class CControllerPopupMassupdateHost extends CController {
 			$hostids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
-				function(array $macro): bool {
+				function (array $macro): bool {
 					return (bool) array_filter(
 						array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))
 					);
@@ -107,7 +107,7 @@ class CControllerPopupMassupdateHost extends CController {
 			);
 			$tags = array_filter($this->getInput('tags', []),
 				function (array $tag): bool {
-					return $tag['tag'] !== '' && $tag['value'] !== '';
+					return ($tag['tag'] !== '' || $tag['value'] !== '');
 				}
 			);
 

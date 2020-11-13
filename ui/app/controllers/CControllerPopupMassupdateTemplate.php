@@ -80,15 +80,15 @@ class CControllerPopupMassupdateTemplate extends CController {
 			$templateids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
-				function($macro) {
+				function (array $macro): bool {
 					return (bool) array_filter(
 						array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))
 					);
 				}
 			);
 			$tags = array_filter($this->getInput('tags', []),
-				function ($tag) {
-					return $tag['tag'] !== '' && $tag['value'] !== '';
+				function (array $tag): bool {
+					return ($tag['tag'] !== '' || $tag['value'] !== '');
 				}
 			);
 

@@ -90,8 +90,8 @@ class CControllerPopupMassupdateTrigger extends CController {
 			$triggerids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$tags = array_filter($this->getInput('tags', []),
-				function ($tag) {
-					return $tag['tag'] !== '' && $tag['value'] !== '';
+				function (array $tag): bool {
+					return ($tag['tag'] !== '' || $tag['value'] !== '');
 				}
 			);
 
