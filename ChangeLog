@@ -2088,8 +2088,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.27rc1
 
 New features:
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 
 Bug fixes:
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
 ...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
 A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
 A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
