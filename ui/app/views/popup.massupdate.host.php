@@ -136,7 +136,7 @@ $templatesFormList->addRow(
 	(new CVisibilityBox('visible[templates]', 'linked-templates-div', _('Original')))->setLabel(_('Link templates')),
 	(new CDiv($newTemplateTable))
 		->setId('linked-templates-div')
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('margin-top: -5px;')
 );
 
 $ipmiFormList = new CFormList('ipmiFormList');
