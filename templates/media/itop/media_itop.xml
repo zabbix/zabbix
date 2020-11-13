@@ -143,15 +143,13 @@
 
         Zabbix.Log(4, '[ iTop Webhook ] Received response with status code ' + request.Status() + '\n' + response);
 
-        if (response !== null) {
-            try {
-                response = JSON.parse(response);
-            }
-            catch (error) {
-                Zabbix.Log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
-                throw 'Failed to parse response received from iTop.\nRequest status code ' +
-                        request.Status() + '. Check debug log for more information.';
-            }
+        try {
+            response = JSON.parse(response);
+        }
+        catch (error) {
+            Zabbix.Log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
+            throw 'Failed to parse response received from iTop.\nRequest status code ' +
+                    request.Status() + '. Check debug log for more information.';
         }
 
         if (request.Status() &lt; 200 || request.Status() &gt;= 300) {
