@@ -338,7 +338,7 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 	}
 	else
 	{
-		if (0 == strcmp(data->value, rule->tail->value))
+		if (NULL != data->value && 0 == strcmp(data->value, rule->tail->value))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "skip repeating discovery rule values: " ZBX_FS_UI64, itemid);
 
