@@ -134,7 +134,7 @@ zabbix_export:
                     catch (error) {
                         Zabbix.Log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
                         throw 'Failed to parse response received from iTop.\nRequest status code ' +
-                            request.Status() + '. Check debug log for more information.';
+                                request.Status() + '. Check debug log for more information.';
                     }
                 }
         
@@ -143,7 +143,7 @@ zabbix_export:
                 }
                 else if (typeof response.code !== 'undefined' && response.code !== 0) {
                     throw 'Request failed with iTop code ' + response.code + ': ' +
-                        JSON.stringify(response.message) + '. Check debug log for more information.';
+                            JSON.stringify(response.message) + '. Check debug log for more information.';
                 }
                 else {
                 Object.keys(response.objects)
@@ -223,8 +223,8 @@ zabbix_export:
                 result.tags.__zbx_itop_id = response.response.id;
                 result.tags.__zbx_itop_key = response.response.friendlyname;
                 result.tags.__zbx_itop_link = params.itop_url + (params.itop_url.endsWith('/') ? '' : '/') +
-                    'pages/UI.php?operation=details&class=' + encodeURIComponent(Itop.params.class) + '&id=' +
-                    encodeURIComponent(response.response.id);
+                        'pages/UI.php?operation=details&class=' + encodeURIComponent(Itop.params.class) + '&id=' +
+                        encodeURIComponent(response.response.id);
             }
             // Update created issue for trigger-based event.
             else {
