@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 19:58+0200\n"
+"POT-Creation-Date: 2020-11-13 19:55+0200\n"
 "PO-Revision-Date: 2020-07-17 16:59+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -63,7 +63,7 @@ msgid "\"host:key\" pair is expected"
 msgstr ""
 
 #: include/forms.inc.php:1263
-#: include/views/configuration.host.discovery.edit.php:687
+#: include/views/configuration.host.discovery.edit.php:698
 #: include/views/js/configuration.host.discovery.edit.js.php:90
 #: include/views/js/item.preprocessing.js.php:145
 msgid "$.path.to.node"
@@ -210,7 +210,7 @@ msgid_plural "%1$s retries left"
 msgstr[0] "%1$s προσπάθεια απέμεινε"
 msgstr[1] "%1$s προσπάθειες απέμειναν"
 
-#: app/views/administration.user.edit.php:377
+#: app/views/administration.user.edit.php:375
 #: include/classes/widgets/CWidgetConfig.php:160
 #: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:312
 #: jsLoader.php:313
@@ -378,8 +378,8 @@ msgstr ""
 msgid "ADD OVERRIDE"
 msgstr ""
 
-#: app/views/popup.discovery.check.php:112
-#: include/views/js/configuration.host.edit.js.php:120
+#: app/views/popup.discovery.check.php:113
+#: include/views/js/configuration.host.edit.js.php:121
 msgid "AES"
 msgstr "AES"
 
@@ -400,14 +400,6 @@ msgstr ""
 #: sysmap.php:76
 msgid "Access denied!"
 msgstr "Απαγορευμένη πρόσβαση!"
-
-#: include/classes/api/services/CUser.php:1183
-#: include/classes/api/services/CUser.php:1225
-#, c-format
-msgid "Account is blocked for %1$s second."
-msgid_plural "Account is blocked for %1$s seconds."
-msgstr[0] ""
-msgstr[1] ""
 
 #: app/views/monitoring.widget.problems.view.php:64
 #: include/actions.inc.php:157 include/blocks.inc.php:768
@@ -440,13 +432,13 @@ msgstr ""
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.tags.tab.php:41
 #: app/partials/popup.operations.php:83 app/partials/popup.operations.php:103
-#: app/partials/popup.operations.php:393
+#: app/partials/popup.operations.php:396
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.mediatype.edit.php:98
 #: app/views/administration.mediatype.edit.php:150
 #: app/views/administration.mediatype.list.php:78
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:226
+#: app/views/administration.user.edit.php:224
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.sharing.edit.php:29
 #: app/views/dashboard.sharing.edit.php:50
@@ -465,17 +457,17 @@ msgstr ""
 #: include/views/configuration.action.edit.php:469
 #: include/views/configuration.correlation.edit.php:53
 #: include/views/configuration.graph.edit.php:362
-#: include/views/configuration.host.discovery.edit.php:476
-#: include/views/configuration.host.discovery.edit.php:575
-#: include/views/configuration.host.discovery.edit.php:725
+#: include/views/configuration.host.discovery.edit.php:487
+#: include/views/configuration.host.discovery.edit.php:586
+#: include/views/configuration.host.discovery.edit.php:736
 #: include/views/configuration.host.edit.php:506
-#: include/views/configuration.host.massupdate.php:226
+#: include/views/configuration.host.massupdate.php:230
 #: include/views/configuration.host.prototype.edit.php:217
-#: include/views/configuration.httpconf.edit.php:206
-#: include/views/configuration.item.edit.php:587
-#: include/views/configuration.item.massupdate.php:243
-#: include/views/configuration.item.prototype.edit.php:553
-#: include/views/configuration.item.prototype.massupdate.php:241
+#: include/views/configuration.httpconf.edit.php:213
+#: include/views/configuration.item.edit.php:596
+#: include/views/configuration.item.massupdate.php:247
+#: include/views/configuration.item.prototype.edit.php:562
+#: include/views/configuration.item.prototype.massupdate.php:245
 #: include/views/configuration.maintenance.edit.php:81
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.edit.php:174
@@ -607,7 +599,7 @@ msgstr "Ενεργό έως"
 #: app/partials/massupdate.macros.tab.php:77
 #: app/partials/massupdate.macros.tab.php:122
 #: app/partials/popup.operations.php:87 app/partials/popup.operations.php:107
-#: app/partials/popup.operations.php:397
+#: app/partials/popup.operations.php:400
 #: app/views/administration.iconmap.edit.php:102
 #: app/views/administration.iconmap.edit.php:148
 #: app/views/administration.image.edit.php:94
@@ -616,12 +608,12 @@ msgstr "Ενεργό έως"
 #: app/views/administration.mediatype.edit.php:193
 #: app/views/administration.mediatype.edit.php:281
 #: app/views/administration.mediatype.edit.php:347
-#: app/views/administration.proxy.edit.php:133
+#: app/views/administration.proxy.edit.php:134
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:132
-#: app/views/administration.user.edit.php:299
-#: app/views/administration.user.edit.php:476
+#: app/views/administration.user.edit.php:297
+#: app/views/administration.user.edit.php:474
 #: app/views/administration.usergroup.edit.php:142
 #: app/views/administration.usergroup.edit.php:193
 #: app/views/administration.usergroup.edit.php:232
@@ -636,7 +628,7 @@ msgstr "Ενεργό έως"
 #: app/views/monitoring.problem.view.php:223
 #: app/views/monitoring.problem.view.php:270
 #: app/views/popup.condition.common.php:667
-#: app/views/popup.discovery.check.php:135 app/views/popup.httpstep.php:73
+#: app/views/popup.discovery.check.php:137 app/views/popup.httpstep.php:73
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
@@ -660,38 +652,38 @@ msgstr "Ενεργό έως"
 #: include/views/configuration.graph.edit.php:500
 #: include/views/configuration.host.discovery.edit.php:117
 #: include/views/configuration.host.discovery.edit.php:211
-#: include/views/configuration.host.discovery.edit.php:512
-#: include/views/configuration.host.discovery.edit.php:632
-#: include/views/configuration.host.discovery.edit.php:704
-#: include/views/configuration.host.discovery.edit.php:730
-#: include/views/configuration.host.discovery.edit.php:783
+#: include/views/configuration.host.discovery.edit.php:523
+#: include/views/configuration.host.discovery.edit.php:643
+#: include/views/configuration.host.discovery.edit.php:715
+#: include/views/configuration.host.discovery.edit.php:741
+#: include/views/configuration.host.discovery.edit.php:794
 #: include/views/configuration.host.edit.php:139
-#: include/views/configuration.host.edit.php:766
+#: include/views/configuration.host.edit.php:769
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.list.php:83
 #: include/views/configuration.host.massupdate.php:61
-#: include/views/configuration.host.massupdate.php:220
+#: include/views/configuration.host.massupdate.php:224
 #: include/views/configuration.host.prototype.edit.php:171
 #: include/views/configuration.host.prototype.edit.php:399
-#: include/views/configuration.httpconf.edit.php:126
-#: include/views/configuration.httpconf.edit.php:144
-#: include/views/configuration.httpconf.edit.php:212
-#: include/views/configuration.httpconf.edit.php:261
+#: include/views/configuration.httpconf.edit.php:128
+#: include/views/configuration.httpconf.edit.php:146
+#: include/views/configuration.httpconf.edit.php:219
+#: include/views/configuration.httpconf.edit.php:268
 #: include/views/configuration.item.edit.php:156
 #: include/views/configuration.item.edit.php:250
-#: include/views/configuration.item.edit.php:636
-#: include/views/configuration.item.edit.php:888
+#: include/views/configuration.item.edit.php:645
+#: include/views/configuration.item.edit.php:897
 #: include/views/configuration.item.massupdate.php:136
-#: include/views/configuration.item.massupdate.php:281
-#: include/views/configuration.item.massupdate.php:420
+#: include/views/configuration.item.massupdate.php:285
+#: include/views/configuration.item.massupdate.php:424
 #: include/views/configuration.item.prototype.edit.php:137
 #: include/views/configuration.item.prototype.edit.php:231
-#: include/views/configuration.item.prototype.edit.php:589
-#: include/views/configuration.item.prototype.edit.php:736
+#: include/views/configuration.item.prototype.edit.php:598
+#: include/views/configuration.item.prototype.edit.php:745
 #: include/views/configuration.item.prototype.massupdate.php:132
-#: include/views/configuration.item.prototype.massupdate.php:279
-#: include/views/configuration.item.prototype.massupdate.php:405
-#: include/views/configuration.item.prototype.massupdate.php:480
+#: include/views/configuration.item.prototype.massupdate.php:283
+#: include/views/configuration.item.prototype.massupdate.php:409
+#: include/views/configuration.item.prototype.massupdate.php:484
 #: include/views/configuration.maintenance.edit.php:121
 #: include/views/configuration.maintenance.edit.php:197
 #: include/views/configuration.maintenance.edit.php:268
@@ -849,7 +841,7 @@ msgstr ""
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:610
 #: include/hosts.inc.php:1407 include/items.inc.php:345
 #: include/views/configuration.httpconf.edit.php:104
-#: include/views/js/configuration.host.edit.js.php:163
+#: include/views/js/configuration.host.edit.js.php:165
 msgid "Agent"
 msgstr "Αντιπρόσωπος"
 
@@ -916,8 +908,8 @@ msgid "All dashboards"
 msgstr ""
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:335
-#: app/views/administration.user.edit.php:341
+#: app/views/administration.user.edit.php:333
+#: app/views/administration.user.edit.php:339
 msgid "All groups"
 msgstr ""
 
@@ -967,11 +959,11 @@ msgstr ""
 msgid "Allow manual close"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:535
-#: include/views/configuration.item.edit.php:763
-#: include/views/configuration.item.massupdate.php:385
-#: include/views/configuration.item.prototype.edit.php:659
-#: include/views/configuration.item.prototype.massupdate.php:395
+#: include/views/configuration.host.discovery.edit.php:546
+#: include/views/configuration.item.edit.php:772
+#: include/views/configuration.item.massupdate.php:389
+#: include/views/configuration.item.prototype.edit.php:668
+#: include/views/configuration.item.prototype.massupdate.php:399
 msgid "Allowed hosts"
 msgstr "Επιτρεπόμενοι ξενιστές"
 
@@ -979,11 +971,11 @@ msgstr "Επιτρεπόμενοι ξενιστές"
 msgid "Alternatively, you can install it manually:"
 msgstr ""
 
-#: app/partials/popup.operations.php:376 app/views/popup.lldoverride.php:68
+#: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
 #: include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:117
 #: include/views/configuration.correlation.edit.php:108
-#: include/views/configuration.host.discovery.edit.php:556
+#: include/views/configuration.host.discovery.edit.php:567
 #: include/views/configuration.trigger.prototype.edit.php:143
 #: include/views/configuration.trigger.prototype.edit.php:336
 #: include/views/configuration.triggers.edit.php:164
@@ -991,7 +983,7 @@ msgstr ""
 msgid "And"
 msgstr "Καί"
 
-#: app/partials/popup.operations.php:375 app/views/monitoring.host.view.php:52
+#: app/partials/popup.operations.php:378 app/views/monitoring.host.view.php:52
 #: app/views/monitoring.problem.view.php:240
 #: app/views/popup.lldoverride.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
@@ -1000,7 +992,7 @@ msgstr "Καί"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:383
 #: include/views/configuration.action.edit.php:116
 #: include/views/configuration.correlation.edit.php:107
-#: include/views/configuration.host.discovery.edit.php:555
+#: include/views/configuration.host.discovery.edit.php:566
 #: include/views/configuration.host.list.php:53
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/configuration.template.list.php:37
@@ -1070,8 +1062,8 @@ msgid "Application error."
 msgstr "Σφάλμα εφαρμογής."
 
 #: app/controllers/CControllerPopupGeneric.php:188
-#: include/views/configuration.item.prototype.edit.php:690
-#: include/views/configuration.item.prototype.massupdate.php:476
+#: include/views/configuration.item.prototype.edit.php:699
+#: include/views/configuration.item.prototype.massupdate.php:480
 msgid "Application prototypes"
 msgstr ""
 
@@ -1098,12 +1090,12 @@ msgstr ""
 #: include/views/configuration.host.edit.php:235
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:400
-#: include/views/configuration.item.edit.php:798
+#: include/views/configuration.item.edit.php:807
 #: include/views/configuration.item.list.php:73
-#: include/views/configuration.item.massupdate.php:446
-#: include/views/configuration.item.prototype.edit.php:675
+#: include/views/configuration.item.massupdate.php:450
+#: include/views/configuration.item.prototype.edit.php:684
 #: include/views/configuration.item.prototype.list.php:62
-#: include/views/configuration.item.prototype.massupdate.php:401
+#: include/views/configuration.item.prototype.massupdate.php:405
 #: include/views/configuration.template.edit.php:134
 #: include/views/configuration.template.list.php:151
 #: include/views/configuration.template.list.php:238
@@ -1165,12 +1157,12 @@ msgstr "Τύπος περιοχής"
 msgid "Arithmetic"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:730
-#: include/views/configuration.item.edit.php:736
-#: include/views/configuration.item.massupdate.php:359
-#: include/views/configuration.item.prototype.edit.php:634
-#: include/views/configuration.item.prototype.edit.php:640
-#: include/views/configuration.item.prototype.massupdate.php:368
+#: include/views/configuration.item.edit.php:739
+#: include/views/configuration.item.edit.php:745
+#: include/views/configuration.item.massupdate.php:363
+#: include/views/configuration.item.prototype.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:649
+#: include/views/configuration.item.prototype.massupdate.php:372
 msgid "As is"
 msgstr "Ως έχει"
 
@@ -1294,7 +1286,7 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
 #: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
-#: include/views/configuration.httpconf.edit.php:234
+#: include/views/configuration.httpconf.edit.php:241
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
 msgstr "Ταυτοποίηση"
@@ -1305,21 +1297,21 @@ msgstr "Ταυτοποίηση"
 msgid "Authentication algorithm"
 msgstr "Αλγόριθμος ταυτοποίησης"
 
-#: include/classes/api/services/CUser.php:1569
+#: include/classes/api/services/CUser.php:1573
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr ""
 
 #: app/partials/popup.operations.php:250
-#: include/views/configuration.host.discovery.edit.php:415
-#: include/views/configuration.item.edit.php:495
+#: include/views/configuration.host.discovery.edit.php:422
+#: include/views/configuration.item.edit.php:500
 #: include/views/configuration.item.massupdate.php:183
-#: include/views/configuration.item.prototype.edit.php:458
+#: include/views/configuration.item.prototype.edit.php:463
 #: include/views/configuration.item.prototype.massupdate.php:179
 msgid "Authentication method"
 msgstr "Μέθοδος ταυτοποίησης"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:315
+#: app/controllers/CControllerAuthenticationUpdate.php:316
 msgid "Authentication method changed"
 msgstr ""
 
@@ -1333,7 +1325,7 @@ msgstr "Σύνθημα ταυτοποίησης"
 msgid "Authentication protocol"
 msgstr "Πρωτόκολλο ταυτοποίησης"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:314
+#: app/controllers/CControllerAuthenticationUpdate.php:315
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -1349,7 +1341,7 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr ""
 
-#: app/views/administration.user.edit.php:188
+#: app/views/administration.user.edit.php:186
 msgid "Auto-login"
 msgstr "Αυτόματη σύνδεση"
 
@@ -1357,15 +1349,15 @@ msgstr "Αυτόματη σύνδεση"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr ""
 
-#: app/views/administration.user.edit.php:193
+#: app/views/administration.user.edit.php:191
 msgid "Auto-logout"
 msgstr ""
 
-#: app/partials/popup.operations.php:364
+#: app/partials/popup.operations.php:367
 #: app/views/administration.miscconfig.edit.php:55
 #: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1344
-#: include/views/configuration.host.edit.php:640
-#: include/views/configuration.host.massupdate.php:206
+#: include/views/configuration.host.edit.php:642
+#: include/views/configuration.host.massupdate.php:210
 #: include/views/configuration.host.prototype.edit.php:322
 msgid "Automatic"
 msgstr "Αυτόματο"
@@ -1461,9 +1453,9 @@ msgid "Base colour"
 msgstr ""
 
 #: include/httptest.inc.php:28
-#: include/views/configuration.host.discovery.edit.php:282
-#: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.prototype.edit.php:310
+#: include/views/configuration.host.discovery.edit.php:283
+#: include/views/configuration.item.edit.php:330
+#: include/views/configuration.item.prototype.edit.php:311
 msgid "Basic"
 msgstr "Βασική"
 
@@ -1638,12 +1630,12 @@ msgstr ""
 #: app/views/administration.image.edit.php:96
 #: app/views/administration.mediatype.edit.php:341
 #: app/views/administration.module.edit.php:61
-#: app/views/administration.proxy.edit.php:126
+#: app/views/administration.proxy.edit.php:127
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:126
-#: app/views/administration.user.edit.php:455
-#: app/views/administration.user.edit.php:486
+#: app/views/administration.user.edit.php:453
+#: app/views/administration.user.edit.php:484
 #: app/views/administration.usergroup.edit.php:212
 #: app/views/administration.valuemap.edit.php:92
 #: app/views/js/administration.housekeeping.edit.js.php:76
@@ -1865,11 +1857,11 @@ msgstr ""
 msgid "Cannot add widgets in kiosk mode"
 msgstr ""
 
-#: include/classes/validators/CLdapAuthValidator.php:72
+#: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
 msgstr ""
 
-#: include/classes/validators/CLdapAuthValidator.php:71
+#: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
 msgstr ""
 
@@ -1909,7 +1901,7 @@ msgstr "Αδύνατη η κλωνοποίηση προτότυπων εναυσ
 msgid "Cannot close problem: %1$s."
 msgstr ""
 
-#: include/classes/validators/CLdapAuthValidator.php:70
+#: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
 msgstr ""
 
@@ -2857,7 +2849,7 @@ msgstr "Αδύνατη η ενημέρωση ενέργειας"
 msgid "Cannot update application"
 msgstr "Αδύνατη η ενημέρωση κατηγορίας"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:319
+#: app/controllers/CControllerAuthenticationUpdate.php:320
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -3127,10 +3119,10 @@ msgstr ""
 
 #: app/views/administration.proxy.edit.php:95
 #: app/views/administration.proxy.edit.php:103
-#: include/views/configuration.host.edit.php:706
-#: include/views/configuration.host.edit.php:722
-#: include/views/configuration.host.massupdate.php:263
-#: include/views/configuration.host.massupdate.php:271
+#: include/views/configuration.host.edit.php:708
+#: include/views/configuration.host.edit.php:724
+#: include/views/configuration.host.massupdate.php:267
+#: include/views/configuration.host.massupdate.php:275
 #: include/views/configuration.host.prototype.edit.php:335
 #: include/views/configuration.host.prototype.edit.php:351
 msgid "Certificate"
@@ -3159,7 +3151,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:76
 #: app/views/administration.mediatype.edit.php:132
-#: app/views/administration.user.edit.php:129
+#: app/views/administration.user.edit.php:127
 msgid "Change password"
 msgstr "Αλλαγή συνθηματικού"
 
@@ -3176,9 +3168,9 @@ msgid "Change type"
 msgstr ""
 
 #: include/forms.inc.php:184 include/items.inc.php:127
-#: include/views/configuration.item.edit.php:565
+#: include/views/configuration.item.edit.php:574
 #: include/views/configuration.item.massupdate.php:168
-#: include/views/configuration.item.prototype.edit.php:531
+#: include/views/configuration.item.prototype.edit.php:540
 #: include/views/configuration.item.prototype.massupdate.php:164
 msgid "Character"
 msgstr "Χαρακτήρας"
@@ -3328,9 +3320,9 @@ msgstr ""
 msgid "Clear history"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:248
-#: include/views/configuration.item.edit.php:872
-#: include/views/configuration.item.edit.php:875
+#: include/views/configuration.httpconf.edit.php:255
+#: include/views/configuration.item.edit.php:881
+#: include/views/configuration.item.edit.php:884
 msgid "Clear history and trends"
 msgstr "Εκκαθάριση ιστορικού και τάσεων"
 
@@ -3353,7 +3345,7 @@ msgstr "Ρολόι"
 
 #: app/views/administration.iconmap.edit.php:134
 #: app/views/administration.mediatype.edit.php:356
-#: app/views/administration.proxy.edit.php:141
+#: app/views/administration.proxy.edit.php:142
 #: app/views/administration.regex.edit.php:143
 #: app/views/administration.script.edit.php:141
 #: app/views/administration.valuemap.edit.php:112
@@ -3362,13 +3354,13 @@ msgstr "Ρολόι"
 #: include/views/configuration.correlation.edit.php:165
 #: include/views/configuration.discovery.edit.php:141
 #: include/views/configuration.graph.edit.php:492
-#: include/views/configuration.host.discovery.edit.php:763
-#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.discovery.edit.php:774
+#: include/views/configuration.host.edit.php:760
 #: include/views/configuration.hostgroups.edit.php:62
 #: include/views/configuration.host.prototype.edit.php:391
-#: include/views/configuration.httpconf.edit.php:241
-#: include/views/configuration.item.edit.php:858
-#: include/views/configuration.item.prototype.edit.php:725
+#: include/views/configuration.httpconf.edit.php:248
+#: include/views/configuration.item.edit.php:867
+#: include/views/configuration.item.prototype.edit.php:734
 #: include/views/configuration.maintenance.edit.php:260
 #: include/views/configuration.template.edit.php:443
 #: include/views/configuration.trigger.prototype.edit.php:633
@@ -3464,7 +3456,7 @@ msgid "Command"
 msgstr "Εντολή"
 
 #: app/controllers/CControllerPopupGeneric.php:374
-#: app/partials/popup.operations.php:312 app/partials/popup.operations.php:323
+#: app/partials/popup.operations.php:315 app/partials/popup.operations.php:326
 #: app/views/administration.script.edit.php:60
 #: app/views/administration.script.list.php:68
 msgid "Commands"
@@ -3555,7 +3547,7 @@ msgstr "Συνθήκη \"%2$s\" μέ χρήση σε τύπο \"%3$s\" για κ
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
 msgstr ""
 
-#: app/partials/popup.operations.php:390
+#: app/partials/popup.operations.php:393
 #: include/views/configuration.action.edit.php:139
 #: include/views/configuration.action.list.php:89
 #: include/views/configuration.correlation.edit.php:120
@@ -3814,12 +3806,12 @@ msgstr ""
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr ""
 
-#: include/views/configuration.host.massupdate.php:294
+#: include/views/configuration.host.massupdate.php:299
 msgid "Connections"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:710
-#: include/views/configuration.host.massupdate.php:266
+#: include/views/configuration.host.edit.php:712
+#: include/views/configuration.host.massupdate.php:270
 #: include/views/configuration.host.prototype.edit.php:339
 msgid "Connections from host"
 msgstr ""
@@ -3828,8 +3820,8 @@ msgstr ""
 msgid "Connections from proxy"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:702
-#: include/views/configuration.host.massupdate.php:259
+#: include/views/configuration.host.edit.php:704
+#: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:331
 msgid "Connections to host"
 msgstr ""
@@ -4088,10 +4080,10 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:120
 #: include/views/configuration.host.prototype.list.php:59
 #: include/views/configuration.host.prototype.list.php:172
-#: include/views/configuration.item.prototype.edit.php:698
+#: include/views/configuration.item.prototype.edit.php:707
 #: include/views/configuration.item.prototype.list.php:63
 #: include/views/configuration.item.prototype.list.php:189
-#: include/views/configuration.item.prototype.massupdate.php:345
+#: include/views/configuration.item.prototype.massupdate.php:349
 #: include/views/configuration.trigger.prototype.edit.php:524
 #: include/views/configuration.trigger.prototype.list.php:58
 #: include/views/configuration.trigger.prototype.list.php:181
@@ -4256,7 +4248,7 @@ msgstr ""
 #: app/views/popup.lldoverride.php:70
 #: include/views/configuration.action.edit.php:119
 #: include/views/configuration.correlation.edit.php:110
-#: include/views/configuration.host.discovery.edit.php:558
+#: include/views/configuration.host.discovery.edit.php:569
 msgid "Custom expression"
 msgstr "Προσαρμοσμένη έκφραση"
 
@@ -4265,11 +4257,11 @@ msgid "Custom graphs"
 msgstr "Προσαρμοσμένα γραφήματα"
 
 #: app/views/popup.lldoperation.php:163
-#: include/views/configuration.host.discovery.edit.php:518
-#: include/views/configuration.item.edit.php:641
-#: include/views/configuration.item.massupdate.php:287
-#: include/views/configuration.item.prototype.edit.php:594
-#: include/views/configuration.item.prototype.massupdate.php:285
+#: include/views/configuration.host.discovery.edit.php:529
+#: include/views/configuration.item.edit.php:650
+#: include/views/configuration.item.massupdate.php:291
+#: include/views/configuration.item.prototype.edit.php:603
+#: include/views/configuration.item.prototype.massupdate.php:289
 msgid "Custom intervals"
 msgstr ""
 
@@ -4329,8 +4321,8 @@ msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr ""
 
-#: app/views/popup.discovery.check.php:111
-#: include/views/js/configuration.host.edit.js.php:119
+#: app/views/popup.discovery.check.php:112
+#: include/views/js/configuration.host.edit.js.php:120
 msgid "DES"
 msgstr "DES"
 
@@ -4627,8 +4619,8 @@ msgid "Default theme \"%1$s\"."
 msgstr "Προκαθορισμένο θέμα \"%1$s\"."
 
 #: app/views/popup.lldoperation.php:99
-#: include/views/configuration.item.massupdate.php:233
-#: include/views/configuration.item.prototype.massupdate.php:231
+#: include/views/configuration.item.massupdate.php:237
+#: include/views/configuration.item.prototype.massupdate.php:235
 #: include/views/monitoring.slideconf.edit.php:118
 #: include/views/monitoring.slideconf.list.php:73
 msgid "Delay"
@@ -4643,13 +4635,13 @@ msgstr "Καθυστερημένο από"
 #: app/views/administration.image.edit.php:79
 #: app/views/administration.mediatype.edit.php:357
 #: app/views/administration.mediatype.list.php:173
-#: app/views/administration.proxy.edit.php:142
+#: app/views/administration.proxy.edit.php:143
 #: app/views/administration.proxy.list.php:175
 #: app/views/administration.regex.edit.php:144
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:142
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:464
+#: app/views/administration.user.edit.php:462
 #: app/views/administration.usergroup.edit.php:221
 #: app/views/administration.usergroup.list.php:228
 #: app/views/administration.user.list.php:210
@@ -4716,7 +4708,7 @@ msgid "Delete dashboard?"
 msgstr ""
 
 #: include/views/configuration.discovery.edit.php:142
-#: include/views/configuration.host.discovery.edit.php:775
+#: include/views/configuration.host.discovery.edit.php:786
 msgid "Delete discovery rule?"
 msgstr "Διαγραφή κανόνα εντοπισμού;"
 
@@ -4747,11 +4739,11 @@ msgstr "Διαγραφή ιστορικού επιλεγμένων σεναρί�
 msgid "Delete icon map?"
 msgstr "Διαγραφή αντιστοίχισης εικονιδίων;"
 
-#: include/views/configuration.item.prototype.edit.php:727
+#: include/views/configuration.item.prototype.edit.php:736
 msgid "Delete item prototype?"
 msgstr "Διαγραφή πρωτότυπου συλλέκτη;"
 
-#: include/views/configuration.item.edit.php:880
+#: include/views/configuration.item.edit.php:889
 msgid "Delete item?"
 msgstr "Διαγραφή συλλέκτη;"
 
@@ -4771,7 +4763,7 @@ msgstr ""
 msgid "Delete missing"
 msgstr "Διαγραφή απόντος;"
 
-#: app/views/administration.proxy.edit.php:144
+#: app/views/administration.proxy.edit.php:145
 msgid "Delete proxy?"
 msgstr "Διαγραφή διαμεσολαβητή;"
 
@@ -4841,7 +4833,7 @@ msgstr "Διαγραφή επιλεγμένου πρωτότυπου ξενισ�
 msgid "Delete selected host prototypes?"
 msgstr "Διαγραφή επιλεγμένων πρωτότυπων ξενιστών;"
 
-#: include/views/configuration.host.edit.php:759
+#: include/views/configuration.host.edit.php:762
 msgid "Delete selected host?"
 msgstr "Διαγραφή επιλεγμένου ξενιστή;"
 
@@ -4913,7 +4905,7 @@ msgstr "Διαγραφή επιλεγμένων πρωτότυπων εναυσ�
 msgid "Delete selected triggers?"
 msgstr "Διαγραφή επιλεγμένων εναυσμάτων;"
 
-#: app/views/administration.user.edit.php:466
+#: app/views/administration.user.edit.php:464
 msgid "Delete selected user?"
 msgstr "Διαγραφή επιλεγμένου χρήστη;"
 
@@ -4961,7 +4953,7 @@ msgstr "Διαγραφή πρωτότυπου εναύσματος;"
 msgid "Delete trigger?"
 msgstr "Διαγραφή εναύσματος;"
 
-#: include/views/configuration.httpconf.edit.php:253
+#: include/views/configuration.httpconf.edit.php:260
 msgid "Delete web scenario?"
 msgstr ""
 
@@ -5031,13 +5023,13 @@ msgstr "Κατάσταση υλοποίησης"
 #: app/views/reports.auditlog.list.php:92
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:235
 #: include/views/configuration.correlation.edit.php:128
-#: include/views/configuration.host.discovery.edit.php:539
+#: include/views/configuration.host.discovery.edit.php:550
 #: include/views/configuration.host.edit.php:191
 #: include/views/configuration.host.massupdate.php:87
-#: include/views/configuration.item.edit.php:831
-#: include/views/configuration.item.massupdate.php:495
-#: include/views/configuration.item.prototype.edit.php:692
-#: include/views/configuration.item.prototype.massupdate.php:518
+#: include/views/configuration.item.edit.php:840
+#: include/views/configuration.item.massupdate.php:499
+#: include/views/configuration.item.prototype.edit.php:701
+#: include/views/configuration.item.prototype.massupdate.php:522
 #: include/views/configuration.maintenance.edit.php:71
 #: include/views/configuration.maintenance.list.php:87
 #: include/views/configuration.template.edit.php:110
@@ -5184,7 +5176,7 @@ msgstr "Απενεργοποίηση επιλεγμένων σεναρίων ι�
 #: app/views/administration.miscconfig.edit.php:53
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:236
+#: app/views/administration.user.edit.php:234
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5202,10 +5194,10 @@ msgstr "Απενεργοποίηση επιλεγμένων σεναρίων ι�
 #: include/views/configuration.correlation.list.php:50
 #: include/views/configuration.correlation.list.php:100
 #: include/views/configuration.discovery.list.php:50
-#: include/views/configuration.host.edit.php:638
+#: include/views/configuration.host.edit.php:640
 #: include/views/configuration.host.list.php:262
 #: include/views/configuration.host.massupdate.php:114
-#: include/views/configuration.host.massupdate.php:204
+#: include/views/configuration.host.massupdate.php:208
 #: include/views/configuration.host.prototype.edit.php:320
 #: include/views/js/monitoring.sysmaps.js.php:256
 msgid "Disabled"
@@ -5233,9 +5225,9 @@ msgstr ""
 #: include/views/configuration.graph.list.php:124
 #: include/views/configuration.host.prototype.edit.php:124
 #: include/views/configuration.host.prototype.list.php:60
-#: include/views/configuration.item.prototype.edit.php:701
+#: include/views/configuration.item.prototype.edit.php:710
 #: include/views/configuration.item.prototype.list.php:64
-#: include/views/configuration.item.prototype.massupdate.php:351
+#: include/views/configuration.item.prototype.massupdate.php:355
 #: include/views/configuration.trigger.prototype.edit.php:525
 #: include/views/configuration.trigger.prototype.list.php:59
 msgid "Discover"
@@ -5463,18 +5455,18 @@ msgid "Do not calculate"
 msgstr "Μην υπολογίζεις"
 
 #: app/views/popup.lldoperation.php:184
-#: include/views/configuration.item.edit.php:672
-#: include/views/configuration.item.massupdate.php:307
-#: include/views/configuration.item.prototype.edit.php:603
-#: include/views/configuration.item.prototype.massupdate.php:305
+#: include/views/configuration.item.edit.php:681
+#: include/views/configuration.item.massupdate.php:311
+#: include/views/configuration.item.prototype.edit.php:612
+#: include/views/configuration.item.prototype.massupdate.php:309
 msgid "Do not keep history"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:205
-#: include/views/configuration.item.edit.php:709
-#: include/views/configuration.item.massupdate.php:325
-#: include/views/configuration.item.prototype.edit.php:615
-#: include/views/configuration.item.prototype.massupdate.php:323
+#: include/views/configuration.item.edit.php:718
+#: include/views/configuration.item.massupdate.php:329
+#: include/views/configuration.item.prototype.edit.php:624
+#: include/views/configuration.item.prototype.massupdate.php:327
 msgid "Do not keep trends"
 msgstr ""
 
@@ -5655,7 +5647,7 @@ msgstr "Κάθε URL πρέπει να έχει μοναδικό όνομα. Β�
 msgid "Each item"
 msgstr ""
 
-#: app/views/administration.user.edit.php:284
+#: app/views/administration.user.edit.php:282
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:259
 #: include/views/configuration.action.edit.php:280
@@ -5968,11 +5960,11 @@ msgstr "Ενεργοποίηση επιλεγμένων εναυσμάτων;"
 msgid "Enable selected web scenarios?"
 msgstr "Ενεργοποίηση επιλεγμένων σεναρίων ιστού;"
 
-#: include/views/configuration.host.discovery.edit.php:530
-#: include/views/configuration.item.edit.php:754
-#: include/views/configuration.item.massupdate.php:378
-#: include/views/configuration.item.prototype.edit.php:654
-#: include/views/configuration.item.prototype.massupdate.php:388
+#: include/views/configuration.host.discovery.edit.php:541
+#: include/views/configuration.item.edit.php:763
+#: include/views/configuration.item.massupdate.php:382
+#: include/views/configuration.item.prototype.edit.php:663
+#: include/views/configuration.item.prototype.massupdate.php:392
 msgid "Enable trapping"
 msgstr ""
 
@@ -5983,7 +5975,7 @@ msgstr ""
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:230
+#: app/views/administration.user.edit.php:228
 #: app/views/administration.usergroup.edit.php:78
 #: app/views/administration.usergroup.edit.php:90
 #: app/views/administration.usergroup.edit.php:91
@@ -6007,12 +5999,12 @@ msgstr ""
 #: include/views/configuration.correlation.list.php:108
 #: include/views/configuration.discovery.edit.php:131
 #: include/views/configuration.discovery.list.php:49
-#: include/views/configuration.host.discovery.edit.php:542
+#: include/views/configuration.host.discovery.edit.php:553
 #: include/views/configuration.host.edit.php:211
 #: include/views/configuration.host.list.php:254
 #: include/views/configuration.host.massupdate.php:113
-#: include/views/configuration.httpconf.edit.php:154
-#: include/views/configuration.item.edit.php:838
+#: include/views/configuration.httpconf.edit.php:156
+#: include/views/configuration.item.edit.php:847
 #: include/views/configuration.triggers.edit.php:551
 msgid "Enabled"
 msgstr "Ενεργοποιημένο"
@@ -6021,10 +6013,10 @@ msgstr "Ενεργοποιημένο"
 msgid "Encrypt"
 msgstr ""
 
-#: app/views/administration.proxy.edit.php:123
+#: app/views/administration.proxy.edit.php:124
 #: app/views/administration.proxy.list.php:74
-#: include/views/configuration.host.edit.php:747
-#: include/views/configuration.host.massupdate.php:316
+#: include/views/configuration.host.edit.php:750
+#: include/views/configuration.host.massupdate.php:321
 #: include/views/configuration.host.prototype.edit.php:376
 msgid "Encryption"
 msgstr ""
@@ -6190,9 +6182,9 @@ msgstr ""
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:766
+#: include/views/configuration.host.discovery.edit.php:777
 #: include/views/configuration.host.discovery.list.php:294
-#: include/views/configuration.item.edit.php:861
+#: include/views/configuration.item.edit.php:870
 #: include/views/configuration.item.list.php:258
 msgid "Execute now"
 msgstr ""
@@ -6210,9 +6202,9 @@ msgid "Executed"
 msgstr "Εκτελεσμένο"
 
 #: include/items.inc.php:1738
-#: include/views/configuration.host.discovery.edit.php:451
-#: include/views/configuration.item.edit.php:525
-#: include/views/configuration.item.prototype.edit.php:494
+#: include/views/configuration.host.discovery.edit.php:462
+#: include/views/configuration.item.edit.php:534
+#: include/views/configuration.item.prototype.edit.php:503
 msgid "Executed script"
 msgstr "Εκτελέσιμη δέσμη ενεργειών"
 
@@ -6551,8 +6543,8 @@ msgid "Filter"
 msgstr "Φίλτρο"
 
 #: app/views/popup.lldoverride.php:163
-#: include/views/configuration.host.discovery.edit.php:637
-#: include/views/configuration.host.discovery.edit.php:754
+#: include/views/configuration.host.discovery.edit.php:648
+#: include/views/configuration.host.discovery.edit.php:765
 msgid "Filters"
 msgstr "Φίλτρα"
 
@@ -6599,12 +6591,12 @@ msgid "Fixed"
 msgstr "Σταθερό"
 
 #: app/views/popup.lldoperation.php:118
-#: include/views/configuration.host.discovery.edit.php:481
-#: include/views/configuration.item.edit.php:594
-#: include/views/configuration.item.edit.php:601
-#: include/views/configuration.item.massupdate.php:250
-#: include/views/configuration.item.prototype.edit.php:558
-#: include/views/configuration.item.prototype.massupdate.php:248
+#: include/views/configuration.host.discovery.edit.php:492
+#: include/views/configuration.item.edit.php:603
+#: include/views/configuration.item.edit.php:610
+#: include/views/configuration.item.massupdate.php:254
+#: include/views/configuration.item.prototype.edit.php:567
+#: include/views/configuration.item.prototype.massupdate.php:252
 #: include/views/js/common.item.edit.js.php:33
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:124
 #: include/views/js/configuration.item.massupdate.js.php:36
@@ -6636,8 +6628,8 @@ msgstr ""
 msgid "Form data"
 msgstr ""
 
-#: include/items.inc.php:1742 include/views/configuration.item.edit.php:543
-#: include/views/configuration.item.prototype.edit.php:510
+#: include/items.inc.php:1742 include/views/configuration.item.edit.php:552
+#: include/views/configuration.item.prototype.edit.php:519
 msgid "Formula"
 msgstr "Τύπος"
 
@@ -6684,7 +6676,7 @@ msgstr "Από"
 msgid "Frontend access"
 msgstr "Πρόσβαση στο περιβάλλον ΙΣΤΟΥ"
 
-#: app/views/administration.user.edit.php:365
+#: app/views/administration.user.edit.php:363
 msgid "Frontend messaging"
 msgstr "Μηνύματα στο περιβάλλον ΙΣΤΟΥ"
 
@@ -6693,7 +6685,7 @@ msgstr "Μηνύματα στο περιβάλλον ΙΣΤΟΥ"
 msgid "Full"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:758
+#: include/views/configuration.host.edit.php:761
 #: include/views/configuration.template.edit.php:444
 #: include/views/monitoring.screen.edit.php:227
 #: include/views/monitoring.sysmap.edit.php:397
@@ -7161,10 +7153,10 @@ msgstr "HTTP"
 msgid "HTTP agent"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:277
-#: include/views/configuration.httpconf.edit.php:162
-#: include/views/configuration.item.edit.php:324
-#: include/views/configuration.item.prototype.edit.php:305
+#: include/views/configuration.host.discovery.edit.php:278
+#: include/views/configuration.httpconf.edit.php:164
+#: include/views/configuration.item.edit.php:325
+#: include/views/configuration.item.prototype.edit.php:306
 msgid "HTTP authentication"
 msgstr "HTTP ταυτοποίηση"
 
@@ -7208,7 +7200,7 @@ msgstr ""
 #: app/views/popup.httpstep.php:133 app/views/popup.httpstep.php:161
 #: include/views/configuration.host.discovery.edit.php:203
 #: include/views/configuration.host.discovery.edit.php:261
-#: include/views/configuration.httpconf.edit.php:136
+#: include/views/configuration.httpconf.edit.php:138
 #: include/views/configuration.item.edit.php:242
 #: include/views/configuration.item.edit.php:300
 #: include/views/configuration.item.massupdate.php:127
@@ -7234,7 +7226,7 @@ msgid "Height"
 msgstr "Ύψος"
 
 #: include/menu.inc.php:213 include/menu.inc.php:216
-#: include/views/general.login.php:89
+#: include/views/general.login.php:86
 msgid "Help"
 msgstr "Βοήθεια"
 
@@ -7316,8 +7308,8 @@ msgstr ""
 msgid "History cleared"
 msgstr "Ιστορικό καθαρίστηκε"
 
-#: include/views/configuration.httpconf.edit.php:249
-#: include/views/configuration.item.edit.php:876
+#: include/views/configuration.httpconf.edit.php:256
+#: include/views/configuration.item.edit.php:885
 msgid "History clearing can take a long time. Continue?"
 msgstr "Η εκκαθάριση ιστορικού μπορεί να πάρει πολύ χρόνο. Συνέχεια;"
 
@@ -7336,10 +7328,10 @@ msgstr "Ιστορικό συμβάντων"
 
 #: app/controllers/CControllerPopupLldOperation.php:219
 #: app/views/popup.lldoperation.php:179 disc_prototypes.php:148
-#: include/views/configuration.item.edit.php:669
-#: include/views/configuration.item.massupdate.php:303
-#: include/views/configuration.item.prototype.edit.php:600
-#: include/views/configuration.item.prototype.massupdate.php:301 items.php:65
+#: include/views/configuration.item.edit.php:678
+#: include/views/configuration.item.massupdate.php:307
+#: include/views/configuration.item.prototype.edit.php:609
+#: include/views/configuration.item.prototype.massupdate.php:305 items.php:65
 msgid "History storage period"
 msgstr "Ιστορικό περιόδου αποθήκευσης"
 
@@ -7385,7 +7377,7 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/views/configuration.application.list.php:81
 #: include/views/configuration.host.discovery.list.php:171
 #: include/views/configuration.host.edit.php:466
-#: include/views/configuration.host.massupdate.php:304
+#: include/views/configuration.host.massupdate.php:309
 #: include/views/configuration.host.prototype.edit.php:130
 #: include/views/configuration.httpconf.list.php:111
 #: include/views/configuration.item.list.php:65
@@ -7483,7 +7475,7 @@ msgstr[1] "Ξενιστές ενεργοποιημένοι"
 #: app/partials/popup.operations.php:181
 #: app/views/administration.script.edit.php:92
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:332
+#: app/views/administration.user.edit.php:330
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
@@ -7537,7 +7529,7 @@ msgstr ""
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:45
-#: app/partials/popup.operations.php:335
+#: app/partials/popup.operations.php:338
 #: app/views/monitoring.host.view.php:106
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.problem.view.php:103
@@ -7578,11 +7570,11 @@ msgstr "Ομάδες ξενιστών"
 msgid "Host info"
 msgstr "Πληροφορίες ξενιστών"
 
-#: include/views/configuration.host.discovery.edit.php:387
-#: include/views/configuration.item.edit.php:431
-#: include/views/configuration.item.edit.php:451
+#: include/views/configuration.host.discovery.edit.php:394
+#: include/views/configuration.item.edit.php:436
+#: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.massupdate.php:55
-#: include/views/configuration.item.prototype.edit.php:433
+#: include/views/configuration.item.prototype.edit.php:438
 #: include/views/configuration.item.prototype.massupdate.php:51
 msgid "Host interface"
 msgstr "Διεπαφή ξενιστή"
@@ -7609,7 +7601,7 @@ msgstr "Θέματα ξενιστή"
 msgid "Host label type"
 msgstr "Τύπος ετικέτας ξενιστή"
 
-#: include/views/configuration.host.edit.php:624
+#: include/views/configuration.host.edit.php:626
 msgid "Host macros"
 msgstr ""
 
@@ -7857,9 +7849,9 @@ msgstr ""
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
 #: include/hosts.inc.php:471 include/hosts.inc.php:1410
 #: include/items.inc.php:348 include/views/configuration.host.edit.php:596
-#: include/views/configuration.host.massupdate.php:306
+#: include/views/configuration.host.massupdate.php:311
 #: include/views/configuration.host.prototype.edit.php:298
-#: include/views/js/configuration.host.edit.js.php:166
+#: include/views/js/configuration.host.edit.js.php:168
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -7876,9 +7868,9 @@ msgid "IPMI scripts can be executed only by server."
 msgstr ""
 
 #: disc_prototypes.php:114 host_discovery.php:104
-#: include/views/configuration.host.discovery.edit.php:409
-#: include/views/configuration.item.edit.php:476
-#: include/views/configuration.item.prototype.edit.php:453 items.php:127
+#: include/views/configuration.host.discovery.edit.php:416
+#: include/views/configuration.item.edit.php:481
+#: include/views/configuration.item.prototype.edit.php:458 items.php:127
 msgid "IPMI sensor"
 msgstr "Αισθητήρας IPMI"
 
@@ -8733,7 +8725,7 @@ msgid "Incorrect media type ID."
 msgstr ""
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1282
+#: include/classes/api/services/CUser.php:1284
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Ανακριβής μέθοδος \"%1$s.%2$s\"."
@@ -8944,6 +8936,14 @@ msgstr ""
 msgid "Incorrect user group."
 msgstr "Λανθασμένη ομάδα χρήστη."
 
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1197
+#: include/classes/api/services/CUser.php:1227
+#: include/classes/api/services/CUser.php:1568
+#: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:86
+msgid "Incorrect user name or password or account is temporarily blocked."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:454
 #: include/classes/api/services/CAction.php:811
 #: include/classes/api/services/CAction.php:854
@@ -9050,7 +9050,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:103
 #: app/controllers/CControllerAuthenticationUpdate.php:135
-#: app/controllers/CControllerAuthenticationUpdate.php:201
+#: app/controllers/CControllerAuthenticationUpdate.php:202
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:89
 #: app/controllers/CControllerPopupItemTestGetValue.php:102
@@ -9357,7 +9357,7 @@ msgstr ""
 msgid "Inherited"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:625
+#: include/views/configuration.host.edit.php:627
 msgid "Inherited and host macros"
 msgstr ""
 
@@ -9498,15 +9498,15 @@ msgstr "Internet Explorer"
 #: app/partials/monitoring.latest.view.html.php:59
 #: app/views/popup.lldoperation.php:109 include/forms.inc.php:699
 #: include/views/configuration.discovery.list.php:68
-#: include/views/configuration.host.discovery.edit.php:476
+#: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.discovery.list.php:178
 #: include/views/configuration.httpconf.list.php:115
-#: include/views/configuration.item.edit.php:587
+#: include/views/configuration.item.edit.php:596
 #: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.massupdate.php:241
-#: include/views/configuration.item.prototype.edit.php:553
+#: include/views/configuration.item.massupdate.php:245
+#: include/views/configuration.item.prototype.edit.php:562
 #: include/views/configuration.item.prototype.list.php:58
-#: include/views/configuration.item.prototype.massupdate.php:239
+#: include/views/configuration.item.prototype.massupdate.php:243
 #: include/views/configuration.services.edit.php:174
 msgid "Interval"
 msgstr "Χρονικό διάστημα"
@@ -9860,8 +9860,8 @@ msgstr ""
 msgid "Invalid user sessions data storage period: %1$s."
 msgstr ""
 
-#: include/menu.inc.php:59 include/views/configuration.host.edit.php:698
-#: include/views/configuration.host.massupdate.php:315
+#: include/menu.inc.php:59 include/views/configuration.host.edit.php:700
+#: include/views/configuration.host.massupdate.php:320
 #: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:295
 msgid "Inventory"
 msgstr "Απογραφή"
@@ -9875,8 +9875,8 @@ msgstr "Απενεργοποιημένη απογραφή ξενιστή \"%1$s\
 msgid "Inventory field"
 msgstr "Πεδίο απογραφής"
 
-#: app/partials/popup.operations.php:361
-#: include/views/configuration.host.massupdate.php:200
+#: app/partials/popup.operations.php:364
+#: include/views/configuration.host.massupdate.php:204
 msgid "Inventory mode"
 msgstr "Τρόπος απογραφής"
 
@@ -9888,9 +9888,9 @@ msgstr "Είναι συνδεδεμένος;"
 msgid "Issue"
 msgstr "Θέμα"
 
-#: app/views/administration.proxy.edit.php:115
-#: include/views/configuration.host.edit.php:738
-#: include/views/configuration.host.massupdate.php:285
+#: app/views/administration.proxy.edit.php:116
+#: include/views/configuration.host.edit.php:741
+#: include/views/configuration.host.massupdate.php:290
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Issuer"
 msgstr ""
@@ -9915,7 +9915,7 @@ msgstr "Ιταλικά (it_IT)"
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
 #: include/forms.inc.php:937 include/views/configuration.graph.edit.php:166
 #: include/views/configuration.graph.edit.php:248
-#: include/views/configuration.item.massupdate.php:503
+#: include/views/configuration.item.massupdate.php:507
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:898
@@ -10011,7 +10011,7 @@ msgstr ""
 #: app/views/popup.lldoperation.php:48
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:937
-#: include/views/configuration.item.prototype.massupdate.php:526
+#: include/views/configuration.item.prototype.massupdate.php:530
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:157
 #: include/views/monitoring.screen.constructor.edit.php:338
 msgid "Item prototype"
@@ -10181,7 +10181,7 @@ msgstr "Συλλέκτες ενημερώθηκαν"
 #: include/classes/widgets/views/widget.hostavail.form.view.php:46
 #: include/hosts.inc.php:468 include/hosts.inc.php:1409
 #: include/items.inc.php:347
-#: include/views/js/configuration.host.edit.js.php:165
+#: include/views/js/configuration.host.edit.js.php:167
 msgid "JMX"
 msgstr "JMX"
 
@@ -10189,10 +10189,10 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "Αντιπρόσωπος JMX"
 
-#: include/views/configuration.host.discovery.edit.php:422
-#: include/views/configuration.item.edit.php:496
+#: include/views/configuration.host.discovery.edit.php:429
+#: include/views/configuration.item.edit.php:501
 #: include/views/configuration.item.massupdate.php:77
-#: include/views/configuration.item.prototype.edit.php:465
+#: include/views/configuration.item.prototype.edit.php:470
 #: include/views/configuration.item.prototype.massupdate.php:73
 msgid "JMX endpoint"
 msgstr ""
@@ -10236,7 +10236,7 @@ msgid "JSON-rpc version is not specified."
 msgstr "Η έκδοση JSON-rpc δεν προσδιορίζεται."
 
 #: include/items.inc.php:1797
-#: include/views/configuration.host.discovery.edit.php:652
+#: include/views/configuration.host.discovery.edit.php:663
 msgid "JSONPath"
 msgstr ""
 
@@ -10273,15 +10273,15 @@ msgstr "Ιούν"
 msgid "June"
 msgstr "Ιούνιος"
 
-#: include/views/configuration.host.discovery.edit.php:524
+#: include/views/configuration.host.discovery.edit.php:535
 #: include/views/configuration.host.discovery.list.php:128
 msgid "Keep lost resources period"
 msgstr ""
 
 #: include/httptest.inc.php:30
-#: include/views/configuration.host.discovery.edit.php:284
-#: include/views/configuration.item.edit.php:331
-#: include/views/configuration.item.prototype.edit.php:312
+#: include/views/configuration.host.discovery.edit.php:285
+#: include/views/configuration.item.edit.php:332
+#: include/views/configuration.item.prototype.edit.php:313
 msgid "Kerberos"
 msgstr ""
 
@@ -10305,7 +10305,7 @@ msgstr "Κλειδί"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Το κλειδί \"%1$s\" δεν ταιριάζει <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: app/partials/popup.operations.php:296
+#: app/partials/popup.operations.php:298
 #: include/views/js/common.item.edit.js.php:214
 msgid "Key passphrase"
 msgstr "Κλειδί συνθηματικής φράσης"
@@ -10339,7 +10339,7 @@ msgstr "LDAP ξενιστής"
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:239
 msgid "LDAP login successful"
 msgstr "Επιτυχής σύνδεση LDAP"
 
@@ -10351,19 +10351,19 @@ msgstr ""
 msgid "LF"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:652
+#: include/views/configuration.host.discovery.edit.php:663
 msgid "LLD macro"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:710
-#: include/views/configuration.host.discovery.edit.php:753
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:764
 msgid "LLD macros"
 msgstr ""
 
-#: app/partials/popup.operations.php:393 app/views/popup.lldoverride.php:101
+#: app/partials/popup.operations.php:396 app/views/popup.lldoverride.php:101
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:56
 #: include/views/configuration.correlation.edit.php:53
-#: include/views/configuration.host.discovery.edit.php:575
+#: include/views/configuration.host.discovery.edit.php:586
 #: include/views/js/monitoring.sysmaps.js.php:134
 #: include/views/js/monitoring.sysmaps.js.php:605
 #: include/views/js/monitoring.sysmaps.js.php:713
@@ -10375,7 +10375,7 @@ msgstr "Επιγραφή"
 msgid "Label location"
 msgstr "Θέση επιγραφής"
 
-#: app/views/administration.user.edit.php:171
+#: app/views/administration.user.edit.php:169
 msgid "Language"
 msgstr "Γλώσσα"
 
@@ -10754,9 +10754,9 @@ msgid "Location longitude"
 msgstr "Γεωγραφικό μήκος τοποθεσίας"
 
 #: include/forms.inc.php:185 include/items.inc.php:129
-#: include/views/configuration.item.edit.php:566
+#: include/views/configuration.item.edit.php:575
 #: include/views/configuration.item.massupdate.php:169
-#: include/views/configuration.item.prototype.edit.php:532
+#: include/views/configuration.item.prototype.edit.php:541
 #: include/views/configuration.item.prototype.massupdate.php:165
 msgid "Log"
 msgstr "Καταγραφή"
@@ -10769,10 +10769,10 @@ msgstr ""
 msgid "Log file monitoring. Returns log"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:721
-#: include/views/configuration.item.massupdate.php:352
-#: include/views/configuration.item.prototype.edit.php:625
-#: include/views/configuration.item.prototype.massupdate.php:361
+#: include/views/configuration.item.edit.php:730
+#: include/views/configuration.item.massupdate.php:356
+#: include/views/configuration.item.prototype.edit.php:634
+#: include/views/configuration.item.prototype.massupdate.php:365
 msgid "Log time format"
 msgstr "Μορφότυπος καταγραφής ώρας"
 
@@ -10787,13 +10787,11 @@ msgstr "Καταγραφή αταίριαστων SNMP traps"
 msgid "Login"
 msgstr "Σύνδεση"
 
-#: include/classes/api/services/CUser.php:1219
+#: include/classes/api/services/CUser.php:1221
 msgid "Login failed."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1196
-#: include/classes/api/services/CUser.php:1565
-#: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:86
+#: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "Ανακριβές όνομα ή κωδικός σύνδεσης."
 
@@ -10854,7 +10852,7 @@ msgstr ""
 #: app/partials/massupdate.macros.tab.php:29
 #: app/views/administration.macros.edit.php:39
 #: app/views/popup.lldoverride.php:101
-#: include/views/configuration.host.discovery.edit.php:575
+#: include/views/configuration.host.discovery.edit.php:586
 msgid "Macro"
 msgstr "Μακροεντολή"
 
@@ -10882,8 +10880,8 @@ msgstr "Η μακροεντολή με hostmacroid \"%1$s\" δεν υπάρχε�
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
 #: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:902
-#: include/views/configuration.host.edit.php:621
-#: include/views/configuration.host.massupdate.php:308
+#: include/views/configuration.host.edit.php:623
+#: include/views/configuration.host.massupdate.php:313
 #: include/views/configuration.host.prototype.edit.php:303
 #: include/views/configuration.template.edit.php:425
 #: include/views/configuration.template.massupdate.php:162
@@ -10979,11 +10977,11 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr "Λείπει υποχρεωτική παράμετρος."
 
-#: app/partials/popup.operations.php:363
+#: app/partials/popup.operations.php:366
 #: app/views/administration.miscconfig.edit.php:54
 #: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1343
-#: include/views/configuration.host.edit.php:639
-#: include/views/configuration.host.massupdate.php:205
+#: include/views/configuration.host.edit.php:641
+#: include/views/configuration.host.massupdate.php:209
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Manual"
 msgstr "Χειροκίνητα"
@@ -11132,11 +11130,11 @@ msgid "Mass update shapes"
 msgstr ""
 
 #: disc_prototypes.php:53 host_discovery.php:54
-#: include/views/configuration.host.discovery.edit.php:346
-#: include/views/configuration.item.edit.php:390
-#: include/views/configuration.item.massupdate.php:486
-#: include/views/configuration.item.prototype.edit.php:418
-#: include/views/configuration.item.prototype.massupdate.php:508 items.php:53
+#: include/views/configuration.host.discovery.edit.php:353
+#: include/views/configuration.item.edit.php:395
+#: include/views/configuration.item.massupdate.php:490
+#: include/views/configuration.item.prototype.edit.php:423
+#: include/views/configuration.item.prototype.massupdate.php:512 items.php:53
 msgid "Master item"
 msgstr ""
 
@@ -11202,8 +11200,8 @@ msgid "May"
 msgstr "Μάι"
 
 #: app/controllers/CControllerPopupMedia.php:168
-#: app/views/administration.user.edit.php:296
-#: app/views/administration.user.edit.php:311 app/views/popup.media.php:65
+#: app/views/administration.user.edit.php:294
+#: app/views/administration.user.edit.php:309 app/views/popup.media.php:65
 msgid "Media"
 msgstr "Μέσα ενημέρωσης"
 
@@ -11253,7 +11251,7 @@ msgstr ""
 msgid "Media type test failed."
 msgstr ""
 
-#: app/views/js/popup.mediatypetest.edit.js.php:110
+#: app/views/js/popup.mediatypetest.edit.js.php:109
 msgid "Media type test log"
 msgstr ""
 
@@ -11333,8 +11331,8 @@ msgstr ""
 msgid "Message templates"
 msgstr ""
 
-#: app/views/administration.user.edit.php:370
-#: app/views/administration.user.edit.php:378
+#: app/views/administration.user.edit.php:368
+#: app/views/administration.user.edit.php:376
 msgid "Message timeout"
 msgstr "Χρονικό όριο μηνύματος"
 
@@ -11352,7 +11350,7 @@ msgstr ""
 msgid "Messages"
 msgstr "Μηνύματα"
 
-#: app/views/administration.user.edit.php:450
+#: app/views/administration.user.edit.php:448
 msgid "Messaging"
 msgstr "Ανταλλαγή μηνυμάτων"
 
@@ -11627,9 +11625,9 @@ msgid "NNTP"
 msgstr "NNTP"
 
 #: include/httptest.inc.php:29
-#: include/views/configuration.host.discovery.edit.php:283
-#: include/views/configuration.item.edit.php:330
-#: include/views/configuration.item.prototype.edit.php:311
+#: include/views/configuration.host.discovery.edit.php:284
+#: include/views/configuration.item.edit.php:331
+#: include/views/configuration.item.prototype.edit.php:312
 msgid "NTLM"
 msgstr "NTLM"
 
@@ -11662,7 +11660,7 @@ msgstr "NTLM"
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
 #: app/partials/monitoring.latest.view.html.php:51
-#: app/partials/popup.operations.php:393
+#: app/partials/popup.operations.php:396
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
 #: app/views/administration.image.edit.php:45
@@ -11718,7 +11716,7 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.edit.php:48
 #: include/views/configuration.host.discovery.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:207
-#: include/views/configuration.host.discovery.edit.php:723
+#: include/views/configuration.host.discovery.edit.php:734
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.discovery.list.php:172
 #: include/views/configuration.host.edit.php:474
@@ -11727,14 +11725,14 @@ msgstr "NTLM"
 #: include/views/configuration.hostgroups.list.php:61
 #: include/views/configuration.host.list.php:132
 #: include/views/configuration.host.list.php:183
-#: include/views/configuration.host.massupdate.php:226
+#: include/views/configuration.host.massupdate.php:230
 #: include/views/configuration.host.prototype.edit.php:189
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.list.php:57
 #: include/views/configuration.httpconf.edit.php:63
-#: include/views/configuration.httpconf.edit.php:123
-#: include/views/configuration.httpconf.edit.php:141
-#: include/views/configuration.httpconf.edit.php:199
+#: include/views/configuration.httpconf.edit.php:125
+#: include/views/configuration.httpconf.edit.php:143
+#: include/views/configuration.httpconf.edit.php:206
 #: include/views/configuration.httpconf.list.php:113
 #: include/views/configuration.item.edit.php:71
 #: include/views/configuration.item.edit.php:152
@@ -11841,12 +11839,12 @@ msgid "Never"
 msgstr "Ποτέ"
 
 #: include/views/configuration.httpconf.edit.php:78
-#: include/views/configuration.item.edit.php:787
-#: include/views/configuration.item.prototype.edit.php:663
+#: include/views/configuration.item.edit.php:796
+#: include/views/configuration.item.prototype.edit.php:672
 msgid "New application"
 msgstr "Νέα κατηγορία"
 
-#: include/views/configuration.item.prototype.edit.php:677
+#: include/views/configuration.item.prototype.edit.php:686
 msgid "New application prototype"
 msgstr ""
 
@@ -11924,7 +11922,7 @@ msgstr ""
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.prototype.list.php:107
 #: include/views/configuration.item.prototype.list.php:154
-#: include/views/configuration.item.prototype.massupdate.php:355
+#: include/views/configuration.item.prototype.massupdate.php:359
 #: include/views/configuration.trigger.prototype.list.php:120
 #: include/views/configuration.trigger.prototype.list.php:135
 #: include/views/configuration.trigger.prototype.massupdate.php:66
@@ -12095,10 +12093,10 @@ msgstr "Δεν δόθηκαν IDs κανόνα εντοπισμού."
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:93
 #: app/views/administration.proxy.edit.php:101
-#: include/views/configuration.host.edit.php:704
-#: include/views/configuration.host.edit.php:714
-#: include/views/configuration.host.massupdate.php:261
-#: include/views/configuration.host.massupdate.php:269
+#: include/views/configuration.host.edit.php:706
+#: include/views/configuration.host.edit.php:716
+#: include/views/configuration.host.massupdate.php:265
+#: include/views/configuration.host.massupdate.php:273
 #: include/views/configuration.host.prototype.edit.php:333
 #: include/views/configuration.host.prototype.edit.php:343
 msgid "No encryption"
@@ -12167,10 +12165,10 @@ msgstr ""
 msgid "No image"
 msgstr "Χωρίς εικόνα"
 
-#: include/views/configuration.host.discovery.edit.php:390
-#: include/views/configuration.item.edit.php:454
+#: include/views/configuration.host.discovery.edit.php:397
+#: include/views/configuration.item.edit.php:459
 #: include/views/configuration.item.massupdate.php:63
-#: include/views/configuration.item.prototype.edit.php:436
+#: include/views/configuration.item.prototype.edit.php:441
 #: include/views/configuration.item.prototype.massupdate.php:59
 #: jsLoader.php:327
 msgid "No interface found"
@@ -12240,8 +12238,8 @@ msgstr ""
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1201
-#: include/classes/api/services/CUser.php:1577
+#: include/classes/api/services/CUser.php:1203
+#: include/classes/api/services/CUser.php:1581
 msgid "No permissions for system access."
 msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματος."
 
@@ -12495,17 +12493,17 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:160
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
 #: include/profiles.inc.php:276 include/users.inc.php:437
-#: include/views/configuration.host.discovery.edit.php:281
+#: include/views/configuration.host.discovery.edit.php:282
 #: include/views/configuration.host.list.php:353
 #: include/views/configuration.host.list.php:359
 #: include/views/configuration.host.list.php:371
 #: include/views/configuration.host.list.php:374
-#: include/views/configuration.item.edit.php:328
-#: include/views/configuration.item.edit.php:792
-#: include/views/configuration.item.edit.php:806
-#: include/views/configuration.item.prototype.edit.php:309
-#: include/views/configuration.item.prototype.edit.php:670
-#: include/views/configuration.item.prototype.edit.php:685
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.edit.php:801
+#: include/views/configuration.item.edit.php:815
+#: include/views/configuration.item.prototype.edit.php:310
+#: include/views/configuration.item.prototype.edit.php:679
+#: include/views/configuration.item.prototype.edit.php:694
 #: include/views/configuration.trigger.prototype.edit.php:287
 #: include/views/configuration.triggers.edit.php:311
 #: include/views/js/monitoring.sysmaps.js.php:27
@@ -12763,9 +12761,9 @@ msgid "Numeral systems"
 msgstr ""
 
 #: include/forms.inc.php:183 include/items.inc.php:125
-#: include/triggers.inc.php:1853 include/views/configuration.item.edit.php:564
+#: include/triggers.inc.php:1853 include/views/configuration.item.edit.php:573
 #: include/views/configuration.item.massupdate.php:167
-#: include/views/configuration.item.prototype.edit.php:530
+#: include/views/configuration.item.prototype.edit.php:539
 #: include/views/configuration.item.prototype.massupdate.php:163
 msgid "Numeric (float)"
 msgstr "Αριθμητικό (κινητή υποδιαστολή)"
@@ -12775,9 +12773,9 @@ msgid "Numeric (integer)"
 msgstr ""
 
 #: include/forms.inc.php:182 include/items.inc.php:123
-#: include/views/configuration.item.edit.php:563
+#: include/views/configuration.item.edit.php:572
 #: include/views/configuration.item.massupdate.php:166
-#: include/views/configuration.item.prototype.edit.php:529
+#: include/views/configuration.item.prototype.edit.php:538
 #: include/views/configuration.item.prototype.massupdate.php:162
 msgid "Numeric (unsigned)"
 msgstr "Αριθμητικό (απρόσημο)"
@@ -12892,7 +12890,7 @@ msgstr "Επί"
 msgid "On status change triggers blink for"
 msgstr "Σε αλλαγή κατάστασης τα εναύσματα αναβοσβήνουν για"
 
-#: app/views/administration.user.edit.php:376
+#: app/views/administration.user.edit.php:374
 msgid "Once"
 msgstr "Άπαξ"
 
@@ -13106,7 +13104,7 @@ msgstr "Χειριστής"
 msgid "Options"
 msgstr ""
 
-#: app/partials/popup.operations.php:377 app/views/monitoring.host.view.php:53
+#: app/partials/popup.operations.php:380 app/views/monitoring.host.view.php:53
 #: app/views/monitoring.problem.view.php:241
 #: app/views/popup.lldoverride.php:69
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
@@ -13116,7 +13114,7 @@ msgstr ""
 #: include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:118
 #: include/views/configuration.correlation.edit.php:109
-#: include/views/configuration.host.discovery.edit.php:557
+#: include/views/configuration.host.discovery.edit.php:568
 #: include/views/configuration.host.list.php:54
 #: include/views/configuration.maintenance.edit.php:144
 #: include/views/configuration.template.list.php:38
@@ -13142,11 +13140,11 @@ msgstr "Ή"
 #: include/views/configuration.host.massupdate.php:168
 #: include/views/configuration.host.massupdate.php:175
 #: include/views/configuration.host.massupdate.php:182
-#: include/views/configuration.host.massupdate.php:189
-#: include/views/configuration.host.massupdate.php:199
-#: include/views/configuration.host.massupdate.php:215
-#: include/views/configuration.host.massupdate.php:248
-#: include/views/configuration.host.massupdate.php:293
+#: include/views/configuration.host.massupdate.php:191
+#: include/views/configuration.host.massupdate.php:203
+#: include/views/configuration.host.massupdate.php:219
+#: include/views/configuration.host.massupdate.php:252
+#: include/views/configuration.host.massupdate.php:298
 #: include/views/configuration.item.massupdate.php:44
 #: include/views/configuration.item.massupdate.php:54
 #: include/views/configuration.item.massupdate.php:76
@@ -13158,21 +13156,21 @@ msgstr "Ή"
 #: include/views/configuration.item.massupdate.php:175
 #: include/views/configuration.item.massupdate.php:182
 #: include/views/configuration.item.massupdate.php:192
-#: include/views/configuration.item.massupdate.php:199
-#: include/views/configuration.item.massupdate.php:206
-#: include/views/configuration.item.massupdate.php:213
-#: include/views/configuration.item.massupdate.php:223
-#: include/views/configuration.item.massupdate.php:295
-#: include/views/configuration.item.massupdate.php:302
-#: include/views/configuration.item.massupdate.php:320
-#: include/views/configuration.item.massupdate.php:344
-#: include/views/configuration.item.massupdate.php:351
-#: include/views/configuration.item.massupdate.php:366
-#: include/views/configuration.item.massupdate.php:377
-#: include/views/configuration.item.massupdate.php:384
-#: include/views/configuration.item.massupdate.php:445
-#: include/views/configuration.item.massupdate.php:485
-#: include/views/configuration.item.massupdate.php:494
+#: include/views/configuration.item.massupdate.php:201
+#: include/views/configuration.item.massupdate.php:208
+#: include/views/configuration.item.massupdate.php:215
+#: include/views/configuration.item.massupdate.php:227
+#: include/views/configuration.item.massupdate.php:299
+#: include/views/configuration.item.massupdate.php:306
+#: include/views/configuration.item.massupdate.php:324
+#: include/views/configuration.item.massupdate.php:348
+#: include/views/configuration.item.massupdate.php:355
+#: include/views/configuration.item.massupdate.php:370
+#: include/views/configuration.item.massupdate.php:381
+#: include/views/configuration.item.massupdate.php:388
+#: include/views/configuration.item.massupdate.php:449
+#: include/views/configuration.item.massupdate.php:489
+#: include/views/configuration.item.massupdate.php:498
 #: include/views/configuration.item.prototype.massupdate.php:40
 #: include/views/configuration.item.prototype.massupdate.php:50
 #: include/views/configuration.item.prototype.massupdate.php:72
@@ -13184,23 +13182,23 @@ msgstr "Ή"
 #: include/views/configuration.item.prototype.massupdate.php:171
 #: include/views/configuration.item.prototype.massupdate.php:178
 #: include/views/configuration.item.prototype.massupdate.php:188
-#: include/views/configuration.item.prototype.massupdate.php:195
-#: include/views/configuration.item.prototype.massupdate.php:202
-#: include/views/configuration.item.prototype.massupdate.php:209
-#: include/views/configuration.item.prototype.massupdate.php:219
-#: include/views/configuration.item.prototype.massupdate.php:293
-#: include/views/configuration.item.prototype.massupdate.php:300
-#: include/views/configuration.item.prototype.massupdate.php:318
-#: include/views/configuration.item.prototype.massupdate.php:344
-#: include/views/configuration.item.prototype.massupdate.php:350
-#: include/views/configuration.item.prototype.massupdate.php:360
-#: include/views/configuration.item.prototype.massupdate.php:376
-#: include/views/configuration.item.prototype.massupdate.php:387
-#: include/views/configuration.item.prototype.massupdate.php:394
-#: include/views/configuration.item.prototype.massupdate.php:400
-#: include/views/configuration.item.prototype.massupdate.php:475
-#: include/views/configuration.item.prototype.massupdate.php:507
-#: include/views/configuration.item.prototype.massupdate.php:517
+#: include/views/configuration.item.prototype.massupdate.php:197
+#: include/views/configuration.item.prototype.massupdate.php:204
+#: include/views/configuration.item.prototype.massupdate.php:211
+#: include/views/configuration.item.prototype.massupdate.php:223
+#: include/views/configuration.item.prototype.massupdate.php:297
+#: include/views/configuration.item.prototype.massupdate.php:304
+#: include/views/configuration.item.prototype.massupdate.php:322
+#: include/views/configuration.item.prototype.massupdate.php:348
+#: include/views/configuration.item.prototype.massupdate.php:354
+#: include/views/configuration.item.prototype.massupdate.php:364
+#: include/views/configuration.item.prototype.massupdate.php:380
+#: include/views/configuration.item.prototype.massupdate.php:391
+#: include/views/configuration.item.prototype.massupdate.php:398
+#: include/views/configuration.item.prototype.massupdate.php:404
+#: include/views/configuration.item.prototype.massupdate.php:479
+#: include/views/configuration.item.prototype.massupdate.php:511
+#: include/views/configuration.item.prototype.massupdate.php:521
 #: include/views/configuration.template.massupdate.php:49
 #: include/views/configuration.template.massupdate.php:78
 #: include/views/configuration.template.massupdate.php:125
@@ -13239,8 +13237,8 @@ msgstr "Άλλα"
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:661
-#: include/views/configuration.item.edit.php:697
+#: include/views/configuration.item.edit.php:670
+#: include/views/configuration.item.edit.php:706
 msgctxt "item_form"
 msgid "Overridden by"
 msgstr "Επικαλυπτόμενο με"
@@ -13264,8 +13262,8 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:415
 #: include/classes/widgets/views/widget.svggraph.form.view.php:294
-#: include/views/configuration.host.discovery.edit.php:739
-#: include/views/configuration.host.discovery.edit.php:755
+#: include/views/configuration.host.discovery.edit.php:750
+#: include/views/configuration.host.discovery.edit.php:766
 msgid "Overrides"
 msgstr ""
 
@@ -13286,7 +13284,7 @@ msgid "PHP LDAP"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:552
-#: include/classes/validators/CLdapAuthValidator.php:69
+#: include/classes/validators/CLdapAuthValidator.php:76
 msgid "PHP LDAP extension missing."
 msgstr ""
 
@@ -13472,15 +13470,15 @@ msgstr ""
 #: app/views/administration.proxy.edit.php:110
 #: app/views/administration.proxy.list.php:124
 #: app/views/administration.proxy.list.php:137
-#: include/views/configuration.host.edit.php:705
-#: include/views/configuration.host.edit.php:718
-#: include/views/configuration.host.edit.php:733
+#: include/views/configuration.host.edit.php:707
+#: include/views/configuration.host.edit.php:720
+#: include/views/configuration.host.edit.php:735
 #: include/views/configuration.host.list.php:362
 #: include/views/configuration.host.list.php:378
 #: include/views/configuration.host.list.php:381
-#: include/views/configuration.host.massupdate.php:262
-#: include/views/configuration.host.massupdate.php:270
-#: include/views/configuration.host.massupdate.php:280
+#: include/views/configuration.host.massupdate.php:266
+#: include/views/configuration.host.massupdate.php:274
+#: include/views/configuration.host.massupdate.php:284
 #: include/views/configuration.host.prototype.edit.php:334
 #: include/views/configuration.host.prototype.edit.php:347
 #: include/views/configuration.host.prototype.edit.php:360
@@ -13489,8 +13487,8 @@ msgstr ""
 
 #: app/views/administration.autoreg.edit.php:56
 #: app/views/administration.proxy.edit.php:105
-#: include/views/configuration.host.edit.php:727
-#: include/views/configuration.host.massupdate.php:274
+#: include/views/configuration.host.edit.php:729
+#: include/views/configuration.host.massupdate.php:278
 #: include/views/configuration.host.prototype.edit.php:355
 msgid "PSK identity"
 msgstr ""
@@ -13582,39 +13580,39 @@ msgid "Passive"
 msgstr "Παθητικός"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:98
-#: app/partials/popup.operations.php:245 app/partials/popup.operations.php:288
+#: app/partials/popup.operations.php:245 app/partials/popup.operations.php:289
 #: app/views/administration.mediatype.edit.php:199
-#: app/views/administration.user.edit.php:112
-#: app/views/administration.user.edit.php:128 disc_prototypes.php:232
+#: app/views/administration.user.edit.php:111
+#: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
 #: include/classes/setup/CSetupWizard.php:262
-#: include/views/configuration.host.discovery.edit.php:299
-#: include/views/configuration.host.discovery.edit.php:417
-#: include/views/configuration.host.discovery.edit.php:446
-#: include/views/configuration.host.edit.php:604
-#: include/views/configuration.host.massupdate.php:190
+#: include/views/configuration.host.discovery.edit.php:302
+#: include/views/configuration.host.discovery.edit.php:424
+#: include/views/configuration.host.discovery.edit.php:455
+#: include/views/configuration.host.edit.php:605
+#: include/views/configuration.host.massupdate.php:192
 #: include/views/configuration.host.prototype.edit.php:294
-#: include/views/configuration.httpconf.edit.php:170
-#: include/views/configuration.item.edit.php:345
-#: include/views/configuration.item.edit.php:483
-#: include/views/configuration.item.edit.php:520
+#: include/views/configuration.httpconf.edit.php:174
+#: include/views/configuration.item.edit.php:347
+#: include/views/configuration.item.edit.php:488
+#: include/views/configuration.item.edit.php:527
 #: include/views/configuration.item.massupdate.php:186
-#: include/views/configuration.item.massupdate.php:214
-#: include/views/configuration.item.prototype.edit.php:326
-#: include/views/configuration.item.prototype.edit.php:460
-#: include/views/configuration.item.prototype.edit.php:489
+#: include/views/configuration.item.massupdate.php:216
+#: include/views/configuration.item.prototype.edit.php:328
+#: include/views/configuration.item.prototype.edit.php:465
+#: include/views/configuration.item.prototype.edit.php:496
 #: include/views/configuration.item.prototype.massupdate.php:182
-#: include/views/configuration.item.prototype.massupdate.php:210
-#: include/views/general.login.php:74
+#: include/views/configuration.item.prototype.massupdate.php:212
+#: include/views/general.login.php:73
 #: include/views/js/common.item.edit.js.php:217 items.php:221
 msgid "Password"
 msgstr "Συνθηματικό"
 
-#: app/views/administration.user.edit.php:119
+#: app/views/administration.user.edit.php:118
 msgid "Password (once again)"
 msgstr "Συνθηματικό (ξανά)"
 
-#: app/views/administration.user.edit.php:125
+#: app/views/administration.user.edit.php:123
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
 
@@ -13661,11 +13659,11 @@ msgid "Performs a DNS query. Returns character string with the required type of 
 msgstr ""
 
 #: app/views/popup.lldoperation.php:110 app/views/report.services.php:37
-#: include/views/configuration.host.discovery.edit.php:476
-#: include/views/configuration.item.edit.php:587
-#: include/views/configuration.item.massupdate.php:242
-#: include/views/configuration.item.prototype.edit.php:553
-#: include/views/configuration.item.prototype.massupdate.php:240
+#: include/views/configuration.host.discovery.edit.php:487
+#: include/views/configuration.item.edit.php:596
+#: include/views/configuration.item.massupdate.php:246
+#: include/views/configuration.item.prototype.edit.php:562
+#: include/views/configuration.item.prototype.massupdate.php:244
 #: include/views/configuration.maintenance.edit.php:81 report4.php:113
 #: srv_status.php:169
 msgid "Period"
@@ -13683,9 +13681,9 @@ msgid "Periods"
 msgstr "Περίοδοι"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:332
-#: app/views/administration.user.edit.php:352
-#: app/views/administration.user.edit.php:359
+#: app/views/administration.user.edit.php:330
+#: app/views/administration.user.edit.php:350
+#: app/views/administration.user.edit.php:357
 #: app/views/administration.usergroup.edit.php:104
 #: app/views/administration.usergroup.edit.php:155
 #: app/views/administration.usergroup.edit.php:206
@@ -13700,7 +13698,7 @@ msgstr "Περίοδοι"
 msgid "Permissions"
 msgstr "Δικαιώματα"
 
-#: app/views/administration.user.edit.php:357
+#: app/views/administration.user.edit.php:355
 msgid "Permissions can be assigned for user groups only."
 msgstr "Τα δικαιώματα μπορούν να εκχωρηθούν μόνο σε ομάδες χρηστών."
 
@@ -13721,12 +13719,12 @@ msgstr "Αλγόριθμος τοποθέτησης"
 msgid "Plain text"
 msgstr "Απλό κείμενο"
 
-#: app/views/administration.user.edit.php:394
-#: app/views/administration.user.edit.php:426
+#: app/views/administration.user.edit.php:392
+#: app/views/administration.user.edit.php:424
 msgid "Play"
 msgstr "Παίξε"
 
-#: app/views/administration.user.edit.php:374
+#: app/views/administration.user.edit.php:372
 msgid "Play sound"
 msgstr "Παίξε ήχο"
 
@@ -13778,13 +13776,13 @@ msgstr ""
 msgid "Polish (pl_PL)"
 msgstr "Πολωνικά (pl_PL)"
 
-#: include/views/configuration.item.edit.php:826
+#: include/views/configuration.item.edit.php:835
 msgid "Populates host inventory field"
 msgstr "Συμπληρώνει πεδίο απογραφής ξενιστή"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:160
-#: app/partials/popup.operations.php:305
+#: app/partials/popup.operations.php:308
 #: app/views/administration.authentication.edit.php:96
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
@@ -13824,20 +13822,20 @@ msgstr ""
 msgid "Pre-installation summary"
 msgstr ""
 
-#: include/views/configuration.host.discovery.edit.php:747
-#: include/views/configuration.item.edit.php:845
-#: include/views/configuration.item.massupdate.php:504
-#: include/views/configuration.item.prototype.edit.php:710
-#: include/views/configuration.item.prototype.massupdate.php:527
+#: include/views/configuration.host.discovery.edit.php:758
+#: include/views/configuration.item.edit.php:854
+#: include/views/configuration.item.massupdate.php:508
+#: include/views/configuration.item.prototype.edit.php:719
+#: include/views/configuration.item.prototype.massupdate.php:531
 msgid "Preprocessing"
 msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:229
-#: include/views/configuration.host.discovery.edit.php:749
-#: include/views/configuration.item.edit.php:847
-#: include/views/configuration.item.massupdate.php:224
-#: include/views/configuration.item.prototype.edit.php:712
-#: include/views/configuration.item.prototype.massupdate.php:220
+#: include/views/configuration.host.discovery.edit.php:760
+#: include/views/configuration.item.edit.php:856
+#: include/views/configuration.item.massupdate.php:228
+#: include/views/configuration.item.prototype.edit.php:721
+#: include/views/configuration.item.prototype.massupdate.php:224
 msgid "Preprocessing steps"
 msgstr ""
 
@@ -13852,7 +13850,7 @@ msgstr ""
 
 #: app/views/administration.iconmap.edit.php:79
 #: app/views/administration.iconmap.edit.php:111
-#: app/views/js/administration.iconmap.edit.js.php:47
+#: app/views/js/administration.iconmap.edit.js.php:45
 #: include/views/configuration.graph.edit.php:472
 msgid "Preview"
 msgstr "Προεπισκόπηση"
@@ -13906,13 +13904,13 @@ msgstr "Τηλέφωνο Β Πρώτης Επαφής"
 msgid "Primary POC screen name"
 msgstr "Καλλιτεχνικό όνομα Πρώτης Επαφής"
 
-#: app/views/popup.discovery.check.php:116
-#: include/views/js/configuration.host.edit.js.php:124
+#: app/views/popup.discovery.check.php:117
+#: include/views/js/configuration.host.edit.js.php:125
 msgid "Privacy passphrase"
 msgstr "Ιδιωτικό συνθηματικό"
 
-#: app/views/popup.discovery.check.php:109
-#: include/views/js/configuration.host.edit.js.php:117
+#: app/views/popup.discovery.check.php:110
+#: include/views/js/configuration.host.edit.js.php:118
 msgid "Privacy protocol"
 msgstr "Ιδιωτικό πρωτόκολλο"
 
@@ -13923,12 +13921,12 @@ msgstr "Ιδιωτικό πρωτόκολλο"
 msgid "Private"
 msgstr ""
 
-#: app/partials/popup.operations.php:278
-#: include/views/configuration.host.discovery.edit.php:440
-#: include/views/configuration.item.edit.php:514
-#: include/views/configuration.item.massupdate.php:207
-#: include/views/configuration.item.prototype.edit.php:483
-#: include/views/configuration.item.prototype.massupdate.php:203
+#: app/partials/popup.operations.php:279
+#: include/views/configuration.host.discovery.edit.php:449
+#: include/views/configuration.item.edit.php:521
+#: include/views/configuration.item.massupdate.php:209
+#: include/views/configuration.item.prototype.edit.php:490
+#: include/views/configuration.item.prototype.massupdate.php:205
 msgid "Private key file"
 msgstr "Αρχείο ιδιωτικού κλειδιού"
 
@@ -14086,7 +14084,7 @@ msgstr "Διαμεσολαβητές"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/views/administration.proxy.edit.php:87
-#: app/views/administration.proxy.edit.php:122
+#: app/views/administration.proxy.edit.php:123
 #: app/views/popup.condition.common.php:507
 #: app/views/popup.itemtestedit.view.php:108 include/actions.inc.php:63
 #: include/views/configuration.discovery.list.php:67
@@ -14160,20 +14158,20 @@ msgid "Public"
 msgstr ""
 
 #: app/partials/popup.operations.php:246
-#: include/views/configuration.host.discovery.edit.php:418
-#: include/views/configuration.item.edit.php:484
+#: include/views/configuration.host.discovery.edit.php:425
+#: include/views/configuration.item.edit.php:489
 #: include/views/configuration.item.massupdate.php:187
-#: include/views/configuration.item.prototype.edit.php:461
+#: include/views/configuration.item.prototype.edit.php:466
 #: include/views/configuration.item.prototype.massupdate.php:183
 msgid "Public key"
 msgstr "Δημόσιο κλειδί"
 
-#: app/partials/popup.operations.php:268
-#: include/views/configuration.host.discovery.edit.php:433
-#: include/views/configuration.item.edit.php:507
-#: include/views/configuration.item.massupdate.php:200
-#: include/views/configuration.item.prototype.edit.php:476
-#: include/views/configuration.item.prototype.massupdate.php:196
+#: app/partials/popup.operations.php:269
+#: include/views/configuration.host.discovery.edit.php:442
+#: include/views/configuration.item.edit.php:514
+#: include/views/configuration.item.massupdate.php:202
+#: include/views/configuration.item.prototype.edit.php:483
+#: include/views/configuration.item.prototype.massupdate.php:198
 msgid "Public key file"
 msgstr "Αρχείο δημόσιου κλειδιού"
 
@@ -14296,7 +14294,7 @@ msgstr "Παραλήπτης (φθίνουσα)"
 msgid "Recipients"
 msgstr ""
 
-#: app/views/administration.user.edit.php:388
+#: app/views/administration.user.edit.php:386
 #: include/classes/screens/CScreenProblem.php:1083
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14336,7 +14334,7 @@ msgstr ""
 msgid "Rectangle"
 msgstr ""
 
-#: app/views/administration.user.edit.php:203
+#: app/views/administration.user.edit.php:201
 msgid "Refresh"
 msgstr ""
 
@@ -14364,7 +14362,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:210
 #: app/views/popup.lldoverride.php:101 include/items.inc.php:1773
-#: include/views/configuration.host.discovery.edit.php:575
+#: include/views/configuration.host.discovery.edit.php:586
 msgid "Regular expression"
 msgstr "Κανονική έκφραση"
 
@@ -14408,7 +14406,7 @@ msgstr ""
 msgid "Release to create a widget."
 msgstr ""
 
-#: include/views/general.login.php:79
+#: include/views/general.login.php:76
 msgid "Remember me for 30 days"
 msgstr "Υπενθύμιση για 30 ημέρες"
 
@@ -14434,9 +14432,9 @@ msgstr "Απομακρυσμένη εντολή"
 #: app/views/administration.mediatype.edit.php:164
 #: app/views/administration.mediatype.edit.php:183
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:287
+#: app/views/administration.user.edit.php:285
 #: app/views/administration.valuemap.edit.php:65
-#: app/views/js/administration.iconmap.edit.js.php:54
+#: app/views/js/administration.iconmap.edit.js.php:52
 #: app/views/js/administration.macros.edit.js.php:45
 #: app/views/js/administration.mediatype.edit.js.php:33
 #: app/views/js/administration.mediatype.edit.js.php:53
@@ -14462,25 +14460,25 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/configuration.correlation.edit.php:82
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:228
-#: include/views/configuration.host.discovery.edit.php:505
-#: include/views/configuration.host.discovery.edit.php:618
-#: include/views/configuration.host.discovery.edit.php:690
+#: include/views/configuration.host.discovery.edit.php:516
+#: include/views/configuration.host.discovery.edit.php:629
+#: include/views/configuration.host.discovery.edit.php:701
 #: include/views/configuration.host.list.php:73
 #: include/views/configuration.host.massupdate.php:63
-#: include/views/configuration.host.massupdate.php:222
+#: include/views/configuration.host.massupdate.php:226
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.edit.php:267
-#: include/views/configuration.item.edit.php:628
+#: include/views/configuration.item.edit.php:637
 #: include/views/configuration.item.massupdate.php:149
-#: include/views/configuration.item.massupdate.php:274
-#: include/views/configuration.item.massupdate.php:422
+#: include/views/configuration.item.massupdate.php:278
+#: include/views/configuration.item.massupdate.php:426
 #: include/views/configuration.item.prototype.edit.php:154
 #: include/views/configuration.item.prototype.edit.php:248
-#: include/views/configuration.item.prototype.edit.php:582
+#: include/views/configuration.item.prototype.edit.php:591
 #: include/views/configuration.item.prototype.massupdate.php:145
-#: include/views/configuration.item.prototype.massupdate.php:272
-#: include/views/configuration.item.prototype.massupdate.php:407
-#: include/views/configuration.item.prototype.massupdate.php:482
+#: include/views/configuration.item.prototype.massupdate.php:276
+#: include/views/configuration.item.prototype.massupdate.php:411
+#: include/views/configuration.item.prototype.massupdate.php:486
 #: include/views/configuration.maintenance.edit.php:107
 #: include/views/configuration.maintenance.edit.php:166
 #: include/views/configuration.maintenance.edit.php:186
@@ -14598,10 +14596,10 @@ msgstr ""
 #: include/items.inc.php:1777
 #: include/views/configuration.host.massupdate.php:62
 #: include/views/configuration.host.massupdate.php:125
-#: include/views/configuration.host.massupdate.php:221
-#: include/views/configuration.item.massupdate.php:421
-#: include/views/configuration.item.prototype.massupdate.php:406
-#: include/views/configuration.item.prototype.massupdate.php:481
+#: include/views/configuration.host.massupdate.php:225
+#: include/views/configuration.item.massupdate.php:425
+#: include/views/configuration.item.prototype.massupdate.php:410
+#: include/views/configuration.item.prototype.massupdate.php:485
 #: include/views/configuration.template.massupdate.php:56
 #: include/views/configuration.template.massupdate.php:95
 #: include/views/configuration.template.massupdate.php:145
@@ -14651,7 +14649,7 @@ msgid "Request type"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:173
-#: include/views/configuration.httpconf.edit.php:202
+#: include/views/configuration.httpconf.edit.php:209
 msgid "Required"
 msgstr "Απαιτούμενο"
 
@@ -14917,7 +14915,7 @@ msgstr "Ανάπτυξη γραμμής"
 msgid "Rows"
 msgstr "Γραμμές"
 
-#: app/views/administration.user.edit.php:208
+#: app/views/administration.user.edit.php:206
 msgid "Rows per page"
 msgstr "Γραμμές ανά σελίδα"
 
@@ -15032,16 +15030,16 @@ msgstr ""
 #: include/classes/widgets/views/widget.hostavail.form.view.php:45
 #: include/hosts.inc.php:465 include/hosts.inc.php:1408
 #: include/items.inc.php:346
-#: include/views/js/configuration.host.edit.js.php:164
+#: include/views/js/configuration.host.edit.js.php:166
 msgid "SNMP"
 msgstr "SNMP"
 
 #: app/views/popup.discovery.check.php:74 disc_prototypes.php:109
 #: host_discovery.php:100 include/forms.inc.php:274
-#: include/views/configuration.host.discovery.edit.php:400
+#: include/views/configuration.host.discovery.edit.php:407
 #: include/views/configuration.host.discovery.list.php:131
-#: include/views/configuration.item.edit.php:466
-#: include/views/configuration.item.prototype.edit.php:446 items.php:122
+#: include/views/configuration.item.edit.php:471
+#: include/views/configuration.item.prototype.edit.php:451 items.php:122
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -15108,9 +15106,9 @@ msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr ""
 
 #: include/items.inc.php:1740
-#: include/views/configuration.host.discovery.edit.php:459
-#: include/views/configuration.item.edit.php:534
-#: include/views/configuration.item.prototype.edit.php:502
+#: include/views/configuration.host.discovery.edit.php:470
+#: include/views/configuration.item.edit.php:543
+#: include/views/configuration.item.prototype.edit.php:511
 msgid "SQL query"
 msgstr "Ερώτημα SQL"
 
@@ -15133,40 +15131,40 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "Αντιπρόσωπος SSH"
 
-#: include/views/configuration.host.discovery.edit.php:323
-#: include/views/configuration.httpconf.edit.php:179
-#: include/views/configuration.item.edit.php:368
-#: include/views/configuration.item.prototype.edit.php:349
+#: include/views/configuration.host.discovery.edit.php:328
+#: include/views/configuration.httpconf.edit.php:185
+#: include/views/configuration.item.edit.php:371
+#: include/views/configuration.item.prototype.edit.php:352
 msgid "SSL certificate file"
 msgstr "SSL αρχείο πιστοποιητικού"
 
-#: include/views/configuration.host.discovery.edit.php:331
-#: include/views/configuration.httpconf.edit.php:182
-#: include/views/configuration.item.edit.php:375
-#: include/views/configuration.item.prototype.edit.php:356
+#: include/views/configuration.host.discovery.edit.php:336
+#: include/views/configuration.httpconf.edit.php:188
+#: include/views/configuration.item.edit.php:378
+#: include/views/configuration.item.prototype.edit.php:359
 msgid "SSL key file"
 msgstr "SSL αρχείο κλειδιού"
 
-#: include/views/configuration.host.discovery.edit.php:338
-#: include/views/configuration.httpconf.edit.php:185
-#: include/views/configuration.item.edit.php:382
-#: include/views/configuration.item.prototype.edit.php:363
+#: include/views/configuration.host.discovery.edit.php:343
+#: include/views/configuration.httpconf.edit.php:191
+#: include/views/configuration.item.edit.php:385
+#: include/views/configuration.item.prototype.edit.php:366
 msgid "SSL key password"
 msgstr "SSL συνθηματικό κλειδιού"
 
 #: app/views/administration.mediatype.edit.php:82
-#: include/views/configuration.host.discovery.edit.php:315
-#: include/views/configuration.httpconf.edit.php:176
-#: include/views/configuration.item.edit.php:360
-#: include/views/configuration.item.prototype.edit.php:341
+#: include/views/configuration.host.discovery.edit.php:320
+#: include/views/configuration.httpconf.edit.php:182
+#: include/views/configuration.item.edit.php:363
+#: include/views/configuration.item.prototype.edit.php:344
 msgid "SSL verify host"
 msgstr "SSL επαλήθευση ξενιστή"
 
 #: app/views/administration.mediatype.edit.php:81
-#: include/views/configuration.host.discovery.edit.php:307
-#: include/views/configuration.httpconf.edit.php:173
-#: include/views/configuration.item.edit.php:352
-#: include/views/configuration.item.prototype.edit.php:333
+#: include/views/configuration.host.discovery.edit.php:312
+#: include/views/configuration.httpconf.edit.php:179
+#: include/views/configuration.item.edit.php:355
+#: include/views/configuration.item.prototype.edit.php:336
 msgid "SSL verify peer"
 msgstr "SSL επαλήθευση ομότιμου"
 
@@ -15211,7 +15209,7 @@ msgstr ""
 msgid "Scan directory"
 msgstr ""
 
-#: include/views/configuration.httpconf.edit.php:232
+#: include/views/configuration.httpconf.edit.php:239
 msgid "Scenario"
 msgstr "Σενάριο"
 
@@ -15224,12 +15222,12 @@ msgid "Scheduled check"
 msgstr "Προγραμματισμένος έλεγχος"
 
 #: app/views/popup.lldoperation.php:119
-#: include/views/configuration.host.discovery.edit.php:482
-#: include/views/configuration.item.edit.php:595
-#: include/views/configuration.item.edit.php:602
-#: include/views/configuration.item.massupdate.php:251
-#: include/views/configuration.item.prototype.edit.php:559
-#: include/views/configuration.item.prototype.massupdate.php:249
+#: include/views/configuration.host.discovery.edit.php:493
+#: include/views/configuration.item.edit.php:604
+#: include/views/configuration.item.edit.php:611
+#: include/views/configuration.item.massupdate.php:255
+#: include/views/configuration.item.prototype.edit.php:568
+#: include/views/configuration.item.prototype.massupdate.php:253
 #: include/views/js/common.item.edit.js.php:36
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:125
 #: include/views/js/configuration.item.massupdate.js.php:39
@@ -15473,8 +15471,8 @@ msgstr "Όνομα ασφάλειας"
 #: include/views/configuration.graph.edit.php:276
 #: include/views/configuration.item.edit.php:99
 #: include/views/configuration.item.prototype.edit.php:81
-#: include/views/configuration.item.prototype.edit.php:382
-#: include/views/configuration.item.prototype.massupdate.php:443
+#: include/views/configuration.item.prototype.edit.php:387
+#: include/views/configuration.item.prototype.massupdate.php:447
 #: include/views/configuration.services.edit.php:94
 #: include/views/js/monitoring.sysmaps.js.php:213
 #: include/views/js/monitoring.sysmaps.js.php:232
@@ -15489,8 +15487,8 @@ msgstr "Επιλέξτε"
 #: app/views/popup.triggerexpr.php:80
 #: include/views/configuration.graph.edit.php:215
 #: include/views/configuration.graph.edit.php:297
-#: include/views/configuration.item.prototype.edit.php:400
-#: include/views/configuration.item.prototype.massupdate.php:459
+#: include/views/configuration.item.prototype.edit.php:405
+#: include/views/configuration.item.prototype.massupdate.php:463
 msgid "Select prototype"
 msgstr "Επιλέξτε πρωτότυπο"
 
@@ -15555,7 +15553,7 @@ msgstr "Αποστολή μηνύματος σε χρήστες"
 msgid "Send only to"
 msgstr "Αποστολή μόνο σε"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:68
+#: app/views/administration.user.edit.php:224 app/views/popup.media.php:68
 #: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "Αποστολή σε"
@@ -15714,9 +15712,9 @@ msgstr "Υπηρεσίες"
 msgid "Services form a circular dependency."
 msgstr "Υπηρεσίες από κυκλική εξάρτηση."
 
-#: include/classes/api/services/CUser.php:1331
-#: include/classes/api/services/CUser.php:1344
-#: include/classes/api/services/CUser.php:1370
+#: include/classes/api/services/CUser.php:1333
+#: include/classes/api/services/CUser.php:1346
+#: include/classes/api/services/CUser.php:1372
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας. Επανασυνδεθείτε."
 
@@ -15734,7 +15732,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
-#: include/classes/html/CInputSecret.php:81 jsLoader.php:355
+#: include/classes/html/CInputSecret.php:79 jsLoader.php:355
 msgid "Set new value"
 msgstr ""
 
@@ -15743,15 +15741,15 @@ msgstr ""
 msgid "Set value to"
 msgstr ""
 
-#: include/classes/validators/CLdapAuthValidator.php:77
+#: include/classes/validators/CLdapAuthValidator.php:83
 msgid "Setting LDAP dereferencing mode failed."
 msgstr ""
 
-#: include/classes/validators/CLdapAuthValidator.php:74
+#: include/classes/validators/CLdapAuthValidator.php:80
 msgid "Setting LDAP protocol failed."
 msgstr ""
 
-#: include/classes/validators/CLdapAuthValidator.php:76
+#: include/classes/validators/CLdapAuthValidator.php:82
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr ""
 
@@ -15916,7 +15914,7 @@ msgid "Show sidebar"
 msgstr ""
 
 #: app/partials/common.filter.trigger.php:168
-#: app/views/administration.user.edit.php:444
+#: app/views/administration.user.edit.php:442
 #: app/views/monitoring.host.view.php:152
 #: app/views/monitoring.problem.view.php:312
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
@@ -15959,10 +15957,10 @@ msgstr ""
 msgid "Show unavailable maps"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:752
-#: include/views/configuration.item.massupdate.php:367
-#: include/views/configuration.item.prototype.edit.php:647
-#: include/views/configuration.item.prototype.massupdate.php:377
+#: include/views/configuration.item.edit.php:761
+#: include/views/configuration.item.massupdate.php:371
+#: include/views/configuration.item.prototype.edit.php:656
+#: include/views/configuration.item.prototype.massupdate.php:381
 msgid "Show value"
 msgstr "Εμφάνιση τιμής"
 
@@ -15986,7 +15984,7 @@ msgstr ""
 msgid "Sign"
 msgstr ""
 
-#: include/views/general.login.php:64 include/views/general.login.php:82
+#: include/views/general.login.php:64 include/views/general.login.php:79
 msgid "Sign in"
 msgstr "Υπογράφω"
 
@@ -16250,7 +16248,7 @@ msgstr "Τυπικοί συλλέκτες"
 msgid "Start in"
 msgstr "Έναρξη σε"
 
-#: include/classes/validators/CLdapAuthValidator.php:75
+#: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
 msgstr ""
 
@@ -16316,7 +16314,7 @@ msgstr ""
 #: include/views/configuration.httpconf.list.php:120
 #: include/views/configuration.item.list.php:74
 #: include/views/configuration.item.list.php:144
-#: include/views/configuration.item.massupdate.php:345
+#: include/views/configuration.item.massupdate.php:349
 #: include/views/configuration.triggers.list.php:75
 #: include/views/configuration.triggers.list.php:202 srv_status.php:145
 msgid "Status"
@@ -16338,7 +16336,7 @@ msgstr "Υπολογισμός κατάστασης"
 msgid "Status calculation algorithm"
 msgstr "Αλγόριθμος υπολογισμού κατάστασης"
 
-#: include/views/configuration.httpconf.edit.php:203
+#: include/views/configuration.httpconf.edit.php:210
 msgid "Status codes"
 msgstr "Κωδικοί κατάστασης"
 
@@ -16393,30 +16391,30 @@ msgstr "Βήμα ονόματος \"%1$s\" υπάρχει ήδη."
 
 #: app/partials/popup.operations.php:49 httpconf.php:52
 #: include/views/configuration.action.edit.php:170
-#: include/views/configuration.httpconf.edit.php:224
-#: include/views/configuration.httpconf.edit.php:233
+#: include/views/configuration.httpconf.edit.php:231
+#: include/views/configuration.httpconf.edit.php:240
 msgid "Steps"
 msgstr "Βήματα"
 
-#: app/views/administration.user.edit.php:399
-#: app/views/administration.user.edit.php:431
+#: app/views/administration.user.edit.php:397
+#: app/views/administration.user.edit.php:429
 msgid "Stop"
 msgstr "Σταματώ"
 
 #: app/views/popup.lldoverride.php:57
-#: include/views/configuration.host.discovery.edit.php:724
+#: include/views/configuration.host.discovery.edit.php:735
 msgid "Stop processing"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:185 app/views/popup.lldoperation.php:206
-#: include/views/configuration.item.edit.php:673
-#: include/views/configuration.item.edit.php:710
-#: include/views/configuration.item.massupdate.php:308
-#: include/views/configuration.item.massupdate.php:326
-#: include/views/configuration.item.prototype.edit.php:604
-#: include/views/configuration.item.prototype.edit.php:616
-#: include/views/configuration.item.prototype.massupdate.php:306
-#: include/views/configuration.item.prototype.massupdate.php:324
+#: include/views/configuration.item.edit.php:682
+#: include/views/configuration.item.edit.php:719
+#: include/views/configuration.item.massupdate.php:312
+#: include/views/configuration.item.massupdate.php:330
+#: include/views/configuration.item.prototype.edit.php:613
+#: include/views/configuration.item.prototype.edit.php:625
+#: include/views/configuration.item.prototype.massupdate.php:310
+#: include/views/configuration.item.prototype.massupdate.php:328
 msgid "Storage period"
 msgstr ""
 
@@ -16452,9 +16450,9 @@ msgstr ""
 msgid "Subject"
 msgstr "Θέμα"
 
-#: app/views/administration.proxy.edit.php:118
-#: include/views/configuration.host.edit.php:742
-#: include/views/configuration.host.massupdate.php:288
+#: app/views/administration.proxy.edit.php:119
+#: include/views/configuration.host.edit.php:745
+#: include/views/configuration.host.massupdate.php:293
 #: include/views/configuration.host.prototype.edit.php:370
 msgctxt "encryption certificate"
 msgid "Subject"
@@ -16485,7 +16483,7 @@ msgstr "Κυρ"
 msgid "Sunday"
 msgstr "Κυριακή"
 
-#: include/menu.inc.php:197 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:93
 msgid "Support"
 msgstr "Υποστήριξη"
 
@@ -16529,7 +16527,7 @@ msgstr "Εναλλαγή μεθόδου ταυτοποίησης, θα επαν�
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr ""
 
-#: app/views/administration.user.edit.php:181 include/users.inc.php:83
+#: app/views/administration.user.edit.php:179 include/users.inc.php:83
 msgid "System default"
 msgstr "Προκαθορισμένο σύστημα"
 
@@ -16659,11 +16657,11 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:382
 #: include/events.inc.php:234 include/events.inc.php:459
-#: include/views/configuration.host.edit.php:612
+#: include/views/configuration.host.edit.php:614
 #: include/views/configuration.host.list.php:170
 #: include/views/configuration.host.list.php:198
-#: include/views/configuration.host.massupdate.php:216
-#: include/views/configuration.host.massupdate.php:307
+#: include/views/configuration.host.massupdate.php:220
+#: include/views/configuration.host.massupdate.php:312
 #: include/views/configuration.maintenance.edit.php:240
 #: include/views/configuration.template.edit.php:417
 #: include/views/configuration.template.list.php:118
@@ -16801,7 +16799,7 @@ msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
 
 #: app/controllers/CControllerPopupGeneric.php:128
-#: app/partials/popup.operations.php:348
+#: app/partials/popup.operations.php:351
 #: app/views/popup.condition.common.php:344 app/views/search.php:164
 #: app/views/search.php:185 app/views/search.php:189 app/views/search.php:190
 #: app/views/search.php:306 include/menu.inc.php:103
@@ -16811,7 +16809,7 @@ msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%1$s\" υπά
 #: include/views/configuration.hostgroups.list.php:150
 #: include/views/configuration.host.list.php:116
 #: include/views/configuration.host.list.php:193
-#: include/views/configuration.host.massupdate.php:305
+#: include/views/configuration.host.massupdate.php:310
 #: include/views/configuration.host.prototype.edit.php:276
 #: include/views/configuration.host.prototype.list.php:58
 #: include/views/configuration.template.edit.php:28
@@ -16838,12 +16836,12 @@ msgstr ""
 #: app/views/popup.itemtestedit.view.php:313
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1421
-#: include/views/configuration.host.discovery.edit.php:773
 #: include/views/configuration.host.discovery.edit.php:784
-#: include/views/configuration.item.edit.php:868
-#: include/views/configuration.item.edit.php:889
-#: include/views/configuration.item.prototype.edit.php:726
-#: include/views/configuration.item.prototype.edit.php:737
+#: include/views/configuration.host.discovery.edit.php:795
+#: include/views/configuration.item.edit.php:877
+#: include/views/configuration.item.edit.php:898
+#: include/views/configuration.item.prototype.edit.php:735
+#: include/views/configuration.item.prototype.edit.php:746
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:448
 #: include/views/configuration.triggers.edit.php:274
@@ -16900,9 +16898,9 @@ msgstr ""
 #: include/items.inc.php:131 include/items.inc.php:1772
 #: include/items.inc.php:1776 include/items.inc.php:1780
 #: include/items.inc.php:1784 include/items.inc.php:1788
-#: include/views/configuration.item.edit.php:567
+#: include/views/configuration.item.edit.php:576
 #: include/views/configuration.item.massupdate.php:170
-#: include/views/configuration.item.prototype.edit.php:533
+#: include/views/configuration.item.prototype.edit.php:542
 #: include/views/configuration.item.prototype.massupdate.php:166
 #: include/views/js/monitoring.sysmaps.js.php:329
 #: include/views/js/monitoring.sysmaps.js.php:483
@@ -17031,7 +17029,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Η κατηγορία σενάριο ιστού ανήκει σε διαφορετικό ξενιστή από τον ξενιστή σενάριο ιστού."
 
-#: app/views/administration.user.edit.php:180
+#: app/views/administration.user.edit.php:178
 msgid "Theme"
 msgstr "Θέμα"
 
@@ -17039,7 +17037,7 @@ msgstr "Θέμα"
 msgid "This day last week"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:677
+#: include/views/configuration.host.edit.php:679
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr ""
@@ -17179,7 +17177,7 @@ msgstr "Ζώνη ώρας PHP μή ορισμένη (παράμετρος ρύθ
 #: app/views/popup.httpstep.php:165 disc_prototypes.php:164
 #: host_discovery.php:120
 #: include/views/configuration.host.discovery.edit.php:163
-#: include/views/configuration.httpconf.edit.php:200
+#: include/views/configuration.httpconf.edit.php:207
 #: include/views/configuration.item.edit.php:202
 #: include/views/configuration.item.prototype.edit.php:183 items.php:158
 msgid "Timeout"
@@ -17305,10 +17303,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:227
 #: app/views/popup.lldoperation.php:200 disc_prototypes.php:156
-#: include/views/configuration.item.edit.php:706
-#: include/views/configuration.item.massupdate.php:321
-#: include/views/configuration.item.prototype.edit.php:612
-#: include/views/configuration.item.prototype.massupdate.php:319 items.php:82
+#: include/views/configuration.item.edit.php:715
+#: include/views/configuration.item.massupdate.php:325
+#: include/views/configuration.item.prototype.edit.php:621
+#: include/views/configuration.item.prototype.massupdate.php:323 items.php:82
 msgid "Trend storage period"
 msgstr "Περίοδος αποθήκευσης τάσεων"
 
@@ -17528,7 +17526,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr "Βαρύτητες εναυσμάτων"
 
-#: app/views/administration.user.edit.php:443 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:441 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "Σοβαρότητα εναύσματος"
 
@@ -17615,7 +17613,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:74
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:226
+#: app/views/administration.user.edit.php:224
 #: app/views/dashboard.sharing.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -17634,21 +17632,21 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:346
 #: include/views/configuration.host.discovery.edit.php:58
 #: include/views/configuration.host.discovery.edit.php:63
-#: include/views/configuration.host.discovery.edit.php:476
+#: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:179
 #: include/views/configuration.item.edit.php:81
 #: include/views/configuration.item.edit.php:86
-#: include/views/configuration.item.edit.php:587
+#: include/views/configuration.item.edit.php:596
 #: include/views/configuration.item.list.php:72
 #: include/views/configuration.item.massupdate.php:45
-#: include/views/configuration.item.massupdate.php:240
+#: include/views/configuration.item.massupdate.php:244
 #: include/views/configuration.item.prototype.edit.php:63
 #: include/views/configuration.item.prototype.edit.php:68
-#: include/views/configuration.item.prototype.edit.php:553
+#: include/views/configuration.item.prototype.edit.php:562
 #: include/views/configuration.item.prototype.list.php:61
 #: include/views/configuration.item.prototype.massupdate.php:41
-#: include/views/configuration.item.prototype.massupdate.php:238
+#: include/views/configuration.item.prototype.massupdate.php:242
 #: include/views/configuration.maintenance.list.php:83
 #: include/views/configuration.services.edit.php:174
 #: include/views/inventory.host.list.php:81
@@ -17678,20 +17676,20 @@ msgstr "Τύπος (αύξουσα)"
 msgid "Type (descending)"
 msgstr "Τύπος (φθίνουσα)"
 
-#: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:79
+#: app/partials/popup.operations.php:382 app/views/popup.lldoverride.php:79
 #: include/views/configuration.action.edit.php:123
 #: include/views/configuration.correlation.edit.php:105
-#: include/views/configuration.host.discovery.edit.php:552
+#: include/views/configuration.host.discovery.edit.php:563
 msgid "Type of calculation"
 msgstr "Τύπος υπολογισμού"
 
 #: app/controllers/CControllerPopupGeneric.php:265
 #: app/controllers/CControllerPopupGeneric.php:328 include/forms.inc.php:179
-#: include/forms.inc.php:659 include/views/configuration.item.edit.php:555
-#: include/views/configuration.item.edit.php:561
+#: include/forms.inc.php:659 include/views/configuration.item.edit.php:564
+#: include/views/configuration.item.edit.php:570
 #: include/views/configuration.item.massupdate.php:163
-#: include/views/configuration.item.prototype.edit.php:521
-#: include/views/configuration.item.prototype.edit.php:527
+#: include/views/configuration.item.prototype.edit.php:530
+#: include/views/configuration.item.prototype.edit.php:536
 #: include/views/configuration.item.prototype.massupdate.php:159
 msgid "Type of information"
 msgstr "Τύπος πληροφοριών"
@@ -17715,7 +17713,7 @@ msgstr "ΑΓΝΩΣΤΟ"
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
 #: include/screens.inc.php:43
 #: include/views/configuration.host.discovery.edit.php:78
-#: include/views/configuration.httpconf.edit.php:201
+#: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.item.edit.php:117
 #: include/views/configuration.item.massupdate.php:84
 #: include/views/configuration.item.prototype.edit.php:99
@@ -17728,7 +17726,7 @@ msgstr "ΑΓΝΩΣΤΟ"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:213
+#: app/views/administration.user.edit.php:211
 msgid "URL (after login)"
 msgstr "URL (μετά την σύνδεση)"
 
@@ -17838,9 +17836,9 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:231
-#: include/views/configuration.item.edit.php:573
+#: include/views/configuration.item.edit.php:582
 #: include/views/configuration.item.massupdate.php:176
-#: include/views/configuration.item.prototype.edit.php:539
+#: include/views/configuration.item.prototype.edit.php:548
 #: include/views/configuration.item.prototype.massupdate.php:172
 msgid "Units"
 msgstr "Μονάδες"
@@ -18038,19 +18036,19 @@ msgstr "Ανοικτά"
 #: app/views/administration.mediatype.edit.php:355
 #: app/views/administration.miscconfig.edit.php:75
 #: app/views/administration.module.edit.php:59
-#: app/views/administration.proxy.edit.php:139
+#: app/views/administration.proxy.edit.php:140
 #: app/views/administration.regex.edit.php:141
 #: app/views/administration.script.edit.php:140
 #: app/views/administration.trigdisplay.edit.php:108
 #: app/views/administration.trigseverity.edit.php:97
-#: app/views/administration.user.edit.php:462
-#: app/views/administration.user.edit.php:485
+#: app/views/administration.user.edit.php:460
+#: app/views/administration.user.edit.php:483
 #: app/views/administration.usergroup.edit.php:219
 #: app/views/administration.valuemap.edit.php:110
 #: app/views/administration.workingtime.edit.php:40
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
-#: app/views/popup.discovery.check.php:135 app/views/popup.httpstep.php:181
+#: app/views/popup.discovery.check.php:137 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:200
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
@@ -18059,16 +18057,16 @@ msgstr "Ανοικτά"
 #: include/views/configuration.correlation.edit.php:164
 #: include/views/configuration.discovery.edit.php:139
 #: include/views/configuration.graph.edit.php:476
-#: include/views/configuration.host.discovery.edit.php:779
-#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.discovery.edit.php:790
+#: include/views/configuration.host.edit.php:758
 #: include/views/configuration.hostgroups.edit.php:61
-#: include/views/configuration.host.massupdate.php:325
+#: include/views/configuration.host.massupdate.php:330
 #: include/views/configuration.host.prototype.edit.php:389
-#: include/views/configuration.httpconf.edit.php:257
-#: include/views/configuration.item.edit.php:884
-#: include/views/configuration.item.massupdate.php:506
-#: include/views/configuration.item.prototype.edit.php:724
-#: include/views/configuration.item.prototype.massupdate.php:530
+#: include/views/configuration.httpconf.edit.php:264
+#: include/views/configuration.item.edit.php:893
+#: include/views/configuration.item.massupdate.php:510
+#: include/views/configuration.item.prototype.edit.php:733
+#: include/views/configuration.item.prototype.massupdate.php:534
 #: include/views/configuration.maintenance.edit.php:258
 #: include/views/configuration.services.edit.php:359
 #: include/views/configuration.template.edit.php:441
@@ -18094,13 +18092,13 @@ msgstr "Ενημέρωση υφιστάμενων"
 #: app/views/popup.lldoperation.php:171 discoveryconf.php:40
 #: disc_prototypes.php:60 host_discovery.php:60 host_discovery.php:219
 #: include/forms.inc.php:227 include/views/configuration.discovery.edit.php:63
-#: include/views/configuration.host.discovery.edit.php:466
+#: include/views/configuration.host.discovery.edit.php:477
 #: include/views/configuration.host.discovery.list.php:124
 #: include/views/configuration.httpconf.edit.php:83
-#: include/views/configuration.item.edit.php:577
-#: include/views/configuration.item.massupdate.php:296
-#: include/views/configuration.item.prototype.edit.php:543
-#: include/views/configuration.item.prototype.massupdate.php:294 items.php:59
+#: include/views/configuration.item.edit.php:586
+#: include/views/configuration.item.massupdate.php:300
+#: include/views/configuration.item.prototype.edit.php:552
+#: include/views/configuration.item.prototype.massupdate.php:298 items.php:59
 #: items.php:260
 msgid "Update interval"
 msgstr "Διάστημα ενημέρωσης"
@@ -18156,7 +18154,7 @@ msgstr "Χρόνος διαθεσιμότητας υπηρεσίας εξυπη�
 msgid "Uptime/Downtime"
 msgstr "Χρόνος διαθεσιμότητας/Μη Διαθεσιμότητας"
 
-#: include/views/js/configuration.host.edit.js.php:129
+#: include/views/js/configuration.host.edit.js.php:131
 msgid "Use bulk requests"
 msgstr "Χρήση ομαδικών αιτήσεων"
 
@@ -18164,7 +18162,7 @@ msgstr "Χρήση ομαδικών αιτήσεων"
 msgid "Use custom event status colours"
 msgstr ""
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:84
+#: app/views/administration.user.edit.php:224 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "Χρήση σε σοβαρότητα"
 
@@ -18178,11 +18176,11 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:185
 #: app/partials/popup.operations.php:103
-#: app/views/administration.user.edit.php:217
+#: app/views/administration.user.edit.php:215
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
 #: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:259
-#: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
+#: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:169
 msgid "User"
 msgstr "Χρήστης"
 
@@ -18228,7 +18226,7 @@ msgstr "Χρήστης προστέθηκε"
 msgid "User agent string"
 msgstr ""
 
-#: app/views/administration.user.edit.php:323
+#: app/views/administration.user.edit.php:321
 msgid "User can't change type for himself"
 msgstr "Ο χρήστης δεν μπορεί να αλλάξει τον τύπο για τον εαυτό του"
 
@@ -18347,13 +18345,13 @@ msgstr ""
 
 #: app/partials/popup.operations.php:258 disc_prototypes.php:85
 #: host_discovery.php:77
-#: include/views/configuration.host.discovery.edit.php:291
-#: include/views/configuration.host.discovery.edit.php:428
-#: include/views/configuration.item.edit.php:338
-#: include/views/configuration.item.edit.php:502
+#: include/views/configuration.host.discovery.edit.php:292
+#: include/views/configuration.host.discovery.edit.php:435
+#: include/views/configuration.item.edit.php:339
+#: include/views/configuration.item.edit.php:507
 #: include/views/configuration.item.massupdate.php:193
-#: include/views/configuration.item.prototype.edit.php:319
-#: include/views/configuration.item.prototype.edit.php:471
+#: include/views/configuration.item.prototype.edit.php:320
+#: include/views/configuration.item.prototype.edit.php:476
 #: include/views/configuration.item.prototype.massupdate.php:189 items.php:95
 msgid "User name"
 msgstr "Όνομα χρήστη"
@@ -18392,8 +18390,8 @@ msgstr ""
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
 
-#: app/views/administration.user.edit.php:322
-#: app/views/administration.user.edit.php:327
+#: app/views/administration.user.edit.php:320
+#: app/views/administration.user.edit.php:325
 #: app/views/administration.user.list.php:65
 #: app/views/administration.user.list.php:94
 msgid "User type"
@@ -18712,9 +18710,9 @@ msgstr ""
 #: include/classes/screens/CScreenPlainText.php:53
 #: include/views/configuration.host.discovery.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:207
-#: include/views/configuration.host.massupdate.php:226
-#: include/views/configuration.httpconf.edit.php:123
-#: include/views/configuration.httpconf.edit.php:141
+#: include/views/configuration.host.massupdate.php:230
+#: include/views/configuration.httpconf.edit.php:125
+#: include/views/configuration.httpconf.edit.php:143
 #: include/views/configuration.item.edit.php:152
 #: include/views/configuration.item.edit.php:246
 #: include/views/configuration.item.massupdate.php:132
@@ -18838,7 +18836,7 @@ msgid "Values without names are not allowed in form fields."
 msgstr ""
 
 #: app/views/popup.httpstep.php:114
-#: include/views/configuration.httpconf.edit.php:118
+#: include/views/configuration.httpconf.edit.php:120
 msgid "Variables"
 msgstr "Μεταβλητές"
 
@@ -19045,7 +19043,7 @@ msgstr ""
 msgid "Welcome to"
 msgstr ""
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:79
+#: app/views/administration.user.edit.php:224 app/views/popup.media.php:79
 msgid "When active"
 msgstr "Όταν είναι ενεργά"
 
@@ -19333,7 +19331,7 @@ msgstr "Ετησίως"
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.prototype.list.php:107
 #: include/views/configuration.item.prototype.list.php:154
-#: include/views/configuration.item.prototype.massupdate.php:354
+#: include/views/configuration.item.prototype.massupdate.php:358
 #: include/views/configuration.trigger.prototype.list.php:120
 #: include/views/configuration.trigger.prototype.list.php:135
 #: include/views/configuration.trigger.prototype.massupdate.php:67
@@ -19354,7 +19352,7 @@ msgstr ""
 msgid "You are logged in as \"%1$s\"."
 msgstr ""
 
-#: app/views/administration.user.edit.php:167
+#: app/views/administration.user.edit.php:165
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Δεν μπορείται να επιλέξετε κάποια από τις γλώσσες, επειδή οι τοπικές ρυθμίσεις για αυτές δεν είναι εγκατεστημένες στον εξυπηρετητή ιστού."
 
@@ -19807,7 +19805,7 @@ msgid "cannot be changed"
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:135
-#: app/controllers/CControllerAuthenticationUpdate.php:201
+#: app/controllers/CControllerAuthenticationUpdate.php:202
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:154
@@ -20075,7 +20073,7 @@ msgstr ""
 
 #: app/views/popup.lldoperation.php:63 app/views/popup.lldoverride.php:145
 #: include/actions.inc.php:35
-#: include/views/configuration.host.discovery.edit.php:592
+#: include/views/configuration.host.discovery.edit.php:603
 #: include/views/js/configuration.host.discovery.edit.js.php:58
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:79
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:166
@@ -20126,10 +20124,10 @@ msgstr ""
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:653
-#: include/views/configuration.item.edit.php:658
-#: include/views/configuration.item.edit.php:689
-#: include/views/configuration.item.edit.php:694
+#: include/views/configuration.item.edit.php:662
+#: include/views/configuration.item.edit.php:667
+#: include/views/configuration.item.edit.php:698
+#: include/views/configuration.item.edit.php:703
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "καθολικές ρυθμίσεις τακτοποίησης"
@@ -20193,7 +20191,7 @@ msgid "in"
 msgstr "εν"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:342
+#: app/views/administration.user.edit.php:340
 msgid "including subgroups"
 msgstr ""
 
@@ -20375,7 +20373,7 @@ msgstr "χάρτης"
 
 #: app/views/popup.lldoperation.php:62 app/views/popup.lldoverride.php:144
 #: include/actions.inc.php:34
-#: include/views/configuration.host.discovery.edit.php:591
+#: include/views/configuration.host.discovery.edit.php:602
 #: include/views/js/configuration.host.discovery.edit.js.php:57
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:78
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:165
@@ -20480,7 +20478,7 @@ msgid "new"
 msgstr "νέο"
 
 #: disc_prototypes.php:1302 disc_prototypes.php:1326 hosts.php:1374
-#: include/views/configuration.item.massupdate.php:401 templates.php:957
+#: include/views/configuration.item.massupdate.php:405 templates.php:957
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "νέο"
@@ -20524,7 +20522,7 @@ msgstr ""
 msgid "of"
 msgstr "απο"
 
-#: app/views/administration.user.edit.php:261
+#: app/views/administration.user.edit.php:259
 #: include/classes/setup/CFrontendSetup.php:256
 #: include/classes/setup/CFrontendSetup.php:309
 #: include/classes/setup/CFrontendSetup.php:326
@@ -20547,7 +20545,7 @@ msgstr "απο"
 msgid "off"
 msgstr "εκτός"
 
-#: app/views/administration.user.edit.php:261
+#: app/views/administration.user.edit.php:259
 #: include/classes/setup/CFrontendSetup.php:309
 #: include/classes/setup/CFrontendSetup.php:326
 #: include/classes/setup/CFrontendSetup.php:347
@@ -20613,7 +20611,7 @@ msgid "regexp() - Regular expression V matching last value in period T (1 - matc
 msgstr ""
 
 #: app/views/popup.lldoverride.php:133
-#: include/views/configuration.host.discovery.edit.php:614
+#: include/views/configuration.host.discovery.edit.php:625
 #: include/views/js/configuration.host.discovery.edit.js.php:62
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:83
 msgid "regular expression"
@@ -20709,10 +20707,10 @@ msgstr ""
 msgid "show icon mappings"
 msgstr "εμφάνιση αντιστοιχίσεων εικονίδιου"
 
-#: include/views/configuration.item.edit.php:744
-#: include/views/configuration.item.massupdate.php:370
-#: include/views/configuration.item.prototype.edit.php:648
-#: include/views/configuration.item.prototype.massupdate.php:380
+#: include/views/configuration.item.edit.php:753
+#: include/views/configuration.item.massupdate.php:374
+#: include/views/configuration.item.prototype.edit.php:657
+#: include/views/configuration.item.prototype.massupdate.php:384
 msgid "show value mappings"
 msgstr "εμφάνιση αντιστοιχίσεων τιμών"
 
@@ -20732,7 +20730,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1569
+#: include/classes/api/services/CUser.php:1573
 msgid "supplied credentials are not unique"
 msgstr ""
 
@@ -20840,7 +20838,7 @@ msgstr ""
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
-#: app/partials/layout.htmlpage.aside.php:77
+#: app/partials/layout.htmlpage.aside.php:76
 #: include/classes/html/CMultiSelect.php:84 jsLoader.php:261
 msgid "type here to search"
 msgstr "Πληκτρολογήστε για αναζήτηση"
