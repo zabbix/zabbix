@@ -933,37 +933,37 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @return array
 	 */
 	private function getOptimalDateTimeIntervalSpec(int $prefered_sub_interval): array {
-		// Possible X-axis main and sub-intervals in seconds.
+		// Possible X-axis main and sub-intervals in seconds or period spec.
 		$intervals = [
 			SEC_PER_MIN => [1, 5, 10, 30],
 			SEC_PER_HOUR => [SEC_PER_MIN, SEC_PER_MIN * 2, SEC_PER_MIN * 5, SEC_PER_MIN * 15, SEC_PER_MIN * 30],
-			SEC_PER_DAY => [SEC_PER_HOUR, SEC_PER_HOUR * 3, SEC_PER_HOUR * 6, SEC_PER_HOUR * 12],
-			SEC_PER_WEEK => [SEC_PER_DAY],
-			SEC_PER_MONTH => [SEC_PER_DAY * 3, SEC_PER_WEEK, SEC_PER_WEEK * 2],
-			SEC_PER_YEAR => [SEC_PER_MONTH, SEC_PER_MONTH * 3, SEC_PER_MONTH * 4, SEC_PER_MONTH * 6],
-			SEC_PER_YEAR * 10 => [SEC_PER_YEAR, SEC_PER_YEAR * 5]
+			'P1D' => [SEC_PER_HOUR, SEC_PER_HOUR * 3, SEC_PER_HOUR * 6, SEC_PER_HOUR * 12],
+			'P1W' => ['P1D'],
+			'P1M' => ['P3D', 'P1W', 'P2W'],
+			'P1Y' => ['P1M', 'P3M', 'P4M', 'P6M'],
+			'P10Y' => ['P1Y', 'P5Y']
 		];
 
 		// Starting date and time aligners.
 		$aligners = [
 			SEC_PER_MIN => ['trim' => 'Y-m-d H:i:00', 'convert' => null],
 			SEC_PER_HOUR => ['trim' => 'Y-m-d H:00:00', 'convert' => null],
-			SEC_PER_DAY => ['trim' => 'Y-m-d 00:00:00', 'convert' => null],
-			SEC_PER_WEEK => ['trim' => 'Y-m-d 00:00:00', 'convert' => 'this week 00:00:00'],
-			SEC_PER_MONTH => ['trim' => 'Y-m-01 00:00:00', 'convert' => null],
-			SEC_PER_YEAR => ['trim' => 'Y-01-01 00:00:00', 'convert' => null],
-			SEC_PER_YEAR * 10 => ['trim' => '1970-01-01 00:00:00', 'convert' => null]
+			'P1D' => ['trim' => 'Y-m-d 00:00:00', 'convert' => null],
+			'P1W' => ['trim' => 'Y-m-d 00:00:00', 'convert' => 'this week 00:00:00'],
+			'P1M' => ['trim' => 'Y-m-01 00:00:00', 'convert' => null],
+			'P1Y' => ['trim' => 'Y-01-01 00:00:00', 'convert' => null],
+			'P10Y' => ['trim' => '1970-01-01 00:00:00', 'convert' => null]
 		];
 
 		// Date and time label formats.
 		$formats = [
 			SEC_PER_MIN => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
 			SEC_PER_HOUR => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
-			SEC_PER_DAY => ['main' => _('m-d'), 'sub' => TIME_FORMAT],
-			SEC_PER_WEEK => ['main' => _('m-d'), 'sub' => _('m-d')],
-			SEC_PER_MONTH => ['main' => _('m-d'), 'sub' => _('m-d')],
-			SEC_PER_YEAR => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _('M')],
-			SEC_PER_YEAR * 10 => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
+			'P1D' => ['main' => _('m-d'), 'sub' => TIME_FORMAT],
+			'P1W' => ['main' => _('m-d'), 'sub' => _('m-d')],
+			'P1M' => ['main' => _('m-d'), 'sub' => _('m-d')],
+			'P1Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _('M')],
+			'P10Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
 		];
 
 		$optimal_intervals = [];
@@ -971,7 +971,11 @@ class CLineGraphDraw extends CGraphDraw {
 
 		foreach ($intervals as $main_interval => $sub_intervals) {
 			foreach ($sub_intervals as $sub_interval) {
-				$interval_diff = abs($sub_interval - $prefered_sub_interval);
+				$sub_interval_ts = is_int($sub_interval)
+					? $sub_interval
+					: (new DateTime('@0'))->add(new DateInterval($sub_interval))->getTimestamp();
+
+				$interval_diff = abs($prefered_sub_interval - $sub_interval_ts);
 
 				if ($interval_diff < $interval_diff_min) {
 					$interval_diff_min = $interval_diff;
@@ -994,13 +998,13 @@ class CLineGraphDraw extends CGraphDraw {
 	/**
 	 * Get date and time intervals in the given range for the X-axis.
 	 *
-	 * @param int $start     Range start in seconds.
-	 * @param int $end       Range end in seconds.
-	 * @param int $interval  Interval in seconds.
+	 * @param int   $start     Range start in seconds.
+	 * @param int   $end       Range end in seconds.
+	 * @param mixed $interval  Interval in seconds (int)) or as period specification (string).
 	 *
 	 * @return array
 	 */
-	private function getDateTimeIntervals(int $start, int $end, int $interval): array {
+	private function getDateTimeIntervals(int $start, int $end, $interval): array {
 		$intervals = [];
 
 		$transitions = (new DateTime())
@@ -1011,36 +1015,46 @@ class CLineGraphDraw extends CGraphDraw {
 			$transitions = [];
 		}
 
-		$time = $start;
+		if (!is_int($interval)) {
+			$interval_di = new DateInterval($interval);
+		}
+
+		$dt = (new DateTime())->setTimestamp($start);
 		$transition = 1;
 
-		while ($time <= $end) {
-			$correct_before = 0;
-			$correct_after = 0;
+		while ($dt->getTimestamp() <= $end) {
+			if (is_int($interval)) {
+				$correct_before = 0;
+				$correct_after = 0;
 
-			while ($transition < count($transitions) && $time >= $transitions[$transition]['ts']) {
-				$offset_diff = $transitions[$transition]['offset'] - $transitions[$transition - 1]['offset'];
+				while ($transition < count($transitions) && $dt->getTimestamp() >= $transitions[$transition]['ts']) {
+					$offset_diff = $transitions[$transition]['offset'] - $transitions[$transition - 1]['offset'];
 
-				if ($interval > abs($offset_diff)) {
-					if ($transitions[$transition]['isdst']) {
-						if ($time - $transitions[$transition]['ts'] >= $offset_diff) {
-							$correct_before -= $offset_diff;
+					if ($interval > abs($offset_diff)) {
+						if ($transitions[$transition]['isdst']) {
+							if ($dt->getTimestamp() - $transitions[$transition]['ts'] >= $offset_diff) {
+								$correct_before -= $offset_diff;
+							}
+							else {
+								$correct_after -= $offset_diff;
+							}
 						}
 						else {
-							$correct_after -= $offset_diff;
+							$correct_before -= $offset_diff;
 						}
 					}
-					else {
-						$correct_before -= $offset_diff;
-					}
+
+					$transition++;
 				}
 
-				$transition++;
+				$ts = $dt->getTimestamp() + $correct_before;
+				$intervals[] = $ts;
+				$dt->setTimestamp($ts + $correct_after + $interval);
 			}
-
-			$time += $correct_before;
-			$intervals[] = $time;
-			$time += $interval + $correct_after;
+			else {
+				$intervals[] = $dt->getTimestamp();
+				$dt->add($interval_di);
+			}
 		}
 
 		return $intervals;
@@ -1062,7 +1076,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$start = strtotime($optimal['aligner']['convert'], $start);
 		}
 
-		$end = $this->stime + $this->period + $optimal['intervals']['main'];
+		$end = $this->stime + $this->period;
 
 		// Draw main intervals.
 		$mains = [];
@@ -1077,10 +1091,19 @@ class CLineGraphDraw extends CGraphDraw {
 			$mains[] = $time;
 		}
 
+		$mains[] = $end;
+
 		// Draw sub-intervals.
+		$sub_ts = is_int($optimal['intervals']['sub'])
+			? $optimal['intervals']['sub']
+			: (new DateTime('@0'))->add(new DateInterval($optimal['intervals']['sub']))->getTimestamp();
+
+		// Sub-intervals' margin from the main interval boundaries.
+		$main_margin = max($label_size, (int) ($sub_ts * .75));
+
 		for ($i = 0, $i_max = count($mains) - 2; $i <= $i_max; $i++) {
-			$pos_min = $mains[$i] - $this->stime + $label_size;
-			$pos_max = $mains[$i + 1] - $this->stime - $label_size;
+			$pos_min = $mains[$i] - $this->stime + $main_margin;
+			$pos_max = $mains[$i + 1] - $this->stime - $main_margin;
 
 			foreach ($this->getDateTimeIntervals($mains[$i], $mains[$i + 1], $optimal['intervals']['sub']) as $time) {
 				$pos = $time - $this->stime;
