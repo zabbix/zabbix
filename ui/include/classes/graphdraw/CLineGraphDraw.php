@@ -1063,7 +1063,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$end = $this->stime + $this->period + $optimal['intervals']['main'];
 
-		// Processing main intervals.
+		// Draw main intervals.
 		$mains = [];
 
 		foreach ($this->getDateTimeIntervals($start, $end, $optimal['intervals']['main']) as $time) {
@@ -1076,7 +1076,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$mains[] = $time;
 		}
 
-		// Processing sub-intervals.
+		// Draw sub-intervals.
 		for ($i = 0, $i_max = count($mains) - 2; $i <= $i_max; $i++) {
 			$pos_min = $mains[$i] - $this->stime + $label_size;
 			$pos_max = $mains[$i + 1] - $this->stime - $label_size;
