@@ -928,11 +928,12 @@ class CLineGraphDraw extends CGraphDraw {
 	/**
 	 * Get best matching X-axis interval specification for the prefered sub-interval.
 	 *
-	 * @param int $prefered_sub_interval  Prefered sub-interval in seconds.
+	 * @param int   $pref_sub_interval  Prefered sub-interval in seconds.
+	 * @param float $min_sub_interval   Prefered minimal sub-interval in seconds (float). Discarded if no matches.
 	 *
 	 * @return array
 	 */
-	private function getOptimalDateTimeIntervalSpec(int $prefered_sub_interval): array {
+	private function getOptimalDateTimeIntervalSpec(int $pref_sub_interval, float $min_sub_interval): array {
 		// Possible X-axis main and sub-intervals.
 		$intervals = [
 			'PT1M' => ['PT1S', 'PT5S', 'PT10S', 'PT30S'],
@@ -966,10 +967,11 @@ class CLineGraphDraw extends CGraphDraw {
 			'P10Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
 		];
 
-		$optimal_main_interval = null;
-		$optimal_sub_interval = null;
+		$best_main_interval = null;
+		$best_sub_interval = null;
+		$best_sub_interval_ts = 0;
 
-		$interval_diff_min = INF;
+		$best_interval_prop = INF;
 
 		foreach ($intervals as $main_interval => $sub_intervals) {
 			foreach ($sub_intervals as $sub_interval) {
@@ -977,24 +979,27 @@ class CLineGraphDraw extends CGraphDraw {
 					->add(new DateInterval($sub_interval))
 					->getTimestamp();
 
-				$interval_diff = abs($prefered_sub_interval - $sub_interval_ts);
+				$interval_prop = max($pref_sub_interval, $sub_interval_ts) / min($pref_sub_interval, $sub_interval_ts);
 
-				if ($interval_diff < $interval_diff_min) {
-					$interval_diff_min = $interval_diff;
+				// Search for best interval preferably matching the $min_sub_interval criteria.
+				if ($interval_prop < $best_interval_prop
+						|| ($sub_interval_ts > $best_sub_interval_ts && $best_sub_interval_ts < $min_sub_interval)) {
+					$best_interval_prop = $interval_prop;
 
-					$optimal_main_interval = $main_interval;
-					$optimal_sub_interval = $sub_interval;
+					$best_main_interval = $main_interval;
+					$best_sub_interval = $sub_interval;
+					$best_sub_interval_ts = $sub_interval_ts;
 				}
 			}
 		}
 
 		return [
 			'intervals' => [
-				'main' => new DateInterval($optimal_main_interval),
-				'sub' => new DateInterval($optimal_sub_interval)
+				'main' => new DateInterval($best_main_interval),
+				'sub' => new DateInterval($best_sub_interval)
 			],
-			'aligner' => $aligners[$optimal_main_interval],
-			'format' => $formats[$optimal_main_interval]
+			'aligner' => $aligners[$best_main_interval],
+			'format' => $formats[$best_main_interval]
 		];
 	}
 
@@ -1070,10 +1075,11 @@ class CLineGraphDraw extends CGraphDraw {
 	 */
 	private function drawDateTimeIntervals() {
 		// Calculate standard label width in time usits.
-		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 1.5;
+		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 2;
 
 		$prefered_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
-		$optimal = $this->getOptimalDateTimeIntervalSpec($prefered_sub_interval);
+
+		$optimal = $this->getOptimalDateTimeIntervalSpec($prefered_sub_interval, $label_size);
 
 		// Align starting date and time with the interval.
 		$start = strtotime(date($optimal['aligner']['trim'], $this->stime));
