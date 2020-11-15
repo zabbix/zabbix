@@ -48,9 +48,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->one()->setDataContext('Templates');
-		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
+		$this->zbxTestClickLinkTextWait('Linux by Zabbix agent');
 
-		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');
+		$this->zbxTestTextPresent('Linux by Zabbix agent');
 		$this->zbxTestClick('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -63,7 +63,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
 
-		$template = 'Template OS Linux by Zabbix agent';
+		$template = 'Linux by Zabbix agent';
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -99,7 +99,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('applications.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 	}
 
@@ -112,9 +112,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		COverlayDialogElement::find()->one()->setDataContext('Templates');
-		$this->query('link:Template OS Linux by Zabbix agent')->waitUntilVisible()->one()->forceClick();
+		$this->zbxTestClickLinkTextWait('Linux by Zabbix agent');
 
-		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');
+		$this->zbxTestTextPresent('Linux by Zabbix agent');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -127,7 +127,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 
-		$template = 'Template OS Linux by Zabbix agent';
+		$template = 'Linux by Zabbix agent';
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -161,7 +161,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
-		$this->zbxTestHrefClickWait('applications.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 	}
 }
