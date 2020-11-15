@@ -105,7 +105,7 @@ class CFormElement extends CElement {
 			if ($label->getText() === '') {
 				$element = $this->getFieldByLabelElement($label);
 				if ($element->isValid() && get_class($element) === CCheckboxElement::class) {
-					$labels->set($key, $element->parents()->query('tag:label')->one(false));
+					$labels->set($key, $element->query('xpath:../label')->one(false));
 				}
 			}
 		}

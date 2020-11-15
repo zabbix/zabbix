@@ -170,35 +170,4 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 
 		return $controls;
 	}
-
-	/**
-	 * Find row by column value.
-	 *
-	 * @param string	$column    column name
-	 * @param string	$value     column value
-	 * @param boolean	$contains  flag that determines if column value should contain the passed value or coincide with it
-	 *
-	 * @return CTableRow|CNullElement
-	 */
-	public function findRow($column, $value, $contains = false) {
-		$headers = $this->getHeadersText();
-
-		if (is_string($column)) {
-			$index = array_search($column, $headers);
-			if ($index === false) {
-				return new CNullElement(['locator' => '"'.$column.'" (table column name)']);
-			}
-
-			$column = $index + 1;
-		}
-
-		$suffix = $contains ? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
-			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
-		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
-
-		return $this->query('xpath', implode('|', $xpaths))->asTableRow([
-			'parent' => $this,
-			'column_selector' => $this->selectors['column']
-		])->one(false);
-	}
 }

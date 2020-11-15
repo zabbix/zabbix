@@ -59,7 +59,7 @@ class CSegmentedRadioElement extends CElement {
 			}
 		}
 
-		return $radio->first()->parents('tag:li')->query('tag:label')->one()->getText();
+		return $radio->first()->query('xpath:../label')->one()->getText();
 	}
 
 	/**

@@ -66,6 +66,8 @@ class CMultifieldTableElement extends CTableElement {
 	/**
 	 * Set field mapping names.
 	 *
+	 * @param array $names	field name
+	 *
 	 * @return CMultifieldTableElement
 	 */
 	public function setFieldNames($names) {
