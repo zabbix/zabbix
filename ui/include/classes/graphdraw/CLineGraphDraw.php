@@ -1007,32 +1007,25 @@ class CLineGraphDraw extends CGraphDraw {
 	private function getDateTimeIntervals(int $start, int $end, $interval): array {
 		$intervals = [];
 
-		$transitions = (new DateTime())
-			->getTimezone()
-				->getTransitions($start, $end);
+		if (is_int($interval)) {
+			$transitions = (new DateTime())->getTimezone()->getTransitions($start, $end);
+			if (!$transitions) {
+				$transitions = [];
+			}
 
-		if (!$transitions) {
-			$transitions = [];
-		}
+			$time = $start;
+			$transition = 1;
 
-		if (!is_int($interval)) {
-			$interval_di = new DateInterval($interval);
-		}
-
-		$dt = (new DateTime())->setTimestamp($start);
-		$transition = 1;
-
-		while ($dt->getTimestamp() <= $end) {
-			if (is_int($interval)) {
+			while ($time <= $end) {
 				$correct_before = 0;
 				$correct_after = 0;
 
-				while ($transition < count($transitions) && $dt->getTimestamp() >= $transitions[$transition]['ts']) {
+				while ($transition < count($transitions) && $time >= $transitions[$transition]['ts']) {
 					$offset_diff = $transitions[$transition]['offset'] - $transitions[$transition - 1]['offset'];
 
 					if ($interval > abs($offset_diff)) {
 						if ($transitions[$transition]['isdst']) {
-							if ($dt->getTimestamp() - $transitions[$transition]['ts'] >= $offset_diff) {
+							if ($time - $transitions[$transition]['ts'] >= $offset_diff) {
 								$correct_before -= $offset_diff;
 							}
 							else {
@@ -1047,11 +1040,17 @@ class CLineGraphDraw extends CGraphDraw {
 					$transition++;
 				}
 
-				$ts = $dt->getTimestamp() + $correct_before;
-				$intervals[] = $ts;
-				$dt->setTimestamp($ts + $correct_after + $interval);
+				$time += $correct_before;
+				$intervals[] = $time;
+				$time += $correct_after + $interval;
 			}
-			else {
+		}
+		else {
+			$interval_di = new DateInterval($interval);
+
+			$dt = (new DateTime())->setTimestamp($start);
+
+			while ($dt->getTimestamp() <= $end) {
 				$intervals[] = $dt->getTimestamp();
 				$dt->add($interval_di);
 			}
