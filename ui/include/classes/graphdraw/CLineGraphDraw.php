@@ -61,8 +61,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->zero = [];
 
-		$this->grid = []; // vertical & horizontal grids params
-
 		$this->cell_width = 30;
 		$this->cell_height_min = 30;
 
@@ -840,8 +838,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Draw start date (and time) label.
 		$this->drawStartEndTimePeriod($this->stime, $time_format, 0);
-
-		$this->calculateTimeInterval();
 		$this->drawDateTimeIntervals();
 
 		// Draw end date (and time) label.
@@ -930,232 +926,169 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	/**
-	 * Calculates the optimal size of time interval.
+	 * Get best matching X-axis interval specification for the prefered sub-interval.
+	 *
+	 * @param int $prefered_sub_interval  Prefered sub-interval in seconds.
+	 *
+	 * @return array
 	 */
-	private function calculateTimeInterval() {
-		$time_interval = ($this->cell_width * $this->period) / $this->sizeX;
+	private function getOptimalDateTimeIntervalSpec($prefered_sub_interval) {
+		// Possible X-axis main and sub-intervals in seconds.
 		$intervals = [
-			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 60],			// minute and 1 second
-			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 12],			// minute and 5 seconds
-			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 6],			// 1 minute and 10 seconds
-			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 2],			// 1 minute and 30 seconds
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],				// 1 hour and 1 minute
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],			// 1 hour and 2 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],			// 1 hour and 5 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 15],		// 1 hour and 15 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 30],		// 1 hour and 30 minutes
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR],				// 1 day and 1 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 3],			// 1 day and 3 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
-			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
-			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY * 3],			// 1 week and 3 days
-			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_WEEK],			// 1 month and 1 week
-			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_WEEK * 2],		// 1 month and 2 weeks
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 3],		// 1 year and 90 days
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 4],		// 1 year and 120 days
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 6],		// 1 year and 180 days
-			['main' => SEC_PER_YEAR * 5, 'sub' => SEC_PER_YEAR],		// 5 years and 1 year
-			['main' => SEC_PER_YEAR * 10, 'sub' => SEC_PER_YEAR * 2],	// 10 years and 2 years
-			['main' => SEC_PER_YEAR * 15, 'sub' => SEC_PER_YEAR * 3],	// 15 years and 3 years
-			['main' => SEC_PER_YEAR * 20, 'sub' => SEC_PER_YEAR * 5],	// 20 years and 5 years
-			['main' => SEC_PER_YEAR * 30, 'sub' => SEC_PER_YEAR * 10],	// 30 years and 10 years
-			['main' => SEC_PER_YEAR * 40, 'sub' => SEC_PER_YEAR * 20],	// 40 years and 20 years
-			['main' => SEC_PER_YEAR * 60, 'sub' => SEC_PER_YEAR * 30],	// 60 years and 30 years
-			['main' => SEC_PER_YEAR * 80, 'sub' => SEC_PER_YEAR * 40]	// 80 years and 40 years
+			SEC_PER_MIN => [1, 5, 10, 30],
+			SEC_PER_HOUR => [SEC_PER_MIN, SEC_PER_MIN * 2, SEC_PER_MIN * 5, SEC_PER_MIN * 15, SEC_PER_MIN * 30],
+			SEC_PER_DAY => [SEC_PER_HOUR, SEC_PER_HOUR * 3, SEC_PER_HOUR * 4, SEC_PER_HOUR * 12],
+			SEC_PER_WEEK => [SEC_PER_DAY],
+			SEC_PER_MONTH => [SEC_PER_DAY * 3, SEC_PER_WEEK, SEC_PER_WEEK * 2],
+			SEC_PER_YEAR => [SEC_PER_MONTH, SEC_PER_MONTH * 3, SEC_PER_MONTH * 4, SEC_PER_MONTH * 6],
+			SEC_PER_YEAR * 10 => [SEC_PER_YEAR, SEC_PER_YEAR * 5]
 		];
 
-		// Default interval values.
-		$distance = SEC_PER_YEAR * 5;
-		$this->grid['horizontal']['main']['interval'] = 0;
-		$this->grid['horizontal']['sub']['interval'] = 0;
+		// Starting date and time aligners.
+		$aligners = [
+			SEC_PER_MIN => ['trim' => 'Y-m-d H:i:00', 'convert' => null],
+			SEC_PER_HOUR => ['trim' => 'Y-m-d H:00:00', 'convert' => null],
+			SEC_PER_DAY => ['trim' => 'Y-m-d 00:00:00', 'convert' => null],
+			SEC_PER_WEEK => ['trim' => 'Y-m-d 00:00:00', 'convert' => 'this week 00:00:00'],
+			SEC_PER_MONTH => ['trim' => 'Y-m-01 00:00:00', 'convert' => null],
+			SEC_PER_YEAR => ['trim' => 'Y-01-01 00:00:00', 'convert' => null],
+			SEC_PER_YEAR * 10 => ['trim' => '1970-01-01 00:00:00', 'convert' => null]
+		];
 
-		foreach ($intervals as $interval) {
-			$time = abs($interval['sub'] - $time_interval);
+		// Date and time label formats.
+		$formats = [
+			SEC_PER_MIN => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
+			SEC_PER_HOUR => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
+			SEC_PER_DAY => ['main' => _('m-d'), 'sub' => TIME_FORMAT],
+			SEC_PER_WEEK => ['main' => _('m-d'), 'sub' => _('m-d')],
+			SEC_PER_MONTH => ['main' => _('m-d'), 'sub' => _('m-d')],
+			SEC_PER_YEAR => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _('M')],
+			SEC_PER_YEAR * 10 => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
+		];
 
-			if ($time < $distance) {
-				$distance = $time;
-				$this->grid['horizontal']['main']['interval'] = $interval['main'];
-				$this->grid['horizontal']['sub']['interval'] = $interval['sub'];
+		$optimal_intervals = [];
+		$interval_diff_min = INF;
+
+		foreach ($intervals as $main_interval => $sub_intervals) {
+			foreach ($sub_intervals as $sub_interval) {
+				$interval_diff = abs($sub_interval - $prefered_sub_interval);
+
+				if ($interval_diff < $interval_diff_min) {
+					$interval_diff_min = $interval_diff;
+
+					$optimal_intervals = [
+						'main' => $main_interval,
+						'sub' => $sub_interval
+					];
+				}
 			}
 		}
+
+		return [
+			'intervals' => $optimal_intervals,
+			'aligner' => $aligners[$optimal_intervals['main']],
+			'format' => $formats[$optimal_intervals['main']]
+		];
+	}
+
+	/**
+	 * Get date and time intervals in the given range for the X-axis.
+	 *
+	 * @param int $start     Range start in seconds.
+	 * @param int $end       Range end in seconds.
+	 * @param int $interval  Interval in seconds.
+	 *
+	 * @return array
+	 */
+	private function getDateTimeIntervals(int $start, int $end, int $interval) {
+		$intervals = [];
+
+		$transitions = (new DateTime())
+			->getTimezone()
+				->getTransitions($start, $end);
+
+		if (!$transitions) {
+			$transitions = [];
+		}
+
+		$time = $start;
+		$transition = 1;
+
+		while ($time <= $end) {
+			$correct_before = 0;
+			$correct_after = 0;
+
+			while ($transition < count($transitions) && $time >= $transitions[$transition]['ts']) {
+				$offset_diff = $transitions[$transition]['offset'] - $transitions[$transition - 1]['offset'];
+
+				if ($interval > abs($offset_diff)) {
+					if ($transitions[$transition]['isdst']) {
+						if ($time - $transitions[$transition]['ts'] >= $offset_diff) {
+							$correct_before -= $offset_diff;
+						}
+						else {
+							$correct_after -= $offset_diff;
+						}
+					}
+					else {
+						$correct_before -= $offset_diff;
+					}
+				}
+
+				$transition++;
+			}
+
+			$time += $correct_before;
+			$intervals[] = $time;
+			$time += $interval + $correct_after;
+		}
+
+		return $intervals;
 	}
 
 	/**
 	 * Draw date and time intervals under the X axis.
 	 */
 	private function drawDateTimeIntervals() {
-		$interval['sub'] = $this->grid['horizontal']['sub']['interval'];
-		$interval['main'] = $this->grid['horizontal']['main']['interval'];
+		// Calculate standard label width in time usits.
+		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 1.5;
 
-		// Sub interval title size.
-		$element_size = imageTextSize(7, 90, 'WWW');
+		$optimal = $this->getOptimalDateTimeIntervalSpec($this->period * $this->cell_width / $this->sizeX);
 
-		$position = 0;
-		$position_from = $element_size['width'] * 1.5;
-		$position_to = $this->sizeX - $element_size['width'] * 1.5;
-		$dt = [];
-		$modifier = [];
-		$format = [];
-
-		foreach (['main', 'sub'] as $type) {
-			$dt[$type] = new DateTime();
-			$dt[$type]->setTimestamp($this->stime);
-
-			if ($interval[$type] >= SEC_PER_YEAR) {
-				$years = $interval[$type] / SEC_PER_YEAR;
-				$year = (int) $dt[$type]->format('Y');
-				$dt[$type]->modify('first day of January this year 00:00:00 -'.($year % $years).' year');
-				$modifier[$type] = '+ '.$years.' year';
-				$format[$type] = _x('Y', DATE_FORMAT_CONTEXT);
-			}
-			elseif ($interval[$type] >= SEC_PER_MONTH) {
-				$months = $interval[$type] / SEC_PER_MONTH;
-				$month = (int) $dt[$type]->format('m');
-				$dt[$type]->modify('first day of this month 00:00:00 -'.(($month - 1) % $months).' month');
-				$modifier[$type] = '+ '.$months.' month';
-				$format[$type] = ($type == 'main') ? _('m-d') : _('M');
-			}
-			elseif ($interval[$type] >= SEC_PER_WEEK) {
-				$weeks = $interval[$type] / SEC_PER_WEEK;
-				$week = (int) $dt[$type]->format('W');
-				$day_of_week = (int) $dt[$type]->format('w');
-				$dt[$type]->modify('today -'.(($week - 1) % $weeks).' week -'.$day_of_week.' day');
-				$modifier[$type] = '+ '.$weeks.' week';
-				$format[$type] = _('m-d');
-			}
-			elseif ($interval[$type] >= SEC_PER_DAY) {
-				$days = $interval[$type] / SEC_PER_DAY;
-				$day = (int) $dt[$type]->format('d');
-				$dt[$type]->modify('today -'.(($day - 1) % $days).' day');
-				$modifier[$type] = '+ '.$days.' day';
-				$format[$type] = _('m-d');
-			}
-			elseif ($interval[$type] >= SEC_PER_HOUR) {
-				$hours = $interval[$type] / SEC_PER_HOUR;
-				$hour = (int) $dt[$type]->format('H');
-				$minute = (int) $dt[$type]->format('i');
-				$second = (int) $dt[$type]->format('s');
-				$dt[$type]->modify('-'.($hour % $hours).' hour -'.$minute.' minute -'.$second.' second');
-				$modifier[$type] = '+ '.$hours.' hour';
-				$format[$type] = TIME_FORMAT;
-			}
-			elseif ($interval[$type] >= SEC_PER_MIN) {
-				$minutes = $interval[$type] / SEC_PER_MIN;
-				$minute = (int) $dt[$type]->format('i');
-				$second = (int) $dt[$type]->format('s');
-				$dt[$type]->modify('-'.($minute % $minutes).' minute -'.$second.' second');
-				$modifier[$type] = '+ '.$minutes.' min';
-				$format[$type] = ($type == 'main') ? _('H:i:s') : TIME_FORMAT;
-			}
-			else {
-				$seconds = $interval[$type];
-				$second = (int) $dt[$type]->format('s');
-				$dt[$type]->modify('-'.($second % $seconds).' second');
-				$modifier[$type] = '+ '.$seconds.' second';
-				$format[$type] = _('H:i:s');
-			}
-
-			// It is necessary to align the X axis after the jump from winter to summer time.
-			$align[$type] = 0;
+		// Align starting date and time with the interval.
+		$start = strtotime(date($optimal['aligner']['trim'], $this->stime));
+		if ($optimal['aligner']['convert'] !== null) {
+			$start = strtotime($optimal['aligner']['convert'], $start);
 		}
 
-		$prev_time = $this->stime;
-		if ($interval['main'] == SEC_PER_MONTH) {
-			$dt_start = new DateTime();
-			$dt_start->setTimestamp($this->stime);
-			$prev_month = (int) $dt_start->format('m');
+		$end = $this->stime + $this->period + $optimal['intervals']['main'];
+
+		// Processing main intervals.
+		$mains = [];
+
+		foreach ($this->getDateTimeIntervals($start, $end, $optimal['intervals']['main']) as $time) {
+			$pos = $time - $this->stime;
+
+			if ($pos >= $label_size && $pos <= $this->period - $label_size) {
+				$this->drawMainPeriod(date($optimal['format']['main'], $time), $pos * $this->sizeX / $this->period);
+			}
+
+			$mains[] = $time;
 		}
 
-		$mirror_till = 0;
+		// Processing sub-intervals.
+		for ($i = 0, $i_max = count($mains) - 2; $i <= $i_max; $i++) {
+			$pos_min = $mains[$i] - $this->stime + $label_size;
+			$pos_max = $mains[$i + 1] - $this->stime - $label_size;
 
-		while (true) {
-			$dt['sub']->modify($modifier['sub']);
+			foreach ($this->getDateTimeIntervals($mains[$i], $mains[$i + 1], $optimal['intervals']['sub']) as $time) {
+				$pos = $time - $this->stime;
 
-			if ($align['sub'] < 0 && abs($align['sub']) < $interval['sub']) {
-				$dt['sub']->modify($align['sub'].' second');
-			}
-
-			$align['sub'] = self::getDSTAlign($dt['sub']);
-
-			if ($dt['main'] < $dt['sub']) {
-				$dt['main']->modify($modifier['main']);
-
-				if ($align['main'] < 0 && abs($align['main']) < $interval['main']) {
-					$dt['main']->modify($align['main'].' second');
-				}
-
-				$align['main'] = self::getDSTAlign($dt['main']);
-			}
-
-			if ($interval['main'] == SEC_PER_MONTH) {
-				$month = (int) $dt['sub']->format('m');
-
-				$draw_main = ($month != $prev_month);
-				$prev_month = $month;
-			}
-			else {
-				$draw_main = ($dt['main'] == $dt['sub']);
-			}
-
-			$time = $dt['sub']->getTimestamp();
-			$delta_x = ($time - $prev_time) * $this->sizeX / $this->period;
-			$position += $delta_x;
-
-			// When clock were turned forward (DST ended) empty gap on the X axis should be mirrored.
-			if ($align['sub'] > 0) {
-				$mirror_till = $time + $align['sub'];
-				$mirror_offset = $align['sub'] * $this->sizeX / $this->period;
-			}
-
-			// First element too-close check.
-			if ($prev_time != $this->stime || $position > $position_from) {
-				// Last element too-close check.
-				if ($position > $position_to && ($mirror_till == 0 || $time >= $mirror_till)) {
-					break;
-				}
-
-				if ($position <= $position_to) {
-					if ($draw_main) {
-						$this->drawMainPeriod($dt['sub']->format($format['main']), $position);
-					}
-					else {
-						$this->drawSubPeriod($dt['sub']->format($format['sub']), $position);
-					}
-				}
-
-				if ($mirror_till != 0 && $time < $mirror_till) {
-					if ($draw_main) {
-						$this->drawMainPeriod($dt['sub']->format($format['main']), $position - $mirror_offset);
-					}
-					else {
-						$this->drawSubPeriod($dt['sub']->format($format['sub']), $position - $mirror_offset);
-					}
+				if ($pos >= max($pos_min, $label_size) && $pos <= min($pos_max, $this->period - $label_size)) {
+					$this->drawSubPeriod(date($optimal['format']['sub'], $time), $pos * $this->sizeX / $this->period);
 				}
 			}
-
-			$prev_time = $time;
 		}
-	}
-
-	/*
-	 * Returns the offset if $dt is the starting or ending point for daylight saving time.
-	 *
-	 * @param DateTime $dt  Current time.
-	 *
-	 * @return int
-	 */
-	private static function getDSTAlign($dt) {
-		$ts = $dt->getTimestamp();
-		$transitions = $dt->getTimezone()->getTransitions($ts - 1, $ts + 1);
-
-		if (count($transitions) == 2 && $ts == $transitions[1]['ts']) {
-			$dst_offset = $transitions[0]['offset'] - $transitions[1]['offset'];
-			return $dst_offset;
-		}
-
-		return 0;
 	}
 
 	private function drawVerticalScale() {
