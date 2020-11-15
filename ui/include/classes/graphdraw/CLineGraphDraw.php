@@ -937,7 +937,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$intervals = [
 			SEC_PER_MIN => [1, 5, 10, 30],
 			SEC_PER_HOUR => [SEC_PER_MIN, SEC_PER_MIN * 2, SEC_PER_MIN * 5, SEC_PER_MIN * 15, SEC_PER_MIN * 30],
-			SEC_PER_DAY => [SEC_PER_HOUR, SEC_PER_HOUR * 3, SEC_PER_HOUR * 4, SEC_PER_HOUR * 12],
+			SEC_PER_DAY => [SEC_PER_HOUR, SEC_PER_HOUR * 3, SEC_PER_HOUR * 6, SEC_PER_HOUR * 12],
 			SEC_PER_WEEK => [SEC_PER_DAY],
 			SEC_PER_MONTH => [SEC_PER_DAY * 3, SEC_PER_WEEK, SEC_PER_WEEK * 2],
 			SEC_PER_YEAR => [SEC_PER_MONTH, SEC_PER_MONTH * 3, SEC_PER_MONTH * 4, SEC_PER_MONTH * 6],
@@ -1053,7 +1053,8 @@ class CLineGraphDraw extends CGraphDraw {
 		// Calculate standard label width in time usits.
 		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 1.5;
 
-		$optimal = $this->getOptimalDateTimeIntervalSpec($this->period * $this->cell_width / $this->sizeX);
+		$prefered_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
+		$optimal = $this->getOptimalDateTimeIntervalSpec($prefered_sub_interval);
 
 		// Align starting date and time with the interval.
 		$start = strtotime(date($optimal['aligner']['trim'], $this->stime));
