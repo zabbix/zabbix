@@ -932,7 +932,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 *
 	 * @return array
 	 */
-	private function getOptimalDateTimeIntervalSpec($prefered_sub_interval) {
+	private function getOptimalDateTimeIntervalSpec(int $prefered_sub_interval): array {
 		// Possible X-axis main and sub-intervals in seconds.
 		$intervals = [
 			SEC_PER_MIN => [1, 5, 10, 30],
@@ -1000,7 +1000,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 *
 	 * @return array
 	 */
-	private function getDateTimeIntervals(int $start, int $end, int $interval) {
+	private function getDateTimeIntervals(int $start, int $end, int $interval): array {
 		$intervals = [];
 
 		$transitions = (new DateTime())
