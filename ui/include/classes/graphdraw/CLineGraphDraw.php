@@ -935,9 +935,9 @@ class CLineGraphDraw extends CGraphDraw {
 	private function getOptimalDateTimeIntervalSpec(int $prefered_sub_interval): array {
 		// Possible X-axis main and sub-intervals in seconds or period spec.
 		$intervals = [
-			SEC_PER_MIN => [1, 5, 10, 30],
-			SEC_PER_HOUR => [SEC_PER_MIN, SEC_PER_MIN * 2, SEC_PER_MIN * 5, SEC_PER_MIN * 15, SEC_PER_MIN * 30],
-			'P1D' => [SEC_PER_HOUR, SEC_PER_HOUR * 3, SEC_PER_HOUR * 6, SEC_PER_HOUR * 12],
+			'PT1M' => ['PT1S', 'PT5S', 'PT10S', 'PT30S'],
+			'PT1H' => ['PT1M', 'PT2M', 'PT5M', 'PT15M', 'PT30M'],
+			'P1D' => ['PT1H', 'PT3H', 'PT6H', 'PT12H'],
 			'P1W' => ['P1D'],
 			'P1M' => ['P3D', 'P1W', 'P2W'],
 			'P1Y' => ['P1M', 'P3M', 'P4M', 'P6M'],
@@ -946,8 +946,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Starting date and time aligners.
 		$aligners = [
-			SEC_PER_MIN => ['trim' => 'Y-m-d H:i:00', 'convert' => null],
-			SEC_PER_HOUR => ['trim' => 'Y-m-d H:00:00', 'convert' => null],
+			'PT1M' => ['trim' => 'Y-m-d H:i:00', 'convert' => null],
+			'PT1H' => ['trim' => 'Y-m-d H:00:00', 'convert' => null],
 			'P1D' => ['trim' => 'Y-m-d 00:00:00', 'convert' => null],
 			'P1W' => ['trim' => 'Y-m-d 00:00:00', 'convert' => 'this week 00:00:00'],
 			'P1M' => ['trim' => 'Y-m-01 00:00:00', 'convert' => null],
@@ -957,8 +957,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Date and time label formats.
 		$formats = [
-			SEC_PER_MIN => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
-			SEC_PER_HOUR => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
+			'PT1M' => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
+			'PT1H' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
 			'P1D' => ['main' => _('m-d'), 'sub' => TIME_FORMAT],
 			'P1W' => ['main' => _('m-d'), 'sub' => _('m-d')],
 			'P1M' => ['main' => _('m-d'), 'sub' => _('m-d')],
@@ -966,48 +966,64 @@ class CLineGraphDraw extends CGraphDraw {
 			'P10Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
 		];
 
-		$optimal_intervals = [];
+		$optimal_main_inrerval = null;
+		$optimal_sub_interval = null;
+
 		$interval_diff_min = INF;
 
 		foreach ($intervals as $main_interval => $sub_intervals) {
 			foreach ($sub_intervals as $sub_interval) {
-				$sub_interval_ts = is_int($sub_interval)
-					? $sub_interval
-					: (new DateTime('@0'))->add(new DateInterval($sub_interval))->getTimestamp();
+				$sub_interval_ts = (new DateTime('@0'))
+					->add(new DateInterval($sub_interval))
+					->getTimestamp();
 
 				$interval_diff = abs($prefered_sub_interval - $sub_interval_ts);
 
 				if ($interval_diff < $interval_diff_min) {
 					$interval_diff_min = $interval_diff;
 
-					$optimal_intervals = [
-						'main' => $main_interval,
-						'sub' => $sub_interval
-					];
+					$optimal_main_inrerval = $main_interval;
+					$optimal_sub_interval = $sub_interval;
 				}
 			}
 		}
 
 		return [
-			'intervals' => $optimal_intervals,
-			'aligner' => $aligners[$optimal_intervals['main']],
-			'format' => $formats[$optimal_intervals['main']]
+			'intervals' => [
+				'main' => new DateInterval($optimal_main_inrerval),
+				'sub' => new DateInterval($optimal_sub_interval)
+			],
+			'aligner' => $aligners[$optimal_main_inrerval],
+			'format' => $formats[$optimal_main_inrerval]
 		];
 	}
 
 	/**
 	 * Get date and time intervals in the given range for the X-axis.
 	 *
-	 * @param int   $start     Range start in seconds.
-	 * @param int   $end       Range end in seconds.
-	 * @param mixed $interval  Interval in seconds (int)) or as period specification (string).
+	 * @param int          $start     Range start in seconds.
+	 * @param int          $end       Range end in seconds.
+	 * @param DateInterval $interval  Date and time interval.
 	 *
 	 * @return array
 	 */
-	private function getDateTimeIntervals(int $start, int $end, $interval): array {
+	private function getDateTimeIntervals(int $start, int $end, DateInterval $interval): array {
 		$intervals = [];
 
-		if (is_int($interval)) {
+		$interval_ts = (new DateTime('@0'))
+			->add($interval)
+			->getTimestamp();
+
+		// Manage time transitions natively.
+		if ($interval_ts >= SEC_PER_DAY) {
+			$dt = (new DateTime())->setTimestamp($start);
+
+			while ($dt->getTimestamp() <= $end) {
+				$intervals[] = $dt->getTimestamp();
+				$dt->add($interval);
+			}
+		}
+		else {
 			$transitions = (new DateTime())->getTimezone()->getTransitions($start, $end);
 			if (!$transitions) {
 				$transitions = [];
@@ -1023,7 +1039,7 @@ class CLineGraphDraw extends CGraphDraw {
 				while ($transition < count($transitions) && $time >= $transitions[$transition]['ts']) {
 					$offset_diff = $transitions[$transition]['offset'] - $transitions[$transition - 1]['offset'];
 
-					if ($interval > abs($offset_diff)) {
+					if ($interval_ts > abs($offset_diff)) {
 						if ($transitions[$transition]['isdst']) {
 							if ($time - $transitions[$transition]['ts'] >= $offset_diff) {
 								$correct_before -= $offset_diff;
@@ -1042,17 +1058,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				$time += $correct_before;
 				$intervals[] = $time;
-				$time += $correct_after + $interval;
-			}
-		}
-		else {
-			$interval_di = new DateInterval($interval);
-
-			$dt = (new DateTime())->setTimestamp($start);
-
-			while ($dt->getTimestamp() <= $end) {
-				$intervals[] = $dt->getTimestamp();
-				$dt->add($interval_di);
+				$time += $correct_after + $interval_ts;
 			}
 		}
 
@@ -1093,12 +1099,12 @@ class CLineGraphDraw extends CGraphDraw {
 		$mains[] = $end;
 
 		// Draw sub-intervals.
-		$sub_ts = is_int($optimal['intervals']['sub'])
-			? $optimal['intervals']['sub']
-			: (new DateTime('@0'))->add(new DateInterval($optimal['intervals']['sub']))->getTimestamp();
+		$sub_interval_ts = (new DateTime('@0'))
+			->add($optimal['intervals']['sub'])
+			->getTimestamp();
 
 		// Sub-intervals' margin from the main interval boundaries.
-		$main_margin = max($label_size, (int) ($sub_ts * .75));
+		$main_margin = max($label_size, (int) ($sub_interval_ts * .75));
 
 		for ($i = 0, $i_max = count($mains) - 2; $i <= $i_max; $i++) {
 			$pos_min = $mains[$i] - $this->stime + $main_margin;
