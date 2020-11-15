@@ -966,7 +966,7 @@ class CLineGraphDraw extends CGraphDraw {
 			'P10Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
 		];
 
-		$optimal_main_inrerval = null;
+		$optimal_main_interval = null;
 		$optimal_sub_interval = null;
 
 		$interval_diff_min = INF;
@@ -982,7 +982,7 @@ class CLineGraphDraw extends CGraphDraw {
 				if ($interval_diff < $interval_diff_min) {
 					$interval_diff_min = $interval_diff;
 
-					$optimal_main_inrerval = $main_interval;
+					$optimal_main_interval = $main_interval;
 					$optimal_sub_interval = $sub_interval;
 				}
 			}
@@ -990,11 +990,11 @@ class CLineGraphDraw extends CGraphDraw {
 
 		return [
 			'intervals' => [
-				'main' => new DateInterval($optimal_main_inrerval),
+				'main' => new DateInterval($optimal_main_interval),
 				'sub' => new DateInterval($optimal_sub_interval)
 			],
-			'aligner' => $aligners[$optimal_main_inrerval],
-			'format' => $formats[$optimal_main_inrerval]
+			'aligner' => $aligners[$optimal_main_interval],
+			'format' => $formats[$optimal_main_interval]
 		];
 	}
 
