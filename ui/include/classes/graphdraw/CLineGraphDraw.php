@@ -950,7 +950,7 @@ class CLineGraphDraw extends CGraphDraw {
 			'PT1M' => ['trim' => 'Y-m-d H:i:00', 'convert' => null],
 			'PT1H' => ['trim' => 'Y-m-d H:00:00', 'convert' => null],
 			'P1D' => ['trim' => 'Y-m-d 00:00:00', 'convert' => null],
-			'P1W' => ['trim' => 'Y-m-d 00:00:00', 'convert' => 'this week 00:00:00'],
+			'P1W' => ['trim' => 'Y-m-d 00:00:00', 'convert' => 'last Sunday 00:00:00'],
 			'P1M' => ['trim' => 'Y-m-01 00:00:00', 'convert' => null],
 			'P1Y' => ['trim' => 'Y-01-01 00:00:00', 'convert' => null],
 			'P10Y' => ['trim' => '1970-01-01 00:00:00', 'convert' => null]
