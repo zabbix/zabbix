@@ -154,11 +154,8 @@ abstract class CControllerHost extends CController {
 
 		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type',
-				'available', 'snmp_available', 'jmx_available', 'ipmi_available', 'error', 'ipmi_error', 'snmp_error',
-				'jmx_error'
-			],
-			'selectInterfaces' => ['ip', 'dns', 'port', 'main', 'type', 'useip'],
+			'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type'],
+			'selectInterfaces' => ['ip', 'dns', 'port', 'main', 'type', 'useip', 'available', 'error'],
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],

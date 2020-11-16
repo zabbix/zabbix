@@ -199,10 +199,10 @@ function get_icon($type, $params = []) {
 function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
-			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
-			'jmx_available', 'ipmi_available', 'error', 'snmp_error', 'jmx_error', 'ipmi_error'
+			'hostid', 'status', 'name', 'maintenance_status', 'flags'
 		],
 		'selectHostDiscovery' => ['ts_delete'],
+		'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available', 'error'],
 		'hostids' => [$hostid],
 		'editable' => true
 	];
@@ -325,7 +325,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		]);
 		$list->addItem($breadcrumbs);
 		$list->addItem($status);
-		$list->addItem(getHostAvailabilityTable($db_host));
+		$list->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
@@ -598,38 +598,47 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 }
 
 /**
- * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
+ * Create HTML helper element for host interfaces availability.
  *
- * @param array $host		an array of host data
+ * @param array $host_interfaces                          Array of arrays of host interfaces.
+ * @param int   $host_interfaces[][type]                  Interface type.
+ * @param int   $host_interfaces[][available]             Interface availability.
+ * @param int   $host_interfaces[][useip]                 Interface use IP or DNS.
+ * @param int   $host_interfaces[][ip]                    Interface IP address.
+ * @param int   $host_interfaces[][dns]                   Interface domain name.
+ * @param int   $host_interfaces[][port]                  Interface port.
+ * @param int   $host_interfaces[][details][version]      Interface SNMP version.
+ * @param int   $host_interfaces[][details][contextname]  Interface context name for SNMP version 3.
+ * @param int   $host_interfaces[][details][community]    Interface community for SNMP non version 3 interface.
+ * @param int   $host_interfaces[][error]                 Interface error message.
  *
- * @return CDiv
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable($host) {
-	$container = (new CDiv())->addClass(ZBX_STYLE_STATUS_CONTAINER);
+function getHostAvailabilityTable($host_interfaces) {
+	$interfaces = [];
 
-	foreach (['ZBX' => '', 'SNMP' => 'snmp_', 'JMX' => 'jmx_', 'IPMI' => 'ipmi_'] as $type => $prefix) {
-		switch ($host[$prefix.'available']) {
-			case HOST_AVAILABLE_TRUE:
-				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);
-				break;
-			case HOST_AVAILABLE_FALSE:
-				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_RED);
+	foreach ($host_interfaces as $interface) {
+		$ip_or_dns = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
+		$description = null;
 
-				if ($host[$prefix.'error'] !== '') {
-					$ai
-						->addClass(ZBX_STYLE_CURSOR_POINTER)
-						->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
-				}
-
-				break;
-			case HOST_AVAILABLE_UNKNOWN:
-				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREY);
-				break;
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$version = $interface['details']['version'];
+			$description = vsprintf('%s%d, %s: %s', ($version == SNMP_V3)
+				? [_('SNMPv'), $version, _('Context name'), $interface['details']['contextname']]
+				: [_('SNMPv'), $version, _x('Community', 'SNMP Community'), $interface['details']['community']]
+			);
 		}
-		$container->addItem($ai);
+
+		$interfaces[] = [
+			'type' => $interface['type'],
+			'available' => $interface['available'],
+			'interface' => $ip_or_dns.(($interface['port'] !== '') ? ':'.$interface['port'] : ''),
+			'description' => $description,
+			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
+		];
 	}
 
-	return $container;
+	return (new CHostAvailability())->setInterfaces($interfaces);
 }
 
 /**

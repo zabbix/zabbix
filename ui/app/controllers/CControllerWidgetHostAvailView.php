@@ -34,14 +34,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$type_fields = [
-			INTERFACE_TYPE_AGENT => 'available',
-			INTERFACE_TYPE_SNMP => 'snmp_available',
-			INTERFACE_TYPE_JMX => 'jmx_available',
-			INTERFACE_TYPE_IPMI => 'ipmi_available'
-		];
-
-		$interface_types = array_keys($type_fields);
+		$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 		// Sanitize non-existing interface types.
 		$fields['interface_type'] = array_values(array_intersect($interface_types, $fields['interface_type']));
@@ -52,14 +45,14 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$hosts_total = array_fill_keys($interface_types, 0);
 		$hosts_count = array_fill_keys($interface_types, [
-			HOST_AVAILABLE_UNKNOWN => 0,
-			HOST_AVAILABLE_TRUE => 0,
-			HOST_AVAILABLE_FALSE => 0
+			INTERFACE_AVAILABLE_UNKNOWN => 0,
+			INTERFACE_AVAILABLE_TRUE => 0,
+			INTERFACE_AVAILABLE_FALSE => 0
 		]);
 
 		$db_hosts = API::Host()->get([
-			'output' => ['available', 'snmp_available', 'jmx_available', 'ipmi_available'],
-			'selectInterfaces' => ['interfaceid', 'type'],
+			'output' => [],
+			'selectInterfaces' => ['type', 'available'],
 			'groupids' => $groupids,
 			'filter' => ($fields['maintenance'] == HOST_MAINTENANCE_STATUS_OFF)
 				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
@@ -67,14 +60,16 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 		]);
 
 		foreach ($db_hosts as $host) {
-			$interfaces = [];
-			foreach ($host['interfaces'] as $val) {
-				$interfaces[$val['type']] = true;
-			}
+			$ignore_types = [];
 
-			foreach (array_keys($interfaces) as $type) {
-				$hosts_count[$type][$host[$type_fields[$type]]]++;
-				$hosts_total[$type]++;
+			foreach ($host['interfaces'] as $interface) {
+				if (array_key_exists($interface['type'], $ignore_types)) {
+					continue;
+				}
+
+				$ignore_types[$interface['type']] = 1;
+				$hosts_count[$interface['type']][$interface['available']]++;
+				$hosts_total[$interface['type']]++;
 			}
 		}
 
