@@ -92,6 +92,16 @@ int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	return SUCCEED;
 }
 
+int	__wrap_DBget_user_by_auth_token(const char *authtoken, zbx_user_t *user)
+{
+	ZBX_UNUSED(authtoken);
+
+	user->type = USER_TYPE_ZABBIX_ADMIN;
+	user->userid = 0;
+
+	return SUCCEED;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*request;

@@ -23,9 +23,54 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "trapper_preproc.h"
+#include "trapper.h"
 #include "../preprocessor/preproc_history.h"
 
 extern int	CONFIG_DOUBLE_PRECISION;
+
+int	get_user(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
+{
+	char	buffer[MAX_STRING_LEN];
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_AUTH_SID, buffer, sizeof(buffer), NULL) || SUCCEED ==
+			zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID_DEPRECATED, buffer, sizeof(buffer), NULL))
+	{
+		ret = DBget_user_by_active_session(buffer, user);
+	}
+	else if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_AUTH_TOKEN, buffer, sizeof(buffer), NULL))
+	{
+		ret = DBget_user_by_auth_token(buffer, user);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse either %s or %s or %s tag", ZBX_PROTO_TAG_AUTH_SID,
+				ZBX_PROTO_TAG_SID_DEPRECATED, ZBX_PROTO_TAG_AUTH_SID);
+
+		if (NULL != result)
+		{
+			*result = zbx_dsprintf(*result, "failed to parse either %s or %s or %s tag",
+					ZBX_PROTO_TAG_AUTH_SID, ZBX_PROTO_TAG_SID_DEPRECATED, ZBX_PROTO_TAG_AUTH_SID);
+		}
+
+		ret = FAIL;
+		goto out;
+	}
+
+	if (FAIL == ret && NULL != result)
+		*result = zbx_dsprintf(*result, "Permission denied");
+out:
+	if (FAIL == ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "Permission denied");
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "Permission granted");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -57,8 +102,16 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	size_t			size;
 	zbx_timespec_t		ts_now;
 
+	/*
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL) ||
 			SUCCEED != DBget_user_by_active_session(buffer, &user) || USER_TYPE_ZABBIX_ADMIN > user.type)
+	{
+		*error = zbx_strdup(NULL, "Permission denied.");
+		goto out;
+	}
+	*/
+
+	if (FAIL == get_user(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;
