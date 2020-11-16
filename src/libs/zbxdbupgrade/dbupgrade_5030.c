@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
 
@@ -29,29 +30,70 @@
 
 extern unsigned char	program_type;
 
-static int	DBpatch_5030000(void)
+typedef struct
+{
+	zbx_uint64_t id;
+	zbx_uint64_t userid;
+	char *idx;
+	zbx_uint64_t idx2;
+	zbx_uint64_t value_id;
+	int value_int;
+	char *value_str;
+	char *source;
+	int type;
+} DBpatch_profile_t;
+
+static void	get_key_fields(DB_ROW row, DBpatch_profile_t *profile, char **subsect, char **field)
+{
+	int tok_idx	= 0;
+	char *token;
+
+	ZBX_DBROW2UINT64(profile->id, row[0]);
+	ZBX_DBROW2UINT64(profile->userid, row[1]);
+	ZBX_DBROW2UINT64(profile->idx2, row[3]);
+	ZBX_DBROW2UINT64(profile->value_id, row[4]);
+
+	profile->value_int = atoi(row[5]);
+	profile->idx = zbx_strdup(profile->idx, row[2]);
+	profile->value_str = zbx_strdup(profile->value_str, row[6]);
+	profile->source = zbx_strdup(profile->source, row[7]);
+	profile->type = atoi(row[8]);
+
+	token = strtok(profile->idx, ".");
+
+
+	while (NULL != token) {
+		token = strtok(NULL, ".");
+		++tok_idx;
+
+		if (3 == tok_idx)
+		{
+			*field = zbx_strdup(*field, token);
+			break;
+		}
+		else if (1 == tok_idx)
+			*subsect = zbx_strdup(*subsect, token);
+	}
+}
+
+static int	split_profile_keys(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	int		i;
-	DB_ROW		row;
-	DB_RESULT	result;
+	int	i;
 
 	const char	*profiles[] = {
-		"web.hosts.php.sort", "web.hosts.php.sortorder"
+		"web.hosts.php.sort", "web.hosts.php.sortorder",
+		"web.triggers.php.sort", "web.triggers.php.sortorder"
 	};
 
 	for (i = 0; i < (int)ARRSIZE(profiles); i++) {
-		zbx_uint64_t	profileid;
-		zbx_uint64_t	userid;
-		char		*idx = zbx_strdup(idx, profiles[i]);
-		zbx_uint64_t	idx2 = 0;
-		zbx_uint64_t	value_id = 0;
-		int	value_int = 0;
-		char		*value_str = NULL;
-		char		*source = NULL;
-		int	type = 0;
+		DB_ROW			row;
+		DB_RESULT		result;
+		DBpatch_profile_t	profile = {0};
+		char			*subsect = NULL;
+		char			*field = NULL;
 
 		result = DBselect("SELECT profileid, userid, idx, idx2, value_id, value_int, value_str, source, type"
 				" FROM profiles where idx = '%s'", profiles[i]);
@@ -61,60 +103,33 @@ static int	DBpatch_5030000(void)
 		if (NULL == row)
 			return FAIL;
 
-		ZBX_DBROW2UINT64(profileid, row[0]);
-		ZBX_DBROW2UINT64(userid, row[1]);
-		ZBX_DBROW2UINT64(idx2, row[3]);
-		ZBX_DBROW2UINT64(value_id, row[4]);
-		value_int = atoi(row[5]);
-		value_str = zbx_strdup(value_str, row[6]);
-		source = zbx_strdup(source, row[7]);
-		type = atoi(row[8]);
-
-		int tok_idx	= 0;
-		char *token	= strtok(idx, ".");
-		char *subsect	= 0;
-		char *field	= 0;
-
-		while (NULL != token) {
-			token = strtok(NULL, ".");
-			++tok_idx;
-			if (1 == tok_idx) {
-				subsect = zbx_strdup(subsect, token);
-			} else if (3 == tok_idx) {
-				field = zbx_strdup(field, token);
-				break;
-			}
-		}
+		get_key_fields(row, &profile, &subsect, &field);
 
 		if (0 == subsect || 0 == field)
 			return FAIL;
 
-		zbx_db_insert_t db_insert_section;
-
-		zbx_db_insert_prepare(&db_insert_section, "profiles", "profileid", "userid",
-			"idx", "idx2", "value_id", "value_int", "value_str", "source", "type", NULL);
-
-
-		char idx_hosts[MAX_STRING_LEN];
-		char idx_templates[MAX_STRING_LEN];
-
-		zbx_snprintf(idx_hosts, MAX_STRING_LEN, "web.hosts.%s.%s", subsect, field);
-		zbx_snprintf(idx_templates, MAX_STRING_LEN, "web.templates.%s.%s", subsect, field);
-
-
-		zbx_db_insert_add_values(&db_insert_section, DBget_maxid("profiles"),
-			userid, idx_hosts, idx2, value_id, value_int, value_str, source, type);
-		zbx_db_insert_add_values(&db_insert_section, DBget_maxid("profiles"),
-			userid, idx_templates, idx2, value_id, value_int, value_str, source, type);
-
-		if (SUCCEED != zbx_db_insert_execute(&db_insert_section))
+		if (ZBX_DB_OK > DBexecute("delete from profiles where profileid = %lu", profile.id))
 			return FAIL;
 
-		zbx_db_insert_clean(&db_insert_section);
+		if (ZBX_DB_OK > DBexecute("insert into profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, source, type) "
+				"values (%lu, %lu, 'web.hosts.%s.php.%s', %lu, %lu, %i, '%s', '%s', %i)",
+				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
+				profile.value_int, profile.value_str, profile.source, profile.type))
+			return FAIL;
 
+		if (ZBX_DB_OK > DBexecute("insert into profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, source, type) "
+				"values (%lu, %lu, 'web.templates.%s.php.%s', %lu, %lu, %i, '%s', '%s', %i)",
+				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
+				profile.value_int, profile.value_str, profile.source, profile.type))
+			return FAIL;
 	}
 
 	return SUCCEED;
+}
+
+static int	DBpatch_5030000(void)
+{
+	return split_profile_keys();
 }
 
 #endif
