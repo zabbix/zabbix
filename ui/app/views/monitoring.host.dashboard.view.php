@@ -32,7 +32,6 @@ if (array_key_exists('no_data', $data)) {
 		->setTitle(_('Dashboards'))
 		->addItem(new CTableInfo())
 		->show();
-
 	return;
 }
 
@@ -46,6 +45,26 @@ $this->includeJsFile('monitoring.host.dashboard.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
+
+
+$breadcrumb_url_list = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
+$breadcrumb_url_view = (new CUrl('zabbix.php'))
+	->setArgument('action', 'host.dashboard.view')
+	->setArgument('hostid', $data['host']['hostid']);
+
+$url_view = (new CUrl('zabbix.php'))
+	->setArgument('action', 'host.dashboard.view')
+	->setArgument('hostid', $data['host']['hostid']);
+
+$breadcrumb_elements = [];
+$breadcrumb_elements[] = (new CSpan())
+	->addItem(new CLink(_('All hosts'), $breadcrumb_url_list->getUrl()));
+$breadcrumb_elements[] = (new CSpan())
+	->addItem((new CObject($data['host']['name'])));
+$breadcrumb_elements[] = (new CSpan())
+	->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl())))
+	->addClass(ZBX_STYLE_SELECTED);
+
 
 $widget = (new CWidget())
 	->setTitle($data['dashboard']['name'])
@@ -67,15 +86,8 @@ $widget = (new CWidget())
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))->setAttribute('aria-label', _('Content controls')))
 	->setBreadcrumbs(
-		(new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addItem(new CPartial('monitoring.host.dashboard.breadcrumbs', [
-				'host' => $data['host'],
-				'dashboard' => $data['dashboard'],
-			]))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+		(new CBreadcrumbs())
+			->addBreadcrumbElements($breadcrumb_elements)
 	);
 
 if ($data['time_selector'] !== null) {
