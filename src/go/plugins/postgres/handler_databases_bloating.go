@@ -45,17 +45,15 @@ func (p *Plugin) databasesBloatingHandler(ctx context.Context, conn PostgresClie
 
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countBloating)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

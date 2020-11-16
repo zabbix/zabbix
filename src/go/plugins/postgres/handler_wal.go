@@ -48,17 +48,14 @@ func (p *Plugin) walHandler(ctx context.Context, conn PostgresClient, key string
 
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&walJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

@@ -23,6 +23,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -55,34 +56,28 @@ func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key st
 
 	row, err = conn.QueryRow(ctx, queryArchiveCount)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&archiveCountJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	row, err = conn.QueryRow(ctx, queryArchiveSize)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&archiveSizeJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	result := string(archiveCountJSON[:len(archiveCountJSON)-1]) + "," + string(archiveSizeJSON[1:])
 	return result, nil

@@ -120,7 +120,7 @@ func (conn *PostgresConn) finalize() (err error) {
 	// get conn pool using url created in postgres.go
 	config, err := pgxpool.ParseConfig(conn.connString)
 	if err != nil {
-		return sanitizeError(err.Error(), conn.connString)
+		return fmt.Errorf(err.Error(), conn.connString)
 	}
 
 	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {

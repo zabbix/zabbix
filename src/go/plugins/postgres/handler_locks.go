@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -88,17 +89,15 @@ FROM
 
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&locksJSON)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	if len(locksJSON) == 0 {
-		return nil, errorCannotParseData
+		return nil, errors.New("cannot parse data")
 	}
 
 	return locksJSON, nil

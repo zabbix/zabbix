@@ -212,7 +212,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		return nil, errors.New(formatZabbixError(err.Error()))
 	}
 
-	ctx, cancel := context.WithTimeout(conn.ctx, conn.timeout)
+	ctx, cancel := context.WithTimeout(conn.ctx, time.Duration(p.options.CallTimeout)*time.Second)
 	defer cancel()
 
 	if key == keyPostgresDatabasesSize || key == keyPostgresDatabasesAge {

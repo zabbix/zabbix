@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -41,10 +42,10 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 	)
 	// for now we are expecting at least one parameter
 	if len(params) == 0 {
-		return nil, errorFourthParamEmptyCustomQueryName
+		return nil, errors.New("The key requires custom query name as fourth parameter")
 	}
 	if len(params[0]) == 0 {
-		return nil, errorFourthParamLenCustomQueryName
+		return nil, errors.New("Expected custom query name as fourth parameter for the key, got empty string")
 	}
 
 	queryName := params[0]
@@ -56,7 +57,7 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 
 	rows, err = conn.QueryByName(ctx, queryName, queryArgs...)
 	if err != nil {
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	defer rows.Close()
 
@@ -80,10 +81,9 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 		err = rows.Scan(valuePointers...)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				p.Errf(err.Error())
-				return nil, errorEmptyResult
+				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
-			return nil, errorCannotFetchData
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 		for i, value := range values {

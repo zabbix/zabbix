@@ -41,16 +41,13 @@ func (p *Plugin) uptimeHandler(ctx context.Context, conn PostgresClient, key str
 	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	err = row.Scan(&uptime)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

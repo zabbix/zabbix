@@ -54,17 +54,15 @@ func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, ke
 
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&connectionsJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

@@ -66,7 +66,7 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
       FROM pg_catalog.pg_stat_database
     ) T ;`
 		if conn.PostgresVersion() >= 120000 {
-			query = fmt.Sprintf(query, "sum(checksum_failures)")
+			query = fmt.Sprintf(query, "sum(COALESCE(checksum_failures, 0))")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
@@ -97,7 +97,7 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
       FROM pg_catalog.pg_stat_database
     ) T ;`
 		if conn.PostgresVersion() >= 120000 {
-			query = fmt.Sprintf(query, "checksum_failures")
+			query = fmt.Sprintf(query, "COALESCE(checksum_failures, 0)")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
@@ -105,17 +105,14 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
 
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&statJSON)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

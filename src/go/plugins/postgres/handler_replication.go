@@ -51,29 +51,24 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 	case keyPostgresReplicationStatus:
 		row, err = conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
-			p.Errf(err.Error())
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 		err = row.Scan(&inRecovery)
 		if err != nil {
-			p.Errf(err.Error())
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 		if inRecovery {
 			row, err = conn.QueryRow(ctx, `SELECT COUNT(*) FROM pg_stat_wal_receiver`)
 			if err != nil {
-				p.Errf(err.Error())
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 
 			err = row.Scan(&status)
 			if err != nil {
 				if err == pgx.ErrNoRows {
-					p.Errf(err.Error())
-					return nil, errorEmptyResult
+					return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 				}
-				p.Errf(err.Error())
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 		} else {
@@ -90,17 +85,14 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 	case keyPostgresReplicationLagB:
 		row, err = conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
-			p.Errf(err.Error())
-			return nil, errorCannotFetchData
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 		err = row.Scan(&inRecovery)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				p.Errf(err.Error())
-				return nil, errorEmptyResult
+				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
-			p.Errf(err.Error())
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 		if inRecovery {
@@ -108,17 +100,14 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 						   FROM pg_stat_wal_receiver;`
 			row, err = conn.QueryRow(ctx, query)
 			if err != nil {
-				p.Errf(err.Error())
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 
 			err = row.Scan(&replicationResult)
 			if err != nil {
 				if err == pgx.ErrNoRows {
-					p.Errf(err.Error())
-					return nil, errorEmptyResult
+					return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 				}
-				p.Errf(err.Error())
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 		} else {
@@ -143,34 +132,28 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 					) T`
 		row, err = conn.QueryRow(ctx, query)
 		if err != nil {
-			p.Errf(err.Error())
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 		err = row.Scan(&stringResult)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				p.Errf(err.Error())
-				return nil, errorEmptyResult
+				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
-			p.Errf(err.Error())
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 		return stringResult, nil
 	}
 	row, err = conn.QueryRow(ctx, query)
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&replicationResult)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	return replicationResult, nil

@@ -53,17 +53,14 @@ func (p *Plugin) databasesSizeHandler(ctx context.Context, conn PostgresClient, 
 
 	row, err = conn.QueryRow(ctx, query, params[0])
 	if err != nil {
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countSize)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	return countSize, nil
