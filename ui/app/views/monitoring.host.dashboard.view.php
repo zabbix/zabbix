@@ -70,7 +70,8 @@ $widget = (new CWidget())
 		(new CLink(_('All hosts'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.view')
-				->getUrl())),
+				->getUrl()
+		)),
 		(new CSpan())->addItem($data['host']['name']),
 		(new CSpan())
 			->addItem(new CLink($data['dashboard']['name'],
