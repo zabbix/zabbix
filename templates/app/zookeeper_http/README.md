@@ -17,9 +17,10 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-The Template uses requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver) for collecting metrics. By default AdminServer is enabled.  
-If you need it, configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
-Don't forget change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.  
+This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).  
+By default AdminServer is enabled and listens on port 8080.  
+You can еnable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).  
+Don't forget change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
 
 
 ## Zabbix configuration
@@ -56,9 +57,9 @@ There are no template links in this template.
 |Zabbix_raw_items |Zookeeper: Get connections stats |<p>Get information on client connections to server. Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</p> |HTTP_AGENT |zookeeper.get_connections_stats |
 |Zookeeper |Zookeeper: Server mode |<p>Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone</p> |DEPENDENT |zookeeper.server_state<p>**Preprocessing**:</p><p>- JSONPATH: `$.server_state`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zookeeper |Zookeeper: Uptime |<p>Uptime of Zookeeper server.</p> |DEPENDENT |zookeeper.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p><p>- MULTIPLIER: `0.001`</p> |
-|Zookeeper |Zookeeper: Version |<p>Version of Zookeeper server.</p> |DEPENDENT |zookeeper.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p><p>- REGEX: `([^,]+)--(.+) \1`</p> |
+|Zookeeper |Zookeeper: Version |<p>Version of Zookeeper server.</p> |DEPENDENT |zookeeper.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p><p>- REGEX: `([^,]+)--(.+) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Zookeeper |Zookeeper: Approximate data size |<p>Data tree size in bytes.The size includes the znode path and its value.</p> |DEPENDENT |zookeeper.approximate_data_size<p>**Preprocessing**:</p><p>- JSONPATH: `$.approximate_data_size`</p> |
-|Zookeeper |Zookeeper: File descriptors, max |<p>Maximum number of file descriptors that a zookeeper server can open.</p> |DEPENDENT |zookeeper.max_file_descriptor_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.max_file_descriptor_count`</p> |
+|Zookeeper |Zookeeper: File descriptors, max |<p>Maximum number of file descriptors that a zookeeper server can open.</p> |DEPENDENT |zookeeper.max_file_descriptor_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.max_file_descriptor_count`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zookeeper |Zookeeper: File descriptors, open |<p>Number of file descriptors that a zookeeper server has open.</p> |DEPENDENT |zookeeper.open_file_descriptor_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.open_file_descriptor_count`</p> |
 |Zookeeper |Zookeeper: Outstanding requests |<p>The number of queued requests when the server is under load and is receiving more sustained requests than it can process.</p> |DEPENDENT |zookeeper.outstanding_requests<p>**Preprocessing**:</p><p>- JSONPATH: `$.outstanding_requests`</p> |
 |Zookeeper |Zookeeper: Commit per sec |<p>The number of commits performed per second</p> |DEPENDENT |zookeeper.commit_count.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.commit_count`</p><p>- CHANGE_PER_SECOND |
@@ -75,7 +76,7 @@ There are no template links in this template.
 |Zookeeper |Zookeeper: Latency, max |<p>The maximum amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.max_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.max_latency`</p> |
 |Zookeeper |Zookeeper: Latency, min |<p>The minimum amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.min_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.min_latency`</p> |
 |Zookeeper |Zookeeper: Latency, avg |<p>The average amount of time it takes for the server to respond to a client request.</p> |DEPENDENT |zookeeper.avg_latency<p>**Preprocessing**:</p><p>- JSONPATH: `$.avg_latency`</p> |
-|Zookeeper |Zookeeper: Znode count |<p>The number of znodes in the ZooKeeper namespace (the data)</p> |DEPENDENT |zookeeper.znode_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.znode_count`</p> |
+|Zookeeper |Zookeeper: Znode count |<p>The number of znodes in the ZooKeeper namespace (the data)</p> |DEPENDENT |zookeeper.znode_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.znode_count`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zookeeper |Zookeeper: Ephemeral nodes count |<p>Number of ephemeral nodes that a zookeeper server has in its data tree.</p> |DEPENDENT |zookeeper.ephemerals_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.ephemerals_count`</p> |
 |Zookeeper |Zookeeper: Watch count |<p>Number of watches currently set on the local ZooKeeper process.</p> |DEPENDENT |zookeeper.watch_count<p>**Preprocessing**:</p><p>- JSONPATH: `$.watch_count`</p> |
 |Zookeeper |Zookeeper: Packets sent per sec |<p>The number of zookeeper packets sent from a server per second.</p> |DEPENDENT |zookeeper.packets_sent<p>**Preprocessing**:</p><p>- JSONPATH: `$.packets_sent`</p><p>- CHANGE_PER_SECOND |

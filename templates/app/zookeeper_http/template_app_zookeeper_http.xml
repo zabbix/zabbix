@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-11T09:51:35Z</date>
+   <date>2020-11-16T09:28:20Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -538,6 +538,10 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                      <type>JSONPATH</type>
                      <params>$.max_file_descriptor_count</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>zookeeper.get_metrics</key>
@@ -878,6 +882,10 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                      <params>([^,]+)--(.+)
 \1</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>zookeeper.get_metrics</key>
@@ -930,6 +938,10 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                   <step>
                      <type>JSONPATH</type>
                      <params>$.znode_count</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
                   </step>
                </preprocessing>
                <master_item>
