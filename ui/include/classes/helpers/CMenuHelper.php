@@ -174,7 +174,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))
 					->setAction('discovery.list')
-					->setAliases(['discoveryconf.php', 'discovery.edit'])
+					->setAliases(['discovery.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
 				? (new CMenuItem(_('Services')))->setUrl(new CUrl('services.php'), 'services.php')
