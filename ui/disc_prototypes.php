@@ -624,12 +624,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($item['parameters']);
 			}
 
-			if (array_key_exists('preprocessing', $item)) {
-				usort($item['preprocessing'], function () {
-					return (func_get_arg(1)['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 1 : 0;
-				});
-			}
-
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
@@ -664,9 +658,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if ($preprocessing) {
-				usort($preprocessing, function () {
-					return (func_get_arg(1)['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 1 : 0;
-				});
 				$item['preprocessing'] = $preprocessing;
 			}
 
@@ -1141,12 +1132,6 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 					if ($type != ITEM_TYPE_HTTPAGENT && $type != ITEM_TYPE_SCRIPT) {
 						unset($update_item_prototype['timeout']);
-					}
-
-					if (array_key_exists('preprocessing', $update_item_prototype)) {
-						usort($update_item_prototype['preprocessing'], function () {
-							return (func_get_arg(1)['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 1 : 0;
-						});
 					}
 				}
 				unset($update_item_prototype);
