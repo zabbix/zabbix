@@ -107,4 +107,18 @@ interface IWaitable {
 	 * @return callable
 	 */
 	public function getAttributesNotPresentCondition($attributes);
+
+	/**
+	 * Condition describing state when object is selected.
+	 *
+	 * @return callable
+	 */
+	public function getSelectedCondition();
+
+	/**
+	 * Condition describing state when object is not selected.
+	 *
+	 * @return callable
+	 */
+	public function getNotSelectedCondition();
 }
