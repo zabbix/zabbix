@@ -67,9 +67,10 @@ $widget = (new CWidget())
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))->setAttribute('aria-label', _('Content controls')))
 	->setBreadcrumbs(new CBreadcrumbs([
-			(new CLink(_('All hosts'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'host.view')
-				->getUrl())),
+			(new CLink(_('All hosts'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.view')
+					->getUrl())),
 			(new CSpan())->addItem($data['host']['name']),
 			(new CSpan())
 				->addItem((new CLink($data['dashboard']['name'], (new CUrl('zabbix.php'))
