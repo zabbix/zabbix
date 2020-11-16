@@ -51,7 +51,7 @@ int	get_user(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
 
 		if (NULL != result)
 		{
-			*result = zbx_dsprintf(*result, "failed to parse either %s or %s or %s tag",
+			*result = zbx_dsprintf(*result, "Failed to parse either %s or %s or %s tag",
 					ZBX_PROTO_TAG_AUTH_SID, ZBX_PROTO_TAG_SID_DEPRECATED, ZBX_PROTO_TAG_AUTH_SID);
 		}
 
@@ -85,7 +85,7 @@ out:
  *             values_num - [OUT] the number of values                        *
  *             value_type - [OUT] the value type                              *
  *             steps      - [OUT] the preprocessing steps                     *
- *             single     - [OUT] is single preproc step is tested            *
+ *             single     - [OUT] is preproc step single                      *
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - the request was parsed successfully                *
