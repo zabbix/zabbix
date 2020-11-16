@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-16T05:32:54Z</date>
+   <date>2020-11-16T06:03:35Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1425,7 +1425,7 @@ return JSON.stringify({"data": output})</params>
                      <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <units>!ms</units>
+                     <units>!s</units>
                      <description>The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1438,7 +1438,7 @@ return JSON.stringify({"data": output})</params>
                      <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <units>!ms</units>
+                     <units>!s</units>
                      <description>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</description>
                      <application_prototypes>
                         <application_prototype>
