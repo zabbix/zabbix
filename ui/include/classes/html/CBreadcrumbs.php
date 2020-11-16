@@ -20,7 +20,6 @@
 
 class CBreadcrumbs extends CList {
 	private const ZBX_STYLE_BREADCRUMBS = 'filter-breadcrumb';
-	private const DELIMITER = '/';
 
 	/**
 	 * Creates a UL list.
