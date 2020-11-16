@@ -1075,7 +1075,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Draw date and time intervals under the X axis.
 	 */
 	private function drawDateTimeIntervals() {
-		// Calculate standard label width in time usits.
+		// Calculate standard label width in time units.
 		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 2;
 
 		$prefered_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
