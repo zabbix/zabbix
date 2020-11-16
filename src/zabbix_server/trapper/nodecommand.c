@@ -304,7 +304,6 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-
 	if (SUCCEED == (ret = execute_script(scriptid, hostid, &user, clientip, &result)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);

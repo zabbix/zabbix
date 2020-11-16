@@ -85,6 +85,7 @@ out:
  *             values_num - [OUT] the number of values                        *
  *             value_type - [OUT] the value type                              *
  *             steps      - [OUT] the preprocessing steps                     *
+ *             single     - [OUT] is single preproc step is tested            *
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - the request was parsed successfully                *
@@ -101,15 +102,6 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	struct zbx_json_parse	jp_data, jp_history, jp_steps, jp_step;
 	size_t			size;
 	zbx_timespec_t		ts_now;
-
-	/*
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL) ||
-			SUCCEED != DBget_user_by_active_session(buffer, &user) || USER_TYPE_ZABBIX_ADMIN > user.type)
-	{
-		*error = zbx_strdup(NULL, "Permission denied.");
-		goto out;
-	}
-	*/
 
 	if (FAIL == get_user(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
