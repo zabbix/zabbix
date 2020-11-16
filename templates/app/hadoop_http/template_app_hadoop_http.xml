@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-12T13:23:15Z</date>
+   <date>2020-11-16T05:36:20Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,8 +11,7 @@
       <template>
          <template>Template App Hadoop by HTTP</template>
          <name>Template App Hadoop by HTTP</name>
-         <description>The template gets the Hadoop metrics from cluster's hosts (ResourceManager, NodeManagers, NameNode, DataNodes) by HTTP agent.&#13;
-You should define the IP address (or FQDN) and Web-UI port of ResourceManager and NameNode in macros in the template to use on the host level.&#13;
+         <description>The template gets the Hadoop metrics from cluster's hosts (ResourceManager, NodeManagers, NameNode, DataNodes) by HTTP agent. You should define the IP address (or FQDN) and Web-UI port for the ResourceManager in {$HADOOP.RESOURCEMANAGER.HOST} and {$HADOOP.RESOURCEMANAGER.PORT} macros and for the NameNode in {$HADOOP.NAMENODE.HOST} and {$HADOOP.NAMENODE.PORT} macros respectively. Macros can be set in the template or overridden at the host level.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
@@ -282,6 +281,10 @@ catch (error) {
                      <type>JSONPATH</type>
                      <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumLiveDataNodes.first()</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>hadoop.namenode.get</key>
@@ -303,6 +306,10 @@ catch (error) {
                   <step>
                      <type>JSONPATH</type>
                      <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].StaleDataNodes.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -587,6 +594,10 @@ catch (error) {
                      <type>JSONPATH</type>
                      <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumActiveNMs.first()</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>hadoop.resourcemanager.get</key>
@@ -639,6 +650,10 @@ catch (error) {
                      <type>JSONPATH</type>
                      <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumDecommissioningNMs.first()</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>hadoop.resourcemanager.get</key>
@@ -660,6 +675,10 @@ catch (error) {
                   <step>
                      <type>JSONPATH</type>
                      <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumLostNMs.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <master_item>
