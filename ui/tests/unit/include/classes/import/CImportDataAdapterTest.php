@@ -1928,7 +1928,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => 'simple',
 							'host' => 'export-host'
 						],
-						'max_columns' => '',
+						'max_columns' => '1',
 						'application' => ''
 					]
 				]
