@@ -271,10 +271,8 @@ $form_grid->addItem([
 			->setId('time')
 	),
 
-	($data['steps'] && $data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)
-		?  (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-		: null,
+	(new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
+		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
