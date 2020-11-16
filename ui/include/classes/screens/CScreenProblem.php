@@ -1114,8 +1114,7 @@ class CScreenProblem extends CScreenBase {
 
 				// Create acknowledge link.
 				$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity']
-						|| $allowed['acknowledge'] || $can_be_closed
-				)
+						|| $allowed['acknowledge'] || $can_be_closed)
 					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 						->addClass(ZBX_STYLE_LINK_ALT)

@@ -489,17 +489,20 @@ function getSystemStatusTotals(array $data) {
 }
 
 /**
- * @param array  $data
- * @param array  $data['data']
- * @param array  $data['data']['groups']
- * @param array  $data['data']['groups'][]['stats']
- * @param array  $data['filter']
- * @param array  $data['filter']['severities']
- * @param array  $data['allowed']
- * @param bool   $data['allowed']['ui_problems']
- * @param bool   $data['allowed']['ack']
- * @param bool   $hide_empty_groups
- * @param CUrl   $groupurl
+ * @param array $data
+ * @param array $data['data']
+ * @param array $data['data']['groups']
+ * @param array $data['data']['groups'][]['stats']
+ * @param array $data['filter']
+ * @param array $data['filter']['severities']
+ * @param array $data['allowed']
+ * @param bool  $data['allowed']['ui_problems']
+ * @param bool  $data['allowed']['add_comments']
+ * @param bool  $data['allowed']['change_severity']
+ * @param bool  $data['allowed']['acknowledge']
+ * @param bool  $data['allowed']['close']
+ * @param bool  $hide_empty_groups
+ * @param CUrl  $groupurl
  *
  * @return CTableInfo
  */
@@ -536,14 +539,18 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
 }
 
 /**
- * @param array  $data
- * @param array  $data['data']
- * @param array  $data['data']['groups']
- * @param array  $data['data']['groups'][]['stats']
- * @param array  $data['filter']
- * @param array  $data['filter']['severities']
- * @param array  $data['allowed']
- * @param bool   $data['allowed']['ack']
+ * @param array $data
+ * @param array $data['data']
+ * @param array $data['data']['groups']
+ * @param array $data['data']['groups'][]['stats']
+ * @param array $data['filter']
+ * @param array $data['filter']['severities']
+ * @param array $data['allowed']
+ * @param bool  $data['allowed']['ui_problems']
+ * @param bool  $data['allowed']['add_comments']
+ * @param bool  $data['allowed']['change_severity']
+ * @param bool  $data['allowed']['acknowledge']
+ * @param bool  $data['allowed']['close']
  *
  * @return CDiv
  */
@@ -564,22 +571,26 @@ function makeSeverityTotals(array $data) {
 }
 
 /**
- * @param int     $severity
- * @param array   $data
- * @param array   $data['data']
- * @param array   $data['data']['triggers']
- * @param array   $data['data']['actions']
- * @param array   $data['filter']
- * @param array   $data['filter']['ext_ack']
- * @param array   $data['severity_names']
- * @param array   $data['allowed']
- * @param bool    $data['allowed']['ack']
- * @param array   $stat
- * @param int     $stats['count']
- * @param array   $stats['problems']
- * @param int     $stats['count_unack']
- * @param array   $stats['problems_unack']
- * @param boolean $is_total
+ * @param int   $severity
+ * @param array $data
+ * @param array $data['data']
+ * @param array $data['data']['triggers']
+ * @param array $data['data']['actions']
+ * @param array $data['filter']
+ * @param array $data['filter']['ext_ack']
+ * @param array $data['severity_names']
+ * @param array $data['allowed']
+ * @param bool  $data['allowed']['ui_problems']
+ * @param bool  $data['allowed']['add_comments']
+ * @param bool  $data['allowed']['change_severity']
+ * @param bool  $data['allowed']['acknowledge']
+ * @param bool  $data['allowed']['close']
+ * @param array $stat
+ * @param int   $stat['count']
+ * @param array $stat['problems']
+ * @param int   $stat['count_unack']
+ * @param array $stat['problems_unack']
+ * @param bool  $is_total
  *
  * @return CCol|string
  */
@@ -908,8 +919,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		// Create acknowledge link.
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close'])
-		)
+				|| ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']))
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)

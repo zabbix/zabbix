@@ -175,8 +175,7 @@ function make_event_details(array $event, array $allowed) {
 		->addRow([
 			_('Acknowledged'),
 			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-					|| ($event['r_eventid'] == 0 && $allowed['close'])
-			)
+					|| ($event['r_eventid'] == 0 && $allowed['close']))
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)
@@ -370,8 +369,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		// Create acknowledge link.
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| ($event['r_eventid'] == 0 && $allowed['close'])
-		)
+				|| ($event['r_eventid'] == 0 && $allowed['close']))
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
@@ -629,8 +627,7 @@ function make_popup_eventlist($trigger, $eventid_till, $allowed, $show_timeline 
 
 			// Create acknowledge link.
 			$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-					|| $can_be_closed
-			)
+					|| $can_be_closed)
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)
