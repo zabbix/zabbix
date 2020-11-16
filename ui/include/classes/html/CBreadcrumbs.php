@@ -36,11 +36,11 @@ class CBreadcrumbs extends CList {
 	}
 
 	protected function getDelimiter() {
- 		return '/';
+		return '/';
 	}
 
 	public function toString($destroy = true) {
-		$this->items = [implode( $this->getDelimiter(), $this->items)];
+		$this->items = [implode($this->getDelimiter(), $this->items)];
 		return parent::toString($destroy);
 	}
 }
