@@ -213,8 +213,8 @@ There are no template links in this template.
 |Storage |{#DEVNAME}: Disk write rate |<p>Rate of write operations on the disk.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60] |
 |Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60] |
 |Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60] |
-|Storage |{#DEVNAME}: Disk read request avg waiting time (r_await) |<p>The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60] |
-|Storage |{#DEVNAME}: Disk write request avg waiting time (w_await) |<p>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60] |
+|Storage |{#DEVNAME}: Disk read request avg waiting time |<p>The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60] |
+|Storage |{#DEVNAME}: Disk write request avg waiting time |<p>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60] |
 
 ## Triggers
 

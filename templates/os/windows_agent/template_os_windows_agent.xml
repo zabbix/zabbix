@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-16T06:03:35Z</date>
+   <date>2020-11-16T06:11:13Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1421,7 +1421,7 @@ return JSON.stringify({"data": output})</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#DEVNAME}: Disk read request avg waiting time (r_await)</name>
+                     <name>{#DEVNAME}: Disk read request avg waiting time</name>
                      <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1434,7 +1434,7 @@ return JSON.stringify({"data": output})</params>
                      </application_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#DEVNAME}: Disk write request avg waiting time (w_await)</name>
+                     <name>{#DEVNAME}: Disk write request avg waiting time</name>
                      <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
