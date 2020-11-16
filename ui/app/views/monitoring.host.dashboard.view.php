@@ -77,8 +77,8 @@ $widget = (new CWidget())
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'host.dashboard.view')
 					->setArgument('hostid', $data['host']['hostid'])
-					->getUrl())
-			)
+					->getUrl()
+			))
 			->addClass(ZBX_STYLE_SELECTED)
 	]));
 
