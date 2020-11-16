@@ -32,6 +32,7 @@ if (array_key_exists('no_data', $data)) {
 		->setTitle(_('Dashboards'))
 		->addItem(new CTableInfo())
 		->show();
+
 	return;
 }
 
@@ -45,7 +46,6 @@ $this->includeJsFile('monitoring.host.dashboard.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
-
 
 $widget = (new CWidget())
 	->setTitle($data['dashboard']['name'])

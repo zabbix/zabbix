@@ -21,25 +21,27 @@
 class CBreadcrumbs extends CList {
 	private const ZBX_STYLE_BREADCRUMBS = 'filter-breadcrumb';
 
-	/**
-	 * Creates a UL list.
-	 *
-	 * @param array $values an array of items to add to the list
-	 */
 	public function __construct(array $values = []) {
 		parent::__construct($values);
-		$this->setAttribute('role', 'navigation');
-		$this->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
-		$this->addClass(ZBX_STYLE_OBJECT_GROUP);
-		$this->addClass(self::ZBX_STYLE_BREADCRUMBS);
+
+		$this->setAttribute('role', 'navigation')
+		      ->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
+			  ->addClass(ZBX_STYLE_OBJECT_GROUP)
+			  ->addClass(self::ZBX_STYLE_BREADCRUMBS);
 	}
 
+	/**
+	 * Return element as delimiter for breadcrumbs
+	 * @return string
+	 */
 	protected function getDelimiter() {
+
 		return '/';
 	}
 
 	public function toString($destroy = true) {
 		$this->items = [implode($this->getDelimiter(), $this->items)];
+
 		return parent::toString($destroy);
 	}
 }
