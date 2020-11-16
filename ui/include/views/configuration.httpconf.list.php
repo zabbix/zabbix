@@ -33,7 +33,7 @@ $filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data[
 			->addRow(
 				(new CLabel(_('Host groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
-					'name' => 'filter_groups[]',
+					'name' => 'filter_groupids[]',
 					'object_name' => 'hostGroup',
 					'data' => $data['filter']['groups'],
 					'popup' => [
@@ -41,7 +41,7 @@ $filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data[
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_groups_',
+							'dstfld1' => 'filter_groupids_',
 							'with_hosts_and_templates' => 1,
 							'editable' => 1,
 							'enrich_parent_groups' => true
@@ -57,7 +57,7 @@ $filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data[
 					'data' => $data['filter']['hosts'],
 					'popup' => [
 						'filter_preselect_fields' => [
-							'hostgroups' => 'filter_groups_'
+							'hostgroups' => 'filter_groupids_'
 						],
 						'parameters' => [
 							'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',

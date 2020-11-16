@@ -75,7 +75,7 @@ $fields = [
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_groupids' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),					null],
@@ -407,25 +407,27 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 	show_messages();
 }
 
+$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+
 /**
  * Update profile keys.
  */
-$sort_field = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-$sort_order = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+$sort_field = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
+$sort_order = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-CProfile::update('web.'.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
-CProfile::update('web.'.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
+CProfile::update($prefix.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
+CProfile::update($prefix.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 if (hasRequest('filter_set')) {
-	CProfile::updateArray('web.graphs.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
-	CProfile::updateArray('web.graphs.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'graphs.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'graphs.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
-	CProfile::deleteIdx('web.graphs.filter_groups');
+	CProfile::deleteIdx($prefix.'graphs.filter_groupids');
 
-	$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.graphs.filter_hostids', []));
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'graphs.filter_hostids', []));
 	if (count($filter_hostids) != 1) {
-		CProfile::deleteIdx('web.graphs.filter_hostids');
+		CProfile::deleteIdx($prefix.'graphs.filter_hostids');
 	}
 }
 
@@ -441,8 +443,8 @@ if (hasRequest('parent_discoveryid')) {
 }
 else {
 	$filter = [
-		'groups' => CProfile::getArray('web.graphs.filter_groups', null),
-		'hosts' => CProfile::getArray('web.graphs.filter_hostids', null)
+		'groups' => CProfile::getArray($prefix.'graphs.filter_groupids', null),
+		'hosts' => CProfile::getArray($prefix.'graphs.filter_hostids', null)
 	];
 }
 
@@ -682,8 +684,8 @@ else {
 		'graphs' => [],
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
-		'profileIdx' => 'web.graphs.filter',
-		'active_tab' => CProfile::get('web.graphs.filter.active', 1),
+		'profileIdx' => $prefix.'graphs.filter',
+		'active_tab' => CProfile::get($prefix.'graphs.filter.active', 1),
 		'context' => getRequest('context')
 	];
 

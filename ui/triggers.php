@@ -686,6 +686,8 @@ else {
 		'context' => getRequest('context')
 	];
 
+	$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';
+
 	$filter_groupids_ms = [];
 	$filter_hostids_ms = [];
 
@@ -710,7 +712,7 @@ else {
 		$filter_name = '';
 		$filter_priority = [];
 		$filter_groupids = [];
-		$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.triggers.filter_hostids', []));
+		$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
 		if (count($filter_hostids) != 1) {
 			$filter_hostids = [];
 		}
@@ -721,25 +723,25 @@ else {
 		$filter_tags = [];
 	}
 	else {
-		$filter_inherited = CProfile::get('web.triggers.filter_inherited', -1);
-		$filter_discovered = CProfile::get('web.triggers.filter_discovered', -1);
-		$filter_dependent = CProfile::get('web.triggers.filter_dependent', -1);
-		$filter_name = CProfile::get('web.triggers.filter_name', '');
-		$filter_priority = CProfile::getArray('web.triggers.filter_priority', []);
-		$filter_groupids = CProfile::getArray('web.triggers.filter_groupids', []);
-		$filter_hostids = CProfile::getArray('web.triggers.filter_hostids', []);
-		$filter_state = CProfile::get('web.triggers.filter_state', -1);
-		$filter_status = CProfile::get('web.triggers.filter_status', -1);
-		$filter_value = CProfile::get('web.triggers.filter_value', -1);
-		$filter_evaltype = CProfile::get('web.triggers.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
+		$filter_inherited = CProfile::get($prefix.'triggers.filter_inherited', -1);
+		$filter_discovered = CProfile::get($prefix.'triggers.filter_discovered', -1);
+		$filter_dependent = CProfile::get($prefix.'triggers.filter_dependent', -1);
+		$filter_name = CProfile::get($prefix.'triggers.filter_name', '');
+		$filter_priority = CProfile::getArray($prefix.'triggers.filter_priority', []);
+		$filter_groupids = CProfile::getArray($prefix.'triggers.filter_groupids', []);
+		$filter_hostids = CProfile::getArray($prefix.'triggers.filter_hostids', []);
+		$filter_state = CProfile::get($prefix.'triggers.filter_state', -1);
+		$filter_status = CProfile::get($prefix.'triggers.filter_status', -1);
+		$filter_value = CProfile::get($prefix.'triggers.filter_value', -1);
+		$filter_evaltype = CProfile::get($prefix.'triggers.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
 
 		$filter_tags = [];
 
-		foreach (CProfile::getArray('web.triggers.filter.tags.tag', []) as $i => $tag) {
+		foreach (CProfile::getArray($prefix.'triggers.filter.tags.tag', []) as $i => $tag) {
 			$filter_tags[] = [
 				'tag' => $tag,
-				'value' => CProfile::get('web.triggers.filter.tags.value', null, $i),
-				'operator' => CProfile::get('web.triggers.filter.tags.operator', null, $i)
+				'value' => CProfile::get($prefix.'triggers.filter.tags.value', null, $i),
+				'operator' => CProfile::get($prefix.'triggers.filter.tags.operator', null, $i)
 			];
 		}
 	}
@@ -787,9 +789,9 @@ else {
 		return (bool) $v['tag'];
 	});
 
-	$sort = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
-	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
-	$active_tab = CProfile::get('web.triggers.filter.active', 1);
+	$sort = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'description'));
+	$sortorder = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$active_tab = CProfile::get($prefix.'triggers.filter.active', 1);
 
 	// Get triggers (build options).
 	$options = [
@@ -972,20 +974,20 @@ else {
 		unset($dependencyTrigger);
 	}
 
-	CProfile::update('web.'.$page['file'].'.sort', $sort, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortorder, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sort', $sort, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sortorder', $sortorder, PROFILE_TYPE_STR);
 
 	if (getRequest('filter_set')) {
-		CProfile::update('web.triggers.filter_inherited', $filter_inherited, PROFILE_TYPE_INT);
-		CProfile::update('web.triggers.filter_discovered', $filter_discovered, PROFILE_TYPE_INT);
-		CProfile::update('web.triggers.filter_dependent', $filter_dependent, PROFILE_TYPE_INT);
-		CProfile::update('web.triggers.filter_name', $filter_name, PROFILE_TYPE_STR);
-		CProfile::updateArray('web.triggers.filter_priority', $filter_priority, PROFILE_TYPE_INT);
-		CProfile::updateArray('web.triggers.filter_groupids', $filter_groupids, PROFILE_TYPE_ID);
-		CProfile::updateArray('web.triggers.filter_hostids', $filter_hostids, PROFILE_TYPE_ID);
-		CProfile::update('web.triggers.filter_state', $filter_state, PROFILE_TYPE_INT);
-		CProfile::update('web.triggers.filter_status', $filter_status, PROFILE_TYPE_INT);
-		CProfile::update('web.triggers.filter.evaltype', $filter_evaltype, PROFILE_TYPE_INT);
+		CProfile::update($prefix.'triggers.filter_inherited', $filter_inherited, PROFILE_TYPE_INT);
+		CProfile::update($prefix.'triggers.filter_discovered', $filter_discovered, PROFILE_TYPE_INT);
+		CProfile::update($prefix.'triggers.filter_dependent', $filter_dependent, PROFILE_TYPE_INT);
+		CProfile::update($prefix.'triggers.filter_name', $filter_name, PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'triggers.filter_priority', $filter_priority, PROFILE_TYPE_INT);
+		CProfile::updateArray($prefix.'triggers.filter_groupids', $filter_groupids, PROFILE_TYPE_ID);
+		CProfile::updateArray($prefix.'triggers.filter_hostids', $filter_hostids, PROFILE_TYPE_ID);
+		CProfile::update($prefix.'triggers.filter_state', $filter_state, PROFILE_TYPE_INT);
+		CProfile::update($prefix.'triggers.filter_status', $filter_status, PROFILE_TYPE_INT);
+		CProfile::update($prefix.'triggers.filter.evaltype', $filter_evaltype, PROFILE_TYPE_INT);
 
 		$filter_tags_fmt = ['tags' => [], 'values' => [], 'operators' => []];
 
@@ -999,35 +1001,35 @@ else {
 			$filter_tags_fmt['operators'][] = $filter_tag['operator'];
 		}
 
-		CProfile::updateArray('web.triggers.filter.tags.tag', $filter_tags_fmt['tags'], PROFILE_TYPE_STR);
-		CProfile::updateArray('web.triggers.filter.tags.value', $filter_tags_fmt['values'], PROFILE_TYPE_STR);
-		CProfile::updateArray('web.triggers.filter.tags.operator', $filter_tags_fmt['operators'], PROFILE_TYPE_INT);
+		CProfile::updateArray($prefix.'triggers.filter.tags.tag', $filter_tags_fmt['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'triggers.filter.tags.value', $filter_tags_fmt['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray($prefix.'triggers.filter.tags.operator', $filter_tags_fmt['operators'], PROFILE_TYPE_INT);
 
 		if ($show_value_column) {
-			CProfile::update('web.triggers.filter_value', $filter_value, PROFILE_TYPE_INT);
+			CProfile::update($prefix.'triggers.filter_value', $filter_value, PROFILE_TYPE_INT);
 		}
 	}
 	elseif (getRequest('filter_rst')) {
-		CProfile::deleteIdx('web.triggers.filter_inherited');
-		CProfile::deleteIdx('web.triggers.filter_discovered');
-		CProfile::deleteIdx('web.triggers.filter_dependent');
-		CProfile::deleteIdx('web.triggers.filter_name');
-		CProfile::deleteIdx('web.triggers.filter_priority');
-		CProfile::deleteIdx('web.triggers.filter_groupids');
+		CProfile::deleteIdx($prefix.'triggers.filter_inherited');
+		CProfile::deleteIdx($prefix.'triggers.filter_discovered');
+		CProfile::deleteIdx($prefix.'triggers.filter_dependent');
+		CProfile::deleteIdx($prefix.'triggers.filter_name');
+		CProfile::deleteIdx($prefix.'triggers.filter_priority');
+		CProfile::deleteIdx($prefix.'triggers.filter_groupids');
 
 		if (count($filter_hostids) != 1) {
-			CProfile::deleteIdx('web.triggers.filter_hostids');
+			CProfile::deleteIdx($prefix.'triggers.filter_hostids');
 		}
 
-		CProfile::deleteIdx('web.triggers.filter_state');
-		CProfile::deleteIdx('web.triggers.filter_status');
-		CProfile::deleteIdx('web.triggers.filter.evaltype');
-		CProfile::deleteIdx('web.triggers.filter.tags.tag');
-		CProfile::deleteIdx('web.triggers.filter.tags.value');
-		CProfile::deleteIdx('web.triggers.filter.tags.operator');
+		CProfile::deleteIdx($prefix.'triggers.filter_state');
+		CProfile::deleteIdx($prefix.'triggers.filter_status');
+		CProfile::deleteIdx($prefix.'triggers.filter.evaltype');
+		CProfile::deleteIdx($prefix.'triggers.filter.tags.tag');
+		CProfile::deleteIdx($prefix.'triggers.filter.tags.value');
+		CProfile::deleteIdx($prefix.'triggers.filter.tags.operator');
 
 		if ($show_value_column) {
-			CProfile::deleteIdx('web.triggers.filter_value');
+			CProfile::deleteIdx($prefix.'triggers.filter_value');
 		}
 	}
 
@@ -1041,7 +1043,7 @@ else {
 
 	$data += [
 		'triggers' => $triggers,
-		'profileIdx' => 'web.triggers.filter',
+		'profileIdx' => $prefix.'triggers.filter',
 		'active_tab' => $active_tab,
 		'sort' => $sort,
 		'sortorder' => $sortorder,
