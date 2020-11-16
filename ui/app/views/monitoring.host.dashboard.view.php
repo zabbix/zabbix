@@ -47,25 +47,6 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 
-$breadcrumb_url_list = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
-$breadcrumb_url_view = (new CUrl('zabbix.php'))
-	->setArgument('action', 'host.dashboard.view')
-	->setArgument('hostid', $data['host']['hostid']);
-
-$url_view = (new CUrl('zabbix.php'))
-	->setArgument('action', 'host.dashboard.view')
-	->setArgument('hostid', $data['host']['hostid']);
-
-$breadcrumb_elements = [];
-$breadcrumb_elements[] = (new CSpan())
-	->addItem(new CLink(_('All hosts'), $breadcrumb_url_list->getUrl()));
-$breadcrumb_elements[] = (new CSpan())
-	->addItem((new CObject($data['host']['name'])));
-$breadcrumb_elements[] = (new CSpan())
-	->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl())))
-	->addClass(ZBX_STYLE_SELECTED);
-
-
 $widget = (new CWidget())
 	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
@@ -86,8 +67,18 @@ $widget = (new CWidget())
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))->setAttribute('aria-label', _('Content controls')))
 	->setBreadcrumbs(
-		(new CBreadcrumbs())
-			->addBreadcrumbElements($breadcrumb_elements)
+		(new CBreadcrumbs([
+			(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view')->getUrl())),
+			(new CSpan())->addItem($data['host']['name']),
+			((new CSpan())
+				->addItem(
+					(new CLink($data['dashboard']['name'],
+					(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.dashboard.view')
+				->setArgument('hostid', $data['host']['hostid'])->getUrl())))
+				->addClass(ZBX_STYLE_SELECTED)
+			)
+		]))
 	);
 
 if ($data['time_selector'] !== null) {
