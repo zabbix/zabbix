@@ -970,25 +970,26 @@ class CLineGraphDraw extends CGraphDraw {
 		$best_main_interval = null;
 		$best_sub_interval = null;
 		$best_sub_interval_ts = 0;
-
-		$best_interval_prop = INF;
+		$best_sub_interval_prop = INF;
 
 		foreach ($intervals as $main_interval => $sub_intervals) {
 			foreach ($sub_intervals as $sub_interval) {
-				$sub_interval_ts = (new DateTime('@0'))
+				$interval_ts = (new DateTime('@0'))
 					->add(new DateInterval($sub_interval))
 					->getTimestamp();
 
-				$interval_prop = max($pref_sub_interval, $sub_interval_ts) / min($pref_sub_interval, $sub_interval_ts);
+				$interval_prop = max($pref_sub_interval, $interval_ts) / min($pref_sub_interval, $interval_ts);
 
-				// Search for best interval preferably matching the $min_sub_interval criteria.
-				if ($interval_prop < $best_interval_prop
-						|| ($sub_interval_ts > $best_sub_interval_ts && $best_sub_interval_ts < $min_sub_interval)) {
-					$best_interval_prop = $interval_prop;
+				// Search for the best interval preferably but not necessarily matching the $min_sub_interval criteria.
+				$is_better = ($best_sub_interval_ts < $min_sub_interval)
+					? $interval_ts > $best_sub_interval_ts
+					: $interval_prop < $best_sub_interval_prop;
 
+				if ($is_better) {
 					$best_main_interval = $main_interval;
 					$best_sub_interval = $sub_interval;
-					$best_sub_interval_ts = $sub_interval_ts;
+					$best_sub_interval_ts = $interval_ts;
+					$best_sub_interval_prop = $interval_prop;
 				}
 			}
 		}
