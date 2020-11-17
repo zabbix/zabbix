@@ -1229,12 +1229,6 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'disable_until' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 			'error' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -1242,6 +1236,12 @@ return [
 				'default' => '',
 			],
 			'errors_from' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'disable_until' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
