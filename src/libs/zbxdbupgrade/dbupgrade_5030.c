@@ -32,21 +32,104 @@ extern unsigned char	program_type;
 
 typedef struct
 {
-	zbx_uint64_t id;
-	zbx_uint64_t userid;
-	char *idx;
-	zbx_uint64_t idx2;
-	zbx_uint64_t value_id;
-	int value_int;
-	char *value_str;
-	char *source;
-	int type;
-} DBpatch_profile_t;
+	zbx_uint64_t	id;
+	zbx_uint64_t	userid;
+	char		*idx;
+	zbx_uint64_t	idx2;
+	zbx_uint64_t	value_id;
+	int		value_int;
+	char		*value_str;
+	char		*source;
+	int		type;
+}
+DBpatch_profile_t;
+
+static int	delete_redundant_filters(void)
+{
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+		"'web.items.filter_application',"
+		"'web.items.filter_delay',"
+		"'web.items.filter_discovery',"
+		"'web.items.filter_groupids',"
+		"'web.items.filter_history',"
+		"'web.items.filter_hostids',"
+		"'web.items.filter_ipmi_sensor',"
+		"'web.items.filter_key',"
+		"'web.items.filter_name',"
+		"'web.items.filter_port',"
+		"'web.items.filter_snmp_community',"
+		"'web.items.filter_snmp_oid',"
+		"'web.items.filter_snmpv3_securityname',"
+		"'web.items.filter_state',"
+		"'web.items.filter_status',"
+		"'web.items.filter_templated_items',"
+		"'web.items.filter_trends',"
+		"'web.items.filter_type',"
+		"'web.items.filter_value_type',"
+		"'web.items.filter_with_triggers',"
+		"'web.items.subfilter_apps',"
+		"'web.items.subfilter_discovery',"
+		"'web.items.subfilter_history',"
+		"'web.items.subfilter_hosts',"
+		"'web.items.subfilter_interval',"
+		"'web.items.subfilter_state',"
+		"'web.items.subfilter_status',"
+		"'web.items.subfilter_templated_items',"
+		"'web.items.subfilter_trends',"
+		"'web.items.subfilter_types',"
+		"'web.items.subfilter_value_types',"
+		"'web.items.subfilter_with_triggers')"))
+		return FAIL;
+
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+		"'web.triggers.filter.evaltype',"
+		"'web.triggers.filter.tags.operator',"
+		"'web.triggers.filter.tags.tag',"
+		"'web.triggers.filter.tags.value',"
+		"'web.triggers.filter_dependent',"
+		"'web.triggers.filter_discovered',"
+		"'web.triggers.filter_groupids',"
+		"'web.triggers.filter_hostids',"
+		"'web.triggers.filter_inherited',"
+		"'web.triggers.filter_name',"
+		"'web.triggers.filter_priority',"
+		"'web.triggers.filter_state',"
+		"'web.triggers.filter_status',"
+		"'web.triggers.filter_value')"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+		"'web.graphs.filter_groups',"
+		"'web.graphs.filter_hostids')"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+		"'web.host_discovery.filter.delay',"
+		"'web.host_discovery.filter.groupids',"
+		"'web.host_discovery.filter.hostids',"
+		"'web.host_discovery.filter.key',"
+		"'web.host_discovery.filter.lifetime',"
+		"'web.host_discovery.filter.name',"
+		"'web.host_discovery.filter.snmp_oid',"
+		"'web.host_discovery.filter.state',"
+		"'web.host_discovery.filter.status',"
+		"'web.host_discovery.filter.type')"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+		"'web.httpconf.filter_groups',"
+		"'web.httpconf.filter_hostids',"
+		"'web.httpconf.filter_status')"))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 static void	get_key_fields(DB_ROW row, DBpatch_profile_t *profile, char **subsect, char **field)
 {
-	int tok_idx	= 0;
-	char *token;
+	int	tok_idx = 0;
+	char	*token;
 
 	ZBX_DBROW2UINT64(profile->id, row[0]);
 	ZBX_DBROW2UINT64(profile->userid, row[1]);
@@ -61,18 +144,20 @@ static void	get_key_fields(DB_ROW row, DBpatch_profile_t *profile, char **subsec
 
 	token = strtok(profile->idx, ".");
 
-
-	while (NULL != token) {
+	while (NULL != token)
+	{
 		token = strtok(NULL, ".");
 		++tok_idx;
 
-		if (3 == tok_idx)
+		if (1 == tok_idx)
+		{
+			*subsect = zbx_strdup(*subsect, token);
+		}
+		else if (3 == tok_idx)
 		{
 			*field = zbx_strdup(*field, token);
 			break;
 		}
-		else if (1 == tok_idx)
-			*subsect = zbx_strdup(*subsect, token);
 	}
 }
 
@@ -81,14 +166,22 @@ static int	split_profile_keys(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	if (FAIL == delete_redundant_filters())
+		return FAIL;
+
 	int	i;
 
-	const char	*profiles[] = {
-		"web.hosts.php.sort", "web.hosts.php.sortorder",
-		"web.triggers.php.sort", "web.triggers.php.sortorder"
+	const char	*keys[] =
+	{
+		"web.items.php.sort", "web.items.php.sortorder",
+		"web.triggers.php.sort", "web.triggers.php.sortorder",
+		"web.graphs.php.sort", "web.graphs.php.sortorder",
+		"web.host_discovery.php.sort", "web.host_discovery.php.sortorder",
+		"web.httpconf.php.sort", "web.httpconf.php.sortorder"
 	};
 
-	for (i = 0; i < (int)ARRSIZE(profiles); i++) {
+	for (i = 0; i < (int)ARRSIZE(keys); i++)
+	{
 		DB_ROW			row;
 		DB_RESULT		result;
 		DBpatch_profile_t	profile = {0};
@@ -96,12 +189,15 @@ static int	split_profile_keys(void)
 		char			*field = NULL;
 
 		result = DBselect("SELECT profileid, userid, idx, idx2, value_id, value_int, value_str, source, type"
-				" FROM profiles where idx = '%s'", profiles[i]);
+				" FROM profiles where idx = '%s'", keys[i]);
 
 		row = DBfetch(result);
 
 		if (NULL == row)
+		{
+			DBfree_result(result);
 			return FAIL;
+		}
 
 		get_key_fields(row, &profile, &subsect, &field);
 
@@ -122,10 +218,17 @@ static int	split_profile_keys(void)
 				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 			return FAIL;
+
+		zbx_free(profile.idx);
+		zbx_free(profile.value_str);
+		zbx_free(profile.source);
+		zbx_free(subsect);
+		zbx_free(field);
 	}
 
 	return SUCCEED;
 }
+
 
 static int	DBpatch_5030000(void)
 {
