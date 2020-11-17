@@ -551,11 +551,6 @@ class CControllerMenuPopup extends CController {
 				'items' => $items,
 				'showEvents' => $show_events,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-				'allowed_ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-						|| (CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-							&& $db_trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
@@ -567,16 +562,35 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
+			$can_be_closed = ($db_trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+					&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			);
+
 			if (array_key_exists('eventid', $data)) {
 				$menu_data['eventid'] = $data['eventid'];
 
 				$events = API::Event()->get([
-					'output' => ['urls'],
+					'output' => ['r_eventid', 'urls'],
+					'select_acknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
 
 				if ($events) {
-					foreach ($events[0]['urls'] as $url) {
+					$event = $events[0];
+
+					if ($event['r_eventid'] != 0) {
+						$can_be_closed = false;
+					}
+					else {
+						foreach ($event['acknowledges'] as $acknowledge) {
+							if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+								$can_be_closed = false;
+								break;
+							}
+						}
+					}
+
+					foreach ($event['urls'] as $url) {
 						$menu_data['urls'][] = [
 							'label' => $url['name'],
 							'url' => $url['url'],
@@ -599,7 +613,13 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if (array_key_exists('acknowledge', $data)) {
-				$menu_data['acknowledge'] = (bool) $data['acknowledge'];
+				$menu_data['acknowledge'] = ((bool) $data['acknowledge']
+						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+							|| $can_be_closed
+						)
+				);
 			}
 
 			return $menu_data;
