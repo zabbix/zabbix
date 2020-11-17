@@ -229,10 +229,6 @@ func (r *tableResult) write(rs *ole.IDispatch) (err error) {
 		return
 	})
 
-	if 0 == len(r.data) {
-		return errors.New("No data available.")
-	}
-
 	if _, ok := oleErr.(stopError); !ok {
 		return oleErr
 	}
@@ -281,13 +277,9 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 
 	v, err := oleutil.GetProperty(result, "Count")
 	if err != nil {
-		return
+		return err
 	}
 	defer v.Clear()
-	count := int64(v.Val)
-	if count == 0 {
-		return
-	}
 
 	return w.write(result)
 }
