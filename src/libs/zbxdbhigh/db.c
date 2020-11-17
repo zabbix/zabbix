@@ -3346,7 +3346,7 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_sql_add_host_availability                                    *
+ * Function: zbx_sql_add_interface_availability                               *
  *                                                                            *
  * Purpose: adds host availability update to sql statement                    *
  *                                                                            *
@@ -3355,57 +3355,48 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
  *                                   statement                                *
  *             sql_offset - [IN/OUT] the number of bytes used in sql          *
  *                                   statement                                *
- *             ha           [IN] the host availability data                   *
+ *             ia           [IN] the interface availability data              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const zbx_host_availability_t *ha)
+int	zbx_sql_add_interface_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_interface_availability_t *ia)
 {
-	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
 	char		delim = ' ';
 	int		i;
 
-	if (FAIL == zbx_host_availability_is_set(ha))
+	if (FAIL == zbx_interface_availability_is_set(ia))
 		return FAIL;
 
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update hosts set");
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update interface set");
 
-	for (i = 0; i < ZBX_AGENT_MAX; i++)
+	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
 	{
-		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%savailable=%d", delim, field_prefix[i],
-					(int)ha->agents[i].available);
-			delim = ',';
-		}
-
-		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-		{
-			char	*error_esc;
-
-			error_esc = DBdyn_escape_field("hosts", "error", ha->agents[i].error);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%serror='%s'", delim, field_prefix[i],
-					error_esc);
-			zbx_free(error_esc);
-			delim = ',';
-		}
-
-		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%serrors_from=%d", delim, field_prefix[i],
-					ha->agents[i].errors_from);
-			delim = ',';
-		}
-
-		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
-		{
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%sdisable_until=%d", delim, field_prefix[i],
-					ha->agents[i].disable_until);
-			delim = ',';
-		}
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cavailable=%d", delim, (int)ia->agent.available);
+		delim = ',';
 	}
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64, ha->hostid);
+	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
+	{
+		char	*error_esc;
+
+		error_esc = DBdyn_escape_field("interface", "error", ia->agent.error);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, error_esc);
+		zbx_free(error_esc);
+		delim = ',';
+	}
+
+	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerrors_from=%d", delim, ia->agent.errors_from);
+		delim = ',';
+	}
+
+	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cdisable_until=%d", delim, ia->agent.disable_until);
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64, ia->interfaceid);
 
 	return SUCCEED;
 }

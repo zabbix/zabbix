@@ -94,8 +94,6 @@ struct	_DC_TRIGGER;
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
 #define HOST_NAME_LEN			128
-#define HOST_ERROR_LEN			2048
-#define HOST_ERROR_LEN_MAX		(HOST_ERROR_LEN + 1)
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
 #define HOST_IPMI_PASSWORD_LEN		20
@@ -111,6 +109,8 @@ struct	_DC_TRIGGER;
 #define INTERFACE_ADDR_LEN_MAX		(INTERFACE_ADDR_LEN + 1)
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		(INTERFACE_PORT_LEN + 1)
+#define INTERFACE_ERROR_LEN		2048
+#define INTERFACE_ERROR_LEN_MAX		(INTERFACE_ERROR_LEN + 1)
 
 #define ITEM_NAME_LEN			255
 #define ITEM_KEY_LEN			2048
@@ -729,14 +729,14 @@ zbx_agent_availability_t;
 
 typedef struct
 {
-	zbx_uint64_t			hostid;
+	zbx_uint64_t			interfaceid;
 
-	zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
+	zbx_agent_availability_t	agent;
 }
-zbx_host_availability_t;
+zbx_interface_availability_t;
 
-int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const zbx_host_availability_t *ha);
+int	zbx_sql_add_interface_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_interface_availability_t *ia);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 typedef struct

@@ -4549,33 +4549,33 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCupdate_hosts_availability                                      *
+ * Function: DCupdate_interfaces_availability                                 *
  *                                                                            *
- * Purpose: performs host availability reset for hosts with availability set  *
- *          on interfaces without enabled items                               *
+ * Purpose: performs interface availability reset for hosts with              *
+ *          availability set on interfaces without enabled items              *
  *                                                                            *
  ******************************************************************************/
-void	DCupdate_hosts_availability(void)
+void	DCupdate_interfaces_availability(void)
 {
-	zbx_vector_ptr_t	hosts;
+	zbx_vector_ptr_t	interfaces;
 	char			*sql_buf = NULL;
 	size_t			sql_buf_alloc = 0, sql_buf_offset = 0;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_ptr_create(&interfaces);
 
-	if (SUCCEED != DCreset_hosts_availability(&hosts))
+	if (SUCCEED != DCreset_interfaces_availability(&interfaces))
 		goto out;
 
 	DBbegin();
 	DBbegin_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 
-	for (i = 0; i < hosts.values_num; i++)
+	for (i = 0; i < interfaces.values_num; i++)
 	{
-		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
-				(zbx_host_availability_t *)hosts.values[i]))
+		if (SUCCEED != zbx_sql_add_interface_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
+				(zbx_interface_availability_t *)interfaces.values[i]))
 		{
 			continue;
 		}
@@ -4593,8 +4593,8 @@ void	DCupdate_hosts_availability(void)
 
 	zbx_free(sql_buf);
 out:
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
+	zbx_vector_ptr_destroy(&interfaces);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

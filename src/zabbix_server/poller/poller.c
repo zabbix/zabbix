@@ -55,22 +55,22 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 
 /******************************************************************************
  *                                                                            *
- * Function: db_host_update_availability                                      *
+ * Function: db_interface_update_availability                                 *
  *                                                                            *
- * Purpose: write host availability changes into database                     *
+ * Purpose: write interface availability changes into database                *
  *                                                                            *
- * Parameters: ha    - [IN] the host availability data                        *
+ * Parameters: ia    - [IN] the interface availability data                   *
  *                                                                            *
  * Return value: SUCCEED - the availability changes were written into db      *
  *               FAIL    - no changes in availability data were detected      *
  *                                                                            *
  ******************************************************************************/
-static int	db_host_update_availability(const zbx_host_availability_t *ha)
+static int	db_interface_update_availability(const zbx_interface_availability_t *ia)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 
-	if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, ha))
+	if (SUCCEED == zbx_sql_add_interface_availability(&sql, &sql_alloc, &sql_offset, ia))
 	{
 		DBbegin();
 		DBexecute("%s", sql);
@@ -86,118 +86,60 @@ static int	db_host_update_availability(const zbx_host_availability_t *ha)
 
 /******************************************************************************
  *                                                                            *
- * Function: host_get_availability                                            *
+ * Function: interface_get_availability                                       *
  *                                                                            *
- * Purpose: get host availability data based on the specified agent type      *
+ * Purpose: get interface availability data                                   *
  *                                                                            *
- * Parameters: dc_host      - [IN] the host                                   *
- *             type         - [IN] the agent type                             *
- *             availability - [OUT] the host availability data                *
+ * Parameters: dc_interface - [IN] the interface                              *
+ *             ia           - [OUT] the interface availability data           *
  *                                                                            *
- * Return value: SUCCEED - the host availability data was retrieved           *
+ * Return value: SUCCEED - the interface availability data was retrieved      *
  *                         successfully                                       *
- *               FAIL    - failed to retrieve host availability data,         *
- *                         invalid agent type was specified                   *
- *                                                                            *
  ******************************************************************************/
-static int	host_get_availability(const DC_HOST *dc_host, unsigned char agent, zbx_host_availability_t *ha)
+static int	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_interface_availability_t *ia)
 {
-	zbx_agent_availability_t	*availability = &ha->agents[agent];
+	zbx_agent_availability_t	*availability = &ia->agent;
 
 	availability->flags = ZBX_FLAGS_AGENT_STATUS;
 
-	switch (agent)
-	{
-		case ZBX_AGENT_ZABBIX:
-			availability->available = dc_host->available;
-			availability->error = zbx_strdup(NULL, dc_host->error);
-			availability->errors_from = dc_host->errors_from;
-			availability->disable_until = dc_host->disable_until;
-			break;
-		case ZBX_AGENT_SNMP:
-			availability->available = dc_host->snmp_available;
-			availability->error = zbx_strdup(NULL, dc_host->snmp_error);
-			availability->errors_from = dc_host->snmp_errors_from;
-			availability->disable_until = dc_host->snmp_disable_until;
-			break;
-		case ZBX_AGENT_IPMI:
-			availability->available = dc_host->ipmi_available;
-			availability->error = zbx_strdup(NULL, dc_host->ipmi_error);
-			availability->errors_from = dc_host->ipmi_errors_from;
-			availability->disable_until = dc_host->ipmi_disable_until;
-			break;
-		case ZBX_AGENT_JMX:
-			availability->available = dc_host->jmx_available;
-			availability->error = zbx_strdup(NULL, dc_host->jmx_error);
-			availability->disable_until = dc_host->jmx_disable_until;
-			availability->errors_from = dc_host->jmx_errors_from;
-			break;
-		default:
-			return FAIL;
-	}
+	availability->available = dc_interface->available;
+	availability->error = zbx_strdup(NULL, dc_interface->error);
+	availability->errors_from = dc_interface->errors_from;
+	availability->disable_until = dc_interface->disable_until;
 
-	ha->hostid = dc_host->hostid;
+	ia->interfaceid = dc_interface->interfaceid;
 
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: host_set_availability                                            *
- *                                                                            *
- * Purpose: sets host availability data based on the specified agent type     *
- *                                                                            *
- * Parameters: dc_host      - [IN] the host                                   *
- *             type         - [IN] the agent type                             *
- *             availability - [IN] the host availability data                 *
- *                                                                            *
- * Return value: SUCCEED - the host availability data was set successfully    *
- *               FAIL    - failed to set host availability data,              *
- *                         invalid agent type was specified                   *
- *                                                                            *
- ******************************************************************************/
-static int	host_set_availability(DC_HOST *dc_host, unsigned char agent, const zbx_host_availability_t *ha)
+/********************************************************************************
+ *                                                                              *
+ * Function: interface_set_availability                                         *
+ *                                                                              *
+ * Purpose: sets interface availability data                                    *
+ *                                                                              *
+ * Parameters: dc_interface - [IN/OUT] the interface                            *
+ *             ia           - [IN] the interface availability data              *
+ *                                                                              *
+ * Return value: SUCCEED - the interface availability data was set successfully *
+ *******************************************************************************/
+static int	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_interface_availability_t *ia)
 {
-	const zbx_agent_availability_t	*availability = &ha->agents[agent];
+	const zbx_agent_availability_t	*availability = &ia->agent;
 	unsigned char			*pavailable;
 	int				*perrors_from, *pdisable_until;
 	char				*perror;
 
-	switch (agent)
-	{
-		case ZBX_AGENT_ZABBIX:
-			pavailable = &dc_host->available;
-			perror = dc_host->error;
-			perrors_from = &dc_host->errors_from;
-			pdisable_until = &dc_host->disable_until;
-			break;
-		case ZBX_AGENT_SNMP:
-			pavailable = &dc_host->snmp_available;
-			perror = dc_host->snmp_error;
-			perrors_from = &dc_host->snmp_errors_from;
-			pdisable_until = &dc_host->snmp_disable_until;
-			break;
-		case ZBX_AGENT_IPMI:
-			pavailable = &dc_host->ipmi_available;
-			perror = dc_host->ipmi_error;
-			perrors_from = &dc_host->ipmi_errors_from;
-			pdisable_until = &dc_host->ipmi_disable_until;
-			break;
-		case ZBX_AGENT_JMX:
-			pavailable = &dc_host->jmx_available;
-			perror = dc_host->jmx_error;
-			pdisable_until = &dc_host->jmx_disable_until;
-			perrors_from = &dc_host->jmx_errors_from;
-			break;
-		default:
-			return FAIL;
-	}
+	pavailable = &dc_interface->available;
+	perror = dc_interface->error;
+	perrors_from = &dc_interface->errors_from;
+	pdisable_until = &dc_interface->disable_until;
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
 		*pavailable = availability->available;
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-		zbx_strlcpy(perror, availability->error, HOST_ERROR_LEN_MAX);
+		zbx_strlcpy(perror, availability->error, INTERFACE_ERROR_LEN_MAX);
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
 		*perrors_from = availability->errors_from;
@@ -229,32 +171,39 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 	}
 }
 
-void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
+/********************************************************************************
+ *                                                                              *
+ * Function: zbx_activate_item_interface                                        *
+ *                                                                              *
+ * Purpose: activate item interface                                             *
+ *                                                                              *
+ * Parameters: item - [IN/OUT] the item                                         *
+ *             ts   - [IN] the timestamp                                        *
+ *                                                                              *
+ *******************************************************************************/
+void	zbx_activate_item_interface(DC_ITEM *item, zbx_timespec_t *ts)
 {
-	zbx_host_availability_t	in, out;
-	unsigned char		agent_type;
+	zbx_interface_availability_t	in, out;
+	unsigned char			agent_type;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, item->host.hostid, item->itemid, (int)item->type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__func__, item->interface.interfaceid, item->itemid, (int)item->type);
 
-	zbx_host_availability_init(&in, item->host.hostid);
-	zbx_host_availability_init(&out, item->host.hostid);
+	zbx_interface_availability_init(&in, item->interface.interfaceid);
+	zbx_interface_availability_init(&out, item->interface.interfaceid);
 
-	if (ZBX_AGENT_UNKNOWN == (agent_type = host_availability_agent_by_item_type(item->type)))
+	if (FAIL == interface_get_availability(&item->interface, &in))
 		goto out;
 
-	if (FAIL == host_get_availability(&item->host, agent_type, &in))
+	if (FAIL == DCinterface_activate(item->interface.interfaceid, ts, &in.agent, &out.agent))
 		goto out;
 
-	if (FAIL == DChost_activate(item->host.hostid, agent_type, ts, &in.agents[agent_type], &out.agents[agent_type]))
+	if (FAIL == db_interface_update_availability(&out))
 		goto out;
 
-	if (FAIL == db_host_update_availability(&out))
-		goto out;
+	interface_set_availability(&item->interface, &out);
 
-	host_set_availability(&item->host, agent_type, &out);
-
-	if (HOST_AVAILABLE_TRUE == in.agents[agent_type].available)
+	if (INTERFACE_AVAILABLE_TRUE == in.agent.available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
 				zbx_agent_type_string(item->type), item->host.host);
@@ -265,57 +214,65 @@ void	zbx_activate_item_host(DC_ITEM *item, zbx_timespec_t *ts)
 				zbx_agent_type_string(item->type), item->host.host);
 	}
 out:
-	zbx_host_availability_clean(&out);
-	zbx_host_availability_clean(&in);
+	zbx_interface_availability_clean(&out);
+	zbx_interface_availability_clean(&in);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
+/********************************************************************************
+ *                                                                              *
+ * Function: zbx_deactivate_item_interface                                      *
+ *                                                                              *
+ * Purpose: activate item interface                                             *
+ *                                                                              *
+ * Parameters: item  - [IN/OUT] the item                                        *
+ *             ts    - [IN] the timestamp                                       *
+ *             error - [IN] the error message                                   *
+ *                                                                              *
+ *******************************************************************************/
+void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
-	zbx_host_availability_t	in, out;
-	unsigned char		agent_type;
+	zbx_interface_availability_t	in, out;
+	unsigned char			agent_type;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, item->host.hostid, item->itemid, (int)item->type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__func__, item->interface.interfaceid, item->itemid, (int)item->type);
 
-	zbx_host_availability_init(&in, item->host.hostid);
-	zbx_host_availability_init(&out,item->host.hostid);
+	zbx_interface_availability_init(&in, item->interface.interfaceid);
+	zbx_interface_availability_init(&out,item->interface.interfaceid);
 
 	if (ZBX_AGENT_UNKNOWN == (agent_type = host_availability_agent_by_item_type(item->type)))
 		goto out;
 
-	if (FAIL == host_get_availability(&item->host, agent_type, &in))
+	if (FAIL == interface_get_availability(&item->interface, &in))
 		goto out;
 
-	if (FAIL == DChost_deactivate(item->host.hostid, agent_type, ts, &in.agents[agent_type],
-			&out.agents[agent_type], error))
-	{
-		goto out;
-	}
-
-	if (FAIL == db_host_update_availability(&out))
+	if (FAIL == DCinterface_deactivate(item->interface.interfaceid, ts, &in.agent, &out.agent, error))
 		goto out;
 
-	host_set_availability(&item->host, agent_type, &out);
+	if (FAIL == db_interface_update_availability(&out))
+		goto out;
 
-	if (0 == in.agents[agent_type].errors_from)
+	interface_set_availability(&item->interface, &out);
+
+	if (0 == in.agent.errors_from)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 				" first network error, wait for %d seconds",
 				zbx_agent_type_string(item->type), item->key_orig, item->host.host,
-				out.agents[agent_type].disable_until - ts->sec);
+				out.agent.disable_until - ts->sec);
 	}
 	else
 	{
-		if (HOST_AVAILABLE_FALSE != in.agents[agent_type].available)
+		if (INTERFACE_AVAILABLE_FALSE != in.agent.available)
 		{
-			if (HOST_AVAILABLE_FALSE != out.agents[agent_type].available)
+			if (INTERFACE_AVAILABLE_FALSE != out.agent.available)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 						" another network error, wait for %d seconds",
 						zbx_agent_type_string(item->type), item->key_orig, item->host.host,
-						out.agents[agent_type].disable_until - ts->sec);
+						out.agent.disable_until - ts->sec);
 			}
 			else
 			{
@@ -327,10 +284,10 @@ void	zbx_deactivate_item_host(DC_ITEM *item, zbx_timespec_t *ts, const char *err
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __func__,
-			out.agents[agent_type].errors_from, out.agents[agent_type].available);
+			out.agent.errors_from, out.agent.available);
 out:
-	zbx_host_availability_clean(&out);
-	zbx_host_availability_clean(&in);
+	zbx_interface_availability_clean(&out);
+	zbx_interface_availability_clean(&in);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -850,7 +807,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
 	int			errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
-	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
+	int			i, num, last_available = INTERFACE_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -878,19 +835,19 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				if (HOST_AVAILABLE_TRUE != last_available)
+				if (INTERFACE_AVAILABLE_TRUE != last_available)
 				{
-					zbx_activate_item_host(&items[i], &timespec);
-					last_available = HOST_AVAILABLE_TRUE;
+					zbx_activate_item_interface(&items[i], &timespec);
+					last_available = INTERFACE_AVAILABLE_TRUE;
 				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
-				if (HOST_AVAILABLE_FALSE != last_available)
+				if (INTERFACE_AVAILABLE_FALSE != last_available)
 				{
-					zbx_deactivate_item_host(&items[i], &timespec, results[i].msg);
-					last_available = HOST_AVAILABLE_FALSE;
+					zbx_deactivate_item_interface(&items[i], &timespec, results[i].msg);
+					last_available = INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
 			case CONFIG_ERROR:

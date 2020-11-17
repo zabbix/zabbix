@@ -310,14 +310,6 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
-	int		errors_from;
-	int		disable_until;
-	int		snmp_errors_from;
-	int		snmp_disable_until;
-	int		ipmi_errors_from;
-	int		ipmi_disable_until;
-	int		jmx_errors_from;
-	int		jmx_disable_until;
 
 	/* item statistics per interface type */
 	int		items_num;
@@ -325,19 +317,9 @@ typedef struct
 	int		ipmi_items_num;
 	int		jmx_items_num;
 
-	/* timestamp of last availability status (available/error) field change on any interface */
-	int		availability_ts;
-
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
-	unsigned char	available;
-	unsigned char	snmp_available;
-	unsigned char	ipmi_available;
-	unsigned char	jmx_available;
 	unsigned char	status;
-
-	/* flag to reset host availability to unknown */
-	unsigned char	reset_availability;
 
 	/* flag to force update for all items */
 	unsigned char	update_items;
@@ -350,10 +332,6 @@ typedef struct
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
-	const char	*error;
-	const char	*snmp_error;
-	const char	*ipmi_error;
-	const char	*jmx_error;
 
 	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
@@ -480,6 +458,14 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	useip;
+	unsigned char	available;
+	int		disable_until;
+	const char	*error;
+	int		errors_from;
+	/* timestamp of last availability status (available/error) field change on interface */
+	int		availability_ts;
+	/* flag to reset host availability to unknown */
+	unsigned char	reset_availability;
 }
 ZBX_DC_INTERFACE;
 

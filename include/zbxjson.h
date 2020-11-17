@@ -68,6 +68,7 @@
 #define ZBX_PROTO_TAG_SID			"sid"
 #define ZBX_PROTO_TAG_VERSION			"version"
 #define ZBX_PROTO_TAG_HOST_AVAILABILITY		"host availability"
+#define ZBX_PROTO_TAG_INTERFACE_AVAILABILITY	"interface availability"
 #define ZBX_PROTO_TAG_HISTORY_DATA		"history data"
 #define ZBX_PROTO_TAG_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_TAG_AUTOREGISTRATION		"auto registration"

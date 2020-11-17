@@ -1967,7 +1967,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	{
 		zbx_vector_uint64_sort(&availability_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&availability_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DCtouch_hosts_availability(&availability_hostids);
+		DCtouch_interfaces_availability(&availability_hostids);
 	}
 
 	ret = SUCCEED;
@@ -2109,7 +2109,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	else
 	{
 		DCsync_configuration(ZBX_DBSYNC_UPDATE, jp_kvs_paths_ptr);
-		DCupdate_hosts_availability();
+		DCupdate_interfaces_availability();
 	}
 
 	zbx_free(error);
@@ -2125,33 +2125,30 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  *                FAIL - no host availability has been changed                *
  *                                                                            *
  ******************************************************************************/
-int	get_host_availability_data(struct zbx_json *json, int *ts)
+int	get_interface_availability_data(struct zbx_json *json, int *ts)
 {
 	int				i, j, ret = FAIL;
-	zbx_vector_ptr_t		hosts;
-	zbx_host_availability_t		*ha;
+	zbx_vector_ptr_t		interfaces;
+	zbx_interface_availability_t	*ia;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_ptr_create(&interfaces);
 
-	if (SUCCEED != DCget_hosts_availability(&hosts, ts))
+	if (SUCCEED != DCget_interfaces_availability(&interfaces, ts))
 		goto out;
 
-	zbx_json_addarray(json, ZBX_PROTO_TAG_HOST_AVAILABILITY);
+	zbx_json_addarray(json, ZBX_PROTO_TAG_INTERFACE_AVAILABILITY);
 
-	for (i = 0; i < hosts.values_num; i++)
+	for (i = 0; i < interfaces.values_num; i++)
 	{
-		ha = (zbx_host_availability_t *)hosts.values[i];
+		ia = (zbx_interface_availability_t *)interfaces.values[i];
 
 		zbx_json_addobject(json, NULL);
-		zbx_json_adduint64(json, ZBX_PROTO_TAG_HOSTID, ha->hostid);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_INTERFACE_ID, ia->interfaceid);
 
-		for (j = 0; j < ZBX_AGENT_MAX; j++)
-		{
-			zbx_json_adduint64(json, availability_tag_available[j], ha->agents[j].available);
-			zbx_json_addstring(json, availability_tag_error[j], ha->agents[j].error, ZBX_JSON_TYPE_STRING);
-		}
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_AVAILABLE, ia->agent.available);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, ia->agent.error, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(json);
 	}
@@ -2160,8 +2157,8 @@ int	get_host_availability_data(struct zbx_json *json, int *ts)
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
+	zbx_vector_ptr_destroy(&interfaces);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2170,28 +2167,28 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_host_availability_contents                               *
+ * Function: process_interfaces_availability_contents                         *
  *                                                                            *
- * Purpose: parses host availability data contents and processes it           *
+ * Purpose: parses interfaces availability data contents and processes it     *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_host_availability_contents(struct zbx_json_parse *jp_data, char **error)
+static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_data, char **error)
 {
-	zbx_uint64_t		hostid;
-	struct zbx_json_parse	jp_row;
-	const char		*p = NULL;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 129;
-	zbx_host_availability_t	*ha = NULL;
-	zbx_vector_ptr_t	hosts;
-	int			i, ret;
+	zbx_uint64_t			interfaceid;
+	struct zbx_json_parse		jp_row;
+	const char			*p = NULL;
+	char				*tmp = NULL;
+	size_t				tmp_alloc = 129;
+	zbx_interface_availability_t	*ia = NULL;
+	zbx_vector_ptr_t		interfaces;
+	int				i, ret;
 
 	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
 
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_ptr_create(&interfaces);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the host entries */
 	{
@@ -2201,55 +2198,46 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 			goto out;
 		}
 
-		if (SUCCEED != (ret = zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOSTID, &tmp, &tmp_alloc,
+		if (SUCCEED != (ret = zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_INTERFACE_ID, &tmp, &tmp_alloc,
 				NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto out;
 		}
 
-		if (SUCCEED != (ret = is_uint64(tmp, &hostid)))
+		if (SUCCEED != (ret = is_uint64(tmp, &interfaceid)))
 		{
 			*error = zbx_strdup(*error, "hostid is not a valid numeric");
 			goto out;
 		}
 
-		ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
-		zbx_host_availability_init(ha, hostid);
+		ia = (zbx_interface_availability_t *)zbx_malloc(NULL, sizeof(zbx_interface_availability_t));
+		zbx_interface_availability_init(ia, interfaceid);
 
-		for (i = 0; i < ZBX_AGENT_MAX; i++)
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_AVAILABLE, &tmp, &tmp_alloc, NULL))
+			continue;
+
+		ia->agent.available = atoi(tmp);
+		ia->agent.flags |= ZBX_FLAGS_AGENT_STATUS_AVAILABLE;
+
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &tmp, &tmp_alloc, NULL))
+			continue;
+
+		ia->agent.error = zbx_strdup(NULL, tmp);
+		ia->agent.flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
+
+		if (SUCCEED != (ret = zbx_interface_availability_is_set(ia)))
 		{
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_available[i], &tmp,
-					&tmp_alloc, NULL))
-			{
-				continue;
-			}
-
-			ha->agents[i].available = atoi(tmp);
-			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_AVAILABLE;
-		}
-
-		for (i = 0; i < ZBX_AGENT_MAX; i++)
-		{
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_error[i], &tmp, &tmp_alloc,
-					NULL))
-				continue;
-
-			ha->agents[i].error = zbx_strdup(NULL, tmp);
-			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
-		}
-
-		if (SUCCEED != (ret = zbx_host_availability_is_set(ha)))
-		{
-			zbx_free(ha);
-			*error = zbx_dsprintf(*error, "no availability data for \"hostid\":" ZBX_FS_UI64, hostid);
+			zbx_free(ia);
+			*error = zbx_dsprintf(*error, "no availability data for \"interfaceid\":" ZBX_FS_UI64,
+					interfaceid);
 			goto out;
 		}
 
-		zbx_vector_ptr_append(&hosts, ha);
+		zbx_vector_ptr_append(&interfaces, ia);
 	}
 
-	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
+	if (0 < interfaces.values_num && SUCCEED == DCset_interfaces_availability(&interfaces))
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
@@ -2259,10 +2247,10 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 		DBbegin();
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = 0; i < hosts.values_num; i++)
+		for (i = 0; i < interfaces.values_num; i++)
 		{
-			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
-					(zbx_host_availability_t *)hosts.values[i]))
+			if (SUCCEED != zbx_sql_add_interface_availability(&sql, &sql_alloc, &sql_offset,
+					(zbx_interface_availability_t *)interfaces.values[i]))
 			{
 				continue;
 			}
@@ -2283,8 +2271,8 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
+	zbx_vector_ptr_destroy(&interfaces);
 
 	zbx_free(tmp);
 
@@ -2293,15 +2281,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_host_availability                                        *
+ * Function: process_interface_availability                                   *
  *                                                                            *
- * Purpose: update proxy hosts availability                                   *
+ * Purpose: update proxy interfaces availability                              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_host_availability(struct zbx_json_parse *jp, char **error)
+int	process_interface_availability(struct zbx_json_parse *jp, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret;
@@ -2317,7 +2305,7 @@ int	process_host_availability(struct zbx_json_parse *jp, char **error)
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
 		goto out;
 
-	ret = process_host_availability_contents(&jp_data, error);
+	ret = process_interfaces_availability_contents(&jp_data, error);
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -4822,7 +4810,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
-		if (SUCCEED != (ret = process_host_availability_contents(&jp_data, &error_step)))
+		if (SUCCEED != (ret = process_interfaces_availability_contents(&jp_data, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 

@@ -40,9 +40,6 @@ static int	DBpatch_5030001(void)
 {
 	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBadd_field("interface", &field);
 }
 
@@ -50,18 +47,12 @@ static int	DBpatch_5030002(void)
 {
 	const ZBX_FIELD	field = {"errors_from", 0, NULL, NULL, 5, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030003(void)
 {
 	const ZBX_FIELD	field = {"disable_until", 0, NULL, NULL, 5, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
 
 	return DBadd_field("interface", &field);
 }
@@ -88,97 +79,61 @@ static int	DBpatch_5030007(void)
 
 static int	DBpatch_5030008(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "disable_until");
 }
 
 static int	DBpatch_5030009(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "ipmi_disable_until");
 }
 
 static int	DBpatch_5030010(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "snmp_disable_until");
 }
 
 static int	DBpatch_5030011(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "jmx_disable_until");
 }
 
 static int	DBpatch_5030012(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "errors_from");
 }
 
 static int	DBpatch_5030013(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "ipmi_errors_from");
 }
 
 static int	DBpatch_5030014(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "snmp_errors_from");
 }
 
 static int	DBpatch_5030015(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "jmx_errors_from");
 }
 
 static int	DBpatch_5030016(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "error");
 }
 
 static int	DBpatch_5030017(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "ipmi_error");
 }
 
 static int	DBpatch_5030018(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "snmp_error");
 }
 
 static int	DBpatch_5030019(void)
 {
-	if (ZBX_PROGRAM_TYPE_PROXY == program_type)
-		return SUCCEED;
-
 	return DBdrop_field("hosts", "jmx_error");
 }
 
@@ -186,7 +141,6 @@ static int	DBpatch_5030020(void)
 {
 	return DBcreate_index("interface", "interface_3", "available", 0);
 }
-
 #endif
 
 DBPATCH_START(5030)

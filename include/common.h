@@ -637,9 +637,9 @@ zbx_prototype_discover_t;
 #define HOST_INVENTORY_FIELD_COUNT	70
 
 /* host availability */
-#define HOST_AVAILABLE_UNKNOWN		0
-#define HOST_AVAILABLE_TRUE		1
-#define HOST_AVAILABLE_FALSE		2
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
 
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0
