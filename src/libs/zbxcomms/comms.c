@@ -574,7 +574,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	{
 		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
 				ip, port, strerror_from_system(zbx_socket_last_error()));
-		goto out;
 	}
 #endif
 	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
@@ -697,7 +696,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	{
 		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
 				ip, port, strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
 	}
 #endif
 	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
@@ -1095,7 +1093,6 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 				zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on "
 						"socket [[%s]:%s]: %s", NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
-				goto out;
 			}
 #endif
 			on = 1;

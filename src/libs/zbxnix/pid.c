@@ -62,7 +62,6 @@ int	create_pid_file(const char *pidfile)
 			F_SETFD, FD_CLOEXEC)))
 	{
 		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
-		return FAIL;
 	}
 
 	/* write pid to file */

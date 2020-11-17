@@ -55,7 +55,6 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in setting the status flag: %s",
 				zbx_strerror(errno)));
-		goto tcp_close;
 	}
 
 	if (FAIL == telnet_login(s.socket, item->username, item->password, result))

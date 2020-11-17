@@ -222,7 +222,6 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, " error in setting the status flag: %s",
 				zbx_strerror(errno));
-			goto tcp_close;
 		}
 #endif
 		if (SUCCEED == telnet_test_login(s.socket))
