@@ -527,6 +527,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
+				'/ul/li/ul[contains(@class, "radio-list-control")]',
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [
