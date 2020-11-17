@@ -230,7 +230,10 @@ class CScreenHostTriggers extends CScreenBase {
 
 			// Info.
 			$info_icons = [];
+
 			if ($problem['r_eventid'] != 0) {
+				$can_be_closed = false;
+
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
@@ -247,8 +250,14 @@ class CScreenHostTriggers extends CScreenBase {
 							: _('Resolved by inaccessible user.')
 					);
 				}
-
-				$can_be_closed = false;
+			}
+			else {
+				foreach ($problem['acknowledges'] as $acknowledge) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+						$can_be_closed = false;
+						break;
+					}
+				}
 			}
 
 			// Clock.

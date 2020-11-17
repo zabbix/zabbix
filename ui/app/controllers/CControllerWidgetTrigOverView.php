@@ -41,12 +41,6 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'style' => $fields['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'allowed' => [
-				'add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
-				'change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
-				'acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
-				'close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 			]
 		];
 
