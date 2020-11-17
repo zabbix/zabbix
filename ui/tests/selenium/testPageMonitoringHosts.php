@@ -774,7 +774,6 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @param string $page_header	Page header name
 	 */
 	private function selectLink($host_name, $column, $page_header) {
-		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->getColumn($column)->click();
 		$this->page->waitUntilReady();
 		if ($page_header != null) {
