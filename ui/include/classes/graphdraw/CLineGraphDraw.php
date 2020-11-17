@@ -926,10 +926,10 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	/**
-	 * Get best matching X-axis interval specification for the prefered sub-interval.
+	 * Get best matching X-axis interval specification for the preferred sub-interval.
 	 *
-	 * @param int   $pref_sub_interval  Prefered sub-interval in seconds.
-	 * @param float $min_sub_interval   Prefered minimal sub-interval in seconds (float). Discarded if no matches.
+	 * @param int   $pref_sub_interval  Preferred sub-interval in seconds.
+	 * @param float $min_sub_interval   Preferred minimal sub-interval in seconds (float). Discarded if no matches.
 	 *
 	 * @return array
 	 */
@@ -1078,9 +1078,9 @@ class CLineGraphDraw extends CGraphDraw {
 		// Calculate standard label width in time units.
 		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 2;
 
-		$prefered_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
+		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
 
-		$optimal = $this->getOptimalDateTimeIntervalSpec($prefered_sub_interval, $label_size);
+		$optimal = $this->getOptimalDateTimeIntervalSpec($preferred_sub_interval, $label_size);
 
 		// Align starting date and time with the interval.
 		$start = strtotime(date($optimal['aligner']['trim'], $this->stime));
