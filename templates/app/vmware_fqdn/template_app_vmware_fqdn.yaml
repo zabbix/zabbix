@@ -706,6 +706,29 @@ zabbix_export:
           name: VMware
       items:
         -
+          name: 'VMware: {#HV.NAME} ping'
+          type: SIMPLE
+          key: 'icmpping[]'
+          history: 7d
+          description: 'Checks if the hypervisor is running and accepting ICMP pings.'
+          applications:
+            -
+              name: VMware
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'VMware: Hypervisor is down'
+              priority: AVERAGE
+              description: 'The service is unavailable or does not accept ICMP ping.'
+              manual_close: 'YES'
+        -
           name: 'VMware: Cluster name'
           type: SIMPLE
           key: 'vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
@@ -1124,6 +1147,15 @@ zabbix_export:
           macro: '{$VMWARE.USERNAME}'
           description: 'VMware service user name'
   value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
     -
       name: 'VMware status'
       mappings:

@@ -216,6 +216,7 @@ No specific Zabbix configuration is required.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
+|VMware |VMware: {#HV.NAME} ping |<p>Checks if the hypervisor is running and accepting ICMP pings.</p> |SIMPLE |icmpping[]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |VMware |VMware: Cluster name |<p>Cluster name of the guest VM.</p> |SIMPLE |vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |VMware |VMware: CPU usage |<p>Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.</p> |SIMPLE |vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 |VMware |VMware: Datacenter name |<p>Datacenter name of the hypervisor.</p> |SIMPLE |vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -246,6 +247,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`{TEMPLATE_NAME:icmpping[].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH | |
