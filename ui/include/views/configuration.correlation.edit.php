@@ -37,7 +37,7 @@ if ($data['correlationid']) {
 	$form->addVar('correlationid', $data['correlationid']);
 }
 
-$correlation_tab = (new CFormList())
+$form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['correlation']['name']))
@@ -101,7 +101,7 @@ $condition_table->addRow([
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 
-$correlation_tab
+$form_list
 	->addRow(_('Type of calculation'), [
 		new CComboBox('evaltype', $data['correlation']['filter']['evaltype'], 'processTypeOfCalculation()', [
 			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
@@ -124,39 +124,35 @@ $correlation_tab
 			->setAriaRequired()
 	);
 
-$correlation_tab
+$form_list
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['correlation']['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
+	->addRow(
+		_('Operations'),
+		(new CList())
+			->addItem(
+				(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
+					->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
+					->setId('operation_0_type')
+					->setLabel(_('Close old events'))
+			)
+			->addItem(
+				(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
+					->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
+					->setId('operation_1_type')
+					->setLabel(_('Close new event'))
+			)
+			->addClass(ZBX_STYLE_CHECKBOX_LIST)
+	)
+	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())))
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', ZBX_CORRELATION_ENABLED))
 			->setChecked($data['correlation']['status'] == ZBX_CORRELATION_ENABLED)
 	);
 
-// Operations tab.
-$operation_tab = (new CFormList())
-	->addRow(
-		_('Close old events'),
-		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
-			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
-			->setId('operation_0_type')
-	)
-	->addRow(
-		_('Close new event'),
-		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
-			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
-			->setId('operation_1_type')
-	)
-	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())));
-
 // Append tabs to form.
-$correlation_tabs = (new CTabView())
-	->addTab('correlationTab', _('Correlation'), $correlation_tab)
-	->addTab('operationTab', _('Operations'), $operation_tab);
-
-if (!hasRequest('form_refresh')) {
-	$correlation_tabs->setSelected(0);
-}
+$correlation_tabs = (new CTabView())->addTab('correlationTab', _('Correlation'), $form_list);
 
 // Append buttons to form.
 if ($data['correlationid']) {
