@@ -418,6 +418,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getSelectedCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isSelected();
+		};
+	}
+
+	/**
 	 * Check if text is present.
 	 *
 	 * @param string $text    text to be present
