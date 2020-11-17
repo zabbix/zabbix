@@ -98,7 +98,9 @@
         json_data.operation = 'core/create';
         json_data.fields.org_id = Itop.params.organization_id;
         json_data.fields.title = params.alert_subject;
-        json_data.fields.description = params.alert_message.replace(/(?:\r\n|\r|\n)/g, '&lt;br&gt;');
+        json_data.fields.description = params.alert_message.replace('&lt;', '&amp;lt;')
+            .replace('&gt;', '&amp;gt;')
+            .replace(/(?:\r\n|\r|\n)/g, '&lt;br&gt;');
     },
 
     setUpdatePayload: function () {
@@ -114,10 +116,10 @@
     },
 
     request: function (data) {
-        ['url', 'user', 'password', 'organization_id', 'class', 'api_version'].forEach(function (field) {
+        ['url', 'user', 'password', 'organization_id', 'class', 'api_version', 'id'].forEach(function (field) {
             if (typeof Itop.params !== 'object' || typeof Itop.params[field] === 'undefined'
                     || Itop.params[field] === '' ) {
-                throw 'Required Itop param is not set: &quot;' + field + '&quot;.';
+                throw 'Required Itop param is not set: &quot;itop_' + field + '&quot;.';
             }
         });
 
@@ -241,6 +243,9 @@ try {
     }
     // Update created issue for trigger-based event.
     else {
+        if (Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}') {
+            throw 'Incorrect iTop ticket ID given: ' + Itop.params.id;
+        }
         Itop.setUpdatePayload();
         Itop.request(json_data);
     }
