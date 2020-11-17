@@ -84,10 +84,19 @@ class CControllerMacrosUpdate extends CController {
 					}
 				}
 				else {
-					if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
-							&& $dbMacro['type'] == $macro['type']
-							&& $dbMacro['description'] === $macro['description']) {
-						continue;
+					if ($dbMacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+						if ($dbMacro['macro'] === $macro['macro']
+								&& $dbMacro['type'] == $macro['type']
+								&& $dbMacro['description'] === $macro['description']) {
+							continue;
+						}
+					}
+					else {
+						if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
+								&& $dbMacro['type'] == $macro['type']
+								&& $dbMacro['description'] === $macro['description']) {
+							continue;
+						}
 					}
 				}
 
