@@ -879,7 +879,7 @@ zabbix_export:
         -
           macro: '{$JMX.MP.USAGE.MAX}'
           value: '85'
-          description: 'A threshold in percent for memory pools utilization trigger. Use a context to change the treshold for a specific pool.'
+          description: 'A threshold in percent for memory pools utilization trigger. Use a context to change the threshold for a specific pool.'
         -
           macro: '{$JMX.MP.USAGE.TIME}'
           value: 10m

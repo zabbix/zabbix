@@ -32,7 +32,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$ZOOKEEPER.COMMAND_URL} |<p>The URL for listing and issuing commands relative to the root URL (admin.commandURL).</p> |`commands` |
-|{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN} |<p>Maximum percentage of file descriptors usage alert treshold (for trigger expression).</p> |`85` |
+|{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN} |<p>Maximum percentage of file descriptors usage alert threshold (for trigger expression).</p> |`85` |
 |{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN} |<p>Maximum number of outstanding requests (for trigger expression).</p> |`10` |
 |{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN} |<p>Maximum number of pending syncs from the followers (for trigger expression).</p> |`10` |
 |{$ZOOKEEPER.PORT} |<p>The port the embedded Jetty server listens on (admin.serverPort).</p> |`8080` |

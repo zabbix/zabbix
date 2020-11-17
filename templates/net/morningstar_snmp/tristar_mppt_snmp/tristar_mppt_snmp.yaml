@@ -301,7 +301,7 @@ zabbix_export:
           units: Ah
           description: |
             MIB: TRISTAR-MPPT
-            Description:Ah Charge Resetable
+            Description:Ah Charge Resettable
             Scaling Factor:0.1
             Units:Ah
             Range:[0.0, 5000]
@@ -323,7 +323,7 @@ zabbix_export:
           units: '!kWh'
           description: |
             MIB: TRISTAR-MPPT
-            Description:kWh Charge Resetable
+            Description:kWh Charge Resettable
             Scaling Factor:0.1
             Units:kWh
             Range:[0.0, 65535.0]

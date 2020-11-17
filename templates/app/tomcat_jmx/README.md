@@ -20,7 +20,7 @@ Metrics are collected by JMX.
 
 1. Enable and configure JMX access to Apache Tomcat.
  See documentation for [instructions](https://tomcat.apache.org/tomcat-10.0-doc/monitoring.html#Enabling_JMX_Remote) (chose your version).
-2. If your Tomcat installation require authentification for JMX, set values in host macros {$TOMCAT.USERNAME} and {$TOMCAT.PASSWORD}.
+2. If your Tomcat installation require authentication for JMX, set values in host macros {$TOMCAT.USERNAME} and {$TOMCAT.PASSWORD}.
 3. You can set custom macro values and add macros with context for specific metrics following macro description.
 
 

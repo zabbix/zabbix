@@ -621,7 +621,7 @@ zabbix_export:
         -
           macro: '{$MEMORY.NAME.NOT_MATCHES}'
           value: (Buffer|Cache)
-          description: 'Filter is overriden to ignore RAM(Cache) and RAM(Buffers) memory objects.'
+          description: 'Filter is overridden to ignore RAM(Cache) and RAM(Buffers) memory objects.'
         -
           macro: '{$PSU_CRIT_STATUS}'
           value: '2'

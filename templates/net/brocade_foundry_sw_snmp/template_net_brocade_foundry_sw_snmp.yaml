@@ -188,7 +188,7 @@ zabbix_export:
               units: °C
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
-                Temperature of the chassis. Each unit is 0.5 degrees Celcius.
+                Temperature of the chassis. Each unit is 0.5 degrees Celsius.
                 Only management module built with temperature sensor hardware is applicable.
                 For those non-applicable management module, it returns no-such-name.
               applications:
