@@ -229,7 +229,6 @@ static int	split_profile_keys(void)
 	return SUCCEED;
 }
 
-
 static int	DBpatch_5030000(void)
 {
 	return split_profile_keys();
