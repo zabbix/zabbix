@@ -194,10 +194,7 @@ static int	split_profile_keys(void)
 		row = DBfetch(result);
 
 		if (NULL == row)
-		{
-			DBfree_result(result);
 			return FAIL;
-		}
 
 		get_key_fields(row, &profile, &subsect, &field);
 
@@ -224,6 +221,7 @@ static int	split_profile_keys(void)
 		zbx_free(profile.source);
 		zbx_free(subsect);
 		zbx_free(field);
+		DBfree_result(result);
 	}
 
 	return SUCCEED;
