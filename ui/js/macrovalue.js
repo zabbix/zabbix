@@ -128,7 +128,8 @@
 							value: $input.val(),
 							placeholder: t('value'),
 							maxlength: $input.attr('maxlength'),
-							autocomplete: 'off'
+							autocomplete: 'off',
+							style: 'width: 100%;'
 						})
 						.on('focus blur', btnUndoFocusEventHandle)
 				)
