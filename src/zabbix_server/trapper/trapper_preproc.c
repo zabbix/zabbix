@@ -249,7 +249,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	zbx_vector_ptr_t	steps, results, history;
 	zbx_timespec_t		ts[2];
 	zbx_preproc_result_t	*result;
-	zbx_preproc_op_t	*first_step;
+	unsigned char		first_step_type;
 
 	zbx_vector_ptr_create(&steps);
 	zbx_vector_ptr_create(&results);
@@ -261,19 +261,18 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 		goto out;
 	}
 
+	first_step_type = 0;
 	if (0 != steps.values_num)
-	{
-		first_step = (zbx_preproc_op_t *)steps.values[0];
+		first_step_type  = ((zbx_preproc_op_t *)steps.values[0])->type;
 
-		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != first_step->type && 1 == state)
-		{
-			preproc_error = zbx_strdup(NULL, "This item is not supported. Please, add a preprocessing step"
-					" \"Check for not supported value\" to process it.");
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-			zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
-			zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
-			goto err;
-		}
+	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != first_step_type && 1 == state)
+	{
+		preproc_error = zbx_strdup(NULL, "This item is not supported. Please, add a preprocessing step"
+				" \"Check for not supported value\" to process it.");
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
+		zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
+		goto err;
 	}
 
 	for (i = 0; i < values_num; i++)
