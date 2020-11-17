@@ -2043,6 +2043,7 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_CALCULATED,
 		ITEM_TYPE_JMX,
 		ITEM_TYPE_HTTPAGENT,
+		ITEM_TYPE_SCRIPT,
 		ITEM_TYPE_SNMP
 	];
 }
