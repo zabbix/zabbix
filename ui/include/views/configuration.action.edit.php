@@ -221,6 +221,11 @@ if ($data['action']['operations']) {
 			}
 		}
 
+		if (array_key_exists('opmessage', $operation_for_popup)) {
+			$operation_for_popup['opmessage']['message'] =
+				htmlspecialchars($operation_for_popup['opmessage']['message'], ENT_NOQUOTES, 'UTF-8');
+		}
+
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 			$esc_steps_txt = null;
 			$esc_period_txt = null;
@@ -352,6 +357,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				}
 			}
 
+			$operation_for_popup['opmessage']['message'] =
+				htmlspecialchars($operation_for_popup['opmessage']['message'], ENT_NOQUOTES, 'UTF-8');
+
 			$operations_table->addRow([
 				$details,
 				(new CCol(
@@ -423,6 +431,11 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				if (array_key_exists($var, $operation_for_popup)) {
 					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
 				}
+			}
+
+			if (array_key_exists('opmessage', $operation_for_popup)) {
+				$operation_for_popup['opmessage']['message'] =
+					htmlspecialchars($operation_for_popup['opmessage']['message'], ENT_NOQUOTES, 'UTF-8');
 			}
 
 			$operations_table->addRow([
