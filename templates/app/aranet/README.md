@@ -19,16 +19,16 @@ No specific Zabbix configuration is required.
 
 | Name                                    | Description                                   | Default                    |
 |-----------------------------------------|-----------------------------------------------|----------------------------|
-| {$ARANET.API.ENDPOINT}                  | <p>-</p>                                      | `https://aranet.cloud/api` |
-| {$ARANET.API.PASSWORD}                  | <p>-</p>                                      | `<PUT YOUR PASSWORD>`      |
-| {$ARANET.API.SPACE_NAME}                | <p>-</p>                                      | `<PUT YOUR SPACE NAME>`    |
-| {$ARANET.API.USERNAME}                  | <p>-</p>                                      | `<PUT YOUR USERNAME>`      |
-| {$ARANET.BATT.VOLTAGE.MIN.CRIT}         | <p>-</p>                                      | `2`                        |
-| {$ARANET.BATT.VOLTAGE.MIN.WARN}         | <p>-</p>                                      | `1`                        |
-| {$ARANET.CO2.MAX.CRIT}                  | <p>-</p>                                      | `1000`                     |
-| {$ARANET.CO2.MAX.WARN}                  | <p>-</p>                                      | `600`                      |
-| {$ARANET.HUMIDITY.MAX.WARN}             | <p>-</p>                                      | `70`                       |
-| {$ARANET.HUMIDITY.MIN.WARN}             | <p>-</p>                                      | `20`                       |
+| {$ARANET.API.ENDPOINT}                  | <p>Aranet Cloud API endpoint</p>              | `https://aranet.cloud/api` |
+| {$ARANET.API.PASSWORD}                  | <p>Aranet Cloud password</p>                  | `<PUT YOUR PASSWORD>`      |
+| {$ARANET.API.SPACE_NAME}                | <p>Aranet Cloud space name</p>                | `<PUT YOUR SPACE NAME>`    |
+| {$ARANET.API.USERNAME}                  | <p>Aranet Cloud username</p>                  | `<PUT YOUR USERNAME>`      |
+| {$ARANET.BATT.VOLTAGE.MIN.CRIT}         | <p>Battery voltage critical threshold</p>     | `2`                        |
+| {$ARANET.BATT.VOLTAGE.MIN.WARN}         | <p>Battery voltage warning threshold</p>      | `1`                        |
+| {$ARANET.CO2.MAX.CRIT}                  | <p>CO2 critical threshold</p>                 | `1000`                     |
+| {$ARANET.CO2.MAX.WARN}                  | <p>CO2 warning threshold</p>                  | `600`                      |
+| {$ARANET.HUMIDITY.MAX.WARN}             | <p>Maximum humidity threshold</p>             | `70`                       |
+| {$ARANET.HUMIDITY.MIN.WARN}             | <p>Minimum humidity threshold</p>             | `20`                       |
 | {$ARANET.LLD.FILTER.SENSOR.MATCHES}     | <p>Filter of discoverable sensors</p>         | `.+`                       |
 | {$ARANET.LLD.FILTER.SENSOR.NOT_MATCHES} | <p>Filter to exclude discoverable sensors</p> | `CHANGE_IF_NEEDED`         |
 
