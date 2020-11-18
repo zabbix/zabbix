@@ -22,7 +22,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|EtherLike-MIB Discovery |<p>Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.</p> |SNMP |net.if.duplex.discovery<p>**Filter**:</p>AND <p>- A: {#IFOPERSTATUS} MATCHES_REGEX `1`</p><p>- B: {#SNMPVALUE} MATCHES_REGEX `(2|3)`</p> |
+|EtherLike-MIB Discovery |<p>Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.</p> |SNMP |net.if.duplex.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- A: {#IFOPERSTATUS} MATCHES_REGEX `1`</p><p>- B: {#SNMPVALUE} MATCHES_REGEX `(2|3)`</p> |
 
 ## Items collected
 

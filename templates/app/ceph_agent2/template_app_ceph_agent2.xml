@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-05T10:18:45Z</date>
+   <date>2020-10-21T12:31:39Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -1453,7 +1453,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Used</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},bytes_used]</key>
+                     <key>ceph.pool["{#POOLNAME}",bytes_used]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1466,7 +1466,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.bytes_used</params>
+                           <params>$.pools["{#POOLNAME}"].bytes_used</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1476,7 +1476,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Max available</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},max_avail]</key>
+                     <key>ceph.pool["{#POOLNAME}",max_avail]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1489,7 +1489,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.max_avail</params>
+                           <params>$.pools["{#POOLNAME}"].max_avail</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1499,7 +1499,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool objects</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},objects]</key>
+                     <key>ceph.pool["{#POOLNAME}",objects]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Number of objects in the pool.</description>
@@ -1511,7 +1511,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.objects</params>
+                           <params>$.pools["{#POOLNAME}"].objects</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1521,7 +1521,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Percent Used</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},percent_used]</key>
+                     <key>ceph.pool["{#POOLNAME}",percent_used]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>%</units>
@@ -1534,7 +1534,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.percent_used</params>
+                           <params>$.pools["{#POOLNAME}"].percent_used</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1544,7 +1544,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Read bandwidth</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},rd_bytes.rate]</key>
+                     <key>ceph.pool["{#POOLNAME}",rd_bytes.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1558,7 +1558,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.rd_bytes</params>
+                           <params>$.pools["{#POOLNAME}"].rd_bytes</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -1572,7 +1572,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Read operations</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},rd_ops.rate]</key>
+                     <key>ceph.pool["{#POOLNAME}",rd_ops.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1586,7 +1586,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.rd_ops</params>
+                           <params>$.pools["{#POOLNAME}"].rd_ops</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -1600,7 +1600,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool RAW Used</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},stored_raw]</key>
+                     <key>ceph.pool["{#POOLNAME}",stored_raw]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1613,7 +1613,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.stored_raw</params>
+                           <params>$.pools["{#POOLNAME}"].stored_raw</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1623,7 +1623,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Write bandwidth</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},wr_bytes.rate]</key>
+                     <key>ceph.pool["{#POOLNAME}",wr_bytes.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1637,7 +1637,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.wr_bytes</params>
+                           <params>$.pools["{#POOLNAME}"].wr_bytes</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -1651,7 +1651,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                   <item_prototype>
                      <name>Ceph: [{#POOLNAME}] Pool Write operations</name>
                      <type>DEPENDENT</type>
-                     <key>ceph.pool[{#POOLNAME},wr_ops.rate]</key>
+                     <key>ceph.pool["{#POOLNAME}",wr_ops.rate]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1665,7 +1665,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.pools.{#POOLNAME}.wr_ops</params>
+                           <params>$.pools["{#POOLNAME}"].wr_ops</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -1686,7 +1686,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},rd_bytes.rate]</key>
+                              <key>ceph.pool["{#POOLNAME}",rd_bytes.rate]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1694,7 +1694,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>2774A4</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},wr_bytes.rate]</key>
+                              <key>ceph.pool["{#POOLNAME}",wr_bytes.rate]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1706,7 +1706,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},rd_ops.rate]</key>
+                              <key>ceph.pool["{#POOLNAME}",rd_ops.rate]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1714,7 +1714,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>2774A4</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},wr_ops.rate]</key>
+                              <key>ceph.pool["{#POOLNAME}",wr_ops.rate]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1726,7 +1726,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>1A7C11</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},bytes_used]</key>
+                              <key>ceph.pool["{#POOLNAME}",bytes_used]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1734,7 +1734,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>2774A4</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},max_avail]</key>
+                              <key>ceph.pool["{#POOLNAME}",max_avail]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1742,7 +1742,7 @@ The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OS
                            <color>F63100</color>
                            <item>
                               <host>Template App Ceph by Zabbix Agent2</host>
-                              <key>ceph.pool[{#POOLNAME},stored_raw]</key>
+                              <key>ceph.pool["{#POOLNAME}",stored_raw]</key>
                            </item>
                         </graph_item>
                      </graph_items>
