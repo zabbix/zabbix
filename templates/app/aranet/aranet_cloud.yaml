@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-16T23:15:41Z'
+  date: '2020-11-16T20:10:41Z'
   groups:
     -
       name: Templates/Applications
@@ -593,7 +593,7 @@ zabbix_export:
         -
           name: 'Volumetric Water Content sensors discovery'
           type: DEPENDENT
-          key: aranet.olumetric.water.content.discovery
+          key: aranet.volumetric.water.content.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -622,8 +622,6 @@ zabbix_export:
               value_type: FLOAT
               units: '{#UNIT}'
               application_prototypes:
-                -
-                  name: '{#METRIC}'
                 -
                   name: '{#METRIC}'
               preprocessing:
@@ -890,30 +888,6 @@ zabbix_export:
                     - '$[?(@.id == "{#ID}" && @.name == "{#SENSOR}")].metrics[?(@.name == "{#METRIC}")].value.first()'
               master_item:
                 key: aranet.get_data
-          master_item:
-            key: aranet.sensor.discovery
-        -
-          name: 'Volumetric Water Content sensors discovery'
-          type: DEPENDENT
-          key: aranet.volumetric.water.content.discovery
-          delay: '0'
-          filter:
-            evaltype: AND
-            conditions:
-              -
-                macro: '{#SENSOR}'
-                value: '{$ARANET.LLD.FILTER.SENSOR.MATCHES}'
-                formulaid: B
-              -
-                macro: '{#SENSOR}'
-                value: '{$ARANET.LLD.FILTER.SENSOR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: C
-              -
-                macro: '{#METRIC}'
-                value: 'Volumetric Water Content'
-                formulaid: A
-          description: 'Discovery for Aranet Cloud Volumetric Water Content sensors'
           master_item:
             key: aranet.sensor.discovery
         -
