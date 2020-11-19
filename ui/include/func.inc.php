@@ -1838,7 +1838,7 @@ function get_prepared_messages(array $options = []): ?string {
 		));
 
 		show_messages(
-			CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+			false, // Failed login can be only error message.
 			CMessageHelper::getTitle(),
 			CMessageHelper::getTitle()
 		);
