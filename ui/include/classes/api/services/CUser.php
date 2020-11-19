@@ -847,7 +847,7 @@ class CUser extends CApiService {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
 				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their role.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change own role.'));
 				}
 
 				if (array_key_exists('usrgrps', $user)) {
