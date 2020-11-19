@@ -706,7 +706,7 @@ zabbix_export:
           name: VMware
       items:
         -
-          name: 'VMware: {#HV.NAME} ping'
+          name: 'VMware: Hypervisor ping'
           type: SIMPLE
           key: 'icmpping[]'
           history: 7d
@@ -936,7 +936,7 @@ zabbix_export:
           name: 'VMware: Number of bytes received'
           type: SIMPLE
           key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
-          delay: '{$VMWARE_PERF_INTERVAL}'
+          delay: '1m'
           history: 7d
           units: Bps
           username: '{$VMWARE.USERNAME}'
@@ -949,7 +949,7 @@ zabbix_export:
           name: 'VMware: Number of bytes transmitted'
           type: SIMPLE
           key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
-          delay: '{$VMWARE_PERF_INTERVAL}'
+          delay: '1m'
           history: 7d
           units: Bps
           username: '{$VMWARE.USERNAME}'
@@ -1082,7 +1082,7 @@ zabbix_export:
               name: 'VMware: Average read latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
-              delay: '{$VMWARE_PERF_INTERVAL}'
+              delay: '1m'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -1121,7 +1121,7 @@ zabbix_export:
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
-              delay: '{$VMWARE_PERF_INTERVAL}'
+              delay: '1m'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
