@@ -81,24 +81,18 @@ $table = (new CTableInfo())
 	]);
 
 if ($data['correlations']) {
-	/*
-	 * If condition type is "New event host group", then to avoid performance drops, call this function first in order
-	 * to read all host groups before each iteration.
-	 */
-	$correlation_condition_string_values = corrConditionValueToString($data['correlations']);
-
-	foreach ($data['correlations'] as $i => $correlation) {
+	foreach ($data['correlations'] as $correlation) {
 		$conditions = [];
 		$operations = [];
 
 		order_result($correlation['filter']['conditions'], 'type', ZBX_SORT_DOWN);
 
-		foreach ($correlation['filter']['conditions'] as $j => $condition) {
+		foreach ($correlation['filter']['conditions'] as $condition) {
 			if (!array_key_exists('operator', $condition)) {
 				$condition['operator'] = CONDITION_OPERATOR_EQUAL;
 			}
 
-			$conditions[] = getCorrConditionDescription($condition, $correlation_condition_string_values[$i][$j]);
+			$conditions[] = getCorrConditionDescription($condition, $data['group_names']);
 			$conditions[] = BR();
 		}
 

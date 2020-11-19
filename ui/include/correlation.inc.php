@@ -99,70 +99,6 @@ function getOperatorsByCorrConditionType($type) {
 }
 
 /**
- * Correlation condition type "host group" contains IDs. IDs are collected and then validated. For other
- * condition types, values are returned as they are.
- *
- * @param array $correlations							An array of correlations.
- * @param array $correlations['filter']					An array containing arrays of correlation conditions.
- * @param array $correlations['filter']['conditions']	An array of correlation conditions.
- *
- * @return array										Returns an array of correlation condition string values.
- */
-function corrConditionValueToString(array $correlations) {
-	$result = [];
-
-	$groupids = [];
-
-	foreach ($correlations as $i => $correlation) {
-		$result[$i] = [];
-
-		foreach ($correlation['filter']['conditions'] as $j => $condition) {
-			switch ($condition['type']) {
-				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
-				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-					$result[$i][$j] = ['tag' => $condition['tag']];
-					break;
-
-				case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-					$result[$i][$j] = ['group' => _('Unknown')];
-					$groupids[$condition['groupid']] = true;
-					break;
-
-				case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-					$result[$i][$j] = ['oldtag' => $condition['oldtag'], 'newtag' => $condition['newtag']];
-					break;
-
-				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-					$result[$i][$j] = ['tag' => $condition['tag'], 'value' => $condition['value']];
-					break;
-			}
-		}
-	}
-
-	if ($groupids) {
-		$groups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => array_keys($groupids),
-			'preservekeys' => true
-		]);
-
-		if ($groups) {
-			foreach ($correlations as $i => $correlation) {
-				foreach ($correlation['filter']['conditions'] as $j => $condition) {
-					if ($condition['type'] == ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP
-							&& array_key_exists($condition['groupid'], $groups)) {
-						$result[$i][$j] = ['group' => $groups[$condition['groupid']]['name']];
-					}
-				}
-			}
-		}
-	}
-
-	return $result;
-}
-
-/**
  * Return the HTML representation of correlation operation type.
  *
  * @param array $operation					An array of correlation operation data.
@@ -177,57 +113,60 @@ function getCorrOperationDescription(array $operation) {
 /**
  * Returns the HTML representation of a correlation condition.
  *
- * @param array  $condition					Array of correlation condition data.
- * @param int	 $condition['type']			Condition type.
- * @param int	 $condition['operator']		Condition operator.
- * @param array  $values					Array of condition values.
- * @param string $values['tag']				Condition event tag.
- * @param string $values['group']			Condition host group name.
- * @param string $values['oldtag']			Condition event old tag.
- * @param string $values['newtag']			Condition event new tag.
- * @param string $values['value']			Condition event tag value.
+ * @param array  $condition              Array of correlation condition data.
+ * @param int    $condition['type']      Condition type.
+ * @param int    $condition['operator']  Condition operator.
+ * @param int    $condition['groupid']   (optional) Depends on type.
+ * @param int    $condition['newtag']    (optional) Depends on type.
+ * @param int    $condition['oldtag']    (optional) Depends on type.
+ * @param int    $condition['tag']       (optional) Depends on type.
+ * @param int    $condition['value']     (optional) Depends on type.
+ * @param array  $group_names            Host group names keyed by host group ID.
  *
  * @return array
  */
-function getCorrConditionDescription(array $condition, array $values) {
+function getCorrConditionDescription(array $condition, array $group_names) {
 	$description = [];
 
 	switch ($condition['type']) {
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 			$description[] = _('Old event tag name').' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic(CHtml::encode($condition['tag']));
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 			$description[] = _('New event tag name').' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic(CHtml::encode($condition['tag']));
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			$description[] = _('New event host group').' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['group']));
+			$description[] = italic(CHtml::encode(array_key_exists($condition['groupid'], $group_names)
+				? $group_names[$condition['groupid']]
+				: _('Unknown')
+			));
 			break;
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			$description[] = _('Value of old event tag').' ';
-			$description[] = italic(CHtml::encode($values['oldtag']));
+			$description[] = italic(CHtml::encode($condition['oldtag']));
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' '.
 				_('value of new event tag').' ';
-			$description[] = italic(CHtml::encode($values['newtag']));
+			$description[] = italic(CHtml::encode($condition['newtag']));
 			break;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 			$description[] = _('Value of old event tag').' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic(CHtml::encode($condition['tag']));
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['value']));
+			$description[] = italic(CHtml::encode($condition['value']));
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 			$description[] = _('Value of new event tag').' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic(CHtml::encode($condition['tag']));
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['value']));
+			$description[] = italic(CHtml::encode($condition['value']));
 			break;
 	}
 

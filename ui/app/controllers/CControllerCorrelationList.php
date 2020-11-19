@@ -108,6 +108,24 @@ class CControllerCorrelationList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$groupids = [];
+		foreach ($data['correlations'] as $correlation) {
+			$groupids += array_column($correlation['filter']['conditions'], 'groupid', 'groupid');
+		}
+
+		if ($groupids) {
+			$groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => array_keys($groupids),
+				'preservekeys' => true
+			]);
+
+			$data['group_names'] = array_column($groups, 'name', 'groupid');
+		}
+		else {
+			$data['group_names'] = [];
+		}
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));
 		$this->setResponse($response);
