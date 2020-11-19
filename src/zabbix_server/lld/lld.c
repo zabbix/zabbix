@@ -1135,6 +1135,35 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name,	uns
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, const char *name)
+{
+	int	i, j;
+
+	for (i = 0; i < overrides->values_num; i++)
+	{
+		const lld_override_t	*override;
+
+		override = (const lld_override_t *)overrides->values[i];
+
+		for (j = 0; j < override->override_operations.values_num; j++)
+		{
+			const lld_override_operation_t	*override_operation;
+
+			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
+
+			if (OPERATION_OBJECT_ITEM_PROTOTYPE == override_operation->operationtype &&
+					ZBX_PROTOTYPE_NO_DISCOVER == override_operation->discover &&
+					SUCCEED == regexp_strmatch_condition(name, override_operation->value,
+					override_operation->operator))
+			{
+				return FAIL;
+			}
+		}
+	}
+
+	return SUCCEED;
+}
+
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, const zbx_vector_ptr_t	*overrides, char **info, char **error)
 {
