@@ -36,7 +36,11 @@
 
 
 		for (var i = 0; i < list.values.length; i++) {
-			const value = list.values[i]
+			const value = list.values[i];
+
+			if (document.querySelectorAll(`[data-triggerid="${value.triggerid}"]`).length > 0) {
+				continue;
+			}
 
 			document
 				.querySelector('#dependency-table tr:last-child')

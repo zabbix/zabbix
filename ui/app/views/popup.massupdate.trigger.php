@@ -96,8 +96,8 @@ $dependencies_form_list = new CFormList('dependencies-form-list');
 
 $dependencies_table = (new CTable())
 	->setId('dependency-table')
-	->addStyle('width: 100%;')
-	->setHeader([_('Name'), _('Action')]);
+	->addStyle('width: 100%;table-layout: fixed;')
+	->setHeader([_('Name'), (new CColHeader(_('Name')))->addStyle('width: 15%;')]);
 
 $bttn_prototype = '';
 if ($data['prototype']) {
