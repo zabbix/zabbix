@@ -56,7 +56,8 @@ $widget = (new CWidget())
 					->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
 					->setModern(true)
 			)
-		])->addVar('action', 'discovery.list')
+		])
+		->addVar('action', 'discovery.list')
 	);
 
 // create form
