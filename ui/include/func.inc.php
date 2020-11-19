@@ -1647,7 +1647,7 @@ function filter_messages(): array {
 	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$messages = CMessageHelper::getMessages();
-		CMessageHelper::clear();
+		CMessageHelper::clear(false);
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
