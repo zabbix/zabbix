@@ -52,7 +52,6 @@ class CScreenHostsInfo extends CScreenBase {
 				' AND '.dbConditionInt('h.hostid', $hostids).
 				$cond_where.
 				' AND i.hostid=h.hostid'.
-				' AND i.main=1'.
 				' AND i.available='.INTERFACE_AVAILABLE_TRUE
 		);
 
@@ -67,7 +66,6 @@ class CScreenHostsInfo extends CScreenBase {
 				' AND '.dbConditionInt('h.hostid', $hostids).
 				$cond_where.
 				' AND i.hostid=h.hostid'.
-				' AND i.main=1'.
 				' AND i.available='.INTERFACE_AVAILABLE_FALSE
 		);
 
@@ -82,7 +80,6 @@ class CScreenHostsInfo extends CScreenBase {
 				' AND '.dbConditionInt('h.hostid', $hostids).
 				$cond_where.
 				' AND i.hostid=h.hostid'.
-				' AND i.main=1'.
 				' AND i.available='.INTERFACE_AVAILABLE_UNKNOWN
 		);
 
