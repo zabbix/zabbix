@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-19T14:14:31Z</date>
+   <date>2020-11-19T14:30:08Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App Hadoop by HTTP</name>
          <description>The template gets the Hadoop metrics from cluster's hosts (ResourceManager, NodeManagers, NameNode, DataNodes) by HTTP agent. You should define the IP address (or FQDN) and Web-UI port for the ResourceManager in {$HADOOP.RESOURCEMANAGER.HOST} and {$HADOOP.RESOURCEMANAGER.PORT} macros and for the NameNode in {$HADOOP.NAMENODE.HOST} and {$HADOOP.NAMENODE.PORT} macros respectively. Macros can be set in the template or overridden at the host level.&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/413459-discussion-thread-for-official-zabbix-template-hadoop&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
