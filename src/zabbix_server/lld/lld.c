@@ -1013,11 +1013,11 @@ int	lld_validate_item_override_no_discover(const zbx_vector_ptr_t *overrides, co
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
-			const lld_override_operation_t	*override_operation;
+			const zbx_lld_override_operation_t	*override_operation;
 
-			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
+			override_operation = (const zbx_lld_override_operation_t *)override->override_operations.values[j];
 
-			if (OPERATION_OBJECT_ITEM_PROTOTYPE == override_operation->operationtype &&
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM == override_operation->operationtype &&
 					ZBX_PROTOTYPE_NO_DISCOVER == override_operation->discover &&
 					SUCCEED == regexp_strmatch_condition(name, override_operation->value,
 					override_operation->operator))
