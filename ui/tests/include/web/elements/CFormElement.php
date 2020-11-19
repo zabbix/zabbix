@@ -259,7 +259,8 @@ class CFormElement extends CElement {
 				$container = $this->getFieldContainer($field);
 
 				foreach ($values as $name => $value) {
-					$container->query('id', $name)->one()->detect()->fill($value);
+					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
+					$container->query('xpath', $xpath)->one()->detect()->fill($value);
 				}
 			}
 
@@ -335,7 +336,8 @@ class CFormElement extends CElement {
 				$container = $this->getFieldContainer($field);
 
 				foreach ($values as $name => $value) {
-					if (!$container->query('id', $name)->one()->detect()->checkValue($value, $raise_exception)) {
+					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
+					if (!$container->query('xpath', $xpath)->one()->detect()->checkValue($value, $raise_exception)) {
 						return false;
 					}
 				}
