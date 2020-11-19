@@ -14,13 +14,13 @@ Zabbix is an open-source product that can be installed on a majority of Unix-lik
 
 | Product           | Readme                                     | Template                                                      |
 |-------------------|--------------------------------------------|---------------------------------------------------------------|
-| Prostar MPPT      | [Readme](prostar_mppt_snmp/README.MD)      | [Template](prostar_mppt_snmp/prostar_mppt_snmp.xml)           |
-| Prostar PWM       | [Readme](prostar_pwm_snmp/README.MD)       | [Template](prostar_pwm_snmp/prostar_pwm_snmp.xml)             |
-| Sunsaver MPPT     | [Readme](sunsaver_mppt_snmp/README.MD)     | [Template](sunsaver_mppt_snmp/sunsaver_mppt_snmp.xml)         |
-| Suresine          | [Readme](suresine_snmp/README.MD)          | [Template](suresine_snmp/suresine_snmp.xml)                   |
-| Tristar MPPT 600V | [Readme](tristar_mppt_600V_snmp/README.MD) | [Template](tristar_mppt_600V_snmp/tristar_mppt_600V_snmp.xml) |
-| Tristar MPPT      | [Readme](tristar_mppt_snmp/README.MD)      | [Template](tristar_mppt_snmp/tristar_mppt_snmp.xml)           |
-| Tristar PWM       | [Readme](tristar_pwm_snmp/README.MD)       | [Template](tristar_pwm_snmp/tristar_pwm_snmp.xml)             |
+| Prostar MPPT      | [Readme](prostar_mppt_snmp/README.md)      | [Template](prostar_mppt_snmp/prostar_mppt_snmp.xml)           |
+| Prostar PWM       | [Readme](prostar_pwm_snmp/README.md)       | [Template](prostar_pwm_snmp/prostar_pwm_snmp.xml)             |
+| Sunsaver MPPT     | [Readme](sunsaver_mppt_snmp/README.md)     | [Template](sunsaver_mppt_snmp/sunsaver_mppt_snmp.xml)         |
+| Suresine          | [Readme](suresine_snmp/README.md)          | [Template](suresine_snmp/suresine_snmp.xml)                   |
+| Tristar MPPT 600V | [Readme](tristar_mppt_600V_snmp/README.md) | [Template](tristar_mppt_600V_snmp/tristar_mppt_600V_snmp.xml) |
+| Tristar MPPT      | [Readme](tristar_mppt_snmp/README.md)      | [Template](tristar_mppt_snmp/tristar_mppt_snmp.xml)           |
+| Tristar PWM       | [Readme](tristar_pwm_snmp/README.md)       | [Template](tristar_pwm_snmp/tristar_pwm_snmp.xml)             |
 
 ## Zabbix set up
 
