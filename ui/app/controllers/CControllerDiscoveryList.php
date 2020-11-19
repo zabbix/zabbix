@@ -93,6 +93,7 @@ class CControllerDiscoveryList extends CController {
 			],
 			'editable' => true,
 			'sortfield' => $sort_field,
+			'sortorder' => $sort_order,
 			'limit' => $limit
 		]);
 
