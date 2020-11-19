@@ -252,23 +252,8 @@ else {
 	$groupids = $data['filter']['groups'] ? getSubGroups(array_keys($data['filter']['groups'])) : null;
 	$hostids = $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null;
 
-	if ($data['view_style'] == STYLE_TOP) {
-		list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
-			= getDataOverviewTop($groupids, $hostids, $data['filter']['application']);
-	}
-	else {
-		list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
-			= getDataOverviewLeft($groupids, $hostids, $data['filter']['application']);
-	}
-
-	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_key,
-		$data['filter']['show_suppressed']
-	);
-
-	$data['db_hosts'] = $db_hosts;
-	$data['items_by_key'] = $items_by_key;
-	$data['item_names_by_key'] = resolveDataOverviewItemNames($items_by_key, $db_items);
-	$data['has_hidden_data'] = $has_hidden_data;
+	list($data['items'], $data['hosts'], $data['has_hidden_data'])
+		= getDataOverview($groupids, $hostids, $data['filter']);
 
 	// Render view.
 	echo (new CView('monitoring.overview.items', $data))->getOutput();
