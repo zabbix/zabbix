@@ -53,8 +53,7 @@ $options = [
 			'details' => $data['filter']['details'],
 			'highlight_row' => $data['filter']['highlight_row'],
 			'show_opdata' => $data['filter']['show_opdata']
-		],
-		'allowed_ack' => (int) $data['allowed_ack']
+		]
 	],
 ];
 

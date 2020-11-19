@@ -75,13 +75,24 @@ if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
 }
 
+$allowed = [
+	'ui_problems' => $data['allowed_ui_problems'],
+	'add_comments' => $data['allowed_add_comments'],
+	'change_severity' => $data['allowed_change_severity'],
+	'acknowledge' => $data['allowed_acknowledge']
+];
+
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
+
+	$allowed['close'] = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $data['allowed_close']);
+	$can_be_closed = $allowed['close'];
 
 	if ($problem['r_eventid'] != 0) {
 		$value = TRIGGER_VALUE_FALSE;
 		$value_str = _('RESOLVED');
 		$value_clock = $problem['r_clock'];
+		$can_be_closed = false;
 	}
 	else {
 		$in_closing = false;
@@ -89,6 +100,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		foreach ($problem['acknowledges'] as $acknowledge) {
 			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 				$in_closing = true;
+				$can_be_closed = false;
 				break;
 			}
 		}
@@ -189,14 +201,6 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$allowed = [
-		'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-		'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-				|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-				|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-				|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
-	];
-
 	$problem_link = [
 		(new CLinkAction($problem['name']))
 			->setHint(
@@ -260,7 +264,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	// Create acknowledge link.
-	$problem_update_link = $data['allowed_ack']
+	$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+			|| $can_be_closed)
 		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
