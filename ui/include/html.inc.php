@@ -623,9 +623,9 @@ function getHostAvailabilityTable($host_interfaces) {
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
-			$description = vsprintf('%s%d, %s: %s', ($version == SNMP_V3)
-				? [_('SNMPv'), $version, _('Context name'), $interface['details']['contextname']]
-				: [_('SNMPv'), $version, _x('Community', 'SNMP Community'), $interface['details']['community']]
+			$description = vsprintf('%s, %s: %s', ($version == SNMP_V3)
+				? [_s('SNMPv%1$d', $version), _('Context name'), $interface['details']['contextname']]
+				: [_s('SNMPv%1$d', $version), _x('Community', 'SNMP Community'), $interface['details']['community']]
 			);
 		}
 

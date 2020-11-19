@@ -1264,11 +1264,11 @@ function getInterfaceSelect(array $interfaces): CSelect {
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
 			if ($version == SNMP_V3) {
-				$option->setExtra('description', sprintf('%s%d, %s: %s', _('SNMPv'), $version,
+				$option->setExtra('description', sprintf('%s, %s: %s', _s('SNMPv%1$d', $version),
 					_('Context name'), $interface['details']['contextname']
 				));
 			} else {
-				$option->setExtra('description', sprintf('%s%d, %s: %s', _('SNMPv'), $version,
+				$option->setExtra('description', sprintf('%s, %s: %s', _s('SNMPv%1$d', $version),
 					_x('Community', 'SNMP Community'), $interface['details']['community']
 				));
 			}
