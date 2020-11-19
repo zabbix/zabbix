@@ -37,16 +37,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$hostids = $fields['hostids'] ? $fields['hostids'] : null;
 
-		if ($fields['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
-				= getDataOverviewTop($groupids, $hostids, $fields['application']);
-		}
-		else {
-			list($db_items, $db_hosts, $items_by_key, $has_hidden_data)
-				= getDataOverviewLeft($groupids, $hostids, $fields['application']);
-		}
-
-		$visible_items = getDataOverviewCellData($db_hosts, $db_items, $items_by_key, $fields['show_suppressed']);
+		list($items, $hosts, $has_hidden_data) = getDataOverview($groupids, $hostids, $fields);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
@@ -54,10 +45,8 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'application' => $fields['application'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
-			'visible_items' => $visible_items,
-			'db_hosts' => $db_hosts,
-			'items_by_key' => $items_by_key,
-			'item_names_by_key' => resolveDataOverviewItemNames($items_by_key, $db_items),
+			'items' => $items,
+			'hosts' => $hosts,
 			'has_hidden_data' => $has_hidden_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
