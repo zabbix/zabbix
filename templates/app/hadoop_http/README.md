@@ -5,9 +5,9 @@
 
 For Zabbix version: 5.0 and higher  
 The template for monitoring Hadoop over HTTP that works without any external scripts.  
-It collects metrics by polling the Hadoop API remotely using an HTTP agent and JSONPATH preprocessing.  
+It collects metrics by polling the Hadoop API remotely using an HTTP agent and JSONPath preprocessing.  
 Zabbix server (or proxy) execute direct requests to ResourceManager, NodeManagers, NameNode, DataNodes APIs.  
-All metrics are collected at once, thanks to Zabbix's bulk data collection.
+All metrics are collected at once, thanks to the Zabbix bulk data collection.
 
 
 This template was tested on:
@@ -124,7 +124,7 @@ There are no template links in this template.
 |NameNode: Service response time is too high (over {$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN} for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"].min(5m)}>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- NameNode: Service is unavailable</p> |
 |NameNode: Service has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:hadoop.namenode.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |NameNode: Failed to fetch NameNode API page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:hadoop.namenode.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- NameNode: Service is unavailable</p> |
-|NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m) |<p>It is good practice to ensure that disk use never exceeds 80 percent capacity.</p> |`{TEMPLATE_NAME:hadoop.namenode.percent_remaining.max(15m)}<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}` |WARNING | |
+|NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m) |<p>A good practice is to ensure that disk use never exceeds 80 percent capacity.</p> |`{TEMPLATE_NAME:hadoop.namenode.percent_remaining.max(15m)}<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}` |WARNING | |
 |NameNode: Cluster has missing blocks |<p>A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.</p> |`{TEMPLATE_NAME:hadoop.namenode.missing_blocks.min(15m)}>0` |AVERAGE | |
 |NameNode: Cluster has volume failures |<p>HDFS now allows for disks to fail in place, without affecting DataNode operations, until a threshold value is reached. This is set on each DataNode via the dfs.datanode.failed.volumes.tolerated property; it defaults to 0, meaning that any volume failure will shut down the DataNode; on a production cluster where DataNodes typically have 6, 8, or 12 disks, setting this parameter to 1 or 2 is typically the best practice.</p> |`{TEMPLATE_NAME:hadoop.namenode.volume_failures_total.min(15m)}>0` |AVERAGE | |
 |NameNode: Cluster has DataNodes in Dead state |<p>The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.</p> |`{TEMPLATE_NAME:hadoop.namenode.num_dead_data_nodes.min(5m)}>0` |AVERAGE | |
