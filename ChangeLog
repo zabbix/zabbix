@@ -2095,6 +2095,7 @@ New features:
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 
 Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
 A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
 ........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
 .......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
