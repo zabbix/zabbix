@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2321,7 +2321,7 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "無法啟用網頁檢測"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6680,7 +6680,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "此表示式不是巨集"
@@ -8514,7 +8514,7 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8606,7 +8606,7 @@ msgstr "提供不正確的項目鍵值\"%1$s\"給\"%2$s\"上的觸發器表示�
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr ""
@@ -16723,7 +16723,7 @@ msgstr "模板\"%1$s\"自主機\"%2$s\"斷連."
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17772,13 +17772,13 @@ msgstr ""
 msgid "Unknown function."
 msgstr "未知的方程式."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主機項目, 在所選的主機中沒有這樣的項目"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "未知的主機, 在系統中沒有出現這樣的主機."
@@ -18849,8 +18849,8 @@ msgstr "Web監測"
 msgid "Web scenario"
 msgstr ""
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "主機 \"%2$s\" 上已有網頁監測情境 \"%1$s\" 了。"

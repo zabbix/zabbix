@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2371,7 +2371,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Web senaryosu etkinleştirilemiyor"
 msgstr[1] "Web senaryoları etkinleştirilemiyor"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6745,7 +6745,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "Verilen ifade bir makro değil"
@@ -8583,7 +8583,7 @@ msgstr "\"%1$s\" keşif kuralı için yanlış süzgeç koşul operatörü."
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış süzgeç koşul türü."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8675,7 +8675,7 @@ msgstr "\"%2$s\" üzerindeki tetikleyici ifadesi için yanlış öğe anahtarı 
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Ekran öğesi için yanlış öğe prototip ID'si \"%1$s\" sağlandı."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr "Yanlış öğe değeri türü"
@@ -16814,7 +16814,7 @@ msgstr "\"%1$s\" şablonlarının \"%2$s\" ana makinelerinden bağlantıları ka
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17869,13 +17869,13 @@ msgstr "Bilinmeyen hata"
 msgid "Unknown function."
 msgstr "Bilinmeyen fonksiyon."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Bilinmeyen ana makine öğesi, seçilen ana makinede böyle bir öğe yok"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "Bilinmeyen ana makine, sistemde böyle bir ana makine bulunmuyor"
@@ -18953,8 +18953,8 @@ msgstr "Web gözlemleme"
 msgid "Web scenario"
 msgstr "Web senaryosu"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "\"%1$s\" web senaryosu, \"%2$s\" sunucusunda halihazırda mevcut."

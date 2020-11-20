@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2018-09-17 12:18+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2368,7 +2368,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Impossibile abilitare scenario web"
 msgstr[1] "Impossibile abilitare scenari web"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6743,7 +6743,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "L'espressione fornita non è una macro"
@@ -8582,7 +8582,7 @@ msgstr "Filtro non corretto per l'operatore condizione sulla regola di discovery
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "Errato filtro \"tipo di condizione\" per azione \"%1$s\"."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8674,7 +8674,7 @@ msgstr "Fornita chiave item \"%1$s\" errata per l'espressione del trigger in \"%
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Errato item prototipo ID \"%1$s\" fornito per elemento screen."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr ""
@@ -16813,7 +16813,7 @@ msgstr "Template \"%1$s\" scollegati dagli host \"%2$s\"."
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17868,13 +17868,13 @@ msgstr "Errore sconosciuto"
 msgid "Unknown function."
 msgstr "Funzione sconosciuta."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host sconosciuto, nessun item di questo tipo nell'host selezionato"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "Host sconosciuto, nessun host di questo tipo presente nel sistema"
@@ -18951,8 +18951,8 @@ msgstr "Monitoraggio web"
 msgid "Web scenario"
 msgstr "Scenario web"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Lo scenario web \"%1$s\" esiste già sull'host \"%2$s\"."

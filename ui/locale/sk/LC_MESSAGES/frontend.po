@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2016-07-23 10:02+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2424,7 +2424,7 @@ msgstr[0] "Nie je možné povoliť scenár"
 msgstr[1] "Nie je možné povoliť scenáre"
 msgstr[2] "Nie je možné povoliť scenáre"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6816,7 +6816,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "Zadaný výraz nie je makro"
@@ -8661,7 +8661,7 @@ msgstr "Nesprávna filtrovacia podmienka operátora pre zisťovacie pravidlo \"%
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "Nesprávny typ filtrovacej podmienky pre akciu \"%1$s\"."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8753,7 +8753,7 @@ msgstr "Neplatný kľúč položky \"%1$s\" pre spúšťač na \"%2$s\"."
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Neplatné ID prototypu položky \"%1$s\" v prvku obrazovky."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr ""
@@ -16915,7 +16915,7 @@ msgstr "Šablóny \"%1$s\" odpojené od hostov \"%2$s\"."
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17977,13 +17977,13 @@ msgstr "Neznáma chyba"
 msgid "Unknown function."
 msgstr "Neznáma funkcia."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Neznáme položky hosta, nenájdené položky na označenom hostovi"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "Neznámy host, nie je prítomný v systéme"
@@ -19066,8 +19066,8 @@ msgstr "Monitorovanie webov"
 msgid "Web scenario"
 msgstr "Web scenár"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Web scenár \"%1$s\" už existuje na hoste \"%2$s\"."

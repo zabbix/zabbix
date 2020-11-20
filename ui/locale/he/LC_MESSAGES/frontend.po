@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2020-02-21 04:07+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -2369,7 +2369,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] "לא ניתן להפעיל תרחיש רשת"
 msgstr[1] "לא ניתן להפעיל תרחישי רשת"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6743,7 +6743,7 @@ msgstr "קבלת ערך ובדיקה"
 msgid "Get value from host"
 msgstr "קבלת ערך ממארח"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "הביטוי שסופק אינו מאקרו"
@@ -8581,7 +8581,7 @@ msgstr "סימן תנאי מסנן שגוי לכלל הגילוי „%1$s”."
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "סוג תנאי מסנן שגוי לפעולה „%1$s”."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8673,7 +8673,7 @@ msgstr "סופק מפתח פריט שגוי „%1$s” לביטוי ההקפצה
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "סופק מזהה אבטיפוס פריט „%1$s” שגוי לרכיב מסך."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr "סוג ערך הפריט שגוי"
@@ -16811,7 +16811,7 @@ msgstr "התבניות „%1$s” נותקו מהמארחים „%2$s”."
 msgid "Templates updated"
 msgstr "תבניות עודכנו"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17866,13 +17866,13 @@ msgstr "שגיאה לא ידועה"
 msgid "Unknown function."
 msgstr "פונקציה לא ידועה."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "פריט מארח לא ידוע, אין כזה פריט במארח הנבחר"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "מארח לא ידוע, לא קיים כזה מארח במערכת"
@@ -18949,8 +18949,8 @@ msgstr "מעקב אחר עמוד אינטרנט"
 msgid "Web scenario"
 msgstr "תרחיש אינטרנט"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "תרחיש האינטרנט „%1$s“ כבר קיים במארח „%2$s“."

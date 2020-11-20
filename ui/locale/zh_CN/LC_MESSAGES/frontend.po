@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2319,7 +2319,7 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "无法启用Web场景"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6679,7 +6679,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "此表达式不是宏"
@@ -8513,7 +8513,7 @@ msgstr "自动发现规则\"%1$s\"的过滤器条件行为不正确"
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "动作\"%1$s\"的过滤器条件类型不正确"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8605,7 +8605,7 @@ msgstr "提供错误的项目键值\"%1$s\"给\"%2$s\"上的触发器表达式."
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "图表元素应用了不正确的监控项目模板ID\"%1$s\" "
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr "项目的数据类型不正确"
@@ -16725,7 +16725,7 @@ msgstr "模板\"%1$s\"自主机\"%2$s\"断连."
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17775,13 +17775,13 @@ msgstr "未知错误"
 msgid "Unknown function."
 msgstr "未知的函数."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主机监控项, 在所选的主机中没有这样的监控项"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "未知的主机, 在系统中没有出现这样的主机."
@@ -18852,8 +18852,8 @@ msgstr "Web监测"
 msgid "Web scenario"
 msgstr "Web 场景"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Web 场景 \"%1$s\" 已经存在在主机 \"%2$s\"."

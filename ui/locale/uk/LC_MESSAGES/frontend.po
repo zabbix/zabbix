@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2019-10-10 13:52+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2427,7 +2427,7 @@ msgstr[0] "Не вдалося активувати веб сценарій"
 msgstr[1] "Не вдалося активувати веб сценарії"
 msgstr[2] "Не вдалося активувати веб сценарії"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6816,7 +6816,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "Наданий вираз це не макрос"
@@ -8660,7 +8660,7 @@ msgstr "Некоректний оператор умови фільтру для
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "Некоректний тип умови фільтру для дії \"%1$s\"."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8752,7 +8752,7 @@ msgstr "У виразі тригера \"%2$s\" вказано некорект�
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Некоректний ID прототипу елемента даних \"%1$s\" вказано для елемента комплексного екрану."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr "Некоректний тип значення елемента даних"
@@ -16913,7 +16913,7 @@ msgstr "Шаблони \"%1$s\" від'єднано від вузлів мере
 msgid "Templates updated"
 msgstr "Шаблони оновлено"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17974,13 +17974,13 @@ msgstr "Невідома помилка"
 msgid "Unknown function."
 msgstr "Невідома функція."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Невідомий елемент даних вузла мережі, немає цього елемента в обраному вузлі"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "Невідомий вузел мережі, його не представлено в системі"
@@ -19063,8 +19063,8 @@ msgstr "Веб моніторинг"
 msgid "Web scenario"
 msgstr "Веб сценарій"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Веб сценарій \"%1$s\" вже існує у вузлі мережі \"%2$s\"."
