@@ -69,12 +69,13 @@ $widget = (new CWidget())
 	->setNavigation(
 		(new CList())
 			->addItem(
-				new CBreadcrumbs('nav', true, [
-					(new CLink(_('All hosts'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'host.view')
-							->getUrl()
-					)),
+				new CBreadcrumbs([
+					(new CSpan())
+						->addItem(new CLink(_('All hosts'),
+							(new CUrl('zabbix.php'))
+								->setArgument('action', 'host.view')
+								->getUrl()
+						)),
 					(new CSpan())->addItem($data['host']['name']),
 					(new CSpan())
 						->addItem(new CLink($data['dashboard']['name'],
@@ -84,8 +85,7 @@ $widget = (new CWidget())
 								->getUrl()
 						))
 						->addClass(ZBX_STYLE_SELECTED)
-				]))
-			->addClass(ZBX_STYLE_HEADER_NAVIGATION));
+				])));
 
 if ($data['time_selector'] !== null) {
 	$widget->addItem(

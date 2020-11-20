@@ -5906,9 +5906,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .input-section-header {
   padding-top: 10px; }
 
-.header-navigation [role='navigation'][aria-label='Hierarchy'] > ::after {
+.breadcrumbs > ::after {
   content: " /"; }
-.header-navigation [role='navigation'][aria-label='Hierarchy'] > :last-child::after {
+.breadcrumbs > :last-child::after {
   content: ""; }
 
 .sidebar .logo:focus .sidebar-logo {

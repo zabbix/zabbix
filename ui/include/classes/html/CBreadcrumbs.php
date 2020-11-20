@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CBreadcrumbs extends CTag {
+class CBreadcrumbs extends CList {
+	private const ZBX_STYLE_BREADCRUMBS = 'breadcrumbs';
 
-	public function __construct($tagname = 'nav', $paired = true, $body = null) {
-		parent::__construct($tagname, $paired, $body);
-
+	public function __construct($values = null) {
+		parent::__construct($values);
 		$this
+			->addClass('breadcrumbs')
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
 	}

@@ -7415,7 +7415,7 @@ z-select,
 	padding-top: 10px;
 }
 
-.header-navigation [role='navigation'][aria-label='Hierarchy'] {
+.breadcrumbs {
 	&>::after {
 		content: " /";
 	}
