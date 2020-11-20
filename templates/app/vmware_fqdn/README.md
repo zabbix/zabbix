@@ -179,7 +179,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: {$VMWARE.VM.UUID} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -252,7 +252,7 @@ No specific Zabbix configuration is required.
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
 |VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH | |
 |VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: {$VMWARE.HV.UUID} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
