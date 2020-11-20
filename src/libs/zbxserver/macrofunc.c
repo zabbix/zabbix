@@ -116,8 +116,8 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 	if (2 == nparam)
 	{
-		char		*p = params[1];
-		size_t		len;
+		char	*p = params[1];
+		size_t	len;
 
 		while ('\0' != *p)
 		{
@@ -138,10 +138,12 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 			else if ('+' == *p || '-' == *p)
 			{
 				int	num;
-				char	op = *(p++);
-				char	*error = NULL;
+				char	op, *error;
 
-				if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, &error)) {
+				op = *(p++);
+
+				if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, &error))
+				{
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to parse time period: %s", error);
 					zbx_free(error);
 					return FAIL;
