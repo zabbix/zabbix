@@ -3362,7 +3362,6 @@ int	zbx_sql_add_interface_availability(char **sql, size_t *sql_alloc, size_t *sq
 		const zbx_interface_availability_t *ia)
 {
 	char		delim = ' ';
-	int		i;
 
 	if (FAIL == zbx_interface_availability_is_set(ia))
 		return FAIL;

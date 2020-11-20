@@ -417,7 +417,7 @@ static int	DCget_disable_until(const ZBX_DC_INTERFACE *interface)
 	return (NULL == interface) ? 0 : interface->disable_until;
 }
 
-static void	DCincrease_disable_until(const ZBX_DC_ITEM *item, ZBX_DC_INTERFACE *interface, int now)
+static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
 {
 	if (NULL != interface && 0 != interface->errors_from)
 		interface->disable_until = now + CONFIG_TIMEOUT;
@@ -9074,7 +9074,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 					continue;
 				}
 
-				DCincrease_disable_until(dc_item, dc_interface, now);
+				DCincrease_disable_until(dc_interface, now);
 			}
 		}
 
@@ -9182,7 +9182,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 					continue;
 				}
 
-				DCincrease_disable_until(dc_item, dc_interface, now);
+				DCincrease_disable_until(dc_interface, now);
 			}
 		}
 
@@ -9423,14 +9423,10 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (NULL == (dc_interface = (ZBX_DC_HOST *)zbx_hashset_search(&config->interfaces,
-				&dc_item->interfaceid)))
-		{
-			continue;
-		}
-
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
 		dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE,
 				time(NULL));
@@ -9547,7 +9543,6 @@ static int	DCinterface_set_agent_availability(ZBX_DC_INTERFACE *dc_interface, in
  ******************************************************************************/
 static int	DCinterface_set_availability(ZBX_DC_INTERFACE *dc_interface, int now, zbx_interface_availability_t *ia)
 {
-	int		i;
 	unsigned char	flags = ZBX_FLAGS_AGENT_STATUS_NONE;
 
 	DCagent_set_availability(&ia->agent, &dc_interface->available, &dc_interface->error,
@@ -9591,8 +9586,6 @@ void	zbx_interface_availability_init(zbx_interface_availability_t *availability,
  ********************************************************************************/
 void	zbx_interface_availability_clean(zbx_interface_availability_t *ia)
 {
-	int	i;
-
 	zbx_free(ia->agent.error);
 }
 

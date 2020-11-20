@@ -126,13 +126,6 @@ static zbx_history_table_t	areg = {
 		}
 };
 
-static const char	*availability_tag_available[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_AVAILABLE,
-					ZBX_PROTO_TAG_SNMP_AVAILABLE, ZBX_PROTO_TAG_IPMI_AVAILABLE,
-					ZBX_PROTO_TAG_JMX_AVAILABLE};
-static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
-					ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
-					ZBX_PROTO_TAG_JMX_ERROR};
-
 typedef struct
 {
 	char		*path;
@@ -2124,7 +2117,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  ******************************************************************************/
 int	get_interface_availability_data(struct zbx_json *json, int *ts)
 {
-	int				i, j, ret = FAIL;
+	int				i, ret = FAIL;
 	zbx_vector_ptr_t		interfaces;
 	zbx_interface_availability_t	*ia;
 

@@ -184,7 +184,6 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 void	zbx_activate_item_interface(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	zbx_interface_availability_t	in, out;
-	unsigned char			agent_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__func__, item->interface.interfaceid, item->itemid, (int)item->type);
