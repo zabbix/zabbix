@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-20T06:31:08Z</date>
+   <date>2020-11-20T07:28:39Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1425,6 +1425,18 @@ return JSON.stringify({"data": output})</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
+                     <name>{#DEVNAME}: Average disk read queue length</name>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
                      <name>{#DEVNAME}: Disk read request avg waiting time</name>
                      <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]</key>
                      <history>7d</history>
@@ -1453,6 +1465,18 @@ return JSON.stringify({"data": output})</params>
                      <value_type>FLOAT</value_type>
                      <units>!s</units>
                      <description>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Average disk write queue length</name>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Disk {#DEVNAME}</name>
@@ -1509,6 +1533,26 @@ return JSON.stringify({"data": output})</params>
                   </trigger_prototype>
                </trigger_prototypes>
                <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#DEVNAME}: Disk average queue length</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Module Windows physical disks by Zabbix agent</host>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template Module Windows physical disks by Zabbix agent</host>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
                   <graph_prototype>
                      <name>{#DEVNAME}: Disk average waiting time</name>
                      <graph_items>
