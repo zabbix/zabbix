@@ -72,15 +72,6 @@ type state struct {
 	Text  string `json:"text"`
 }
 
-type get struct {
-	Description   string `json:"Description"`
-	LoadState     state  `json:"LoadState"`
-	ActiveState   state  `json:"ActiveState"`
-	UnitFileState state  `json:"UnitFileState"`
-	SubState      string `json:"SubState"`
-	Job           uint32 `json:"Job"`
-}
-
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
 	var err error
 	var conn *dbus.Conn
@@ -157,8 +148,11 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	}
 
 	if len(params) < 1 {
-		return nil,
-			fmt.Errorf("Too few parameters.")
+		return nil, fmt.Errorf("Too few parameters.")
+	}
+
+	if params[0] == "" {
+		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
 	if len(params) < 2 || len(params[1]) == 0 {
@@ -170,114 +164,24 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
 	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
 	if err != nil {
+		fmt.Println("Git here")
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
 	}
 
-	v, ok := value.(map[string]interface{})
+	values, ok := value.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("Cannot format unit properties for a response.")
 	}
+	var out *get
+	switch unitType {
+	case "Service":
+		out, err = getService(values)
+	default:
+		out, err = getUnit(values)
+	}
 
-	out := get{}
-	for k, val := range v {
-		switch k {
-		case "Description":
-			description, ok := val.(string)
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			out.Description = description
-			continue
-		case "SubState":
-			subState, ok := val.(string)
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			out.SubState = subState
-			continue
-		case "Job":
-			jobSlice, ok := val.([]interface{})
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			if len(jobSlice) < 1 {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			job, ok := jobSlice[0].(uint32)
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			out.Job = job
-			continue
-		case "LoadState":
-			loadState, ok := val.(string)
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			switch loadState {
-			case "loaded":
-				out.LoadState = state{1, "loaded"}
-			case "masked":
-				out.LoadState = state{3, "masked"}
-			default:
-				out.LoadState = state{2, "error"}
-			}
-			continue
-		case "ActiveState":
-			activeState, ok := val.(string)
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			switch activeState {
-			case "active":
-				out.ActiveState = state{1, "active"}
-			case "reloading":
-				out.ActiveState = state{2, "reloading"}
-			case "inactive":
-				out.ActiveState = state{3, "inactive"}
-			case "activating":
-				out.ActiveState = state{5, "activating"}
-			case "deactivating":
-				out.ActiveState = state{6, "deactivating"}
-			default:
-				out.ActiveState = state{4, "failed"}
-			}
-			continue
-		case "UnitFileState":
-			unitFileState, ok := val.(string)
-			if !ok {
-				return nil, fmt.Errorf("Cannot format unit properties for a response.")
-			}
-
-			switch unitFileState {
-			case "enabled":
-				out.UnitFileState = state{1, "enabled"}
-			case "enabled-runtime":
-				out.UnitFileState = state{2, "enabled-runtime"}
-			case "linked":
-				out.UnitFileState = state{3, "linked"}
-			case "linked-runtime":
-				out.UnitFileState = state{4, "linked-runtime"}
-			case "masked":
-				out.UnitFileState = state{5, "masked"}
-			case "masked-runtime":
-				out.UnitFileState = state{6, "masked-runtime"}
-			case "static":
-				out.UnitFileState = state{7, "static"}
-			case "disabled":
-				out.UnitFileState = state{8, "disabled"}
-			default:
-				out.UnitFileState = state{9, "invalid"}
-			}
-			continue
-		}
+	if err != nil {
+		return nil, err
 	}
 
 	ret, err := json.Marshal(out)
