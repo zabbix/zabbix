@@ -2420,6 +2420,7 @@
 					promiseScrollIntoView($obj, data, pos)
 						.then(function() {
 							methods.addWidget.call($obj, widget_data);
+							data['pos-action'] = '';
 
 							// New widget is last element in data['widgets'] array.
 							widget = data['widgets'].slice(-1)[0];
@@ -2564,7 +2565,10 @@
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'action': function() {}
+					'action': function() {
+						// Clear action.
+						data['pos-action'] = '';
+					}
 				}
 			],
 			'dialogueid': 'widgetConfg'
@@ -2775,9 +2779,6 @@
 		// Add new widget user interaction handlers.
 		$.subscribe('overlay.close', function(e, dialogue) {
 			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
-				data['pos-action'] = '';
-
-				resizeDashboardGrid($obj, data);
 				resetNewWidgetPlaceholderState(data);
 			}
 		});
@@ -2871,11 +2872,11 @@
 			.on('mouseenter mousemove', function(event) {
 				var $target = $(event.target);
 
-				if (data['pos-action'] !== '' && data['pos-action'] !== 'add') {
+				if (data['pos-action'] !== '' && data['pos-action'] !== 'add' && data['pos-action'] !== 'addmodal') {
 					return;
 				}
 
-				if (data['pos-action'] !== 'add' && !$target.is($obj)
+				if (data['pos-action'] !== 'add' && data['pos-action'] !== 'addmodal' && !$target.is($obj)
 						&& !$target.is(data.new_widget_placeholder.getObject())
 						&& !data.new_widget_placeholder.getObject().has($target).length) {
 					data.add_widget_dimension = {};
@@ -4333,6 +4334,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['pos-action'] = 'addmodal';
 				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
