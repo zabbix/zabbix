@@ -404,3 +404,14 @@ $multiselect-selected-bg-color: #696969;
 		color: $font-color;
 	}
 }
+
+.header-navigation [role='navigation'][aria-label='Hierarchy'] {
+	&>::after {
+		content: " /";
+	}
+
+	&>:last-child::after {
+		content: "";
+	}
+}
+

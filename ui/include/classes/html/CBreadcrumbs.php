@@ -18,31 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CBreadcrumbs extends CList {
-	private const ZBX_STYLE_BREADCRUMBS = 'filter-breadcrumb';
+class CBreadcrumbs extends CTag {
 
-	public function __construct(array $values = []) {
-		parent::__construct($values);
+	public function __construct($tagname = 'nav', $paired = true, $body = null) {
+		parent::__construct($tagname, $paired, $body);
 
 		$this
 			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addClass(self::ZBX_STYLE_BREADCRUMBS);
-	}
-
-	/**
-	 * Return element as delimiter for breadcrumbs
-	 * @return string
-	 */
-	protected function getDelimiter() {
-
-		return '/';
-	}
-
-	public function toString($destroy = true) {
-		$this->items = [implode($this->getDelimiter(), $this->items)];
-
-		return parent::toString($destroy);
+			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
 	}
 }

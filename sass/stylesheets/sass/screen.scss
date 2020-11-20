@@ -184,7 +184,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	background: url($sprite-path) no-repeat -540px -400px;
 }
 
-.object-group {
+.header-navigation {
 	min-height: 24px;
 	line-height: 24px;
 	padding: 10px 0 6px;
@@ -227,7 +227,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 }
 
 // Object group navigation.
-.object-group {
+.header-navigation {
 	margin-bottom: -1px;
 
 	li {
@@ -282,13 +282,13 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 		}
 	}
 
-	.object-group {
+	.header-navigation {
 		margin: 0;
 	}
 }
 
 // Breadcrumbs inline with filter block.
-.filter-breadcrumb {
+.header-navigation {
 	display: inline-block;
 	padding-top: 0;
 	z-index: 3;
@@ -7413,4 +7413,14 @@ z-select,
 // Used in form lists to separate input elements on sections.
 .input-section-header {
 	padding-top: 10px;
+}
+
+.header-navigation [role='navigation'][aria-label='Hierarchy'] {
+	&>::after {
+		content: " /";
+	}
+
+	&>:last-child::after {
+		content: "";
+	}
 }

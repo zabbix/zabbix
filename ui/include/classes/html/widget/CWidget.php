@@ -71,9 +71,9 @@ class CWidget {
 		return $this;
 	}
 
-	public function setBreadcrumbs($breadcrumbs = null) {
-		if ($breadcrumbs !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
-			$this->body[] = $breadcrumbs;
+	public function setNavigation($list = null) {
+		if ($list !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
+			$this->body[] = $list;
 		}
 
 		return $this;

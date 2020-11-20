@@ -128,15 +128,14 @@ $widget = (new CWidget())
 					->setAttribute('aria-label', _('Content controls'))
 					->addClass(ZBX_STYLE_DASHBRD_EDIT)
 			]))->addStyle('display: none'))
-	)->setBreadcrumbs(
+	)->setNavigation(
 		(new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
 				'dashboard' => $data['dashboard']
 			]))
-				->addClass(ZBX_STYLE_OBJECT_GROUP)
-				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+				->addClass(ZBX_STYLE_HEADER_NAVIGATION)
 	);
 
 if ($data['time_selector'] !== null) {

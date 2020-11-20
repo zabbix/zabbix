@@ -43,8 +43,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		->addItem((new CList())
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+			->addClass(ZBX_STYLE_HEADER_NAVIGATION)
 			->addItem([
 				(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
 				'/',
