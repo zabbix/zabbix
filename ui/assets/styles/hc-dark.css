@@ -6679,7 +6679,7 @@ td.inactive-bg {
 .filter-container.tabfilter-container .tabfilter-item-label.focused {
   box-shadow: 0 0 0 2px #ffffff; }
 
-.header-navigation [role='navigation'][aria-label='Hierarchy'] > ::after {
+.breadcrumbs > ::after {
   content: " /"; }
-.header-navigation [role='navigation'][aria-label='Hierarchy'] > :last-child::after {
+.breadcrumbs > :last-child::after {
   content: ""; }

@@ -6047,7 +6047,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-avail-widget .host-avail-total {
   color: #f2f2f2; }
 
-.header-navigation [role='navigation'][aria-label='Hierarchy'] > ::after {
+.breadcrumbs > ::after {
   content: " /"; }
-.header-navigation [role='navigation'][aria-label='Hierarchy'] > :last-child::after {
+.breadcrumbs > :last-child::after {
   content: ""; }

@@ -1280,7 +1280,7 @@ td.inactive-bg {
 	}
 }
 
-.header-navigation [role='navigation'][aria-label='Hierarchy'] {
+.breadcrumbs {
 	&>::after {
 		content: " /";
 	}
