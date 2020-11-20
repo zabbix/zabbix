@@ -504,7 +504,7 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}<10m'
-              name: 'VMware: {$VMWARE.VM.UUID} has been restarted (uptime < 10m)'
+              name: 'VMware: VM has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1031,7 +1031,7 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}<10m'
-              name: 'VMware: {$VMWARE.HV.UUID} has been restarted (uptime < 10m)'
+              name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
