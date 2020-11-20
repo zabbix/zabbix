@@ -71,7 +71,7 @@ class CWidget {
 		return $this;
 	}
 
-	public function setNavigation($list = null) {
+	public function setNavigation($list) {
 		if ($list !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			$this->body[] = (new CDiv($list))->addClass(ZBX_STYLE_HEADER_NAVIGATION);
 		}
