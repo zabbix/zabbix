@@ -27,7 +27,7 @@ include dirname(__FILE__).'/js/monitoring.sysmaps.js.php';
 
 // create menu
 $menu = (new CList())
-	->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+	->addClass(ZBX_STYLE_HEADER_NAVIGATION)
 	->addItem([
 		_('Map element').':&nbsp;',
 		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
