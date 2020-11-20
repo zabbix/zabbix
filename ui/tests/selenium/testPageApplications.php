@@ -125,7 +125,7 @@ class testPageApplications extends CLegacyWebTest {
 			// Check disabled creation button of application
 			$this->zbxTestAssertElementText("//button[@id='form']", 'Create application (select host first)');
 			$this->zbxTestAssertAttribute("//button[@id='form']",'disabled','true');
-			$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
+			$this->zbxTestAssertElementNotPresentXpath("//div[contains(@class, 'header-navigation')]");
 		}
 
 		if (CTestArrayHelper::get($data['filter'], 'Host groups', false)) {

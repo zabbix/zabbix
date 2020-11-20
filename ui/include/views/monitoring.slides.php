@@ -38,22 +38,19 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 				]
 			]
 		])
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addClass(ZBX_STYLE_HEADER_NAVIGATION)
-			->addItem([
-				(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
-				'/',
-				(new CSpan())
-					->addClass(ZBX_STYLE_SELECTED)
-					->addItem(
-						new CLink($data['screen']['name'], (new CUrl('slides.php'))
-							->setArgument('elementid', $data['screen']['slideshowid'])
-						)
-					)
-			])
-		);
+		->setNavigation(
+			(new CList())
+				->addItem(new CBreadcrumbs([
+						(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
+						(new CSpan())
+							->addClass(ZBX_STYLE_SELECTED)
+							->addItem(
+								new CLink($data['screen']['name'], (new CUrl('slides.php'))
+									->setArgument('elementid', $data['screen']['slideshowid'])
+								)
+							)
+					])
+				));
 }
 
 $favourite_icon = get_icon('favourite', [

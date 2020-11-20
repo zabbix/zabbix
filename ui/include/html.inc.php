@@ -521,24 +521,21 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  *
  * @return object
  */
+
 function get_header_sysmap_table($sysmapid, $name, $severity_min) {
-	$list = (new CList())
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-		->addClass(ZBX_STYLE_HEADER_NAVIGATION)
-		->addItem([
+	$list = (new CBreadcrumbs([
 			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
-			'/',
 			(new CSpan())
 				->addClass(ZBX_STYLE_SELECTED)
 				->addItem(
-					new CLink($name, (new CUrl('zabbix.php'))
-						->setArgument('action', 'map.view')
-						->setArgument('sysmapid', $sysmapid)
-						->setArgument('severity_min', $severity_min)
+					new CLink($name,
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'map.view')
+							->setArgument('sysmapid', $sysmapid)
+							->setArgument('severity_min', $severity_min)
 					)
 				)
-		]);
+	]));
 
 	// get map parent maps
 	$parent_sysmaps = get_parent_sysmaps($sysmapid);

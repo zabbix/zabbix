@@ -27,7 +27,6 @@ include dirname(__FILE__).'/js/monitoring.sysmaps.js.php';
 
 // create menu
 $menu = (new CList())
-	->addClass(ZBX_STYLE_HEADER_NAVIGATION)
 	->addItem([
 		_('Map element').':&nbsp;',
 		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
@@ -86,7 +85,7 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.json_encode([
 
 (new CWidget())
 	->setTitle(_('Network maps'))
-	->addItem($menu)
+	->setNavigation($menu)
 	->addItem(
 		(new CDiv(
 			(new CDiv())

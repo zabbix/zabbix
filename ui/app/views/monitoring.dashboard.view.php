@@ -130,13 +130,22 @@ $widget = (new CWidget())
 			]))->addStyle('display: none'))
 	)->setNavigation(
 		(new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
-				'dashboard' => $data['dashboard']
-			]))
-				->addClass(ZBX_STYLE_HEADER_NAVIGATION)
-	);
+			->addItem(new CBreadcrumbs([
+				(new CSpan())
+					->addItem(
+						new CLink(_('All dashboards'),
+							(new CUrl('zabbix.php'))
+								->setArgument('action', 'dashboard.list')
+								->getUrl()
+						)),
+				(new CSpan())
+					->addItem((new CLink($data['dashboard']['name'], (new CUrl('zabbix.php'))
+						->setArgument('action', 'dashboard.view')
+						->setArgument('dashboardid', $data['dashboard']['dashboardid'])))
+						->setId('dashboard-direct-link')
+					)
+					->addClass(ZBX_STYLE_SELECTED)
+			])));
 
 if ($data['time_selector'] !== null) {
 	$widget->addItem(
