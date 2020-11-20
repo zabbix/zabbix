@@ -46,12 +46,25 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.2rc1
 
 New features:
+.......PS. [ZBXNEXT-6269] added hv ip to vmware.hv.discovery and vm metrics for FQDN template (MVekslers)
+.........T [ZBXNEXT-6272] added template VMWare FQDN and updated template VMWare (tuskov)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6351] added template "Aranet Cloud" (afayantsev)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
 .........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 ...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+A.F.I..... [ZBX-18539] fixed acknowledge status being displayed as link even if problem cannot be closed manually; fixed order of role actions and few messages used in user roles functionality (agriscenko)
+..F....... [ZBX-18550] fixed script item and LLD rule types not having the "Execute now" feature (Ivo)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
 ..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
 ..F....... [ZBX-18575] added clone and delete buttons to user role update form (vmaksimovs)
 A.F....... [ZBX-18549] fixed error when user was able to change the user type of own role (gcalenko, vmaksimovs)
