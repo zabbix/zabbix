@@ -42,7 +42,7 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-# VMware
+# VMware FQDN
 
 ## Overview
 
@@ -84,7 +84,7 @@ No specific Zabbix configuration is required.
 |Discover VMware clusters |<p>Discovery of clusters</p> |SIMPLE |vmware.cluster.discovery[{$VMWARE.URL}] |
 |Discover VMware datastores |<p>-</p> |SIMPLE |vmware.datastore.discovery[{$VMWARE.URL}] |
 |Discover VMware hypervisors |<p>Discovery of hypervisors.</p> |SIMPLE |vmware.hv.discovery[{$VMWARE.URL}] |
-|Discover VMware VMs |<p>Discovery of guest virtual machines.</p> |SIMPLE |vmware.vm.discovery[{$VMWARE.URL}] |
+|Discover VMware VMs FQDN |<p>Discovery of guest virtual machines.</p> |SIMPLE |vmware.vm.discovery[{$VMWARE.URL}]<p>**Filter**:</p>AND <p>- A: {#VM.DNS} NOT_MATCHES_REGEX `^$`</p> |
 
 ## Items collected
 
