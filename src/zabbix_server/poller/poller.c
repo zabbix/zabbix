@@ -209,7 +209,7 @@ void	zbx_activate_item_interface(DC_ITEM *item, zbx_timespec_t *ts)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
+		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": interface became available",
 				zbx_agent_type_string(item->type), item->host.host);
 	}
 out:
@@ -276,7 +276,7 @@ void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char
 			else
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
-						" host unavailable",
+						" interface unavailable",
 						zbx_agent_type_string(item->type), item->host.host);
 			}
 		}
