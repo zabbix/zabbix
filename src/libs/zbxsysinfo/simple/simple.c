@@ -229,16 +229,13 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: no login prompt");
 
-		goto tcp_close;
+		zbx_tcp_close(&s);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __func__, zbx_socket_strerror());
-		goto out;
 	}
-tcp_close:
-	zbx_tcp_close(&s);
-out:
+
 	return SYSINFO_RET_OK;
 }
 
