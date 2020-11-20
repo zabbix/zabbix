@@ -201,13 +201,13 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 
 	if (-1 == fcntl(stdout_orig, F_SETFD, FD_CLOEXEC))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to set the FD_CLOEXEC file descriptor flag on stdout: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): failed to set the FD_CLOEXEC file descriptor flag on stdout: %s",
 				__func__, zbx_strerror(errno));
 	}
 
 	if (-1 == fcntl(stderr_orig, F_SETFD, FD_CLOEXEC))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to set the FD_CLOEXEC file descriptor flag on stderr: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): failed to set the FD_CLOEXEC file descriptor flag on stderr: %s",
 				__func__, zbx_strerror(errno));
 	}
 
