@@ -24,7 +24,7 @@ class CBreadcrumbs extends CList {
 	public function __construct($values = null) {
 		parent::__construct($values);
 		$this
-			->addClass('breadcrumbs')
+			->addClass(self::ZBX_STYLE_BREADCRUMBS)
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
 	}
