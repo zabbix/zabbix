@@ -227,7 +227,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -237,7 +237,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '1439m',
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -247,7 +247,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '23h',
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -257,7 +257,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '13140001m',
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -267,7 +267,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '219001h',
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -277,7 +277,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '9126d',
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -287,7 +287,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '1304w',
 					'errors' => [
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -297,7 +297,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_internal' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -307,7 +307,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_discovery' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -317,7 +317,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_autoreg' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -327,7 +327,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_services_mode' => true,
 					'hk_services' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_services": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -337,7 +337,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_audit_mode' => true,
 					'hk_audit' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -347,7 +347,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_sessions_mode' => true,
 					'hk_sessions' => 0,
 					'errors' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
+						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.'
 					]
 				]
 			],
@@ -358,7 +358,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_history_global' => true,
 					'hk_history' => -1,
 					'errors' => [
-						'Incorrect value for field "hk_history": a time unit is expected.',
+						'Incorrect value for field "hk_history": a time unit is expected.'
 					]
 				]
 			],
@@ -369,7 +369,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_trends_global' => true,
 					'hk_trends' => -1,
 					'errors' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
+						'Incorrect value for field "hk_trends": a time unit is expected.'
 					]
 				]
 			],

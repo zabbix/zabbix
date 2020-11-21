@@ -48,7 +48,7 @@ class CSubmitButtonTest extends CTagTest {
 			[
 				['caption', 'button', 'button"&"'],
 				'<button type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
-			],
+			]
 		];
 	}
 	/**

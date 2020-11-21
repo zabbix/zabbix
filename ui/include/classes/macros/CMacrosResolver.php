@@ -547,7 +547,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'host' => [],
 			'interface' => [],
 			'item' => [],
-			'log' => [],
+			'log' => []
 		];
 		$usermacros = [];
 		$macro_values = [];

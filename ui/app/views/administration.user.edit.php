@@ -311,7 +311,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 						'dstfrm' => $user_form->getName()
 					]).', null, this);'
 				)
-				->addClass(ZBX_STYLE_BTN_LINK),
+				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

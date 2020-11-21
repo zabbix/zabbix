@@ -229,7 +229,7 @@ class CRoleHelper {
 			self::API_ACCESS => (bool) $role['rules'][self::API_ACCESS],
 			self::API_MODE => (bool) $role['rules'][self::API_MODE],
 			self::SECTION_API => $role['rules'][self::SECTION_API],
-			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS],
+			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS]
 		];
 
 		foreach ($role['rules'][self::SECTION_UI] as $rule) {

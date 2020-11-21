@@ -117,7 +117,7 @@ class CVaultSecretParserTest extends PHPUnit_Framework_TestCase {
 			['zabbix/secret/:path:key', 0, [], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "secret/:path:key"'
-			]],
+			]]
 		];
 	}
 

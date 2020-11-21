@@ -1118,7 +1118,7 @@ class testFormHost extends CWebTest {
 							'index' => 0,
 							'ip' => '',
 							'dns' => 'zabbix.com',
-							'Connect to' => 'DNS',
+							'Connect to' => 'DNS'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1234,7 +1234,7 @@ class testFormHost extends CWebTest {
 				'Groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
 				'Monitored by proxy' => 'Active proxy 2',
-				'Enabled' => true,
+				'Enabled' => true
 			],
 			'interfaces' => [
 				'Agent' => [
@@ -1633,7 +1633,7 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'testFormHost with items',
+					'name' => 'testFormHost with items'
 				]
 			],
 			[
