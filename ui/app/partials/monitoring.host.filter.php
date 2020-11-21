@@ -136,7 +136,7 @@ $right_column = (new CFormList())
 				->setId('show_suppressed_#{uniqid}')
 				->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-				->setEnabled($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
+				->setEnabled($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	]);
 

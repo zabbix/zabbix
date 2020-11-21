@@ -73,13 +73,13 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			],
 			[
 				[
-					'type' => 'Script',
+					'type' => 'Script'
 				]
 			],
 			[
 				[
 					'type' => 'SMS',
-					'gsm_modem' => '/dev/ttyS0',
+					'gsm_modem' => '/dev/ttyS0'
 				]
 			]
 		];

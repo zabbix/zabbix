@@ -73,7 +73,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 					'hostids' => [$graphPrototype['discoveryRule']['hostid']],
 					'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
 					'expandName' => true,
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 				]);
 
 				// Collect those graph IDs where parent graph is graph prototype selected for

@@ -24,7 +24,7 @@
  */
 
 $output = [
-	'header' => $data['title'],
+	'header' => $data['title']
 ];
 
 $options = $data['options'];

@@ -519,7 +519,7 @@ $item_form_list
 			->setChecked(array_key_exists('master_itemid', $data['visible'])),
 		(new CDiv([
 			(new CVar('master_itemname')),
-			$master_item,
+			$master_item
 		]))->setId('master_item')
 	)
 	// Append description to form list.

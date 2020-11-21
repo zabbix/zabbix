@@ -498,7 +498,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.interface.trailing.spaces'
 					],
-					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    '],
+					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    ']
 				]
 			]
 		];
@@ -755,7 +755,7 @@ class testFormItemTest extends CWebTest {
 									'authentication_protocol' => $data['snmp_fields']['authentication_protocol'],
 									'authentication_passphrase' => $data['snmp_fields']['authentication_passphrase'],
 									'privacy_protocol' => $data['snmp_fields']['privacy_protocol'],
-									'privacy_passphrase' => $data['snmp_fields']['privacy_passphrase'],
+									'privacy_passphrase' => $data['snmp_fields']['privacy_passphrase']
 								];
 							}
 							else {
@@ -770,7 +770,7 @@ class testFormItemTest extends CWebTest {
 									'authentication_protocol' => 'MD5',
 									'authentication_passphrase' => '',
 									'privacy_protocol' => 'DES',
-									'privacy_passphrase' => '',
+									'privacy_passphrase' => ''
 								];
 							}
 

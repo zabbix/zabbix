@@ -157,7 +157,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Name' => 'All interfaces selected',
 						'Layout' => 'Vertical',
 						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI']
-					],
+					]
 				]
 			],
 			// Create a Host availability widget that displays SNMP, JMX, IPMI interface and display hosts in maintenance.

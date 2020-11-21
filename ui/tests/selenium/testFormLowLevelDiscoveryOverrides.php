@@ -1174,7 +1174,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 0,
-												'delay' => '',
+												'delay' => ''
 											]
 										]
 									]
@@ -1453,7 +1453,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
 									'fields' => [
-										'Discover' => 'No',
+										'Discover' => 'No'
 									]
 								],
 								[
@@ -1577,7 +1577,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Discover' => null,
 						'Severity' => 'Warning',
 						'Tags' => [
-							['tag' => 'tag1', 'value' => 'value1'],
+							['tag' => 'tag1', 'value' => 'value1']
 						]
 					]
 				]

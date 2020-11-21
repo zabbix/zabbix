@@ -115,7 +115,7 @@ class CControllerModuleList extends CController {
 			'modules' => $modules,
 			'paging' => $paging,
 			'filter_profile' => 'web.modules.filter',
-			'filter_active_tab' => CProfile::get('web.modules.filter.active', 1),
+			'filter_active_tab' => CProfile::get('web.modules.filter.active', 1)
 		];
 
 		$response = new CControllerResponseData($data);
