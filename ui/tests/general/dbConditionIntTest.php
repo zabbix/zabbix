@@ -30,7 +30,7 @@ class dbConditionIntTest extends CTest {
 			[
 				['field', []],
 				'1=0',
-				'1=0',
+				'1=0'
 			],
 			[
 				['field', range(1, 100)],

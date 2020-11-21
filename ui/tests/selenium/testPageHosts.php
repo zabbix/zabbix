@@ -365,7 +365,7 @@ class testPageHosts extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST']
 					],
 					'result' => [
 						['Name' => 'Host with tags for cloning', 'Templates' => ''],
@@ -378,7 +378,7 @@ class testPageHosts extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST']
 					],
 					'result' => [
 						['Name' => 'Simple form test host']
@@ -389,7 +389,7 @@ class testPageHosts extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-							['name' => 'action', 'operator' => 'Contains'],
+							['name' => 'action', 'operator' => 'Contains']
 					],
 					'result' => [
 						['Name' => 'Host with tags for cloning'],
@@ -402,7 +402,7 @@ class testPageHosts extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Equals'],
+						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
 			]

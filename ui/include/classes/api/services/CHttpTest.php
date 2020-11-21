@@ -862,7 +862,7 @@ class CHttpTest extends CApiService {
 					ZBX_HTTPFIELD_HEADER => 'headers',
 					ZBX_HTTPFIELD_VARIABLE => 'variables',
 					ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields',
-					ZBX_HTTPFIELD_POST_FIELD => 'posts',
+					ZBX_HTTPFIELD_POST_FIELD => 'posts'
 				];
 				foreach ($fields as $type => $field) {
 					if (!$this->outputIsRequested($field, $options['selectSteps'])) {

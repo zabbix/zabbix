@@ -109,7 +109,7 @@ abstract class CControllerHost extends CController {
 				'port' => ($filter['port'] === '') ? null : $filter['port'],
 				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 					? null
-					: HOST_MAINTENANCE_STATUS_OFF,
+					: HOST_MAINTENANCE_STATUS_OFF
 			],
 			'sortfield' => 'name',
 			'limit' => $config['search_limit'] + 1,

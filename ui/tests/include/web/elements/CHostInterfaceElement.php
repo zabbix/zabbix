@@ -42,7 +42,7 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 		$instance->selectors = [
 			'header' => $header,
 			'row' => $row,
-			'column' => $column,
+			'column' => $column
 		];
 
 		return $instance;

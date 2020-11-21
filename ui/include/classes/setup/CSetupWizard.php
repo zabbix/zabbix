@@ -466,7 +466,7 @@ class CSetupWizard extends CForm {
 				new CTag('ol', true, [
 					new CTag('li', true, new CLink(_('Download the configuration file'), 'setup.php?save_config=1')),
 					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
-				]),
+				])
 			];
 		}
 		else {

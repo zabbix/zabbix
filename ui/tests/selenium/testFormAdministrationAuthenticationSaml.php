@@ -247,7 +247,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 					'username' => 'Admin',
 					'custom_settings' => [
 						'Case sensitive login' => true
-					],
+					]
 				]
 			],
 			// Login as zabbix user

@@ -59,7 +59,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -74,7 +74,7 @@ class testWebScenario extends CAPITest {
 							[
 								'name' => 'Homepage',
 								'url' => 'http://zabbix.com',
-								'no' => 0,
+								'no' => 0
 							]
 						]
 					],
@@ -85,10 +85,10 @@ class testWebScenario extends CAPITest {
 							[
 								'name' => 'Homepage',
 								'url' => 'http://zabbix.com',
-								'no' => 0,
+								'no' => 0
 							]
 						]
-					],
+					]
 				],
 				'expected_error' => 'Web scenario "Api web scenario" already exists.'
 			],
@@ -101,7 +101,7 @@ class testWebScenario extends CAPITest {
 							[
 								'name' => 'Homepage',
 								'url' => 'http://zabbix.com',
-								'no' => 0,
+								'no' => 0
 							]
 						]
 					],
@@ -112,7 +112,7 @@ class testWebScenario extends CAPITest {
 							[
 								'name' => 'Homepage',
 								'url' => 'http://zabbix.com',
-								'no' => 0,
+								'no' => 0
 							]
 						]
 					]
@@ -155,9 +155,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -169,9 +169,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -194,17 +194,17 @@ class testWebScenario extends CAPITest {
 					'headers' => [
 						[
 							'name' => 'header_name-symbols☺æų""\\//!@#$%^&*()_+',
-							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+',
+							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+'
 						],
 						[
 							'name' => 'header_name-symbols☺æų""\\//!@#$%^&*()_+',
-							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+',
-						],
+							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+'
+						]
 					],
 					'variables' => [
 						[
 							'name' => '{variables_name-symbols☺æų""\\//!@#$%^&*()_+}',
-							'value' => 'variables_value-symbols☺æų""\\//!@#$%^&*()_+',
+							'value' => 'variables_value-symbols☺æų""\\//!@#$%^&*()_+'
 						]
 					],
 					'verify_host' => '1',
@@ -213,7 +213,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'step-symbols☺æų""\\//!@#$%^&*()_+',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				]],
@@ -234,13 +234,13 @@ class testWebScenario extends CAPITest {
 					'headers' => [
 						[
 							'name' => 'АПИ веб название УТФ-8',
-							'value' => 'АПИ веб значение УТФ-8',
+							'value' => 'АПИ веб значение УТФ-8'
 						]
 					],
 					'variables' => [
 						[
 							'name' => '{АПИ веб переменная УТФ-8}',
-							'value' => 'АПИ веб значение переменной УТФ-8',
+							'value' => 'АПИ веб значение переменной УТФ-8'
 						]
 					],
 					'steps' => [
@@ -262,7 +262,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -273,7 +273,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				]],
@@ -384,7 +384,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [[
 					'name' => 'Api update web scenario with unexpected parameter',
-					'hostid' => '50009',
+					'hostid' => '50009'
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "hostid".'
 			],
@@ -440,14 +440,14 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [[
 					'httptestid' => '15001',
-					'name' => '',
+					'name' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'httptest' => [[
 					'httptestid' => '15001',
-					'name' => 'Api web scenario',
+					'name' => 'Api web scenario'
 				]],
 				'expected_error' => 'Web scenario "Api web scenario" already exists.'
 			],
@@ -455,11 +455,11 @@ class testWebScenario extends CAPITest {
 				'httptest' => [
 					[
 						'httptestid' => '15001',
-						'name' => 'Web scenarios with the same name',
+						'name' => 'Web scenarios with the same name'
 					],
 					[
 						'httptestid' => '15002',
-						'name' => 'Web scenarios with the same name',
+						'name' => 'Web scenarios with the same name'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (hostid, name)=(50009, Web scenarios with the same name) already exists.'
@@ -469,7 +469,7 @@ class testWebScenario extends CAPITest {
 				'httptest' => [
 					[
 						'httptestid' => '15001',
-						'name' => 'Апи скрипт обнавлён утф-8',
+						'name' => 'Апи скрипт обнавлён утф-8'
 					]
 				],
 				'expected_error' => null
@@ -478,11 +478,11 @@ class testWebScenario extends CAPITest {
 				'httptest' => [
 					[
 						'httptestid' => '15001',
-						'name' => 'Api updated one web scenario',
+						'name' => 'Api updated one web scenario'
 					],
 					[
 						'httptestid' => '15002',
-						'name' => 'Api updated two web scenario',
+						'name' => 'Api updated two web scenario'
 					]
 				],
 				'expected_error' => null
@@ -556,7 +556,7 @@ class testWebScenario extends CAPITest {
 			// Check web name.
 			[
 				'httptest' => [
-					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
@@ -569,9 +569,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/agent": value is too long.'
 			],
@@ -591,9 +591,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Application with applicationid "123456" does not exist.'
 			],
@@ -605,9 +605,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
@@ -619,9 +619,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
@@ -633,9 +633,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/applicationid": a number is expected.'
 			],
@@ -647,9 +647,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'The web scenario application belongs to a different host than the web scenario host.'
 			],
@@ -661,9 +661,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Cannot add a discovered application "API discovery application" to a web scenario.'
 			],
@@ -748,7 +748,7 @@ class testWebScenario extends CAPITest {
 					'headers' => [
 						[
 							'name' => 'login',
-							'value' => '',
+							'value' => ''
 						]
 					]
 				],
@@ -760,7 +760,7 @@ class testWebScenario extends CAPITest {
 					'headers' => [
 						[
 							'name' => '',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					]
 				],
@@ -772,7 +772,7 @@ class testWebScenario extends CAPITest {
 					'headers' => [
 						[
 							'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					]
 				],
@@ -789,9 +789,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/http_password": value is too long.'
 			],
@@ -804,9 +804,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Incorrect value for field "http_password": should be empty.'
 			],
@@ -821,9 +821,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/http_password": value is too long.'
 			],
@@ -837,9 +837,9 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
-					],
+					]
 				],
 				'expected_error' => 'Incorrect value for field "http_user": should be empty.'
 			],
@@ -847,7 +847,7 @@ class testWebScenario extends CAPITest {
 				'httptest' => [
 					'name' => 'Api web with long http_user',
 					'authentication' => '1',
-					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
+					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65'
 				],
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
@@ -856,7 +856,7 @@ class testWebScenario extends CAPITest {
 				'httptest' => [
 					'name' => 'Api web with long http_user',
 					'authentication' => '2',
-					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
+					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65'
 				],
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
@@ -864,7 +864,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with long http_proxy',
-					'http_proxy' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'http_proxy' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 				],
 				'expected_error' => 'Invalid parameter "/1/http_proxy": value is too long.'
 			],
@@ -872,49 +872,49 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with empty retries',
-					'retries' => '',
+					'retries' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
-					'retries' => '☺',
+					'retries' => '☺'
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
-					'retries' => '1.5',
+					'retries' => '1.5'
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
-					'retries' => '1s',
+					'retries' => '1s'
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
-					'retries' => '-5',
+					'retries' => '-5'
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": value must be one of 1-10.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
-					'retries' => '0',
+					'retries' => '0'
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": value must be one of 1-10.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
-					'retries' => '11',
+					'retries' => '11'
 				],
 				'expected_error' => 'Invalid parameter "/1/retries": value must be one of 1-10.'
 			],
@@ -922,7 +922,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with long ssl_cert_file',
-					'ssl_cert_file' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'ssl_cert_file' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
@@ -930,7 +930,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with long ssl_key_file',
-					'ssl_key_file' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'ssl_key_file' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
 			],
@@ -938,7 +938,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with long ssl_key_password ',
-					'ssl_key_password' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'ssl_key_password' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value is too long.'
 			],
@@ -994,7 +994,7 @@ class testWebScenario extends CAPITest {
 					'variables' => [
 						[
 							'name' => '{}',
-							'value' => '☺',
+							'value' => '☺'
 						]
 					]
 				],
@@ -1006,7 +1006,7 @@ class testWebScenario extends CAPITest {
 					'variables' => [
 						[
 							'name' => '{test',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					]
 				],
@@ -1018,7 +1018,7 @@ class testWebScenario extends CAPITest {
 					'variables' => [
 						[
 							'name' => 'test}',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					]
 				],
@@ -1030,7 +1030,7 @@ class testWebScenario extends CAPITest {
 					'variables' => [
 						[
 							'name' => '',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					]
 				],
@@ -1042,7 +1042,7 @@ class testWebScenario extends CAPITest {
 					'variables' => [
 						[
 							'name' => '{Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condin256}',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					]
 				],
@@ -1054,18 +1054,18 @@ class testWebScenario extends CAPITest {
 					'variables' => [
 						[
 							'name' => '{duplicate name}',
-							'value' => 'admin',
+							'value' => 'admin'
 						],
 						[
 							'name' => '{duplicate name}',
-							'value' => 'admin',
+							'value' => 'admin'
 						]
 					],
 					'steps' => [
 						[
 							'name' => 'Homepage',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1082,7 +1082,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong verify_host',
-					'verify_host' => '☺',
+					'verify_host' => '☺'
 				],
 				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
@@ -1118,7 +1118,7 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong verify_peer',
-					'verify_peer' => '☺',
+					'verify_peer' => '☺'
 				],
 				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
@@ -1246,7 +1246,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step as zabbix admin with read-write permissions',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1278,7 +1278,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1310,7 +1310,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1342,7 +1342,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1374,7 +1374,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step as zabbix user with read-write permissions',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1406,7 +1406,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1438,7 +1438,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1470,7 +1470,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'API create step',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
+							'no' => 0
 						]
 					]
 				],
@@ -1490,7 +1490,7 @@ class testWebScenario extends CAPITest {
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => ['15006'],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
+			]
 		];
 	}
 
@@ -1539,14 +1539,14 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [[
 					'httptestid' => '15015',
-					'status' => '1',
+					'status' => '1'
 				]],
 				'expected_error' => null
 			],
 			[
 				'httptest' => [[
 					'httptestid' => '15015',
-					'applicationid' => '15016',
+					'applicationid' => '15016'
 				]],
 				'expected_error' => null
 			],

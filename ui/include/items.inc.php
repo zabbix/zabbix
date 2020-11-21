@@ -1157,7 +1157,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 	}
 
 	CArrayHelper::sort($db_hosts, [
-		['field' => 'name', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
 	return $db_hosts;
@@ -1993,7 +1993,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 					: $items[$items_index]['type'],
 				'source' => ($items_index === false)
 					? $master_items[$master_itemid]['source']
-					: $items[$items_index]['source'],
+					: $items[$items_index]['source']
 			];
 		}
 	}

@@ -51,7 +51,7 @@ class testPageInventory extends CLegacyWebTest {
 			$data['os'],
 			$data['serialno_a'],
 			$data['tag'],
-			$data['macaddress_a'],
+			$data['macaddress_a']
 		]);
 	}
 

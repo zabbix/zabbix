@@ -102,7 +102,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
-				],
+				]
 			],
 			[
 				[

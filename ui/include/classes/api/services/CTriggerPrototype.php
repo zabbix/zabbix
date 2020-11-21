@@ -603,7 +603,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			foreach ($triggerPrototype['dependencies'] as $dependency) {
 				$insert[] = [
 					'triggerid_down' => $triggerPrototype['triggerid'],
-					'triggerid_up' => $dependency['triggerid'],
+					'triggerid_up' => $dependency['triggerid']
 				];
 			}
 		}
@@ -1124,7 +1124,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
