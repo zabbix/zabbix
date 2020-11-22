@@ -5583,13 +5583,16 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-#mediatype_testlog .logitems {
-  overflow: auto;
-  margin-bottom: 10px; }
-  #mediatype_testlog .logitems pre {
-    white-space: nowrap; }
-#mediatype_testlog .logtotalms {
-  margin-bottom: 10px; }
+.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
+  overflow-x: auto; }
+  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
+    height: 9px; }
+.mediatypetest-modal .logitems pre {
+  white-space: nowrap; }
+.mediatypetest-modal .logtotalms {
+  color: #333333;
+  float: left;
+  line-height: 24px; }
 
 #itemsTable .table-col-handle {
   width: 26px; }

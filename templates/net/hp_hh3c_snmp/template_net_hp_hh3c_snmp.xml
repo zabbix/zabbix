@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:10Z</date>
+   <date>2020-10-20T07:19:46Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -23,7 +23,7 @@ Known Issues:&#13;
   Version: 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP&#13;
   Device: HP 1910-48&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -209,7 +209,6 @@ Template tooling version used: 0.36</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                           <recovery_mode>NONE</recovery_mode>
                            <name>{#ENT_NAME}: Operating system description has changed</name>
                            <priority>INFO</priority>
                            <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -218,6 +217,7 @@ Template tooling version used: 0.36</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -267,6 +267,7 @@ fanError(41) means that the fan stops working.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Module Discovery</name>
@@ -344,6 +345,7 @@ percent of memory are used.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#MODULE_NAME}: CPU utilization</name>
@@ -426,6 +428,7 @@ rpsError(61) means the Redundant Power Supply is in the state of fault.</descrip
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -507,6 +510,7 @@ The temperature for the {#SNMPVALUE}.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

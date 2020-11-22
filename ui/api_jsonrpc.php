@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 $allowed_content = [
 	'application/json-rpc' => 'json-rpc',
 	'application/json' => 'json-rpc',
-	'application/jsonrequest' => 'json-rpc',
+	'application/jsonrequest' => 'json-rpc'
 ];
 $http_request = new CHttpRequest();
 $content_type = $http_request->header('Content-Type');

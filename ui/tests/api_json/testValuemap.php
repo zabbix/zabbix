@@ -345,11 +345,11 @@ class testValuemap extends CAPITest {
 				'valuemap' => [
 					[
 						'valuemapid' => '19',
-						'name' => 'API valuemap with the same ids1',
+						'name' => 'API valuemap with the same ids1'
 					],
 					[
 						'valuemapid' => '19',
-						'name' => 'API valuemap with the same ids2',
+						'name' => 'API valuemap with the same ids2'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (valuemapid)=(19) already exists.'
@@ -491,7 +491,7 @@ class testValuemap extends CAPITest {
 				'valuemap' => [
 					[
 						'valuemapid' => '19',
-						'name' => 'API valuemap name updated',
+						'name' => 'API valuemap name updated'
 					]
 				],
 				'expected_error' => null
@@ -709,7 +709,7 @@ class testValuemap extends CAPITest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'API value update as zabbix admin',
+					'name' => 'API value update as zabbix admin'
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],
@@ -740,7 +740,7 @@ class testValuemap extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'valuemap' => [
 					'valuemapid' => '19',
-					'name' => 'API value update as zabbix user',
+					'name' => 'API value update as zabbix user'
 				],
 				'expected_error' => 'Only super admins can update value maps.'
 			],

@@ -273,7 +273,7 @@ if (hasRequest('form')) {
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
 				'selectTrigger' => ['description'],
 				'output' => ['name', 'triggerid'],
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 
 			foreach ($service['dependencies'] as $dependency) {
@@ -283,7 +283,7 @@ if (hasRequest('form')) {
 					'triggerid' => $child_service['triggerid'],
 					'trigger' => ($child_service['triggerid'] == 0) ? '' : $child_service['trigger']['description'],
 					'serviceid' => $dependency['servicedownid'],
-					'soft' => $dependency['soft'],
+					'soft' => $dependency['soft']
 				];
 			}
 

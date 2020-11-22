@@ -133,7 +133,7 @@ class testUserMacro extends CAPITest {
 					[
 						'macro' => '{$ABC123}',
 						'value' => 'test'
-					],
+					]
 				],
 				'expected_error' => null
 			],
@@ -142,7 +142,7 @@ class testUserMacro extends CAPITest {
 					[
 						'macro' => '{$MACRO:context}',
 						'value' => 'test'
-					],
+					]
 				],
 				'expected_error' => null
 			],
@@ -151,7 +151,7 @@ class testUserMacro extends CAPITest {
 					[
 						'macro' => '{$MACRO:"A"}',
 						'value' => 'test'
-					],
+					]
 				],
 				'expected_error' => null
 			],
@@ -331,7 +331,7 @@ class testUserMacro extends CAPITest {
 				'hostmacro' => [
 					[
 						'hostmacroid' => '1',
-						'value' => 'test',
+						'value' => 'test'
 					],
 					[
 						'hostmacroid' => '2',
@@ -432,7 +432,7 @@ class testUserMacro extends CAPITest {
 						'globalmacroid' => '13',
 						'macro' => '{$MACRO_UPDATED}',
 						'value' => 'updated'
-					],
+					]
 				],
 				'expected_error' => null
 			],
@@ -477,7 +477,7 @@ class testUserMacro extends CAPITest {
 						'description' => ''
 					]
 				],
-				'expected_error' => null,
+				'expected_error' => null
 			]
 		];
 	}
@@ -615,7 +615,7 @@ class testUserMacro extends CAPITest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'globalmacro' => [
 					'globalmacroid' => '13',
-					'macro' => '{$MACRO_UPDATE_ADMIN}',
+					'macro' => '{$MACRO_UPDATE_ADMIN}'
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
@@ -640,7 +640,7 @@ class testUserMacro extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'globalmacro' => [
 					'globalmacroid' => '14',
-					'macro' => '{$MACRO_UPDATE_USER}',
+					'macro' => '{$MACRO_UPDATE_USER}'
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
@@ -665,7 +665,7 @@ class testUserMacro extends CAPITest {
 				'user' => ['user' => 'guest', 'password' => ''],
 				'globalmacro' => [
 					'globalmacroid' => '14',
-					'macro' => '{$MACRO_UPDATE_GUEST}',
+					'macro' => '{$MACRO_UPDATE_GUEST}'
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],

@@ -249,7 +249,7 @@ catch (error) {&#13;
             <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.__ilert_incident_url}</event_menu_url>
             <event_menu_name>iLert incident</event_menu_name>
-            <description>Please refer to https://docs.ilert.com/integration/zabbix &#13;
+            <description>Please refer to https://docs.ilert.com/integrations/zabbix/native &#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
 Add a dedicated user with the media type &quot;iLert&quot;. You can also rewrite the incident summary via &quot;.ILERT.INCIDENT.SUMMARY&quot; parameter or leave it empty to use the standard pattern.</description>

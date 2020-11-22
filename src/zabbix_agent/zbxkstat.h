@@ -22,7 +22,7 @@
 #ifndef ZABBIX_ZBXKSTAT_H
 #define ZABBIX_ZBXKSTAT_H
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
 #include "zbxtypes.h"
 

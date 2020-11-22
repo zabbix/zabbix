@@ -797,7 +797,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($application_prototypes as $application_prototype) {
 						if (is_array($application_prototype) && array_key_exists('new', $application_prototype)) {
 							$new_application_prototypes[] = [
-								'name' => $application_prototype['new'],
+								'name' => $application_prototype['new']
 							];
 						}
 						else {

@@ -3680,7 +3680,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		for (i = 0; i < values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve key \"%s\" on host \"%s\" from "
+						"configuration cache", hostkeys[i].key, hostkeys[i].host);
 				continue;
+			}
 
 			if (last_hostid != items[i].host.hostid)
 			{
@@ -3704,6 +3708,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					zbx_free(error);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unknown validation error for item \"%s\"",
+							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
 				}
 
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);

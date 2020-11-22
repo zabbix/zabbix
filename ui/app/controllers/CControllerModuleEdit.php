@@ -91,7 +91,7 @@ class CControllerModuleEdit extends CController {
 					? $this->hasInput('status')
 						? MODULE_STATUS_ENABLED
 						: MODULE_STATUS_DISABLED
-					: $this->module['status'],
+					: $this->module['status']
 			];
 
 			$response = new CControllerResponseData($data);

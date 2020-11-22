@@ -444,7 +444,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.interface.trailing.spaces'
 					],
-					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    '],
+					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    ']
 				]
 			]
 		];
