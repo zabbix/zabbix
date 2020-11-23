@@ -314,49 +314,49 @@ func getName(name string) string {
 func (p *Plugin) setUnitStates(v map[string]interface{}) {
 	loadState, ok := v["LoadState"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "LoadState")
+		p.Debugf("cannot format '%s' unit property for a response.", "LoadState")
 	}
 	v["LoadState"] = createState([]string{"loaded", "error", "masked"}, loadState)
 
 	activeState, ok := v["ActiveState"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "ActiveState")
+		p.Debugf("cannot format '%s' unit property for a response.", "ActiveState")
 	}
 	v["ActiveState"] = createState([]string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}, activeState)
 
 	unitFileState, ok := v["UnitFileState"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "UnitFileState")
+		p.Debugf("cannot format '%s' unit property for a response.", "UnitFileState")
 	}
 	v["UnitFileState"] = createState([]string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}, unitFileState)
 
 	onFailureJobMode, ok := v["OnFailureJobMode"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "OnFailureJobMode")
+		p.Debugf("cannot format '%s' unit property for a response.", "OnFailureJobMode")
 	}
 	v["OnFailureJobMode"] = createState([]string{"fail", "replace", "replace-irreversibly", "isolate", "flush", "ignore-dependencies", "ignore-requirements"}, onFailureJobMode)
 
 	collectMode, ok := v["CollectMode"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "CollectMode")
+		p.Debugf("cannot format '%s' unit property for a response.", "CollectMode")
 	}
 	v["CollectMode"] = createState([]string{"inactive, inactive-or-failed"}, collectMode)
 
 	startLimitAction, ok := v["StartLimitAction"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "StartLimitAction")
+		p.Debugf("cannot format '%s' unit property for a response.", "StartLimitAction")
 	}
 	v["StartLimitAction"] = createState([]string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}, startLimitAction)
 
 	failureAction, ok := v["FailureAction"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "FailureAction")
+		p.Debugf("cannot format '%s' unit property for a response.", "FailureAction")
 	}
 	v["FailureAction"] = createState([]string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}, failureAction)
 
 	successAction, ok := v["SuccessAction"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "SuccessAction")
+		p.Debugf("cannot format '%s' unit property for a response.", "SuccessAction")
 	}
 	v["SuccessAction"] = createState([]string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}, successAction)
 }
@@ -364,19 +364,19 @@ func (p *Plugin) setUnitStates(v map[string]interface{}) {
 func (p *Plugin) setServiceStates(v map[string]interface{}) {
 	notifyAccess, ok := v["NotifyAccess"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "NotifyAccess")
+		p.Debugf("cannot format '%s' unit property for a response.", "NotifyAccess")
 	}
 	v["NotifyAccess"] = createState([]string{"none", "main", "exec", "all"}, notifyAccess)
 
 	restart, ok := v["Restart"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "Restart")
+		p.Debugf("cannot format '%s' unit property for a response.", "Restart")
 	}
 	v["Restart"] = createState([]string{"no", "on-success", "on-failure", "on-abnormal", "on-watchdog", "on-abort", "always"}, restart)
 
 	t, ok := v["Type"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "Type")
+		p.Debugf("cannot format '%s' unit property for a response.", "Type")
 	}
 	v["Type"] = createState([]string{"simple", "exec", "forking", "oneshot", "dbus", "notify", "idle"}, t)
 }
@@ -384,13 +384,13 @@ func (p *Plugin) setServiceStates(v map[string]interface{}) {
 func (p *Plugin) setSocketStates(v map[string]interface{}) {
 	bindIPv6Only, ok := v["BindIPv6Only"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "BindIPv6Only")
+		p.Debugf("cannot format '%s' unit property for a response.", "BindIPv6Only")
 	}
 	v["BindIPv6Only"] = createState([]string{"default", " both", "ipv6-only"}, bindIPv6Only)
 
 	timestamping, ok := v["Timestamping"].(string)
 	if !ok {
-		p.Debugf("Cannot format '%s' unit property for a response.", "Timestamping")
+		p.Debugf("cannot format '%s' unit property for a response.", "Timestamping")
 	}
 	v["Timestamping"] = createState([]string{"off", "us", "usec", "µs", "poweroff", "ns", "nsec"}, timestamping)
 }
