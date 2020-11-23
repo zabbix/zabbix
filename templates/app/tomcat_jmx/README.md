@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.4 and higher  
 Official JMX Template for Apache Tomcat.
 
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 Metrics are collected by JMX.
 
