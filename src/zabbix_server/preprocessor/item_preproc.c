@@ -192,7 +192,7 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
  ******************************************************************************/
 static int	item_preproc_validate_notsupport(char **errmsg)
 {
-	*errmsg = zbx_dsprintf(NULL, "item is not supported");
+	*errmsg = zbx_dsprintf(*errmsg, "item is not supported");
 	return FAIL;
 }
 
