@@ -147,11 +147,7 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 		return nil, fmt.Errorf("Too many parameters.")
 	}
 
-	if len(params) < 1 {
-		return nil, fmt.Errorf("Too few parameters.")
-	}
-
-	if params[0] == "" {
+	if len(params) == 0 || len(params[0]) == 0 {
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
