@@ -21,6 +21,7 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+........S. [ZBX-18599] fixed potential server crash during upgrade to 5.2, mainly on ARM (kalimulin)
 A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
 ........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
 ........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
