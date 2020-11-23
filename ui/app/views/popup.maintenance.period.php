@@ -70,6 +70,7 @@ $form_list
 		(new CSelect('timeperiod_type'))
 			->setId('timeperiod_type')
 			->setFocusableElementId('label-timeperiod-type')
+			->setValue($data['timeperiod_type'])
 			->addOptions(CSelect::createOptionsFromArray([
 				TIMEPERIOD_TYPE_ONETIME	=> _('One time only'),
 				TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
