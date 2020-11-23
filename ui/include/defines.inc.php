@@ -20,7 +20,7 @@
 
 define('ZABBIX_VERSION',		'5.4.0alpha1');
 define('ZABBIX_API_VERSION',	'5.4.0');
-define('ZABBIX_EXPORT_VERSION',	'5.2');
+define('ZABBIX_EXPORT_VERSION',	'5.4');
 define('ZABBIX_DB_VERSION',		5020000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
@@ -589,6 +589,7 @@ define('ZBX_PREPROC_PROMETHEUS_TO_JSON',		23);
 define('ZBX_PREPROC_CSV_TO_JSON',				24);
 define('ZBX_PREPROC_STR_REPLACE',				25);
 define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
+define('ZBX_PREPROC_XML_TO_JSON',				27);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);

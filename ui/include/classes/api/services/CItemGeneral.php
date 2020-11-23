@@ -1244,7 +1244,7 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => $this::$supported_preprocessing_types]);
+			$type_validator = new CLimitedSetValidator(['values' => $this::SUPPORTED_PREPROCESSING_TYPES]);
 
 			$error_handler_validator = new CLimitedSetValidator([
 				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
@@ -1440,6 +1440,7 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_DELTA_VALUE:
 					case ZBX_PREPROC_DELTA_SPEED:
+					case ZBX_PREPROC_XML_TO_JSON:
 						// Check if 'params' is empty, because it must be empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));

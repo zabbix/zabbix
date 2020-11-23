@@ -1239,7 +1239,7 @@ if (isset($_REQUEST['form'])) {
 
 	$data = getItemFormData($itemPrototype);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
-	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
+	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	$data['display_interfaces'] = $data['hostid']
@@ -1323,7 +1323,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_ACTION_ADD),
 		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_ACTION_ADD),
 		'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
-		'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
+		'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES,
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
 		'timeout' =>  getRequest('timeout', DB::getDefault('items', 'timeout'))
 	];
