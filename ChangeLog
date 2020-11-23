@@ -5,7 +5,6 @@ New features:
 .........T [ZBXNEXT-6316] added iTop media (tuskov)
 .........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
 .........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
-.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 ...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
@@ -14,6 +13,7 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
 A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
 ........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
 ........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
