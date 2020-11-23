@@ -207,7 +207,6 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 	var units []unit
 	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1"))
 	err := obj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store(&units)
-
 	if nil != err {
 		return nil, fmt.Errorf("Cannot retrieve list of units: %s", err)
 	}
@@ -272,7 +271,6 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 
 	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
 	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
-
 	if nil != err {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
 	}
@@ -282,7 +280,6 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 		fallthrough
 	case reflect.Array:
 		ret, err := json.Marshal(value)
-
 		if nil != err {
 			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
 		}
