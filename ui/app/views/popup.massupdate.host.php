@@ -284,10 +284,10 @@ $tabs = (new CTabView())
 	->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
 		'visible' => [],
 		'macros' => [['macro' => '', 'type' => ZBX_MACRO_TYPE_TEXT, 'value' => '', 'description' => '']],
-		'macros_checkbox' => [ZBX_ACTION_ADD => 0, ZBX_ACTION_REPLACE => 0, ZBX_ACTION_REMOVE => 0, ZBX_ACTION_REMOVE_ALL => 0],
-		'macros_visible' => ZBX_ACTION_ADD
+		'macros_checkbox' => [ZBX_ACTION_ADD => 0, ZBX_ACTION_REPLACE => 0, ZBX_ACTION_REMOVE => 0,
+			ZBX_ACTION_REMOVE_ALL => 0
+		]
 	]))
-
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list)
 	->setSelected(0);

@@ -118,7 +118,7 @@ $form_list = (new CFormList('macros-form-list'))
 			->setLabel(_('Macros'))
 			->setChecked(array_key_exists('macros', $data['visible'])),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_macros', (int) $data['macros_visible']))
+			(new CRadioButtonList('mass_update_macros', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
 				->addValue(_('Update'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)

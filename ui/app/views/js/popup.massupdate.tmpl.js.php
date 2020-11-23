@@ -84,7 +84,7 @@
 
 <script type="text/x-jquery-tmpl" id="dependency-row-tmpl">
 	<tr id="dependency_#{triggerid}" data-triggerid="#{triggerid}">
-		<td style="overflow: hidden;text-overflow: ellipsis;">
+		<td>
 			<input type="hidden" name="dependencies[]" id="dependencies_#{triggerid}" value="#{triggerid}">
 			<a href="#{url}" target="_blank">#{name}</a>
 		</td>

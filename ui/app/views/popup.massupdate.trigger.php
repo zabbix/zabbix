@@ -96,8 +96,9 @@ $dependencies_form_list = new CFormList('dependencies-form-list');
 
 $dependencies_table = (new CTable())
 	->setId('dependency-table')
-	->addStyle('width: 100%;table-layout: fixed;')
-	->setHeader([_('Name'), (new CColHeader(_('Action')))->addStyle('width: 15%;')]);
+	->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	->addStyle('width: 100%;')
+	->setHeader([_('Name'), (new CColHeader(_('Action')))->setWidth(50)]);
 
 $bttn_prototype = '';
 if ($data['prototype']) {
@@ -143,9 +144,7 @@ $dependencies_form_list->addRow(
 				->addClass(ZBX_STYLE_BTN_LINK),
 			$bttn_prototype
 		])
-	]))
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('dependencies-div')
+	]))->setId('dependencies-div')
 );
 
 // Append tabs to the form.
