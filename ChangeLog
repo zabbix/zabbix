@@ -273,6 +273,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.6rc1
 
 New features:
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
 .........T [ZBXNEXT-6316] added iTop media (tuskov)
 .........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
 .........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
