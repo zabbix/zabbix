@@ -156,6 +156,7 @@ $filter_column3 = (new CFormList())
 		(new CSelect('filter_status'))
 			->setId('filter_status')
 			->setFocusableElementId('label-status')
+			->setValue($data['filter']['status'])
 			->addOptions(CSelect::createOptionsFromArray([
 				-1 => _('all'),
 				ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
