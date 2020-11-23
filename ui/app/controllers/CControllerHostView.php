@@ -115,7 +115,7 @@ class CControllerHostView extends CControllerHost {
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page']
-			],
+			]
 		] + $this->getData($filter);
 
 		$response = new CControllerResponseData($data);

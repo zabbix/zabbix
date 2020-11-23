@@ -433,7 +433,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'h'],
 						['type' => CRelativeTimeParser::ZBX_TOKEN_PRECISION, 'suffix' => 'm'],
 						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '1', 'suffix' => 'y'],
-						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '+', 'value' => '2', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '+', 'value' => '2', 'suffix' => 's']
 					],
 					'match' => 'now/y/M/w/d/h/m-1y+2'
 				]
@@ -443,7 +443,7 @@ class CRelativeTimeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'tokens' => [
-						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's'],
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's']
 					],
 					'match' => 'now-300s'
 				]

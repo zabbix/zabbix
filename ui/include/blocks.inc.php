@@ -93,10 +93,10 @@ function getSystemStatusData(array $filter) {
 		'stats' => [],
 		'allowed' => [
 			'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-			'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-					|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+			'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 		]
 	];
 
@@ -119,7 +119,8 @@ function getSystemStatusData(array $filter) {
 	unset($group);
 
 	$options = [
-		'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
+		'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
+		'selectAcknowledges' => ['action'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
 		'evaltype' => $filter_evaltype,
@@ -163,7 +164,7 @@ function getSystemStatusData(array $filter) {
 		}
 
 		$options = [
-			'output' => ['priority'],
+			'output' => ['priority', 'manual_close'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
@@ -334,7 +335,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $data['triggers'][<triggerid>]['opdata']
  * @param array  $data['allowed']
  * @param bool   $data['allowed']['ui_problems']
- * @param bool   $data['allowed']['ack']
+ * @param bool   $data['allowed']['add_comments']
+ * @param bool   $data['allowed']['change_severity']
+ * @param bool   $data['allowed']['acknowledge']
+ * @param bool   $data['allowed']['close']
  *
  * @return CDiv
  */
@@ -486,17 +490,20 @@ function getSystemStatusTotals(array $data) {
 }
 
 /**
- * @param array  $data
- * @param array  $data['data']
- * @param array  $data['data']['groups']
- * @param array  $data['data']['groups'][]['stats']
- * @param array  $data['filter']
- * @param array  $data['filter']['severities']
- * @param array  $data['allowed']
- * @param bool   $data['allowed']['ui_problems']
- * @param bool   $data['allowed']['ack']
- * @param bool   $hide_empty_groups
- * @param CUrl   $groupurl
+ * @param array $data
+ * @param array $data['data']
+ * @param array $data['data']['groups']
+ * @param array $data['data']['groups'][]['stats']
+ * @param array $data['filter']
+ * @param array $data['filter']['severities']
+ * @param array $data['allowed']
+ * @param bool  $data['allowed']['ui_problems']
+ * @param bool  $data['allowed']['add_comments']
+ * @param bool  $data['allowed']['change_severity']
+ * @param bool  $data['allowed']['acknowledge']
+ * @param bool  $data['allowed']['close']
+ * @param bool  $hide_empty_groups
+ * @param CUrl  $groupurl
  *
  * @return CTableInfo
  */
@@ -533,14 +540,18 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
 }
 
 /**
- * @param array  $data
- * @param array  $data['data']
- * @param array  $data['data']['groups']
- * @param array  $data['data']['groups'][]['stats']
- * @param array  $data['filter']
- * @param array  $data['filter']['severities']
- * @param array  $data['allowed']
- * @param bool   $data['allowed']['ack']
+ * @param array $data
+ * @param array $data['data']
+ * @param array $data['data']['groups']
+ * @param array $data['data']['groups'][]['stats']
+ * @param array $data['filter']
+ * @param array $data['filter']['severities']
+ * @param array $data['allowed']
+ * @param bool  $data['allowed']['ui_problems']
+ * @param bool  $data['allowed']['add_comments']
+ * @param bool  $data['allowed']['change_severity']
+ * @param bool  $data['allowed']['acknowledge']
+ * @param bool  $data['allowed']['close']
  *
  * @return CDiv
  */
@@ -561,22 +572,26 @@ function makeSeverityTotals(array $data) {
 }
 
 /**
- * @param int     $severity
- * @param array   $data
- * @param array   $data['data']
- * @param array   $data['data']['triggers']
- * @param array   $data['data']['actions']
- * @param array   $data['filter']
- * @param array   $data['filter']['ext_ack']
- * @param array   $data['severity_names']
- * @param array   $data['allowed']
- * @param bool    $data['allowed']['ack']
- * @param array   $stat
- * @param int     $stats['count']
- * @param array   $stats['problems']
- * @param int     $stats['count_unack']
- * @param array   $stats['problems_unack']
- * @param boolean $is_total
+ * @param int   $severity
+ * @param array $data
+ * @param array $data['data']
+ * @param array $data['data']['triggers']
+ * @param array $data['data']['actions']
+ * @param array $data['filter']
+ * @param array $data['filter']['ext_ack']
+ * @param array $data['severity_names']
+ * @param array $data['allowed']
+ * @param bool  $data['allowed']['ui_problems']
+ * @param bool  $data['allowed']['add_comments']
+ * @param bool  $data['allowed']['change_severity']
+ * @param bool  $data['allowed']['acknowledge']
+ * @param bool  $data['allowed']['close']
+ * @param array $stat
+ * @param int   $stat['count']
+ * @param array $stat['problems']
+ * @param int   $stat['count_unack']
+ * @param array $stat['problems_unack']
+ * @param bool  $is_total
  *
  * @return CCol|string
  */
@@ -742,7 +757,10 @@ function make_status_of_zbx() {
  * @param string $problems[]['objectid']
  * @param int    $problems[]['clock']
  * @param int    $problems[]['ns']
- * @param array  $problems[]['acknowledged']
+ * @param string $problems[]['r_eventid']
+ * @param string $problems[]['acknowledged']
+ * @param array  $problems[]['acknowledges']
+ * @param string $problems[]['acknowledges'][]['action']
  * @param array  $problems[]['severity']
  * @param array  $problems[]['suppression_data']
  * @param array  $problems[]['tags']
@@ -751,6 +769,7 @@ function make_status_of_zbx() {
  * @param array  $triggers
  * @param string $triggers[<triggerid>]['expression']
  * @param string $triggers[<triggerid>]['description']
+ * @param string $triggers[<triggerid>]['manual_close']
  * @param array  $triggers[<triggerid>]['hosts']
  * @param string $triggers[<triggerid>]['hosts'][]['name']
  * @param string $triggers[<triggerid>]['opdata']
@@ -761,7 +780,10 @@ function make_status_of_zbx() {
  * @param array  $filter['show_opdata']      (optional)
  * @param array  $allowed
  * @param bool   $allowed['ui_problems']
- * @param bool   $allowed['ack']
+ * @param bool   $allowed['add_comments']
+ * @param bool   $allowed['change_severity']
+ * @param bool   $allowed['acknowledge']
+ * @param bool   $allowed['close']
  *
  * @return CTableInfo
  */
@@ -899,9 +921,24 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			}
 		}
 
+		$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']);
+
+		if ($problem['r_eventid'] != 0) {
+			$can_be_closed = false;
+		}
+		else {
+			foreach ($problem['acknowledges'] as $acknowledge) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+					$can_be_closed = false;
+					break;
+				}
+			}
+		}
+
 		// Create acknowledge link.
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-		$problem_update_link = $allowed['ack']
+		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+				|| $can_be_closed)
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)

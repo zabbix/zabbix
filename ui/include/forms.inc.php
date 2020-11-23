@@ -284,7 +284,7 @@ function getItemFilterForm(&$items) {
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
 			1 => _('Inherited items'),
-			0 => _('Not inherited items'),
+			0 => _('Not inherited items')
 		])
 	);
 
@@ -1528,7 +1528,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
 							->removeId()
-					]))->addClass('step-action'),
+					]))->addClass('step-action')
 				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))

@@ -273,7 +273,7 @@ class testTaskCreate extends CAPITest {
 				'item' => [
 					'itemid' => '90004',
 					'type' => '18',
-					'master_itemid' => '23287',
+					'master_itemid' => '23287'
 				],
 				'expected_error' => 'Cannot send request: wrong item type.'
 			],

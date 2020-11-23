@@ -113,7 +113,7 @@ trait MacrosTrait {
 				$rows[] = [
 					'macro' => CTestArrayHelper::get($values, 'macro', ''),
 					'value' => CTestArrayHelper::get($values, 'value', ''),
-					'description' => CTestArrayHelper::get($values, 'description', ''),
+					'description' => CTestArrayHelper::get($values, 'description', '')
 				];
 			}
 		}
