@@ -360,9 +360,12 @@ func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names 
 				return
 			}
 		}
+		v[key] = &state{0, value}
+		p.Debugf("cannot create mapping for '%s' unit state: unknown state '%s'", key, value)
+	} else {
+		p.Debugf("cannot create mapping for '%s' unit state: unit state with information type string not found", key)
 	}
 
-	p.Debugf("cannot format '%s' unit property for a response.", key)
 }
 
 func init() {
