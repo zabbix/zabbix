@@ -72,6 +72,11 @@ type state struct {
 	Text  string `json:"text"`
 }
 
+type stateMapping struct {
+	unitName   string
+	stateNames []string
+}
+
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
 	var err error
 	var conn *dbus.Conn
@@ -308,97 +313,57 @@ func getName(name string) string {
 }
 
 func (p *Plugin) setUnitStates(v map[string]interface{}) {
-	loadState, ok := v["LoadState"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "LoadState")
+	mappings := []stateMapping{
+		{"LoadState", []string{"loaded", "error", "masked"}},
+		{"ActiveState", []string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}},
+		{"UnitFileState", []string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}},
+		{"OnFailureJobMode", []string{"fail", "replace", "replace-irreversibly", "isolate", "flush", "ignore-dependencies", "ignore-requirements"}},
+		{"CollectMode", []string{"inactive, inactive-or-failed"}},
+		{"StartLimitAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
+		{"FailureAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
+		{"SuccessAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
 	}
-	v["LoadState"] = createState([]string{"loaded", "error", "masked"}, loadState)
 
-	activeState, ok := v["ActiveState"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "ActiveState")
+	for _, mapping := range mappings {
+		p.createStateMapping(v, mapping.unitName, mapping.stateNames)
 	}
-	v["ActiveState"] = createState([]string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}, activeState)
-
-	unitFileState, ok := v["UnitFileState"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "UnitFileState")
-	}
-	v["UnitFileState"] = createState([]string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}, unitFileState)
-
-	onFailureJobMode, ok := v["OnFailureJobMode"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "OnFailureJobMode")
-	}
-	v["OnFailureJobMode"] = createState([]string{"fail", "replace", "replace-irreversibly", "isolate", "flush", "ignore-dependencies", "ignore-requirements"}, onFailureJobMode)
-
-	collectMode, ok := v["CollectMode"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "CollectMode")
-	}
-	v["CollectMode"] = createState([]string{"inactive, inactive-or-failed"}, collectMode)
-
-	startLimitAction, ok := v["StartLimitAction"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "StartLimitAction")
-	}
-	v["StartLimitAction"] = createState([]string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}, startLimitAction)
-
-	failureAction, ok := v["FailureAction"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "FailureAction")
-	}
-	v["FailureAction"] = createState([]string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}, failureAction)
-
-	successAction, ok := v["SuccessAction"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "SuccessAction")
-	}
-	v["SuccessAction"] = createState([]string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}, successAction)
 }
 
 func (p *Plugin) setServiceStates(v map[string]interface{}) {
-	notifyAccess, ok := v["NotifyAccess"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "NotifyAccess")
+	mappings := []stateMapping{
+		{"NotifyAccess", []string{"none", "main", "exec", "all"}},
+		{"Restart", []string{"no", "on-success", "on-failure", "on-abnormal", "on-watchdog", "on-abort", "always"}},
+		{"Type", []string{"simple", "exec", "forking", "oneshot", "dbus", "notify", "idle"}},
 	}
-	v["NotifyAccess"] = createState([]string{"none", "main", "exec", "all"}, notifyAccess)
 
-	restart, ok := v["Restart"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "Restart")
+	for _, mapping := range mappings {
+		p.createStateMapping(v, mapping.unitName, mapping.stateNames)
 	}
-	v["Restart"] = createState([]string{"no", "on-success", "on-failure", "on-abnormal", "on-watchdog", "on-abort", "always"}, restart)
-
-	t, ok := v["Type"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "Type")
-	}
-	v["Type"] = createState([]string{"simple", "exec", "forking", "oneshot", "dbus", "notify", "idle"}, t)
 }
 
 func (p *Plugin) setSocketStates(v map[string]interface{}) {
-	bindIPv6Only, ok := v["BindIPv6Only"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "BindIPv6Only")
+	mappings := []stateMapping{
+		{"bindIPv6Only", []string{"default", " both", "ipv6-only"}},
+		{"Timestamping", []string{"no", "on-success", "on-failure", "on-abnormal", "on-watchdog", "on-abort", "always"}},
+		{"Type", []string{"off", "us", "usec", "µs", "poweroff", "ns", "nsec"}},
 	}
-	v["BindIPv6Only"] = createState([]string{"default", " both", "ipv6-only"}, bindIPv6Only)
 
-	timestamping, ok := v["Timestamping"].(string)
-	if !ok {
-		p.Debugf("cannot format '%s' unit property for a response.", "Timestamping")
+	for _, mapping := range mappings {
+		p.createStateMapping(v, mapping.unitName, mapping.stateNames)
 	}
-	v["Timestamping"] = createState([]string{"off", "us", "usec", "µs", "poweroff", "ns", "nsec"}, timestamping)
 }
 
-func createState(options []string, value string) *state {
-	for i, option := range options {
-		if value == option {
-			return &state{i + 1, value}
+func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names []string) {
+	if value, ok := v[key].(string); ok {
+		for i, name := range names {
+			if value == name {
+				v[key] = &state{i + 1, value}
+				return
+			}
 		}
 	}
 
-	return &state{0, value}
+	p.Debugf("cannot format '%s' unit property for a response.", key)
 }
 
 func init() {
