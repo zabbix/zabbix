@@ -24,6 +24,7 @@ class CWidget {
 	private $title = null;
 	private $title_submenu = null;
 	private $controls = null;
+	private $navigation = null;
 
 	/**
 	 * The contents of the body of the widget.
@@ -52,7 +53,6 @@ class CWidget {
 	}
 
 	public function setControls($controls) {
-		zbx_value2array($controls);
 		$this->controls = $controls;
 
 		return $this;
@@ -73,7 +73,7 @@ class CWidget {
 
 	public function setNavigation($list) {
 		if ($list !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
-			$this->body[] = (new CDiv($list))->addClass(ZBX_STYLE_HEADER_NAVIGATION);
+			$this->navigation = (new CDiv($list))->addClass(ZBX_STYLE_HEADER_NAVIGATION);
 		}
 
 		return $this;
@@ -112,7 +112,7 @@ class CWidget {
 			'with_current_messages' => true
 		]);
 
-		$items[] = new CTag('main', true, $this->body);
+		$items[] = new CTag('main', true, [$this->navigation, $this->body]);
 
 		return unpack_object($items);
 	}
