@@ -89,7 +89,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		*single = (0 == strcmp(buffer, "true") ? 1 : 0);
 
 	*state = 0;
-	if (FAIL != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
+	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
 		*state = atoi(buffer);
 
 	zbx_timespec(&ts_now);
