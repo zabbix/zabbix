@@ -140,7 +140,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
-	var property, unitType string
+	var unitType string
 	var values map[string]interface{}
 
 	if len(params) > 2 {
@@ -158,7 +158,7 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	}
 
 	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
-	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType, property).Store(&values)
+	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType).Store(&values)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
 	}
