@@ -33,9 +33,9 @@
 		let tags_initialized = false;
 
 		$('#tabs').on('tabscreate tabsactivate', function(event, ui) {
-			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if (panel.attr('id') === 'tags-tab') {
+			if ($panel.attr('id') === 'tags-tab') {
 				if (tags_initialized) {
 					return;
 				}
