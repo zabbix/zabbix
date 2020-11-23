@@ -318,7 +318,7 @@ func (p *Plugin) setUnitStates(v map[string]interface{}) {
 		{"ActiveState", []string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}},
 		{"UnitFileState", []string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}},
 		{"OnFailureJobMode", []string{"fail", "replace", "replace-irreversibly", "isolate", "flush", "ignore-dependencies", "ignore-requirements"}},
-		{"CollectMode", []string{"inactive, inactive-or-failed"}},
+		{"CollectMode", []string{"inactive", "inactive-or-failed"}},
 		{"StartLimitAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
 		{"FailureAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
 		{"SuccessAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
@@ -343,9 +343,8 @@ func (p *Plugin) setServiceStates(v map[string]interface{}) {
 
 func (p *Plugin) setSocketStates(v map[string]interface{}) {
 	mappings := []stateMapping{
-		{"bindIPv6Only", []string{"default", " both", "ipv6-only"}},
-		{"Timestamping", []string{"no", "on-success", "on-failure", "on-abnormal", "on-watchdog", "on-abort", "always"}},
-		{"Type", []string{"off", "us", "usec", "µs", "poweroff", "ns", "nsec"}},
+		{"bindIPv6Only", []string{"default", "both", "ipv6-only"}},
+		{"Timestamping", []string{"off", "us", "usec", "µs", "ns", "nsec"}},
 	}
 
 	for _, mapping := range mappings {
