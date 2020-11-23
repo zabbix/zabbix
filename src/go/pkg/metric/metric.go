@@ -24,6 +24,8 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
+	"unicode"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -43,19 +45,39 @@ const (
 // Param stores parameters' metadata.
 type Param struct {
 	name         string
+	description  string
 	kind         paramKind
 	required     bool
 	validator    Validator
 	defaultValue *string
 }
 
-func newParam(name string, kind paramKind, required bool, validator Validator) *Param {
-	if name == "" {
-		panic("name cannot be empty")
+func ucFirst(str string) string {
+	for i, v := range str {
+		return string(unicode.ToUpper(v)) + str[i+1:]
+	}
+
+	return ""
+}
+
+func newParam(name, description string, kind paramKind, required bool, validator Validator) *Param {
+	name = strings.TrimSpace(name)
+	if len(name) == 0 {
+		panic("parameter name cannot be empty")
+	}
+
+	description = ucFirst(strings.TrimSpace(description))
+	if len(description) == 0 {
+		panic("parameter description cannot be empty")
+	}
+
+	if description[len(description)-1:] != "." {
+		description += "."
 	}
 
 	return &Param{
 		name:         name,
+		description:  description,
 		kind:         kind,
 		required:     required,
 		validator:    validator,
@@ -65,14 +87,14 @@ func newParam(name string, kind paramKind, required bool, validator Validator) *
 
 // NewParam creates a new parameter with given name and validator.
 // Returns a pointer.
-func NewParam(name string) *Param {
-	return newParam(name, kindGeneral, optional, nil)
+func NewParam(name, description string) *Param {
+	return newParam(name, description, kindGeneral, optional, nil)
 }
 
 // NewConnParam creates a new connection parameter with given name and validator.
 // Returns a pointer.
-func NewConnParam(name string) *Param {
-	return newParam(name, kindConn, optional, nil)
+func NewConnParam(name, description string) *Param {
+	return newParam(name, description, kindConn, optional, nil)
 }
 
 // WithSession transforms a connection typed parameter to a dual purpose parameter which can be either
@@ -172,6 +194,19 @@ func ordinalize(num int) string {
 // 4. Connection parameters must be placed in a row.
 func New(description string, params []*Param, varParam bool) *Metric {
 	connParamIdx := -1
+
+	description = ucFirst(strings.TrimSpace(description))
+	if len(description) == 0 {
+		panic("metric description cannot be empty")
+	}
+
+	if description[len(description)-1:] != "." {
+		description += "."
+	}
+
+	if params == nil {
+		params = []*Param{}
+	}
 
 	if len(params) > 0 {
 		if params[0].kind != kindGeneral {
