@@ -32,7 +32,8 @@ type Validator interface {
 }
 
 type SetValidator struct {
-	Set []string
+	Set             []string
+	CaseInsensitive bool
 }
 
 func (v SetValidator) Validate(value *string) error {
@@ -45,7 +46,7 @@ func (v SetValidator) Validate(value *string) error {
 	}
 
 	for _, s := range v.Set {
-		if *value == s {
+		if (v.CaseInsensitive && strings.ToLower(*value) == strings.ToLower(s)) || (!v.CaseInsensitive && *value == s) {
 			return nil
 		}
 	}
@@ -69,6 +70,27 @@ func (v PatternValidator) Validate(value *string) error {
 
 	if !b {
 		return fmt.Errorf("value does not match pattern %q", v.Pattern)
+	}
+
+	return nil
+}
+
+type LenValidator struct {
+	Min *int
+	Max *int
+}
+
+func (v LenValidator) Validate(value *string) error {
+	if value == nil || (v.Min == nil && v.Max == nil) {
+		return nil
+	}
+
+	if v.Min != nil && len(*value) < *v.Min {
+		return fmt.Errorf("value cannot be shorter than %d characters", v.Min)
+	}
+
+	if v.Max != nil && len(*value) > *v.Max {
+		return fmt.Errorf("value cannot be longer than %d characters", v.Max)
 	}
 
 	return nil
