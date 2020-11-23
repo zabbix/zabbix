@@ -176,10 +176,6 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 		p.setSocketStates(values)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	val, err := json.Marshal(values)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot create JSON array: %s", err)
