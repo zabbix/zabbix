@@ -34,7 +34,7 @@
 #	include "vmstats.h"
 #endif
 
-#ifdef HAVE_KSTAT_H	/* Solaris */
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)	/* Solaris */
 #	include "zbxkstat.h"
 #endif
 
@@ -55,7 +55,7 @@ typedef struct
 	ZBX_VMSTAT_DATA		vmstat;
 	ZBX_CPUS_UTIL_DATA_AIX	cpus_phys_util;
 #endif
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 	zbx_kstat_t		kstat;
 #endif
 }

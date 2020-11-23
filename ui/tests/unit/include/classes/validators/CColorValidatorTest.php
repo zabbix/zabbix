@@ -39,7 +39,7 @@ class CColorValidatorTest extends CValidatorTest {
 			[[], 'F3F3F3'],
 			[[], 'FFFFFF'],
 			[[], 'ffffff'],
-			[['empty' => true], ''],
+			[['empty' => true], '']
 		];
 	}
 
@@ -69,7 +69,7 @@ class CColorValidatorTest extends CValidatorTest {
 				['messageRegex' => 'Incorrect color "%1$s"'],
 				'fff',
 				'Incorrect color "fff"'
-			],
+			]
 		];
 	}
 
@@ -99,7 +99,7 @@ class CColorValidatorTest extends CValidatorTest {
 				['messageRegex' => 'Incorrect color "%2$s" for "%1$s"'],
 				'fff',
 				'Incorrect color "fff" for "object"'
-			],
+			]
 		];
 	}
 

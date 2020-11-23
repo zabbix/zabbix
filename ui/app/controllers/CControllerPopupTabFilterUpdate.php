@@ -63,7 +63,7 @@ class CControllerPopupTabFilterUpdate extends CController {
 
 		$rules = [
 			'tabfilter_from' =>		'range_time|required',
-			'tabfilter_to' =>		'range_time|required',
+			'tabfilter_to' =>		'range_time|required'
 		];
 
 		$validator = new CNewValidator($this->getInputAll(), $rules);

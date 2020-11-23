@@ -65,7 +65,7 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'field' => [
-						'Default language' => 'Английский (en_GB)'
+						'Язык по умолчанию' => 'Английский (en_GB)'
 					],
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
@@ -254,7 +254,7 @@ class testLanguage extends CWebTest {
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Permissions');
-		$form->fill(['Role' => 'Super Admin role']);
+		$form->fill(['Role' => 'Super admin role']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();

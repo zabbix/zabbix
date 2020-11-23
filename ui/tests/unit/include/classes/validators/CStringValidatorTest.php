@@ -50,7 +50,7 @@ class CStringValidatorTest extends CValidatorTest {
 
 			[['regex' => '/^\d+$/'], 1],
 			[['regex' => '/^\d+$/'], '3'],
-			[['regex' => '/^\d+$/', 'empty' => true], ''],
+			[['regex' => '/^\d+$/', 'empty' => true], '']
 		];
 	}
 
@@ -97,7 +97,7 @@ class CStringValidatorTest extends CValidatorTest {
 				['regex' => '/^\d+$/', 'messageEmpty' => 'Empty string'],
 				'',
 				'Empty string'
-			],
+			]
 		];
 	}
 
@@ -144,7 +144,7 @@ class CStringValidatorTest extends CValidatorTest {
 				['regex' => '/^$/', 'messageEmpty' => 'Empty string'],
 				'',
 				'Empty string'
-			],
+			]
 		];
 	}
 

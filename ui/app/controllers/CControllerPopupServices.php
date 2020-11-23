@@ -123,7 +123,7 @@ class CControllerPopupServices extends CController {
 				'output' => ['serviceid', 'name', 'algorithm'],
 				'selectTrigger' => ['description'],
 				'preservekeys' => true,
-				'sortfield' => ['name'],
+				'sortfield' => ['name']
 			]);
 
 			if ($service) {

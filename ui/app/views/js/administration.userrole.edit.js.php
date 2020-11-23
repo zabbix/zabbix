@@ -112,14 +112,42 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', () => {
-		const ui_manager = new UserRoleUiManager(<?php echo (bool) $this->data['readonly']; ?>);
+		const clone_btn = document.getElementById('clone');
+		const ui_manager = new UserRoleUiManager(<?= $this->data['readonly'] ? 'true' : 'false'; ?>);
 		const type_elem = document.querySelector('.js-userrole-usertype');
+
+		if (clone_btn !== null) {
+			clone_btn.addEventListener('click', () => {
+				if (ui_manager.readonly) {
+					var url = new Curl('zabbix.php?action=userrole.edit');
+
+					document
+						.querySelectorAll('#name, #type')
+						.forEach((element) => {
+							url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
+						});
+
+					redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+				}
+
+				document
+					.querySelectorAll('#roleid, #delete, #clone')
+					.forEach((element) => { element.remove(); });
+
+				const update_btn = document.querySelector('#update');
+				update_btn.innerHTML = <?= json_encode(_('Add')) ?>;
+				update_btn.setAttribute('value', 'userrole.create');
+				update_btn.setAttribute('id', 'add');
+
+				document.querySelector('#name').focus();
+			});
+		}
 
 		if (!type_elem) {
 			return false;
 		}
 
-		type_elem.addEventListener('change', (event) => {
+		type_elem.addEventListener('change', () => {
 			ui_manager.disableUiCheckbox();
 
 			let user_type = type_elem.options[type_elem.selectedIndex].value,
@@ -144,7 +172,7 @@
 
 		document
 			.querySelector('.js-userrole-apiaccess')
-			.addEventListener('change', (event) => {
+			.addEventListener('change', () => {
 				ui_manager.disableApiSection();
 			});
 

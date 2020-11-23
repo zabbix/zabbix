@@ -149,11 +149,7 @@ class CControllerProblemView extends CControllerProblem {
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('filter_reset'),
-			'page' => $this->getInput('page', 1),
-			'allowed_ack' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			'page' => $this->getInput('page', 1)
 		];
 
 		$response = new CControllerResponseData($data);

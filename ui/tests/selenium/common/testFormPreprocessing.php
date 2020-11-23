@@ -354,7 +354,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty regular expression',
-						'Key' => 'Empty-both-parameters',
+						'Key' => 'Empty-both-parameters'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression']
@@ -367,7 +367,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty pattern of regular expression',
-						'Key' => 'empty-first-parameter',
+						'Key' => 'empty-first-parameter'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_2' => 'test output']
@@ -380,10 +380,10 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty output of regular expression',
-						'Key' => 'empty-second-parameter',
+						'Key' => 'empty-second-parameter'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => 'expression'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression']
 					],
 					'error' => 'Incorrect value for field "params": second parameter is expected.'
 				]
@@ -422,7 +422,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty JavaScript',
-						'Key' => 'item-empty-javascript',
+						'Key' => 'item-empty-javascript'
 					],
 					'preprocessing' => [
 						['type' => 'JavaScript']
@@ -436,7 +436,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Does not match regular expression empty',
-						'Key' => 'does-not-match-regular-expression-empty',
+						'Key' => 'does-not-match-regular-expression-empty'
 					],
 					'preprocessing' => [
 						['type' => 'Does not match regular expression']
@@ -531,7 +531,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat comma',
-						'Key' => 'discard-uncahnged-with-heartbeat-comma',
+						'Key' => 'discard-uncahnged-with-heartbeat-comma'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1,5']
@@ -544,7 +544,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat dot',
-						'Key' => 'discard-uncahnged-with-heartbeat-dot',
+						'Key' => 'discard-uncahnged-with-heartbeat-dot'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
@@ -557,7 +557,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat negative',
-						'Key' => 'discard-uncahnged-with-heartbeat-negative',
+						'Key' => 'discard-uncahnged-with-heartbeat-negative'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '-3']
@@ -649,6 +649,19 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Validation
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Not supported step',
+						'Key' => 'check-for-not-supported'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value']
+					]
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -669,6 +682,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'item.all.preprocessing'
 					],
 					'preprocessing' => [
+						['type' => 'Check for not supported value'],
 						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
@@ -708,7 +722,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Does not match regular expression', 'parameter_1' => '8g!@#$%^&*()-='],
 						['type' => 'Check for error in JSON', 'parameter_1' => '9h!@#$%^&*()-='],
 						['type' => 'Check for error in XML', 'parameter_1' => '0i!@#$%^&*()-='],
-						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-=']
+						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-='],
+						['type' => 'Check for not supported value']
 					]
 				]
 			],
@@ -803,6 +818,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Right trim', 'parameter_1' => '    22   '],
 						['type' => 'Left trim', 'parameter_1' => '   33  '],
 						['type' => 'Trim', 'parameter_1' => '   0    '],
+						['type' => 'Check for not supported value'],
 						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    '],
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    '],
 						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],
@@ -1260,7 +1276,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometheus-space-in-pattern'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu usage_metric'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu usage_metric']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -1273,7 +1289,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometheus-digits-in-pattern'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '1223'],
+						['type' => 'Prometheus pattern', 'parameter_1' => '1223']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -1868,6 +1884,27 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->assertPreprocessingSteps($data['preprocessing']);
 	}
 
+	/**
+	 * Check that adding two 'Check for not supported value'
+	 * preprocessing steps is impossible.
+	 */
+	public function checkRepeatedNotSupported() {
+		$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(['Key' => 'test.key']);
+		$form->selectTab('Preprocessing');
+
+		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
+		$this->query('id:param_add')->one()->click();
+
+		$this->assertTrue($this->query('xpath://select[@id="preprocessing_0_type"]'.
+				'//option[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://select[@id="preprocessing_1_type"]'.
+				'//option[text()="Check for not supported value"]')->one()->isEnabled());
+	}
+
 	/*
 	 * Preprocessing steps with Custom on fail checks for item, item prototype and LLD.
 	 */
@@ -1989,6 +2026,10 @@ abstract class testFormPreprocessing extends CWebTest {
 					'parameter_1' => 'expression',
 					'parameter_2' => 'output',
 					'on_fail' => true
+				],
+				[
+					'type' => 'Check for not supported value',
+					'on_fail' => true
 				]
 			]);
 
@@ -2034,6 +2075,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'Left trim',
 				'JavaScript',
 				'Discard unchanged with heartbeat',
+				'Check for not supported value'
 			]), $steps[$i]['on_fail']->isEnabled());
 		}
 
@@ -2068,7 +2110,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'Right trim',
 				'Left trim',
 				'JavaScript',
-				'Discard unchanged with heartbeat',
+				'Discard unchanged with heartbeat'
 			])) {
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 				$this->assertFalse($steps[$i]['on_fail']->isSelected());
@@ -2076,6 +2118,11 @@ abstract class testFormPreprocessing extends CWebTest {
 				$this->assertTrue($steps[$i]['error_handler_params'] === null
 					|| !$steps[$i]['error_handler_params']->isVisible()
 				);
+			}
+			elseif (in_array($options['type'], ['Check for not supported value'])) {
+				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
+				$this->assertTrue($steps[$i]['on_fail']->isSelected());
+				$this->assertTrue($steps[$i]['error_handler']->isVisible());
 			}
 			else {
 				$this->assertTrue($steps[$i]['on_fail']->isSelected());
@@ -2294,6 +2341,9 @@ abstract class testFormPreprocessing extends CWebTest {
 						'parameter_1' => '5'
 					],
 					[
+						'type' => 'Check for not supported value'
+					],
+					[
 						'type' => 'Custom multiplier',
 						'parameter_1' => '10',
 						'on_fail' => false
@@ -2370,6 +2420,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				case 'Octal to decimal':
 				case 'Prometheus pattern':
 				case 'Check for error using regular expression':
+				case 'Check for not supported value':
 					$this->assertTrue($step['on_fail']->isSelected());
 					$this->assertFalse($step['error_handler']->isEnabled());
 					break;

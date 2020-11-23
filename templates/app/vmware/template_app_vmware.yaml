@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:08Z'
+  date: '2020-11-12T14:22:58Z'
   groups:
     -
       name: Templates/Applications
@@ -177,6 +177,15 @@ zabbix_export:
               templates:
                 -
                   name: 'VMware Hypervisor'
+              macros:
+                -
+                  macro: '{$VMWARE.HV.UUID}'
+                  value: '{#HV.UUID}'
+                  description: 'UUID of hypervisor.'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#HV.IP}'
         -
           name: 'Discover VMware VMs'
           type: SIMPLE
@@ -203,6 +212,15 @@ zabbix_export:
               templates:
                 -
                   name: 'VMware Guest'
+              macros:
+                -
+                  macro: '{$VMWARE.VM.UUID}'
+                  value: '{#VM.UUID}'
+                  description: 'UUID of guest virtual machine.'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#VM.IP}'
     -
       template: 'VMware Guest'
       name: 'VMware Guest'
@@ -220,7 +238,7 @@ zabbix_export:
         -
           name: 'VMware: Cluster name'
           type: SIMPLE
-          key: 'vmware.vm.cluster.name[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -239,7 +257,7 @@ zabbix_export:
         -
           name: 'VMware: Number of virtual CPUs'
           type: SIMPLE
-          key: 'vmware.vm.cpu.num[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           history: 7d
           username: '{$VMWARE.USERNAME}'
@@ -256,7 +274,7 @@ zabbix_export:
         -
           name: 'VMware: CPU ready'
           type: SIMPLE
-          key: 'vmware.vm.cpu.ready[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.cpu.ready[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: ms
           username: '{$VMWARE.USERNAME}'
@@ -268,7 +286,7 @@ zabbix_export:
         -
           name: 'VMware: CPU usage'
           type: SIMPLE
-          key: 'vmware.vm.cpu.usage[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.cpu.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: Hz
           username: '{$VMWARE.USERNAME}'
@@ -280,7 +298,7 @@ zabbix_export:
         -
           name: 'VMware: Datacenter name'
           type: SIMPLE
-          key: 'vmware.vm.datacenter.name[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -299,7 +317,7 @@ zabbix_export:
         -
           name: 'VMware: Hypervisor name'
           type: SIMPLE
-          key: 'vmware.vm.hv.name[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -318,7 +336,7 @@ zabbix_export:
         -
           name: 'VMware: Ballooned memory'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.ballooned[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -330,7 +348,7 @@ zabbix_export:
         -
           name: 'VMware: Compressed memory'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.compressed[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.compressed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -342,7 +360,7 @@ zabbix_export:
         -
           name: 'VMware: Private memory'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.private[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.private[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -354,7 +372,7 @@ zabbix_export:
         -
           name: 'VMware: Shared memory'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.shared[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.shared[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -366,7 +384,7 @@ zabbix_export:
         -
           name: 'VMware: Swapped memory'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.swapped[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -378,7 +396,7 @@ zabbix_export:
         -
           name: 'VMware: Guest memory usage'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -390,7 +408,7 @@ zabbix_export:
         -
           name: 'VMware: Host memory usage'
           type: SIMPLE
-          key: 'vmware.vm.memory.size.usage.host[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size.usage.host[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -402,7 +420,7 @@ zabbix_export:
         -
           name: 'VMware: Memory size'
           type: SIMPLE
-          key: 'vmware.vm.memory.size[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.memory.size[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           history: 7d
           units: B
@@ -420,7 +438,7 @@ zabbix_export:
         -
           name: 'VMware: Power state'
           type: SIMPLE
-          key: 'vmware.vm.powerstate[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -438,7 +456,7 @@ zabbix_export:
         -
           name: 'VMware: Committed storage space'
           type: SIMPLE
-          key: 'vmware.vm.storage.committed[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.storage.committed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -450,7 +468,7 @@ zabbix_export:
         -
           name: 'VMware: Uncommitted storage space'
           type: SIMPLE
-          key: 'vmware.vm.storage.uncommitted[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -462,7 +480,7 @@ zabbix_export:
         -
           name: 'VMware: Unshared storage space'
           type: SIMPLE
-          key: 'vmware.vm.storage.unshared[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -474,7 +492,7 @@ zabbix_export:
         -
           name: 'VMware: Uptime'
           type: SIMPLE
-          key: 'vmware.vm.uptime[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
           units: uptime
           username: '{$VMWARE.USERNAME}'
@@ -486,7 +504,7 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}<10m'
-              name: 'VMware: {HOST.HOST} has been restarted (uptime < 10m)'
+              name: 'VMware: VM has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -494,7 +512,7 @@ zabbix_export:
         -
           name: 'Network device discovery'
           type: SIMPLE
-          key: 'vmware.vm.net.if.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -503,7 +521,7 @@ zabbix_export:
             -
               name: 'VMware: Number of bytes received on interface {#IFDESC}'
               type: SIMPLE
-              key: 'vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps]'
+              key: 'vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]'
               history: 7d
               units: Bps
               username: '{$VMWARE.USERNAME}'
@@ -515,7 +533,7 @@ zabbix_export:
             -
               name: 'VMware: Number of packets received on interface {#IFDESC}'
               type: SIMPLE
-              key: 'vmware.vm.net.if.in[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps]'
+              key: 'vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -526,7 +544,7 @@ zabbix_export:
             -
               name: 'VMware: Number of bytes transmitted on interface {#IFDESC}'
               type: SIMPLE
-              key: 'vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},bps]'
+              key: 'vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]'
               history: 7d
               units: Bps
               username: '{$VMWARE.USERNAME}'
@@ -538,7 +556,7 @@ zabbix_export:
             -
               name: 'VMware: Number of packets transmitted on interface {#IFDESC}'
               type: SIMPLE
-              key: 'vmware.vm.net.if.out[{$VMWARE.URL},{HOST.HOST},{#IFNAME},pps]'
+              key: 'vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -549,7 +567,7 @@ zabbix_export:
         -
           name: 'Disk device discovery'
           type: SIMPLE
-          key: 'vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -558,7 +576,7 @@ zabbix_export:
             -
               name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps]'
+              key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]'
               history: 7d
               units: Bps
               username: '{$VMWARE.USERNAME}'
@@ -570,7 +588,7 @@ zabbix_export:
             -
               name: 'VMware: Average number of reads from the disk {#DISKDESC}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops]'
+              key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -581,7 +599,7 @@ zabbix_export:
             -
               name: 'VMware: Average number of bytes written to the disk {#DISKDESC}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},bps]'
+              key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]'
               history: 7d
               units: Bps
               username: '{$VMWARE.USERNAME}'
@@ -593,7 +611,7 @@ zabbix_export:
             -
               name: 'VMware: Average number of writes to the disk {#DISKDESC}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{HOST.HOST},{#DISKNAME},ops]'
+              key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -604,7 +622,7 @@ zabbix_export:
         -
           name: 'Mounted filesystem discovery'
           type: SIMPLE
-          key: 'vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -613,7 +631,7 @@ zabbix_export:
             -
               name: 'VMware: Free disk space on {#FSNAME}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},free]'
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},free]'
               history: 7d
               units: B
               username: '{$VMWARE.USERNAME}'
@@ -625,7 +643,7 @@ zabbix_export:
             -
               name: 'VMware: Free disk space on {#FSNAME} (percentage)'
               type: SIMPLE
-              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},pfree]'
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree]'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -638,7 +656,7 @@ zabbix_export:
             -
               name: 'VMware: Total disk space on {#FSNAME}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},total]'
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]'
               delay: 1h
               history: 7d
               units: B
@@ -656,7 +674,7 @@ zabbix_export:
             -
               name: 'VMware: Used disk space on {#FSNAME}'
               type: SIMPLE
-              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{HOST.HOST},{#FSNAME},used]'
+              key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},used]'
               history: 7d
               units: B
               username: '{$VMWARE.USERNAME}'
@@ -680,9 +698,32 @@ zabbix_export:
           name: VMware
       items:
         -
+          name: 'VMware: Hypervisor ping'
+          type: SIMPLE
+          key: 'icmpping[]'
+          history: 7d
+          description: 'Checks if the hypervisor is running and accepting ICMP pings.'
+          applications:
+            -
+              name: VMware
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'VMware: Hypervisor is down'
+              priority: AVERAGE
+              description: 'The service is unavailable or does not accept ICMP ping.'
+              manual_close: 'YES'
+        -
           name: 'VMware: Cluster name'
           type: SIMPLE
-          key: 'vmware.hv.cluster.name[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -701,7 +742,7 @@ zabbix_export:
         -
           name: 'VMware: CPU usage'
           type: SIMPLE
-          key: 'vmware.hv.cpu.usage[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
           units: Hz
           username: '{$VMWARE.USERNAME}'
@@ -713,7 +754,7 @@ zabbix_export:
         -
           name: 'VMware: Datacenter name'
           type: SIMPLE
-          key: 'vmware.hv.datacenter.name[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -732,7 +773,7 @@ zabbix_export:
         -
           name: 'VMware: Full name'
           type: SIMPLE
-          key: 'vmware.hv.fullname[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -751,7 +792,7 @@ zabbix_export:
         -
           name: 'VMware: CPU frequency'
           type: SIMPLE
-          key: 'vmware.hv.hw.cpu.freq[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.cpu.freq[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           units: Hz
@@ -764,7 +805,7 @@ zabbix_export:
         -
           name: 'VMware: CPU model'
           type: SIMPLE
-          key: 'vmware.hv.hw.cpu.model[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.cpu.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -778,7 +819,7 @@ zabbix_export:
         -
           name: 'VMware: CPU cores'
           type: SIMPLE
-          key: 'vmware.hv.hw.cpu.num[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.cpu.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           username: '{$VMWARE.USERNAME}'
@@ -795,7 +836,7 @@ zabbix_export:
         -
           name: 'VMware: CPU threads'
           type: SIMPLE
-          key: 'vmware.hv.hw.cpu.threads[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.cpu.threads[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           username: '{$VMWARE.USERNAME}'
@@ -807,7 +848,7 @@ zabbix_export:
         -
           name: 'VMware: Total memory'
           type: SIMPLE
-          key: 'vmware.hv.hw.memory[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.memory[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           units: B
@@ -820,7 +861,7 @@ zabbix_export:
         -
           name: 'VMware: Model'
           type: SIMPLE
-          key: 'vmware.hv.hw.model[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -834,7 +875,7 @@ zabbix_export:
         -
           name: 'VMware: Bios UUID'
           type: SIMPLE
-          key: 'vmware.hv.hw.uuid[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.uuid[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -848,7 +889,7 @@ zabbix_export:
         -
           name: 'VMware: Vendor'
           type: SIMPLE
-          key: 'vmware.hv.hw.vendor[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.hw.vendor[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -862,7 +903,7 @@ zabbix_export:
         -
           name: 'VMware: Ballooned memory'
           type: SIMPLE
-          key: 'vmware.hv.memory.size.ballooned[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -874,7 +915,7 @@ zabbix_export:
         -
           name: 'VMware: Used memory'
           type: SIMPLE
-          key: 'vmware.hv.memory.used[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.memory.used[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
           units: B
           username: '{$VMWARE.USERNAME}'
@@ -886,8 +927,8 @@ zabbix_export:
         -
           name: 'VMware: Number of bytes received'
           type: SIMPLE
-          key: 'vmware.hv.network.in[{$VMWARE.URL},{HOST.HOST},bps]'
-          delay: '{$VMWARE_PERF_INTERVAL}'
+          key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
+          delay: '1m'
           history: 7d
           units: Bps
           username: '{$VMWARE.USERNAME}'
@@ -899,8 +940,8 @@ zabbix_export:
         -
           name: 'VMware: Number of bytes transmitted'
           type: SIMPLE
-          key: 'vmware.hv.network.out[{$VMWARE.URL},{HOST.HOST},bps]'
-          delay: '{$VMWARE_PERF_INTERVAL}'
+          key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
+          delay: '1m'
           history: 7d
           units: Bps
           username: '{$VMWARE.USERNAME}'
@@ -912,7 +953,7 @@ zabbix_export:
         -
           name: 'VMware: Health state rollup'
           type: SIMPLE
-          key: 'vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -925,32 +966,32 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}=3'
-              name: 'VMware: The {HOST.HOST} health is Red'
+              name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
               dependencies:
                 -
-                  name: 'VMware: The {HOST.HOST} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
             -
               expression: '{last()}=2'
-              name: 'VMware: The {HOST.HOST} health is Yellow'
+              name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
               description: 'One or more components in the appliance might become overloaded soon.'
               dependencies:
                 -
-                  name: 'VMware: The {HOST.HOST} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
                 -
-                  name: 'VMware: The {HOST.HOST} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
                 -
-                  name: 'VMware: The {HOST.HOST} health is Yellow'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=2'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2'
         -
           name: 'VMware: Overall status'
           type: SIMPLE
-          key: 'vmware.hv.status[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -963,22 +1004,22 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}=3'
-              name: 'VMware: The {HOST.HOST} health is Red'
+              name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
             -
               expression: '{last()}=2'
-              name: 'VMware: The {HOST.HOST} health is Yellow'
+              name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
               description: 'One or more components in the appliance might become overloaded soon.'
               dependencies:
                 -
-                  name: 'VMware: The {HOST.HOST} health is Red'
-                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{HOST.HOST}].last()}=3'
+                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  expression: '{VMware Hypervisor:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3'
         -
           name: 'VMware: Uptime'
           type: SIMPLE
-          key: 'vmware.hv.uptime[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
           units: uptime
           username: '{$VMWARE.USERNAME}'
@@ -990,14 +1031,14 @@ zabbix_export:
           triggers:
             -
               expression: '{last()}<10m'
-              name: 'VMware: {HOST.HOST} has been restarted (uptime < 10m)'
+              name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
         -
           name: 'VMware: Version'
           type: SIMPLE
-          key: 'vmware.hv.version[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           trends: '0'
@@ -1011,7 +1052,7 @@ zabbix_export:
         -
           name: 'VMware: Number of guest VMs'
           type: SIMPLE
-          key: 'vmware.hv.vm.num[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.vm.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           history: 7d
           username: '{$VMWARE.USERNAME}'
@@ -1024,7 +1065,7 @@ zabbix_export:
         -
           name: 'Datastore discovery'
           type: SIMPLE
-          key: 'vmware.hv.datastore.discovery[{$VMWARE.URL},{HOST.HOST}]'
+          key: 'vmware.hv.datastore.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1032,8 +1073,8 @@ zabbix_export:
             -
               name: 'VMware: Average read latency of the datastore {#DATASTORE}'
               type: SIMPLE
-              key: 'vmware.hv.datastore.read[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]'
-              delay: '{$VMWARE_PERF_INTERVAL}'
+              key: 'vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
+              delay: '1m'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -1044,7 +1085,7 @@ zabbix_export:
             -
               name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
               type: SIMPLE
-              key: 'vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},pfree]'
+              key: 'vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]'
               delay: 5m
               history: 7d
               value_type: FLOAT
@@ -1058,7 +1099,7 @@ zabbix_export:
             -
               name: 'VMware: Total size of datastore {#DATASTORE}'
               type: SIMPLE
-              key: 'vmware.hv.datastore.size[{$VMWARE.URL},{HOST.HOST},{#DATASTORE}]'
+              key: 'vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]'
               delay: 5m
               history: 7d
               units: B
@@ -1071,8 +1112,8 @@ zabbix_export:
             -
               name: 'VMware: Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
-              key: 'vmware.hv.datastore.write[{$VMWARE.URL},{HOST.HOST},{#DATASTORE},latency]'
-              delay: '{$VMWARE_PERF_INTERVAL}'
+              key: 'vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
+              delay: '1m'
               history: 7d
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
@@ -1098,6 +1139,15 @@ zabbix_export:
           macro: '{$VMWARE.USERNAME}'
           description: 'VMware service user name'
   value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
     -
       name: 'VMware status'
       mappings:
