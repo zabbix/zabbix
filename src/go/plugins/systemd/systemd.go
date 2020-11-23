@@ -173,7 +173,7 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	case "Socket":
 		p.setSocketStates(values)
 	case "Unit":
-		p.setSocketStates(values)
+		p.setUnitStates(values)
 	}
 
 	val, err := json.Marshal(values)
