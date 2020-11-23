@@ -311,7 +311,7 @@ class ZSelect extends HTMLElement {
 		this._highlight(this._preselected_index);
 
 		document.addEventListener('wheel', this._events.document_wheel);
-		document.querySelector('.wrapper').addEventListener('scroll', this._events.document_wheel);
+		setTimeout(() => document.querySelector('.wrapper').addEventListener('scroll', this._events.document_wheel), 0);
 	}
 
 	_collapse() {
