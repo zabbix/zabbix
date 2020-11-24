@@ -220,8 +220,9 @@ foreach ($data['hosts'] as $host) {
 	$host_interface = '';
 	if ($interface !== null) {
 		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		if (array_key_exists('port', $interface) && $interface['port'] !== '') {
-			$host_interface .= NAME_DELIMITER.$interface['port'];
+
+		if ($interface['useip'] == INTERFACE_USE_IP && filter_var($interface['ip'], FILTER_FLAG_IPV6) !== false) {
+			$host_interface = '['.$host_interface.']';
 		}
 	}
 
@@ -456,7 +457,7 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		$host_interface,
+		$host_interface.':'.$interface['port'],
 		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY)
 			? ($host['proxy_hostid'] != 0)

@@ -621,6 +621,10 @@ function getHostAvailabilityTable($host_interfaces) {
 		$ip_or_dns = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 		$description = null;
 
+		if ($interface['useip'] == INTERFACE_USE_IP && filter_var($interface['ip'], FILTER_FLAG_IPV6) !== false) {
+			$ip_or_dns = '['.$ip_or_dns.']';
+		}
+
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
 			$description = vsprintf('%s, %s: %s', ($version == SNMP_V3)
@@ -632,7 +636,7 @@ function getHostAvailabilityTable($host_interfaces) {
 		$interfaces[] = [
 			'type' => $interface['type'],
 			'available' => $interface['available'],
-			'interface' => $ip_or_dns.(($interface['port'] !== '') ? ':'.$interface['port'] : ''),
+			'interface' => $ip_or_dns.':'.$interface['port'],
 			'description' => $description,
 			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
 		];
