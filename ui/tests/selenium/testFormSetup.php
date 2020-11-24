@@ -452,7 +452,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Skip the case with invalid DB schema if DB type is not PostgreSQL
-		if (array_key_exists('Database schema', $data['field']) && $db_parameters['Database type'] !== 'PostgreSQL') {
+		if ($data['field']['name'] === 'Database schema' && $db_parameters['Database type'] === 'MySQL') {
 
 			return;
 		}
@@ -467,7 +467,7 @@ class testFormSetup extends CWebTest {
 			if ($db_parameters['Database type'] === 'PostgreSQL' || $db_parameters['Database host'] !== 'localhost') {
 				$form->getField('Database type')->fill($db_parameters['Database type']);
 				$form->getField('Database TLS encryption')->check();
-				$form->query('xpath:.//label[@for="verify_certificate"]/span')->asCheckbox()->one()->check();
+				$form->query('xpath:.//label[@for="verify_certificate"]/span')->waitUntilVisible()->asCheckbox()->one()->check();
 				if (array_key_exists('fill_ca_file', $data)) {
 					$form->getField('Database TLS CA file')->fill('/etc/apache2/magic');
 				}
