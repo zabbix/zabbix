@@ -168,6 +168,30 @@ class CSidebar extends CBaseComponent {
 		return this;
 	}
 
+	updateSubmenuPosition(force) {
+		let update = () => {
+			let menu_item = ZABBIX.MenuMain.getExpanded();
+
+			if (menu_item) {
+				menu_item = menu_item.getSubmenu().getExpanded();
+				menu_item && menu_item.getSubmenu().updateRect(menu_item._target);
+			}
+		};
+
+		if (force) {
+			update();
+		} else {
+			if (!this._animation_frame_running) {
+				this._animation_frame_running = true;
+
+				window.requestAnimationFrame(() => {
+					update();
+					this._animation_frame_running = false;
+				});
+			}
+		}
+	}
+
 	/**
 	 * Register all DOM events.
 	 */
@@ -256,9 +280,26 @@ class CSidebar extends CBaseComponent {
 						});
 					}, UI_TRANSITION_DURATION);
 				}
+
+				this.updateSubmenuPosition(true);
 			},
 
-			viewmodechange: (e) => {
+			collapseSubmenu: (e) => {
+				if (!this._target.contains(e.target)) {
+					ZABBIX.MenuMain.collapseExpanded(1);
+				}
+			},
+
+			updateSubmenuPosition: () => {
+				this.updateSubmenuPosition(false);
+
+			},
+
+			scroll: () => {
+				ZABBIX.MenuMain.collapseExpanded(1);
+			},
+
+			viewmodeChange: (e) => {
 				if (e.target.classList.contains('button-compact')) {
 					ZABBIX.MenuMain.collapseExpanded();
 					clearTimeout(this._expand_timer);
@@ -322,6 +363,12 @@ class CSidebar extends CBaseComponent {
 				if (view_mode === SIDEBAR_VIEW_MODE_FULL) {
 					document.removeEventListener('keyup', this._events.escape);
 					document.removeEventListener('click', this._events.click);
+					document.addEventListener('click', this._events.collapseSubmenu);
+					window.addEventListener('resize', this._events.updateSubmenuPosition);
+				}
+				else {
+					document.removeEventListener('click', this._events.collapseSubmenu);
+					window.removeEventListener('resize', this._events.updateSubmenuPosition);
 				}
 			}
 		};
@@ -330,10 +377,13 @@ class CSidebar extends CBaseComponent {
 		this.on('focusout', this._events.focusout);
 
 		for (const el of this._target.querySelectorAll('.js-sidebar-mode')) {
-			el.addEventListener('click', this._events.viewmodechange);
+			el.addEventListener('click', this._events.viewmodeChange);
 		}
 
 		ZABBIX.MenuMain.on('expand', this._events.expand);
+
+		this._sidebar_scrollable.addEventListener('scroll', this._events.updateSubmenuPosition);
+		document.querySelector('.wrapper').addEventListener('scroll', this._events.collapseSubmenu);
 
 		this._events._update(this._view_mode);
 	}

@@ -26,20 +26,21 @@ const MENU_EVENT_FOCUS           = 'focus';
 
 class CMenu extends CBaseComponent {
 
-	constructor(target) {
+	constructor(target, level) {
 		super(target);
 
-		this.init();
+		this.init(level || 0);
 		this.registerEvents();
 	}
 
-	init() {
+	init(level) {
 		this._expanded_item = null;
 		this._selected_item = null;
 		this._items = [];
+		this._level = level;
 
 		for (const el of this._target.childNodes) {
-			const item = new CMenuItem(el);
+			const item = new CMenuItem(el, this._level);
 			if (item.isExpanded()) {
 				this._expanded_item = item;
 			}
@@ -49,18 +50,23 @@ class CMenu extends CBaseComponent {
 			this._items.push(item);
 		}
 
-		if (this.hasClass('submenu')) {
-			this._target.style.maxHeight = this._target.scrollHeight + 'px';
-		}
+		this.hasClass('submenu') && this.updateHeight();
 	}
 
 	getItems() {
 		return this._items;
 	}
 
-	collapseExpanded() {
-		this._expanded_item !== null && this._expanded_item.collapseSubmenu();
-		this._expanded_item = null;
+	getLevel() {
+		return this._level;
+	}
+
+	collapseExpanded(from_level) {
+		if (this._expanded_item !== null && this._expanded_item.collapseSubmenu(from_level)) {
+			this._expanded_item = null;
+		}
+
+		return this._level > (from_level || 0);
 	}
 
 	expandSelected() {
@@ -94,6 +100,19 @@ class CMenu extends CBaseComponent {
 		return this._selected_item;
 	}
 
+	updateHeight() {
+		this._target.style.maxHeight = `${this._target.scrollHeight}px`;
+	}
+
+	updateRect(relative_item) {
+		const r_rect = relative_item.getBoundingClientRect();
+
+		this._target.style.top = `${Math.max(86, Math.min(r_rect.y, window.innerHeight - this._target.scrollHeight))}px`;
+		this._target.style.left = `${r_rect.x + r_rect.width}px`;
+		this._target.style.maxWidth = `${this._target.scrollWidth}px`;
+		this._target.style.maxHeight = `${this._target.scrollHeight}px`;
+	}
+
 	/**
 	 * Register all DOM events.
 	 */
@@ -113,7 +132,7 @@ class CMenu extends CBaseComponent {
 				this.fire(MENU_EVENT_EXPAND, {menu_item: e.detail.target});
 			},
 
-			collapse: (e) => {
+			collapse: () => {
 				this._expanded_item = null;
 			}
 		};

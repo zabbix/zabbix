@@ -49,7 +49,13 @@ class CMenuHelper {
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_OVERVIEW)
-				? (new CMenuItem(_('Overview')))->setUrl(new CUrl('overview.php'), 'overview.php')
+				? (new CMenuItem(_('Overview')))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Trigger overview')))
+							->setUrl((new CUrl('overview.php'))->setArgument('type', 0), 'overview.php?type=0'),
+						(new CMenuItem(_('Data overview')))
+							->setUrl((new CUrl('overview.php'))->setArgument('type', 1), 'overview.php?type=1')
+					]))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 				? (new CMenuItem(_('Latest data')))
@@ -58,16 +64,19 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SCREENS)
 				? (new CMenuItem(_('Screens')))
-					->setUrl(new CUrl('screens.php'), 'screens.php')
-					->setAliases([
-						'screenconf.php?!templateid=*', 'screenedit.php?!templateid=*',
-						'screen.import.php', 'slides.php', 'slideconf.php'
-					])
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Screens')))
+							->setUrl(new CUrl('screens.php'), 'screens.php')
+							->setAliases(['screenconf.php?!templateid=*', 'screenedit.php?!templateid=*']),
+						(new CMenuItem(_('Slide shows')))
+							->setUrl(new CUrl('slides.php'), 'slides.php')
+							->setAliases(['slideconf.php'])
+					]))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_MAPS)
 				? (new CMenuItem(_('Maps')))
 					->setAction('map.view')
-					->setAliases(['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php'])
+					->setAliases(['image.php', 'sysmaps.php', 'sysmap.php', 'map.php'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))->setAction('discovery.view')
@@ -149,9 +158,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				? (new CMenuItem(_('Templates')))
 					->setUrl(new CUrl('templates.php'), 'templates.php')
-					->setAliases(
-						['conf.import.php?rules_preset=template', 'template.dashboard.list', 'template.dashboard.edit']
-					)
+					->setAliases(['template.dashboard.list', 'template.dashboard.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
@@ -159,14 +166,36 @@ class CMenuHelper {
 					->setAliases([
 						'items.php', 'triggers.php', 'graphs.php', 'application.list', 'application.edit',
 						'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
-						'host_prototypes.php', 'httpconf.php', 'conf.import.php?rules_preset=host'
+						'host_prototypes.php', 'httpconf.php'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
 				? (new CMenuItem(_('Maintenance')))->setUrl(new CUrl('maintenance.php'), 'maintenance.php')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_ACTIONS)
-				? (new CMenuItem(_('Actions')))->setUrl(new CUrl('actionconf.php'), 'actionconf.php')
+				? (new CMenuItem(_('Actions')))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Trigger actions')))
+							->setUrl(
+								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
+								'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
+							),
+						(new CMenuItem(_('Discovery actions')))
+							->setUrl(
+								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
+								'actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY
+							),
+						(new CMenuItem(_('Autoregistration actions')))
+							->setUrl(
+								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
+								'actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
+							),
+						(new CMenuItem(_('Internal actions')))
+							->setUrl(
+								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
+								'actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL
+							)
+					]))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
 				? (new CMenuItem(_('Event correlation')))->setUrl(new CUrl('correlation.php'), 'correlation.php')
@@ -192,14 +221,39 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
-					->setAction('gui.edit')
-					->setAliases([
-						'autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
-						'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
-						'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
-						'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
-						'conf.import.php?rules_preset=valuemap'
-					])
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('GUI')))
+							->setAction('gui.edit'),
+						(new CMenuItem(_('Autoregistration')))
+							->setAction('autoreg.edit'),
+						(new CMenuItem(_('Housekeeping')))
+							->setAction('housekeeping.edit'),
+						(new CMenuItem(_('Images')))
+							->setAction('image.list')
+							->setAliases(['image.edit']),
+						(new CMenuItem(_('Icon mapping')))
+							->setAction('iconmap.list')
+							->setAliases(['iconmap.edit']),
+						(new CMenuItem(_('Regular expressions')))
+							->setAction('regex.list')
+							->setAliases(['regex.edit']),
+						(new CMenuItem(_('Macros')))
+							->setAction('macros.edit'),
+						(new CMenuItem(_('Value mapping')))
+							->setAction('valuemap.list')
+							->setAliases(['valuemap.edit']),
+						(new CMenuItem(_('Working time')))
+							->setAction('workingtime.edit'),
+						(new CMenuItem(_('Trigger severities')))
+							->setAction('trigseverity.edit'),
+						(new CMenuItem(_('Trigger displaying options')))
+							->setAction('trigdisplay.edit'),
+						(new CMenuItem(_('Modules')))
+							->setAction('module.list')
+							->setAliases(['module.edit', 'module.scan']),
+						(new CMenuItem(_('Other')))
+							->setAction('miscconfig.edit')
+					]))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				? (new CMenuItem(_('Proxies')))
@@ -229,7 +283,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)
 				? (new CMenuItem(_('Media types')))
 					->setAction('mediatype.list')
-					->setAliases(['mediatype.edit', 'conf.import.php?rules_preset=mediatype'])
+					->setAliases(['mediatype.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)
 				? (new CMenuItem(_('Scripts')))
@@ -237,7 +291,24 @@ class CMenuHelper {
 					->setAliases(['script.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
-				? (new CMenuItem(_('Queue')))->setUrl(new CUrl('queue.php'), 'queue.php')
+				? (new CMenuItem(_('Queue')))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Queue overview')))
+							->setUrl(
+								(new CUrl('queue.php'))->setArgument('config', QUEUE_OVERVIEW),
+								'queue.php?config='.QUEUE_OVERVIEW
+							),
+						(new CMenuItem(_('Queue overview by proxy')))
+							->setUrl(
+								(new CUrl('queue.php'))->setArgument('config', QUEUE_OVERVIEW_BY_PROXY),
+								'queue.php?config='.QUEUE_OVERVIEW_BY_PROXY
+							),
+						(new CMenuItem(_('Queue details')))
+							->setUrl(
+								(new CUrl('queue.php'))->setArgument('config', QUEUE_DETAILS),
+								'queue.php?config='.QUEUE_DETAILS
+							)
+					]))
 				: null
 		];
 		$submenu_administration = array_filter($submenu_administration);
@@ -326,8 +397,6 @@ class CMenuHelper {
 	 * @return CMenuItem
 	 */
 	private static function getFirstMenuItem(): CMenuItem {
-		// FIXME: components menu store menu for guest, not for user. Because they initialized before we login.
-		// $menu = APP::Component()->get('menu.main');
 		$menu = self::getMainMenu();
 
 		foreach (CRoleHelper::getUiSectionsLabels(CWebUser::$data['type']) as $section_label) {

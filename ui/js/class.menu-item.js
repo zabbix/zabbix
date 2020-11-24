@@ -24,18 +24,18 @@ const MENUITEM_EVENT_FOCUS    = 'focus';
 
 class CMenuItem extends CBaseComponent {
 
-	constructor(target) {
+	constructor(target, level) {
 		super(target);
 
-		this.init();
+		this.init(level);
 		this.registerEvents();
 	}
 
-	init() {
+	init(level) {
 		this._toggle = this._target.querySelector('a');
 
 		if (this.hasClass('has-submenu')) {
-			this._submenu = new CMenu(this._target.querySelector('.submenu'));
+			this._submenu = new CMenu(this._target.querySelector('.submenu'), ++level);
 		}
 
 		this._is_expanded = this.hasClass('is-expanded');
@@ -67,24 +67,31 @@ class CMenuItem extends CBaseComponent {
 	}
 
 	expandSubmenu() {
-		if (!this._is_expanded && this.toggleClass('is-expanded', this.hasSubmenu())) {
+		if (!this._is_expanded && this.hasSubmenu()) {
+			this.addClass('is-expanded');
 			this._is_expanded = true;
+			this._submenu.updateHeight();
+
+			// if (this._submenu.getLevel() > 0) {
+			// 	this._submenu._target.style.top = `${this._target.getBoundingClientRect().y}px`;
+			// }
+
 			this.fire(MENUITEM_EVENT_EXPAND);
 		}
 
 		return this;
 	}
 
-	collapseSubmenu() {
-		this.removeClass('is-expanded');
-		this.blur();
-
-		if (this._is_expanded) {
+	collapseSubmenu(from_level) {
+		if (this._is_expanded && this.hasSubmenu() && this._submenu.collapseExpanded(from_level)) {
+			this.blur();
+			this.removeClass('is-expanded');
 			this._is_expanded = false;
 			this.fire(MENUITEM_EVENT_COLLAPSE);
+			return true;
 		}
 
-		return this;
+		return false;
 	}
 
 	/**
@@ -103,6 +110,12 @@ class CMenuItem extends CBaseComponent {
 					this.expandSubmenu();
 				}
 				this.fire(MENUITEM_EVENT_FOCUS);
+			},
+
+			expand: () => {
+				if (this.hasSubmenu() && this._is_expanded) {
+					this.fire(MENUITEM_EVENT_EXPAND);
+				}
 			}
 		};
 
@@ -111,6 +124,7 @@ class CMenuItem extends CBaseComponent {
 			this._toggle.addEventListener('focus', this._events.focus);
 
 			this._submenu.on(MENU_EVENT_FOCUS, this._events.focus);
+			this._submenu.on(MENU_EVENT_EXPAND, this._events.expand);
 		}
 	}
 }
