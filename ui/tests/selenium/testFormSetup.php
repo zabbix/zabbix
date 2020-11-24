@@ -221,31 +221,15 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_checkInstallSection() {
 		$this->openSpecifiedSection('Install');
-		// The following behavior differs depending on how and where the test is executed (single/pack, local/Jenkins)
-		if ($this->query('class:msg-bad')->one(false)->isValid()) {
-			$this->assertMessage(TEST_BAD, 'Cannot create the configuration file.', 'Unable to overwrite the existing '.
-					'configuration file');
-			$text_elements = [
-				"//p" => 'Alternatively, you can install it manually:',
-				"//ol//a" => 'Download the configuration file',
-				"//ol/li[2]" => 'Save it as "/home/jenkins/workspace/zabbix-dev/frontend/sources/ui/conf/zabbix.conf.php"'
-			];
-			foreach ($text_elements as $element => $text) {
-				$this->assertEquals($text, $this->query('xpath', $element)->one()->getText());
-			}
-			$this->checkButtons('Install section');
-		}
-		else {
-			$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
-			$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
-					$this->query('class:green')->one()->getText());
-			$this->checkButtons('last section');
+		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
+		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
+				$this->query('class:green')->one()->getText());
+		$this->checkButtons('last section');
 
-			// Check that Dashboard view is opened after completing the form
-			$this->query('button:Finish')->one()->click();
-			$this->page->waitUntilReady();
-			$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
-		}
+		// Check that Dashboard view is opened after completing the form
+		$this->query('button:Finish')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
 	public function getDbConnectionDetails() {
@@ -461,7 +445,7 @@ class testFormSetup extends CWebTest {
 			$db_parameters['Database port'] = ($db_parameters['Database type'] === 'PostgreSQL') ? 5432 : 3306;
 		}
 
-		// Skip the case with invalid DB schema if DB type is not PostgreSQL
+		// Skip the case with invalid DB schema if DB type is MySQL
 		if ($data['field']['name'] === 'Database schema' && $db_parameters['Database type'] === 'MySQL') {
 
 			return;
@@ -809,15 +793,8 @@ class testFormSetup extends CWebTest {
 					'Next step' => true
 				];
 				break;
-
-			case 'Install section':
-				$buttons = [
-					'Cancel' => true,
-					'Back' => true,
-					'Finish' => true
-				];
-				break;
 		}
+
 		foreach ($buttons as $button => $clickable) {
 			$this->assertEquals($clickable, $this->query('button', $button)->one()->isCLickable());
 		}
