@@ -130,6 +130,8 @@ class testFormSetup extends CWebTest {
 						$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
 					}
 					else {
+						$form->getField('Database host')->fill($db_parameters['Database host']);
+						$this->page->removeFocus();
 						$this->checkTlsFieldsLayout();
 					}
 					break;
@@ -201,7 +203,7 @@ class testFormSetup extends CWebTest {
 		else {
 			$summary_fields['Database type'] = 'MySQL';
 			$this->assertFalse($this->query('xpath://span[text()="Database schema"]')->one(false)->isValid());
-			$summary_fields['Database TLS encryption'] = ($db_parameters['Database host'] === 'localhost') ? false : true;
+			$summary_fields['Database TLS encryption'] = ($db_parameters['Database host'] === 'localhost') ? 'false' : 'true';
 		}
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
@@ -226,7 +228,7 @@ class testFormSetup extends CWebTest {
 			$text_elements = [
 				"//p" => 'Alternatively, you can install it manually:',
 				"//ol//a" => 'Download the configuration file',
-				"//ol/li[2]" => 'Save it as "/home/jenkins/workspace/zabbix-dev/frontend/sources/frontends/php/conf/zabbix.conf.php"'
+				"//ol/li[2]" => 'Save it as "/home/jenkins/workspace/zabbix-dev/frontend/sources/ui/conf/zabbix.conf.php"'
 			];
 			foreach ($text_elements as $element => $text) {
 				$this->assertEquals($text, $this->query('xpath', $element)->one()->getText());
@@ -255,7 +257,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'Database host',
 						'value'=> 'incorrect_DB_host'
-					]
+					],
+					'mysql_error' => 'php_network_getaddresses: getaddrinfo failed: Name or service not known'
 				]
 			],
 			// Partially non-numeric port number.
@@ -266,7 +269,8 @@ class testFormSetup extends CWebTest {
 						'name' => 'Database port',
 						'value' => '123aaa'
 					],
-					'check_port' => 123
+					'check_port' => 123,
+					'mysql_error' => 'Connection refused'
 				]
 			],
 			// Large port number.
@@ -287,7 +291,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'Database name',
 						'value' => 'Wrong database name'
-					]
+					],
+					'mysql_error' => "Unknown database 'Wrong database name'"
 				]
 			],
 			// Incorrect DB schema for PostgreSQL.
@@ -308,7 +313,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'User',
 						'value' => 'incorrect user name'
-					]
+					],
+					'mysql_error' => 'Access denied for user'
 				]
 			],
 			// Set incorrect password.
@@ -318,7 +324,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'Password',
 						'value' => 'this_password_is_incorrect'
-					]
+					],
+					'mysql_error' => 'Access denied for user'
 				]
 			],
 			// Empty "Database TLS CA file" field.
@@ -353,7 +360,8 @@ class testFormSetup extends CWebTest {
 						'name' => 'Database TLS CA file',
 						'value' => '/etc/apache2/magic'
 					],
-					'tls_encryption' => true
+					'tls_encryption' => true,
+					'mysql_error' => 'Incorrect file path for "Database TLS CA file": 123456.'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
@@ -378,7 +386,8 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'fill_ca_file' => true
+					'fill_ca_file' => true,
+					'mysql_error' => 'Database error code 2002'
 				]
 			],
 			// Wrong "Database TLS certificate file" field format.
@@ -403,7 +412,8 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'fill_ca_file' => true
+					'fill_ca_file' => true,
+					'mysql_error' => 'Database error code 2002'
 				]
 			],
 			// With "Database TLS encryption" set.
@@ -496,7 +506,14 @@ class testFormSetup extends CWebTest {
 		// Check the outcome for the specified database configuration
 		$this->clickSectionButton('Next step');
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error_details = CTestArrayHelper::get($data, 'error_details', 'Error connecting to database');
+			// Define the reference error message details and assert error message
+			if (array_key_exists('error_details', $data)) {
+				$error_details = $data['error_details'];
+			}
+			else {
+				$error_details = ($db_parameters['Database type'] === 'MySQL') ? $data['mysql_error'] :
+					'Error connecting to database.';
+			}
 			$this->assertMessage(TEST_BAD, 'Cannot connect to the database.', $error_details);
 		}
 		else {
