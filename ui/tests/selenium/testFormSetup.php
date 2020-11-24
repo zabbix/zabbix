@@ -464,9 +464,17 @@ class testFormSetup extends CWebTest {
 		// Fill required TLS rellated field values
 		if (array_key_exists('tls_encryption', $data)) {
 			// TLS fields are not present in case if DB type = MySQL and for DB host = localhost
-			if ($db_parameters['Database type'] === 'PostgreSQL' || $db_parameters['Database host'] !== 'localhost') {
+			if (($db_parameters['Database type'] === 'MySQL' && $db_parameters['Database host'] === 'localhost')) {
+				$tls_text = 'Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows).';
+				$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
+				// Skip data provider as TLS encryption firlds are not visible
+
+				return;
+			}
+			else {
 				$form->getField('Database type')->fill($db_parameters['Database type']);
 				$form->getField('Database host')->fill($db_parameters['Database host']);
+				$this->page->removeFocus();
 				$form->getField('Database TLS encryption')->check();
 				$form->query('xpath:.//label[@for="verify_certificate"]/span')->asCheckbox()->one()->check();
 				if (array_key_exists('fill_ca_file', $data)) {
@@ -474,6 +482,7 @@ class testFormSetup extends CWebTest {
 				}
 			}
 		}
+
 		$form->fill($db_parameters);
 
 		// Check that port number was trimmed after removing focus, starting with 1st non-numeric symbol.
