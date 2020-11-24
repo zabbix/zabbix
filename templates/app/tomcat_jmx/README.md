@@ -1,20 +1,20 @@
 
-# Apache Tomcat by JMX
+# Apache Tomcat JMX
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.4 and higher  
 Official JMX Template for Apache Tomcat.
 
 
 This template was tested on:
 
 - Apache Tomcat, version 8.5.59
-- Zabbix, version 5.0, 5.2
+- Zabbix, version 5.4
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 Metrics are collected by JMX.
 
@@ -78,7 +78,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Tomcat: Version has been changed |<p>Tomcat version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].diff()}=1 and {TEMPLATE_NAME:jmx["Catalina:type=Server",serverInfo].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |{#JMXVALUE}: Gzip compression is disabled |<p>gzip compression is disabled for connector {#JMXVALUE}.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},compression].str(off)} = 1` |INFO |<p>Manual close: YES</p> |
-|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Apache Tomcat by JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
+|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`{TEMPLATE_NAME:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
 
 ## Feedback
 

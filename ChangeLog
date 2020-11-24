@@ -1,7 +1,13 @@
 Changes for 5.4.0alpha1
 
 New features:
-.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
+.......PS. [ZBXNEXT-6269] added hv ip to vmware.hv.discovery and vm metrics for FQDN template (MVekslers)
+.........T [ZBXNEXT-6272] added template VMWare FQDN and updated template VMWare (tuskov)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6351] added template "Aranet Cloud" (afayantsev)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
 ........S. [ZBXNEXT-6280] added trend function cache (wiper)
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 ...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
@@ -15,6 +21,16 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18636] fixed import converter non static method error (rlataria)
+........S. [ZBX-18599] fixed potential server crash during upgrade to 5.2, mainly on ARM (kalimulin)
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+A.F.I..... [ZBX-18539] fixed acknowledge status being displayed as link even if problem cannot be closed manually; fixed order of role actions and few messages used in user roles functionality (agriscenko)
+..F....... [ZBX-18550] fixed script item and LLD rule types not having the "Execute now" feature (Ivo)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
 ..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
 ..F....... [ZBX-18575] added clone and delete buttons to user role update form (vmaksimovs)
 A.F....... [ZBX-18549] fixed error when user was able to change the user type of own role (gcalenko, vmaksimovs)
@@ -46,12 +62,28 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.2rc1
 
 New features:
-.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
+.......PS. [ZBXNEXT-6269] added hv ip to vmware.hv.discovery and vm metrics for FQDN template (MVekslers)
+.........T [ZBXNEXT-6272] added template VMWare FQDN and updated template VMWare (tuskov)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6351] added template "Aranet Cloud" (afayantsev)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 ...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-18636] fixed import converter non static method error (rlataria)
+........S. [ZBX-18599] fixed potential server crash during upgrade to 5.2, mainly on ARM (kalimulin)
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+A.F.I..... [ZBX-18539] fixed acknowledge status being displayed as link even if problem cannot be closed manually; fixed order of role actions and few messages used in user roles functionality (agriscenko)
+..F....... [ZBX-18550] fixed script item and LLD rule types not having the "Execute now" feature (Ivo)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
 ..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
 ..F....... [ZBX-18575] added clone and delete buttons to user role update form (vmaksimovs)
 A.F....... [ZBX-18549] fixed error when user was able to change the user type of own role (gcalenko, vmaksimovs)
@@ -304,7 +336,10 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.6rc1
 
 New features:
-.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 ...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
@@ -313,6 +348,12 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
 ..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
 A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
 ..F....... [ZBX-18518] fixed characters counter which were removed in script modal window (gcalenko)
@@ -2140,6 +2181,7 @@ New features:
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 
 Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
 A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
 ........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
 .......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)

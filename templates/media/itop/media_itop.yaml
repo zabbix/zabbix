@@ -1,0 +1,303 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-11-06T13:56:32Z'
+  media_types:
+    -
+      name: iTop
+      type: WEBHOOK
+      parameters:
+        0:
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        1:
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        2:
+          name: event_recovery_value
+          value: '{EVENT.RECOVERY.VALUE}'
+        3:
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        4:
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        5:
+          name: event_value
+          value: '{EVENT.VALUE}'
+        6:
+          name: itop_api_version
+          value: '1.3'
+        7:
+          name: itop_class
+          value: UserRequest
+        14:
+          name: itop_comment
+          value: 'Created by Zabbix action {ACTION.NAME}'
+        8:
+          name: itop_id
+          value: '{EVENT.TAGS.__zbx_itop_id}'
+        9:
+          name: itop_log
+          value: private_log
+        10:
+          name: itop_organization_id
+          value: '<PLACE ORGANIZATION ID>'
+        11:
+          name: itop_password
+          value: '<PLACE PASSWORD OR TOKEN>'
+        12:
+          name: itop_url
+          value: '<PLACE YOUR ITOP URL>'
+        13:
+          name: itop_user
+          value: '<PLACE LOGIN>'
+      script: |
+        var Itop = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                if (params.log !== 'private_log' && params.log !== 'public_log') {
+                    throw 'Incorrect "itop_log" parameter given: ' + params.log + '\nMust be "private_log" or "public_log".';
+                }
+        
+                Itop.params = params;
+                if (typeof Itop.params.url === 'string') {
+                    if (!Itop.params.url.endsWith('/')) {
+                        Itop.params.url += '/';
+                    }
+        
+                    Itop.params.url += 'webservices/rest.php?version=' + encodeURIComponent(Itop.params.api_version);
+                }
+            },
+        
+            setProxy: function (HTTPProxy) {
+                Itop.HTTPProxy = HTTPProxy;
+            },
+        
+            setCreatePayload: function () {
+                json_data.operation = 'core/create';
+                json_data.fields.org_id = Itop.params.organization_id;
+                json_data.fields.title = params.alert_subject;
+                json_data.fields.description = params.alert_message.replace('<', '&lt;')
+                    .replace('>', '&gt;')
+                    .replace(/(?:\r\n|\r|\n)/g, '<br>');
+            },
+        
+            setUpdatePayload: function () {
+                json_data.operation = 'core/update';
+                json_data.key = Itop.params.id;
+                json_data.fields.title = params.alert_subject;
+                json_data.fields[Itop.params.log] = {
+                    add_item: {
+                        message: params.alert_subject + '\n' + params.alert_message,
+                        format: 'text'
+                    }
+                };
+            },
+        
+            request: function (data) {
+                ['url', 'user', 'password', 'organization_id', 'class', 'api_version', 'id'].forEach(function (field) {
+                    if (typeof Itop.params !== 'object' || typeof Itop.params[field] === 'undefined'
+                            || Itop.params[field] === '' ) {
+                        throw 'Required Itop param is not set: "itop_' + field + '".';
+                    }
+                });
+        
+                var response,
+                    url = Itop.params.url,
+                    request = new HttpRequest(),
+                    object;
+        
+                request.addHeader('Content-Type: multipart/form-data');
+                request.addHeader('Authorization: Basic ' + btoa(Itop.params.user + ':' + Itop.params.password));
+        
+                if (Itop.HTTPProxy) {
+                    request.setProxy(Itop.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ iTop Webhook ] Sending request: ' + url + '&json_data=' + data);
+        
+                response = request.post(url + '&json_data=' + encodeURIComponent(data));
+        
+                Zabbix.log(4, '[ iTop Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
+        
+                try {
+                    response = JSON.parse(response);
+                }
+                catch (error) {
+                    Zabbix.log(4, '[ iTop Webhook ] Failed to parse response received from iTop');
+                    throw 'Failed to parse response received from iTop.\nRequest status code ' +
+                            request.getStatus() + '. Check debug log for more information.';
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    throw 'Request failed with status code ' + request.getStatus() + '. Check debug log for more information.';
+                }
+                else if (typeof response.code !== 'undefined' && response.code !== 0) {
+                    throw 'Request failed with iTop code ' + response.code + ': ' +
+                            JSON.stringify(response.message) + '. Check debug log for more information.';
+                }
+                else {
+                    Object.keys(response.objects)
+                        .forEach(function (key) {
+                            object = response.objects[key];
+                        });
+            
+                    return {
+                        status: request.getStatus(),
+                        response: object.fields
+                    };
+                }
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                json_data = {},
+                itop_params = {},
+                result = {tags: {}},
+                required_params = [
+                    'alert_subject', 'summary', 'event_recovery_value',
+                    'event_source', 'event_value', 'action_name'
+                ];
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('itop_')) {
+                        itop_params[key.substring(5)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
+                        throw 'Parameter "' + key + '" can\'t be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                    && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_recovery_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            Itop.setParams(itop_params);
+            Itop.setProxy(params.HTTPProxy);
+        
+            json_data.operation = '';
+            json_data.class = Itop.params.class;
+            json_data.comment = Itop.params.comment;
+            json_data.output_fields = 'id, friendlyname';
+            json_data.fields = {};
+        
+            // Create issue for non trigger-based events.
+            if (params.event_source !== '0' && params.event_recovery_value !== '0') {
+                Itop.setCreatePayload();
+                Itop.request(json_data);
+            }
+            // Create issue for trigger-based events.
+            else if (params.event_value === '1' && params.event_update_status === '0'
+                    && Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}') {
+                Itop.setCreatePayload();
+        
+                var response = Itop.request(json_data);
+        
+                result.tags.__zbx_itop_id = response.response.id;
+                result.tags.__zbx_itop_key = response.response.friendlyname;
+                result.tags.__zbx_itop_link = params.itop_url + (params.itop_url.endsWith('/') ? '' : '/') +
+                        'pages/UI.php?operation=details&class=' + encodeURIComponent(Itop.params.class) + '&id=' +
+                        encodeURIComponent(response.response.id);
+            }
+            // Update created issue for trigger-based event.
+            else {
+                if (Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}') {
+                    throw 'Incorrect iTop ticket ID given: ' + Itop.params.id;
+                }
+                Itop.setUpdatePayload();
+                Itop.request(json_data);
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[ iTop Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_itop_link}'
+      event_menu_name: 'iTop: {EVENT.TAGS.__zbx_itop_key}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
