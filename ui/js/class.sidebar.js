@@ -90,7 +90,7 @@ class CSidebar extends CBaseComponent {
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
 				this.removeClass('focus-off');
-				ZABBIX.MenuMain.focusSelected();
+				ZABBIX.MenuMain.focusSelected(1);
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
@@ -118,6 +118,10 @@ class CSidebar extends CBaseComponent {
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.collapseExpanded();
 				this._sidebar_scrollable.scrollTop = 0;
+			}
+
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				ZABBIX.MenuMain.collapseExpanded(1);
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {

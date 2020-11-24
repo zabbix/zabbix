@@ -69,19 +69,19 @@ class CMenu extends CBaseComponent {
 		return this._level > (from_level || 0);
 	}
 
-	expandSelected() {
-		if (this._selected_item !== null && this._selected_item !== this._expanded_item) {
+	expandSelected(till_level) {
+		if (this._level < till_level && this._selected_item !== null && this._selected_item !== this._expanded_item) {
 			this.collapseExpanded();
-			this._selected_item.hasSubmenu() && this._selected_item.expandSubmenu();
+			this._selected_item.hasSubmenu() && this._selected_item.expandSubmenu(till_level);
 		}
 
 		return this;
 	}
 
-	focusSelected() {
+	focusSelected(till_level) {
 		if (this._selected_item !== null) {
 			if (this._selected_item.hasSubmenu()) {
-				this.expandSelected();
+				this.expandSelected(till_level);
 				this._selected_item.getSubmenu().focusSelected();
 			}
 			else {
