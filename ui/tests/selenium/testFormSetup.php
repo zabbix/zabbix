@@ -361,7 +361,7 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'mysql_error' => 'Incorrect file path for "Database TLS CA file": 123456.'
+					'mysql_error' => 'Database error code 2002'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
