@@ -1368,7 +1368,7 @@ class CWidgetHelper {
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.
 			'});'.
-			'$("z-select[id$=\"aggregate_function\"]").on("change", (e) => {'.
+			'$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {'.
 				'changeDataSetAggregateFunction(e.target);'.
 			'});'
 		];
