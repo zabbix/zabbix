@@ -3197,6 +3197,12 @@ ZABBIX.apps.map = (function($) {
 				select_icon_disabled.addOption({label: icon.name, value: icon.imageid});
 			}
 
+			document.getElementById('massLabelLocation').selectedIndex = 0;
+			select_icon_off.selectedIndex = 0
+			select_icon_on.selectedIndex = 0
+			select_icon_maintenance.selectedIndex = 0
+			select_icon_disabled.selectedIndex = 0
+
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
