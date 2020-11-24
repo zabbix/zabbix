@@ -137,6 +137,8 @@ class testFormSetup extends CWebTest {
 						$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
 					}
 					else {
+						$form->getField('Database host')->fill($db_parameters['Database host']);
+						$this->page->removeFocus();
 						$this->checkTlsFieldsLayout();
 					}
 					break;
@@ -145,7 +147,7 @@ class testFormSetup extends CWebTest {
 					// Check that Database Schema and Database TLS encryption fields are visible
 					$schema_field = $form->getField('Database schema');
 					$this->assertTrue($schema_field->isValid());
-					$this->assertEquals($maxlength, $schema_field->getAttribute('maxlength'));
+					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
 					$this->checkTlsFieldsLayout();
 					break;
 			}
@@ -182,8 +184,6 @@ class testFormSetup extends CWebTest {
 				}
 			}
 			$credentials_field->select('Plain text');
-			$form->invalidate();
-
 		}
 	}
 
@@ -260,7 +260,7 @@ class testFormSetup extends CWebTest {
 			'Database server' => $db_parameters['Database host'],
 			'Database name' => $db_parameters['Database name'],
 			'Database user' => $db_parameters['User'],
-			'Database password' => '********',
+			'Database password' => '******',
 			'Zabbix server' => 'localhost',
 			'Zabbix server port' => '10051',
 			'Zabbix server name' => ''
@@ -274,27 +274,48 @@ class testFormSetup extends CWebTest {
 		else {
 			$summary_fields['Database type'] = 'MySQL';
 			$this->assertFalse($this->query('xpath://span[text()="Database schema"]')->one(false)->isValid());
-			$summary_fields['Database TLS encryption'] = ($db_parameters['Database host'] === 'localhost') ? false : true;
+			$summary_fields['Database TLS encryption'] = ($db_parameters['Database host'] === 'localhost') ? 'false' : 'true';
 		}
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
 			$xpath = 'xpath://span[text()="'.$field_name.'"]/../../div[@class="table-forms-td-right"]';
-			$this->assertEquals($value, $this->query($xpath)->one()->getText());
+			// Assert contains is used as Password length can differ
+			if ($field_name === 'Database password') {
+				$this->assertContains($value, $this->query($xpath)->one()->getText());
+			}
+			else {
+				$this->assertEquals($value, $this->query($xpath)->one()->getText());
+			}
 		}
 		$this->checkButtons();
 	}
 
 	public function testFormSetup_checkInstallSection() {
 		$this->openSpecifiedSection('Install');
-		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
-		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
-				$this->query('class:green')->one()->getText());
-		$this->checkButtons('last section');
+		if ($this->query('class:msg-bad')->one(false)->isValid()) {
+			$this->assertMessage(TEST_BAD, 'Cannot create the configuration file.', 'Unable to overwrite the existing '.
+					'configuration file');
+			$text_elements = [
+				"//p" => 'Alternatively, you can install it manually:',
+				"//ol//a" => 'Download the configuration file',
+				"//ol/li[2]" => 'Save it as "/home/jenkins/workspace/zabbix-dev/frontend/sources/ui/conf/zabbix.conf.php"'
+			];
+			foreach ($text_elements as $element => $text) {
+				$this->assertEquals($text, $this->query('xpath', $element)->one()->getText());
+			}
+			$this->checkButtons('Install section');
+		}
+		else {
+			$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
+			$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
+					$this->query('class:green')->one()->getText());
+			$this->checkButtons('last section');
 
-		// Chek that user is not logged in after completing the form
-		$this->query('button:Finish')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertContains('index.php', $this->page->getCurrentURL());
+			// Check that Dashboard view is opened after completing the form
+			$this->query('button:Finish')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertContains('index.php', $this->page->getCurrentURL());
+		}
 	}
 
 	public function getDbConnectionDetails() {
@@ -306,7 +327,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'Database host',
 						'value'=> 'incorrect_DB_host'
-					]
+					],
+					'mysql_error' => 'php_network_getaddresses: getaddrinfo failed: Name or service not known'
 				]
 			],
 			// Partially non-numeric port number.
@@ -317,7 +339,8 @@ class testFormSetup extends CWebTest {
 						'name' => 'Database port',
 						'value' => '123aaa'
 					],
-					'check_port' => 123
+					'check_port' => 123,
+					'mysql_error' => 'Connection refused'
 				]
 			],
 			// Large port number.
@@ -338,7 +361,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'Database name',
 						'value' => 'Wrong database name'
-					]
+					],
+					'mysql_error' => "Unknown database 'Wrong database name'"
 				]
 			],
 			// Incorrect DB schema for PostgreSQL.
@@ -359,7 +383,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'User',
 						'value' => 'incorrect user name'
-					]
+					],
+					'mysql_error' => 'Access denied for user'
 				]
 			],
 			// Set incorrect password.
@@ -369,7 +394,8 @@ class testFormSetup extends CWebTest {
 					'field' => [
 						'name' => 'Password',
 						'value' => 'this_password_is_incorrect'
-					]
+					],
+					'mysql_error' => 'Access denied for user'
 				]
 			],
 			// Empty "Database TLS CA file" field.
@@ -404,7 +430,8 @@ class testFormSetup extends CWebTest {
 						'name' => 'Database TLS CA file',
 						'value' => '/etc/apache2/magic'
 					],
-					'tls_encryption' => true
+					'tls_encryption' => true,
+					'mysql_error' => 'Database error code 2002'
 				]
 			],
 			// Wrong "Database TLS key file" field format.
@@ -429,7 +456,8 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'fill_ca_file' => true
+					'fill_ca_file' => true,
+					'mysql_error' => 'Database error code 2002'
 				]
 			],
 			// Wrong "Database TLS certificate file" field format.
@@ -454,7 +482,8 @@ class testFormSetup extends CWebTest {
 						'value' => '/etc/apache2/magic'
 					],
 					'tls_encryption' => true,
-					'fill_ca_file' => true
+					'fill_ca_file' => true,
+					'mysql_error' => 'Database error code 2002'
 				]
 			],
 			// With "Database TLS encryption" set.
@@ -502,8 +531,8 @@ class testFormSetup extends CWebTest {
 			$db_parameters['Database port'] = ($db_parameters['Database type'] === 'PostgreSQL') ? 5432 : 3306;
 		}
 
-		// Skip the case with invalid DB schema if DB type is not PostgreSQL
-		if (array_key_exists('Database schema', $data['field']) && $db_parameters['Database type'] !== 'PostgreSQL') {
+		// Skip the case with invalid DB schema if DB type is MySQL
+		if ($data['field']['name'] === 'Database schema' && $db_parameters['Database type'] === 'MySQL') {
 
 			return;
 		}
@@ -515,8 +544,17 @@ class testFormSetup extends CWebTest {
 		// Fill required TLS rellated field values
 		if (array_key_exists('tls_encryption', $data)) {
 			// TLS fields are not present in case if DB type = MySQL and for DB host = localhost
-			if ($db_parameters['Database type'] === 'PostgreSQL' || $db_parameters['Database host'] !== 'localhost') {
+			if (($db_parameters['Database type'] === 'MySQL' && $db_parameters['Database host'] === 'localhost')) {
+				$tls_text = 'Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows).';
+				$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
+				// Skip data provider as TLS encryption firlds are not visible
+
+				return;
+			}
+			else {
 				$form->getField('Database type')->fill($db_parameters['Database type']);
+				$form->getField('Database host')->fill($db_parameters['Database host']);
+				$this->page->removeFocus();
 				$form->getField('Database TLS encryption')->check();
 				$form->query('xpath:.//label[@for="verify_certificate"]/span')->asCheckbox()->one()->check();
 				if (array_key_exists('fill_ca_file', $data)) {
@@ -524,6 +562,7 @@ class testFormSetup extends CWebTest {
 				}
 			}
 		}
+
 		$form->fill($db_parameters);
 
 		// Check that port number was trimmed after removing focus, starting with 1st non-numeric symbol.
@@ -537,7 +576,14 @@ class testFormSetup extends CWebTest {
 		// Check the outcome for the specified database configuration
 		$this->clickSectionButton('Next step');
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error_details = CTestArrayHelper::get($data, 'error_details', 'Error connecting to database.');
+			// Define the reference error message details and assert error message
+			if (array_key_exists('error_details', $data)) {
+				$error_details = $data['error_details'];
+			}
+			else {
+				$error_details = ($db_parameters['Database type'] === 'MySQL') ? $data['mysql_error'] :
+					'Error connecting to database.';
+			}
 			$this->assertMessage(TEST_BAD, 'Cannot connect to the database.', $error_details);
 		}
 		else {
@@ -737,7 +783,7 @@ class testFormSetup extends CWebTest {
 		$form->fill($server_parameters);
 		$this->clickSectionButton('Next step', 2);
 
-		// Check that the vields are filled correctly in the Pre-installation summary section
+		// Check that the fields are filled correctly in the Pre-installation summary section
 		$summary_fields = [
 			'Zabbix server' => $server_parameters['Host'],
 			'Zabbix server port' => $server_parameters['Port'],
@@ -834,6 +880,14 @@ class testFormSetup extends CWebTest {
 					'Cancel' => true,
 					'Back' => true,
 					'Next step' => true
+				];
+				break;
+
+			case 'Install section':
+				$buttons = [
+					'Cancel' => true,
+					'Back' => true,
+					'Finish' => true
 				];
 				break;
 		}
