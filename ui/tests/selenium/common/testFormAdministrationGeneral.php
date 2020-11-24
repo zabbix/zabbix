@@ -40,7 +40,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	}
 
 	public $config_link;
-	public $form_path;
+	public $form_selector;
 	public $default;
 	public $db_default;
 	public $custom;
@@ -49,9 +49,9 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * Test for checking form update without changing any data.
 	 */
 	public function executeSimpleUpdate() {
-		$sql = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
+		$config = CDBHelper::getRow('SELECT * FROM config ORDER BY configid');
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		$values = $form->getFields()->asValues();
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -61,7 +61,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->page->waitUntilReady();
 		$form->invalidate();
 		// Check that DBdata is not changed.
-		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
+		$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config ORDER BY configid'));
 		// Check that Frontend form is not changed.
 		$this->assertEquals($values, $form->getFields()->asValues());
 	}
@@ -73,25 +73,25 @@ class testFormAdministrationGeneral extends CWebTest {
 	 */
 	public function executeResetButtonTest($other = false) {
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of some previous scenario.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults', $other);
-		$default_sql = CDBHelper::getRow('SELECT * FROM config');
+		$default_config = CDBHelper::getRow('SELECT * FROM config');
 
 		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
-		foreach (['Cancel','Reset defaults'] as $action) {
+		foreach (['Cancel', 'Reset defaults'] as $action) {
 			// Fill form with custom data.
 			$form->fill($this->custom);
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$custom_sql = CDBHelper::getRow('SELECT * FROM config');
+			$custom_config = CDBHelper::getRow('SELECT * FROM config');
 			// Check custom data in form.
 			$this->page->refresh()->waitUntilReady();
 			$form->invalidate();
 			$form->checkValue($this->custom);
 			$this->resetConfiguration($form, $this->default, $action, $other, $this->custom);
-			$sql = ($action === 'Reset defaults') ? $default_sql : $custom_sql;
-			$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
+			$config = ($action === 'Reset defaults') ? $default_config : $custom_config;
+			$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM config'));
 		}
 	}
 
@@ -147,7 +147,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	 */
 	public function executeCheckForm($data, $other = false) {
 		$this->page->login()->open($this->config_link);
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults', $other);
 		// Fill form with new data.
@@ -168,13 +168,13 @@ class testFormAdministrationGeneral extends CWebTest {
 		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
 		$form->checkValue($values);
 		// Check saved configuration in database.
-		$sql = CDBHelper::getRow('SELECT * FROM config');
+		$config = CDBHelper::getRow('SELECT * FROM config');
 		$db = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
 			? CTestArrayHelper::get($data, 'db', [])
 			: $this->db_default;
 		foreach ($db as $key => $value) {
-			$this->assertArrayHasKey($key, $sql);
-			$this->assertEquals($value, $sql[$key]);
+			$this->assertArrayHasKey($key, $config);
+			$this->assertEquals($value, $config[$key]);
 		}
 	}
 }

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=trigdisplay.edit';
-	public $form_path = 'xpath://form[contains(@action, "trigdisplay.update")]';
+	public $form_selector = 'xpath://form[contains(@action, "trigdisplay.update")]';
 
 	public $default = [
 		'Use custom event status colours' => false,
@@ -118,7 +118,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Configuration of trigger displaying options');
 		$this->assertPageHeader('Trigger displaying options');
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$limits = [
 			'problem_unack_color' => 6,

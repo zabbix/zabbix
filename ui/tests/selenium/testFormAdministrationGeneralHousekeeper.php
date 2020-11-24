@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=housekeeping.edit';
-	public $form_path = 'id:housekeeping';
+	public $form_selector = 'id:housekeeping';
 
 	public $default = [
 		// Events and alerts.
@@ -107,7 +107,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Configuration of housekeeping');
 		$this->assertPageHeader('Housekeeping');
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$headers = ['Events and alerts', 'Services', 'Audit', 'User sessions', 'History', 'Trends'];
 		foreach ($headers as $header) {

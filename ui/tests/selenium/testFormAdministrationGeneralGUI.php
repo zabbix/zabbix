@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=gui.edit';
-	public $form_path = 'xpath://form[contains(@action, "gui.update")]';
+	public $form_selector = 'xpath://form[contains(@action, "gui.update")]';
 
 	public $default = [
 		'Default language' => 'English (en_GB)',
@@ -958,7 +958,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Time filter default period' => '5h'
 					],
-					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2',
+					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2'
 				]
 			],
 			[
@@ -966,7 +966,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Max period' => '1y'
 					],
-					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2',
+					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2'
 				]
 			]
 		];
@@ -977,7 +977,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	 */
 	public function testFormAdministrationGeneralGUI_CheckSavedValues($data) {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default, 'Reset defaults');
 		// Fill nesessary settings.

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralOtherParams extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=miscconfig.edit';
-	public $form_path = 'name:otherForm';
+	public $form_selector = 'name:otherForm';
 
 	public $default = [
 		'Group for discovered hosts' => 'Empty group',
@@ -101,7 +101,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		$this->page->login()->open($this->config_link);
 		$this->assertPageTitle('Other configuration parameters');
 		$this->assertPageHeader('Other configuration parameters');
-		$form = $this->query($this->form_path)->waitUntilReady()->asForm()->one();
+		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		foreach (['Authorization', 'Security', 'Communication with Zabbix server'] as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
@@ -130,7 +130,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 				'iframe_sandboxing_enabled'
 			];
 			foreach ($checkboxes as $checkbox) {
-				$this->assertTrue($this->query('id', $checkbox)->one()->isEnabled());
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
 
