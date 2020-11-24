@@ -708,7 +708,7 @@ footer {
     top: 0;
     left: 100%;
     padding: 1px;
-    box-shadow: 4px 4px 8px 0 rgba(118, 141, 153, 0.5);
+    box-shadow: 4px 4px 8px 0 rgba(118, 141, 153, 0.35);
     transition: none; }
     .menu-main .submenu .submenu li {
       border: 0; }

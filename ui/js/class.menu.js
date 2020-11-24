@@ -104,10 +104,14 @@ class CMenu extends CBaseComponent {
 		this._target.style.maxHeight = `${this._target.scrollHeight}px`;
 	}
 
-	updateRect(relative_item) {
+	updateRect(relative_item, limit) {
 		const r_rect = relative_item.getBoundingClientRect();
 
-		this._target.style.top = `${Math.max(86, Math.min(r_rect.y, window.innerHeight - this._target.scrollHeight))}px`;
+		limit = Object.assign({top: 0, bottom: 0}, limit || {});
+
+		this._target.style.top = `${Math.max(limit.top,
+			Math.min(r_rect.y, window.innerHeight - this._target.scrollHeight - limit.bottom)
+		)}px`;
 		this._target.style.left = `${r_rect.x + r_rect.width}px`;
 		this._target.style.maxWidth = `${this._target.scrollWidth}px`;
 		this._target.style.maxHeight = `${this._target.scrollHeight}px`;

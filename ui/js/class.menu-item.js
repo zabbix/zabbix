@@ -72,10 +72,6 @@ class CMenuItem extends CBaseComponent {
 			this._is_expanded = true;
 			this._submenu.updateHeight();
 
-			// if (this._submenu.getLevel() > 0) {
-			// 	this._submenu._target.style.top = `${this._target.getBoundingClientRect().y}px`;
-			// }
-
 			this.fire(MENUITEM_EVENT_EXPAND);
 		}
 

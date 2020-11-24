@@ -169,12 +169,15 @@ class CSidebar extends CBaseComponent {
 	}
 
 	updateSubmenuPosition(force) {
-		let update = () => {
+		const update = () => {
 			let menu_item = ZABBIX.MenuMain.getExpanded();
 
 			if (menu_item) {
 				menu_item = menu_item.getSubmenu().getExpanded();
-				menu_item && menu_item.getSubmenu().updateRect(menu_item._target);
+				menu_item && menu_item.getSubmenu().updateRect(menu_item._target, {
+					top: document.querySelector('.sidebar-nav').getBoundingClientRect().top,
+					bottom: document.getElementById('msg-global-footer').offsetHeight
+				});
 			}
 		};
 
@@ -292,7 +295,6 @@ class CSidebar extends CBaseComponent {
 
 			updateSubmenuPosition: () => {
 				this.updateSubmenuPosition(false);
-
 			},
 
 			scroll: () => {
