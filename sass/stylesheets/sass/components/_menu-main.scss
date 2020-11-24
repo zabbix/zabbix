@@ -246,7 +246,7 @@ $menu-main-icons: (
 			top: 0;
 			left: 100%;
 			padding: 1px;
-			box-shadow: 4px 4px 8px 0 rgba(#768D99, .35);
+			box-shadow: 4px 4px 8px 0 $menu-main-submenu-next-level-shadow;
 
 			li {
 				border: 0;
@@ -254,7 +254,7 @@ $menu-main-icons: (
 				a {
 					padding: 6px 20px;
 					border-left: 0;
-					background-color: #0a466a;
+					background-color: $menu-main-submenu-next-level-bg;
 				}
 
 				&.is-selected a {
@@ -269,6 +269,11 @@ $menu-main-icons: (
 
 			@if $ui-transitions {
 				transition: none;
+			}
+
+			&::before,
+			&::after {
+				display: none;
 			}
 		}
 

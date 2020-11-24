@@ -721,6 +721,8 @@ footer {
       .menu-main .submenu .submenu li a:hover,
       .menu-main .submenu .submenu li a:focus {
         background-color: #092637; }
+    .menu-main .submenu .submenu::before, .menu-main .submenu .submenu::after {
+      display: none; }
   .menu-main .submenu .has-submenu > a::after {
     top: 13px;
     transform: rotate(90deg); }

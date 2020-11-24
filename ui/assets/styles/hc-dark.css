@@ -695,19 +695,21 @@ footer {
     top: 0;
     left: 100%;
     padding: 1px;
-    box-shadow: 4px 4px 8px 0 rgba(118, 141, 153, 0.35);
+    box-shadow: 4px 4px 8px 0 transparent;
     transition: none; }
     .menu-main .submenu .submenu li {
       border: 0; }
       .menu-main .submenu .submenu li a {
         padding: 6px 20px;
         border-left: 0;
-        background-color: #0a466a; }
+        background-color: #ffffff; }
       .menu-main .submenu .submenu li.is-selected a {
         background-color: #0c0c0c; }
       .menu-main .submenu .submenu li a:hover,
       .menu-main .submenu .submenu li a:focus {
         background-color: #1a1a1a; }
+    .menu-main .submenu .submenu::before, .menu-main .submenu .submenu::after {
+      display: none; }
   .menu-main .submenu .has-submenu > a::after {
     top: 13px;
     transform: rotate(90deg); }
@@ -5952,9 +5954,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a::before {
     background-position-x: -570px; }
 
-.menu-main > li.has-submenu.is-expanded > a::before, .menu-main > li.has-submenu > a:hover::before, .menu-main > li.has-submenu > a:focus::before {
+.menu-main li.has-submenu.is-expanded > a::before,
+.menu-main li.has-submenu .is-selected > a::before, .menu-main li.has-submenu > a:hover::before, .menu-main li.has-submenu > a:focus::before {
   background-position-x: -570px; }
-.menu-main > li.has-submenu.is-expanded > a::after, .menu-main > li.has-submenu > a:hover::after, .menu-main > li.has-submenu > a:focus::after {
+.menu-main li.has-submenu.is-expanded > a::after,
+.menu-main li.has-submenu .is-selected > a::after, .menu-main li.has-submenu > a:hover::after, .menu-main li.has-submenu > a:focus::after {
   background-position-x: -606px; }
 
 .menu-user a {

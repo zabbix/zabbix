@@ -721,19 +721,21 @@ footer {
     top: 0;
     left: 100%;
     padding: 1px;
-    box-shadow: 4px 4px 8px 0 rgba(118, 141, 153, 0.35);
+    box-shadow: 4px 4px 8px 0 rgba(43, 43, 43, 0.35);
     transition: none; }
     .menu-main .submenu .submenu li {
       border: 0; }
       .menu-main .submenu .submenu li a {
         padding: 6px 20px;
         border-left: 0;
-        background-color: #0a466a; }
+        background-color: #454545; }
       .menu-main .submenu .submenu li.is-selected a {
         background-color: #1c1c1c; }
       .menu-main .submenu .submenu li a:hover,
       .menu-main .submenu .submenu li a:focus {
         background-color: #0e0e0e; }
+    .menu-main .submenu .submenu::before, .menu-main .submenu .submenu::after {
+      display: none; }
   .menu-main .submenu .has-submenu > a::after {
     top: 13px;
     transform: rotate(90deg); }
