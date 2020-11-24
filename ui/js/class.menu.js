@@ -115,6 +115,10 @@ class CMenu extends CBaseComponent {
 		this._target.style.left = `${r_rect.x + r_rect.width}px`;
 		this._target.style.maxWidth = `${this._target.scrollWidth}px`;
 		this._target.style.maxHeight = `${this._target.scrollHeight}px`;
+
+		if (this._expanded_item && this._expanded_item.hasSubmenu()) {
+			this._expanded_item.getSubmenu().updateRect(this._expanded_item._target, limit);
+		}
 	}
 
 	/**
