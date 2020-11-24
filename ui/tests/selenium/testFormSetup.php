@@ -466,8 +466,9 @@ class testFormSetup extends CWebTest {
 			// TLS fields are not present in case if DB type = MySQL and for DB host = localhost
 			if ($db_parameters['Database type'] === 'PostgreSQL' || $db_parameters['Database host'] !== 'localhost') {
 				$form->getField('Database type')->fill($db_parameters['Database type']);
+				$form->getField('Database host')->fill($db_parameters['Database host']);
 				$form->getField('Database TLS encryption')->check();
-				$form->query('xpath:.//label[@for="verify_certificate"]/span')->waitUntilVisible()->asCheckbox()->one()->check();
+				$form->query('xpath:.//label[@for="verify_certificate"]/span')->asCheckbox()->one()->check();
 				if (array_key_exists('fill_ca_file', $data)) {
 					$form->getField('Database TLS CA file')->fill('/etc/apache2/magic');
 				}
