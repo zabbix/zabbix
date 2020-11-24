@@ -202,22 +202,25 @@ Uses data provided by "pg dump" command.
 
 **ceph.osd.discovery[\<commonParams\>]** — Returns a list of discovered OSDs in LLD format.
 Can be used in conjunction with "ceph.osd.stats" and "ceph.osd.dump" in order to create "per osd" items.  
-Uses data provided by "osd crush tree" and "osd crush rule dump" commands.  
+Uses data provided by "osd crush tree" command.  
 *Output sample:*
 ```json
 [
-    {
-        "{#OSDNAME}": "2",
-        "{#CRUSHRULE}": "default"
-    },
-    {
-        "{#OSDNAME}": "1",
-        "{#CRUSHRULE}": "default"
-    },
-    {
-        "{#OSDNAME}": "0",
-        "{#CRUSHRULE}": "newbucket"
-    }
+  {
+    "{#OSDNAME}": "0",
+    "{#CLASS}": "hdd",
+    "{#HOST}": "node1"
+  },
+  {
+    "{#OSDNAME}": "1",
+    "{#CLASS}": "hdd",
+    "{#HOST}": "node2"
+  },
+  {
+    "{#OSDNAME}": "2",
+    "{#CLASS}": "hdd",
+    "{#HOST}": "node3"
+  }
 ]
 ```
 
