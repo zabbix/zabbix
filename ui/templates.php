@@ -656,7 +656,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'output' => ['screenid'],
 				'templateids' => $cloneTemplateId,
 				'preservekeys' => true,
-				'inherited' => false
 			]);
 
 			if ($dbTemplateScreens) {
