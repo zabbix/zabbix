@@ -138,7 +138,7 @@ class testFormSetup extends CWebTest {
 					// Check that Database Schema and Database TLS encryption fields are visible
 					$schema_field = $form->getField('Database schema');
 					$this->assertTrue($schema_field->isValid());
-					$this->assertEquals($maxlength, $schema_field->getAttribute('maxlength'));
+					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
 					$this->checkTlsFieldsLayout();
 					break;
 			}
@@ -187,7 +187,7 @@ class testFormSetup extends CWebTest {
 			'Database server' => $db_parameters['Database host'],
 			'Database name' => $db_parameters['Database name'],
 			'Database user' => $db_parameters['User'],
-			'Database password' => '********',
+			'Database password' => '******',
 			'Zabbix server' => 'localhost',
 			'Zabbix server port' => '10051',
 			'Zabbix server name' => ''
@@ -206,22 +206,44 @@ class testFormSetup extends CWebTest {
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
 			$xpath = 'xpath://span[text()="'.$field_name.'"]/../../div[@class="table-forms-td-right"]';
-			$this->assertEquals($value, $this->query($xpath)->one()->getText());
+			// Assert contains is used as Password length can differ
+			if ($field_name === 'Database password') {
+				$this->assertContains($value, $this->query($xpath)->one()->getText());
+			}
+			else {
+				$this->assertEquals($value, $this->query($xpath)->one()->getText());
+			}
 		}
 		$this->checkButtons();
 	}
 
 	public function testFormSetup_checkInstallSection() {
 		$this->openSpecifiedSection('Install');
-		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
-		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
-				$this->query('class:green')->one()->getText());
-		$this->checkButtons('last section');
+		// The following behavior differs depending on how and where the test is executed (single/pack, local/Jenkins)
+		if ($this->query('class:msg-bad')->one(false)->isValid()) {
+			$this->assertMessage(TEST_BAD, 'Cannot create the configuration file.', 'Unable to overwrite the existing '.
+					'configuration file');
+			$text_elements = [
+				"//p" => 'Alternatively, you can install it manually:',
+				"//ol//a" => 'Download the configuration file',
+				"//ol/li[2]" => 'Save it as "/home/jenkins/workspace/zabbix-dev/frontend/sources/frontends/php/conf/zabbix.conf.php"'
+			];
+			foreach ($text_elements as $element => $text) {
+				$this->assertEquals($text, $this->query('xpath', $element)->one()->getText());
+			}
+			$this->checkButtons('Install section');
+		}
+		else {
+			$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
+			$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
+					$this->query('class:green')->one()->getText());
+			$this->checkButtons('last section');
 
-		// Chek that user is not logged in after completing the form
-		$this->query('button:Finish')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
+			// Check that Dashboard view is opened after completing the form
+			$this->query('button:Finish')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
+		}
 	}
 
 	public function getDbConnectionDetails() {
@@ -464,7 +486,7 @@ class testFormSetup extends CWebTest {
 		// Check the outcome for the specified database configuration
 		$this->clickSectionButton('Next step');
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error_details = CTestArrayHelper::get($data, 'error_details', 'Error connecting to database.');
+			$error_details = CTestArrayHelper::get($data, 'error_details', 'Error connecting to database');
 			$this->assertMessage(TEST_BAD, 'Cannot connect to the database.', $error_details);
 		}
 		else {
@@ -758,6 +780,14 @@ class testFormSetup extends CWebTest {
 					'Cancel' => true,
 					'Back' => true,
 					'Next step' => true
+				];
+				break;
+
+			case 'Install section':
+				$buttons = [
+					'Cancel' => true,
+					'Back' => true,
+					'Finish' => true
 				];
 				break;
 		}
