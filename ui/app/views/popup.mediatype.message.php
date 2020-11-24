@@ -43,6 +43,7 @@ if ($data['params']['old_message_type'] != -1) {
 
 $form_list = (new CFormList())->addRow(new CLabel(_('Message type'), 'label-message-type'),
 	(new CSelect('message_type'))
+		->setId('message_type')
 		->setFocusableElementId( 'label-message-type')
 		->setValue($data['params']['old_message_type'])
 		->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem')))
