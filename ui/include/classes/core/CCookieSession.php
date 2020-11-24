@@ -123,7 +123,7 @@ class CCookieSession implements SessionHandlerInterface {
 		session_decode($session_data);
 		$session_data = $this->prepareData(CSessionHelper::getAll());
 
-		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, $this->isAutologin() ? time() + 60 * 60 * 24 * 30 : 0)) {
+		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, $this->isAutologinEnabled() ? time() + SEC_PER_YEAR : 0)) {
 			throw new \Exception(_('Cannot set session cookie.'));
 		}
 
@@ -192,7 +192,7 @@ class CCookieSession implements SessionHandlerInterface {
 		return '';
 	}
 
-	protected function isAutologin(): bool {
-		return CWebUser::$data['autologin'] === '1';
+	protected function isAutologinEnabled(): bool {
+		return (CWebUser::$data['autologin'] === '1');
 	}
 }
