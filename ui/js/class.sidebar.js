@@ -312,6 +312,7 @@ class CSidebar extends CBaseComponent {
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
 				}
 				else if (e.target.classList.contains('button-hide')) {
+					ZABBIX.MenuMain.collapseExpanded(1);
 					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
 				}
 				else {
