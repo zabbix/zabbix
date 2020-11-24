@@ -3325,6 +3325,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = get_history_log_value(m, c_event->trigger.expression, &replace_to,
 							N_functionid, c_event->clock, c_event->ns, tz);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_VALUETYPE);
+				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3454,11 +3459,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
-				{
-					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_VALUETYPE);
-				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
@@ -3579,6 +3579,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_VALUETYPE);
+				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3672,11 +3677,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
-				{
-					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_VALUETYPE);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
@@ -4022,6 +4022,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_ITEM_VALUETYPE);
+				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to, ZBX_REQUEST_PROXY_NAME);
@@ -4049,11 +4054,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
-				{
-					ret = DBget_item_value(c_event->objectid, &replace_to,
-							ZBX_REQUEST_ITEM_VALUETYPE);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
