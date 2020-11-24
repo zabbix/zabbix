@@ -31,6 +31,9 @@ extern unsigned char	program_type;
 
 static int	DBpatch_5030000(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
 		return FAIL;
 
