@@ -168,12 +168,7 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
 	}
 
-	switch unitType {
-	case "Service":
-		p.setServiceStates(values)
-	case "Socket":
-		p.setSocketStates(values)
-	case "Unit":
+	if unitType == "Unit" {
 		p.setUnitStates(values)
 	}
 
@@ -317,34 +312,6 @@ func (p *Plugin) setUnitStates(v map[string]interface{}) {
 		{"LoadState", []string{"loaded", "error", "masked"}},
 		{"ActiveState", []string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}},
 		{"UnitFileState", []string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}},
-		{"OnFailureJobMode", []string{"fail", "replace", "replace-irreversibly", "isolate", "flush", "ignore-dependencies", "ignore-requirements"}},
-		{"CollectMode", []string{"inactive", "inactive-or-failed"}},
-		{"StartLimitAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
-		{"FailureAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
-		{"SuccessAction", []string{"none", "reboot", "reboot-force", "reboot-immediate", "poweroff", "poweroff-force", "poweroff-immediate", "exit", "exit-force"}},
-	}
-
-	for _, mapping := range mappings {
-		p.createStateMapping(v, mapping.unitName, mapping.stateNames)
-	}
-}
-
-func (p *Plugin) setServiceStates(v map[string]interface{}) {
-	mappings := []stateMapping{
-		{"NotifyAccess", []string{"none", "main", "exec", "all"}},
-		{"Restart", []string{"no", "on-success", "on-failure", "on-abnormal", "on-watchdog", "on-abort", "always"}},
-		{"Type", []string{"simple", "exec", "forking", "oneshot", "dbus", "notify", "idle"}},
-	}
-
-	for _, mapping := range mappings {
-		p.createStateMapping(v, mapping.unitName, mapping.stateNames)
-	}
-}
-
-func (p *Plugin) setSocketStates(v map[string]interface{}) {
-	mappings := []stateMapping{
-		{"bindIPv6Only", []string{"default", "both", "ipv6-only"}},
-		{"Timestamping", []string{"off", "us", "usec", "µs", "ns", "nsec"}},
 	}
 
 	for _, mapping := range mappings {
