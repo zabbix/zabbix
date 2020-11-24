@@ -53,7 +53,10 @@
 	obj.dispatchEvent(new CustomEvent('change', {}));
 
 	document.querySelector('#visible_type').addEventListener('click', cb);
-	document.querySelector('#visible_interfaceid').addEventListener('click', cb);
+
+	if (!!document.querySelector('#visible_interfaceid')) {
+		document.querySelector('#visible_interfaceid').addEventListener('click', cb);
+	}
 })();
 
 // History mode.
