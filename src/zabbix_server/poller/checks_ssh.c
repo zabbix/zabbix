@@ -283,8 +283,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
-				MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() command output exceeded limit of %d KB",
+				__func__, MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 	}
 
 	output = convert_to_utf8(buffer, offset, encoding);
@@ -580,8 +580,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
-				MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() command output exceeded limit of %d KB",
+				__func__, MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 	}
 
 	output = convert_to_utf8(buffer, offset, encoding);
