@@ -70,7 +70,7 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN) {
-			$denied = array_merge($denied, ['auditacts.php', 'correlation.php', 'queue.php']);
+			$denied = array_merge($denied, ['auditacts.php', 'queue.php']);
 		}
 
 		if (in_array($action, $denied)) {
@@ -117,7 +117,6 @@ class CLegacyAction extends CAction {
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
 				CRoleHelper::UI_REPORTS_ACTION_LOG => ['auditacts.php'],
-				CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => ['correlation.php'],
 				CRoleHelper::UI_ADMINISTRATION_QUEUE => ['queue.php']
 			];
 		}

@@ -278,7 +278,6 @@ class CRouter {
 		'chart6.php'					=> ['CLegacyAction', null, null],
 		'chart7.php'					=> ['CLegacyAction', null, null],
 		'conf.import.php'				=> ['CLegacyAction', null, null],
-		'correlation.php'				=> ['CLegacyAction', null, null],
 		'disc_prototypes.php'			=> ['CLegacyAction', null, null],
 		'discoveryconf.php'				=> ['CLegacyAction', null, null],
 		'graphs.php'					=> ['CLegacyAction', null, null],
