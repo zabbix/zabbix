@@ -722,7 +722,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					],
 					'message' => 'Cannot update configuration',
 					'details' => [
-						'Incorrect value for field "period_default": time filter default period exceeds the Max period for time selector.'
+						'Incorrect value for field "period_default": time filter default period exceeds the max period.'
 					]
 				]
 			],
