@@ -60,7 +60,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$host_interface = '';
 	if ($interface !== null) {
 		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
+		$host_interface .= ':'.$interface['port'];
 	}
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
