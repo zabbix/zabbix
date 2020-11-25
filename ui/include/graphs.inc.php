@@ -287,11 +287,10 @@ function getGraphParentTemplates(array $graphs, $flag) {
  * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
  * @param int    $flag              Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array|null
  */
-function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool $provide_links, $context) {
+function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($graphid, $parent_templates['links'])) {
 		return null;
 	}
@@ -303,7 +302,7 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$url = (new CUrl('graphs.php'))->setArgument('context', $context);
+		$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
 
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
@@ -331,11 +330,10 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
  * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array
  */
-function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $provide_links, $context) {
+function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($graphid, $parent_templates['links'])) {
@@ -344,7 +342,7 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$url = (new CUrl('graphs.php'))
 				->setArgument('form', 'update')
-				->setArgument('context', $context);
+				->setArgument('context', 'template');
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);

@@ -230,11 +230,10 @@ function getHttpTestParentTemplates(array $httptests) {
  * @param string $httptestid
  * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array|null
  */
-function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $provide_links, $context) {
+function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($httptestid, $parent_templates['links'])) {
 		return null;
 	}
@@ -250,7 +249,7 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $
 			(new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', $context)
+				->setArgument('context', 'template')
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
@@ -266,11 +265,10 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $
  * @param string $httptestid
  * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array
  */
-function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $provide_links, $context) {
+function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($httptestid, $parent_templates['links'])) {
@@ -282,7 +280,7 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $p
 					->setArgument('form', 'update')
 					->setArgument('hostid', $template['hostid'])
 					->setArgument('httptestid', $parent_templates['links'][$httptestid]['httptestid'])
-					->setArgument('context', $context)
+					->setArgument('context', 'template')
 			);
 		}
 		else {

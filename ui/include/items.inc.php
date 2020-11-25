@@ -906,11 +906,10 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links, $context) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -926,19 +925,19 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 			$url = (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', $context);
+				->setArgument('context', 'template');
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url = (new CUrl('disc_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-				->setArgument('context', $context);
+				->setArgument('context', 'template');
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
 			$url = (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
-				->setArgument('context', $context);
+				->setArgument('context', 'template');
 		}
 
 		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
@@ -958,11 +957,10 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array
  */
-function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $provide_links, $context) {
+function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($itemid, $parent_templates['links'])) {
@@ -973,21 +971,21 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 				$url = (new CUrl('host_discovery.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', $context);
+					->setArgument('context', 'template');
 			}
 			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('disc_prototypes.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setArgument('context', $context);
+					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', $context);
+					->setArgument('context', 'template');
 			}
 
 			$name = new CLink(CHtml::encode($template['name']), $url);

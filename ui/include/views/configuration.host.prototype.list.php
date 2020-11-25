@@ -67,7 +67,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
 	$name = [];
 	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
-		$data['allowed_ui_conf_templates'], $data['context']
+		$data['allowed_ui_conf_templates']
 	);
 	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
 		(new CUrl('host_prototypes.php'))

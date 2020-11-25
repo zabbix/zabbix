@@ -199,7 +199,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
 	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE,
-		$data['allowed_ui_conf_templates'], $data['context']
+		$data['allowed_ui_conf_templates']
 	);
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {

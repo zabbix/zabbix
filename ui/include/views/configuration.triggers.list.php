@@ -233,7 +233,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	// description
 	$description = [];
 	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates'], $data['context']
+		ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 	);
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

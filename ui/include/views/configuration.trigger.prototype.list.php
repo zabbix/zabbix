@@ -75,7 +75,7 @@ foreach ($data['triggers'] as $trigger) {
 	// description
 	$description = [];
 	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates'], $data['context']
+		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
 	$description[] = new CLink(

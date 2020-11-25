@@ -94,7 +94,7 @@ foreach ($data['items'] as $item) {
 	// description
 	$description = [];
 	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
-		$data['allowed_ui_conf_templates'], $data['context']
+		$data['allowed_ui_conf_templates']
 	);
 
 	if (!empty($item['discoveryRule'])) {
@@ -158,7 +158,7 @@ foreach ($data['items'] as $item) {
 
 		$trigger_description = [];
 		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
-			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates'], $data['context']
+			ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 		);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

@@ -2360,11 +2360,10 @@ function getTriggerParentTemplates(array $triggers, $flag) {
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array|null
  */
-function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, bool $provide_links, $context) {
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($triggerid, $parent_templates['links'])) {
 		return null;
 	}
@@ -2387,14 +2386,14 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-					->setArgument('context', $context);
+					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('triggers.php'))
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1)
-					->setArgument('context', $context);
+					->setArgument('context', 'template');
 			}
 
 			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
@@ -2420,11 +2419,10 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- * @param string $context           Additional parameter in URL to identify main section.
  *
  * @return array
  */
-function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bool $provide_links, $context) {
+function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($triggerid, $parent_templates['links'])) {
@@ -2449,7 +2447,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-						->setArgument('context', $context);
+						->setArgument('context', 'template');
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
@@ -2457,7 +2455,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 						->setArgument('hostid', $template['hostid'])
-						->setArgument('context', $context);
+						->setArgument('context', 'template');
 				}
 
 				$name = new CLink(CHtml::encode($template['name']), $url);
