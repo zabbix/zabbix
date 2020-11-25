@@ -252,8 +252,7 @@ else {
 	$groupids = $data['filter']['groups'] ? getSubGroups(array_keys($data['filter']['groups'])) : null;
 	$hostids = $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null;
 
-	list($data['items'], $data['hosts'], $data['has_hidden_data'])
-		= getDataOverview($groupids, $hostids, $data['filter']);
+	[$data['items'], $data['hosts'], $data['has_hidden_data']] = getDataOverview($groupids, $hostids, $data['filter']);
 
 	// Render view.
 	echo (new CView('monitoring.overview.items', $data))->getOutput();
