@@ -487,7 +487,7 @@ class testPageMonitoringHosts extends CWebTest {
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableResult($start_rows_count, 'Name');
+		$start_contents = $this->getTableResult('Name');
 
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
@@ -503,7 +503,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
 		$this->assertTableStats($reset_rows_count);
-		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count, 'Name'));
+		$this->assertEquals($start_contents, $this->getTableResult('Name'));
 	}
 
 	// Checking that Show suppressed problems filter works.
@@ -684,7 +684,7 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_HostContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
-		$row->query('xpath://a[@class="link-action" and text()="'.$data['name'].'"]')->one()->click();
+		$row->query('link:'.$data['name'])->one()->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
@@ -709,17 +709,21 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
-		$rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
 		foreach (['Name', 'Status'] as $listing) {
 			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
 			$query->one()->click();
-			$after_listing = $this->getTableResult($rows_count, $listing);
+			$this->page->waitUntilReady();
+			$after_listing = $this->getTableResult($listing);
 			$query->one()->click();
-			$this->assertEquals(array_reverse($after_listing), $this->getTableResult($rows_count, $listing));
+			$this->page->waitUntilReady();
+			$this->assertEquals(array_reverse($after_listing), $this->getTableResult($listing));
 		}
 	}
 
-	// Сount problems amount from first column and compare with displayed problems from another Problems column.
+	/**
+	 *
+	 * Сount problems amount from first column and compare with displayed problems from another Problems column.
+	 */
 	public function testPageMonitoringHosts_CountProblems() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -745,8 +749,7 @@ class testPageMonitoringHosts extends CWebTest {
 			}
 
 			// Getting problems amount from second Problems column and then comparing with summarized first column.
-			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')
-					->one()->getText();
+			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
 			$this->assertEquals((int)$problems, $result);
 		}
 	}
@@ -754,10 +757,9 @@ class testPageMonitoringHosts extends CWebTest {
 	/**
 	 * Get data from chosen column.
 	 *
-	 * @param integer $rows_count	Amount of rows where column value should be checked
 	 * @param string $column		Column name, where value should be checked
 	 */
-	private function getTableResult($rows_count, $column) {
+	private function getTableResult($column) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
@@ -776,10 +778,10 @@ class testPageMonitoringHosts extends CWebTest {
 	private function selectLink($host_name, $column, $page_header) {
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->getColumn($column)->click();
 		$this->page->waitUntilReady();
-		if ($page_header != null) {
+		if ($page_header !== null) {
 			$this->assertPageHeader($page_header);
 		}
-		if ($host_name == 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
+		if ($host_name === 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
 				' and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
 		}
