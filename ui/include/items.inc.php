@@ -1141,7 +1141,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
-	list($db_items, $hostids) = getDataOverviewItems($groupids, $hostids, $filter['application']);
+	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
 
 	$data = [];
 	$item_counter = [];

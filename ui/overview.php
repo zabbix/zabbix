@@ -213,9 +213,9 @@ if ($type == SHOW_TRIGGERS) {
 		$host_options['hostids'] = array_keys($filter['hosts']);
 	}
 
-	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-		$data['hosts_by_name'], $data['exceeded_limit']
-	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
+	[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'], $data['hosts_by_name'],
+		$data['exceeded_limit']
+	] = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
 
 	$data['filter'] = $filter;
 

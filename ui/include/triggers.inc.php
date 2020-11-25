@@ -805,7 +805,7 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 		['field' => 'description', 'order' => ZBX_SORT_UP]
 	]);
 
-	list($triggers_by_name, $hosts_by_name, $exceeded_limit) = getTriggersOverviewTableData($db_hosts, $db_triggers);
+	[$triggers_by_name, $hosts_by_name, $exceeded_limit] = getTriggersOverviewTableData($db_hosts, $db_triggers);
 
 	return [$db_hosts, $db_triggers, $dependencies, $triggers_by_name, $hosts_by_name, $exceeded_limit];
 }
