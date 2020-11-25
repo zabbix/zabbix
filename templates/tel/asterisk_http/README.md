@@ -30,7 +30,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AMI.PORT} |<p>AMI port number for checking service availability.</p> |`8088` |
+|{$AMI.PORT} |<p>AMI port number for checking service availability.</p> |`5038` |
 |{$AMI.QUEUE_CALLERS.MAX.WARN} |<p>The maximum number of callers in a queue for trigger expression.</p> |`10` |
 |{$AMI.RESPONSE_TIME.MAX.WARN} |<p>The Asterisk Manager API page maximum response time in seconds for trigger expression.</p> |`10s` |
 |{$AMI.SECRET} |<p>The Asterisk Manager secret.</p> |`zabbix` |
