@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2019-12-09 09:51+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -2372,7 +2372,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Kan ikke aktivere webscenario"
 msgstr[1] "Kan ikke aktivere webscenarier"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6747,7 +6747,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "Gitt uttrykk er ikke en makro"
@@ -8585,7 +8585,7 @@ msgstr "Feil filtertilstandsoperatør for oppdagelsesregel \"%1$s\"."
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "Feil filtertilstandstype for handling \"%1$s\"."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8677,7 +8677,7 @@ msgstr "Feil varenøkkel \"%1$s\" gitt for utløserkonsept på \"%2$s\"."
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Feil vare prototype ID \"%1$s\" gitt for skjermelement."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr "Feil element verdi type"
@@ -16817,7 +16817,7 @@ msgstr "Maler \"%1$s\" koblet fra verter \"%2$s\"."
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17872,13 +17872,13 @@ msgstr "Ukjent feil"
 msgid "Unknown function."
 msgstr "Ukjent funksjon."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Ukjent vertsobjekt, ikke noe element i valgt vert"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "Ukjent vert, ingen slik vert i systemet"
@@ -18955,8 +18955,8 @@ msgstr "Nettovervåking"
 msgid "Web scenario"
 msgstr "Nettscenario"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Nettscenario \"%1$s\" eksisterer allerede på verten \"%2$s\"."

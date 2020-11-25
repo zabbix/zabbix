@@ -309,7 +309,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'testFormDiscoveryRule2',
+						'Name' => 'testFormDiscoveryRule2'
 					],
 					'expected' => [
 						'testFormDiscoveryRule2'
@@ -319,7 +319,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Update interval' => '0',
+						'Update interval' => '0'
 					],
 					'expected' => [
 						'Test discovery rule',

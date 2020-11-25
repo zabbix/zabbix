@@ -44,7 +44,7 @@ class testUserGroup extends CAPITest {
 			],
 			[
 				'group' => [
-					'name' => '',
+					'name' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
@@ -57,10 +57,10 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'name' => 'One user group with existing name',
+						'name' => 'One user group with existing name'
 					],
 					[
-						'name' => 'Zabbix administrators',
+						'name' => 'Zabbix administrators'
 					]
 				],
 				'expected_error' => 'User group "Zabbix administrators" already exists.'
@@ -68,10 +68,10 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'name' => 'User group with two identical name',
+						'name' => 'User group with two identical name'
 					],
 					[
-						'name' => 'User group with two identical name',
+						'name' => 'User group with two identical name'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(User group with two identical name) already exists.'
@@ -97,10 +97,10 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'name' => 'API user group create one',
+						'name' => 'API user group create one'
 					],
 					[
-						'name' => 'æų',
+						'name' => 'æų'
 					]
 				],
 				'expected_error' => null
@@ -108,7 +108,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'name' => 'Апи группа УТФ-8',
+						'name' => 'Апи группа УТФ-8'
 					]
 				],
 				'expected_error' => null
@@ -199,7 +199,7 @@ class testUserGroup extends CAPITest {
 				'group' => [[
 					'name' => 'Disable group with admin',
 					'usrgrpid' => '7',
-					'users_status' => 1,
+					'users_status' => 1
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -207,7 +207,7 @@ class testUserGroup extends CAPITest {
 				'group' => [[
 					'name' => 'Disable group GUI access with admin',
 					'usrgrpid' => '7',
-					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
+					'gui_access' => GROUP_GUI_ACCESS_DISABLED
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -255,11 +255,11 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'usrgrpid' => '13',
-						'name' => 'API user group with the same ids1',
+						'name' => 'API user group with the same ids1'
 					],
 					[
 						'usrgrpid' => '13',
-						'name' => 'API user group with the same ids2',
+						'name' => 'API user group with the same ids2'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (usrgrpid)=(13) already exists.'
@@ -269,7 +269,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					[
 						'usrgrpid' => '13',
-						'name' => 'Апи группа пользователей обновленна УТФ-8',
+						'name' => 'Апи группа пользователей обновленна УТФ-8'
 					]
 				],
 				'expected_error' => null
@@ -496,7 +496,7 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Check rights, without permission',
 					'rights' => [
-						'id' => '4',
+						'id' => '4'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "permission" is missing.'
@@ -506,7 +506,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'Check rights, with empty permission',
 					'rights' => [
 						'id' => '4',
-						'permission' => '',
+						'permission' => ''
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/rights/1/permission": an integer is expected.'
@@ -516,7 +516,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'Check rights, permission not valid number',
 					'rights' => [
 						'id' => '4',
-						'permission' => '1.1',
+						'permission' => '1.1'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/rights/1/permission": an integer is expected.'
@@ -526,7 +526,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'Check rights, incorrect permission value',
 					'rights' => [
 						'id' => '4',
-						'permission' => '1',
+						'permission' => '1'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
@@ -536,7 +536,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'Check rights, incorrect permission value',
 					'rights' => [
 						'id' => '4',
-						'permission' => '4',
+						'permission' => '4'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
@@ -550,7 +550,7 @@ class testUserGroup extends CAPITest {
 					'debug_mode' => 1,
 					'rights' => [
 						'id' => '50012',
-						'permission' => '3',
+						'permission' => '3'
 					],
 					'userids' => ['2', '8']
 				],
@@ -732,7 +732,7 @@ class testUserGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => ['16'],
 				'expected_error' => 'Only Super Admins can delete user groups.'
-			],
+			]
 		];
 	}
 

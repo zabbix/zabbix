@@ -624,7 +624,7 @@ switch ($data['popup_type']) {
 				$check_box,
 				$description,
 				$script_execute_on,
-				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
+				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'))
 			]);
 		}
 		unset($data['table_records']);

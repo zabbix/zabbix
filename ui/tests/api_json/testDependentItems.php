@@ -711,7 +711,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => array_merge(
 					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 4495, 5494)
 				)
-			],
+			]
 		];
 	}
 	/**

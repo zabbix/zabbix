@@ -154,7 +154,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 						(new CCheckBox('filter_show_suppressed'))
 							->setChecked($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 							->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-							->setEnabled($data['filter']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
+							->setEnabled($data['filter']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 					]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 				])
 		])

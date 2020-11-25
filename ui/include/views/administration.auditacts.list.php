@@ -80,7 +80,7 @@ foreach ($this->data['alerts'] as $alert) {
 		$status = (new CSpan([
 			_('In progress').':',
 			BR(),
-			_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries']),
+			_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries'])
 		]))->addClass(ZBX_STYLE_YELLOW);
 	}
 	else {

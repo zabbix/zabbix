@@ -80,7 +80,7 @@ class CControllerDiscoveryView extends CController {
 						'druleids' => $filter_druleids,
 						'filter' => ['status' => DRULE_STATUS_ACTIVE]
 					]), ['druleid' => 'id'])
-					: [],
+					: []
 			],
 			'profileIdx' => 'web.discovery.filter',
 			'active_tab' => CProfile::get('web.discovery.filter.active', 1)

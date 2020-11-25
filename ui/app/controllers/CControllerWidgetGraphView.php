@@ -372,7 +372,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
-				'initial_load' => (int) $this->getInput('initial_load', 0),
+				'initial_load' => (int) $this->getInput('initial_load', 0)
 			],
 			'time_control_data' => $time_control_data,
 			'timeline' => $timeline,

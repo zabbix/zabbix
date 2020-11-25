@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-13 19:55+0200\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
 "PO-Revision-Date: 2020-07-17 16:59+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -2376,7 +2376,7 @@ msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Αδύνατη η ενεργοποίηση σενάριου ιστού"
 msgstr[1] "Αδύνατη η ενεργοποίηση σενάριων ιστού"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr ""
 
@@ -6754,7 +6754,7 @@ msgstr ""
 msgid "Get value from host"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "Η δοσμένη έκφραση δεν είναι μακροεντολή"
@@ -8593,7 +8593,7 @@ msgstr "Λανθασμένο φίλτρο συνθήκης τελεστή γιά
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "Λανθασμένος τύπος φίλτρου συνθήκης γιά ενέργεια \"%1$s\"."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8685,7 +8685,7 @@ msgstr "Λανθασμένο κλειδί συλλέκτη \"%1$s\" παρέχε
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Λανθασμένο ID πρωτότυπου συλλέκτη \"%1$s\" παρεχόμενο γιά στοιχείο οθόνης."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr ""
@@ -16828,7 +16828,7 @@ msgstr "Σχεδιότυπα \"%1$s\" αποσυνδεδεμένα απο ξεν
 msgid "Templates updated"
 msgstr ""
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -17884,13 +17884,13 @@ msgstr "Άγνωστο σφάλμα"
 msgid "Unknown function."
 msgstr "Άγνωστη λειτουργία."
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Άγνωστος συλλέκτης ξενιστή, κανένας τέτοιος συλλέκτης σε επιλεγμένο ξενιστή"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "Άγνωστος ξενιστής, δεν υπάρχει τέτοιος ξενιστής στο σύστημα"
@@ -18968,8 +18968,8 @@ msgstr "Εποπτεία Ιστού"
 msgid "Web scenario"
 msgstr ""
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Σενάριο ιστού \"%1$s\" υπάρχει ήδη σε ξενιστή \"%2$s\"."

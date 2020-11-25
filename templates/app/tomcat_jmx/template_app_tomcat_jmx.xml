@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-02T09:08:07Z</date>
+   <date>2020-11-23T08:33:45Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Apache Tomcat by JMX</template>
-         <name>Apache Tomcat by JMX</name>
+         <template>Template App Apache Tomcat JMX</template>
+         <name>Template App Apache Tomcat JMX</name>
          <description>The template to monitor Apache Tomcat by Zabbix that work without any external scripts.&#13;
 The metrics are collected by JMX.&#13;
 &#13;
@@ -262,7 +262,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},bytesSent]</key>
                            </item>
                         </graph_item>
@@ -271,7 +271,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},bytesReceived]</key>
                            </item>
                         </graph_item>
@@ -403,7 +403,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},maxActive]</key>
                            </item>
                         </graph_item>
@@ -412,7 +412,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},activeSessions]</key>
                            </item>
                         </graph_item>
@@ -421,7 +421,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>F63100</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},rejectedSessions]</key>
                            </item>
                         </graph_item>
@@ -430,7 +430,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>A54F10</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},maxActiveSessions]</key>
                            </item>
                         </graph_item>
@@ -525,7 +525,7 @@ Template tooling version used: 0.38</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Apache Tomcat by JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}&gt;{Apache Tomcat by JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100</expression>
+                     <expression>{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}&gt;{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100</expression>
                      <name>{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}</name>
                      <priority>HIGH</priority>
                      <description>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</description>
@@ -539,7 +539,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},maxThreads]</key>
                            </item>
                         </graph_item>
@@ -548,7 +548,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},currentThreadCount]</key>
                            </item>
                         </graph_item>
@@ -557,7 +557,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>F63100</color>
                            <item>
-                              <host>Apache Tomcat by JMX</host>
+                              <host>Template App Apache Tomcat JMX</host>
                               <key>jmx[{#JMXOBJ},currentThreadsBusy]</key>
                            </item>
                         </graph_item>

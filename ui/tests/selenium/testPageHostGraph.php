@@ -72,7 +72,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Triggers',
 			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Graphs',
 			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Discovery rules',
-			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Web scenarios',
+			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Web scenarios'
 		];
 		$count_items = CDBHelper::getValue('SELECT COUNT(*) FROM items WHERE hostid='.$hostid);
 		$count_graphs = CDBHelper::getCount($sql);
@@ -593,7 +593,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'host' => 'Host to delete graphs',
 					'graph' => 'all'
 				]
-			],
+			]
 		];
 	}
 
