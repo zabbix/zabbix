@@ -21,14 +21,14 @@
 
 class CHostAvailability extends CTag {
 
-	const LABELS = [
+	public const LABELS = [
 		INTERFACE_TYPE_AGENT => 'ZBX',
 		INTERFACE_TYPE_SNMP => 'SNMP',
 		INTERFACE_TYPE_IPMI => 'IPMI',
 		INTERFACE_TYPE_JMX => 'JMX'
 	];
 
-	const COLORS = [
+	public const COLORS = [
 		INTERFACE_AVAILABLE_UNKNOWN => ZBX_STYLE_STATUS_GREY,
 		INTERFACE_AVAILABLE_TRUE => ZBX_STYLE_STATUS_GREEN,
 		INTERFACE_AVAILABLE_FALSE => ZBX_STYLE_STATUS_RED,
@@ -45,14 +45,16 @@ class CHostAvailability extends CTag {
 	/**
 	 * Set host interfaces.
 	 *
-	 * @param array  $interfaces               Array of arrays with all host interfaces.
-	 * @param int    $interfaces[][type]       Type of interface, INTERFACE_TYPE_* constant.
-	 * @param string $interfaces[][interface]  Hint table 'Interface' column value.
-	 * @param string $interfaces[][detail]     Hint table 'Interface' column additional details string.
-	 * @param int    $interfaces[][available]  Hint table 'Status' column value, INTERFACE_AVAILABLE_* constant.
-	 * @param string $interfaces[][error]      Hint table 'Error' column value.
+	 * @param array  $interfaces                 Array of arrays with all host interfaces.
+	 * @param int    $interfaces[]['type']       Type of interface, INTERFACE_TYPE_* constant.
+	 * @param string $interfaces[]['interface']  Hint table 'Interface' column value.
+	 * @param string $interfaces[]['detail']     Hint table 'Interface' column additional details string.
+	 * @param int    $interfaces[]['available']  Hint table 'Status' column value, INTERFACE_AVAILABLE_* constant.
+	 * @param string $interfaces[]['error']      Hint table 'Error' column value.
+	 *
+	 * @return CHostAvailability
 	 */
-	public function setInterfaces(array $interfaces) {
+	public function setInterfaces(array $interfaces): CHostAvailability {
 		$this->type_interfaces = array_fill_keys(array_keys(static::LABELS), []);
 
 		foreach ($interfaces as $interface) {
@@ -111,7 +113,8 @@ class CHostAvailability extends CTag {
 				: INTERFACE_AVAILABLE_TRUE;
 
 			if (in_array(INTERFACE_AVAILABLE_FALSE, $available)) {
-				$status = (in_array(INTERFACE_AVAILABLE_UNKNOWN, $available) || in_array(INTERFACE_AVAILABLE_TRUE, $available))
+				$status = (in_array(INTERFACE_AVAILABLE_UNKNOWN, $available)
+						|| in_array(INTERFACE_AVAILABLE_TRUE, $available))
 					? INTERFACE_AVAILABLE_MIXED
 					: INTERFACE_AVAILABLE_FALSE;
 			}

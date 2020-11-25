@@ -600,21 +600,21 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Create HTML helper element for host interfaces availability.
  *
- * @param array $host_interfaces                          Array of arrays of host interfaces.
- * @param int   $host_interfaces[][type]                  Interface type.
- * @param int   $host_interfaces[][available]             Interface availability.
- * @param int   $host_interfaces[][useip]                 Interface use IP or DNS.
- * @param int   $host_interfaces[][ip]                    Interface IP address.
- * @param int   $host_interfaces[][dns]                   Interface domain name.
- * @param int   $host_interfaces[][port]                  Interface port.
- * @param int   $host_interfaces[][details][version]      Interface SNMP version.
- * @param int   $host_interfaces[][details][contextname]  Interface context name for SNMP version 3.
- * @param int   $host_interfaces[][details][community]    Interface community for SNMP non version 3 interface.
- * @param int   $host_interfaces[][error]                 Interface error message.
+ * @param array $host_interfaces                              Array of arrays of host interfaces.
+ * @param int   $host_interfaces[]['type']                    Interface type.
+ * @param int   $host_interfaces[]['available']               Interface availability.
+ * @param int   $host_interfaces[]['useip']                   Interface use IP or DNS.
+ * @param int   $host_interfaces[]['ip']                      Interface IP address.
+ * @param int   $host_interfaces[]['dns']                     Interface domain name.
+ * @param int   $host_interfaces[]['port']                    Interface port.
+ * @param int   $host_interfaces[]['details']['version']      Interface SNMP version.
+ * @param int   $host_interfaces[]['details']['contextname']  Interface context name for SNMP version 3.
+ * @param int   $host_interfaces[]['details']['community']    Interface community for SNMP non version 3 interface.
+ * @param int   $host_interfaces[]['error']                   Interface error message.
  *
  * @return CHostAvailability
  */
-function getHostAvailabilityTable($host_interfaces) {
+function getHostAvailabilityTable($host_interfaces): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
