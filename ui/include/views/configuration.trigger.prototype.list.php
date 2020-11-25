@@ -80,11 +80,11 @@ foreach ($data['triggers'] as $trigger) {
 
 	$description[] = new CLink(
 		CHtml::encode($trigger['description']),
-		'trigger_prototypes.php?'.
-			'form=update'.
-			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&triggerid='.$triggerid.
-			'&context='.$data['context']
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('triggerid', $triggerid)
+			->setArgument('context', $data['context'])
 	);
 
 	if ($trigger['dependencies']) {

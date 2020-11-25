@@ -35,14 +35,7 @@
 			if ($state_obj.val() == -1) {
 				// Restore the last remembered status filter value.
 				if ($status_buttons.prop('disabled') && typeof $status_buttons.data('last-value') !== 'undefined') {
-					for (var i = 0; i < $status_buttons.length; i++) {
-						if ($($status_buttons[i]).val() == $status_buttons.data('last-value')) {
-							$($status_buttons[i]).prop('checked', true);
-						}
-						else {
-							$($status_buttons[i]).prop('checked', false);
-						}
-					}
+					$status_buttons.filter('[value=' + $status_buttons.data('last-value') + ']').prop('checked', true);
 				}
 
 				$status_buttons.prop('disabled', false);
@@ -53,14 +46,7 @@
 					$status_buttons.data('last-value', $status_obj.val());
 				}
 
-				for (var i = 0; i < $status_buttons.length; i++) {
-					if ($($status_buttons[i]).val() == <?= ITEM_STATUS_ACTIVE ?>) {
-						$($status_buttons[i]).prop('checked', true);
-					}
-					else {
-						$($status_buttons[i]).prop('checked', false);
-					}
-				}
+				$status_buttons.filter('[value=' + <?= ITEM_STATUS_ACTIVE ?> + ']').prop('checked', true);
 
 				$status_buttons.prop('disabled', true);
 			}

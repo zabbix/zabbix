@@ -67,7 +67,11 @@ $itemTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
-		($data['hostid'] == 0) ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
+		($data['hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),

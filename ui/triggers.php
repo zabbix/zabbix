@@ -800,7 +800,7 @@ else {
 		'groupids' => $filter_groupids ? $filter_groupids_enriched : null,
 		'editable' => true,
 		'dependent' => ($filter_dependent != -1) ? $filter_dependent : null,
-		'templated' => ($filter_value != -1) ? false : ($data['context'] === 'template'),
+		'templated' => ($filter_value == -1) ? ($data['context'] === 'template') : false,
 		'inherited' => ($filter_inherited != -1) ? $filter_inherited : null,
 		'preservekeys' => true,
 		'sortfield' => $sort,
