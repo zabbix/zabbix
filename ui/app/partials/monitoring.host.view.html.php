@@ -60,7 +60,11 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$host_interface = '';
 	if ($interface !== null) {
 		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		$host_interface .= ':'.$interface['port'];
+
+		if ($interface['useip'] == INTERFACE_USE_IP
+				&& filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+			$host_interface = '['.$host_interface.']';
+		}
 	}
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
@@ -99,7 +103,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$table->addRow([
 		[$host_name, $maintenance_icon],
-		(new CCol($host_interface))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($host_interface.':'.$interface['port']))->addClass(ZBX_STYLE_NOWRAP),
 		getHostAvailabilityTable($host['interfaces']),
 		$host['tags'],
 		$problems_div,
