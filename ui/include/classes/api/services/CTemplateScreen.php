@@ -59,7 +59,7 @@ class CTemplateScreen extends CScreen {
 			'templateids'				=> null,
 			'hostids'					=> null,
 			'editable'					=> false,
-			'noInheritance'				=> true,
+			'noInheritance'				=> null,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
