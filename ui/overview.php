@@ -211,9 +211,9 @@ if ($type == SHOW_TRIGGERS) {
 		$host_options['hostids'] = array_keys($filter['hosts']);
 	}
 
-	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-		$data['hosts_by_name'], $data['exceeded_limit']
-	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
+	[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'], $data['hosts_by_name'],
+		$data['exceeded_limit']
+	] = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
 
 	$data['filter'] = $filter;
 
@@ -254,8 +254,7 @@ else {
 	$groupids = $data['filter']['groups'] ? getSubGroups(array_keys($data['filter']['groups'])) : null;
 	$hostids = $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null;
 
-	list($data['items'], $data['hosts'], $data['has_hidden_data'])
-		= getDataOverview($groupids, $hostids, $data['filter']);
+	[$data['items'], $data['hosts'], $data['has_hidden_data']] = getDataOverview($groupids, $hostids, $data['filter']);
 
 	// Render view.
 	echo (new CView('monitoring.overview.items', $data))->getOutput();

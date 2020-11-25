@@ -27,7 +27,7 @@ $table = (new CTableInfo())
 	->setHeadingColumn(0);
 
 $headings[] = _('Items');
-foreach ($data['hosts'] as $hostid => $host) {
+foreach ($data['hosts'] as $host) {
 	$headings[] = (new CColHeader($host['name']))
 		->addClass('vertical_rotation')
 		->setTitle($host['name']);

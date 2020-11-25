@@ -1149,9 +1149,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
-	list($db_items, $hostids) = getDataOverviewItems($groupids, $hostids, $filter['application']);
-
-	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
 
 	$data = [];
 	$item_counter = [];
@@ -1218,6 +1216,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 		['field' => 'name', 'order' => ZBX_SORT_UP],
 	]);
 
+	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 	$has_hidden_hosts = (count($db_hosts) > $data_display_limit);
 	$db_hosts = array_slice($db_hosts, 0, $data_display_limit, true);
 
