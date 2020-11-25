@@ -1146,7 +1146,6 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$data = [];
 	$item_counter = [];
 	$db_hosts = [];
-	$host_items = [];
 
 	foreach ($db_items as $db_item) {
 		$item_name = $db_item['name_expanded'];
@@ -1161,47 +1160,33 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 			$item_counter[$host_name][$item_name] = 0;
 		}
 
-		if (!array_key_exists($item_name, $host_items) || !array_key_exists($host_name, $host_items[$item_name])) {
-			$host_items[$item_name][$host_name] = [];
-		}
+		$item_place = $item_counter[$host_name][$item_name];
+		$item_counter[$host_name][$item_name]++;
 
-		if (!array_key_exists($db_item['itemid'], $host_items[$item_name][$host_name])) {
-			if (array_key_exists($db_item['itemid'], $host_items[$item_name][$host_name])) {
-				$item_place = $host_items[$item_name][$host_name][$db_item['itemid']]['item_place'];
-			}
-			else {
-				$item_place = $item_counter[$host_name][$item_name];
-				$item_counter[$host_name][$item_name]++;
-			}
+		$item = [
+			'itemid' => $db_item['itemid'],
+			'value_type' => $db_item['value_type'],
+			'units' => $db_item['units'],
+			'valuemapid' => $db_item['valuemapid'],
+			'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
+		];
 
-			$item = [
-				'itemid' => $db_item['itemid'],
-				'value_type' => $db_item['value_type'],
-				'units' => $db_item['units'],
-				'valuemapid' => $db_item['valuemapid'],
-				'item_place' => $item_place,
-				'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
+		if (array_key_exists('triggerid', $db_item)) {
+			$item += [
+				'triggerid' => $db_item['triggerid'],
+				'severity' => $db_item['priority'],
+				'tr_value' => $db_item['value']
 			];
-
-			if (array_key_exists('triggerid', $db_item)) {
-				$item += [
-					'triggerid' => $db_item['triggerid'],
-					'severity' => $db_item['priority'],
-					'tr_value' => $db_item['value']
-				];
-			}
-			else {
-				$item += [
-					'triggerid' => null,
-					'severity' => null,
-					'tr_value' => null
-				];
-			}
-
-			$data[$item_name][$item_place][$host_name] = $item;
-
-			$host_items[$item_name][$host_name][$db_item['itemid']] = $data[$item_name][$item_place][$host_name];
 		}
+		else {
+			$item += [
+				'triggerid' => null,
+				'severity' => null,
+				'tr_value' => null
+			];
+		}
+
+		$data[$item_name][$item_place][$host_name] = $item;
 	}
 
 	CArrayHelper::sort($db_hosts, [
