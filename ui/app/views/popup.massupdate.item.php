@@ -31,6 +31,7 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 $form = (new CForm())
 	->cleanItems()
 	->setId('massupdate-form')
+	->setName('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('ids', $data['ids'])
 	->addVar('action', $data['prototype'] ? 'popup.massupdate.itemprototype' : 'popup.massupdate.item')
@@ -438,34 +439,59 @@ if ($data['prototype']) {
 
 // Append master item select to form list.
 if ($data['displayMasteritems']) {
-	$master_item = [
-		(new CTextBox('master_itemname', '', true))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		(new CVar('master_itemid', '', 'master_itemid'))
-	];
+	if (!$data['prototype']) {
+		$master_item = (new CDiv([
+			(new CMultiSelect([
+				'name' => 'master_itemid',
+				'object_name' => 'items',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'master_itemid',
+						'hostid' => $data['hostid'],
+						'only_hostid' => $data['hostid'],
+						'webitems' => true
+					]
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(true)
+		]))->setId('master_item');
+	}
+	else {
+		$master_item = [
+			(new CTextBox('master_itemname', '', true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(),
+			(new CVar('master_itemid', '', 'master_itemid'))
+		];
 
-	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$master_item[] = (new CButton('button', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			json_encode([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'srcfld2' => 'name',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'master_itemid',
-				'dstfld2' => 'master_itemname',
-				'only_hostid' => $data['hostid'],
-				'with_webitems' => 1,
-				'normal_only' => 1
-			]).', null, this);'
-		);
+		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$master_item[] = (new CButton('button', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->removeId()
+			->onClick('return PopUp("popup.generic",'.
+				json_encode([
+					'srctbl' => 'items',
+					'srcfld1' => 'itemid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'master_itemid',
+					'dstfld2' => 'master_itemname',
+					'only_hostid' => $data['hostid'],
+					'with_webitems' => 1,
+					'normal_only' => 1
+				]).', null, this);'
+			);
 
-	if ($data['prototype']) {
 		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$master_item[] = (new CButton('button', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
+			->removeId()
 			->onClick('return PopUp("popup.generic",'.
 				json_encode([
 					'srctbl' => 'item_prototypes',
