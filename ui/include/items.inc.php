@@ -1257,7 +1257,8 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	foreach ($interfaces as $interface) {
 		$ip_or_dns = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 
-		if ($interface['useip'] == INTERFACE_USE_IP && filter_var($interface['ip'], FILTER_FLAG_IPV6) !== false) {
+		if ($interface['useip'] == INTERFACE_USE_IP
+				&& filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
 			$ip_or_dns = '['.$ip_or_dns.']';
 		}
 

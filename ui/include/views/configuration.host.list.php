@@ -221,7 +221,8 @@ foreach ($data['hosts'] as $host) {
 	if ($interface !== null) {
 		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 
-		if ($interface['useip'] == INTERFACE_USE_IP && filter_var($interface['ip'], FILTER_FLAG_IPV6) !== false) {
+		if ($interface['useip'] == INTERFACE_USE_IP
+				&& filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
 			$host_interface = '['.$host_interface.']';
 		}
 	}
