@@ -1224,7 +1224,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	foreach ($data as &$items_of_same_name) {
 		$items_of_same_name = array_map(function($column_items) use (&$itemids, $data_display_limit) {
 			$column_items = array_slice($column_items, 0, $data_display_limit, true);
-			$itemids = array_merge($itemids, array_column($column_items, 'itemid'));
+			$itemids += array_column($column_items, 'itemid', 'itemid');
 			return $column_items;
 		}, $items_of_same_name);
 	}
@@ -1232,7 +1232,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 
 	$has_hidden_items = (count($db_items) != count($itemids));
 
-	$db_items = array_intersect_key($db_items, array_flip($itemids));
+	$db_items = array_intersect_key($db_items, $itemids);
 	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
 
 	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
