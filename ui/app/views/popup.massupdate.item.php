@@ -316,27 +316,26 @@ $item_form_list
 			->setId('trends_div')
 	);
 
-// Append status to form list.
-$status_combo_box = new CComboBox('status', ITEM_STATUS_ACTIVE);
-foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
-	$status_combo_box->addItem($status, item_status2str($status));
-}
-
 $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[status]', 'status', _('Original')))
 			->setLabel($data['prototype'] ? _('Create enabled') : _('Status')),
-		$status_combo_box
+		(new CRadioButtonList('status', ITEM_STATUS_ACTIVE))
+			->addValue($data['prototype'] ? _('Yes'): item_status2str(ITEM_STATUS_ACTIVE), ITEM_STATUS_ACTIVE)
+			->addValue($data['prototype'] ? _('No'): item_status2str(ITEM_STATUS_DISABLED), ITEM_STATUS_DISABLED)
+			->setModern(true)
 	);
 
 	if ($data['prototype']) {
-		$item_form_list	->addRow(
-			(new CVisibilityBox('visible[discover]', 'discover', _('Original')))->setLabel(_('Discover')),
-			(new CRadioButtonList('discover', ZBX_PROTOTYPE_DISCOVER))
-				->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
-				->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
-				->setModern(true)
-		);
+		$item_form_list
+			->addRow(
+				(new CVisibilityBox('visible[discover]', 'discover', _('Original')))
+					->setLabel(_('Discover')),
+				(new CRadioButtonList('discover', ZBX_PROTOTYPE_DISCOVER))
+					->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+					->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+					->setModern(true)
+			);
 	}
 
 	// Append logtime to form list.
@@ -364,7 +363,10 @@ $item_form_list
 	)
 	->addRow(
 		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))->setLabel(_('Enable trapping')),
-		new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON)
+		(new CRadioButtonList('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF))
+			->addValue(_('Yes'), HTTPCHECK_ALLOW_TRAPS_ON)
+			->addValue(_('No'), HTTPCHECK_ALLOW_TRAPS_OFF)
+			->setModern(true)
 	)
 	->addRow(
 		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))->setLabel(_('Allowed hosts')),
