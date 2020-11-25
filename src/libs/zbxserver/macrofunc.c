@@ -138,7 +138,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 			else if ('+' == *p || '-' == *p)
 			{
 				int	num;
-				char	op, *error;
+				char	op, *error = NULL;
 
 				op = *(p++);
 
