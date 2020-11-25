@@ -157,7 +157,7 @@ static int	DBpatch_5030000(void)
 		zbx_free(subsect);
 		zbx_free(field);
 
-		if (ZBX_DB_OK > DBexecute("delete from profiles where profileid=%lu", profile.id))
+		if (ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64 "", profile.id))
 			return FAIL;
 	}
 
