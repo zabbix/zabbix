@@ -743,7 +743,11 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_restoreServerConfig() {
 		// Open the last section of the setup form
-		$this->openSpecifiedSection('Install');
+		$this->openSpecifiedSection('Zabbix server details');
+		// Restore Zabbix server name field value
+		$form = $this->query('xpath://form')->asForm()->one();
+		$form->getField('Name')->fill('TEST_SERVER_NAME');
+		$this->clickSectionButton('Next step', 2);
 		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place
 		sleep(3);
 		$this->clickSectionButton('Finish');
