@@ -80,7 +80,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Group to check triggers filtering' => [
-							'Average' => '1',
+							'Average' => '1'
 						],
 						'Host group for tag permissions' => [
 							'Not classified' => '2'
@@ -1017,7 +1017,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					],
 					'expected' => [
 						'Average' => '1',
-						'Warning' => '1',
+						'Warning' => '1'
 					]
 				]
 			],

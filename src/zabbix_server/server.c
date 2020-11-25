@@ -73,6 +73,7 @@
 #include "export.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
+#include "zbxtrends.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -219,6 +220,7 @@ zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE		= ZBX_GIBIBYTE;
@@ -568,6 +570,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_TREND_FUNC_CACHE_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"TrendFunctionCacheSize\" configuration parameter must be either 0"
+				" or greater than 128KB");
+		err = 1;
+	}
+
 	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
@@ -691,6 +700,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"TrendFunctionCacheSize",	&CONFIG_TREND_FUNC_CACHE_SIZE,		TYPE_UINT64,
+			PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&CONFIG_VALUE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
@@ -1142,6 +1153,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_history_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_tfc_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

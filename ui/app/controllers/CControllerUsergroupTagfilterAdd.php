@@ -81,7 +81,7 @@ class CControllerUsergroupTagfilterAdd extends CController {
 			$tag_filters[] = [
 				'groupid' => $groupid,
 				'tag' => $new_tag_filter['tag'],
-				'value' => $new_tag_filter['value'],
+				'value' => $new_tag_filter['value']
 			];
 		}
 

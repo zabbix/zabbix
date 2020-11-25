@@ -68,7 +68,7 @@ $fields = [
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'finish' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'next' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
-	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null]
 ];
 
 CSessionHelper::set('check_fields_result', check_fields($fields, false));

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:14Z'
+  date: '2020-10-27T08:54:47Z'
   groups:
     -
       name: Templates/Applications
@@ -515,6 +515,26 @@ zabbix_export:
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
         -
+          name: 'Zabbix trend function cache, % unique requests'
+          type: INTERNAL
+          key: 'zabbix[tcache,cache,pitems]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+        -
+          name: 'Zabbix trend function cache, % misses'
+          type: INTERNAL
+          key: 'zabbix[tcache,cache,pmisses]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+        -
           name: 'Zabbix value cache, % used'
           type: INTERNAL
           key: 'zabbix[vcache,buffer,pused]'
@@ -839,6 +859,21 @@ zabbix_export:
                     name: 'Zabbix internal queues'
                     host: 'Zabbix Server'
   graphs:
+    -
+      name: 'Trend function cache effectiveness'
+      graph_items:
+        -
+          sortorder: '1'
+          color: C80000
+          item:
+            host: 'Zabbix Server'
+            key: 'zabbix[tcache,cache,pmisses]'
+        -
+          sortorder: '2'
+          color: 00C800
+          item:
+            host: 'Zabbix Server'
+            key: 'zabbix[tcache,cache,pitems]'
     -
       name: 'Value cache effectiveness'
       type: STACKED

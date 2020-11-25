@@ -41,7 +41,9 @@ $widget->setTitleSubmenu([
 $content_control->addItem(
 	(new CButton('form', _('Import')))
 		->setEnabled($data['allowed_edit'])
-		->onClick('redirect("screen.import.php?rules_preset=screen")')
+		->onClick('return PopUp("popup.import", jQuery.extend('.
+			json_encode(['rules_preset' => 'screen']).', null), null, this);'
+		)
 		->removeId()
 );
 

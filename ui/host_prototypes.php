@@ -388,7 +388,7 @@ if (hasRequest('form')) {
 			'macros' => $macros,
 			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces')),
 			'interfaces' => getRequest('interfaces', []),
-			'main_interfaces' => getRequest('mainInterfaces', []),
+			'main_interfaces' => getRequest('mainInterfaces', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),

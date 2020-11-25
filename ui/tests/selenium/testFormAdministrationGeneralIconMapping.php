@@ -177,7 +177,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'name' => 'LongNameqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwerr',
 					'mappings' => [
 						['expression' => 'Create with long name']
-					],
+					]
 				]
 			],
 			[
@@ -447,7 +447,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'mappings' => [
 						['expression' => '/!@#$%^&*()123updated', 'action' => 'update']
 					],
-					'check_db' => true,
+					'check_db' => true
 				]
 			],
 			[
@@ -636,7 +636,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['action' => 'remove'],
 						['action' => 'remove'],
 						['action' => 'remove'],
-						['action' => 'remove'],
+						['action' => 'remove']
 					],
 					'error' => 'Invalid parameter "/1": the parameter "mappings" is missing.'
 				]
@@ -646,7 +646,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				[
 					'new_name' => 'CLONE: change first expression name as the second expression name',
 					'mappings' => [
-						['expression' => 'expression 2 for clone', 'action' => 'update'],
+						['expression' => 'expression 2 for clone', 'action' => 'update']
 					],
 					'error' => 'Invalid parameter "/1/mappings/2": value (inventory_link, expression)=(1, expression 2 for clone) already exists.'
 				]

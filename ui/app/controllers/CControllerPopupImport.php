@@ -1,0 +1,205 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CControllerPopupImport extends CController {
+
+	protected function checkInput() {
+		$fields = [
+			'import' => 'in 1',
+			'rules_preset' => 'in host,template,mediatype,valuemap,screen,map',
+			'rules' => 'array'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$output = [];
+			if (($messages = getMessages()) !== null) {
+				$output['errors'] = $messages->toString();
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions() {
+		$user_type = $this->getUserType();
+
+		switch ($this->getInput('rules_preset', '')) {
+			case 'map' :
+				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
+
+			case 'screen':
+				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
+			case 'host':
+			case 'template':
+			case 'mediatype':
+			case 'valuemap':
+				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
+
+			default:
+				return false;
+		}
+	}
+
+	protected function doAction() {
+		$rules = [
+			'groups' => ['createMissing' => false],
+			'hosts' => ['updateExisting' => false, 'createMissing' => false],
+			'templates' => ['updateExisting' => false, 'createMissing' => false],
+			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
+			'applications' => ['createMissing' => false, 'deleteMissing' => false],
+			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'screens' => ['updateExisting' => false, 'createMissing' => false],
+			'maps' => ['updateExisting' => false, 'createMissing' => false],
+			'images' => ['updateExisting' => false, 'createMissing' => false],
+			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
+		];
+
+		// Adjust defaults for given rule preset, if specified.
+		switch ($this->getInput('rules_preset')) {
+			case 'host':
+				$rules['groups'] = ['createMissing' => true];
+				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
+				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
+					'deleteMissing' => false
+				];
+				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
+				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				break;
+
+			case 'template':
+				$rules['groups'] = ['createMissing' => true];
+				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
+					'deleteMissing' => false
+				];
+				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
+				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
+					'deleteMissing' => false
+				];
+				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
+				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				break;
+
+			case 'mediatype':
+				$rules['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
+				break;
+
+			case 'valuemap':
+				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				break;
+
+			case 'map':
+				$rules['maps'] = [
+					'updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
+				];
+				$rules['images'] = ['updateExisting' => false, 'createMissing' => true];
+				break;
+
+			case 'screen':
+				$rules['screens'] = [
+					'updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
+					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+				];
+				break;
+		}
+
+		if ($this->hasInput('import')) {
+			$request_rules = array_intersect_key($this->getInput('rules', []), $rules);
+			$request_rules += array_fill_keys(array_keys($rules), []);
+			$options = array_fill_keys(['updateExisting', 'createMissing', 'deleteMissing'], false);
+
+			foreach ($request_rules as $rule_name => &$rule) {
+				$rule = array_map('boolval', array_intersect_key($rule + $options, $rules[$rule_name]));
+			}
+			unset($rule);
+
+			$result = false;
+
+			if (!isset($_FILES['import_file'])) {
+				error(_('No file was uploaded.'));
+			} else {
+				// CUploadFile throws exceptions, so we need to catch them
+				try {
+					$file = new CUploadFile($_FILES['import_file']);
+
+					$result = API::Configuration()->import([
+						'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
+						'source' => $file->getContent(),
+						'rules' => $request_rules
+					]);
+				}
+				catch (Exception $e) {
+					error($e->getMessage());
+				}
+			}
+
+			$output = [];
+
+			if ($result) {
+				$output = ['message' => _('Imported successfully')];
+			}
+			else {
+				if (($messages = getMessages()) !== null) {
+					$output['errors'] = $messages->toString();
+				}
+			}
+
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+			);
+		}
+		else {
+			$this->setResponse(new CControllerResponseData([
+				'title' => _('Import'),
+				'rules' => $rules,
+				'rules_preset' => $this->getInput('rules_preset'),
+				'allowed_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
+				'allowed_edit_screens' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS),
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			]));
+		}
+	}
+}
