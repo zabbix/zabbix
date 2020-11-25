@@ -80,7 +80,7 @@ static void	DBpatch_5030000_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *pr
 
 static int	DBpatch_5030000(void)
 {
-	int	i;
+	int	i, ret = SUCCEED;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -99,7 +99,7 @@ static int	DBpatch_5030000(void)
 		"web.httpconf.php.sortorder"
 	};
 
-	for (i = 0; i < (int)ARRSIZE(keys); i++)
+	for (i = 0; SUCCEED == ret && i < (int)ARRSIZE(keys); i++)
 	{
 		DB_ROW			row;
 		DB_RESULT		result;
@@ -110,9 +110,7 @@ static int	DBpatch_5030000(void)
 		result = DBselect("SELECT profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
 				" FROM profiles where idx='%s'", keys[i]);
 
-		row = DBfetch(result);
-
-		if (NULL == row)
+		if (NULL == (row = DBfetch(result)))
 		{
 			DBfree_result(result);
 			continue;
@@ -125,30 +123,33 @@ static int	DBpatch_5030000(void)
 		if (NULL == subsect || NULL == field)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Failed to parse profile key fields for key '%s'", keys[i]);
-			zbx_free(profile.idx);
-			zbx_free(profile.value_str);
-			zbx_free(profile.source);
-			return FAIL;
+			ret = FAIL;
 		}
 
-		if (ZBX_DB_OK > DBexecute("insert into profiles "
+		if (SUCCEED == ret && ZBX_DB_OK > DBexecute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
 				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.hosts.%s.php.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
 				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 		{
-			return FAIL;
+			ret = FAIL;
 		}
 
-		if (ZBX_DB_OK > DBexecute("insert into profiles "
+		if (SUCCEED == ret && ZBX_DB_OK > DBexecute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
 				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.templates.%s.php.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
 				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 		{
-			return FAIL;
+			ret = FAIL;
+		}
+
+		if (SUCCEED == ret &&
+				ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64, profile.id))
+		{
+			ret = FAIL;
 		}
 
 		zbx_free(profile.idx);
@@ -156,12 +157,9 @@ static int	DBpatch_5030000(void)
 		zbx_free(profile.source);
 		zbx_free(subsect);
 		zbx_free(field);
-
-		if (ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64 "", profile.id))
-			return FAIL;
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_5030001(void)
