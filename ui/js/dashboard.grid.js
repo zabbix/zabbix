@@ -2872,7 +2872,7 @@
 			.on('mouseenter mousemove', function(event) {
 				var $target = $(event.target);
 
-				if (data['pos-action'] !== '' && data['pos-action'] !== 'add' && data['pos-action'] !== 'addmodal') {
+				if (data['pos-action'] !== '' && data['pos-action'] !== 'add') {
 					return;
 				}
 
@@ -3883,6 +3883,8 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['pos-action'] = 'paste';
+
 				hideMessageExhausted(data);
 
 				var new_widget = data.storage.readKey('dashboard.copied_widget');
@@ -3985,6 +3987,7 @@
 					.always(function() {
 						// Mark dashboard as updated.
 						data['options']['updated'] = true;
+						data['pos-action'] = '';
 
 						clearDashboardBusy(data, 'pasteWidget', dashboard_busy_item);
 					});
