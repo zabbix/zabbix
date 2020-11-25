@@ -1196,30 +1196,14 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	// Unset exceeded items.
-	$items_left = ZBX_MAX_TABLE_COLUMNS;
-	foreach ($data as &$items_of_same_name) {
-		$items_of_same_name_cnt = count($items_of_same_name);
-		if ($items_left <= 0) {
-			$items_of_same_name = null;
-		}
-		elseif ($items_left < $items_of_same_name_cnt) {
-			$items_of_same_name = array_slice($items_of_same_name, $items_left);
-		}
-		$items_left -= $items_of_same_name_cnt;
-	}
-	unset($items_of_same_name);
-	$data = array_filter($data);
-
+	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS);
 	$itemids = [];
-	foreach ($data as &$items_of_same_name) {
-		$items_of_same_name = array_map(function($column_items) use (&$itemids) {
-			$column_items = array_slice($column_items, 0, ZBX_MAX_TABLE_COLUMNS, true);
-			$itemids += array_column($column_items, 'itemid', 'itemid');
-			return $column_items;
-		}, $items_of_same_name);
-	}
-	unset($items_of_same_name);
+	array_walk($data, function (array &$item_columns) use (&$itemids) {
+		array_walk($item_columns, function (array &$item_column) use (&$itemids) {
+			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS);
+			$itemids += array_column($item_column, 'itemid', 'itemid');
+		});
+	});
 
 	$has_hidden_items = (count($db_items) != count($itemids));
 
