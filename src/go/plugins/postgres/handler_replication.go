@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/jackc/pgx/v4"
@@ -58,6 +59,7 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 		if err != nil {
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
+
 		if inRecovery {
 			row, err = conn.QueryRow(ctx, `SELECT COUNT(*) FROM pg_stat_wal_receiver`)
 			if err != nil {
@@ -66,14 +68,16 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 
 			err = row.Scan(&status)
 			if err != nil {
-				if err == pgx.ErrNoRows {
+				if errors.Is(err, pgx.ErrNoRows) {
 					return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 				}
+
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 		} else {
 			status = 2
 		}
+
 		return strconv.Itoa(status), nil
 
 	case keyPostgresReplicationLagSec:
@@ -90,29 +94,34 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 
 		err = row.Scan(&inRecovery)
 		if err != nil {
-			if err == pgx.ErrNoRows {
+			if errors.Is(err, pgx.ErrNoRows) {
 				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
+
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
+
 		if inRecovery {
 			query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
 						   FROM pg_stat_wal_receiver;`
 			row, err = conn.QueryRow(ctx, query)
+
 			if err != nil {
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 
 			err = row.Scan(&replicationResult)
 			if err != nil {
-				if err == pgx.ErrNoRows {
+				if errors.Is(err, pgx.ErrNoRows) {
 					return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 				}
+
 				return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 			}
 		} else {
 			replicationResult = 0
 		}
+
 		return replicationResult, nil
 
 	case keyPostgresReplicationRecoveryRole:
@@ -131,31 +140,37 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 						FROM pg_stat_replication
 					) T`
 		row, err = conn.QueryRow(ctx, query)
+
 		if err != nil {
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 		err = row.Scan(&stringResult)
 		if err != nil {
-			if err == pgx.ErrNoRows {
+			if errors.Is(err, pgx.ErrNoRows) {
 				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
+
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
+
 		return stringResult, nil
 	}
+
 	row, err = conn.QueryRow(ctx, query)
+
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&replicationResult)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	return replicationResult, nil
 
+	return replicationResult, nil
 }

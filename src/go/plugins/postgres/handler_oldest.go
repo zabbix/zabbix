@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -48,10 +49,12 @@ func (p *Plugin) oldestHandler(ctx context.Context, conn PostgresClient, key str
 
 	err = row.Scan(&resultXID)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
 	return resultXID, nil
 }

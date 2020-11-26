@@ -27,12 +27,7 @@ import (
 
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/plugin"
-)
-
-var (
-	opts     PluginOptions
-	err      error
-	database string
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -63,7 +58,8 @@ func (p *Plugin) Start() {
 		// create empty storage if error occurred
 		queryStorage = yarn.NewFromMap(map[string]string{})
 	}
-	p.connMgr = p.NewConnManager(
+
+	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.ConnectTimeout)*time.Second,
 		time.Duration(p.options.CallTimeout)*time.Second,
@@ -80,8 +76,13 @@ func (p *Plugin) Stop() {
 
 // whereToConnect builds a session based on key's parameters and a configuration file.
 func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (u *URI, err error) {
-	var uri string
+	var (
+		database string
+		uri      string
+	)
+
 	user := ""
+
 	if len(params) > 1 {
 		user = params[1]
 	}
@@ -91,7 +92,7 @@ func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (u *UR
 		password = params[2]
 	}
 
-	database := defaultPluginOptions.Database
+	database = defaultPluginOptions.Database
 	if len(params) > 3 {
 		database = params[3]
 	}
@@ -103,7 +104,7 @@ func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (u *UR
 			uri = params[0]
 		} else {
 			if _, ok := defaultPluginOptions.Sessions[params[0]]; !ok {
-				return nil, errorUnknownSession
+				return nil, zbxerr.ErrorUnknownSession
 			}
 
 			// Use a pre-defined session
@@ -135,6 +136,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 
 	// get connection string for PostgreSQL
 	connString := u.URI()
+
 	switch key {
 	case keyPostgresDiscoveryDatabases:
 		handler = p.databasesDiscoveryHandler // postgres.databasesdiscovery[[connString][,section]]
@@ -194,11 +196,11 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		handler = p.oldestHandler // postgres.oldestXid[[connString]
 
 	default:
-		return nil, errorUnsupportedMetric
+		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
 	if len(params) > commonParamsNum && key != keyPostgresCustom {
-		return nil, errorTooManyParameters
+		return nil, errors.New("too many parameters")
 	}
 
 	conn, err := p.connMgr.GetPostgresConnection(connString)
@@ -207,9 +209,11 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		if key == keyPostgresPing {
 			return postgresPingFailed, nil
 		}
-		p.Errf("connection error: %s", err)
+
+		p.Errf("connection error: %s", err.Error())
 		p.Debugf("parameters: %+v", params)
-		return nil, errors.New(formatZabbixError(err.Error()))
+
+		return nil, err
 	}
 
 	ctx, cancel := context.WithTimeout(conn.ctx, time.Duration(p.options.CallTimeout)*time.Second)
@@ -222,6 +226,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 	} else {
 		handlerParams = make([]string, 0)
 	}
+
 	return handler(ctx, conn, key, handlerParams)
 }
 
@@ -252,5 +257,4 @@ func init() {
 		keyPostgresAutovacuum, "Returns count of autovacuum workers.",
 		keyPostgresReplicationMasterDiscoveryApplicationName, "Returns JSON discovery with application name from pg_stat_replication.",
 	)
-	/* registerConnectionsMertics() */
 }

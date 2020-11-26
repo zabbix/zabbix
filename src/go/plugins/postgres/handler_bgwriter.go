@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -30,7 +31,8 @@ const (
 	keyPostgresBgwriter = "pgsql.bgwriter"
 )
 
-// bgwriterHandler executes select  with statistics from pg_stat_bgwriter and returns JSON if all is OK or nil otherwise.
+// bgwriterHandler executes select  with statistics from pg_stat_bgwriter
+// and returns JSON if all is OK or nil otherwise.
 func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
 	var (
 		bgwriterJSON string
@@ -62,9 +64,10 @@ func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key s
 
 	err = row.Scan(&bgwriterJSON)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

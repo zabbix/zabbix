@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
@@ -28,11 +29,13 @@ import (
 )
 
 const (
-	keyPostgresStatSum = "pgsql.dbstat.sum"
-	keyPostgresStat    = "pgsql.dbstat"
+	PGVersionWithChecksum = 120000
+	keyPostgresStatSum    = "pgsql.dbstat.sum"
+	keyPostgresStat       = "pgsql.dbstat"
 )
 
-// dbStatHandler executes select from pg_catalog.pg_stat_database command for each database and returns JSON if all is OK or nil otherwise.
+// dbStatHandler executes select from pg_catalog.pg_stat_database
+// command for each database and returns JSON if all is OK or nil otherwise.
 func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
 	var (
 		statJSON, query string
@@ -65,7 +68,7 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
       , sum(blk_write_time) as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.PostgresVersion() >= 120000 {
+		if conn.PostgresVersion() >= PGVersionWithChecksum {
 			query = fmt.Sprintf(query, "sum(COALESCE(checksum_failures, 0))")
 		} else {
 			query = fmt.Sprintf(query, "null")
@@ -96,7 +99,7 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
       , blk_write_time as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.PostgresVersion() >= 120000 {
+		if conn.PostgresVersion() >= PGVersionWithChecksum {
 			query = fmt.Sprintf(query, "COALESCE(checksum_failures, 0)")
 		} else {
 			query = fmt.Sprintf(query, "null")
@@ -110,9 +113,10 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
 
 	err = row.Scan(&statJSON)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

@@ -32,7 +32,10 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/zbxerr"
 )
+
+const MinSupportedPGVersion = 100000
 
 var errorQueryNotFound = "query %q not found"
 
@@ -44,7 +47,7 @@ type PostgresClient interface {
 	QueryByName(ctx context.Context, queryName string, args ...interface{}) (row pgx.Rows, err error)
 }
 
-// PostgresConn holds pointer to the Pool of Postgres Instance
+// PostgresConn holds pointer to the Pool of Postgres Instance.
 type PostgresConn struct {
 	sync.Mutex
 	postgresPool   *pgxpool.Pool
@@ -74,7 +77,6 @@ func (conn *PostgresConn) QueryRow(ctx context.Context, query string, args ...in
 
 // QueryRowByName executes a query from queryStorage by its name and returns a singe row.
 func (conn *PostgresConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row pgx.Row, err error) {
-
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
@@ -91,14 +93,15 @@ func (conn *PostgresConn) Query(ctx context.Context, query string, args ...inter
 	if ctxErr := ctx.Err(); ctxErr != nil {
 		return rows, ctxErr
 	}
+
 	return
 }
 
 // QueryByName executes a query from queryStorage by its name and returns a singe row.
 func (conn *PostgresConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows pgx.Rows, err error) {
-
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
+
 		return conn.Query(ctx, normalizedSQL, args...)
 	}
 
@@ -113,6 +116,7 @@ func (conn *PostgresConn) updateAccessTime() {
 func (conn *PostgresConn) finalize() (err error) {
 	conn.Lock()
 	defer conn.Unlock()
+
 	if conn.postgresPool != nil {
 		return
 	}
@@ -126,8 +130,11 @@ func (conn *PostgresConn) finalize() (err error) {
 	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		d := net.Dialer{}
 		newCtx, cancel := context.WithTimeout(context.Background(), conn.timeout)
+
 		defer cancel()
+
 		conn, err := d.DialContext(newCtx, network, addr)
+
 		return conn, err
 	}
 
@@ -152,19 +159,21 @@ func (conn *PostgresConn) finalize() (err error) {
 		return fmt.Errorf("invalid Postgres version: %s", err)
 	}
 
-	if version < 100000 {
-		return fmt.Errorf("Postgres version %s is not supported", versionPG)
+	if version < MinSupportedPGVersion {
+		return fmt.Errorf("postgres version %s is not supported", versionPG)
 	}
 
 	conn.version = version
 	conn.postgresPool = newConn
 	conn.ctx = context.Background()
-	return
+
+	return nil
 }
 
 func (conn *PostgresConn) close() {
 	conn.Lock()
 	defer conn.Unlock()
+
 	if conn.postgresPool != nil {
 		conn.postgresPool.Close()
 		conn.postgresPool = nil
@@ -181,11 +190,10 @@ type ConnManager struct {
 	callTimeout    time.Duration
 	Destroy        context.CancelFunc
 	queryStorage   yarn.Yarn
-	log            log.Logger
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func (p *Plugin) NewConnManager(keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
+func NewConnManager(keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
@@ -195,11 +203,11 @@ func (p *Plugin) NewConnManager(keepAlive, connectTimeout, callTimeout, hkInterv
 		callTimeout:    callTimeout,
 		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
 		queryStorage:   queryStorage,
-		log:            p,
 	}
 
 	// Repeatedly check for unused connections and close them
 	go connMgr.housekeeper(ctx, hkInterval)
+
 	return connMgr
 }
 
@@ -235,17 +243,21 @@ func (c *ConnManager) get(connString string) *PostgresConn {
 	c.Lock()
 	defer c.Unlock()
 	conn, ok := c.connections[connString]
+
 	if !ok {
 		conn = &PostgresConn{connString: connString, timeout: c.connectTimeout, queryStorage: &c.queryStorage}
 		c.connections[connString] = conn
-		c.log.Debugf("created new connection %s", connString)
+
+		log.Debugf("[%s] Created new connection %s", pluginName, connString)
 	}
+
 	conn.updateAccessTime()
+
 	return conn
 }
 
 // closeUnused closes each connection that has not been accessed within at least the keepalive interval.
-func (c *ConnManager) closeUnused() (err error) {
+func (c *ConnManager) closeUnused() {
 	c.Lock()
 	defer c.Unlock()
 
@@ -253,11 +265,9 @@ func (c *ConnManager) closeUnused() (err error) {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.close()
 			delete(c.connections, connString)
-			c.log.Debugf("closed unused connection: %s", connString)
+			log.Debugf("%s] Closed unused connection: %s", pluginName, connString)
 		}
 	}
-	// Return the last error only
-	return
 }
 
 // GetPostgresConnection returns the existed connection or creates a new one.
@@ -267,17 +277,20 @@ func (c *ConnManager) GetPostgresConnection(connString string) (conn *PostgresCo
 		c.Lock()
 		defer c.Unlock()
 		delete(c.connections, connString)
-		c.log.Debugf("removed failed connection %s: %s", connString, err)
-		return nil, fmt.Errorf("Cannot establish connection to Postgres server: %s", err)
+		log.Debugf("[%s] Removed failed connection %s: %s", pluginName, connString, err)
+
+		return nil, zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
+
 	return
 }
 
-// GetPostgresVersion exec query to get PG version from PG we conected to
+// GetPostgresVersion exec query to get PG version from PG we connected to.
 func GetPostgresVersion(conn *pgxpool.Pool) (versionPG string, err error) {
 	err = conn.QueryRow(context.Background(), "select current_setting('server_version_num');").Scan(&versionPG)
 	if err != nil {
 		return versionPG, err
 	}
+
 	return
 }

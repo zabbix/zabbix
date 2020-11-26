@@ -41,20 +41,27 @@ func getConnPool(t testing.TB) (*PostgresConn, error) {
 func сreateConnection() error {
 	connString := "postgresql://postgres:postgres@localhost:5432/postgres"
 	newConn, err := pgxpool.Connect(context.Background(), connString)
+
 	if err != nil {
 		log.Critf("[сreateConnection] cannot create connection to Postgres: %s", err.Error())
 		return err
 	}
+
 	versionPG, err := GetPostgresVersion(newConn)
+
 	if err != nil {
 		log.Critf("[сreateConnection] cannot get Postgres version: %s", err.Error())
 		return err
 	}
+
 	version, err := strconv.Atoi(versionPG)
+
 	if err != nil {
 		log.Critf("[сreateConnection] invalid Postgres version: %s", err.Error())
 		return err
 	}
+
 	sharedConn = &PostgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
+
 	return nil
 }

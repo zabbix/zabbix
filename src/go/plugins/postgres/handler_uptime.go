@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -30,7 +31,8 @@ const (
 	keyPostgresUptime = "pgsql.uptime"
 )
 
-// uptimeHandler finds difference btw current time and postmaster start time and returns int64 if all is OK or nil otherwise.
+// uptimeHandler finds difference btw current time and
+// postmaster start time and returns int64 if all is OK or nil otherwise.
 func (p *Plugin) uptimeHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
 	var (
 		uptime float64
@@ -40,14 +42,18 @@ func (p *Plugin) uptimeHandler(ctx context.Context, conn PostgresClient, key str
 
 	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
 	row, err = conn.QueryRow(ctx, query)
+
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
 	err = row.Scan(&uptime)
+
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

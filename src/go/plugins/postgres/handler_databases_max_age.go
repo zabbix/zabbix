@@ -41,10 +41,11 @@ func (p *Plugin) databasesAgeHandler(ctx context.Context, conn PostgresClient, k
 
 	// for now we are expecting only database name as a param
 	if len(params) == 0 {
-		return nil, errors.New("The key requires database name as fourth parameter")
+		return nil, errors.New("the key requires database name as fourth parameter")
 	}
+
 	if len(params[0]) == 0 {
-		return nil, errors.New("Expected database name as fourth parameter for the key, got empty string")
+		return nil, errors.New("expected database name as fourth parameter for the key, got empty string")
 	}
 
 	query := `SELECT age(datfrozenxid)
@@ -52,16 +53,19 @@ func (p *Plugin) databasesAgeHandler(ctx context.Context, conn PostgresClient, k
    		WHERE datistemplate = false
 			 AND datname = $1;`
 	row, err = conn.QueryRow(ctx, query, params[0])
+
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&countAge)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
 	return countAge, nil
 }

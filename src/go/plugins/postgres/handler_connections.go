@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -37,6 +38,7 @@ func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, ke
 		err             error
 		row             pgx.Row
 	)
+
 	query := `SELECT row_to_json(T)
 	FROM (
 		SELECT
@@ -59,7 +61,7 @@ func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, ke
 
 	err = row.Scan(&connectionsJSON)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
 

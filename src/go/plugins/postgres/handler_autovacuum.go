@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -37,6 +38,7 @@ func (p *Plugin) autovacuumHandler(ctx context.Context, conn PostgresClient, key
 		err                    error
 		row                    pgx.Row
 	)
+
 	query := `SELECT count(*)
 				FROM pg_catalog.pg_stat_activity
 			   WHERE query like '%%autovacuum%%'
@@ -50,9 +52,10 @@ func (p *Plugin) autovacuumHandler(ctx context.Context, conn PostgresClient, key
 
 	err = row.Scan(&countAutovacuumWorkers)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -37,6 +38,7 @@ func (p *Plugin) cacheHandler(ctx context.Context, conn PostgresClient, key stri
 		err   error
 		row   pgx.Row
 	)
+
 	query := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM pg_catalog.pg_stat_database;`
 
 	row, err = conn.QueryRow(ctx, query)
@@ -46,9 +48,10 @@ func (p *Plugin) cacheHandler(ctx context.Context, conn PostgresClient, key stri
 
 	err = row.Scan(&cache)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

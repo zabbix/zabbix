@@ -26,7 +26,7 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
-// Session struct holds individual options for postgres connection for each session
+// Session struct holds individual options for postgres connection for each session.
 type Session struct {
 
 	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
@@ -42,7 +42,7 @@ type Session struct {
 	Password string `conf:"optional"`
 }
 
-// PluginOptions are options for Postgres connection
+// PluginOptions are options for Postgres connection.
 type PluginOptions struct {
 
 	// Database is the default DB name.
@@ -71,7 +71,6 @@ const MaxAuthPassLen = 512
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
@@ -117,24 +116,23 @@ func (p *Plugin) Validate(options interface{}) error {
 			if err != nil {
 				return fmt.Errorf("invalid parameters for session '%s': %s", name, err.Error())
 			}
-			// if session database is empty use global database
+			// if session database is empty use global database.
 			if session.Database == "" {
 				database = opts.Database
 			} else {
 				database = session.Database
 			}
-			// validate Database name
+			// validate Database name.
 			err = validateDatabase(database)
 			if err != nil {
 				return fmt.Errorf("invalid database parameters for session '%s': %s", name, err.Error())
 			}
-			// validate Password length
+			// validate Password length.
 			if len(session.Password) > MaxAuthPassLen {
 				return fmt.Errorf("invalid parameters for session '%s': password cannot be longer than %d characters",
 					name, MaxAuthPassLen)
 			}
 		}
-
 	}
 
 	return err

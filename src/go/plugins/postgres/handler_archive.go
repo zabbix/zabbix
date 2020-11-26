@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -37,6 +38,7 @@ func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key st
 		err                               error
 		row                               pgx.Row
 	)
+
 	queryArchiveCount := `SELECT row_to_json(T)
 							FROM (
 									SELECT archived_count, failed_count
@@ -61,9 +63,10 @@ func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key st
 
 	err = row.Scan(&archiveCountJSON)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
@@ -74,11 +77,14 @@ func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key st
 
 	err = row.Scan(&archiveSizeJSON)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	result := string(archiveCountJSON[:len(archiveCountJSON)-1]) + "," + string(archiveSizeJSON[1:])
+
+	result := archiveCountJSON[:len(archiveCountJSON)-1] + "," + archiveSizeJSON[1:]
+
 	return result, nil
 }

@@ -42,10 +42,11 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 	)
 	// for now we are expecting at least one parameter
 	if len(params) == 0 {
-		return nil, errors.New("The key requires custom query name as fourth parameter")
+		return nil, errors.New("the key requires custom query name as fourth parameter")
 	}
+
 	if len(params[0]) == 0 {
-		return nil, errors.New("Expected custom query name as fourth parameter for the key, got empty string")
+		return nil, errors.New("expected custom query name as fourth parameter for the key, got empty string")
 	}
 
 	queryName := params[0]
@@ -80,9 +81,10 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 	for rows.Next() {
 		err = rows.Scan(valuePointers...)
 		if err != nil {
-			if err == pgx.ErrNoRows {
+			if errors.Is(err, pgx.ErrNoRows) {
 				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
+
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
@@ -95,11 +97,10 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 	}
 	// Any errors encountered by rows.Next or rows.Scan will be returned here
 	if rows.Err() != nil {
-		return nil, errors.New(formatZabbixError(err.Error()))
+		return nil, err
 	}
 
 	res := "[" + strings.Join(data, ",") + "]"
 
 	return res, nil
-
 }

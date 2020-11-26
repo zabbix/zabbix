@@ -96,6 +96,7 @@ FROM
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
 	if len(locksJSON) == 0 {
 		return nil, errors.New("cannot parse data")
 	}

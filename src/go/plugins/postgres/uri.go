@@ -65,15 +65,15 @@ func (u *URI) User() string {
 // postgresql://[user[:password]@][netloc][:port][,...][/dbname][?param1=value1&...]
 // for unix socket host=socket_name as param
 func (u *URI) URI() string {
-
 	if len(u.user) == 0 && len(u.password) == 0 {
 		return "postgresql" + "://" + u.Addr()
 	}
+
 	if u.scheme == "unix" {
-		return "postgresql" + "://" + u.user + ":" + u.password + "@/" + u.database + "?" + "host=" + u.Addr()
-	} else {
-		return "postgresql" + "://" + u.user + ":" + u.password + "@" + u.Addr() + "/" + u.database
+		return "postgresql" + "://" + u.user + ":" + u.password + "@:" + u.port + "/" + u.database + "?" + "host=" + u.Addr()
 	}
+
+	return "postgresql" + "://" + u.user + ":" + u.password + "@" + u.Addr() + "/" + u.database
 }
 
 func newURIWithCreds(uri, user, password, database string) (res *URI, err error) {
@@ -115,10 +115,8 @@ func parseURI(uri string) (res *URI, err error) {
 
 			if len(port) == 0 {
 				port = DefaultPort
-			} else {
-				if _, err := strconv.ParseUint(port, 10, 16); err != nil {
-					return nil, errors.New("port must be integer and must be between 0 and 65535")
-				}
+			} else if _, err := strconv.ParseUint(port, 10, 16); err != nil {
+				return nil, errors.New("port must be integer and must be between 0 and 65535")
 			}
 
 			res.port = port
@@ -128,11 +126,24 @@ func parseURI(uri string) (res *URI, err error) {
 				return nil, errors.New("socket is required")
 			}
 
-			res.socket = u.Path
+			portIndex := strings.LastIndexByte(u.Path, '/')
+
+			if !strings.Contains(u.Path[portIndex+1:], ".s.PGSQL.") {
+				return nil, errors.New("wrong socket path")
+			}
+
+			port := u.Path[portIndex+1+len(".s.PGSQL."):]
+			if _, err = strconv.Atoi(port); err != nil {
+				return nil, errors.New("port is required")
+			}
+
+			res.socket = u.Path[:portIndex]
+			res.port = port
 
 		default:
 			return nil, errors.New("the only supported schemes are: tcp and unix")
 		}
+
 		res.scheme = u.Scheme
 	} else {
 		return nil, errors.New("failed to parse connection string")

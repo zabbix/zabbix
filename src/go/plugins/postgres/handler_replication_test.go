@@ -93,7 +93,7 @@ func TestPlugin_replicationHandler(t *testing.T) {
 			}
 			if tt.wantErr == false {
 				if tt.args.key == "pgsql.replication.status" || tt.args.key == "pgsql.replication.master.discovery.application_name" {
-					if len(got.(string)) == 0 && err != errorCannotParseData {
+					if len(got.(string)) == 0 {
 						t.Errorf("Plugin.replicationTransactions() at DeepEqual error = %v, wantErr %v", err, tt.wantErr)
 						return
 					}

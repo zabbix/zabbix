@@ -24,6 +24,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -33,16 +34,18 @@ const (
 	postgresPingOk      = 1
 )
 
-// pingHandler executes 'SELECT 1 as pingOk' commands and returns pingOK if a connection is alive or postgresPingFailed otherwise.
+// pingHandler executes 'SELECT 1 as pingOk' commands and
+// returns pingOK if a connection is alive or postgresPingFailed otherwise.
 func (p *Plugin) pingHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
 	var pingOK int64 = postgresPingUnknown
+
 	var row pgx.Row
 
-	row, _ = conn.QueryRow(ctx, fmt.Sprintf("SELECT %d as pingOk", postgresPingOk))
+	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d as pingOk", postgresPingOk))
 	_ = row.Scan(&pingOK)
+
 	if pingOK != postgresPingOk {
-		p.Errf(string(errorPostgresPing))
-		return postgresPingFailed, nil
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return pingOK, nil

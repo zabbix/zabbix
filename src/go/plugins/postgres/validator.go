@@ -23,16 +23,10 @@ import (
 	"errors"
 )
 
-func validateHost(host string) (err error) {
-	if len(host) == 0 {
-		return errors.New("Hostname cannot be empty")
-	}
-	return
-}
-
 func validateDatabase(database string) (err error) {
 	if len(database) < 1 || len(database) > 63 || database == "" {
 		return errors.New("size name of database must be between 1 and 63 bytes")
 	}
+
 	return
 }

@@ -23,6 +23,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -61,7 +62,7 @@ func TestPlugin_locksHandler(t *testing.T) {
 				t.Errorf("Plugin.locksHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if len(got.(string)) == 0 && err != errorCannotParseData {
+			if len(got.(string)) == 0 && err != errors.New("cannot parse data") {
 				t.Errorf("Plugin.locksHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

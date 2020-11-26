@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
@@ -40,10 +41,11 @@ func (p *Plugin) databasesSizeHandler(ctx context.Context, conn PostgresClient, 
 
 	// for now we are expecting only database name as a param
 	if len(params) == 0 {
-		return nil, errorFourthParamEmptyDatabaseName
+		return nil, errors.New("the key requires database name as fourth parameter")
 	}
+
 	if len(params[0]) == 0 {
-		return nil, errorFourthParamLenDatabaseName
+		return nil, errors.New("expected database name as fourth parameter for the key, got empty string")
 	}
 
 	query := `SELECT pg_database_size(datname::text)
@@ -58,10 +60,12 @@ func (p *Plugin) databasesSizeHandler(ctx context.Context, conn PostgresClient, 
 
 	err = row.Scan(&countSize)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
 	return countSize, nil
 }
