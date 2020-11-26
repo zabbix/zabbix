@@ -316,33 +316,31 @@ $item_form_list
 			->setId('trends_div')
 	);
 
-$item_form_list
-	->addRow(
-		(new CVisibilityBox('visible[status]', 'status', _('Original')))
-			->setLabel($data['prototype'] ? _('Create enabled') : _('Status')),
-		(new CRadioButtonList('status', ITEM_STATUS_ACTIVE))
-			->addValue($data['prototype'] ? _('Yes'): item_status2str(ITEM_STATUS_ACTIVE), ITEM_STATUS_ACTIVE)
-			->addValue($data['prototype'] ? _('No'): item_status2str(ITEM_STATUS_DISABLED), ITEM_STATUS_DISABLED)
+// Append status to form list.
+$item_form_list->addRow(
+	(new CVisibilityBox('visible[status]', 'status', _('Original')))
+		->setLabel($data['prototype'] ? _('Create enabled') : _('Status')),
+	(new CRadioButtonList('status', ITEM_STATUS_ACTIVE))
+		->addValue($data['prototype'] ? _('Yes') : item_status2str(ITEM_STATUS_ACTIVE), ITEM_STATUS_ACTIVE)
+		->addValue($data['prototype'] ? _('No') : item_status2str(ITEM_STATUS_DISABLED), ITEM_STATUS_DISABLED)
+		->setModern(true)
+);
+
+if ($data['prototype']) {
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[discover]', 'discover', _('Original')))->setLabel(_('Discover')),
+		(new CRadioButtonList('discover', ZBX_PROTOTYPE_DISCOVER))
+			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
 			->setModern(true)
 	);
+}
 
-	if ($data['prototype']) {
-		$item_form_list
-			->addRow(
-				(new CVisibilityBox('visible[discover]', 'discover', _('Original')))
-					->setLabel(_('Discover')),
-				(new CRadioButtonList('discover', ZBX_PROTOTYPE_DISCOVER))
-					->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
-					->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
-					->setModern(true)
-			);
-	}
-
-	// Append logtime to form list.
-	$item_form_list->addRow(
-		(new CVisibilityBox('visible[logtimefmt]', 'logtimefmt', _('Original')))->setLabel(_('Log time format')),
-		(new CTextBox('logtimefmt', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+// Append logtime to form list.
+$item_form_list->addRow(
+	(new CVisibilityBox('visible[logtimefmt]', 'logtimefmt', _('Original')))->setLabel(_('Log time format')),
+	(new CTextBox('logtimefmt', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // Append valuemap to form list.
 $valuemaps_combobox = (new CComboBox('valuemapid', 0))->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
