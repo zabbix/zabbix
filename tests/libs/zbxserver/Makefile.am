@@ -2,7 +2,8 @@ if SERVER
 SERVER_tests = \
 	get_trigger_expression_constant \
 	evaluate_function \
-	substitute_lld_macros
+	substitute_lld_macros \
+	macro_fmttime
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -104,6 +105,24 @@ substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@
 
 substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+
+macro_fmttime_SOURCES = \
+	macro_fmttime.c \
+	$(COMMON_SRC_FILES)
+
+macro_fmttime_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+macro_fmttime_LDADD += $(COMMON_LIB_FILES)
+
+macro_fmttime_LDADD += @SERVER_LIBS@
+
+macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@
+
+macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxserver \
+	$(VALUECACHE_WRAP_FUNCS)
 
 evaluate_function_SOURCES = \
 	evaluate_function.c \
