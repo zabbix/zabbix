@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-26T17:34:55Z</date>
+   <date>2020-11-26T18:07:40Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -223,38 +223,38 @@ var asterisk = {
 };
 
 function block2Object(text) {
-    var arr_fields = [],
+    var fields = [],
         dict = {};
 
     text.split('\r\n').forEach(function (line) {
-        arr_fields = line.split(': ');
-        dict[arr_fields[0]] = arr_fields[1];
+        fields = line.split(': ');
+        dict[fields[0]] = fields[1];
     })
 
     return dict;
 }
 
 function text2Object(text) {
-    var arr_blocks = text.split('\r\n\r\n'),
+    var blocks = text.split('\r\n\r\n'),
         arr = [],
         i = 1,
-        j = arr_blocks.length - 2;
+        j = blocks.length - 2;
 
     for (i; i &lt; j; i++) {
-        arr.push(block2Object(arr_blocks[i]));
+        arr.push(block2Object(blocks[i]));
     }
 
     return arr;
 }
 
-function sipPeers() {
+function getSipPeers() {
     var response = Ami.request(url, 'SIPpeers'),
-        arr_elements = text2Object(response.body);
-    asterisk.sip.total = arr_elements.length;
-    asterisk.sip.trunks = arr_elements.filter(function (element) {
+        elements = text2Object(response.body);
+    asterisk.sip.total = elements.length;
+    asterisk.sip.trunks = elements.filter(function (element) {
         return element.ObjectName.search(Ami.params.trunk) != -1;
     });
-    arr_elements.forEach(function (element) {
+    elements.forEach(function (element) {
         if (element.IPaddress === '-none-') {
             switch (element.Status) {
                 case 'Unmonitored':
@@ -265,10 +265,12 @@ function sipPeers() {
                     asterisk.sip.monitored_offline++;
                     break;
             }
-        } else {
+        }
+        else {
             if (element.Status === 'Unmonitored') {
                 asterisk.sip.unmonitored_online++;
-            } else {
+            }
+            else {
                 asterisk.sip.monitored_online++;
                 if (element.Status.search('^OK') != -1) {
                     element.Status = element.Status.split(' ')[0]
@@ -277,19 +279,19 @@ function sipPeers() {
         }
     });
     asterisk.sip.trunks.forEach(function (trunk) {
-        l = channels.match(new RegExp(' SIP/' + trunk.ObjectName.split('/')[0], 'g'));
-        trunk.active_channels = (l === null) ? 0 : l.length;
+        var active_channels = channels.match(new RegExp(' SIP/' + trunk.ObjectName.split('/')[0], 'g'));
+        trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
     });
 }
 
-function iaxPeerList() {
+function getIaxPeerList() {
     response = Ami.request(url, 'IAXpeerlist');
-    arr_elements = text2Object(response.body);
-    asterisk.iax.total = arr_elements.length;
-    asterisk.iax.trunks = arr_elements.filter(function (element) {
+    elements = text2Object(response.body);
+    asterisk.iax.total = elements.length;
+    asterisk.iax.trunks = elements.filter(function (element) {
         return element.ObjectName.search(Ami.params.trunk) != -1;
     });
-    arr_elements.forEach(function (element) {
+    elements.forEach(function (element) {
         if (element.Status.search('^OK') != -1) {
             element.Status = element.Status.split(' ')[0]
         }
@@ -305,33 +307,33 @@ function iaxPeerList() {
     });
     asterisk.iax.online = asterisk.iax.total - asterisk.iax.offline;
     asterisk.iax.trunks.forEach(function (trunk) {
-        l = channels.match(new RegExp('( IAX2/' + trunk.ObjectName.split('/')[0] +
+        var active_channels = channels.match(new RegExp('( IAX2/' + trunk.ObjectName.split('/')[0] +
             '| IAX2/' + trunk.ObjectUsername + ')', 'g'));
-        trunk.active_channels = (l === null) ? 0 : l.length;
+        trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
     });
 }
 
-function pjsipShowEndpoints() {
+function getPjsipShowEndpoints() {
     response = Ami.request(url, 'PJSIPShowEndpoints');
-    arr_elements = text2Object(response.body);
-    asterisk.pjsip.total = arr_elements.length;
-    asterisk.pjsip.trunks = arr_elements.filter(function (element) {
+    elements = text2Object(response.body);
+    asterisk.pjsip.total = elements.length;
+    asterisk.pjsip.trunks = elements.filter(function (element) {
         return element.ObjectName.search(Ami.params.trunk) != -1;
     });
 
-    arr_elements.forEach(function (element) {
+    elements.forEach(function (element) {
         if (element.DeviceState === 'Unavailable') {
             asterisk.pjsip.unavailable++;
         }
     });
     asterisk.pjsip.available = asterisk.pjsip.total - asterisk.pjsip.unavailable;
     asterisk.pjsip.trunks.forEach(function (trunk) {
-        l = channels.match(new RegExp(' PJSIP/' + trunk.ObjectName.split('/')[0], 'g'));
-        trunk.active_channels = (l === null) ? 0 : l.length;
+        var active_channels = channels.match(new RegExp(' PJSIP/' + trunk.ObjectName.split('/')[0], 'g'));
+        trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
     });
 }
 
-function queueSummary() {
+function getQueueSummary() {
     response = Ami.request(url, 'QueueSummary');
     asterisk.queue.queues = text2Object(response.body);
     asterisk.queue.total = asterisk.queue.queues.length;
@@ -378,10 +380,18 @@ Object.keys(fields).forEach(function (field) {
 
 response = Ami.request(url, 'ListCommands');
 var list = response.body;
-if (list.includes('SIPpeers')) { sipPeers(); }
-if (list.includes('IAXpeerlist')) { iaxPeerList(); }
-if (list.includes('PJSIPShowEndpoints')) { pjsipShowEndpoints(); }
-if (list.includes('QueueSummary')) { queueSummary(); }
+if (list.includes('SIPpeers')) {
+    getSipPeers();
+}
+if (list.includes('IAXpeerlist')) {
+    getIaxPeerList();
+}
+if (list.includes('PJSIPShowEndpoints')) {
+   getPjsipShowEndpoints();
+}
+if (list.includes('QueueSummary')) {
+   getQueueSummary();
+}
 
 try {
   response = Ami.request(url, 'Logoff');
