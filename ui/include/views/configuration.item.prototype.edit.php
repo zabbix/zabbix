@@ -726,24 +726,27 @@ $form_list
 
 // Append valuemap to form list.
 if ($readonly) {
-	$form->addVar('valuemapid', $data['valuemapid']);
-	$valuemap_select = (new CTextBox('valuemap_name',
-		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
-		true
-	))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('label-valuemap');
+	if ($data['valuemaps']) {
+		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
+	}
+	else {
+		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
+	}
 }
 else {
-	$valuemap_select = (new CSelect('valuemapid'))
-		->setId('valuemapid')
-		->setValue($data['valuemapid'])
-		->setFocusableElementId('label-valuemap')
-		->addOption(new CSelectOption(0, _('As is')));
+	$valuemaps = $data['valuemaps'];
+	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
+}
 
-	foreach ($data['valuemaps'] as $valuemap) {
-		$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
-	}
+$valuemap_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->setFocusableElementId('label-valuemap')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setReadonly($readonly);
+
+foreach ($valuemaps as $valuemap) {
+	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 $form_list
