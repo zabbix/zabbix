@@ -31,7 +31,7 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Define a set of supported pre-processing rules.
 	 *
-	 * @const array
+	 * @var array
 	 */
 	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_TRIM, ZBX_PREPROC_RTRIM,
 		ZBX_PREPROC_LTRIM, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_DELTA_VALUE,

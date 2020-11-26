@@ -39,7 +39,7 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Define a set of supported pre-processing rules.
 	 *
-	 * @const array
+	 * @var array
 	 */
 	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
