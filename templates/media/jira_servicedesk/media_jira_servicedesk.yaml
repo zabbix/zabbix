@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:48Z'
   media_types:
     -
@@ -71,7 +71,7 @@ zabbix_export:
         
             setTags: function(event_tags_json) {
                 if (!Jira.schema) {
-                    Zabbix.Log(4, '[ Jira Service Desk Webhook ] Cannot add labels because failed to retrieve field schema.');
+                    Zabbix.log(4, '[ Jira Service Desk Webhook ] Cannot add labels because failed to retrieve field schema.');
         
                     return;
                 }
@@ -134,7 +134,7 @@ zabbix_export:
                             });
                     }
                     else {
-                        Zabbix.Log(4, '[ Jira Service Desk Webhook ] Cannot add custom fields' +
+                        Zabbix.log(4, '[ Jira Service Desk Webhook ] Cannot add custom fields' +
                             'because failed to retrieve field schema.');
                     }
                 }
@@ -152,55 +152,55 @@ zabbix_export:
         
                 var response,
                     url = Jira.params.url + query,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
-                request.AddHeader('Content-Type: application/json');
-                request.AddHeader('Authorization: Basic ' + btoa(Jira.params.user + ':' + Jira.params.password));
-                request.AddHeader('X-ExperimentalApi: opt-in');
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Basic ' + btoa(Jira.params.user + ':' + Jira.params.password));
+                request.addHeader('X-ExperimentalApi: opt-in');
         
                 if (typeof Jira.HTTPProxy !== 'undefined' && Jira.HTTPProxy !== '') {
-                    request.SetProxy(Jira.HTTPProxy);
+                    request.setProxy(Jira.HTTPProxy);
                 }
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ Jira Service Desk Webhook ] Sending request: ' + url +
+                Zabbix.log(4, '[ Jira Service Desk Webhook ] Sending request: ' + url +
                     ((typeof data === 'string') ? ('\n' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ Jira Service Desk Webhook ] Received response with status code ' +
-                    request.Status() + '\n' + response);
+                Zabbix.log(4, '[ Jira Service Desk Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ Jira Service Desk Webhook ] Failed to parse response received from Jira');
+                        Zabbix.log(4, '[ Jira Service Desk Webhook ] Failed to parse response received from Jira');
                         response = null;
                     }
                 }
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     if (response !== null && typeof response.errors !== 'undefined'
                         && Object.keys(response.errors).length > 0) {
@@ -215,7 +215,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.Status(),
+                    status: request.getStatus(),
                     response: response
                 };
             },
@@ -328,7 +328,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ Jira Service Desk Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ Jira Service Desk Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

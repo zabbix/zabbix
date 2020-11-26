@@ -701,15 +701,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 					'user-zabbix' => true,
 					'admin-zabbix' => true
 				]
-			]],
-			[[
-				'url' => 'conf.import.php',
-				'title' =>	'Configuration import',
-				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false
-				]
 			]]
 		];
 	}

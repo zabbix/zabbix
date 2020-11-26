@@ -101,7 +101,7 @@ class CRole extends CApiService {
 				'readonly' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0,1']
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -223,10 +223,6 @@ class CRole extends CApiService {
 	 * @throws APIException if no permissions or the input is invalid.
 	 */
 	protected function validateCreate(array &$roles) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permissions to create user roles.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
@@ -256,7 +252,7 @@ class CRole extends CApiService {
 		}
 
 		$this->checkDuplicates(array_keys(array_flip(array_column($roles, 'name'))));
-		$this->checkRules($roles);
+
 		$db_modules = DBfetchArray(DBselect(
 			'SELECT moduleid'.
 			' FROM module'.
@@ -295,6 +291,8 @@ class CRole extends CApiService {
 				}
 			}
 		}
+
+		$this->checkRules($roles);
 	}
 
 	/**
@@ -356,12 +354,12 @@ class CRole extends CApiService {
 			'rules' =>			['type' => API_OBJECT, 'fields' => [
 				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1']
+					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'ui.default_access' =>		['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED],
 				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => '0,1']
+					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'modules.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED],
 				'api.access' =>				['type' => API_INT32, 'in' => CRoleHelper::API_ACCESS_DISABLED.','.CRoleHelper::API_ACCESS_ENABLED],
@@ -369,7 +367,7 @@ class CRole extends CApiService {
 				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'actions' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
-					'status' =>					['type' => API_INT32, 'in' => '0,1']
+					'status' =>					['type' => API_INT32, 'in' => '0,1', 'default' => '1']
 				]],
 				'actions.default_access' =>	['type' => API_INT32, 'in' => CRoleHelper::DEFAULT_ACCESS_DISABLED.','.CRoleHelper::DEFAULT_ACCESS_ENABLED]
 			]]
@@ -380,33 +378,30 @@ class CRole extends CApiService {
 
 		$db_roles = $this->get([
 			'output' => ['roleid', 'name', 'type', 'readonly'],
+			'roleids' => array_column($roles, 'roleid'),
+			'selectRules' => [CRoleHelper::UI_DEFAULT_ACCESS],
 			'preservekeys' => true
 		]);
-
 		$roles = $this->extendObjectsByKey($roles, $db_roles, 'roleid', ['name', 'type']);
 
-		$names = [];
-
-		foreach ($roles as $index => $role) {
-			// Check if this user role exists.
-			if (!array_key_exists($role['roleid'], $db_roles)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			$db_role = $db_roles[$role['roleid']];
-
-			if ($db_role['readonly'] == 1) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Cannot update readonly user role "%1$s".', $db_role['name'])
-				);
-			}
-
-			if ($role['name'] !== $db_role['name']) {
-				$names[] = $role['name'];
-			}
+		if (array_diff(array_column($roles, 'roleid'), array_column($db_roles, 'roleid'))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		$readonly = array_search(1, array_column($db_roles, 'readonly', 'name'));
+
+		if ($readonly !== false) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update readonly user role "%1$s".', $readonly));
+		}
+
+		$role_type = array_column($roles, 'type', 'roleid');
+
+		if (array_key_exists(self::$userData['roleid'], $role_type)
+				&& $role_type[self::$userData['roleid']] != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('User cannot change the user type of own role.'));
+		}
+
+		$names = array_diff(array_column($roles, 'name'), array_column($db_roles, 'name'));
 
 		if ($names) {
 			$this->checkDuplicates($names);
@@ -445,7 +440,6 @@ class CRole extends CApiService {
 	 * @throws APIException if input is invalid.
 	 */
 	private function checkRules(array $roles, array $db_roles = []): void {
-		$is_create = ($db_roles === []);
 		$moduleids = [];
 
 		foreach ($roles as $role) {
@@ -453,21 +447,38 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			if (array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
-				$status = 0;
+			if (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])
+					|| array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
+				$ui_rules = [];
+				$default_access = CRoleHelper::DEFAULT_ACCESS_ENABLED;
 
-				foreach ($role['rules'][CRoleHelper::SECTION_UI] as $ui_element) {
-					$status += (int) $ui_element['status'];
+				if (array_key_exists(CRoleHelper::UI_DEFAULT_ACCESS, $role['rules'])) {
+					$default_access = $role['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
+				}
+				elseif (array_key_exists('roleid', $role)) {
+					$default_access = $db_roles[$role['roleid']]['rules'][CRoleHelper::UI_DEFAULT_ACCESS];
+				}
 
-					if (!in_array(sprintf('%s.%s', CRoleHelper::SECTION_UI, $ui_element['name']),
-							CRoleHelper::getAllUiElements((int) $role['type']))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('UI element "%1$s" is not available.', $ui_element['name'])
-						);
+				$skip = strlen(CRoleHelper::SECTION_UI.'.');
+
+				foreach (CRoleHelper::getAllUiElements((int) $role['type']) as $rule) {
+					$index = substr($rule, $skip);
+					$ui_rules[$index] = $default_access;
+				}
+
+				if (array_key_exists('rules', $role) && array_key_exists(CRoleHelper::SECTION_UI, $role['rules'])) {
+					foreach ($role['rules'][CRoleHelper::SECTION_UI] as $ui_rule) {
+						if (!array_key_exists($ui_rule['name'], $ui_rules)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('UI element "%1$s" is not available.', $ui_rule['name'])
+							);
+						}
+
+						$ui_rules[$ui_rule['name']] = $ui_rule['status'];
 					}
 				}
 
-				if ($is_create && !$status) {
+				if (!in_array(1, $ui_rules)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
 				}
 			}
@@ -576,46 +587,6 @@ class CRole extends CApiService {
 				}
 				else {
 					$delete[] = $db_row['role_ruleid'];
-				}
-			}
-
-			// Validate UI section if it is updated, it should contain at least one allowed element.
-			foreach ($roles as $role) {
-				$rules = array_key_exists('rules', $role) ? $role['rules'] : [];
-
-				if (!array_key_exists(CRoleHelper::SECTION_UI, $rules)) {
-					continue;
-				}
-
-				$rules[CRoleHelper::SECTION_UI] = array_column($rules[CRoleHelper::SECTION_UI], 'status', 'name');
-
-				foreach ($db_roles_rules[$role['roleid']] as $db_rule) {
-					$section = CRoleHelper::getRuleSection($db_rule['name']);
-
-					if ($section !== CRoleHelper::SECTION_UI) {
-						continue;
-					}
-
-					if ($db_rule['name'] === CRoleHelper::UI_DEFAULT_ACCESS) {
-						$rules += [CRoleHelper::UI_DEFAULT_ACCESS => $db_rule['value_int']];
-					}
-					else {
-						$index = substr($db_rule['name'], strlen(CRoleHelper::SECTION_UI) + 1);
-						$rules[CRoleHelper::SECTION_UI] += [$index => $db_rule['value_int']];
-					}
-				}
-
-				if ($rules[CRoleHelper::UI_DEFAULT_ACCESS]) {
-					$skip = strlen(CRoleHelper::SECTION_UI.'.');
-
-					foreach (CRoleHelper::getAllUiElements((int) $role['type']) as $rule) {
-						$index = substr($rule, $skip);
-						$rules[CRoleHelper::SECTION_UI] += [$index => $rules[CRoleHelper::UI_DEFAULT_ACCESS]];
-					}
-				}
-
-				if (!in_array(1, $rules[CRoleHelper::SECTION_UI])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one UI element must be checked.'));
 				}
 			}
 		}

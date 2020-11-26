@@ -68,7 +68,7 @@ class CLegacyWebTest extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('server-name', $ZBX_SERVER_NAME);
 		}
 
-		$this->zbxTestTextNotPresent('Login name or password is incorrect');
+		$this->zbxTestTextNotPresent('Incorrect user name or password or account is temporarily blocked.');
 	}
 
 	public function zbxTestLogout() {

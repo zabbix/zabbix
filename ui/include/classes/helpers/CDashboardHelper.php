@@ -99,9 +99,9 @@ class CDashboardHelper {
 				$fields = $widget_form->getFieldsData();
 
 				if ($with_rf_rate) {
-					$rf_rate = CProfile::get('web.dashbrd.widget.rf_rate', null, $widgetid);
+					$rf_rate = (int) CProfile::get('web.dashbrd.widget.rf_rate', -1, $widgetid);
 
-					if ($rf_rate === null) {
+					if ($rf_rate == -1) {
 						if ($context === CWidgetConfig::CONTEXT_DASHBOARD) {
 							$rf_rate = ($fields['rf_rate'] == -1)
 								? CWidgetConfig::getDefaultRfRate($widget['type'])

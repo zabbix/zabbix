@@ -394,7 +394,7 @@ class CControllerPopupGeneric extends CController {
 				]
 			],
 			'api_methods' => [
-				'title' => _('Api methods'),
+				'title' => _('API methods'),
 				'min_user_type' => USER_TYPE_SUPER_ADMIN,
 				'allowed_src_fields' => 'name',
 				'form' => [
@@ -404,7 +404,7 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
-			],
+			]
 		];
 	}
 

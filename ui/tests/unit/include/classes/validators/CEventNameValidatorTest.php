@@ -45,7 +45,7 @@ class CEventNameValidatorTest extends PHPUnit_Framework_TestCase {
 			['{?Expression macro without closing bracket', false, 'incorrect syntax near "Expression macro without closing bracket"'],
 			['Expression macro without closing bracket at the end of event name {?', false, 'unexpected end of string'],
 			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect syntax near "{?20+1}}"'],
-			['Empty expression macro {?}', false, 'incorrect syntax near "}"'],
+			['Empty expression macro {?}', false, 'incorrect syntax near "}"']
 		];
 	}
 

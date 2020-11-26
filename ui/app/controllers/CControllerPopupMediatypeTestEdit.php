@@ -49,7 +49,7 @@ class CControllerPopupMediatypeTestEdit extends CController {
 	protected function doAction() {
 		$mediatype = API::MediaType()->get([
 			'output' => ['type', 'name', 'status', 'parameters'],
-			'mediatypeids' => $this->getInput('mediatypeid'),
+			'mediatypeids' => $this->getInput('mediatypeid')
 		]);
 
 		if (!$mediatype) {

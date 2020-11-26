@@ -106,7 +106,7 @@ $form = (new CForm())
 				(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-				)),
+				))
 			]))
 				->addClass('form_row')
 				->addClass('dynamic-row'))

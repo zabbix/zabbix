@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.4 and higher  
 The template for monitoring Asterisk over HTTP that works without any external scripts.  
 It collects metrics by polling the Asterisk Manager API remotely using an HTTP agent and JS preprocessing.  
 All metrics are collected at once, thanks to Zabbix's bulk data collection.

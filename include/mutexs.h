@@ -44,8 +44,11 @@ typedef enum
 	ZBX_MUTEX_SQLITE3,
 	ZBX_MUTEX_PROCSTAT,
 	ZBX_MUTEX_PROXY_HISTORY,
+#ifdef HAVE_VMINFO_T_UPDATES
 	ZBX_MUTEX_KSTAT,
+#endif
 	ZBX_MUTEX_MODBUS,
+	ZBX_MUTEX_TREND_FUNC,
 	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }

@@ -37,6 +37,7 @@
 #include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
+#include "zbxtrends.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -3035,6 +3036,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			{
 				DCconfig_items_apply_changes(&item_diff);
 				DCmass_update_trends(history, history_num, &trends, &trends_num, compression_age);
+
+				if (0 != trends_num)
+					zbx_tfc_invalidate_trends(trends, trends_num);
 
 				do
 				{

@@ -756,7 +756,9 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	] + $host_options;
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments',
+			'manual_close'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectDependencies' => ['triggerid'],
 		'monitored' => true,
@@ -961,8 +963,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 /**
  * Creates and returns a trigger status cell for the trigger overview table.
  *
- * @param array  $trigger
- * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
+ * @param array $trigger
+ * @param array $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  *
  * @return CCol
  */

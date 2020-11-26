@@ -853,7 +853,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				'max' => $max,
 				'interval' => $interval,
 				'rows' => $rows,
-				'power' => $power,
+				'power' => $power
 			];
 
 			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
@@ -945,7 +945,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 0,
 		'value' => convertUnits([
-			'value' => $min,
+			'value' => $min
 		] + ($min_calculated ? $options_calculated : $options_fixed))
 	];
 
@@ -955,7 +955,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 				? ($value / 10 - $min / 10) / ($max / 10 - $min / 10)
 				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
-				'value' => $value,
+				'value' => $value
 			] + $options_calculated)
 		];
 	}
@@ -963,7 +963,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 1,
 		'value' => convertUnits([
-			'value' => $max,
+			'value' => $max
 		] + ($max_calculated ? $options_calculated : $options_fixed))
 	];
 
@@ -985,7 +985,7 @@ function expandShortGraphItem($short_item) {
 		'dr' => 'drawtype',
 		'ya' => 'yaxisside',
 		'ca' => 'calc_fnc',
-		'co' => 'color',
+		'co' => 'color'
 	];
 
 	$item = [];

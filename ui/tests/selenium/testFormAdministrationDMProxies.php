@@ -283,7 +283,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 		// Name, newname
 		return [
 			['Active proxy 3', 'New active proxy 3 updated'],
-			['Passive proxy 3', 'New passive proxy 3 updated'],
+			['Passive proxy 3', 'New passive proxy 3 updated']
 		];
 	}
 

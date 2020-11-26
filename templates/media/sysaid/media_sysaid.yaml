@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:52Z'
   media_types:
     -
@@ -102,41 +102,41 @@ zabbix_export:
         
             request: function (method, query, data) {
                 var response,
-                    request = SysAid.req || (SysAid.req = new CurlHttpRequest()),
+                    request = SysAid.req || (SysAid.req = new HttpRequest()),
                     url = SysAid.params.url + query;
         
                 if (typeof SysAid.HTTPProxy !== 'undefined' && SysAid.HTTPProxy.trim() !== '') {
-                    request.SetProxy(SysAid.HTTPProxy);
+                    request.setProxy(SysAid.HTTPProxy);
                 }
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ SysAid Webhook ] Sending request: ' +
+                Zabbix.log(4, '[ SysAid Webhook ] Sending request: ' +
                     url + ((typeof data === 'string') ? (' ' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ SysAid Webhook ] Received response with status code ' + request.Status() + ': ' + response);
+                Zabbix.log(4, '[ SysAid Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
         
-                if (request.Status() !== 200) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.getStatus() !== 200) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     message += ': ' + response;
                     throw message + ' Check debug log for more information.';
@@ -147,7 +147,7 @@ zabbix_export:
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ SysAid Webhook ] Failed to parse response received from SysAid');
+                        Zabbix.log(4, '[ SysAid Webhook ] Failed to parse response received from SysAid');
                         response = null;
                     }
                 }
@@ -157,7 +157,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.Status(),
+                    status: request.getStatus(),
                     response: response
                 };
             },
@@ -322,7 +322,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ SysAid Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ SysAid Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

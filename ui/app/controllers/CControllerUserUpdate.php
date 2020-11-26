@@ -27,8 +27,6 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
-		$timezones = DateTimeZone::listIdentifiers();
-		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -42,7 +40,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'password2' =>		'string',
 			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
-			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
+			'timezone' =>		'db users.timezone|in '.implode(',', $this->timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',

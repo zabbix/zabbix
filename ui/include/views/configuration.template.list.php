@@ -130,7 +130,10 @@ $widget = (new CWidget())
 				)
 			)
 			->addItem(
-				(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
+				(new CButton('form', _('Import')))
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'template']).', null), null, this);'
+					)
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
