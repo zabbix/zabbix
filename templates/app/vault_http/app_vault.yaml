@@ -1,0 +1,4813 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-11-26T20:48:20Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Template App HashiCorp Vault by HTTP'
+      name: 'Template App HashiCorp Vault by HTTP'
+      description: |
+        Get HashiCorp Vault metrics from Vault API HTTP Prometheus metrics endpoint.
+        
+        Some metrics may not be collected depending on your Vault instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Vault
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Vault: Check mountpoint discovery'
+          type: DEPENDENT
+          key: vault.check_mountpoint_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^vault_rollback_attempt_(?:.+?)_count$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var name,
+                      output = [];
+                  
+                  JSON.parse(value).forEach(function (v) {
+                      if (name = v.name.match(/^vault_(rollback_attempt|route_rollback)_(.+?)_count$/)) {
+                          output.push(
+                              {
+                                  '{#MOUNTPOINT}': name[2].replace(/_/g, '/'),
+                                  '{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
+                                  '{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
+                              }
+                          );
+                      }
+                  });
+                  
+                  return JSON.stringify(output);
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Check replication discovery'
+          type: DEPENDENT
+          key: vault.check_replication_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^replication_(?:.+)$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value !== "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Check storage discovery'
+          type: DEPENDENT
+          key: vault.check_storage_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^vault_(?:.+)_(?:get|put|list|delete)_count$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var name,
+                      output = [];
+                  
+                  JSON.parse(value).forEach(function (v) {
+                      if (name = v.name.match(/^vault_((?!barrier).+?)_(get|put|list|delete)_count$/)) {
+                          output.push(
+                              {
+                                  '{#STORAGE}': name[1],
+                                  '{#OPERATION}': name[2].toUpperCase(),
+                                  '{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
+                                  '{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
+                              }
+                          );
+                      }
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Check WAL discovery'
+          type: DEPENDENT
+          key: vault.check_wal_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^vault_wal_(?:.+)$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value !== "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Clear metrics'
+          type: DEPENDENT
+          key: vault.clear_metrics
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.errors
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.get_metrics
+        -
+          name: 'Vault: Get health'
+          type: HTTP_AGENT
+          key: vault.get_health
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          url: '{$VAULT.API.SCHEME}://{HOST.CONN}:{$VAULT.API.PORT}/v1/sys/health'
+          status_codes: '200,429,472,473,503,501'
+          headers:
+            -
+              name: X-Vault-Token
+              value: '{$VAULT.TOKEN}'
+        -
+          name: 'Vault: Get leader'
+          type: HTTP_AGENT
+          key: vault.get_leader
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          url: '{$VAULT.API.SCHEME}://{HOST.CONN}:{$VAULT.API.PORT}/v1/sys/leader'
+          headers:
+            -
+              name: X-Vault-Token
+              value: '{$VAULT.TOKEN}'
+        -
+          name: 'Vault: Get metrics'
+          type: HTTP_AGENT
+          key: vault.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          applications:
+            -
+              name: 'Zabbix raw items'
+          url: '{$VAULT.API.SCHEME}://{HOST.CONN}:{$VAULT.API.PORT}/v1/sys/metrics?format=prometheus'
+          status_codes: '200,503'
+          headers:
+            -
+              name: X-Vault-Token
+              value: '{$VAULT.TOKEN}'
+        -
+          name: 'Vault: Get metrics error'
+          type: DEPENDENT
+          key: vault.get_metrics.error
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Get metrics error'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.errors[0]'
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_metrics
+          triggers:
+            -
+              expression: '{strlen()}>0'
+              name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
+              priority: WARNING
+        -
+          name: 'Vault: Healthcheck'
+          type: DEPENDENT
+          key: vault.health.check
+          delay: '0'
+          history: 7d
+          description: 'Seal status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.healthcheck
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          triggers:
+            -
+              expression: '{last()}=0'
+              name: 'Vault: Vault server is not responding'
+              priority: HIGH
+        -
+          name: 'Vault: Initialized'
+          type: DEPENDENT
+          key: vault.health.initialized
+          delay: '0'
+          history: 7d
+          description: 'Initialization status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.initialized
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+        -
+          name: 'Vault: Performance standby'
+          type: DEPENDENT
+          key: vault.health.performance_standby
+          delay: '0'
+          history: 7d
+          description: 'Performance standby status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.performance_standby
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+        -
+          name: 'Vault: Disaster Recovery replication'
+          type: DEPENDENT
+          key: vault.health.replication_dr_mode
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            Disaster recovery replication mode
+            https://www.vaultproject.io/docs/enterprise/replication
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.replication_dr_mode
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+        -
+          name: 'Vault: Performance replication'
+          type: DEPENDENT
+          key: vault.health.replication_performance_mode
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            Performance replication mode
+            https://www.vaultproject.io/docs/enterprise/replication
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.replication_performance_mode
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+        -
+          name: 'Vault: Sealed'
+          type: DEPENDENT
+          key: vault.health.sealed
+          delay: '0'
+          history: 7d
+          description: 'Seal status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sealed
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          triggers:
+            -
+              expression: '{last()}=1'
+              name: 'Vault: Vault server is sealed'
+              priority: AVERAGE
+              description: 'https://www.vaultproject.io/docs/concepts/seal'
+        -
+          name: 'Vault: Standby'
+          type: DEPENDENT
+          key: vault.health.standby
+          delay: '0'
+          history: 7d
+          description: 'Standby status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.standby
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+        -
+          name: 'Vault: Version'
+          type: DEPENDENT
+          key: vault.health.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Server version'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Vault version has changed. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Vault: HA enabled'
+          type: DEPENDENT
+          key: vault.leader.ha_enabled
+          delay: '0'
+          history: 7d
+          description: 'HA enabled status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.ha_enabled
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_leader
+        -
+          name: 'Vault: Is leader'
+          type: DEPENDENT
+          key: vault.leader.is_self
+          delay: '0'
+          history: 7d
+          description: 'Leader status'
+          applications:
+            -
+              name: Vault
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.is_self
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_leader
+        -
+          name: 'Vault: Audit log request failures, count'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.request.failure
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of audit log request failures'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_request_failure
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log requests, median'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.request.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by all audit log requests across all audit log devices'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_audit_log_request{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log requests, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.request.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by all audit log requests across all audit log devices'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_audit_log_request{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log requests, rate'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.request.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Duration of time taken by all audit log requests across all audit log devices'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_request_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log response failures'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.response.failure
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of audit log response failures.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_response_failure
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log response, median'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.response.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by audit log responses across all audit log devices'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_audit_log_response{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log response, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.response.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by audit log responses across all audit log devices'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_audit_log_response{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Audit log response, rate'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.response.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Duration of time taken by audit log responses across all audit log devices'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_response_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier DELETE ops, median'
+          type: DEPENDENT
+          key: vault.metrics.barrier.delete.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by DELETE operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_delete{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier DELETE ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.barrier.delete.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by DELETE operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_delete{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier DELETE ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.barrier.delete.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by DELETE operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_delete_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier GET ops, median'
+          type: DEPENDENT
+          key: vault.metrics.barrier.get.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by GET operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_get{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier GET ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.barrier.get.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by GET operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_get{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier LIST ops, median'
+          type: DEPENDENT
+          key: vault.metrics.barrier.list.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by LIST operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_list{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier LIST ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.barrier.list.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by LIST operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_list{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier LIST ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.barrier.list.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by LIST operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_list_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier PUT ops, median'
+          type: DEPENDENT
+          key: vault.metrics.barrier.put.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by PUT operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_put{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier PUT ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.barrier.put.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by PUT operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_barrier_put{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier PUT ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.barrier.put.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by PUT operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_put_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Cache hit, rate'
+          type: DEPENDENT
+          key: vault.metrics.cache.hit.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a value was retrieved from the LRU cache'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_cache_hit
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Cache miss, rate'
+          type: DEPENDENT
+          key: vault.metrics.cache.miss.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a value was not in the LRU cache. The results in a read from the configured storage.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_cache_miss
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Cache write, rate'
+          type: DEPENDENT
+          key: vault.metrics.cache.write.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a value was written to the LRU cache'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_cache_write
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Check token, median'
+          type: DEPENDENT
+          key: vault.metrics.core.check.token.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by token checks handled by Vault corecore'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_check_token{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Check token, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.check.token.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by token checks handled by Vault corecore'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_check_token{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Check token, rate'
+          type: DEPENDENT
+          key: vault.metrics.core.check.token.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by token checks handled by Vault corecore'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_check_token_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch ACL and token, rate'
+          type: DEPENDENT
+          key: vault.metrics.core.fetch.acl_and_token
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_fetch_acl_and_token_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch ACL and token, median'
+          type: DEPENDENT
+          key: vault.metrics.core.fetch.acl_and_token.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_fetch_acl_and_token{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch ACL and token, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.fetch.acl_and_token.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_fetch_acl_and_token{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Requests, rate'
+          type: DEPENDENT
+          key: vault.metrics.core.handle.request
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by requests handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_handle_request_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Requests, median'
+          type: DEPENDENT
+          key: vault.metrics.core.handle.request.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by requests handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_handle_request{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Requests, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.handle.request.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by requests handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_handle_request{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Leadership setup failed, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.leadership.setup_failed
+          delay: '0'
+          history: 7d
+          description: 'Cluster leadership setup failures which have occurred in a highly available Vault cluster'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_core_leadership_setup_failed
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_core_leadership_setup_failed")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          triggers:
+            -
+              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
+              name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
+              priority: AVERAGE
+              description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h'
+        -
+          name: 'Vault: Leadership setup lost, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.leadership_lost
+          delay: '0'
+          history: 7d
+          description: 'Cluster leadership losses which have occurred in a highly available Vault cluster'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_core_leadership_lost_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_core_leadership_lost_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          triggers:
+            -
+              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
+              name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
+              priority: AVERAGE
+              description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h'
+        -
+          name: 'Vault: Post-unseal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.post_unseal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by post-unseal operations handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_post_unseal_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Post-unseal ops, median'
+          type: DEPENDENT
+          key: vault.metrics.core.post_unseal.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by post-unseal operations handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_post_unseal{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Post-unseal ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.post_unseal.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by post-unseal operations handled by Vault core'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_post_unseal{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Pre-seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.pre_seal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by pre-seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_pre_seal_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Pre-seal ops, median'
+          type: DEPENDENT
+          key: vault.metrics.core.pre_seal.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: __DESCRIPTION__
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_pre_seal{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Pre-seal ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.pre_seal.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: __DESCRIPTION__
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_pre_seal{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.seal
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_seal_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Seal ops, median'
+          type: DEPENDENT
+          key: vault.metrics.core.seal.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_seal{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Seal ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.seal.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_seal{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Internal seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_internal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by internal seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_seal_internal_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Internal seal ops, median'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_internal.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by internal seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_seal_internal{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Internal seal ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_internal.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by internal seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_seal_internal{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Requested seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_with_request
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by requested seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_seal_with_request_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Requested seal ops, median'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_with_request.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by requested seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_seal_with_request{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Requested seal ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_with_request.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by requested seal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_seal_with_request{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Leadership step downs, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.step_down
+          delay: '0'
+          history: 7d
+          description: 'Cluster leadership step down'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_core_step_down_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_core_step_down_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          triggers:
+            -
+              expression: '{delta(1h)}>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
+              name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
+              priority: AVERAGE
+              description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h'
+        -
+          name: 'Vault: Unseal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.unseal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by unseal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_unseal_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Unseal ops, median'
+          type: DEPENDENT
+          key: vault.metrics.core.unseal.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by unseal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_unseal{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Unseal ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.core.unseal.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Duration of time taken by unseal operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_core_unseal{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch lease times, counter'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times
+          delay: '0'
+          history: 7d
+          description: 'Time taken to fetch lease times'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_fetch_lease_times_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch lease times by token, counter'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times.by_token
+          delay: '0'
+          history: 7d
+          description: 'Time taken to fetch lease times by token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_fetch_lease_times_by_token_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch lease times by token, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times.by_token.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to fetch lease times by token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_fetch_lease_times_by_token{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch lease times by token, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times.by_token.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to fetch lease times by token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_fetch_lease_times_by_token{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch lease times, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to fetch lease times'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_fetch_lease_times{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Fetch lease times, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to fetch lease times'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_fetch_lease_times{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Number of expiring leases'
+          type: DEPENDENT
+          key: vault.metrics.expire.num_leases
+          delay: '0'
+          history: 7d
+          description: 'Number of all leases which are eligible for eventual expiry'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_num_leases
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Register ops, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.register
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken for register operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_register_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Register auth ops, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.register.auth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken for register authentication operations which create lease entries without lease ID'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_register_auth_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Register auth ops, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.register.auth.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken for register authentication operations which create lease entries without lease ID'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_register_auth{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Register auth ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.register.auth.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken for register authentication operations which create lease entries without lease ID'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_register_auth{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Register ops, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.register.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken for register operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_register{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Register ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.register.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken for register operations'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_register{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire renew, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to renew a lease'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_renew_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire renew, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to renew a lease'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_renew{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire renew, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to renew a lease'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_renew{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Renew token, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew_token
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to renew a token which does not need to invoke a logical backend'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_renew_token_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Renew token, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew_token.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to renew a token which does not need to invoke a logical backend'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_renew_token{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Renew token, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew_token.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to renew a token which does not need to invoke a logical backend'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_renew_token{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Revoke secrets by token, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.by_token
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to revoke all secrets issued with a given token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_by_token_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Revoke secrets by token, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.by_token.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke all secrets issued with a given token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke_by_token{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Revoke secrets by token, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.by_token.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke all secrets issued with a given token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke_by_token{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke force, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.force
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to forcibly revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_force_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke force, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.force.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to forcibly revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke_force{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke force, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.force.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to forcibly revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke_force{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke prefix, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.prefix
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Tokens revoke on a prefix'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_prefix_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke prefix, median'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.prefix.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke tokens on a prefix'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke_prefix{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Expire revoke prefix, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.prefix.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke tokens on a prefix'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_expire_revoke_prefix{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy DELETE ops, median'
+          type: DEPENDENT
+          key: vault.metrics.policy.delete_policy.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to delete a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_delete_policy{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy DELETE ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.policy.delete_policy.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to delete a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_delete_policy{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy DELETE ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.delete_policy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to delete a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_delete_policy_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy GET ops, median'
+          type: DEPENDENT
+          key: vault.metrics.policy.get_policy.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to get a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_get_policy{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy GET ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.policy.get_policy.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to get a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_get_policy{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy GET ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.get_policy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to get a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_get_policy_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy LIST ops, median'
+          type: DEPENDENT
+          key: vault.metrics.policy.list_policies.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to list policies'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_list_policies{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy LIST ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.policy.list_policies.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to list policies'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_list_policies{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy LIST ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.list_policies.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to list policies'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_list_policies_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy SET ops, median'
+          type: DEPENDENT
+          key: vault.metrics.policy.set_policy.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to set a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_set_policy{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy SET ops, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.policy.set_policy.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to set a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_policy_set_policy{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Policy SET ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.set_policy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to set a policy'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_set_policy_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Process CPU seconds, total'
+          type: DEPENDENT
+          key: vault.metrics.process.cpu.seconds.total
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Total user and system CPU time spent in seconds'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_cpu_seconds_total
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Open file descriptors, max'
+          type: DEPENDENT
+          key: vault.metrics.process.max.fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of open file descriptors'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Open file descriptors, current'
+          type: DEPENDENT
+          key: vault.metrics.process.open.fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Process resident memory'
+          type: DEPENDENT
+          key: vault.metrics.process.resident_memory.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Uptime'
+          type: DEPENDENT
+          key: vault.metrics.process.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Server uptime'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_start_time_seconds
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.floor(Date.now()/1000 - Number(value));'
+          master_item:
+            key: vault.clear_metrics
+          triggers:
+            -
+              expression: '{last()}<10m'
+              name: 'Vault: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        -
+          name: 'Vault: Process virtual memory, current'
+          type: DEPENDENT
+          key: vault.metrics.process.virtual_memory.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Process virtual memory, max'
+          type: DEPENDENT
+          key: vault.metrics.process.virtual_memory.max.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Maximum amount of virtual memory available in bytes.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_max_bytes
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime allocated bytes'
+          type: DEPENDENT
+          key: vault.metrics.runtime.alloc.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Number of bytes allocated by the Vault process. This could burst from time to time, but should return to a steady state value.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_alloc_bytes
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime freed objects'
+          type: DEPENDENT
+          key: vault.metrics.runtime.free.count
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of freed objects'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_free_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime heap objects'
+          type: DEPENDENT
+          key: vault.metrics.runtime.heap.objects
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of objects on the heap. This is a good general memory pressure indicator worth establishing a baseline and thresholds for alerting.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_heap_objects
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime malloc count, rate'
+          type: DEPENDENT
+          key: vault.metrics.runtime.malloc.count.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Cumulative count of allocated heap objects'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_malloc_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime num goroutines'
+          type: DEPENDENT
+          key: vault.metrics.runtime.num_goroutines
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of goroutines. This serves as a general system load indicator worth establishing a baseline and thresholds for alerting.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_num_goroutines
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime sys bytes'
+          type: DEPENDENT
+          key: vault.metrics.runtime.sys.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Number of bytes allocated to Vault. This includes what is being used by Vault''s heap and what has been reclaimed but not given back to the operating system.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_sys_bytes
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime GC runs, total'
+          type: DEPENDENT
+          key: vault.metrics.runtime.total.gc.runs
+          delay: '0'
+          history: 7d
+          description: 'Total number of garbage collection runs since Vault was last started'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_total_gc_runs
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Secret kv entries'
+          type: DEPENDENT
+          key: vault.metrics.secret.kv.count
+          delay: '0'
+          history: 7d
+          description: 'Number of entries in each key-value secret engine'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_secret_kv_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_secret_kv_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token secret lease creation, rate'
+          type: DEPENDENT
+          key: vault.metrics.secret.lease.creation.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counts the number of leases created by secret engines'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_secret_lease_creation
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_secret_lease_creation")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token count, total'
+          type: DEPENDENT
+          key: vault.metrics.token
+          delay: '0'
+          history: 7d
+          description: 'Total number of service tokens available for use; counts all un-expired and un-revoked tokens in Vault''s token store. This measurement is performed every 10 minutes.'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token count by auth, total'
+          type: DEPENDENT
+          key: vault.metrics.token.by_auth
+          delay: '0'
+          history: 7d
+          description: 'Total number of service tokens that were created by a auth method'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count_by_auth
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count_by_auth")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token count by policy, total'
+          type: DEPENDENT
+          key: vault.metrics.token.by_policy
+          delay: '0'
+          history: 7d
+          description: 'Total number of service tokens that have a policy attached'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count_by_policy
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count_by_policy")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token count by ttl, total'
+          type: DEPENDENT
+          key: vault.metrics.token.by_ttl
+          delay: '0'
+          history: 7d
+          description: 'Number of service tokens, grouped by the TTL range they were assigned at creation'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count_by_ttl
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count_by_ttl")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token create, count'
+          type: DEPENDENT
+          key: vault.metrics.token.create
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to create a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_create_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token create, median'
+          type: DEPENDENT
+          key: vault.metrics.token.create.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The time taken to create a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_create{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token create, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.token.create.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The time taken to create a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_create{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token createAccessor, count'
+          type: DEPENDENT
+          key: vault.metrics.token.createAccessor
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to create a token accessor'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_createAccessor_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token createAccessor, median'
+          type: DEPENDENT
+          key: vault.metrics.token.createAccessor.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The time taken to create a token accessor'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_createAccessor{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token createAccessor, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.token.createAccessor.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The time taken to create a token accessor'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_createAccessor{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token creation, rate'
+          type: DEPENDENT
+          key: vault.metrics.token.creation.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of service or batch tokens created'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_creation
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_creation")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token lookup, median'
+          type: DEPENDENT
+          key: vault.metrics.token.lookup.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The time taken to look up a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_lookup{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token lookup, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.token.lookup.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The time taken to look up a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_lookup{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token lookup, rate'
+          type: DEPENDENT
+          key: vault.metrics.token.lookup.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to look up a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_lookup_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token revoke, count'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to look up a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_revoke_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token revoke, median'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_revoke{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token revoke, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke a token'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_revoke{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token revoke tree, count'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke.tree
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to revoke a token tree'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_revoke_tree_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token revoke tree, median'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke.tree.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke a token tree'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_revoke_tree{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token revoke tree, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke.tree.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to revoke a token tree'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_revoke_tree{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token store, count'
+          type: DEPENDENT
+          key: vault.metrics.token.store
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to store an updated token entry without writing to the secondary index'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_store_count
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token store, median'
+          type: DEPENDENT
+          key: vault.metrics.token.store.median
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to store an updated token entry without writing to the secondary index'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_store{quantile="0.5"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Token store, 90th percentile'
+          type: DEPENDENT
+          key: vault.metrics.token.store.pct_90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'Time taken to store an updated token entry without writing to the secondary index'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'vault_token_store{quantile="0.9"}'
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return (isNaN(value)) ? 0 : value;
+                  
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Runtime GC pause, total'
+          type: DEPENDENT
+          key: vault.metrics.total.gc.pause
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'The total garbage collector pause time since Vault was last started'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_total_gc_pause_ns
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1.0E-9'
+          master_item:
+            key: vault.clear_metrics
+        -
+          name: 'Vault: Barrier GET ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.vault.barrier.get.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by GET operations at the barrier'
+          applications:
+            -
+              name: Vault
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_get_count
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+      discovery_rules:
+        -
+          name: 'Mountpoint metrics discovery'
+          type: DEPENDENT
+          key: vault.mountpoint.discovery
+          delay: '0'
+          description: 'Mountpoint metrics discovery'
+          item_prototypes:
+            -
+              name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, median'
+              type: DEPENDENT
+              key: 'vault.metrics.rollback.attempt.median[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to perform a rollback operation on the given mount point'
+              application_prototypes:
+                -
+                  name: 'Vault: Mountpoint {#MOUNTPOINT}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_Q}{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, 90th percentile'
+              type: DEPENDENT
+              key: 'vault.metrics.rollback.attempt.pct_90[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to perform a rollback operation on the given mount point'
+              application_prototypes:
+                -
+                  name: 'Vault: Mountpoint {#MOUNTPOINT}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_Q}{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, rate'
+              type: DEPENDENT
+              key: 'vault.metrics.rollback.attempt.rate[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to perform a rollback operation on the given mount point'
+              application_prototypes:
+                -
+                  name: 'Vault: Mountpoint {#MOUNTPOINT}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_C}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Route rollback [{#MOUNTPOINT}] ops, median'
+              type: DEPENDENT
+              key: 'vault.metrics.route.rollback.median[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
+              application_prototypes:
+                -
+                  name: 'Vault: Mountpoint {#MOUNTPOINT}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_Q}{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Route rollback [{#MOUNTPOINT}] ops, rate'
+              type: DEPENDENT
+              key: 'vault.metrics.route.rollback.rate[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
+              application_prototypes:
+                -
+                  name: 'Vault: Mountpoint {#MOUNTPOINT}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_C}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Route rollback [{#MOUNTPOINT}] ops, 90th percentile'
+              type: DEPENDENT
+              key: 'vault.metrics.rroute.rollback.pct_90[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
+              application_prototypes:
+                -
+                  name: 'Vault: Mountpoint {#MOUNTPOINT}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_Q}{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+          master_item:
+            key: vault.check_mountpoint_discovery
+        -
+          name: 'Replication metrics discovery'
+          type: DEPENDENT
+          key: vault.replication.discovery
+          delay: '0'
+          description: 'Discovery for replication metrics'
+          item_prototypes:
+            -
+              name: 'Vault: Stream WAL guard found, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.logshipper.streamWALs.guard_found[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is matched/found'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - logshipper_streamWALs_guard_found
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Stream WAL missing guard, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.logshipper.streamWALs.missing_guard[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is not matched/found'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - logshipper_streamWALs_missing_guard
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Last remote WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.fsm.last_remote_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last remote WAL'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_fsm_last_remote_wal
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Merkle commit index{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.merkle.commit_index[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The last committed index in the Merkle Tree'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_merkle_commit_index
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Last DR WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.wal.last_dr_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last DR WAL'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_wal_last_dr_wal
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Last performance WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.wal.last_performance_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last Performance WAL'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_wal_last_performance_wal
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Last WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.wal.last_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last WAL'
+              application_prototypes:
+                -
+                  name: 'Vault: Replication'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_wal_last_wal
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+          master_item:
+            key: vault.check_replication_discovery
+        -
+          name: 'Storage backend metrics discovery'
+          type: DEPENDENT
+          key: vault.storage.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#STORAGE}'
+                value: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
+                formulaid: A
+          description: 'Storage backend metrics discovery'
+          item_prototypes:
+            -
+              name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, median'
+              type: DEPENDENT
+              key: 'vault.metrics.storage.median[{#STORAGE}, {#OPERATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Duration of a {#OPERATION} operation against the {#STORAGE} storage backend'
+              application_prototypes:
+                -
+                  name: 'Vault: Storage {#STORAGE}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_Q}{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, 90th percentile'
+              type: DEPENDENT
+              key: 'vault.metrics.storage.pct_90[{#STORAGE}, {#OPERATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Duration of a {#OPERATION} operation against the {#STORAGE} storage backend'
+              application_prototypes:
+                -
+                  name: 'Vault: Storage {#STORAGE}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_Q}{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, rate'
+              type: DEPENDENT
+              key: 'vault.metrics.storage.rate[{#STORAGE}, {#OPERATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Duration of a {#OPERATION} operation against the {#STORAGE} storage backend'
+              application_prototypes:
+                -
+                  name: 'Vault: Storage {#STORAGE}'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_C}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: vault.clear_metrics
+          master_item:
+            key: vault.check_storage_discovery
+        -
+          name: 'WAL metrics discovery'
+          type: DEPENDENT
+          key: vault.wal.discovery
+          delay: '0'
+          description: 'Discovery for WAL metrics'
+          item_prototypes:
+            -
+              name: 'Vault: Delete WALs, median{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.deletewals.median[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to delete a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_deletewals{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Delete WALs, 90th percentile{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.deletewals.pct_90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to delete a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_deletewals{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Delete WALs, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.deletewals[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to delete a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_deletewals_count
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Flush ready WAL, median{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.flushready.median[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_flushready{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Flush ready WAL, 90th percentile{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.flushready.pct_90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_flushready{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Flush ready WAL, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.flushready[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_flushready_count
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: GC deleted WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.gc.deleted[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of Write Ahead Logs (WAL) deleted during each garbage collection run'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_gc_deleted
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: WALs on disk, total{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.gc.total[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total Number of Write Ahead Logs (WAL) on disk'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_gc_total
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Load WALs, median{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.loadWAL.median[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to load a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_loadWAL{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Load WALs, 90th percentile{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.loadWAL.pct_90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to load a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_loadWAL{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Load WALs, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.loadWAL[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to load a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_loadWAL_count
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Persist WALs, median{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.persistwals.median[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to persist a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_persistwals{quantile="0.5"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Persist WALs, 90th percentile{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.persistwals.pct_90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'Time taken to persist a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'vault_wal_persistwals{quantile="0.9"}'
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      return (isNaN(value)) ? 0 : value;
+                      
+              master_item:
+                key: vault.clear_metrics
+            -
+              name: 'Vault: Persist WALs, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.persistwals[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to persist a Write Ahead Log (WAL)'
+              application_prototypes:
+                -
+                  name: 'Vault: WAL'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_persistwals_count
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+          master_item:
+            key: vault.check_wal_discovery
+      macros:
+        -
+          macro: '{$VAULT.API.PORT}'
+          value: '8200'
+          description: 'Vault port'
+        -
+          macro: '{$VAULT.API.SCHEME}'
+          value: http
+          description: 'Vault API scheme'
+        -
+          macro: '{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of Vault leadership losses'
+        -
+          macro: '{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of Vault leadership setyp failed'
+        -
+          macro: '{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of Vault leadership step downs'
+        -
+          macro: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
+          value: .+
+          description: 'Filter of discoverable storage backends'
+        -
+          macro: '{$VAULT.OPEN.FDS.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used file descriptors for trigger expression'
+        -
+          macro: '{$VAULT.TOKEN}'
+          description: 'Vault auth token'
+  triggers:
+    -
+      expression: '{Template App HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{Template App HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
+      name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
+      priority: WARNING
+  graphs:
+    -
+      name: 'Vault: Cache rate'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.cache.hit.rate
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.cache.miss.rate
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.cache.write.rate
+    -
+      name: 'Vault: Expiring leases'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.expire.num_leases
+    -
+      name: 'Vault: K/V secret engine entries'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.secret.kv.count
+    -
+      name: 'Vault: Requests rate'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 34bdeb
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.core.handle.request
+    -
+      name: 'Vault: Runtime memory'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.runtime.alloc.bytes
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.process.resident_memory.bytes
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.process.virtual_memory.bytes
+    -
+      name: 'Vault: Token checks'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.core.check.token.rate
+    -
+      name: 'Vault: Token lookup'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.token.lookup.rate
+    -
+      name: 'Vault: Tokens count'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Template App HashiCorp Vault by HTTP'
+            key: vault.metrics.token
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
+    -
+      name: 'Vault flag'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'False'
+        -
+          value: '1'
+          newvalue: 'True'
