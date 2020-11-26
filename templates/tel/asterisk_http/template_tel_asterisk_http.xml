@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-26T08:22:49Z</date>
+   <date>2020-11-26T10:35:12Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Tel Asterisk by HTTP</template>
          <name>Template Tel Asterisk by HTTP</name>
-         <description>The template gets Asterisk metrics from AMI by HTTP agent. Enable the mini-HTTP Server within your Asterisk instance, add the option webenabled=yes in the general section of manager.conf file and create Asterisk Manager user with system and command write permissions. Do not forget to define {$AMI.URL}, {$AMI.USERNAME}, {$AMI.SECRET} macros. If there are errors, increase the logging to debug level and see the Zabbix server log.&#13;
+         <description>The template gets Asterisk metrics from AMI by HTTP agent. You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and create Asterisk Manager user with system and command write permissions within your Asterisk instance. Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status. Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level. If there are errors, increase the logging to debug level and see the Zabbix server log.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk&#13;
 &#13;
@@ -205,12 +205,14 @@ var asterisk = {
     },
     iax: {
         trunks: [],
+        online: 0,
         offline: 0,
         unmonitored: 0,
         total: 0
     },
     pjsip: {
         trunks: [],
+        available: 0,
         unavailable: 0,
         total: 0
     },
@@ -301,6 +303,7 @@ function iaxPeerList() {
                 break;
         }
     });
+    asterisk.iax.online = asterisk.iax.total - asterisk.iax.offline;
     asterisk.iax.trunks.forEach(function (trunk) {
         l = channels.match(new RegExp('( IAX2/' + trunk.ObjectName.split('/')[0] +
             '| IAX2/' + trunk.ObjectUsername + ')', 'g'));
@@ -321,6 +324,7 @@ function pjsipShowEndpoints() {
             asterisk.pjsip.unavailable++;
         }
     });
+    asterisk.pjsip.available = asterisk.pjsip.total - asterisk.pjsip.unavailable;
     asterisk.pjsip.trunks.forEach(function (trunk) {
         l = channels.match(new RegExp(' PJSIP/' + trunk.ObjectName.split('/')[0], 'g'));
         trunk.active_channels = (l === null) ? 0 : l.length;
@@ -425,6 +429,28 @@ return JSON.stringify(asterisk);
                </master_item>
             </item>
             <item>
+               <name>Asterisk: IAX online peers</name>
+               <type>DEPENDENT</type>
+               <key>asterisk.iax.online</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of online IAX peers.</description>
+               <applications>
+                  <application>
+                     <name>Asterisk</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.iax.online</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>asterisk.get_stats</key>
+               </master_item>
+            </item>
+            <item>
                <name>Asterisk: IAX peers</name>
                <type>DEPENDENT</type>
                <key>asterisk.iax.total</key>
@@ -462,6 +488,28 @@ return JSON.stringify(asterisk);
                   <step>
                      <type>JSONPATH</type>
                      <params>$.iax.unmonitored</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>asterisk.get_stats</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Asterisk: PJSIP available endpoints</name>
+               <type>DEPENDENT</type>
+               <key>asterisk.pjsip.available</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of available PJSIP peers.</description>
+               <applications>
+                  <application>
+                     <name>Asterisk</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.pjsip.available</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -845,7 +893,7 @@ return JSON.stringify(asterisk);
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
-                           <name>IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m</name>
+                           <name>IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)</name>
                            <priority>WARNING</priority>
                            <description>The IAX trunk may not be able to process new calls.</description>
                         </trigger_prototype>
@@ -943,7 +991,7 @@ OK</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
-                           <name>PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m</name>
+                           <name>PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)</name>
                            <priority>WARNING</priority>
                            <description>The PJSIP trunk may not be able to process new calls.</description>
                         </trigger_prototype>
@@ -1062,7 +1110,7 @@ In use</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(10m)}&gt;{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}</expression>
-                           <name>"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m</name>
+                           <name>"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)</name>
                            <priority>WARNING</priority>
                            <description>There is a large number of calls in the queue.</description>
                         </trigger_prototype>
@@ -1142,7 +1190,7 @@ In use</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(10m)}&gt;={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}</expression>
-                           <name>SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m</name>
+                           <name>SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)</name>
                            <priority>WARNING</priority>
                            <description>The SIP trunk may not be able to process new calls.</description>
                         </trigger_prototype>
@@ -1292,12 +1340,20 @@ OK</description>
                <color>1A7C11</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
-                  <key>asterisk.iax.offline</key>
+                  <key>asterisk.iax.online</key>
                </item>
             </graph_item>
             <graph_item>
                <sortorder>1</sortorder>
                <color>2774A4</color>
+               <item>
+                  <host>Template Tel Asterisk by HTTP</host>
+                  <key>asterisk.iax.offline</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
                   <key>asterisk.iax.unmonitored</key>
@@ -1310,6 +1366,14 @@ OK</description>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>
+               <item>
+                  <host>Template Tel Asterisk by HTTP</host>
+                  <key>asterisk.pjsip.available</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
                <item>
                   <host>Template Tel Asterisk by HTTP</host>
                   <key>asterisk.pjsip.unavailable</key>
