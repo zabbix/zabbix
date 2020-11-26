@@ -521,28 +521,20 @@ $form_list
 	);
 
 // Append value type to form list.
-if ($readonly) {
-	$form->addVar('value_type', $data['value_type']);
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type_name')),
-		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow((new CLabel(_('Type of information'), 'label-value-type')),
-	(new CSelect('value_type'))
-		->setId('value_type')
-		->setFocusableElementId('label-value-type')
-		->setValue($data['value_type'])
-		->addOptions(CSelect::createOptionsFromArray([
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))
-	);
-}
+$form_list->addRow((new CLabel(_('Type of information'), 'label-value-type')),
+(new CSelect('value_type'))
+	->setId('value_type')
+	->setFocusableElementId('label-value-type')
+	->setValue($data['value_type'])
+	->addOptions(CSelect::createOptionsFromArray([
+		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+		ITEM_VALUE_TYPE_STR => _('Character'),
+		ITEM_VALUE_TYPE_LOG => _('Log'),
+		ITEM_VALUE_TYPE_TEXT => _('Text')
+	]))
+	->setReadonly($readonly)
+);
 
 $form_list
 	->addRow(_('Units'),
