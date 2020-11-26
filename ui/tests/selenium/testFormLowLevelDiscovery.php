@@ -66,7 +66,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				['host' => 'Simple form test host', 'form' => 'testFormDiscoveryRule1']
 			],
 			[
-				['type' => 'Zabbix agent (active)', 'host' => 'Simple form test host'],
+				['type' => 'Zabbix agent (active)', 'host' => 'Simple form test host']
 			],
 			[
 				['type' => 'Simple check', 'host' => 'Simple form test host']
@@ -302,18 +302,18 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					);
 					if ($dbInterfaces) {
 						foreach ($dbInterfaces as $host_interface) {
-							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
-							$host_interface['ip'].' : '.$host_interface['port'].'"]');
+							$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.
+									$host_interface['ip'].' : '.$host_interface['port'].'"]');
 						}
 					}
 					else {
 						$this->zbxTestTextPresent('No interface found');
-						$this->zbxTestAssertNotVisibleId('interfaceid');
+						$this->zbxTestAssertNotVisibleId('interface-select');
 					}
 					break;
 				default:
 					$this->zbxTestTextNotVisible(['Host interface', 'No interface found']);
-					$this->zbxTestAssertNotVisibleId('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interface-select');
 					break;
 			}
 		}
@@ -1484,10 +1484,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
-				$interfaceid = $this->zbxTestGetText("//select[@id='interfaceid']/optgroup/option[not(@disabled)]");
+				$interfaceid = $this->zbxTestGetText('//z-select[@id="interface-select"]//li[not(@disabled)]');
 				break;
 			default:
-				$this->zbxTestAssertNotVisibleId('interfaceid');
+				$this->zbxTestAssertNotVisibleId('interface-select');
 		}
 
 		if (isset($data['name'])) {
@@ -1602,10 +1602,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				case 'SSH agent':
 				case 'TELNET agent':
 				case 'JMX agent':
-					$this->zbxTestAssertElementPresentXpath("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.$interfaceid.'"]');
 					break;
 				default:
-					$this->zbxTestAssertNotVisibleId('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interface-select');
 			}
 
 			// "Check now" button availability
@@ -1661,7 +1661,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 						'name' => 'Rule with macro does not match',
 						'key' => 'macro-doesnt-match-key',
 						'macros'=> [
-							['macro' => '{#TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match'],
+							['macro' => '{#TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match']
 						]
 					]
 				],
@@ -1756,7 +1756,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Rule with wrong macro',
 					'key' => 'macro-wrong-key',
 					'macros'=> [
-							['macro' => '{TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match'],
+							['macro' => '{TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match']
 					],
 					'error_message' => 'Incorrect filter condition macro for discovery rule'
 				]
@@ -1767,7 +1767,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-empty-formula-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula' => '',
@@ -1781,7 +1781,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
 							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
-							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B',
@@ -1794,7 +1794,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-extra-argument-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B or C',
@@ -1807,7 +1807,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-wrong-formula-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'Wrong formula',
@@ -1820,7 +1820,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-not-in-formula-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'A and Not B',
@@ -1833,7 +1833,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-wrong-operator-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'NOT A and not B',
@@ -1846,7 +1846,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-not-formula',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'not A not B',
@@ -1897,7 +1897,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Macro with empty path',
 					'key' => 'macro-with-empty-path',
 					'macros' => [
-						['macro' => '{#MACRO}', 'path'=>''],
+						['macro' => '{#MACRO}', 'path'=>'']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
@@ -1908,7 +1908,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Macro without #',
 					'key' => 'macro-without-hash',
 					'macros' => [
-						['macro' => '{MACRO}', 'path'=>'$.path'],
+						['macro' => '{MACRO}', 'path'=>'$.path']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
@@ -1919,7 +1919,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Macro with cyrillic symbols',
 					'key' => 'macro-with-cyrillic-symbols',
 					'macros' => [
-						['macro' => '{#МАКРО}', 'path'=>'$.path'],
+						['macro' => '{#МАКРО}', 'path'=>'$.path']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
@@ -1930,7 +1930,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Macro with special symbols',
 					'key' => 'macro-with-with-special-symbols',
 					'macros' => [
-						['macro' => '{#MACRO!@$%^&*()_+|?}', 'path'=>'$.path'],
+						['macro' => '{#MACRO!@$%^&*()_+|?}', 'path'=>'$.path']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
@@ -1941,7 +1941,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'LLD with empty macro',
 					'key' => 'lld-with-empty-macro',
 					'macros' => [
-						['macro' => '', 'path'=>'$.path'],
+						['macro' => '', 'path'=>'$.path']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
 				]
@@ -1952,7 +1952,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'LLD with context macro',
 					'key' => 'lld-with-context-macro',
 					'macros' => [
-						['macro' => '{$MACRO:A}', 'path'=>'$.path'],
+						['macro' => '{$MACRO:A}', 'path'=>'$.path']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
@@ -1964,7 +1964,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'lld-with-two-equal-macros',
 					'macros' => [
 						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
-						['macro' => '{#MACRO}', 'path'=>'$.path.b'],
+						['macro' => '{#MACRO}', 'path'=>'$.path.b']
 					],
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
 				]

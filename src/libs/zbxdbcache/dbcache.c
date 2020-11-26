@@ -420,37 +420,55 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
  *                                                                            *
  * Function: dc_remove_updated_trends                                         *
  *                                                                            *
- * Purpose: helper function for DCflush trends                                *
+ * Purpose: Update trends disable_until for items without trends data past or *
+ *          equal the specified clock                                         *
+ *                                                                            *
+ * Comments: A helper function for DCflush trends                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const char *table_name,
 		int value_type, zbx_uint64_t *itemids, int *itemids_num, int clock)
 {
-	int		i;
+	int		i, j, clocks_num, now, age;
 	ZBX_DC_TREND	*trend;
 	zbx_uint64_t	itemid;
 	size_t		sql_offset;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		clocks[] = {SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, SEC_PER_YEAR, INT_MAX};
 
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct itemid"
-			" from %s"
-			" where clock>=%d and",
-			table_name, clock);
+	now = time(NULL);
+	age = now - clock;
+	for (clocks_num = 0; age > clocks[clocks_num]; clocks_num++)
+		clocks[clocks_num] = now - clocks[clocks_num];
+	clocks[clocks_num] = clock;
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	/* remove itemids with trends data past or equal the clock */
+	for (j = 0; j <= clocks_num && 0 < *itemids_num; j++)
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_remove(itemids, itemids_num, &itemid, 1);
-	}
-	DBfree_result(result);
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct itemid"
+				" from %s"
+				" where clock>=%d and",
+				table_name, clocks[j]);
 
+		if (0 < j)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " clock<%d and", clocks[j - 1]);
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, *itemids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+			uint64_array_remove(itemids, itemids_num, &itemid, 1);
+		}
+		DBfree_result(result);
+	}
+
+	/* update trends disable_until for the leftover itemids */
 	while (0 != *itemids_num)
 	{
 		itemid = itemids[--*itemids_num];
@@ -2511,13 +2529,33 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		}
 
 		if (0 == item->history)
-			h->flags |= ZBX_DC_FLAG_NOHISTORY;
-
-		if ((ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type) ||
-				0 == item->trends)
 		{
-			h->flags |= ZBX_DC_FLAG_NOTRENDS;
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
 		}
+		else if (now - h->ts.sec > item->history_sec)
+		{
+			h->flags |= ZBX_DC_FLAG_NOHISTORY;
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside history "
+					"storage period", item->host.host, item->key_orig, zbx_date2str(h->ts.sec),
+					zbx_time2str(h->ts.sec));
+		}
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
+		{
+			if (0 == item->trends)
+			{
+				h->flags |= ZBX_DC_FLAG_NOTRENDS;
+			}
+			else if (now - h->ts.sec > item->trends_sec)
+			{
+				h->flags |= ZBX_DC_FLAG_NOTRENDS;
+				zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" value timestamp \"%s %s\" is outside "
+						"trends storage period", item->host.host, item->key_orig,
+						zbx_date2str(h->ts.sec), zbx_time2str(h->ts.sec));
+			}
+		}
+		else
+			h->flags |= ZBX_DC_FLAG_NOTRENDS;
 
 		normalize_item_value(item, h);
 
@@ -3721,7 +3759,7 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, data, data};
+	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
@@ -3985,6 +4023,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			item->head->next = data;
 			item->head = data;
 		}
+		item->values_num++;
 	}
 }
 
@@ -4139,6 +4178,7 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 				hc_queue_item(item);
 				break;
 			case ZBX_HC_ITEM_STATUS_NORMAL:
+				item->values_num--;
 				data_free = item->tail;
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
@@ -4472,4 +4512,67 @@ out:
 	zbx_vector_ptr_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_diag_stats                                            *
+ *                                                                            *
+ * Purpose: get history cache diagnostics statistics                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+{
+	LOCK_CACHE;
+
+	*values_num = cache->history_num;
+	*items_num = cache->history_items.num_data;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_mem_stats                                             *
+ *                                                                            *
+ * Purpose: get shared memory allocator statistics                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
+{
+	LOCK_CACHE;
+
+	if (NULL != data)
+		zbx_mem_get_stats(hc_mem, data);
+
+	if (NULL != index)
+		zbx_mem_get_stats(hc_index_mem, index);
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_items                                                 *
+ *                                                                            *
+ * Purpose: get statistics of cached items                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_hc_item_t		*item;
+
+	LOCK_CACHE;
+
+	zbx_vector_uint64_pair_reserve(items, cache->history_items.num_data);
+
+	zbx_hashset_iter_reset(&cache->history_items, &iter);
+	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
+		zbx_vector_uint64_pair_append_ptr(items, &pair);
+	}
+
+	UNLOCK_CACHE;
 }

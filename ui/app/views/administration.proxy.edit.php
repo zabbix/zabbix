@@ -111,6 +111,7 @@ $encryption_form_list = (new CFormList('encryption'))
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableAutocomplete()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

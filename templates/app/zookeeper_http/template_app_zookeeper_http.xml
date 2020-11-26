@@ -1,0 +1,1510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-11-16T15:38:49Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App Zookeeper by HTTP</template>
+         <name>Template App Zookeeper by HTTP</name>
+         <description>Get Apache Zookeeper metrics by HTTP agent.&#13;
+  This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to AdminServer.  &#13;
+  Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+            <application>
+               <name>Zookeeper</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Zookeeper: Approximate data size</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.approximate_data_size</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>Data tree size in bytes.The size includes the znode path and its value.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.approximate_data_size</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Election time, avg</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.avg_election_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Time between entering and leaving election.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var metrics = JSON.parse(value),
+    res = metrics.avg_election_time || metrics['election_time{quantile="0.5"}'];
+if (isNaN(res)) {
+    return 0;
+}
+return res;</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Fsync time, avg</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.avg_fsynctime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Time to fsync transaction log.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var metrics = JSON.parse(value),
+    res = metrics.avg_fsynctime || metrics['fsynctime{quantile="0.5"}'];
+if (isNaN(res)) {
+    return 0;
+}
+return res;</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Latency, avg</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.avg_latency</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>The average amount of time it takes for the server to respond to a client request.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.avg_latency</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Snapshot write time, avg</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.avg_snapshottime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Average time to write a snapshot.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var metrics = JSON.parse(value),
+    res = metrics['snapshottime{quantile="0.5"}'] || metrics.avg_snapshottime ;
+if (isNaN(res)) {
+    return 0;
+}
+return res;</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Bytes received per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.bytes_received_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Number of bytes received per second.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.bytes_received_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Elections</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.cnt_election_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of elections happened.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var metrics = JSON.parse(value);
+if (metrics.server_state === "standalone") { 
+    return 0 
+    }
+else {
+    return metrics.cnt_election_time || metrics.election_time_count
+}</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Fsync</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.cnt_fsynctime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of performed fsyncs.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var metrics = JSON.parse(value)
+return metrics.cnt_fsynctime || metrics.fsynctime_count</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Snapshot writes</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.cnt_snapshottime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of performed snapshot writes.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var metrics = JSON.parse(value)
+return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Commit per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.commit_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of commits performed per second</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.commit_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Drop connections per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.connection_drop_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Rate of connection drops.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.connection_drop_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Rejected connections per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.connection_rejected.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Rate of connection rejected.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.connection_rejected</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Revalidate connections per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.connection_revalidate_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Rate ofconnection revalidations.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.connection_revalidate_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Diff syncs per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.diff_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of diff syncs performed per second</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.diff_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Ephemeral nodes count</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.ephemerals_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of ephemeral nodes that a zookeeper server has in its data tree.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.ephemerals_count</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Get connections stats</name>
+               <type>HTTP_AGENT</type>
+               <key>zookeeper.get_connections_stats</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>Get information on client connections to server. Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/connections</url>
+            </item>
+            <item>
+               <name>Zookeeper: Get server metrics</name>
+               <type>HTTP_AGENT</type>
+               <key>zookeeper.get_metrics</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/monitor</url>
+            </item>
+            <item>
+               <name>Zookeeper: Global sessions</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.global_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of global sessions.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.global_sessions</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Local sessions</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.local_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of local sessions.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.local_sessions</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Looking per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.looking_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Rate of transitions into looking state.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.looking_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: File descriptors, max</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.max_file_descriptor_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Maximum number of file descriptors that a zookeeper server can open.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.max_file_descriptor_count</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Latency, max</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.max_latency</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>The maximum amount of time it takes for the server to respond to a client request.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.max_latency</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Latency, min</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.min_latency</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>The minimum amount of time it takes for the server to respond to a client request.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.min_latency</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Alive connections</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.num_alive_connections</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of active clients connected to a zookeeper server.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.num_alive_connections</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: File descriptors, open</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.open_file_descriptor_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of file descriptors that a zookeeper server has open.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.open_file_descriptor_count</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Outstanding requests</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.outstanding_requests</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of queued requests when the server is under load and is receiving more sustained requests than it can process.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.outstanding_requests</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}</expression>
+                     <name>Zookeeper: Too many queued requests (over {$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}% for 5 min)</name>
+                     <priority>AVERAGE</priority>
+                     <description>Number of queued requests in the server. This goes up when the server receives more requests than it can process.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Zookeeper: Packets received per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.packets_received.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of zookeeper packets received by a server per second.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.packets_received</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Packets sent per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.packets_sent</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of zookeeper packets sent from a server per second.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.packets_sent</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Revalidate per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.revalidate_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Rate of revalidations.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.revalidate_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Server mode</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.server_state</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.server_state</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Zookeeper node state has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Zookeeper: Snap syncs per sec</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.snap_count.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of snap syncs performed per second</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.snap_count</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>s</units>
+               <description>Uptime of Zookeeper server.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.uptime</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Zookeeper: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(10m)}=1</expression>
+                     <name>Zookeeper: Failed to fetch info data (or no data for 10m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Zookeeper: Version</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Version of Zookeeper server.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.version</params>
+                  </step>
+                  <step>
+                     <type>REGEX</type>
+                     <params>([^,]+)--(.+)
+\1</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>3h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Zookeeper: Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Zookeeper version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Zookeeper: Watch count</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.watch_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of watches currently set on the local ZooKeeper process.</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.watch_count</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Zookeeper: Znode count</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.znode_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of znodes in the ZooKeeper namespace (the data)</description>
+               <applications>
+                  <application>
+                     <name>Zookeeper</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.znode_count</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Clients discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>zookeeper.clients</key>
+               <delay>1h</delay>
+               <url>{$ZOOKEEPER.SCHEME}://{HOST.CONN}:{$ZOOKEEPER.PORT}/{$ZOOKEEPER.COMMAND_URL}/connections</url>
+               <description>Get list of client connections.&#13;
+Note, depending on the number of client connections this operation may be expensive (i.e. impact server performance).</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency, avg</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.avg_latency[{#TYPE},{#CLIENT}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>ms</units>
+                     <description>The average amount of time it takes for the server to respond to a client request.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].avg_latency.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_connections_stats</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency, max</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.max_latency[{#TYPE},{#CLIENT}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>ms</units>
+                     <description>The maximum amount of time it takes for the server to respond to a client request.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].max_latency.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_connections_stats</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency, min</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.min_latency[{#TYPE},{#CLIENT}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>ms</units>
+                     <description>The minimum amount of time it takes for the server to respond to a client request.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].min_latency.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_connections_stats</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Outstanding requests</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.outstanding_requests[{#TYPE},{#CLIENT}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The number of queued requests when the server is under load and is receiving more sustained requests than it can process.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].outstanding_requests.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_connections_stats</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Packets received per sec</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.packets_received[{#TYPE},{#CLIENT}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>The number of packets received.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].packets_received.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_connections_stats</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Packets sent per sec</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.packets_sent[{#TYPE},{#CLIENT}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>The number of packets sent.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Zookeeper {#TYPE} {#CLIENT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.{#TYPE}.[?(@.remote_socket_address == "{#ADDRESS}")].packets_sent.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_connections_stats</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Zookeeper by HTTP</host>
+                              <key>zookeeper.max_latency[{#TYPE},{#CLIENT}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Zookeeper by HTTP</host>
+                              <key>zookeeper.min_latency[{#TYPE},{#CLIENT}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>BOLD_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Zookeeper by HTTP</host>
+                              <key>zookeeper.avg_latency[{#TYPE},{#CLIENT}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Zookeeper client {#TYPE} [{#CLIENT}]: Packets</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Zookeeper by HTTP</host>
+                              <key>zookeeper.packets_sent[{#TYPE},{#CLIENT}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Zookeeper by HTTP</host>
+                              <key>zookeeper.packets_received[{#TYPE},{#CLIENT}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var source = JSON.parse(value),
+    data = [];
+
+source.connections.forEach(function(v){
+    data.push({
+        "{#ADDRESS}": v.remote_socket_address,
+        "{#CLIENT}": v.remote_socket_address.split(':')[0],
+        "{#TYPE}": "connections"})
+});
+
+source.secure_connections.forEach(function(v){
+data.push({
+    "{#ADDRESS}": v.remote_socket_address,
+    "{#CLIENT}":v.remote_socket_address.split(':')[0],
+    "{#TYPE}": "secure_connections"})
+});
+
+return JSON.stringify(data);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Leader metrics discovery</name>
+               <type>DEPENDENT</type>
+               <key>zookeeper.metrics.leader</key>
+               <delay>0</delay>
+               <description>Additional metrics for leader node</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Zookeeper: Learners{#SINGLETON}</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.learners[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of learners.</description>
+                     <applications>
+                        <application>
+                           <name>Zookeeper</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.learners</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_metrics</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper: Pending syncs{#SINGLETON}</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.pending_syncs[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of pending syncs to carry out to ZooKeeper ensemble followers.</description>
+                     <applications>
+                        <application>
+                           <name>Zookeeper</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.pending_syncs</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_metrics</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}</expression>
+                           <name>Zookeeper: Too many pending syncs (over {$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}% for 5 min)</name>
+                           <priority>AVERAGE</priority>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper: Quorum size{#SINGLETON}</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.quorum_size[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <applications>
+                        <application>
+                           <name>Zookeeper</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.quorum_size</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_metrics</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper: Synced followers{#SINGLETON}</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.synced_followers[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of synced followers reported when a node server_state is leader.</description>
+                     <applications>
+                        <application>
+                           <name>Zookeeper</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.synced_followers</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_metrics</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper: Synced non-voting follower{#SINGLETON}</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.synced_non_voting_followers[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of synced voting followers reported when a node server_state is leader.</description>
+                     <applications>
+                        <application>
+                           <name>Zookeeper</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.synced_non_voting_followers</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_metrics</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Zookeeper: Synced observers{#SINGLETON}</name>
+                     <type>DEPENDENT</type>
+                     <key>zookeeper.synced_observers[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of synced observers.</description>
+                     <applications>
+                        <application>
+                           <name>Zookeeper</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.synced_observers</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>zookeeper.get_metrics</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template App Zookeeper by HTTP:zookeeper.synced_followers[{#SINGLETON}].last()} &lt; {Template App Zookeeper by HTTP:zookeeper.quorum_size[{#SINGLETON}].last()}-1</expression>
+                     <name>Zookeeper: Too few active followers</name>
+                     <priority>AVERAGE</priority>
+                     <description>The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended.</description>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <master_item>
+                  <key>zookeeper.get_metrics</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.server_state</params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(value == 'leader' ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$ZOOKEEPER.COMMAND_URL}</macro>
+               <value>commands</value>
+               <description>The URL for listing and issuing commands relative to the root URL (admin.commandURL).</description>
+            </macro>
+            <macro>
+               <macro>{$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}</macro>
+               <value>85</value>
+               <description>Maximum percentage of file descriptors usage alert treshold (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}</macro>
+               <value>10</value>
+               <description>Maximum number of outstanding requests (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}</macro>
+               <value>10</value>
+               <description>Maximum number of pending syncs from the followers (for trigger expression).</description>
+            </macro>
+            <macro>
+               <macro>{$ZOOKEEPER.PORT}</macro>
+               <value>8080</value>
+               <description>The port the embedded Jetty server listens on (admin.serverPort).</description>
+            </macro>
+            <macro>
+               <macro>{$ZOOKEEPER.SCHEME}</macro>
+               <value>http</value>
+               <description>Request scheme which may be http or https</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <triggers>
+      <trigger>
+         <expression>{Template App Zookeeper by HTTP:zookeeper.open_file_descriptor_count.min(5m)} * 100 / {Template App Zookeeper by HTTP:zookeeper.max_file_descriptor_count.last()} &gt; {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}</expression>
+         <name>Zookeeper: Too many file descriptors used (over {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% for 5 min)</name>
+         <priority>WARNING</priority>
+         <description>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</description>
+      </trigger>
+   </triggers>
+   <graphs>
+      <graph>
+         <name>Zookeeper: File descriptors usage</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.max_file_descriptor_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.open_file_descriptor_count</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Zookeeper: Latency</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.max_latency</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.min_latency</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <drawtype>BOLD_LINE</drawtype>
+               <color>F63100</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.avg_latency</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Zookeeper: Nodes</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.znode_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.ephemerals_count</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Zookeeper: Packets</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.packets_sent</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Zookeeper by HTTP</host>
+                  <key>zookeeper.packets_received.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

@@ -192,6 +192,11 @@ class CDBHelper {
 			return;
 		}
 
+		if (substr($top_table, 0, 1) === '!') {
+			$tables[] = substr($top_table, 1);
+			return;
+		}
+
 		$schema = DB::getSchema();
 
 		foreach ($schema[$top_table]['fields'] as $field => $field_data) {
@@ -466,7 +471,7 @@ class CDBHelper {
 							'values' => [
 								'r_eventid' => $fields['eventid'],
 								'r_clock' => $fields['clock'],
-								'r_ns' => $fields['ns'],
+								'r_ns' => $fields['ns']
 							],
 							'where' => ['eventid' => array_column($problems, 'eventid')]
 						]);

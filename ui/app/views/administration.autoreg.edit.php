@@ -58,8 +58,8 @@ if ($data['change_psk']) {
 				DB::getFieldLength('config_autoreg_tls', 'tls_psk_identity')
 			))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setAttribute('autocomplete', 'off')
-				->setAriaRequired(),
+				->setAriaRequired()
+				->disableAutocomplete(),
 			null,
 			'tls_psk'
 		)
@@ -67,8 +67,8 @@ if ($data['change_psk']) {
 			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 			(new CTextBox('tls_psk', $data['tls_psk'], false, DB::getFieldLength('config_autoreg_tls', 'tls_psk')))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setAttribute('autocomplete', 'off')
-				->setAriaRequired(),
+				->setAriaRequired()
+				->disableAutocomplete(),
 			null,
 			'tls_psk'
 		);

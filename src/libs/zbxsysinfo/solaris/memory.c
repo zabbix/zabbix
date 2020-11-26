@@ -19,7 +19,9 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#ifdef HAVE_VMINFO_T_UPDATES
 #include "stats.h"
+#endif
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
@@ -27,6 +29,59 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
+
+#ifndef HAVE_VMINFO_T_UPDATES
+static int	VM_MEMORY_USED(AGENT_RESULT *result)
+{
+	zbx_uint64_t	used;
+
+	used = sysconf(_SC_PHYS_PAGES) - sysconf(_SC_AVPHYS_PAGES);
+
+	SET_UI64_RESULT(result, used * sysconf(_SC_PAGESIZE));
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+{
+	zbx_uint64_t	used, total;
+
+	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	used = total - sysconf(_SC_AVPHYS_PAGES);
+
+	SET_DBL_RESULT(result, used / (double)total * 100);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+{
+	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+{
+	zbx_uint64_t	total;
+
+	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	SET_DBL_RESULT(result, sysconf(_SC_AVPHYS_PAGES) / (double)total * 100);
+
+	return SYSINFO_RET_OK;
+}
+
+#else /*HAVE_VMINFO_T_UPDATES*/
 
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
@@ -113,6 +168,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
+#endif /*HAVE_VMINFO_T_UPDATES*/
 
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

@@ -122,7 +122,17 @@ class CControllerHousekeepingUpdate extends CController {
 			$response->setMessageOk(_('Configuration updated'));
 		}
 		else {
-			$response->setFormData($this->getInputAll());
+			$response->setFormData($this->getInputAll() + [
+				'hk_events_mode' => '0',
+				'hk_services_mode' => '0',
+				'hk_audit_mode' => '0',
+				'hk_sessions_mode' => '0',
+				'hk_history_mode' => '0',
+				'hk_history_global' => '0',
+				'hk_trends_mode' => '0',
+				'hk_trends_global' => '0',
+				'compression_status' => '0'
+			]);
 			$response->setMessageError(_('Cannot update configuration'));
 		}
 

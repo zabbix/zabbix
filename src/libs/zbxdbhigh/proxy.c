@@ -3680,7 +3680,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		for (i = 0; i < values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve key \"%s\" on host \"%s\" from "
+						"configuration cache", hostkeys[i].key, hostkeys[i].host);
 				continue;
+			}
 
 			if (last_hostid != items[i].host.hostid)
 			{
@@ -3704,6 +3708,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					zbx_free(error);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unknown validation error for item \"%s\"",
+							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
 				}
 
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);
@@ -4367,7 +4376,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __func__, tmp);
 			continue;
 		}
-		else if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TLS_ACCEPTED, tmp, sizeof(tmp), NULL))
+
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TLS_ACCEPTED, tmp, sizeof(tmp), NULL))
 		{
 			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 		}

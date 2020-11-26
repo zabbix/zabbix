@@ -345,7 +345,7 @@ function interfaceType2str($type) {
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
-		INTERFACE_TYPE_IPMI => _('IPMI'),
+		INTERFACE_TYPE_IPMI => _('IPMI')
 	];
 
 	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
@@ -1030,7 +1030,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	foreach ($items_by_name as $name => $hostid_to_itemids) {
+	foreach ($items_by_name as $hostid_to_itemids) {
 		foreach ($db_hosts as $host) {
 			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
 				continue;
@@ -1157,7 +1157,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 	}
 
 	CArrayHelper::sort($db_hosts, [
-		['field' => 'name', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
 	return $db_hosts;
@@ -1174,10 +1174,10 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	$db_items = getDataOverviewItems($groupids, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name'], $items_by_name)) {
-			$items_by_name[$db_item['name']] = [];
+		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
+			$items_by_name[$db_item['name_expanded']] = [];
 		}
-		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
 	}
 
 	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
@@ -1215,10 +1215,10 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$db_items = getDataOverviewItems(null, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name'], $items_by_name)) {
-			$items_by_name[$db_item['name']] = [];
+		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
+			$items_by_name[$db_item['name_expanded']] = [];
 		}
-		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
 	}
 
 	$items_by_name_ctn = count($items_by_name);
@@ -1227,6 +1227,59 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
 
 	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+}
+
+/**
+ * Prepares interfaces select element with options.
+ *
+ * @param array $interfaces
+ *
+ * @return CSelect
+ */
+function getInterfaceSelect(array $interfaces): CSelect {
+	$interface_select = new CSelect('interfaceid');
+
+	/** @var CSelectOption[] $options_by_type */
+	$options_by_type = [];
+
+	foreach ($interfaces as $interface) {
+		$label = $interface['useip']
+			? $interface['ip'].' : '.$interface['port']
+			: $interface['dns'].' : '.$interface['port'];
+
+		$option = new CSelectOption($interface['interfaceid'], $label);
+
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$version = $interface['details']['version'];
+			if ($version == SNMP_V3) {
+				$option->setExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_('Context name'), $interface['details']['contextname']
+				));
+			} else {
+				$option->setExtra('description', sprintf('%s: %d, %s: %s', _('Version'), $version,
+					_x('Community', 'SNMP Community'), $interface['details']['community']
+				));
+			}
+		}
+
+		$options_by_type[$interface['type']][] = $option;
+	}
+
+	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+		if (array_key_exists($interface_type, $options_by_type)) {
+			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
+
+			if ($interface_type == INTERFACE_TYPE_SNMP) {
+				$interface_group->setOptionTemplate('#{label}'.(new CDiv('#{description}'))->addClass('description'));
+			}
+
+			$interface_group->addOptions($options_by_type[$interface_type]);
+
+			$interface_select->addOptionGroup($interface_group);
+		}
+	}
+
+	return $interface_select;
 }
 
 /**
@@ -1940,7 +1993,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 					: $items[$items_index]['type'],
 				'source' => ($items_index === false)
 					? $master_items[$master_itemid]['source']
-					: $items[$items_index]['source'],
+					: $items[$items_index]['source']
 			];
 		}
 	}

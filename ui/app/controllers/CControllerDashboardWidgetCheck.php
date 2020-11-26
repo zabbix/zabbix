@@ -29,7 +29,7 @@ class CControllerDashboardWidgetCheck extends CController {
 		$fields = [
 			'type' => 'string|required',
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'json'
 		];
 
 		$ret = $this->validateInput($fields);

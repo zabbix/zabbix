@@ -158,7 +158,11 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' =>	 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO|P_ALLOW_LLD_MACRO,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_HTTPAGENT,
+										_('Timeout')
+									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
@@ -793,7 +797,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($application_prototypes as $application_prototype) {
 						if (is_array($application_prototype) && array_key_exists('new', $application_prototype)) {
 							$new_application_prototypes[] = [
-								'name' => $application_prototype['new'],
+								'name' => $application_prototype['new']
 							];
 						}
 						else {
@@ -1359,7 +1363,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 	$data['hosts'] = API::Host()->get([
 		'output' => ['hostid'],
 		'itemids' => $data['item_prototypeids'],
-		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port']
+		'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details']
 	]);
 
 	$data['display_interfaces'] = true;

@@ -36,7 +36,7 @@ class CWebTest extends CTest {
 
 	// Network throttling emulation modes.
 	const NETWORK_THROTTLING_NONE		= 'none';
-	const NETWORK_THROTTLING_OFFLINE		= 'offline';
+	const NETWORK_THROTTLING_OFFLINE	= 'offline';
 	const NETWORK_THROTTLING_SLOW		= 'slow';
 	const NETWORK_THROTTLING_FAST		= 'fast';
 
@@ -469,6 +469,11 @@ class CWebTest extends CTest {
 
 			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) === false) {
 				$this->fail($message."\n".'Cannot save current screenshot.');
+			}
+
+			if ($compare['ref'] !== null
+					&& file_put_contents(PHPUNIT_SCREENSHOT_DIR.'src_'.$name, $compare['ref']) === false) {
+				$this->fail($message."\n".'Cannot save reference screenshot.');
 			}
 
 			if ($compare['diff'] !== null) {

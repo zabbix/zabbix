@@ -69,7 +69,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 		goto fail;
 	}
 
-	item.key = zbx_dsprintf(item.key, "system.run[%s,%s]", param, NULL == result ? "nowait" : "wait");
+	item.key = zbx_dsprintf(item.key, "system.run[%s%s]", param, NULL == result ? ",nowait" : "");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 
 	init_result(&agent_result);
@@ -534,6 +534,8 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	else
 		port = 0;
 
+	DBbegin();
+
 	taskid = DBget_maxid("task");
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_STATUS_NEW, now,
@@ -542,8 +544,6 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	task->data = zbx_tm_remote_command_create(script->type, script->command, script->execute_on, port,
 			script->authtype, script->username, script->password, script->publickey, script->privatekey,
 			taskid, host->hostid, alertid);
-
-	DBbegin();
 
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;

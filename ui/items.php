@@ -152,7 +152,11 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_HTTPAGENT,
+										_('Timeout')
+									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
@@ -641,7 +645,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED),
+				'status' => getRequest('status', ITEM_STATUS_DISABLED)
 			];
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -855,8 +859,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+		'request' => [
+			'itemid' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -1011,7 +1017,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 			if ($items) {
 				$item = [
-					'interfaceid' => getRequest('interfaceid'),
+					'interfaceid' => getRequest('interfaceid', 0),
 					'description' => getRequest('description'),
 					'delay' => $delay,
 					'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
@@ -1297,8 +1303,12 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 		if ($items) {
 			// Check items belong only to hosts.
-			$hosts_status = array_unique(array_column(array_column(array_column($items, 'hosts'), 0), 'status'));
-			if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
+			$hosts_status = [];
+			foreach ($items as $item) {
+				$hosts_status[$item['hosts'][0]['status']] = true;
+			}
+
+			if (array_key_exists(HOST_STATUS_TEMPLATE, $hosts_status)) {
 				$result = false;
 			}
 			else {
@@ -1339,10 +1349,18 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('group_itemid')
-	]);
+	$tasks = [];
+
+	foreach (getRequest('group_itemid') as $itemid) {
+		$tasks[] = [
+			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+			'request' => [
+				'itemid' => $itemid
+			]
+		];
+	}
+
+	$result = (bool) API::Task()->create($tasks);
 
 	if ($result) {
 		uncheckTableRows(getRequest('checkbox_hash'));
@@ -2005,9 +2023,12 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['items']) {
-		$hosts_status = array_unique(array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status'));
-		foreach ($hosts_status as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
+		$hosts_status = [];
+		foreach ($data['items'] as $item) {
+			$hosts_status[$item['hosts'][0]['status']] = true;
+		}
+		foreach ($hosts_status as $key => $value) {
+			if ($key != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
 				break;
 			}

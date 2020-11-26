@@ -78,20 +78,20 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '4 (0/2/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0)', '',
-									'', '', '', '', '', '', '12 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0)'
+							'notifications' => [ '', '', '', '4 (0/2/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0/0/0/0)', '',
+									'', '', '', '', '', '', '12 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0/0/0/0)'
 							]
 						],
 						[
 							'alias' => 'guest',
-							'notifications' => [ '', '2 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0)', '', '', '',
-									'', '', '', '', '10 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/5/0/0/0/0/0/0/0)', '', ''
+							'notifications' => [ '', '2 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0)', '', '', '',
+									'', '', '', '', '10 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/5/0/0/0/0/0/0/0/0/0/0)', '', ''
 							]
 						],
 						[
 							'alias' => 'test-user',
-							'notifications' => [ '', '', '3 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0)', '', '',
-								'', '', '', '', '', '11 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0)', ''
+							'notifications' => [ '', '', '3 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0/0/0/0)', '', '',
+								'', '', '', '', '', '11 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0/0/0/0)', ''
 							]
 						]
 					]
@@ -110,12 +110,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						[
 							'alias' => 'disabled-user',
 							'notifications' => [ '', '', '', '', '', '', '', '', '', '',
-								'15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0)', '']
+								'15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0/0/0/0)', '']
 						],
 						[
 							'alias' => 'user-for-blocking',
 							'notifications' => [ '', '', '', '', '', '',
-								'14 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0)', '', '', '', '', '']
+								'14 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0/0/0/0)', '', '', '', '', '']
 						]
 					]
 				]
@@ -128,12 +128,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						[
 							'alias' => 'admin-zabbix',
 							'notifications' => [ '', '', '', '', '',
-								'16 (0/8/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0)', '']
+								'16 (0/8/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0/0/0/0)', '']
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0)',
-								'7 (0/3/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/4/0/0/0/0/0/0/0)', '']
+							'notifications' => [ '', '', '', '', '15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0/0/0/0)',
+								'7 (0/3/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/4/0/0/0/0/0/0/0/0/0/0)', '']
 						]
 					]
 				]
@@ -167,10 +167,14 @@ class testPageReportsNotifications extends CLegacyWebTest {
 	 */
 	public function testPageReportsNotifications_CheckFilters($data) {
 		$this->zbxTestLogin('report4.php');
+		$this->page->waitUntilReady();
+		// TODO: without sleep test fail because the "zabbix-sidebar-logo" element receive the click.
+		sleep(1);
 
 		// Select period
 		if (array_key_exists('period', $data)) {
-			$this->zbxTestDropdownSelect('period', $data['period']);
+			$this->zbxTestDropdownSelectWait('period', $data['period']);
+			sleep(1);
 			if ($data['period'] === 'Yearly') {
 				$this->zbxTestAssertElementNotPresentId('year');
 			}
@@ -178,12 +182,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Select year
 		if (array_key_exists('year', $data)) {
-			$this->zbxTestDropdownSelect('year', $data['year']);
+			$this->zbxTestDropdownSelectWait('year', $data['year']);
 		}
 
 		// Select media
 		if (array_key_exists('media_type', $data)) {
-			$this->zbxTestDropdownSelect('media_type', $data['media_type']);
+			$this->zbxTestDropdownSelectWait('media_type', $data['media_type']);
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
 			$media_types = [];

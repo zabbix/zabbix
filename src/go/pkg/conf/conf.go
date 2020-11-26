@@ -220,8 +220,13 @@ func setBasicValue(value reflect.Value, meta *Meta, str *string) (err error) {
 		}
 	case reflect.Bool:
 		var v bool
-		if *str == "true" {
+		switch *str {
+		case "true":
 			v = true
+		case "false":
+			v = false
+		default:
+			return errors.New("invalid boolean value")
 		}
 		value.SetBool(v)
 	case reflect.Ptr:

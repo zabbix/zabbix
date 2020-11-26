@@ -183,7 +183,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template',
@@ -196,7 +196,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template'
@@ -207,7 +207,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Contains'],
+						['name' => 'action', 'operator' => 'Contains']
 					],
 					'expected_templates' => [
 						'Form test template',
@@ -220,7 +220,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Equals'],
+						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
 			]
@@ -259,7 +259,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->login()->open('templates.php?groupid=0');
 		// Reset Templates filter from possible previous scenario.
 		$this->resetFilter();
-		// Click on Hosts link in Temlate row.
+		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
 		// Check that Hosts page is opened.

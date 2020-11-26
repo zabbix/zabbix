@@ -388,7 +388,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 
 	if (NULL == query || '\0' == *query)
 	{
-		*error = zbx_strdup(NULL, "ODBC query cannot be empty.");
+		*error = zbx_strdup(*error, "SQL query cannot be empty.");
 		goto out;
 	}
 

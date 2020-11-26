@@ -16,7 +16,7 @@
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
 GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
 For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.&#13;
-2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI &lt;protocol(host:port or /path/to/socket)/&gt;.&#13;
+2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.&#13;
 Examples: MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock&#13;
 For more information about MySQL Unix socket file please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html.&#13;
 3. If you had set URI in the {$MYSQL.DSN}, please define the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).&#13;

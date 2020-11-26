@@ -105,12 +105,12 @@ function parse_schema($path) {
 			foreach ($fieldata as $name => $val) {
 				$str .= "\t\t\t\t'$name' => $val,\n";
 			}
-			$str .= "\t\t\t],\n";
+			$str = substr($str, 0, -2)."\n\t\t\t],\n";
 		}
-		$str .= "\t\t],\n";
+		$str = substr($str, 0, -2)."\n\t\t]\n";
 		$str .= "\t],\n";
 	}
-	$str .= "];\n";
+	$str = substr($str, 0, -2)."\n];\n";
 
 	return $str;
 }

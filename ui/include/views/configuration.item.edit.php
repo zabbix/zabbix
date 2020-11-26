@@ -199,8 +199,10 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
 	->addRow(
-		new CLabel(_('Timeout'), 'timeout'),
-		(new CTextBox('timeout', $data['timeout'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
+		(new CTextBox('timeout', $data['timeout'], $readonly))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
 		'timeout_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
@@ -314,7 +316,8 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete(),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
@@ -335,14 +338,16 @@ $form_list
 	->addRow(
 		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_username_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
 	->addRow(
 		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
@@ -380,7 +385,9 @@ $form_list
 		new CLabel(_('SSL key password'), 'ssl_key_password'),
 		(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly,
 			DB::getFieldLength('items', 'ssl_key_password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'ssl_key_password_row'
 	)
 	// Append master item select to form list.
@@ -438,41 +445,22 @@ if ($data['interfaces']) {
 		}
 	}
 	else {
-		$interfacesComboBox = (new CComboBox('interfaceid', $data['interfaceid']))
+		$select_interface = getInterfaceSelect($data['interfaces'])
+			->setId('interface-select')
+			->setValue($data['interfaceid'])
+			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
 
-		// Set up interface groups sorted by priority.
-		$interface_types = zbx_objectValues($this->data['interfaces'], 'type');
-		$interface_groups = [];
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-			if (in_array($interface_type, $interface_types)) {
-				$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
-			}
-		}
-
-		// add interfaces to groups
-		foreach ($data['interfaces'] as $interface) {
-			$option = new CComboItem($interface['interfaceid'],
-				$interface['useip']
-					? $interface['ip'].' : '.$interface['port']
-					: $interface['dns'].' : '.$interface['port'],
-				($interface['interfaceid'] == $data['interfaceid'])
-			);
-			$option->setAttribute('data-interfacetype', $interface['type']);
-			$interface_groups[$interface['type']]->addItem($option);
-		}
-		foreach ($interface_groups as $interface_group) {
-			$interfacesComboBox->addItem($interface_group);
-		}
-
-		$span = (new CSpan(_('No interface found')))
-			->addClass(ZBX_STYLE_RED)
-			->setId('interface_not_defined')
-			->setAttribute('style', 'display: none;');
-
-		$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(),
-			[$interfacesComboBox, $span], 'interface_row'
-		);
+		$form_list->addRow(
+			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))->setAsteriskMark(),
+			[
+				$select_interface,
+				(new CSpan(_('No interface found')))
+					->setId('interface_not_defined')
+					->addClass(ZBX_STYLE_RED)
+					->setAttribute('style', 'display: none;')
+			], 'interface_row');
 		$form->addVar('selectedInterfaceId', $data['interfaceid']);
 	}
 }
@@ -517,7 +505,9 @@ $form_list
 		'row_jmx_endpoint'
 	)
 	->addRow(_('User name'),
-		(new CTextBox('username', $data['username'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('username', $data['username'], $discovered_item, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_username'
 	)
 	->addRow(
@@ -535,7 +525,9 @@ $form_list
 		'row_privatekey'
 	)
 	->addRow(_('Password'),
-		(new CTextBox('password', $data['password'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('password', $data['password'], $discovered_item, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_password'
 	)
 	->addRow(

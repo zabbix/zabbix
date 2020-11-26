@@ -77,7 +77,7 @@ class CControllerSearch extends CController {
 			'templates' => [],
 			'total_groups_cnt' => 0,
 			'total_hosts_cnt' => 0,
-			'total_templates_cnt' => 0,
+			'total_templates_cnt' => 0
 		];
 
 		if ($this->search !== '') {

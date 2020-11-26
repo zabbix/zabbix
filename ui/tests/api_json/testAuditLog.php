@@ -81,7 +81,7 @@ class testAuditLog extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			// Extend selectDetails and ouptut.
+			// Extend selectDetails and output.
 			[
 				'api_request' => [
 					'userids' => '1',
@@ -188,7 +188,7 @@ class testAuditLog extends CAPITest {
 					'output' => ['auditid'],
 					'search' => [
 						'note' => ['[']
-					],
+					]
 				],
 				'expected_result' => [
 					[

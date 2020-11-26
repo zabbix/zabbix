@@ -39,7 +39,7 @@ class CPage {
 	/**
 	 * Page defaults.
 	 */
-	const DEFAULT_PAGE_WIDTH = 1280;
+	const DEFAULT_PAGE_WIDTH = 1440;
 	const DEFAULT_PAGE_HEIGHT = 1024;
 
 	/**
@@ -542,7 +542,7 @@ class CPage {
 		$this->open('index.php');
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
+		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 	}
 }

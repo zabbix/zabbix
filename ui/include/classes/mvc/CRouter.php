@@ -302,7 +302,7 @@ class CRouter {
 	];
 
 	/**
-	 * Add new actions (potentially overwritting the existing ones).
+	 * Add new actions (potentially overwriting the existing ones).
 	 *
 	 * @param array  $actions                           List of actions.
 	 * @param string $actions['action_name']            Definition of the 'action_name' action.

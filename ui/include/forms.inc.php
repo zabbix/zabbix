@@ -282,7 +282,7 @@ function getItemFilterForm(&$items) {
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
 			1 => _('Inherited items'),
-			0 => _('Not inherited items'),
+			0 => _('Not inherited items')
 		])
 	);
 
@@ -835,7 +835,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	if ($data['parent_discoveryid'] != 0) {
 		$data['discover'] = hasRequest('form_refresh')
 			? getRequest('discover', DB::getDefault('items', 'discover'))
-			: ($item
+			: (($item && array_key_exists('discover', $item))
 				? $item['discover']
 				: DB::getDefault('items', 'discover')
 			);
@@ -1427,7 +1427,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
 							->removeId()
-					]))->addClass('step-action'),
+					]))->addClass('step-action')
 				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))

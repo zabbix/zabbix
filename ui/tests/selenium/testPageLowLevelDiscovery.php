@@ -116,7 +116,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
 
-		// Check that filtered count mathces expected.
+		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
 		$this->assertTableStats(1);
 
@@ -274,9 +274,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Virtualization'
+						'Host groups' => 'Templates/Server hardware'
 					],
-					'rows' => 8
+					'rows' => 39
 				]
 			],
 			[
@@ -309,7 +309,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'testFormDiscoveryRule2',
+						'Name' => 'testFormDiscoveryRule2'
 					],
 					'expected' => [
 						'testFormDiscoveryRule2'
@@ -319,7 +319,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Update interval' => '0',
+						'Update interval' => '0'
 					],
 					'expected' => [
 						'Test discovery rule',

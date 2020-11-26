@@ -76,7 +76,7 @@ abstract class DbBackend {
 	protected $tls_cipher_list = '';
 
 	/**
-	 * Set TLS specific options for db conection.
+	 * Set TLS specific options for db connection.
 	 *
 	 * @param string $key_file       Path to TLS key file.
 	 * @param string $cert_file      Path to TLS cert file.

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-04T17:53:48Z</date>
+   <date>2020-10-20T07:24:02Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -24,7 +24,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Operating systems</name>
@@ -952,7 +952,6 @@ machine</params>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Operating system description has changed</name>
                      <priority>INFO</priority>
                      <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -1500,6 +1499,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].change()}&lt;0 and {Template OS Linux by Prom:net.if.speed[node_exporter,"{#IFNAME}"].last()}&gt;0&#13;
@@ -1908,6 +1908,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:vfs.dev.read.await[node_exporter,"{#DEVNAME}"].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} or {Template OS Linux by Prom:vfs.dev.write.await[node_exporter,"{#DEVNAME}"].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
@@ -2189,6 +2190,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template OS Linux by Prom:vfs.fs.pused[node_exporter,"{#FSNAME}"].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;

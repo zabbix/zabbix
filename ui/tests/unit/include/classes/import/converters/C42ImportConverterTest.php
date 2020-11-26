@@ -104,7 +104,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 										'name' => 'Clock'
 									],
 									'max_columns' => 3
-								],
+								]
 							]
 						]
 					]
@@ -136,7 +136,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 						[
 							'name' => 'Parent screen 2',
 							'hsize' => 1,
-							'vsize' => 4,
+							'vsize' => 4
 						],
 						[
 							'name' => 'Child screen',
@@ -161,7 +161,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
-				],
+				]
 			],
 			[
 				[

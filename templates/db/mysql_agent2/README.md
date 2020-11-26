@@ -1,9 +1,9 @@
 
-# Template DB MySQL by Zabbix agent 2
+# MySQL by Zabbix agent 2
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.0 and higher  
 The template is developed for monitoring DBMS MySQL and its forks.
 
 This template was tested on:
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Create MySQL user for monitoring (`<password>` at your discretion):
 
@@ -26,7 +26,7 @@ GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_m
 
 For more information please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
 
-2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI <protocol(host:port or /path/to/socket)/>.  
+2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.  
 **Examples:** MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock  
 For more information about MySQL Unix socket file please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html.
 
