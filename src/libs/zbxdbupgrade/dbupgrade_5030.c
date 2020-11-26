@@ -81,10 +81,6 @@ static void	DBpatch_5030000_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *pr
 static int	DBpatch_5030000(void)
 {
 	int	i, ret = SUCCEED;
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const char	*keys[] =
 	{
 		"web.items.php.sort",
@@ -99,13 +95,15 @@ static int	DBpatch_5030000(void)
 		"web.httpconf.php.sortorder"
 	};
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	for (i = 0; SUCCEED == ret && i < (int)ARRSIZE(keys); i++)
 	{
+		char			*subsect = NULL, *field = NULL;
 		DB_ROW			row;
 		DB_RESULT		result;
 		zbx_dbpatch_profile_t	profile = {0};
-		char			*subsect = NULL;
-		char			*field = NULL;
 
 		result = DBselect("SELECT profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
 				" FROM profiles where idx='%s'", keys[i]);
