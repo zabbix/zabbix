@@ -288,8 +288,10 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	output = convert_to_utf8(buffer, offset, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
 	zbx_replace_invalid_utf8(output);
+
 	SET_TEXT_RESULT(result, output);
 	output = NULL;
+
 	ret = SYSINFO_RET_OK;
 channel_close:
 	/* close an active data channel */
