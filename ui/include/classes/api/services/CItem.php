@@ -115,6 +115,7 @@ class CItem extends CItemGeneral {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectInterfaces'			=> null,
+			'selectTags'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectApplications'		=> null,
@@ -506,6 +507,7 @@ class CItem extends CItemGeneral {
 	 */
 	protected function createReal(array &$items) {
 		$items_rtdata = [];
+		$new_tags = [];
 
 		foreach ($items as $key => &$item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
@@ -523,37 +525,15 @@ class CItem extends CItemGeneral {
 
 		foreach ($items_rtdata as $key => &$value) {
 			$value['itemid'] = $itemids[$key];
+			$items[$key]['itemid'] = $itemids[$key]; // TODO miks: no need to pass $itemids to the function calls at the end of the function.
 		}
 		unset($value);
 
 		DB::insert('item_rtdata', $items_rtdata, false);
 
-		$item_applications = [];
-		foreach ($items as $key => $item) {
-			$items[$key]['itemid'] = $itemids[$key];
-
-			if (!isset($item['applications'])) {
-				continue;
-			}
-
-			foreach ($item['applications'] as $appid) {
-				if ($appid == 0) {
-					continue;
-				}
-
-				$item_applications[] = [
-					'applicationid' => $appid,
-					'itemid' => $items[$key]['itemid']
-				];
-			}
-		}
-
-		if ($item_applications) {
-			DB::insertBatch('items_applications', $item_applications);
-		}
-
 		$this->createItemParameters($items, $itemids);
-		$this->createItemPreprocessing($items);
+		$this->createItemPreprocessing($items, $itemids);
+		$this->createItemTags($items, $itemids);
 	}
 
 	/**
@@ -571,29 +551,9 @@ class CItem extends CItemGeneral {
 		}
 		DB::update('items', $data);
 
-		$itemApplications = [];
-		$applicationids = [];
-		foreach ($items as $item) {
-			if (!isset($item['applications'])) {
-				continue;
-			}
-			$applicationids[] = $item['itemid'];
-
-			foreach ($item['applications'] as $appid) {
-				$itemApplications[] = [
-					'applicationid' => $appid,
-					'itemid' => $item['itemid']
-				];
-			}
-		}
-
-		if (!empty($applicationids)) {
-			DB::delete('items_applications', ['itemid' => $applicationids]);
-			DB::insertBatch('items_applications', $itemApplications);
-		}
-
 		$this->updateItemParameters($items);
 		$this->updateItemPreprocessing($items);
+		$this->updateItemTags($items);
 	}
 
 	/**
@@ -783,8 +743,8 @@ class CItem extends CItemGeneral {
 
 		$tpl_items = $this->get([
 			'output' => $output,
-			'selectApplications' => ['applicationid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
@@ -1202,6 +1162,19 @@ class CItem extends CItemGeneral {
 				}
 			}
 			unset($item);
+		}
+
+		// Adding item tags.
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			$tags = API::getApiService()->select('item_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['itemid']),
+				'filter' => ['itemid' => $itemids],
+				'preservekeys' => true
+			]);
+
+			$relation_map = $this->createRelationMap($tags, 'itemid', 'itemtagid');
+			$tags = $this->unsetExtraFields($tags, ['itemtagid', 'itemid'], []);
+			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;

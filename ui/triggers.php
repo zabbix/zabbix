@@ -184,15 +184,14 @@ if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 }
 
 $tags = getRequest('tags', []);
+
+// Unset empty and inherited tags.
 foreach ($tags as $key => $tag) {
-	// remove empty new tag lines
 	if ($tag['tag'] === '' && $tag['value'] === '') {
 		unset($tags[$key]);
 		continue;
 	}
-
-	// remove inherited tags
-	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 		unset($tags[$key]);
 	}
 	else {

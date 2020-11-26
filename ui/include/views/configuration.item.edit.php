@@ -862,37 +862,6 @@ $form_list
 		'row_trapper_hosts'
 	);
 
-// Add "New application" and list of applications to form list.
-if ($discovered_item) {
-	$form->addVar('new_application', '');
-	foreach ($data['db_applications'] as $db_application) {
-		foreach ($data['applications'] as $application) {
-			if ($db_application['applicationid'] == $application) {
-				$form->addVar('applications[]', $db_application['applicationid']);
-			}
-		}
-	}
-
-	$application_list_box = new CListBox('applications_names[]', $data['applications'], 6);
-	foreach ($data['db_applications'] as $application) {
-		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
-	}
-	$application_list_box->setEnabled(!$discovered_item);
-}
-else {
-	$form_list->addRow(new CLabel(_('New application'), 'new_application'), (new CSpan(
-		(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->addClass(ZBX_STYLE_FORM_NEW_GROUP));
-
-	$application_list_box = new CListBox('applications[]', $data['applications'], 6);
-	$application_list_box->addItem(0, '-'._('None').'-');
-	foreach ($data['db_applications'] as $application) {
-		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
-	}
-}
-
-$form_list->addRow(_('Applications'), $application_list_box);
-
 // Append populate host to form list.
 if ($discovered_item) {
 	$form->addVar('inventory_link', 0);
@@ -941,6 +910,15 @@ $form_list
 // Append tabs to form.
 $itemTab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $form_list)
+	->addTab('tags-tab', _('Tags'),
+		new CPartial('configuration.tags.tab', [
+			'source' => 'item',
+			'tags' => $data['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags'],
+			'readonly' => $discovered_item
+		]),
+		TAB_INDICATOR_TAGS
+	)
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),

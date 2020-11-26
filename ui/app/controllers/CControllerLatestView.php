@@ -35,7 +35,6 @@ class CControllerLatestView extends CControllerLatest {
 			// filter inputs
 			'filter_groupids' =>			'array_id',
 			'filter_hostids' =>				'array_id',
-			'filter_application' =>			'string',
 			'filter_select' =>				'string',
 			'filter_show_without_data' =>	'in 1',
 			'filter_show_details' =>		'in 1',
@@ -67,9 +66,6 @@ class CControllerLatestView extends CControllerLatest {
 				PROFILE_TYPE_ID
 			);
 			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-			CProfile::update('web.latest.filter.application', trim($this->getInput('filter_application', '')),
-				PROFILE_TYPE_STR
-			);
 			CProfile::update('web.latest.filter.select', trim($this->getInput('filter_select', '')), PROFILE_TYPE_STR);
 			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0),
 				PROFILE_TYPE_INT
@@ -81,7 +77,6 @@ class CControllerLatestView extends CControllerLatest {
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.latest.filter.groupids');
 			CProfile::deleteIdx('web.latest.filter.hostids');
-			CProfile::delete('web.latest.filter.application');
 			CProfile::delete('web.latest.filter.select');
 			CProfile::delete('web.latest.filter.show_without_data');
 			CProfile::delete('web.latest.filter.show_details');
@@ -91,13 +86,23 @@ class CControllerLatestView extends CControllerLatest {
 		$filter_hostids = CProfile::getArray('web.latest.filter.hostids');
 		$filter_show_without_data = $filter_hostids ? CProfile::get('web.latest.filter.show_without_data', 1) : 1;
 
+		$filter_tags = [];
+		if (!$filter_tags) {
+			$filter_tags = [[
+				'tag' => '',
+				'operator' => TAG_OPERATOR_LIKE,
+				'value' => ''
+			]];
+		}
+
 		$filter = [
 			'groupids' => CProfile::getArray('web.latest.filter.groupids'),
 			'hostids' => $filter_hostids,
-			'application' => CProfile::get('web.latest.filter.application', ''),
 			'select' => CProfile::get('web.latest.filter.select', ''),
 			'show_without_data' => $filter_show_without_data,
-			'show_details' => CProfile::get('web.latest.filter.show_details', 0)
+			'show_details' => CProfile::get('web.latest.filter.show_details', 0),
+			'tags' => $filter_tags,
+			'evaltype' => TAG_EVAL_TYPE_AND_OR
 		];
 
 		$sort_field = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
@@ -112,7 +117,6 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('action', 'latest.view.refresh')
 			->setArgument('filter_groupids', $filter['groupids'])
 			->setArgument('filter_hostids', $filter['hostids'])
-			->setArgument('filter_application', $filter['application'])
 			->setArgument('filter_select', $filter['select'])
 			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
 			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
@@ -123,10 +127,9 @@ class CControllerLatestView extends CControllerLatest {
 		// data sort and pager
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
+		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['items'], ZBX_SORT_UP, $view_curl);
 
 		$this->extendData($prepared_data, $filter['show_without_data']);
-		$this->addCollapsedDataFromProfile($prepared_data);
 
 		// display
 		$data = [

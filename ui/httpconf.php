@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
@@ -26,7 +25,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'class.tab-indicators.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js', 'class.tab-indicators.js', 'textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -36,7 +35,6 @@ $fields = [
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
-	'applicationid'   => [T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')],
 	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'],
 	'name'            => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')],
 	'delay'           => [T_ZBX_STR, O_OPT, null,  null,					'isset({add}) || isset({update})'],
@@ -75,7 +73,6 @@ $fields = [
 								_('Password')
 							],
 	'http_proxy'		=> [T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
-	'new_application'	=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'hostname'			=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'templated'			=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'verify_host'		=> [T_ZBX_STR, O_OPT, null,	null,				null],
@@ -84,6 +81,8 @@ $fields = [
 	'ssl_key_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_password'	=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
+	'tags'				=> [T_ZBX_STR, O_OPT, null,	null,				null],
+	'show_inherited_tags' => [T_ZBX_INT, O_OPT, null, IN([0,1]),		null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -134,6 +133,20 @@ if (hasRequest('httptestid')) {
 }
 elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
+}
+
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
 }
 
 /*
@@ -214,12 +227,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	try {
 		DBstart();
 
-		$new_application = getRequest('new_application');
-
-		if (!empty($_REQUEST['applicationid']) && $new_application) {
-			throw new Exception(_('Cannot create new application, web scenario is already assigned to application.'));
-		}
-
 		$steps = getRequest('steps', []);
 		$field_names = ['headers', 'variables', 'post_fields', 'query_fields'];
 		$i = 1;
@@ -266,7 +273,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
-			'applicationid' => getRequest('applicationid', 0),
 			'delay' => getRequest('delay', DB::getDefault('httptest', 'delay')),
 			'retries' => $_REQUEST['retries'],
 			'status' => hasRequest('status') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED,
@@ -301,50 +307,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		unset($variable);
 
-		if ($new_application) {
-			$exApp = API::Application()->get([
-				'output' => ['applicationid', 'flags'],
-				'hostids' => $_REQUEST['hostid'],
-				'filter' => ['name' => $new_application]
-			]);
-
-			/*
-			 * If application exists and it is a discovered application, prevent adding it to web scenario. If it is
-			 * a normal application, assign it to web scenario. Otherwise create new application.
-			 */
-			if ($exApp) {
-				if ($exApp[0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					throw new Exception(_s('Application "%1$s" already exists.', $new_application));
-				}
-				else {
-					$httpTest['applicationid'] = $exApp[0]['applicationid'];
-				}
-			}
-			else {
-				$result = API::Application()->create([
-					'name' => $new_application,
-					'hostid' => $_REQUEST['hostid']
-				]);
-				if ($result) {
-					$httpTest['applicationid'] = reset($result['applicationids']);
-				}
-				else {
-					throw new Exception(_s('Cannot add new application "%1$s".', $new_application));
-				}
-			}
-		}
-
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change
 			$dbHttpTest = API::HttpTest()->get([
 				'httptestids' => $_REQUEST['httptestid'],
 				'output' => API_OUTPUT_EXTEND,
-				'selectSteps' => API_OUTPUT_EXTEND
+				'selectSteps' => API_OUTPUT_EXTEND,
+				'selectTags' => ['tag', 'value']
 			]);
 			$dbHttpTest = reset($dbHttpTest);
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
-			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, ['applicationid']);
+			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest);
 			foreach (['headers', 'variables'] as $field_name) {
 				if (count($httpTest[$field_name]) !== count($dbHttpTest[$field_name])) {
 					continue;
@@ -398,6 +372,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$httpTest['httptestid'] = $httpTestId = $_REQUEST['httptestid'];
 
+			CArrayHelper::sort($dbHttpTest['tags'], ['tag', 'value']);
+			CArrayHelper::sort($tags, ['tag', 'value']);
+			if (array_values($dbHttpTest['tags']) !== array_values($tags)) {
+				$httpTest['tags'] = $tags;
+			}
+
 			$result = API::HttpTest()->update($httpTest);
 			if (!$result) {
 
@@ -412,6 +392,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['httptestid'], $step['httpstepid']);
 			}
 			unset($step);
+
+			$httpTest['tags'] = $tags;
 
 			$result = API::HttpTest()->create($httpTest);
 			if (!$result) {
@@ -546,7 +528,8 @@ if (isset($_REQUEST['form'])) {
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'templates' => [],
-		'context' => getRequest('context')
+		'context' => getRequest('context'),
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0)
 	];
 
 	$host = API::Host()->get([
@@ -556,23 +539,27 @@ if (isset($_REQUEST['form'])) {
 	]);
 	$data['host'] = reset($host);
 
-	if (hasRequest('httptestid') && !hasRequest('form_refresh')) {
+	if (hasRequest('httptestid')) {
 		$db_httptests = API::HttpTest()->get([
-			'output' => ['name', 'applicationid', 'delay', 'retries', 'status', 'agent', 'authentication',
+			'output' => ['name', 'delay', 'retries', 'status', 'agent', 'authentication',
 				'http_user', 'http_password', 'http_proxy', 'templateid', 'verify_peer', 'verify_host', 'ssl_cert_file',
 				'ssl_key_file', 'ssl_key_password', 'headers', 'variables'
 			],
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
 				'follow_redirects', 'retrieve_mode', 'headers', 'variables', 'query_fields', 'post_type'
 			],
+			'selectTags' => ['tag', 'value'],
 			'httptestids' => getRequest('httptestid')
 		]);
 
 		$db_httptest = $db_httptests[0];
+	}
+	else {
+		$db_httptest = null;
+	}
 
+	if ($db_httptest && !hasRequest('form_refresh')) {
 		$data['name'] = $db_httptest['name'];
-		$data['applicationid'] = $db_httptest['applicationid'];
-		$data['new_application'] = '';
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
@@ -672,11 +659,8 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		$data['name'] = getRequest('name', '');
-		$data['applicationid'] = getRequest('applicationid');
-		$data['new_application'] = getRequest('new_application', '');
 		$data['delay'] = getRequest('delay', DB::getDefault('httptest', 'delay'));
 		$data['retries'] = getRequest('retries', 1);
-
 		$data['agent'] = getRequest('agent', ZBX_DEFAULT_AGENT);
 		$data['agent_other'] = getRequest('agent_other');
 
@@ -704,23 +688,7 @@ if (isset($_REQUEST['form'])) {
 		$data['pairs'] = array_values(getRequest('pairs', []));
 	}
 
-	$data['application_list'] = [];
-	if (!empty($data['hostid'])) {
-		$db_applications = API::Application()->get([
-			'output' => ['name'],
-			'hostids' => $data['hostid'],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
-		]);
-
-		CArrayHelper::sort($db_applications, ['name']);
-		foreach ($db_applications as $applicationid => $db_application) {
-			$data['application_list'][$applicationid] = $db_application['name'];
-		}
-	}
-
 	$i = 1;
-
 	foreach($data['steps'] as $stepid => $step) {
 		$pairs_grouped = [
 			'query_fields' => [],
@@ -738,6 +706,25 @@ if (isset($_REQUEST['form'])) {
 		$data['steps'][$stepid]['no'] = $i++;
 	}
 
+	if ($db_httptest) {
+		$linked_templates = getHttpTestParentTemplates($db_httptests);
+		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'], $linked_templates,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
+		$tags = getHttpTestTags([
+			'templates' => $linked_templates['templates'],
+			'hostid' => getRequest('hostid'),
+			'tags' => hasRequest('form_refresh') ? $tags : $db_httptest['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags']
+		]);
+	}
+
+	$data['tags'] = $tags;
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+//
 	// render view
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
 }
@@ -841,10 +828,9 @@ else {
 
 	$dbHttpTests = DBselect(
 		'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
-			'ht.authentication,ht.http_proxy,a.applicationid,a.name AS application_name'.
+			'ht.authentication,ht.http_proxy'.
 			' FROM httptest ht'.
 			' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-			' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
 			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
 	);
 	$httpTests = [];

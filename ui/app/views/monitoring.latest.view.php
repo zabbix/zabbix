@@ -40,6 +40,48 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
+	$filter_tags_table = (new CTable())
+		->setId('filter-tags_#{uniqid}')
+		->addRow(
+			(new CCol(
+				(new CRadioButtonList('evaltype', (int) $data['filter']['evaltype']))
+					->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
+					->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
+					->setModern(true)
+					->setId('evaltype_#{uniqid}')
+			))->setColSpan(4)
+		);
+
+	foreach ($data['filter']['tags'] as $i => $tag) {
+		$filter_tags_table->addRow([
+			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('tags['.$i.'][value]', $tag['value']))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('tags['.$i.'][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+					->removeId()
+			))->addClass(ZBX_STYLE_NOWRAP)
+		], 'form_row');
+	}
+
+	$filter_tags_table->addRow(
+		(new CCol(
+			(new CButton('tags_add', _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-add')
+				->removeId()
+		))->setColSpan(3)
+	);
+
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
 		->setProfile('web.latest.filter')
 		->setActiveTab($data['active_tab'])
@@ -81,43 +123,29 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
-				->addRow(_('Application'), [
-					(new CTextBox('filter_application', $data['filter']['application']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					(new CButton('application_name', _('Select')))
-						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic", jQuery.extend('.
-							json_encode([
-								'srctbl' => 'applications',
-								'srcfld1' => 'name',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_application',
-								'real_hosts' => '1',
-								'with_applications' => '1'
-							]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
-						)
-				]),
+				->addRow(_('Name'),
+					(new CTextBox('filter_select', $data['filter']['select']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				),
 			(new CFormList())
-				->addRow(_('Name'), (new CTextBox('filter_select', $data['filter']['select']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-				->addRow(_('Show items without data'),
-					(new CCheckBox('filter_show_without_data'))
-						->setChecked($data['filter']['show_without_data'] == 1)
-						->setAttribute('disabled', $data['filter']['hostids'] ? null : 'disabled')
-				)
-				->addRow(_('Show details'),
-					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1)
-				)
+				->addRow(_('Tags'), $filter_tags_table)
+				->addRow(_('Show details'), [
+					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1),
+					(new CDiv([
+						(new CLabel(_('Show items without data'), 'show_suppressed_#{uniqid}'))
+							->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+						(new CCheckBox('filter_show_without_data'))
+							->setChecked($data['filter']['show_without_data'] == 1)
+							->setAttribute('disabled', $data['filter']['hostids'] ? null : 'disabled')
+					]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+				])
 		])
 	);
 }
 
-$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip(['filter',
-	'sort_field', 'sort_order', 'view_curl', 'paging', 'rows', 'hosts', 'applications', 'applications_size',
-	'applications_index', 'items', 'history', 'collapsed_index', 'collapsed_all', 'config'
-]))));
+$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
+	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config'])
+)));
 
 $widget->show();
 

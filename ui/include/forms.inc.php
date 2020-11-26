@@ -889,8 +889,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
-		'new_application' => getRequest('new_application', ''),
-		'applications' => getRequest('applications', []),
 		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'ipmi_sensor' => getRequest('ipmi_sensor', ''),
 		'authtype' => getRequest('authtype', 0),
@@ -931,8 +929,23 @@ function getItemFormData(array $item = [], array $options = []) {
 		'http_password' => getRequest('http_password', ''),
 		'preprocessing' => getRequest('preprocessing', []),
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
-		'context' => getRequest('context')
+		'context' => getRequest('context'),
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
+		'tags' => getRequest('tags', [])
 	];
+
+	// Unset empty and inherited tags.
+	foreach ($data['tags'] as $key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($data['tags'][$key]);
+		}
+		elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+			unset($data['tags'][$key]);
+		}
+		else {
+			unset($data['tags'][$key]['type']);
+		}
+	}
 
 	if ($data['parent_discoveryid'] != 0) {
 		$data['discover'] = hasRequest('form_refresh')
@@ -1004,9 +1017,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		]);
 		$discoveryRule = reset($discoveryRule);
 		$data['hostid'] = $discoveryRule['hostid'];
-
-		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
-		$data['application_prototypes'] = getRequest('application_prototypes', []);
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);
@@ -1101,7 +1111,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['privatekey'] = $data['item']['privatekey'];
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
-		$data['new_application'] = getRequest('new_application', '');
 		// ITEM_TYPE_HTTPAGENT
 		$data['timeout'] = $data['item']['timeout'];
 		$data['url'] = $data['item']['url'];
@@ -1124,6 +1133,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['http_authtype'] = $data['item']['authtype'];
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
+		$data['tags'] = $data['item']['tags'];
 
 		if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
 			// Convert hash to array where every item is hash for single key value pair as it is used by view.
@@ -1193,59 +1203,11 @@ function getItemFormData(array $item = [], array $options = []) {
 			$data['history'] = $data['item']['history'];
 			$data['status'] = $data['item']['status'];
 			$data['trends'] = $data['item']['trends'];
-
-			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
-
-			if ($data['parent_discoveryid'] != 0) {
-				/*
-				 * Get a list of application prototypes assigned to item prototype. Don't select distinct names,
-				 * since database can be accidentally created case insensitive.
-				 */
-				$application_prototypes = DBfetchArray(DBselect(
-					'SELECT ap.name'.
-					' FROM application_prototype ap,item_application_prototype iap'.
-					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
-						' AND ap.itemid='.zbx_dbstr($data['parent_discoveryid']).
-						' AND iap.itemid='.zbx_dbstr($data['itemid'])
-				));
-
-				// Merge form submitted data with data existing in DB to find diff and correctly display ListBox.
-				$data['application_prototypes'] = array_unique(
-					zbx_array_merge($data['application_prototypes'], zbx_objectValues($application_prototypes, 'name'))
-				);
-			}
 		}
 	}
 
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE];
-	}
-
-	// applications
-	if (count($data['applications']) == 0) {
-		array_push($data['applications'], 0);
-	}
-	$data['db_applications'] = DBfetchArray(DBselect(
-		'SELECT DISTINCT a.applicationid,a.name'.
-		' FROM applications a'.
-		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
-			(($data['parent_discoveryid'] != 0) ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
-	));
-	order_result($data['db_applications'], 'name');
-
-	if ($data['parent_discoveryid'] != 0) {
-		// Make the application prototype list no appearing empty, but filling it with "-None-" as first element.
-		if (count($data['application_prototypes']) == 0) {
-			$data['application_prototypes'][] = 0;
-		}
-
-		// Get a list of application prototypes by discovery rule.
-		$data['db_application_prototypes'] = DBfetchArray(DBselect(
-			'SELECT ap.application_prototypeid,ap.name'.
-			' FROM application_prototype ap'.
-			' WHERE ap.itemid='.zbx_dbstr($data['parent_discoveryid'])
-		));
-		order_result($data['db_application_prototypes'], 'name');
 	}
 
 	// interfaces
@@ -1297,6 +1259,99 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if ($data['type'] != ITEM_TYPE_DEPENDENT) {
 		$data['master_itemid'] = 0;
+	}
+
+	// Select inherited tags.
+	if ($data['show_inherited_tags']) {
+		//if ($data['parent_discoveryid'] != 0) {
+		if ($data['item']['discoveryRule']) {
+			$items = [$data['item']['discoveryRule']];
+			$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
+		}
+		else {
+			$items = [[
+				'templateid' => $data['item']['templateid'],
+				'itemid' => $data['itemid']
+			]];
+			$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
+		}
+		unset($parent_templates[0]);
+
+		$db_templates = $parent_templates
+			? API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($parent_templates),
+				'preservekeys' => true
+			])
+			: [];
+
+		$db_host = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid'],
+			'templated_hosts' => true
+		]);
+		$db_host_tags = $db_host[0]['tags'];
+		$db_host = [
+			'permission' => PERM_READ_WRITE,
+			'hostid' => $db_host[0]['hostid'],
+			'name' => $db_host[0]['name']
+		];
+
+		// Make list of template tags.
+		$inherited_tags = [];
+		foreach ($parent_templates as $templateid => $template) {
+			if (array_key_exists($templateid, $db_templates)) {
+				foreach ($db_templates[$templateid]['tags'] as $tag) {
+					if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+						$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
+						];
+					}
+					else {
+						$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+							$templateid => $template
+						];
+					}
+				}
+			}
+		}
+
+		// Overwrite and attache host level tags.
+		foreach ($db_host_tags as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+					'parent_templates' => [$db_host['hostid'] => $db_host],
+					'type' => ZBX_PROPERTY_INHERITED
+				];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+					$db_host['hostid'] => $db_host
+				];
+			}
+		}
+
+		// Overwrite and attache item's own tags.
+		foreach ($data['tags'] as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+		}
+
+		$data['tags'] = array_values($inherited_tags);
+	}
+
+	if (!$data['tags']) {
+		$data['tags'] = [['tag' => '', 'value' => '']];
+	}
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
 	return $data;
@@ -2146,4 +2201,102 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 			->addClass('element-table-add')
 			->setEnabled(!$readonly)
 	));
+}
+
+/**
+ * Get direct or inherited tags for web scenario edit form.
+ *
+ * @param array  $data
+ * @param string $data['templates'][<templateid>]['hostid']
+ * @param string $data['templates'][<templateid>]['name']
+ * @param int    $data['templates'][<templateid>]['permission']
+ * @param string $data['hostid']
+ * @param array  $data['tags']
+ * @param string $data['tags'][]['tag']
+ * @param string $data['tags'][]['value']
+ * @param int    $data['show_inherited_tags']
+ */
+function getHttpTestTags(array $data) {
+	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
+
+	if ($data['show_inherited_tags']) {
+		unset($data['templates'][0]);
+
+		$db_templates = $data['templates']
+			? API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($data['templates']),
+				'preservekeys' => true
+			])
+			: [];
+
+		$db_host = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid'],
+			'templated_hosts' => true
+		]);
+
+		if ($db_host) {
+			$db_host_tags = $db_host[0]['tags'];
+			$db_host = [
+				'permission' => PERM_READ_WRITE,
+				'hostid' => $db_host[0]['hostid'],
+				'name' => $db_host[0]['name']
+			];
+		}
+		else {
+			$db_host_tags = [];
+		}
+
+		// Make list of template tags.
+		$inherited_tags = [];
+		foreach ($data['templates'] as $templateid => $template) {
+			if (array_key_exists($templateid, $db_templates)) {
+				foreach ($db_templates[$templateid]['tags'] as $tag) {
+					if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+						$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
+						];
+					}
+					else {
+						$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+							$templateid => $template
+						];
+					}
+				}
+			}
+		}
+
+		// Overwrite and attache host level tags.
+		foreach ($db_host_tags as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+					'parent_templates' => [$db_host['hostid'] => $db_host],
+					'type' => ZBX_PROPERTY_INHERITED
+				];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+					$db_host['hostid'] => $db_host
+				];
+			}
+		}
+
+		// Overwrite and attache http test's own tags.
+		foreach ($data['tags'] as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+		}
+
+		$tags = array_values($inherited_tags);
+	}
+
+	return $tags;
 }

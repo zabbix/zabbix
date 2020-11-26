@@ -145,7 +145,6 @@ $fields = [
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -242,6 +241,11 @@ $fields = [
 	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
+	'mass_update_tags'	=>			[T_ZBX_INT, O_OPT, null,
+										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]), null
+									],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -462,6 +466,20 @@ if (hasRequest('preprocessing')) {
 	unset($step);
 }
 
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
+}
+
 /*
  * Actions
  */
@@ -483,28 +501,8 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$applications = getRequest('applications', []);
-	$application = reset($applications);
-	if ($application == 0) {
-		array_shift($applications);
-	}
-
 	DBstart();
 	$result = true;
-
-	if (!zbx_empty($_REQUEST['new_application'])) {
-		$new_appid = API::Application()->create([
-			'name' => $_REQUEST['new_application'],
-			'hostid' => getRequest('hostid')
-		]);
-		if ($new_appid) {
-			$new_appid = reset($new_appid['applicationids']);
-			$applications[$new_appid] = $new_appid;
-		}
-		else {
-			$result = false;
-		}
-	}
 
 	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 	$type = getRequest('type', ITEM_TYPE_ZABBIX);
@@ -646,10 +644,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
-				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED)
+				'status' => getRequest('status', ITEM_STATUS_DISABLED),
+				'tags' => $tags
 			];
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
@@ -712,8 +710,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 					'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 				],
-				'selectApplications' => ['applicationid'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+				'selectTags' => ['tag', 'value'],
 				'itemids' => getRequest('itemid')
 			]);
 			$db_item = reset($db_items);
@@ -792,12 +790,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 				if ($db_item['jmx_endpoint'] !== getRequest('jmx_endpoint', '')) {
 					$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
-				}
-				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
-				natsort($db_applications);
-				natsort($applications);
-				if (array_values($db_applications) !== array_values($applications)) {
-					$item['applications'] = $applications;
 				}
 				if ($db_item['inventory_link'] != getRequest('inventory_link', 0)) {
 					$item['inventory_link'] = getRequest('inventory_link', 0);
@@ -879,6 +871,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['params'] !== getRequest('params', '')) {
 					$item['params'] = getRequest('params', '');
 				}
+			}
+
+			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
+			CArrayHelper::sort($tags, ['tag', 'value']);
+			if (array_values($db_item['tags']) !== array_values($tags)) {
+				$item['tags'] = $tags;
 			}
 
 			if ($item) {
@@ -1141,6 +1139,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];

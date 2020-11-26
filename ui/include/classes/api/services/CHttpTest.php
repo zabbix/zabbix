@@ -56,7 +56,7 @@ class CHttpTest extends CApiService {
 
 		$defOptions = [
 			'httptestids'    => null,
-			'applicationids' => null,
+//			'applicationids' => null,
 			'hostids'        => null,
 			'groupids'       => null,
 			'templateids'    => null,
@@ -77,6 +77,7 @@ class CHttpTest extends CApiService {
 			'expandStepName' => null,
 			'selectHosts'    => null,
 			'selectSteps'    => null,
+			'selectTags'	 => null,
 			'countOutput'    => false,
 			'groupCount'     => false,
 			'preservekeys'   => false,
@@ -148,11 +149,11 @@ class CHttpTest extends CApiService {
 		}
 
 		// applicationids
-		if (!is_null($options['applicationids'])) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['where'][] = dbConditionId('ht.applicationid', $options['applicationids']);
-		}
+//		if (!is_null($options['applicationids'])) {
+//			zbx_value2array($options['applicationids']);
+//
+//			$sqlParts['where'][] = dbConditionId('ht.applicationid', $options['applicationids']);
+//		}
 
 		// inherited
 		if (isset($options['inherited'])) {
@@ -279,7 +280,6 @@ class CHttpTest extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
-			'applicationid' =>		['type' => API_ID],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
@@ -323,8 +323,13 @@ class CHttpTest extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest_tag', 'value'), 'default' => DB::getDefault('httptest_tag', 'value')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -337,7 +342,6 @@ class CHttpTest extends CApiService {
 
 		$this->checkHostPermissions(array_keys($names_by_hostid));
 		$this->checkDuplicates($names_by_hostid);
-		$this->checkApplications($httptests, __FUNCTION__);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
 		$this->validateSslParameters($httptests, __FUNCTION__);
 		$this->validateSteps($httptests, __FUNCTION__);
@@ -418,6 +422,10 @@ class CHttpTest extends CApiService {
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest_tag', 'value'), 'default' => DB::getDefault('httptest_tag', 'value')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
@@ -508,7 +516,6 @@ class CHttpTest extends CApiService {
 		if ($names_by_hostid) {
 			$this->checkDuplicates($names_by_hostid);
 		}
-		$this->checkApplications($httptests, __FUNCTION__, $db_httptests);
 		$this->validateAuthParameters($httptests, __FUNCTION__, $db_httptests);
 		$this->validateSslParameters($httptests, __FUNCTION__, $db_httptests);
 		$this->validateSteps($httptests, __FUNCTION__, $db_httptests);
@@ -660,66 +667,66 @@ class CHttpTest extends CApiService {
 		}
 	}
 
-	/**
-	 * Check that application belongs to web scenario host.
-	 *
-	 * @param array  $httptests
-	 * @param string $method
-	 * @param array  $db_httptests
-	 *
-	 * @throws APIException  if application does not exists or belongs to another host.
-	 */
-	private function checkApplications(array $httptests, $method, array $db_httptests = null) {
-		$applicationids = [];
-
-		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
-					&& ($method === 'validateCreate'
-						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
-				$applicationids[$httptest['applicationid']] = true;
-			}
-		}
-
-		if (!$applicationids) {
-			return;
-		}
-
-		$db_applications = DB::select('applications', [
-			'output' => ['applicationid', 'hostid', 'name', 'flags'],
-			'applicationids' => array_keys($applicationids),
-			'preservekeys' => true
-		]);
-
-		foreach ($httptests as $index => $httptest) {
-			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
-					&& ($method === 'validateCreate'
-						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
-				if (!array_key_exists($httptest['applicationid'], $db_applications)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Application with applicationid "%1$s" does not exist.', $httptest['applicationid'])
-					);
-				}
-
-				$db_application = $db_applications[$httptest['applicationid']];
-
-				if ($db_application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a discovered application "%1$s" to a web scenario.', $db_application['name']
-					));
-				}
-
-				$hostid = ($method === 'validateCreate')
-					? $httptest['hostid']
-					: $db_httptests[$httptest['httptestid']]['hostid'];
-
-				if (bccomp($db_application['hostid'], $hostid) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('The web scenario application belongs to a different host than the web scenario host.')
-					);
-				}
-			}
-		}
-	}
+//	/**
+//	 * Check that application belongs to web scenario host.
+//	 *
+//	 * @param array  $httptests
+//	 * @param string $method
+//	 * @param array  $db_httptests
+//	 *
+//	 * @throws APIException  if application does not exists or belongs to another host.
+//	 */
+//	private function checkApplications(array $httptests, $method, array $db_httptests = null) {
+//		$applicationids = [];
+//
+//		foreach ($httptests as $index => $httptest) {
+//			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
+//					&& ($method === 'validateCreate'
+//						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
+//				$applicationids[$httptest['applicationid']] = true;
+//			}
+//		}
+//
+//		if (!$applicationids) {
+//			return;
+//		}
+//
+//		$db_applications = DB::select('applications', [
+//			'output' => ['applicationid', 'hostid', 'name', 'flags'],
+//			'applicationids' => array_keys($applicationids),
+//			'preservekeys' => true
+//		]);
+//
+//		foreach ($httptests as $index => $httptest) {
+//			if (array_key_exists('applicationid', $httptest) && $httptest['applicationid'] != 0
+//					&& ($method === 'validateCreate'
+//						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
+//				if (!array_key_exists($httptest['applicationid'], $db_applications)) {
+//					self::exception(ZBX_API_ERROR_PARAMETERS,
+//						_s('Application with applicationid "%1$s" does not exist.', $httptest['applicationid'])
+//					);
+//				}
+//
+//				$db_application = $db_applications[$httptest['applicationid']];
+//
+//				if ($db_application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+//					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+//						'Cannot add a discovered application "%1$s" to a web scenario.', $db_application['name']
+//					));
+//				}
+//
+//				$hostid = ($method === 'validateCreate')
+//					? $httptest['hostid']
+//					: $db_httptests[$httptest['httptestid']]['hostid'];
+//
+//				if (bccomp($db_application['hostid'], $hostid) != 0) {
+//					self::exception(ZBX_API_ERROR_PARAMETERS,
+//						_('The web scenario application belongs to a different host than the web scenario host.')
+//					);
+//				}
+//			}
+//		}
+//	}
 
 	/**
 	 * @param array  $httptests
@@ -933,6 +940,19 @@ class CHttpTest extends CApiService {
 					$result[$dbHttpStep['httptestid']]['steps'] = $dbHttpStep['stepscnt'];
 				}
 			}
+		}
+
+		// Adding web scenario tags.
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			$tags = API::getApiService()->select('httptest_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['httptestid']),
+				'filter' => ['httptestid' => $httpTestIds],
+				'preservekeys' => true
+			]);
+
+			$relation_map = $this->createRelationMap($tags, 'httptestid', 'httptesttagid');
+			$tags = $this->unsetExtraFields($tags, ['httptesttagid', 'httptestid'], []);
+			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;

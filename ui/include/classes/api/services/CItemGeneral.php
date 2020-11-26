@@ -249,8 +249,10 @@ abstract class CItemGeneral extends CApiService {
 			'lldmacros' => (get_class($this) === 'CItemPrototype')
 		]);
 
+		$index = 0;
 		foreach ($items as $inum => &$item) {
 			$item = $this->clearValues($item);
+			$index++;
 
 			$fullItem = $items[$inum];
 
@@ -604,10 +606,39 @@ abstract class CItemGeneral extends CApiService {
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 
 			$this->validateItemPreprocessing($fullItem);
+			$this->validateTags($item, '/'.$index);
 		}
 		unset($item);
 
 		$this->checkExistingItems($items);
+	}
+
+	/**
+	 * Validates tags.
+	 *
+	 * @param array  $item
+	 * @param array  $item['tags']
+	 * @param string $item['tags'][]['tag']
+	 * @param string $item['tags'][]['value']
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateTags(array $item, string $path = '/') {
+		if (!array_key_exists('tags', $item)) {
+			return;
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value'), 'default' => DB::getDefault('item_tag', 'value')]
+			]]
+		]];
+
+		$item_tags = ['tags' => $item['tags']];
+		if (!CApiInputValidator::validate($api_input_rules, $item_tags, $path, $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -1721,18 +1752,19 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items                     An array of items.
 	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array $itemids                   An array of itemids.
 	 */
-	protected function createItemPreprocessing(array $items) {
+	protected function createItemPreprocessing(array $items, array $itemids) {
 		$item_preproc = [];
 
-		foreach ($items as $item) {
+		foreach ($items as $key => $item) {
 			if (array_key_exists('preprocessing', $item)) {
 				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
-						'itemid' => $item['itemid'],
-						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
+						'itemid' => $itemids[$key],
+						'step' => ($preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],
 						'error_handler' => $preprocessing['error_handler'],
@@ -1767,7 +1799,7 @@ abstract class CItemGeneral extends CApiService {
 				$step = 1;
 
 				foreach ($item['preprocessing'] as $item_preproc) {
-					$curr_step = $item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++;
+					$curr_step = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
 					$item_preprocs[$item['itemid']][$curr_step] = [
 						'type' => $item_preproc['type'],
 						'params' => $item_preproc['params'],
@@ -2653,5 +2685,84 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Update item tags.
+	 *
+	 * @param array  $items
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['tags']
+	 * @param string $items[]['tags'][]['tag']
+	 * @param string $items[]['tags'][]['value']
+	 */
+	protected function updateItemTags(array $items): void {
+		$items = array_filter($items, function($item) {
+			return array_key_exists('tags', $item);
+		});
+
+		// Select tags from database.
+		$db_item_tags = API::getApiService()->select('item_tag', [
+			'output' => ['itemtagid', 'itemid', 'tag', 'value'],
+			'filter' => ['itemid' => array_keys($items)],
+			'preservekeys' => true
+		]);
+		$items = $this->createRelationMap($db_item_tags, 'itemid', 'itemtagid')
+			->mapMany($items, $db_item_tags, 'db_tags');
+
+		// Find which tags must be added/deleted.
+		$new_tags = [];
+		$del_tagids = [];
+		foreach ($items as $item) {
+			CArrayHelper::sort($item['tags'], ['tag', 'value']);
+
+			foreach ($item['db_tags'] as $del_tag_key => $tag_delete) {
+				foreach ($item['tags'] as $new_tag_key => $tag_add) {
+					if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
+						unset($item['db_tags'][$del_tag_key], $item['tags'][$new_tag_key]);
+						continue 2;
+					}
+				}
+			}
+
+			$del_tagids = array_merge($del_tagids, array_column($item['db_tags'], 'itemtagid'));
+
+			foreach ($item['tags'] as $tag_add) {
+				$tag_add['itemid'] = $item['itemid'];
+				$new_tags[] = $tag_add;
+			}
+		}
+
+		if ($del_tagids) {
+			DB::delete('item_tag', ['itemtagid' => $del_tagids]);
+		}
+		if ($new_tags) {
+			DB::insert('item_tag', $new_tags);
+		}
+	}
+
+	/**
+	 * Record item tags into database.
+	 *
+	 * @param array  $items
+	 * @param array  $items[]['tags']
+	 * @param string $items[]['tags'][]['tag']
+	 * @param string $items[]['tags'][]['value']
+	 * @param array  $itemids
+	 */
+	protected function createItemTags(array $items, array $itemids): void {
+		$new_tags = [];
+		foreach ($items as $key => $item) {
+			if (array_key_exists('tags', $item)) {
+				foreach ($item['tags'] as $tag) {
+					$tag['itemid'] = $itemids[$key];
+					$new_tags[] = $tag;
+				}
+			}
+		}
+
+		if ($new_tags) {
+			DB::insert('item_tag', $new_tags);
+		}
 	}
 }

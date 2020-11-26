@@ -127,7 +127,6 @@ $httpTable = (new CTableInfo())
 		_('Attempts'),
 		_('Authentication'),
 		_('HTTP proxy'),
-		_('Application'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		($data['context'] === 'host') ? _('Info') : null
 	]);
@@ -176,7 +175,6 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
-		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		(new CLink(
 			httptest_status2str($httpTest['status']),
 			(new CUrl('httpconf.php'))
