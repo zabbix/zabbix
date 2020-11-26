@@ -145,7 +145,10 @@ foreach ($data['items'] as $item) {
 			(new CUrl('items.php'))
 				->setArgument('group_itemid[]', $item['itemid'])
 				->setArgument('hostid', $item['hostid'])
-				->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED) ? 'item.massenable' : 'item.massdisable')
+				->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
+					? 'item.massenable'
+					: 'item.massdisable'
+				)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
