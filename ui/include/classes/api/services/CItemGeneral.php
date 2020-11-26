@@ -1452,12 +1452,15 @@ abstract class CItemGeneral extends CApiService {
 							);
 						}
 
-						// Check if one of the deltas (Delta per second or Delta value) already exists.
-						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
-						}
-						else {
-							$delta = true;
+						if ($preprocessing['type'] == ZBX_PREPROC_DELTA_VALUE
+								|| $preprocessing['type'] == ZBX_PREPROC_DELTA_SPEED) {
+							// Check if one of the deltas (Delta per second or Delta value) already exists.
+							if ($delta) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
+							}
+							else {
+								$delta = true;
+							}
 						}
 						break;
 
