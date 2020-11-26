@@ -46,7 +46,7 @@
 					$status_buttons.data('last-value', $status_obj.val());
 				}
 
-				$status_buttons.filter('[value=' + <?= ITEM_STATUS_ACTIVE ?> + ']').prop('checked', true);
+				$status_buttons.filter('[value=<?= ITEM_STATUS_ACTIVE ?>]').prop('checked', true);
 
 				$status_buttons.prop('disabled', true);
 			}
