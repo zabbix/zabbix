@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-26T10:35:12Z</date>
+   <date>2020-11-26T17:34:55Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -383,7 +383,10 @@ if (list.includes('IAXpeerlist')) { iaxPeerList(); }
 if (list.includes('PJSIPShowEndpoints')) { pjsipShowEndpoints(); }
 if (list.includes('QueueSummary')) { queueSummary(); }
 
-response = Ami.request(url, 'Logoff');
+try {
+  response = Ami.request(url, 'Logoff');
+}
+catch (e) {}
 
 return JSON.stringify(asterisk);
 </params>
