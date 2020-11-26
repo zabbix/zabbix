@@ -118,6 +118,7 @@ $form_list
 	)
 	->addRow((new CLabel(_('Day of week'), 'label-every-dow'))->setAsteriskMark(),
 		(new CSelect('every'))
+			->setValue($data['every'])
 			->setFocusableElementId('label-every-dow')
 			->addOptions(CSelect::createOptionsFromArray([
 				1 => _('first'),
