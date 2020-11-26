@@ -558,11 +558,9 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	buffer = (char *)zbx_malloc(buffer, buf_size);
-	*buffer = '\0';
 	offset = 0;
 
-	while (0 != (rc = ssh_channel_read(channel, tmp_buf, sizeof(tmp_buf) - 1, 0))
-			&& MAX_EXECUTE_OUTPUT_LEN > offset + rc)
+	while (0 != (rc = ssh_channel_read(channel, tmp_buf, sizeof(tmp_buf), 0)))
 	{
 		if (rc < 0)
 		{
@@ -573,24 +571,24 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			goto channel_close;
 		}
 
-		tmp_buf[rc] = '\0';
-		zbx_strcpy_alloc(&buffer, &buf_size, &offset, tmp_buf);
-	}
+		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		{
+			SET_MSG_RESULT(result,zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
+					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
+			goto channel_close;
+		}
 
-	if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() command output exceeded limit of %d KB",
-				__func__, MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
 	}
 
 	output = convert_to_utf8(buffer, offset, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
+	zbx_replace_invalid_utf8(output);
 
-	if (SUCCEED == set_result_type(result, ITEM_VALUE_TYPE_TEXT, output))
-		ret = SYSINFO_RET_OK;
+	SET_TEXT_RESULT(result, output);
+	output = NULL;
 
-	zbx_free(output);
-
+	ret = SYSINFO_RET_OK;
 channel_close:
 	ssh_channel_close(channel);
 	zbx_free(buffer);
