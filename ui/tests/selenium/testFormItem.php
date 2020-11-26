@@ -410,12 +410,10 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertVisibleId('type_name');
-			$this->zbxTestAssertAttribute("//input[@id='type_name']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='type_name']", 'size', 20);
-			$this->zbxTestAssertAttribute("//input[@id='type_name']", 'readonly');
+			$this->zbxTestAssertVisibleId('type');
+			$this->zbxTestAssertAttribute("//z-select[@id='type']", 'readonly');
 
-			$type = $this->zbxTestGetValue("//input[@id='type_name']");
+			$type = $this->zbxTestGetSelectedLabel('type');
 		}
 
 		$this->zbxTestTextPresent('Key');
@@ -660,11 +658,8 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		else {
-			// TODO: uncomment after fix in DEV-1695
-//			$this->zbxTestAssertVisibleId('value_type');
-//			$this->zbxTestAssertAttribute("//input[@id='value_type']", 'maxlength', 255);
-//			$this->zbxTestAssertAttribute("//input[@id='value_type']", 'size', 20);
-//			$this->zbxTestAssertAttribute("//input[@id='value_type']", 'readonly');
+			$this->zbxTestAssertVisibleId('value_type');
+			$this->zbxTestAssertAttribute("//z-select[@id='value_type']", 'readonly');
 		}
 
 		if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {

@@ -609,13 +609,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			// TODO: uncomment after fix in DEV-1695
-//			$this->zbxTestAssertVisibleId('type');
-//			$this->zbxTestAssertAttribute("//input[@id='typename']", 'maxlength', 255);
-//			$this->zbxTestAssertAttribute("//input[@id='typename']", 'size', 20);
-//			$this->zbxTestAssertAttribute("//input[@id='typename']", 'readonly');
-//			$type = $this->zbxTestGetValue("//input[@id='typename']");
-
+			$this->zbxTestAssertVisibleId('type');
+			$this->zbxTestAssertAttribute("//z-select[@id='type']", 'readonly');
 			$type = $this->zbxTestGetSelectedLabel('type');
 		}
 
@@ -685,7 +680,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($templateid)) {
-			$value_type = $this->zbxTestGetValue("//input[@id='value_type_name']");
+			$value_type = $this->zbxTestGetSelectedLabel('value_type');
 		}
 		elseif (isset($data['value_type'])) {
 			$this->zbxTestDropdownSelect('value_type', $data['value_type']);
