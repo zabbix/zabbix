@@ -277,7 +277,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
-			SET_MSG_RESULT(result,zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
 			goto channel_close;
 		}
@@ -573,7 +573,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
-			SET_MSG_RESULT(result,zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
 			goto channel_close;
 		}
