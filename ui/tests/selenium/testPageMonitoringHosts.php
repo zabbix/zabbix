@@ -684,7 +684,7 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_HostContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
-		$row->query('link:'.$data['name'])->one()->click();
+		$row->query('link', $data['name'])->one()->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
@@ -721,7 +721,6 @@ class testPageMonitoringHosts extends CWebTest {
 	}
 
 	/**
-	 *
 	 * Сount problems amount from first column and compare with displayed problems from another Problems column.
 	 */
 	public function testPageMonitoringHosts_CountProblems() {
