@@ -156,7 +156,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	);
 }
 
-
 $partial = ($data['view_style'] == STYLE_TOP) ? 'dataoverview.table.top' : 'dataoverview.table.left';
 $table = new CPartial($partial, [
 	'items' => $data['items'],
