@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-25T20:09:30Z</date>
+   <date>2020-11-26T08:22:49Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -11,9 +11,7 @@
       <template>
          <template>Template Tel Asterisk by HTTP</template>
          <name>Template Tel Asterisk by HTTP</name>
-         <description>The template gets Asterisk metrics from AMI by HTTP agent.&#13;
-Enable the mini-HTTP Server, add the option webenabled=yes in the general section of manager.conf file and create Asterisk Manager user.&#13;
-Do not forget to define {$AMI.USERNAME} and {$AMI.SECRET} macros.&#13;
+         <description>The template gets Asterisk metrics from AMI by HTTP agent. Enable the mini-HTTP Server within your Asterisk instance, add the option webenabled=yes in the general section of manager.conf file and create Asterisk Manager user with system and command write permissions. Do not forget to define {$AMI.URL}, {$AMI.USERNAME}, {$AMI.SECRET} macros. If there are errors, increase the logging to debug level and see the Zabbix server log.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk&#13;
 &#13;

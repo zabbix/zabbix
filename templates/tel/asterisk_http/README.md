@@ -18,8 +18,11 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of manager.conf file and create Asterisk Manager user in your Asterisk instance.
-Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.
+You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and
+ create Asterisk Manager user with system and command write permissions within your Asterisk instance.  
+Please, define AMI address in {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status.
+Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.  
+If there are errors, increase the logging to debug level and see the Zabbix server log.
 
 
 ## Zabbix configuration
