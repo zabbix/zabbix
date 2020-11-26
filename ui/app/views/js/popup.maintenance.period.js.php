@@ -59,10 +59,12 @@ jQuery('#timeperiod_type').change(function() {
  */
 function submitMaintenancePeriod(overlay) {
 	var $container = overlay.$dialogue.find('form'),
-		elements;
+		elements = {};
 
 	$container.trimValues(['#start_date']);
-	elements = jQuery('input:visible,input[type=hidden]', $container).serialize();
+	$('>input, >ul>li:visible input', $container)
+		.serializeArray()
+		.forEach(({name, value}) => elements[name] = value);
 
 	overlay.setLoading();
 	overlay.xhr = sendAjaxData('zabbix.php', {
