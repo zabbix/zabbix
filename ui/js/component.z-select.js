@@ -330,6 +330,7 @@ class ZSelect extends HTMLElement {
 		}
 
 		this._preselected_index = index;
+		this._highlighted_index = index;
 	}
 
 	_change(index) {
