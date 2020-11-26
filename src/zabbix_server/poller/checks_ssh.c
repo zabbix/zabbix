@@ -264,7 +264,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	buffer = (char *)zbx_malloc(buffer, buf_size);
 
-	while (0 != (rc = libssh2_channel_read(channel, tmp_buf, sizeof(tmp_buf) - 1)))
+	while (0 != (rc = libssh2_channel_read(channel, tmp_buf, sizeof(tmp_buf))))
 	{
 		if (rc < 0)
 		{
