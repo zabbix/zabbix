@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-26T15:39:59Z'
+  date: '2020-11-26T17:09:01Z'
   groups:
     -
       name: Templates/Applications
@@ -33,7 +33,7 @@ zabbix_export:
           name: 'Zabbix raw items'
       items:
         -
-          name: 'GitLab: Cache: Misses, total'
+          name: 'GitLab: Cache: Misses rate, total'
           type: DEPENDENT
           key: gitlab.cache.misses_total.rate
           delay: '0'
@@ -55,7 +55,7 @@ zabbix_export:
           master_item:
             key: gitlab.get_metrics
         -
-          name: 'GitLab: Cache: Operations, total'
+          name: 'GitLab: Cache: Operations rate, total'
           type: DEPENDENT
           key: gitlab.cache.operations_total.rate
           delay: '0'
@@ -248,7 +248,7 @@ zabbix_export:
                 - ''
           url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
         -
-          name: 'GitLab: HTTP requests, 4xx'
+          name: 'GitLab: HTTP requests rate, 4xx'
           type: DEPENDENT
           key: gitlab.http.requests.4xx.rate
           delay: '0'
@@ -272,7 +272,7 @@ zabbix_export:
           master_item:
             key: gitlab.get_metrics
         -
-          name: 'GitLab: HTTP requests, 5xx'
+          name: 'GitLab: HTTP requests rate, 5xx'
           type: DEPENDENT
           key: gitlab.http.requests.5xx.rate
           delay: '0'
@@ -302,7 +302,7 @@ zabbix_export:
               priority: WARNING
               description: '"Too many requests failed on GitLab instance with 5xx HTTP code"'
         -
-          name: 'GitLab: HTTP requests, total'
+          name: 'GitLab: HTTP requests rate, total'
           type: DEPENDENT
           key: gitlab.http.requests.rate
           delay: '0'
@@ -729,7 +729,7 @@ zabbix_export:
           master_item:
             key: gitlab.get_metrics
         -
-          name: 'GitLab: Ruby: CPU'
+          name: 'GitLab: Ruby: CPU  usage per second'
           type: DEPENDENT
           key: gitlab.ruby.process_cpu_seconds.rate
           delay: '0'
