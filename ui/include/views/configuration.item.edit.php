@@ -76,21 +76,14 @@ $form_list->addRow(
 );
 
 // Append type to form list.
-if ($readonly) {
-	$form->addVar('type', $data['type']);
-	$form_list->addRow((new CLabel(_('Type'), 'type_name')),
-		(new CTextBox('type_name', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow((new CLabel(_('Type'), 'label-type')),
-		(new CSelect('type'))
-			->setId('type')
-			->setFocusableElementId('label-type')
-			->setValue($data['type'])
-			->addOptions(CSelect::createOptionsFromArray($data['types']))
-	);
-}
+$form_list->addRow((new CLabel(_('Type'), 'label-type')),
+	(new CSelect('type'))
+		->setId('type')
+		->setFocusableElementId('label-type')
+		->setValue($data['type'])
+		->addOptions(CSelect::createOptionsFromArray($data['types']))
+		->setReadonly($readonly)
+);
 
 // Append key to form list.
 $key_controls = [(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('items', 'key_')))
