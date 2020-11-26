@@ -129,7 +129,7 @@ class testDiscoveryRule extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
-			],
+			]
 		];
 
 		// TODO: add other properties, multiple rules, duplicates etc.
@@ -2943,8 +2943,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test overrides and override operations are deleted.' => [
 				['133763'],
-				['101', '102'],
-				['101', '102', '103', '104', '105', '106'],
+				['1001', '1002'],
+				['1001', '1002', '1003', '1004', '1005', '1006'],
 				null
 			]
 		];
@@ -5361,7 +5361,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				]
-			],
+			]
 		];
 
 		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.

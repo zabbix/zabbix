@@ -311,7 +311,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 						'dstfrm' => $user_form->getName()
 					]).', null, this);'
 				)
-				->addClass(ZBX_STYLE_BTN_LINK),
+				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -344,7 +344,7 @@ if ($data['action'] === 'user.edit') {
 		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(),
 			(new CDiv([
 				$role_multiselect,
-				new CDiv(_('User can\'t change role for himself'))
+				new CDiv(_('User cannot change own role.'))
 			]))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('multiselect-description-container')

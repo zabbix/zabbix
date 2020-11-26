@@ -168,6 +168,7 @@ typedef struct
 	char			*datacenter_name;
 	char			*parent_name;
 	char			*parent_type;
+	char			*ip;
 	char			**props;
 	zbx_vector_str_t	ds_names;
 	zbx_vector_ptr_t	vms;
@@ -345,8 +346,12 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_STORAGE_UNSHARED		13
 #define ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED		14
 #define ZBX_VMWARE_VMPROP_UPTIME			15
+#define ZBX_VMWARE_VMPROP_IPADDRESS			16
+#define ZBX_VMWARE_VMPROP_GUESTHOSTNAME			17
+#define ZBX_VMWARE_VMPROP_GUESTFAMILY			18
+#define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
 
-#define ZBX_VMWARE_VMPROPS_NUM				16
+#define ZBX_VMWARE_VMPROPS_NUM				20
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
