@@ -1206,13 +1206,24 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$db_hosts = array_slice($db_hosts, 0, $data_display_limit, true);
 
 	$data = array_slice($data, 0, $data_display_limit);
+	$items_left = $data_display_limit;
 	$itemids = [];
-	array_walk($data, function (array &$item_columns) use ($data_display_limit, &$itemids) {
+	array_walk($data, function (array &$item_columns) use ($data_display_limit, &$itemids, &$items_left) {
+		if ($items_left != 0) {
+			$item_columns = array_slice($item_columns, 0, min($data_display_limit, $items_left));
+			$items_left -= count($item_columns);
+		}
+		else {
+			$item_columns = null;
+			return;
+		}
+
 		array_walk($item_columns, function (array &$item_column) use ($data_display_limit, &$itemids) {
 			$item_column = array_slice($item_column, 0, $data_display_limit);
 			$itemids += array_column($item_column, 'itemid', 'itemid');
 		});
 	});
+	$data = array_filter($data);
 
 	$has_hidden_items = (count($db_items) != count($itemids));
 
