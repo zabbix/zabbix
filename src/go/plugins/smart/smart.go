@@ -22,16 +22,17 @@ package smart
 import (
 	"encoding/json"
 	"fmt"
-	"path/filepath"
-	"time"
 
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxcmd"
 )
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
+}
+
+type devices struct {
+	Devices []deviceInfo `json:"devices"`
 }
 
 type deviceInfo struct {
@@ -65,7 +66,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		for _, dev := range devices {
-			deviceJSON, err := zbxcmd.Execute(fmt.Sprintf("smartctl -a %s -json", dev), time.Second*time.Duration(3*time.Second))
+			deviceJSON, err := executeSmartctl(fmt.Sprintf("smartctl -a %s -json", dev.Name))
 			if err != nil {
 				return nil, err
 			}
@@ -93,16 +94,16 @@ func init() {
 		"smart.discovery", "Returns JSON array of smart devices, usage: smart.discovery.")
 }
 
-func ScanDevices() ([]string, error) {
-	var devices []string
-	files, err := filepath.Glob("/dev/sd*[^0-9]")
+func ScanDevices() ([]deviceInfo, error) {
+	var devices devices
+	devicesJSON, err := executeSmartctl("smartctl --scan -j")
 	if err != nil {
 		return nil, err
 	}
 
-	for _, file := range files {
-		devices = append(devices, file)
+	if err = json.Unmarshal([]byte(devicesJSON), &devices); err != nil {
+		return nil, err
 	}
 
-	return devices, nil
+	return devices.Devices, nil
 }
