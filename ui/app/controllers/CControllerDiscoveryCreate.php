@@ -77,9 +77,6 @@ class CControllerDiscoveryCreate extends CController {
 		$result = API::DRule()->create($drule);
 
 		if ($result) {
-			$druleid = reset($result['druleids']);
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$drule['name']);
-
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'discovery.list')
 				->setArgument('page', CPagerHelper::loadPage('discovery.list', null))
