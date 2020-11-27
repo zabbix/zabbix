@@ -36,7 +36,7 @@
 #include "ipmi.h"
 
 #include "../poller/poller.h"
-#include "../availability/availability.h"
+#include "availability.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 

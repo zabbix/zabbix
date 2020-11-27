@@ -22,7 +22,6 @@
 #include "zbxipcservice.h"
 #include "avail_protocol.h"
 
-
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 {
 	static zbx_ipc_socket_t	socket;
