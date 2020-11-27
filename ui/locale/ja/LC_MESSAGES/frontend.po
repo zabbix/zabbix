@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-20 20:01+0200\n"
-"PO-Revision-Date: 2020-11-16 01:38+0300\n"
+"POT-Creation-Date: 2020-11-27 19:56+0200\n"
+"PO-Revision-Date: 2020-11-23 13:11+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1605483484.000000\n"
+"X-POOTLE-MTIME: 1606129902.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -196,7 +196,7 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] "リトライ残り%1$s回"
 
-#: app/views/administration.user.edit.php:499
+#: app/views/administration.user.edit.php:504
 #: include/classes/widgets/CWidgetConfig.php:213
 #: include/classes/widgets/CWidgetConfig.php:214 jsLoader.php:313
 #: jsLoader.php:314
@@ -393,22 +393,22 @@ msgstr "アクセスは拒否されました"
 msgid "Access denied!"
 msgstr "アクセスは拒否されました！"
 
-#: app/views/administration.user.edit.php:437
+#: app/views/administration.user.edit.php:442
 #: app/views/administration.userrole.edit.php:181
 msgid "Access to API"
 msgstr "APIへのアクセス"
 
-#: app/views/administration.user.edit.php:392
+#: app/views/administration.user.edit.php:397
 #: app/views/administration.userrole.edit.php:78
 msgid "Access to UI elements"
 msgstr "UI要素へのアクセス"
 
-#: app/views/administration.user.edit.php:464
+#: app/views/administration.user.edit.php:469
 #: app/views/administration.userrole.edit.php:235
 msgid "Access to actions"
 msgstr "アクションへのアクセス"
 
-#: app/views/administration.user.edit.php:411
+#: app/views/administration.user.edit.php:416
 #: app/views/administration.userrole.edit.php:130
 msgid "Access to modules"
 msgstr "モジュールへのアクセス"
@@ -454,7 +454,7 @@ msgstr "確認済の解決済イベント"
 #: app/views/administration.mediatype.edit.php:151
 #: app/views/administration.mediatype.list.php:84
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:235
+#: app/views/administration.user.edit.php:240
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.share.edit.php:29 app/views/dashboard.share.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
@@ -638,8 +638,8 @@ msgstr "設定有効期間の終了日時"
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:132
-#: app/views/administration.user.edit.php:308
-#: app/views/administration.user.edit.php:598
+#: app/views/administration.user.edit.php:313
+#: app/views/administration.user.edit.php:603
 #: app/views/administration.usergroup.edit.php:144
 #: app/views/administration.usergroup.edit.php:195
 #: app/views/administration.usergroup.edit.php:234
@@ -944,8 +944,8 @@ msgid "All dashboards"
 msgstr "すべてのダッシュボード"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:367
-#: app/views/administration.user.edit.php:373
+#: app/views/administration.user.edit.php:372
+#: app/views/administration.user.edit.php:378
 msgid "All groups"
 msgstr "すべてのグループ"
 
@@ -1007,11 +1007,11 @@ msgstr "手動クローズを許可"
 msgid "Allowed hosts"
 msgstr "許可されたホスト"
 
-#: app/views/administration.user.edit.php:457
+#: app/views/administration.user.edit.php:462
 msgid "Allowed methods"
 msgstr "許可されたメソッド"
 
-#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:656
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
@@ -1396,7 +1396,7 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "自動"
 
-#: app/views/administration.user.edit.php:196
+#: app/views/administration.user.edit.php:201
 msgid "Auto-login"
 msgstr "自動ログイン (1ヶ月)"
 
@@ -1404,7 +1404,7 @@ msgstr "自動ログイン (1ヶ月)"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "自動ログインと自動ログアウトを同時に有効にすることはできません。"
 
-#: app/views/administration.user.edit.php:201
+#: app/views/administration.user.edit.php:206
 msgid "Auto-logout"
 msgstr "自動ログアウト"
 
@@ -1469,7 +1469,7 @@ msgid "Axes"
 msgstr "軸"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 msgid "Back"
 msgstr "戻る"
 
@@ -1561,7 +1561,7 @@ msgstr "境界タイプ"
 msgid "Border width"
 msgstr "境界幅"
 
-#: app/controllers/CControllerUserUpdateGeneral.php:93
+#: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr "両方のパスワードが一致している必要があります。"
 
@@ -1681,8 +1681,8 @@ msgstr "削除できません"
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:126
-#: app/views/administration.user.edit.php:577
-#: app/views/administration.user.edit.php:608
+#: app/views/administration.user.edit.php:582
+#: app/views/administration.user.edit.php:613
 #: app/views/administration.usergroup.edit.php:214
 #: app/views/administration.userrole.edit.php:272
 #: app/views/administration.valuemap.edit.php:92
@@ -1880,8 +1880,8 @@ msgstr "トリガーを追加できません"
 msgid "Cannot add trigger prototype"
 msgstr "トリガーのプロトタイプを追加できません"
 
-#: app/controllers/CControllerUserCreate.php:65
-#: app/controllers/CControllerUserCreate.php:121
+#: app/controllers/CControllerUserCreate.php:63
+#: app/controllers/CControllerUserCreate.php:119
 msgid "Cannot add user"
 msgstr "ユーザーを追加できません"
 
@@ -2021,7 +2021,7 @@ msgstr "新規アプリケーションを作成できません。Webシナリオ
 msgid "Cannot create template."
 msgstr "テンプレートを作成できません。"
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:654
 msgid "Cannot create the configuration file."
 msgstr "設定ファイルが作成できません。"
 
@@ -2885,8 +2885,8 @@ msgstr "認証の設定を更新できません"
 
 #: app/controllers/CControllerAutoregUpdate.php:41
 #: app/controllers/CControllerAutoregUpdate.php:73
-#: app/controllers/CControllerGuiUpdate.php:51
-#: app/controllers/CControllerGuiUpdate.php:99
+#: app/controllers/CControllerGuiUpdate.php:53
+#: app/controllers/CControllerGuiUpdate.php:101
 #: app/controllers/CControllerHousekeepingUpdate.php:67
 #: app/controllers/CControllerHousekeepingUpdate.php:140
 #: app/controllers/CControllerMiscConfigUpdate.php:57
@@ -3090,10 +3090,10 @@ msgstr "トリガーのプロトタイプ\"%1$s\"を更新できません: %2$s�
 msgid "Cannot update trigger prototypes"
 msgstr "トリガーのプロトタイプを更新できません"
 
-#: app/controllers/CControllerUserProfileUpdate.php:65
-#: app/controllers/CControllerUserProfileUpdate.php:125
-#: app/controllers/CControllerUserUpdate.php:69
-#: app/controllers/CControllerUserUpdate.php:133
+#: app/controllers/CControllerUserProfileUpdate.php:63
+#: app/controllers/CControllerUserProfileUpdate.php:123
+#: app/controllers/CControllerUserUpdate.php:67
+#: app/controllers/CControllerUserUpdate.php:131
 msgid "Cannot update user"
 msgstr "ユーザーを更新できません"
 
@@ -3611,12 +3611,12 @@ msgstr "設定"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "設定したキャッシュの統計。cache - buffer (mode: pfree, total, used, free)。"
 
-#: include/classes/setup/CSetupWizard.php:672
+#: include/classes/setup/CSetupWizard.php:674
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "設定ファイル\"%1$s\"を作成しました。"
 
-#: app/controllers/CControllerGuiEdit.php:86
+#: app/controllers/CControllerGuiEdit.php:96
 msgid "Configuration of GUI"
 msgstr "GUIの設定"
 
@@ -3759,7 +3759,7 @@ msgstr "ユーザーグループの設定"
 msgid "Configuration of user roles"
 msgstr "ユーザの役割が作成できません"
 
-#: app/controllers/CControllerUserEdit.php:209
+#: app/controllers/CControllerUserEdit.php:208
 #: app/controllers/CControllerUserList.php:170
 msgid "Configuration of users"
 msgstr "ユーザーの設定"
@@ -3774,7 +3774,7 @@ msgid "Configuration of web monitoring"
 msgstr "Web監視の設定"
 
 #: app/controllers/CControllerAutoregUpdate.php:69
-#: app/controllers/CControllerGuiUpdate.php:95
+#: app/controllers/CControllerGuiUpdate.php:97
 #: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:115
 #: app/controllers/CControllerTrigDisplayUpdate.php:108
@@ -3790,7 +3790,7 @@ msgstr "データベース接続設定"
 msgid "Confirmation text"
 msgstr "確認テキスト"
 
-#: include/classes/setup/CSetupWizard.php:670
+#: include/classes/setup/CSetupWizard.php:672
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "おめでとうございます！Webインターフェースのインストールが終了しました。"
 
@@ -4532,15 +4532,15 @@ msgid "Data storage period"
 msgstr "データ保存期間"
 
 #: include/classes/setup/CSetupWizard.php:380
-#: include/classes/setup/CSetupWizard.php:519
-#: include/classes/setup/CSetupWizard.php:712
+#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:714
 msgid "Database TLS CA file"
 msgstr "データベースのTLS CAファイル"
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:392
-#: include/classes/setup/CSetupWizard.php:525
-#: include/classes/setup/CSetupWizard.php:720
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:722
 msgid "Database TLS certificate file"
 msgstr "データベースのTLS証明書ファイル"
 
@@ -4549,18 +4549,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr "データベースのTLS証明書ファイルは読み込み専用にしてください"
 
 #: include/classes/setup/CSetupWizard.php:404
-#: include/classes/setup/CSetupWizard.php:533
+#: include/classes/setup/CSetupWizard.php:535
 msgid "Database TLS cipher list"
 msgstr "データベースのTLS暗号化方式リスト"
 
 #: include/classes/setup/CSetupWizard.php:362
-#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:517
 msgid "Database TLS encryption"
 msgstr "データベースのTLS暗号化"
 
 #: include/classes/setup/CSetupWizard.php:386
-#: include/classes/setup/CSetupWizard.php:522
-#: include/classes/setup/CSetupWizard.php:716
+#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:718
 msgid "Database TLS key file"
 msgstr "データベースのTLSキーファイル"
 
@@ -4573,7 +4573,7 @@ msgid "Database host"
 msgstr "データベースホスト"
 
 #: include/classes/setup/CSetupWizard.php:398
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database host verification"
 msgstr "データベースのホスト検証"
 
@@ -4582,34 +4582,34 @@ msgid "Database monitor"
 msgstr "データベースモニタ"
 
 #: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:495 setup.php:45
+#: include/classes/setup/CSetupWizard.php:497 setup.php:45
 msgid "Database name"
 msgstr "データベース名"
 
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:499
 msgid "Database password"
 msgstr "データベースパスワード"
 
 #: include/classes/setup/CSetupWizard.php:298
-#: include/classes/setup/CSetupWizard.php:494 setup.php:44
+#: include/classes/setup/CSetupWizard.php:496 setup.php:44
 msgid "Database port"
 msgstr "データベースポート"
 
 #: include/classes/setup/CSetupWizard.php:311
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Database schema"
 msgstr "データベーススキーマ"
 
-#: include/classes/setup/CSetupWizard.php:493
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database server"
 msgstr "データベースサーバー"
 
 #: include/classes/setup/CSetupWizard.php:289
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:482
 msgid "Database type"
 msgstr "データベースタイプ"
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:498
 msgid "Database user"
 msgstr "データベースユーザー"
 
@@ -4709,7 +4709,7 @@ msgstr "デフォルトのリフレッシュ間隔"
 msgid "Default host inventory mode"
 msgstr "デフォルトのホストインベントリモード"
 
-#: app/views/administration.gui.edit.php:68
+#: app/views/administration.gui.edit.php:67
 #: include/classes/setup/CSetupWizard.php:220
 msgid "Default language"
 msgstr "デフォルトの言語"
@@ -4726,13 +4726,13 @@ msgstr "デフォルトのメディア"
 msgid "Default operation step duration"
 msgstr "デフォルトのアクション実行ステップの間隔"
 
-#: app/views/administration.gui.edit.php:78
-#: include/classes/setup/CSetupWizard.php:465
+#: app/views/administration.gui.edit.php:79
+#: include/classes/setup/CSetupWizard.php:467
 msgid "Default theme"
 msgstr "デフォルトのテーマ"
 
-#: app/views/administration.gui.edit.php:73
-#: include/classes/setup/CSetupWizard.php:460
+#: app/views/administration.gui.edit.php:72
+#: include/classes/setup/CSetupWizard.php:461
 msgid "Default time zone"
 msgstr "デフォルトのタイムゾーン"
 
@@ -4759,7 +4759,7 @@ msgstr "遅延時間"
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:142
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:586
+#: app/views/administration.user.edit.php:591
 #: app/views/administration.usergroup.edit.php:223
 #: app/views/administration.usergroup.list.php:236
 #: app/views/administration.user.list.php:244
@@ -5037,7 +5037,7 @@ msgstr "選択したトリガーのプロトタイプを削除しますか？"
 msgid "Delete selected triggers?"
 msgstr "選択したトリガーを削除しますか？"
 
-#: app/views/administration.user.edit.php:588
+#: app/views/administration.user.edit.php:593
 msgid "Delete selected user?"
 msgstr "選択したユーザーを削除しますか？"
 
@@ -5107,7 +5107,7 @@ msgstr "削除: テンプレート\"%1$s\"。"
 msgid "Delimiter"
 msgstr "区切り文字"
 
-#: app/views/administration.user.edit.php:457
+#: app/views/administration.user.edit.php:462
 msgid "Denied methods"
 msgstr "拒否されたメソッド"
 
@@ -5320,8 +5320,8 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: app/views/administration.miscconfig.edit.php:54
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:245
-#: app/views/administration.user.edit.php:438
+#: app/views/administration.user.edit.php:250
+#: app/views/administration.user.edit.php:443
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5641,7 +5641,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr "イメージのダウンロード"
 
-#: include/classes/setup/CSetupWizard.php:656
+#: include/classes/setup/CSetupWizard.php:658
 msgid "Download the configuration file"
 msgstr "設定ファイルのダウンロード"
 
@@ -5786,7 +5786,7 @@ msgstr "各URLの名前は重複できません。同じURL名が使用されて
 msgid "Each item"
 msgstr "アイテムごと"
 
-#: app/views/administration.user.edit.php:293
+#: app/views/administration.user.edit.php:298
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:261
 #: include/views/configuration.action.edit.php:282
@@ -6111,8 +6111,8 @@ msgstr "トラッピングの有効化"
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:239
-#: app/views/administration.user.edit.php:438
+#: app/views/administration.user.edit.php:244
+#: app/views/administration.user.edit.php:443
 #: app/views/administration.usergroup.edit.php:80
 #: app/views/administration.usergroup.edit.php:92
 #: app/views/administration.usergroup.edit.php:93
@@ -6546,7 +6546,7 @@ msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 #: app/controllers/CControllerDashboardPropertiesCheck.php:38
 #: app/controllers/CControllerDashboardPropertiesEdit.php:38
 #: app/controllers/CControllerPopupTriggerWizard.php:236
-#: app/controllers/CControllerUserUpdateGeneral.php:113
+#: app/controllers/CControllerUserUpdateGeneral.php:126
 #: include/classes/api/services/CAction.php:1692
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:325
@@ -6838,7 +6838,7 @@ msgstr "開始"
 msgid "Frontend access"
 msgstr "Webインターフェースへのアクセス"
 
-#: app/views/administration.user.edit.php:487
+#: app/views/administration.user.edit.php:492
 msgid "Frontend messaging"
 msgstr "Webインターフェースのアラート表示"
 
@@ -6872,8 +6872,8 @@ msgstr "GMT%1$s"
 msgid "GSM modem"
 msgstr "GSMモデム"
 
-#: app/views/administration.gui.edit.php:29
-#: app/views/administration.gui.edit.php:133 include/html.inc.php:893
+#: app/views/administration.gui.edit.php:30
+#: app/views/administration.gui.edit.php:134 include/html.inc.php:893
 msgid "GUI"
 msgstr "表示設定"
 
@@ -6882,7 +6882,7 @@ msgid "GUI access disabled."
 msgstr "GUIアクセスを無効にしました"
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:470
+#: include/classes/setup/CSetupWizard.php:472
 msgid "GUI settings"
 msgstr "GUI設定"
 
@@ -7641,7 +7641,7 @@ msgstr[0] "ホストを有効にしました"
 #: app/partials/popup.operations.php:181
 #: app/views/administration.script.edit.php:92
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:364
+#: app/views/administration.user.edit.php:369
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
@@ -8717,9 +8717,9 @@ msgstr "テーブル\"%2$s\"へのwhereステートメントのフィールド\"
 msgid "Incorrect fields for sysmap."
 msgstr "マップの設定が正しくありません。"
 
-#: include/classes/setup/CSetupWizard.php:712
-#: include/classes/setup/CSetupWizard.php:716
-#: include/classes/setup/CSetupWizard.php:720
+#: include/classes/setup/CSetupWizard.php:714
+#: include/classes/setup/CSetupWizard.php:718
+#: include/classes/setup/CSetupWizard.php:722
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr "\"%1$s\": %2$sのファイルパスが正しくありません。"
@@ -9239,7 +9239,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
-#: app/controllers/CControllerUserUpdateGeneral.php:98 correlation.php:225
+#: app/controllers/CControllerUserUpdateGeneral.php:111 correlation.php:225
 #: correlation.php:235 correlation.php:241 correlation.php:261
 #: correlation.php:265 correlation.php:278
 #: include/classes/api/services/CAction.php:1724
@@ -9565,11 +9565,11 @@ msgid "Insert expression"
 msgstr "条件式の挿入"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:679
 msgid "Install"
 msgstr "インストール"
 
-#: setup.php:171
+#: setup.php:172
 msgid "Installation"
 msgstr "インストール"
 
@@ -10531,7 +10531,7 @@ msgstr "ラベル"
 msgid "Label location"
 msgstr "ラベルの位置"
 
-#: app/views/administration.user.edit.php:188
+#: app/views/administration.user.edit.php:193
 msgid "Language"
 msgstr "言語"
 
@@ -10705,11 +10705,11 @@ msgstr "先頭文字列削除"
 msgid "Legend"
 msgstr "凡例"
 
-#: setup.php:194
+#: setup.php:195
 msgid "Licensed under"
 msgstr "ライセンスは"
 
-#: app/views/administration.gui.edit.php:81
+#: app/views/administration.gui.edit.php:82
 msgid "Limit for search and filter results"
 msgstr "検索/フィルターの項目の上限値"
 
@@ -11329,19 +11329,19 @@ msgstr "最大値"
 msgid "Max columns"
 msgstr "最大列数"
 
-#: app/views/administration.gui.edit.php:93
+#: app/views/administration.gui.edit.php:94
 msgid "Max count of elements to show inside table cell"
 msgstr "テーブルセル内のリストの最大項目数"
 
-#: app/views/administration.gui.edit.php:114
+#: app/views/administration.gui.edit.php:115
 msgid "Max history display period"
 msgstr "ヒストリの最大表示期間"
 
-#: app/views/administration.gui.edit.php:87
+#: app/views/administration.gui.edit.php:88
 msgid "Max number of columns and rows in overview tables"
 msgstr "概要テーブル内の列と行の最大数"
 
-#: app/views/administration.gui.edit.php:126
+#: app/views/administration.gui.edit.php:127
 msgid "Max period"
 msgstr "最大期間"
 
@@ -11379,8 +11379,8 @@ msgid "May"
 msgstr "5月"
 
 #: app/controllers/CControllerPopupMedia.php:167
-#: app/views/administration.user.edit.php:305
-#: app/views/administration.user.edit.php:320 app/views/popup.media.php:65
+#: app/views/administration.user.edit.php:310
+#: app/views/administration.user.edit.php:325 app/views/popup.media.php:65
 msgid "Media"
 msgstr "メディア"
 
@@ -11507,8 +11507,8 @@ msgstr "メッセージテンプレート"
 msgid "Message templates"
 msgstr "メッセージテンプレート"
 
-#: app/views/administration.user.edit.php:492
-#: app/views/administration.user.edit.php:500
+#: app/views/administration.user.edit.php:497
+#: app/views/administration.user.edit.php:505
 msgid "Message timeout"
 msgstr "表示期間"
 
@@ -11526,7 +11526,7 @@ msgstr "メッセージ/コマンド"
 msgid "Messages"
 msgstr "メッセージ"
 
-#: app/views/administration.user.edit.php:572
+#: app/views/administration.user.edit.php:577
 msgid "Messaging"
 msgstr "アラート表示"
 
@@ -12102,7 +12102,7 @@ msgstr "次のページ"
 
 #: include/classes/setup/CSetupWizard.php:142
 #: include/classes/setup/CSetupWizard.php:421
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 msgid "Next step"
 msgstr "次のステップ"
 
@@ -12296,7 +12296,7 @@ msgstr "詳細がありません"
 msgid "No discovery rule IDs given."
 msgstr "ディスカバリルールIDが設定されていません。"
 
-#: app/views/administration.user.edit.php:414
+#: app/views/administration.user.edit.php:419
 #: app/views/administration.userrole.edit.php:163
 msgid "No enabled modules found."
 msgstr "有効なモジュールがありません。"
@@ -12474,7 +12474,7 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:56
 #: app/controllers/CControllerPopupMediatypeTestSend.php:73
 #: app/controllers/CControllerPopupScriptExec.php:103
-#: app/controllers/CControllerUserUpdateGeneral.php:121
+#: app/controllers/CControllerUserUpdateGeneral.php:134
 #: app/controllers/CControllerWidgetClockView.php:111
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:303
@@ -13107,7 +13107,7 @@ msgstr "ON"
 msgid "On status change triggers blink for"
 msgstr "ステータスが変化したイベントの点滅期間"
 
-#: app/views/administration.user.edit.php:498
+#: app/views/administration.user.edit.php:503
 msgid "Once"
 msgstr "一度だけ"
 
@@ -13808,7 +13808,7 @@ msgstr "パースエラー"
 msgid "Passive"
 msgstr "パッシブ"
 
-#: app/controllers/CControllerUserUpdateGeneral.php:98
+#: app/controllers/CControllerUserUpdateGeneral.php:111
 #: app/partials/popup.operations.php:245 app/partials/popup.operations.php:289
 #: app/views/administration.mediatype.edit.php:200
 #: app/views/administration.user.edit.php:113
@@ -13915,9 +13915,9 @@ msgid "Periods"
 msgstr "監視対象のメンテナンス期間"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:364
-#: app/views/administration.user.edit.php:384
-#: app/views/administration.user.edit.php:481
+#: app/views/administration.user.edit.php:369
+#: app/views/administration.user.edit.php:389
+#: app/views/administration.user.edit.php:486
 #: app/views/administration.usergroup.edit.php:106
 #: app/views/administration.usergroup.edit.php:157
 #: app/views/administration.usergroup.edit.php:208
@@ -13931,7 +13931,7 @@ msgstr "監視対象のメンテナンス期間"
 msgid "Permissions"
 msgstr "権限"
 
-#: app/views/administration.user.edit.php:389
+#: app/views/administration.user.edit.php:394
 msgid "Permissions can be assigned for user groups only."
 msgstr "権限はユーザーグループにのみ割り当てることができます。"
 
@@ -13953,16 +13953,16 @@ msgstr "配置アルゴリズム"
 msgid "Plain text"
 msgstr "プレーンテキスト"
 
-#: app/views/administration.user.edit.php:516
-#: app/views/administration.user.edit.php:548
+#: app/views/administration.user.edit.php:521
+#: app/views/administration.user.edit.php:553
 msgid "Play"
 msgstr "再生"
 
-#: app/views/administration.user.edit.php:496
+#: app/views/administration.user.edit.php:501
 msgid "Play sound"
 msgstr "サウンド再生"
 
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "設定値を確認してください。正しければ\"%1$s\"ボタンを押してください。もしくは、\"%2$s\"ボタンを押して設定値を修正してください。"
@@ -13976,7 +13976,7 @@ msgstr "すべてのマクロを削除してよいか確認してください。
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "データベースを手動で作成してください。そしてデータベースに接続するための設定値を設定してください。終了したら\"%1$s\"ボタンを押してください。"
 
-#: include/classes/setup/CSetupWizard.php:860
+#: include/classes/setup/CSetupWizard.php:862
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "\"allow_url_fopen\"ディレクティブを有効にしてください。"
 
@@ -14055,7 +14055,7 @@ msgid "Post type"
 msgstr "POSTデータの形式"
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:550
+#: include/classes/setup/CSetupWizard.php:552
 msgid "Pre-installation summary"
 msgstr "インストール事前準備概要"
 
@@ -14546,7 +14546,7 @@ msgstr "受信者 (降順)"
 msgid "Recipients"
 msgstr "受信者"
 
-#: app/views/administration.user.edit.php:510
+#: app/views/administration.user.edit.php:515
 #: include/classes/screens/CScreenProblem.php:1086
 #: include/views/configuration.item.list.php:175
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14586,7 +14586,7 @@ msgstr "復旧時刻"
 msgid "Rectangle"
 msgstr "長方形"
 
-#: app/views/administration.user.edit.php:211
+#: app/views/administration.user.edit.php:216
 msgid "Refresh"
 msgstr "リフレッシュ"
 
@@ -14680,7 +14680,7 @@ msgstr "リモートコマンド"
 #: app/views/administration.mediatype.edit.php:165
 #: app/views/administration.mediatype.edit.php:184
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:296
+#: app/views/administration.user.edit.php:301
 #: app/views/administration.valuemap.edit.php:65
 #: app/views/js/administration.iconmap.edit.js.php:52
 #: app/views/js/administration.macros.edit.js.php:45
@@ -14947,7 +14947,7 @@ msgstr "すべてのフィールドをデフォルト値に戻しますか？"
 msgid "Reset confirmation"
 msgstr "リセットの確認"
 
-#: app/views/administration.gui.edit.php:136
+#: app/views/administration.gui.edit.php:137
 #: app/views/administration.housekeeping.edit.php:191
 #: app/views/administration.miscconfig.edit.php:177
 #: app/views/administration.trigdisplay.edit.php:168
@@ -15147,8 +15147,8 @@ msgstr "右側Y軸"
 msgid "Right trim"
 msgstr "末尾文字列削除"
 
-#: app/views/administration.user.edit.php:344
-#: app/views/administration.user.edit.php:354
+#: app/views/administration.user.edit.php:349
+#: app/views/administration.user.edit.php:359
 msgid "Role"
 msgstr "ユーザーの役割"
 
@@ -15173,7 +15173,7 @@ msgstr "行の結合"
 msgid "Rows"
 msgstr "行"
 
-#: app/views/administration.user.edit.php:216
+#: app/views/administration.user.edit.php:221
 msgid "Rows per page"
 msgstr "ページあたりの表示行数"
 
@@ -15478,7 +15478,7 @@ msgstr "保存する"
 msgid "Save changes"
 msgstr "変更を保存"
 
-#: include/classes/setup/CSetupWizard.php:657
+#: include/classes/setup/CSetupWizard.php:659
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"として保存しました"
@@ -15826,7 +15826,7 @@ msgstr "ユーザーにメッセージを送信"
 msgid "Send only to"
 msgstr "次のメディアのみ使用"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:68
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:68
 #: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "送信先"
@@ -16206,7 +16206,7 @@ msgstr "サイドバーを表示"
 #: app/partials/common.filter.trigger.php:168
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.problem.filter.php:247
-#: app/views/administration.user.edit.php:566
+#: app/views/administration.user.edit.php:571
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:102
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:154
@@ -16222,7 +16222,7 @@ msgstr "メンテナンス中の障害を表示"
 msgid "Show tags"
 msgstr "タグを表示"
 
-#: app/views/administration.gui.edit.php:108
+#: app/views/administration.gui.edit.php:109
 msgid "Show technical errors"
 msgstr "技術的エラーを表示"
 
@@ -16258,7 +16258,7 @@ msgstr "使用不可なマップの表示"
 msgid "Show value"
 msgstr "値のマッピング"
 
-#: app/views/administration.gui.edit.php:98
+#: app/views/administration.gui.edit.php:99
 msgid "Show warning if Zabbix server is down"
 msgstr "Zabbixサーバー停止時にワーニングを表示"
 
@@ -16695,8 +16695,8 @@ msgstr "\"%1$s\"の名前を持つステップがすでに存在します。"
 msgid "Steps"
 msgstr "ステップ"
 
-#: app/views/administration.user.edit.php:521
-#: app/views/administration.user.edit.php:553
+#: app/views/administration.user.edit.php:526
+#: app/views/administration.user.edit.php:558
 msgid "Stop"
 msgstr "停止"
 
@@ -16721,8 +16721,8 @@ msgstr "保存期間"
 msgid "Store credentials in"
 msgstr "資格情報保存先"
 
-#: include/classes/setup/CSetupWizard.php:485
-#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:487
+#: include/classes/setup/CSetupWizard.php:488
 msgid "Stored in HashiCorp Vault secret"
 msgstr "HashiCorp Vaultのシークレット内に保存"
 
@@ -16835,8 +16835,7 @@ msgstr "スウェーデン語 (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
 
-#: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:462
+#: include/classes/helpers/CDateTimeZoneHelper.php:97
 msgid "System"
 msgstr "システム"
 
@@ -16846,8 +16845,9 @@ msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "システムのブート時刻。UNIXのタイムスタンプで整数値を返す。"
 
 #: app/views/administration.user.edit.php:138
-#: app/views/administration.user.edit.php:139
-#: app/views/administration.user.edit.php:140 include/users.inc.php:81
+#: app/views/administration.user.edit.php:140
+#: include/classes/helpers/CDateTimeZoneHelper.php:74
+#: include/classes/helpers/CDateTimeZoneHelper.php:80 include/users.inc.php:81
 msgid "System default"
 msgstr "システムデフォルト"
 
@@ -17353,7 +17353,7 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Webシナリオが設定されているホストと異なるホストに所属するアプリケーションが利用されています。"
 
-#: app/views/administration.user.edit.php:190
+#: app/views/administration.user.edit.php:195
 msgid "Theme"
 msgstr "テーマ"
 
@@ -17467,7 +17467,7 @@ msgstr "特定のZabbixのプロセスもしくはプロセスグループ(<type
 msgid "Time elapsed:"
 msgstr "経過時間："
 
-#: app/views/administration.gui.edit.php:120
+#: app/views/administration.gui.edit.php:121
 msgid "Time filter default period"
 msgstr "フィルタリングするデフォルト期間"
 
@@ -17501,7 +17501,7 @@ msgstr "時間の形式"
 msgid "Time units in period shift must be greater or equal to period time unit."
 msgstr "期間のシフトの時間単位は期間の時間単位以上にしてください。"
 
-#: app/views/administration.user.edit.php:189
+#: app/views/administration.user.edit.php:194
 msgid "Time zone"
 msgstr "タイムゾーン"
 
@@ -17845,7 +17845,7 @@ msgstr "トリガーのプロトタイプを更新しました"
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr "トリガーの復旧条件式には少なくとも1つのhost:keyへの参照が必要です。"
 
-#: app/views/administration.user.edit.php:565 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:570 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "トリガーの深刻度"
 
@@ -17932,7 +17932,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: app/views/administration.mediatype.list.php:80
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:235
+#: app/views/administration.user.edit.php:240
 #: app/views/dashboard.share.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -18050,7 +18050,7 @@ msgstr "不明"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:221
+#: app/views/administration.user.edit.php:226
 msgid "URL (after login)"
 msgstr "ログイン後のURL"
 
@@ -18372,7 +18372,7 @@ msgstr "Up"
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:266
 #: app/views/administration.autoreg.edit.php:90
-#: app/views/administration.gui.edit.php:135
+#: app/views/administration.gui.edit.php:136
 #: app/views/administration.housekeeping.edit.php:190
 #: app/views/administration.iconmap.edit.php:132
 #: app/views/administration.image.edit.php:77
@@ -18384,8 +18384,8 @@ msgstr "Up"
 #: app/views/administration.regex.edit.php:141
 #: app/views/administration.script.edit.php:140
 #: app/views/administration.trigdisplay.edit.php:167
-#: app/views/administration.user.edit.php:584
-#: app/views/administration.user.edit.php:607
+#: app/views/administration.user.edit.php:589
+#: app/views/administration.user.edit.php:612
 #: app/views/administration.usergroup.edit.php:221
 #: app/views/administration.userrole.edit.php:298
 #: app/views/administration.valuemap.edit.php:110
@@ -18506,7 +18506,7 @@ msgstr "bulkリクエストを使用"
 msgid "Use custom event status colours"
 msgstr "イベントのステータスの文字色を変更"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:84
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "指定した深刻度のときに使用"
 
@@ -18524,7 +18524,7 @@ msgstr "アイテムで使用"
 
 #: app/controllers/CControllerAuditLogList.php:184
 #: app/partials/popup.operations.php:103
-#: app/views/administration.user.edit.php:225
+#: app/views/administration.user.edit.php:230
 #: app/views/reports.auditlog.list.php:87 httpconf.php:66
 #: include/actions.inc.php:1700 include/actions.inc.php:1753
 #: include/actions.inc.php:1967 include/classes/setup/CSetupWizard.php:350
@@ -18567,7 +18567,7 @@ msgstr "ユーザー\"%1$s\"は\"%2$s\"アクション内で使用されてい�
 msgid "User action"
 msgstr "ユーザーの操作"
 
-#: app/controllers/CControllerUserCreate.php:114
+#: app/controllers/CControllerUserCreate.php:112
 msgid "User added"
 msgstr "ユーザーを追加しました"
 
@@ -18580,10 +18580,10 @@ msgstr "ユーザーエージェント文字列"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
-#: app/views/administration.user.edit.php:347
+#: app/views/administration.user.edit.php:352
 #: include/classes/api/services/CUser.php:850
 msgid "User cannot change own role."
-msgstr ""
+msgstr "ユーザーは自分の役割を変更できません。"
 
 #: app/views/administration.userrole.edit.php:63
 #: include/classes/api/services/CRole.php:401
@@ -18706,7 +18706,7 @@ msgstr "ユーザー名"
 msgid "User password"
 msgstr "ユーザーのパスワード"
 
-#: app/controllers/CControllerUserProfileEdit.php:138
+#: app/controllers/CControllerUserProfileEdit.php:137
 #: app/views/administration.user.edit.php:38
 msgid "User profile"
 msgstr "ユーザープロファイル"
@@ -18769,7 +18769,7 @@ msgstr "マップ\"%2$s\"のユーザーでの共有にはパラメータ:%1$s �
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"のユーザーでの共有にはパラメータ:%1$s が必要です。"
 
-#: app/views/administration.user.edit.php:358
+#: app/views/administration.user.edit.php:363
 #: app/views/administration.userrole.edit.php:55
 #: app/views/administration.userrole.edit.php:70
 msgid "User type"
@@ -18780,8 +18780,8 @@ msgid "User unblocked"
 msgid_plural "Users unblocked"
 msgstr[0] "ユーザーのブロックを解除しました"
 
-#: app/controllers/CControllerUserProfileUpdate.php:120
-#: app/controllers/CControllerUserUpdate.php:126
+#: app/controllers/CControllerUserProfileUpdate.php:118
+#: app/controllers/CControllerUserUpdate.php:124
 msgid "User updated"
 msgstr "ユーザーを更新しました"
 
@@ -18812,8 +18812,8 @@ msgstr "ユーザー名"
 msgid "Username and password"
 msgstr "ユーザー名とパスワード"
 
-#: include/classes/setup/CSetupWizard.php:585
-#: include/classes/setup/CSetupWizard.php:878
+#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr "ユーザー名とパスワードはVaultのシークレットキー内の\"username\"と\"password\"として保存してください。"
 
@@ -19251,17 +19251,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "特定のプロセスに関する様々な情報。浮動小数点値を返す"
 
 #: include/classes/setup/CSetupWizard.php:327
-#: include/classes/setup/CSetupWizard.php:504
+#: include/classes/setup/CSetupWizard.php:506
 msgid "Vault API endpoint"
 msgstr "VaultのAPIエンドポイント"
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Vault authentication token"
 msgstr "Vaultの認証トークン"
 
 #: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:874 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:876 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
 
@@ -19270,7 +19270,7 @@ msgid "Vault secret"
 msgstr "Vaultのシークレット"
 
 #: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:509
 msgid "Vault secret path"
 msgstr "Vaultのシークレットパス"
 
@@ -19470,7 +19470,7 @@ msgstr "ようこそ"
 msgid "Welcome to"
 msgstr "ようこそ"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:79
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:79
 msgid "When active"
 msgstr "有効な時間帯"
 
@@ -19544,7 +19544,7 @@ msgstr "トリガーなし"
 msgid "Wizard"
 msgstr "ウィザード"
 
-#: app/views/administration.gui.edit.php:103
+#: app/views/administration.gui.edit.php:104
 msgid "Working time"
 msgstr "ワーキングタイム"
 
@@ -19791,8 +19791,8 @@ msgstr "昨日"
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"としてログインしています。"
 
-#: app/views/administration.gui.edit.php:62
-#: app/views/administration.user.edit.php:175
+#: app/views/administration.gui.edit.php:63
+#: app/views/administration.user.edit.php:178
 #: include/classes/setup/CSetupWizard.php:216
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
@@ -19915,7 +19915,7 @@ msgstr "Zabbixのログイン画面"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:878
-#: include/classes/setup/CSetupWizard.php:541
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Zabbix server"
 msgstr "Zabbixサーバー"
 
@@ -19948,11 +19948,11 @@ msgstr "Zabbixサーバーが動作していません (画面のリフレッシ�
 msgid "Zabbix server is running"
 msgstr "Zabbixサーバーの起動"
 
-#: include/classes/setup/CSetupWizard.php:545
+#: include/classes/setup/CSetupWizard.php:547
 msgid "Zabbix server name"
 msgstr "Zabbixサーバー名"
 
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:544
 msgid "Zabbix server port"
 msgstr "Zabbixサーバーのポート"
 
@@ -20262,7 +20262,7 @@ msgstr "変更できません"
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
-#: app/controllers/CControllerUserUpdateGeneral.php:98 correlation.php:225
+#: app/controllers/CControllerUserUpdateGeneral.php:111 correlation.php:225
 #: correlation.php:235 correlation.php:241 correlation.php:261
 #: correlation.php:265 correlation.php:278
 #: include/classes/api/services/CAction.php:1898
@@ -20442,7 +20442,7 @@ msgid "days"
 msgstr "日"
 
 #: app/controllers/CControllerMapView.php:123
-#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:484
 #: include/classes/widgets/CWidgetHelper.php:63
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -20635,7 +20635,7 @@ msgid "in"
 msgstr "期間中"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:374
+#: app/views/administration.user.edit.php:379
 msgid "including subgroups"
 msgstr "サブグループを含む"
 
@@ -20998,7 +20998,7 @@ msgstr "数値"
 msgid "of"
 msgstr "of"
 
-#: app/views/administration.user.edit.php:270
+#: app/views/administration.user.edit.php:275
 #: include/classes/setup/CFrontendSetup.php:238
 #: include/classes/setup/CFrontendSetup.php:291
 #: include/classes/setup/CFrontendSetup.php:308
@@ -21021,7 +21021,7 @@ msgstr "of"
 msgid "off"
 msgstr "off"
 
-#: app/views/administration.user.edit.php:270
+#: app/views/administration.user.edit.php:275
 #: app/views/monitoring.host.dashboard.view.php:51
 #: include/classes/setup/CFrontendSetup.php:291
 #: include/classes/setup/CFrontendSetup.php:308
