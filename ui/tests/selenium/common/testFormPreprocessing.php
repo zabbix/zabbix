@@ -722,8 +722,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Does not match regular expression', 'parameter_1' => '8g!@#$%^&*()-='],
 						['type' => 'Check for error in JSON', 'parameter_1' => '9h!@#$%^&*()-='],
 						['type' => 'Check for error in XML', 'parameter_1' => '0i!@#$%^&*()-='],
-						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-='],
-						['type' => 'Check for not supported value']
+						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-=']
 					]
 				]
 			],
@@ -818,7 +817,6 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Right trim', 'parameter_1' => '    22   '],
 						['type' => 'Left trim', 'parameter_1' => '   33  '],
 						['type' => 'Trim', 'parameter_1' => '   0    '],
-						['type' => 'Check for not supported value'],
 						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    '],
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    '],
 						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],

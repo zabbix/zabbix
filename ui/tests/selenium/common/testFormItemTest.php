@@ -91,8 +91,7 @@ class testFormItemTest extends CWebTest {
 		// Check Test item button.
 		$this->checkTestButtonInPreprocessing($item_type);
 		$this->saveFormAndCheckMessage($item_type.$success_text);
-		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='
-			.zbx_dbstr($item_name));
+		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($item_name));
 
 		// Open created item and change type.
 		foreach ($data as $update) {
@@ -119,7 +118,7 @@ class testFormItemTest extends CWebTest {
 				if ($i === 0) {
 					if ($check_now) {
 						$execute_button = $this->query('id:check_now')
-							->waitUntilVisible()->one();
+								->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
@@ -129,7 +128,7 @@ class testFormItemTest extends CWebTest {
 						&& array_key_exists('Master item', $update)) {
 							sleep(2);
 							$item_form->getFieldContainer('Master item')
-								->asMultiselect()->select($update['Master item']);
+									->asMultiselect()->select($update['Master item']);
 					}
 
 					$type = $update['Type'];
@@ -659,8 +658,7 @@ class testFormItemTest extends CWebTest {
 				$item_form->getField('Host interface')->fill($data['host_interface']);
 			}
 			// Get ip and port separately.
-			$host_interface = explode(' : ', $item_form->getField('Host interface')
-				->getText(), 2);
+			$host_interface = explode(' : ', $item_form->getField('Host interface')->getText(), 2);
 		}
 
 		if (CTestArrayHelper::get($data, 'preprocessing')){
@@ -670,18 +668,19 @@ class testFormItemTest extends CWebTest {
 
 		// Open Test item dialog form.
 		$this->query('id:test_item')->waitUntilVisible()->one()->click();
-		$dialog = $this->query('xpath://div[@data-dialogueid="item-test" and @role="dialog"]')
-			->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->assertEquals('Test item', $dialog->getTitle());
-				$test_form = $this->query('id:preprocessing-test-form')
-					->waitUntilPresent()->one()->waitUntilReady();
+				$this->assertEquals('Test item', $overlay->getTitle());
+				$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->one()->waitUntilReady();
 				// Check "Get value from host" checkbox.
 				$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 				$this->assertTrue($get_host_value->isEnabled());
 				$this->assertTrue($get_host_value->isChecked());
+
+				$not_supported = $test_form->query('id:not_supported')->asCheckbox()->one();
+				$this->assertFalse($not_supported->isEnabled());
 
 				if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
 					$elements = [
@@ -718,8 +717,8 @@ class testFormItemTest extends CWebTest {
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
-				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN "
-					. "(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
+				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
+						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
 				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
@@ -857,7 +856,7 @@ class testFormItemTest extends CWebTest {
 				}
 
 				// Check value fields.
-				$this->checkValueFields($data);
+				$this->checkValueFields($data, $not_supported);
 
 				// Change interface fields in testing form.
 				if (CTestArrayHelper::get($data, 'interface')) {
@@ -871,7 +870,7 @@ class testFormItemTest extends CWebTest {
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Click Test button in test form.
-				$dialog->query('button:Get value and test')->one()->waitUntilVisible()->click();
+				$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Check empty interface fields.
@@ -880,7 +879,7 @@ class testFormItemTest extends CWebTest {
 					$elements['port']->clear();
 					$button->click();
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.',
-						'Incorrect value for field "Port": cannot be empty.']);
+							'Incorrect value for field "Port": cannot be empty.']);
 				}
 				if ($data['fields']['Type'] === 'Simple check') {
 					$elements['address']->clear();
@@ -888,8 +887,6 @@ class testFormItemTest extends CWebTest {
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
 				}
 
-				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-				$value_test_button = $overlay->query('button:Get value and test')->waitUntilVisible()->one();
 				// Uncheck "Get value from host" checkbox.
 				if (CTestArrayHelper::get($data, 'host_value', true) === false) {
 					$get_host_value->uncheck();
@@ -902,11 +899,14 @@ class testFormItemTest extends CWebTest {
 					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
 					$overlay->query('button:Test')->waitUntilVisible()->one();
 
+					$this->assertTrue($not_supported->isEnabled());
+					$this->assertFalse($not_supported->isChecked());
+
 					/*
 					 * Check that value fields still present after "Get value
 					 * from host" checkbox is unset.
 					 */
-					$this->checkValueFields($data);
+					$this->checkValueFields($data, $not_supported);
 				}
 
 				// Compare data macros with macros from test table.
@@ -953,17 +953,15 @@ class testFormItemTest extends CWebTest {
 					$preprocessing_table = $test_form->query('id:preprocessing-steps')->asTable()->one();
 
 					foreach ($data['preprocessing'] as $i => $step) {
-						$this->assertEquals(($i+1).': '.$step['type'],
-							$preprocessing_table->getRow($i)->getText());
+						$this->assertEquals(($i+1).': '.$step['type'], $preprocessing_table->getRow($i)->getText());
 					}
 				}
 				break;
 			case TEST_BAD:
-				$message = $dialog->query('tag:output')->waitUntilPresent()
-					->asMessage()->one();
+				$message = $overlay->query('tag:output')->waitUntilPresent()->asMessage()->one();
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine($data['error']));
-				$dialog->close();
+				$overlay->close();
 				break;
 		}
 	}
@@ -974,13 +972,15 @@ class testFormItemTest extends CWebTest {
 	 *
 	 * @param array $data data provider
 	 */
-	private function checkValueFields($data) {
+	private function checkValueFields($data, $not_supported) {
 		$test_form = $this->query('id:preprocessing-test-form')
-			->waitUntilPresent()->one()->waitUntilReady();
+				->waitUntilPresent()->one()->waitUntilReady();
 		$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 
 		$checked = $get_host_value->isChecked();
 		$prev_enabled = false;
+
+		$value = $test_form->query('id:value')->asMultiline()->one();
 
 		if (!$checked) {
 			/*
@@ -991,22 +991,25 @@ class testFormItemTest extends CWebTest {
 				$prev_enabled = false;
 				foreach ($data['preprocessing'] as $step) {
 					if (in_array($step['type'], ['Discard unchanged with heartbeat',
-						'Simple change', 'Change per second', 'Discard unchanged'
-					])) {
+							'Simple change', 'Change per second', 'Discard unchanged'])
+					) {
 						$prev_enabled = true;
 						break;
 					}
 				}
 			}
+
+			$not_supported->check();
+			$this->assertFalse($value->isEnabled());
+		}
+		else {
+			$this->assertTrue($value->isEnabled(!$checked));
 		}
 
-		$this->assertTrue($test_form->query('id:value')->asMultiline()
-				->one()->isEnabled(!$checked));
 		$this->assertTrue($test_form->query('id:prev_value')->asMultiline()
 				->one()->isEnabled($checked && $prev_enabled));
 		$this->assertTrue($test_form->query('id:prev_time')
 				->one()->isEnabled($prev_enabled));
-
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
 		$this->assertTrue($test_form->query('id:eol')->one()->isEnabled());
 	}
