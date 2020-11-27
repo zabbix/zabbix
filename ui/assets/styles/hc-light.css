@@ -5933,6 +5933,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background: #f3f3f3;
   z-index: 3; }
 
+.global-macro-table .table-col-value {
+  min-width: 300px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }
 .sidebar button:focus {

@@ -36,6 +36,13 @@ $widget = (new CWidget())
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
+	->addClass('global-macro-table')
+	->setColumns([
+		(new CTableColumn())->addClass('table-col-macro'),
+		(new CTableColumn())->addClass('table-col-value'),
+		(new CTableColumn())->addClass('table-col-description'),
+		(new CTableColumn())->addClass('table-col-action'),
+	])
 	->setHeader([_('Macro'), _('Value'), _('Description'), '']);
 
 foreach ($data['macros'] as $i => $macro) {

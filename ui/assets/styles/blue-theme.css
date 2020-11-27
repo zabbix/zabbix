@@ -5977,3 +5977,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   top: 0;
   background: #ffffff;
   z-index: 3; }
+
+.global-macro-table .table-col-value {
+  min-width: 300px; }
