@@ -80,7 +80,7 @@ static void	DBpatch_5030000_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *pr
 
 static int	DBpatch_5030000(void)
 {
-	int	i, ret = SUCCEED;
+	int		i, ret = SUCCEED;
 	const char	*keys[] =
 	{
 		"web.items.php.sort",
@@ -105,8 +105,8 @@ static int	DBpatch_5030000(void)
 		DB_RESULT		result;
 		zbx_dbpatch_profile_t	profile = {0};
 
-		result = DBselect("SELECT profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
-				" FROM profiles where idx='%s'", keys[i]);
+		result = DBselect("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
+				" from profiles where idx='%s'", keys[i]);
 
 		if (NULL == (row = DBfetch(result)))
 		{
@@ -120,7 +120,7 @@ static int	DBpatch_5030000(void)
 
 		if (NULL == subsect || NULL == field)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Failed to parse profile key fields for key '%s'", keys[i]);
+			zabbix_log(LOG_LEVEL_ERR, "failed to parse profile key fields for key '%s'", keys[i]);
 			ret = FAIL;
 		}
 
@@ -224,7 +224,9 @@ static int	DBpatch_5030001(void)
 		"'web.httpconf.filter_groups',"
 		"'web.httpconf.filter_hostids',"
 		"'web.httpconf.filter_status')"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
