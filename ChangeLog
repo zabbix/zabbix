@@ -1,6 +1,7 @@
 Changes for 5.4.0alpha1
 
 New features:
+........S. [ZBXNEXT-6332] added {ITEM.VALUETYPE} macro (arimdjonoks)
 .........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
 .......PS. [ZBXNEXT-6269] added hv ip to vmware.hv.discovery and vm metrics for FQDN template (MVekslers)
 .........T [ZBXNEXT-6272] added template VMWare FQDN and updated template VMWare (tuskov)
@@ -21,6 +22,7 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+A.F....... [ZBX-18470] fixed unusefull timezone formatting; replaced comboboxes by CSelect elements for timezone selection (miks)
 ..F....... [ZBX-18636] fixed import converter non static method error (rlataria)
 ........S. [ZBX-18599] fixed potential server crash during upgrade to 5.2, mainly on ARM (kalimulin)
 .........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
