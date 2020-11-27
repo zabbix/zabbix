@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-26T18:07:40Z</date>
+   <date>2020-11-27T09:13:17Z</date>
    <groups>
       <group>
          <name>Templates/Telephony</name>
@@ -273,7 +273,7 @@ function getSipPeers() {
             else {
                 asterisk.sip.monitored_online++;
                 if (element.Status.search('^OK') != -1) {
-                    element.Status = element.Status.split(' ')[0]
+                    element.Status = element.Status.split(' ')[0];
                 }
             }
         }
@@ -293,7 +293,7 @@ function getIaxPeerList() {
     });
     elements.forEach(function (element) {
         if (element.Status.search('^OK') != -1) {
-            element.Status = element.Status.split(' ')[0]
+            element.Status = element.Status.split(' ')[0];
         }
         switch (element.Status) {
             case 'Unmonitored':
@@ -387,14 +387,14 @@ if (list.includes('IAXpeerlist')) {
     getIaxPeerList();
 }
 if (list.includes('PJSIPShowEndpoints')) {
-   getPjsipShowEndpoints();
+    getPjsipShowEndpoints();
 }
 if (list.includes('QueueSummary')) {
-   getQueueSummary();
+    getQueueSummary();
 }
 
 try {
-  response = Ami.request(url, 'Logoff');
+    response = Ami.request(url, 'Logoff');
 }
 catch (e) {}
 
