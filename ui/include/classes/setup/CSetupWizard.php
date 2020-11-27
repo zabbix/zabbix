@@ -297,7 +297,6 @@ class CSetupWizard extends CForm {
 
 		$table->addRow(_('Database port'), [
 			(new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false))
-				->removeAttribute('style')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
@@ -435,7 +434,6 @@ class CSetupWizard extends CForm {
 
 		$table->addRow(_('Port'),
 			(new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5, false, false, false))
-				->removeAttribute('style')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
