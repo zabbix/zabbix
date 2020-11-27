@@ -11,7 +11,7 @@ All metrics are collected at once, thanks to Zabbix's bulk data collection.
 
 This template was tested on:
 
-- Zabbix, version 5.0 and later
+- Zabbix, version 5.4 and later
 - Asterisk, version 13 and later
 
 ## Setup
