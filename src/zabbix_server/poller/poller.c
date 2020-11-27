@@ -962,9 +962,12 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	DCconfig_clean_items(items, NULL, num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
+
 	if (NULL != data)
+	{
 		zbx_availability_flush(data, data_offset);
-	zbx_free(data);
+		zbx_free(data);
+	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
