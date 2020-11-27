@@ -154,7 +154,13 @@
 			var value = list[i];
 
 			if (typeof value.dcheckid === 'undefined') {
-				value.dcheckid = getUniqueId();
+				for (;;) {
+					value.dcheckid = getUniqueId();
+
+					if (typeof ZBX_CHECKLIST[value.dcheckid] === 'undefined') {
+						break;
+					}
+				}
 			}
 
 			if (typeof ZBX_CHECKLIST[value.dcheckid] === 'undefined') {
