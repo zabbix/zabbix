@@ -104,7 +104,7 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 	if err != nil {
 		return err
 	}
-	defer v.Clear()
+	defer clearOle(v)
 	if v.Val == 0 {
 		return errors.New("Empty WMI search result.")
 	}
@@ -201,7 +201,7 @@ func (r *tableResult) write(rs *ole.IDispatch) (err error) {
 	if err != nil {
 		return err
 	}
-	defer v.Clear()
+	defer clearOle(v)
 
 	r.data = make([]map[string]interface{}, 0)
 
