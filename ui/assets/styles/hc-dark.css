@@ -5934,9 +5934,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   z-index: 3; }
 
 .global-macro-table .table-col-value, .inherted-macros-table .table-col-value {
-  min-width: 300px; }
+  width: 300px; }
 .global-macro-table .table-col-template-value, .inherted-macros-table .table-col-template-value {
-  min-width: 300px; }
+  width: 300px; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
