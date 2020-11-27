@@ -1,13 +1,13 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-26T20:48:20Z'
+  date: '2020-11-27T13:43:20Z'
   groups:
     -
       name: Templates/Applications
   templates:
     -
-      template: 'Template App HashiCorp Vault by HTTP'
-      name: 'Template App HashiCorp Vault by HTTP'
+      template: 'HashiCorp Vault by HTTP'
+      name: 'HashiCorp Vault by HTTP'
       description: |
         Get HashiCorp Vault metrics from Vault API HTTP Prometheus metrics endpoint.
         
@@ -191,6 +191,13 @@ zabbix_export:
           applications:
             -
               name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"healthcheck": 0}'
           url: '{$VAULT.API.SCHEME}://{HOST.CONN}:{$VAULT.API.PORT}/v1/sys/health'
           status_codes: '200,429,472,473,503,501'
           headers:
@@ -207,6 +214,12 @@ zabbix_export:
           applications:
             -
               name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
           url: '{$VAULT.API.SCHEME}://{HOST.CONN}:{$VAULT.API.PORT}/v1/sys/leader'
           headers:
             -
@@ -222,8 +235,14 @@ zabbix_export:
           applications:
             -
               name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: DISCARD_VALUE
           url: '{$VAULT.API.SCHEME}://{HOST.CONN}:{$VAULT.API.PORT}/v1/sys/metrics?format=prometheus'
-          status_codes: '200,503'
+          status_codes: '200,503,403'
           headers:
             -
               name: X-Vault-Token
@@ -236,7 +255,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Get metrics error'
+          description: 'Get metrics error.'
           applications:
             -
               name: Vault
@@ -257,13 +276,17 @@ zabbix_export:
               expression: '{strlen()}>0'
               name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
               priority: WARNING
+              dependencies:
+                -
+                  name: 'Vault: Vault server is sealed'
+                  expression: '{HashiCorp Vault by HTTP:vault.health.sealed.last()}=1'
         -
           name: 'Vault: Healthcheck'
           type: DEPENDENT
           key: vault.health.check
           delay: '0'
           history: 7d
-          description: 'Seal status'
+          description: 'Vault healthcheck.'
           applications:
             -
               name: Vault
@@ -293,7 +316,7 @@ zabbix_export:
           key: vault.health.initialized
           delay: '0'
           history: 7d
-          description: 'Initialization status'
+          description: 'Initialization status.'
           applications:
             -
               name: Vault
@@ -321,7 +344,7 @@ zabbix_export:
           key: vault.health.performance_standby
           delay: '0'
           history: 7d
-          description: 'Performance standby status'
+          description: 'Performance standby status.'
           applications:
             -
               name: Vault
@@ -401,7 +424,7 @@ zabbix_export:
           key: vault.health.sealed
           delay: '0'
           history: 7d
-          description: 'Seal status'
+          description: 'Seal status.'
           applications:
             -
               name: Vault
@@ -435,7 +458,7 @@ zabbix_export:
           key: vault.health.standby
           delay: '0'
           history: 7d
-          description: 'Standby status'
+          description: 'Standby status.'
           applications:
             -
               name: Vault
@@ -465,7 +488,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Server version'
+          description: 'Server version.'
           applications:
             -
               name: Vault
@@ -494,7 +517,7 @@ zabbix_export:
           key: vault.leader.ha_enabled
           delay: '0'
           history: 7d
-          description: 'HA enabled status'
+          description: 'HA enabled status.'
           applications:
             -
               name: Vault
@@ -521,7 +544,7 @@ zabbix_export:
           key: vault.leader.is_self
           delay: '0'
           history: 7d
-          description: 'Leader status'
+          description: 'Leader status.'
           applications:
             -
               name: Vault
@@ -543,13 +566,13 @@ zabbix_export:
           master_item:
             key: vault.get_leader
         -
-          name: 'Vault: Audit log request failures, count'
+          name: 'Vault: Audit log request failures, rate'
           type: DEPENDENT
-          key: vault.metrics.audit.log.request.failure
+          key: vault.metrics.audit.log.request.failure.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of audit log request failures'
+          description: 'Number of audit log request failures.'
           applications:
             -
               name: Vault
@@ -560,6 +583,10 @@ zabbix_export:
                 - vault_audit_log_request_failure
                 - ''
               error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: vault.clear_metrics
         -
@@ -570,7 +597,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by all audit log requests across all audit log devices'
+          description: 'Duration of time taken by all audit log requests across all audit log devices.'
           applications:
             -
               name: Vault
@@ -592,12 +619,12 @@ zabbix_export:
         -
           name: 'Vault: Audit log requests, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.audit.log.request.pct_90
+          key: vault.metrics.audit.log.request.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by all audit log requests across all audit log devices'
+          description: 'Duration of time taken by all audit log requests across all audit log devices.'
           applications:
             -
               name: Vault
@@ -624,7 +651,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Duration of time taken by all audit log requests across all audit log devices'
+          description: 'Number of all audit log requests across all audit log devices.'
           applications:
             -
               name: Vault
@@ -642,9 +669,9 @@ zabbix_export:
           master_item:
             key: vault.clear_metrics
         -
-          name: 'Vault: Audit log response failures'
+          name: 'Vault: Audit log response failures, rate'
           type: DEPENDENT
-          key: vault.metrics.audit.log.response.failure
+          key: vault.metrics.audit.log.response.failure.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -673,7 +700,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by audit log responses across all audit log devices'
+          description: 'Duration of time taken by audit log responses across all audit log devices.'
           applications:
             -
               name: Vault
@@ -695,12 +722,12 @@ zabbix_export:
         -
           name: 'Vault: Audit log response, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.audit.log.response.pct_90
+          key: vault.metrics.audit.log.response.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by audit log responses across all audit log devices'
+          description: 'Duration of time taken by audit log responses across all audit log devices.'
           applications:
             -
               name: Vault
@@ -727,7 +754,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'Duration of time taken by audit log responses across all audit log devices'
+          description: 'Number of audit log responses across all audit log devices.'
           applications:
             -
               name: Vault
@@ -752,7 +779,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by DELETE operations at the barrier'
+          description: 'Duration of time taken by DELETE operations at the barrier.'
           applications:
             -
               name: Vault
@@ -774,12 +801,12 @@ zabbix_export:
         -
           name: 'Vault: Barrier DELETE ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.barrier.delete.pct_90
+          key: vault.metrics.barrier.delete.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by DELETE operations at the barrier'
+          description: 'Duration of time taken by DELETE operations at the barrier.'
           applications:
             -
               name: Vault
@@ -805,7 +832,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by DELETE operations at the barrier'
+          description: 'Number of DELETE operations at the barrier.'
           applications:
             -
               name: Vault
@@ -830,7 +857,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by GET operations at the barrier'
+          description: 'Duration of time taken by GET operations at the barrier.'
           applications:
             -
               name: Vault
@@ -852,12 +879,12 @@ zabbix_export:
         -
           name: 'Vault: Barrier GET ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.barrier.get.pct_90
+          key: vault.metrics.barrier.get.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by GET operations at the barrier'
+          description: 'Duration of time taken by GET operations at the barrier.'
           applications:
             -
               name: Vault
@@ -884,7 +911,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by LIST operations at the barrier'
+          description: 'Duration of time taken by LIST operations at the barrier.'
           applications:
             -
               name: Vault
@@ -906,12 +933,12 @@ zabbix_export:
         -
           name: 'Vault: Barrier LIST ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.barrier.list.pct_90
+          key: vault.metrics.barrier.list.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by LIST operations at the barrier'
+          description: 'Duration of time taken by LIST operations at the barrier.'
           applications:
             -
               name: Vault
@@ -937,7 +964,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by LIST operations at the barrier'
+          description: 'Number of LIST operations at the barrier.'
           applications:
             -
               name: Vault
@@ -962,7 +989,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by PUT operations at the barrier'
+          description: 'Duration of time taken by PUT operations at the barrier.'
           applications:
             -
               name: Vault
@@ -984,12 +1011,12 @@ zabbix_export:
         -
           name: 'Vault: Barrier PUT ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.barrier.put.pct_90
+          key: vault.metrics.barrier.put.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by PUT operations at the barrier'
+          description: 'Duration of time taken by PUT operations at the barrier.'
           applications:
             -
               name: Vault
@@ -1015,7 +1042,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by PUT operations at the barrier'
+          description: 'Number of PUT operations at the barrier.'
           applications:
             -
               name: Vault
@@ -1039,7 +1066,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times a value was retrieved from the LRU cache'
+          description: 'Number of times a value was retrieved from the LRU cache.'
           applications:
             -
               name: Vault
@@ -1087,7 +1114,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times a value was written to the LRU cache'
+          description: 'Number of times a value was written to the LRU cache.'
           applications:
             -
               name: Vault
@@ -1112,7 +1139,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by token checks handled by Vault corecore'
+          description: 'Duration of time taken by token checks handled by Vault corecore.'
           applications:
             -
               name: Vault
@@ -1134,12 +1161,12 @@ zabbix_export:
         -
           name: 'Vault: Check token, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.check.token.pct_90
+          key: vault.metrics.core.check.token.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by token checks handled by Vault corecore'
+          description: 'Duration of time taken by token checks handled by Vault corecore.'
           applications:
             -
               name: Vault
@@ -1165,7 +1192,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by token checks handled by Vault corecore'
+          description: 'Number of token checks handled by Vault corecore.'
           applications:
             -
               name: Vault
@@ -1189,7 +1216,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core'
+          description: 'Number of ACL and corresponding token entry fetches handled by Vault core.'
           applications:
             -
               name: Vault
@@ -1214,7 +1241,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core'
+          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core.'
           applications:
             -
               name: Vault
@@ -1236,12 +1263,12 @@ zabbix_export:
         -
           name: 'Vault: Fetch ACL and token, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.fetch.acl_and_token.pct_90
+          key: vault.metrics.core.fetch.acl_and_token.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core'
+          description: 'Duration of time taken by ACL and corresponding token entry fetches handled by Vault core.'
           applications:
             -
               name: Vault
@@ -1267,7 +1294,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by requests handled by Vault core'
+          description: 'Number of requests handled by Vault core.'
           applications:
             -
               name: Vault
@@ -1292,7 +1319,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by requests handled by Vault core'
+          description: 'Duration of time taken by requests handled by Vault core.'
           applications:
             -
               name: Vault
@@ -1314,12 +1341,12 @@ zabbix_export:
         -
           name: 'Vault: Requests, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.handle.request.pct_90
+          key: vault.metrics.core.handle.request.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by requests handled by Vault core'
+          description: 'Duration of time taken by requests handled by Vault core.'
           applications:
             -
               name: Vault
@@ -1344,7 +1371,7 @@ zabbix_export:
           key: vault.metrics.core.leadership.setup_failed
           delay: '0'
           history: 7d
-          description: 'Cluster leadership setup failures which have occurred in a highly available Vault cluster'
+          description: 'Cluster leadership setup failures which have occurred in a highly available Vault cluster.'
           applications:
             -
               name: Vault
@@ -1373,7 +1400,7 @@ zabbix_export:
           key: vault.metrics.core.leadership_lost
           delay: '0'
           history: 7d
-          description: 'Cluster leadership losses which have occurred in a highly available Vault cluster'
+          description: 'Cluster leadership losses which have occurred in a highly available Vault cluster.'
           applications:
             -
               name: Vault
@@ -1445,7 +1472,7 @@ zabbix_export:
         -
           name: 'Vault: Post-unseal ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.post_unseal.pct_90
+          key: vault.metrics.core.post_unseal.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1496,7 +1523,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: __DESCRIPTION__
+          description: 'Duration of time taken by pre-seal operations'
           applications:
             -
               name: Vault
@@ -1518,12 +1545,12 @@ zabbix_export:
         -
           name: 'Vault: Pre-seal ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.pre_seal.pct_90
+          key: vault.metrics.core.pre_seal.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: __DESCRIPTION__
+          description: 'Duration of time taken by pre-seal operations'
           applications:
             -
               name: Vault
@@ -1549,7 +1576,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by seal operations'
+          description: 'Duration of time taken by seal operations.'
           applications:
             -
               name: Vault
@@ -1570,7 +1597,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by seal operations'
+          description: 'Duration of time taken by seal operations.'
           applications:
             -
               name: Vault
@@ -1592,12 +1619,12 @@ zabbix_export:
         -
           name: 'Vault: Seal ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.seal.pct_90
+          key: vault.metrics.core.seal.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by seal operations'
+          description: 'Duration of time taken by seal operations.'
           applications:
             -
               name: Vault
@@ -1622,7 +1649,7 @@ zabbix_export:
           key: vault.metrics.core.seal_internal
           delay: '0'
           history: 7d
-          description: 'Duration of time taken by internal seal operations'
+          description: 'Duration of time taken by internal seal operations.'
           applications:
             -
               name: Vault
@@ -1643,7 +1670,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by internal seal operations'
+          description: 'Duration of time taken by internal seal operations.'
           applications:
             -
               name: Vault
@@ -1665,12 +1692,12 @@ zabbix_export:
         -
           name: 'Vault: Internal seal ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.seal_internal.pct_90
+          key: vault.metrics.core.seal_internal.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by internal seal operations'
+          description: 'Duration of time taken by internal seal operations.'
           applications:
             -
               name: Vault
@@ -1695,7 +1722,7 @@ zabbix_export:
           key: vault.metrics.core.seal_with_request
           delay: '0'
           history: 7d
-          description: 'Duration of time taken by requested seal operations'
+          description: 'Duration of time taken by requested seal operations.'
           applications:
             -
               name: Vault
@@ -1716,7 +1743,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by requested seal operations'
+          description: 'Duration of time taken by requested seal operations.'
           applications:
             -
               name: Vault
@@ -1738,12 +1765,12 @@ zabbix_export:
         -
           name: 'Vault: Requested seal ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.seal_with_request.pct_90
+          key: vault.metrics.core.seal_with_request.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by requested seal operations'
+          description: 'Duration of time taken by requested seal operations.'
           applications:
             -
               name: Vault
@@ -1768,7 +1795,7 @@ zabbix_export:
           key: vault.metrics.core.step_down
           delay: '0'
           history: 7d
-          description: 'Cluster leadership step down'
+          description: 'Cluster leadership step down.'
           applications:
             -
               name: Vault
@@ -1797,7 +1824,7 @@ zabbix_export:
           key: vault.metrics.core.unseal
           delay: '0'
           history: 7d
-          description: 'Duration of time taken by unseal operations'
+          description: 'Duration of time taken by unseal operations.'
           applications:
             -
               name: Vault
@@ -1818,7 +1845,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by unseal operations'
+          description: 'Duration of time taken by unseal operations.'
           applications:
             -
               name: Vault
@@ -1840,12 +1867,12 @@ zabbix_export:
         -
           name: 'Vault: Unseal ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.core.unseal.pct_90
+          key: vault.metrics.core.unseal.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Duration of time taken by unseal operations'
+          description: 'Duration of time taken by unseal operations.'
           applications:
             -
               name: Vault
@@ -1870,7 +1897,7 @@ zabbix_export:
           key: vault.metrics.expire.fetch.lease.times
           delay: '0'
           history: 7d
-          description: 'Time taken to fetch lease times'
+          description: 'Time taken to fetch lease times.'
           applications:
             -
               name: Vault
@@ -1889,7 +1916,7 @@ zabbix_export:
           key: vault.metrics.expire.fetch.lease.times.by_token
           delay: '0'
           history: 7d
-          description: 'Time taken to fetch lease times by token'
+          description: 'Time taken to fetch lease times by token.'
           applications:
             -
               name: Vault
@@ -1910,7 +1937,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to fetch lease times by token'
+          description: 'Time taken to fetch lease times by token.'
           applications:
             -
               name: Vault
@@ -1932,12 +1959,12 @@ zabbix_export:
         -
           name: 'Vault: Fetch lease times by token, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.fetch.lease.times.by_token.pct_90
+          key: vault.metrics.expire.fetch.lease.times.by_token.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to fetch lease times by token'
+          description: 'Time taken to fetch lease times by token.'
           applications:
             -
               name: Vault
@@ -1964,7 +1991,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to fetch lease times'
+          description: 'Time taken to fetch lease times.'
           applications:
             -
               name: Vault
@@ -1986,12 +2013,12 @@ zabbix_export:
         -
           name: 'Vault: Fetch lease times, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.fetch.lease.times.pct_90
+          key: vault.metrics.expire.fetch.lease.times.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to fetch lease times'
+          description: 'Time taken to fetch lease times.'
           applications:
             -
               name: Vault
@@ -2016,7 +2043,7 @@ zabbix_export:
           key: vault.metrics.expire.num_leases
           delay: '0'
           history: 7d
-          description: 'Number of all leases which are eligible for eventual expiry'
+          description: 'Number of all leases which are eligible for eventual expiry.'
           applications:
             -
               name: Vault
@@ -2036,7 +2063,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken for register operations'
+          description: 'Time taken for register operations.'
           applications:
             -
               name: Vault
@@ -2056,7 +2083,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken for register authentication operations which create lease entries without lease ID'
+          description: 'Time taken for register authentication operations which create lease entries without lease ID.'
           applications:
             -
               name: Vault
@@ -2077,7 +2104,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken for register authentication operations which create lease entries without lease ID'
+          description: 'Time taken for register authentication operations which create lease entries without lease ID.'
           applications:
             -
               name: Vault
@@ -2099,12 +2126,12 @@ zabbix_export:
         -
           name: 'Vault: Register auth ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.register.auth.pct_90
+          key: vault.metrics.expire.register.auth.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken for register authentication operations which create lease entries without lease ID'
+          description: 'Time taken for register authentication operations which create lease entries without lease ID.'
           applications:
             -
               name: Vault
@@ -2131,7 +2158,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken for register operations'
+          description: 'Time taken for register operations.'
           applications:
             -
               name: Vault
@@ -2153,12 +2180,12 @@ zabbix_export:
         -
           name: 'Vault: Register ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.register.pct_90
+          key: vault.metrics.expire.register.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken for register operations'
+          description: 'Time taken for register operations.'
           applications:
             -
               name: Vault
@@ -2184,7 +2211,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to renew a lease'
+          description: 'Time taken to renew a lease.'
           applications:
             -
               name: Vault
@@ -2205,7 +2232,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to renew a lease'
+          description: 'Time taken to renew a lease.'
           applications:
             -
               name: Vault
@@ -2227,12 +2254,12 @@ zabbix_export:
         -
           name: 'Vault: Expire renew, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.renew.pct_90
+          key: vault.metrics.expire.renew.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to renew a lease'
+          description: 'Time taken to renew a lease.'
           applications:
             -
               name: Vault
@@ -2258,7 +2285,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to renew a token which does not need to invoke a logical backend'
+          description: 'Time taken to renew a token which does not need to invoke a logical backend.'
           applications:
             -
               name: Vault
@@ -2279,7 +2306,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to renew a token which does not need to invoke a logical backend'
+          description: 'Time taken to renew a token which does not need to invoke a logical backend.'
           applications:
             -
               name: Vault
@@ -2301,12 +2328,12 @@ zabbix_export:
         -
           name: 'Vault: Renew token, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.renew_token.pct_90
+          key: vault.metrics.expire.renew_token.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to renew a token which does not need to invoke a logical backend'
+          description: 'Time taken to renew a token which does not need to invoke a logical backend.'
           applications:
             -
               name: Vault
@@ -2332,7 +2359,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to revoke a token'
+          description: 'Time taken to revoke a token.'
           applications:
             -
               name: Vault
@@ -2352,7 +2379,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to revoke all secrets issued with a given token'
+          description: 'Time taken to revoke all secrets issued with a given token.'
           applications:
             -
               name: Vault
@@ -2373,7 +2400,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke all secrets issued with a given token'
+          description: 'Time taken to revoke all secrets issued with a given token.'
           applications:
             -
               name: Vault
@@ -2395,12 +2422,12 @@ zabbix_export:
         -
           name: 'Vault: Revoke secrets by token, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.revoke.by_token.pct_90
+          key: vault.metrics.expire.revoke.by_token.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke all secrets issued with a given token'
+          description: 'Time taken to revoke all secrets issued with a given token.'
           applications:
             -
               name: Vault
@@ -2426,7 +2453,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to forcibly revoke a token'
+          description: 'Time taken to forcibly revoke a token.'
           applications:
             -
               name: Vault
@@ -2447,7 +2474,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to forcibly revoke a token'
+          description: 'Time taken to forcibly revoke a token.'
           applications:
             -
               name: Vault
@@ -2469,12 +2496,12 @@ zabbix_export:
         -
           name: 'Vault: Expire revoke force, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.revoke.force.pct_90
+          key: vault.metrics.expire.revoke.force.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to forcibly revoke a token'
+          description: 'Time taken to forcibly revoke a token.'
           applications:
             -
               name: Vault
@@ -2501,7 +2528,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke a token'
+          description: 'Time taken to revoke a token.'
           applications:
             -
               name: Vault
@@ -2523,12 +2550,12 @@ zabbix_export:
         -
           name: 'Vault: Expire revoke, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.revoke.pct_90
+          key: vault.metrics.expire.revoke.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke a token'
+          description: 'Time taken to revoke a token.'
           applications:
             -
               name: Vault
@@ -2554,7 +2581,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Tokens revoke on a prefix'
+          description: 'Tokens revoke on a prefix.'
           applications:
             -
               name: Vault
@@ -2575,7 +2602,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke tokens on a prefix'
+          description: 'Time taken to revoke tokens on a prefix.'
           applications:
             -
               name: Vault
@@ -2597,12 +2624,12 @@ zabbix_export:
         -
           name: 'Vault: Expire revoke prefix, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.expire.revoke.prefix.pct_90
+          key: vault.metrics.expire.revoke.prefix.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke tokens on a prefix'
+          description: 'Time taken to revoke tokens on a prefix.'
           applications:
             -
               name: Vault
@@ -2629,7 +2656,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to delete a policy'
+          description: 'Time taken to delete a policy.'
           applications:
             -
               name: Vault
@@ -2651,12 +2678,12 @@ zabbix_export:
         -
           name: 'Vault: Policy DELETE ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.policy.delete_policy.pct_90
+          key: vault.metrics.policy.delete_policy.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to delete a policy'
+          description: 'Time taken to delete a policy.'
           applications:
             -
               name: Vault
@@ -2682,7 +2709,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to delete a policy'
+          description: 'Number of operations to delete a policy.'
           applications:
             -
               name: Vault
@@ -2707,7 +2734,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to get a policy'
+          description: 'Time taken to get a policy.'
           applications:
             -
               name: Vault
@@ -2729,12 +2756,12 @@ zabbix_export:
         -
           name: 'Vault: Policy GET ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.policy.get_policy.pct_90
+          key: vault.metrics.policy.get_policy.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to get a policy'
+          description: 'Time taken to get a policy.'
           applications:
             -
               name: Vault
@@ -2760,7 +2787,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to get a policy'
+          description: 'Number of operations to get a policy.'
           applications:
             -
               name: Vault
@@ -2785,7 +2812,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to list policies'
+          description: 'Time taken to list policies.'
           applications:
             -
               name: Vault
@@ -2807,12 +2834,12 @@ zabbix_export:
         -
           name: 'Vault: Policy LIST ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.policy.list_policies.pct_90
+          key: vault.metrics.policy.list_policies.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to list policies'
+          description: 'Time taken to list policies.'
           applications:
             -
               name: Vault
@@ -2838,7 +2865,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to list policies'
+          description: 'Number of operations to list policies.'
           applications:
             -
               name: Vault
@@ -2863,7 +2890,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to set a policy'
+          description: 'Time taken to set a policy.'
           applications:
             -
               name: Vault
@@ -2885,12 +2912,12 @@ zabbix_export:
         -
           name: 'Vault: Policy SET ops, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.policy.set_policy.pct_90
+          key: vault.metrics.policy.set_policy.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to set a policy'
+          description: 'Time taken to set a policy.'
           applications:
             -
               name: Vault
@@ -2916,7 +2943,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to set a policy'
+          description: 'Number of operations to set a policy.'
           applications:
             -
               name: Vault
@@ -2941,7 +2968,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Total user and system CPU time spent in seconds'
+          description: 'Total user and system CPU time spent in seconds.'
           applications:
             -
               name: Vault
@@ -2961,7 +2988,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Maximum number of open file descriptors'
+          description: 'Maximum number of open file descriptors.'
           applications:
             -
               name: Vault
@@ -2972,6 +2999,10 @@ zabbix_export:
                 - process_max_fds
                 - ''
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: vault.clear_metrics
         -
@@ -2981,7 +3012,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of open file descriptors'
+          description: 'Number of open file descriptors.'
           applications:
             -
               name: Vault
@@ -3002,7 +3033,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Resident memory size in bytes'
+          description: 'Resident memory size in bytes.'
           applications:
             -
               name: Vault
@@ -3022,7 +3053,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: s
-          description: 'Server uptime'
+          description: 'Server uptime.'
           applications:
             -
               name: Vault
@@ -3054,7 +3085,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Virtual memory size in bytes'
+          description: 'Virtual memory size in bytes.'
           applications:
             -
               name: Vault
@@ -3086,6 +3117,10 @@ zabbix_export:
                 - process_virtual_memory_max_bytes
                 - ''
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: vault.clear_metrics
         -
@@ -3116,7 +3151,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of freed objects'
+          description: 'Number of freed objects.'
           applications:
             -
               name: Vault
@@ -3156,7 +3191,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Cumulative count of allocated heap objects'
+          description: 'Cumulative count of allocated heap objects.'
           applications:
             -
               name: Vault
@@ -3220,7 +3255,7 @@ zabbix_export:
           key: vault.metrics.runtime.total.gc.runs
           delay: '0'
           history: 7d
-          description: 'Total number of garbage collection runs since Vault was last started'
+          description: 'Total number of garbage collection runs since Vault was last started.'
           applications:
             -
               name: Vault
@@ -3263,7 +3298,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Counts the number of leases created by secret engines'
+          description: 'Counts the number of leases created by secret engines.'
           applications:
             -
               name: Vault
@@ -3313,7 +3348,7 @@ zabbix_export:
           key: vault.metrics.token.by_auth
           delay: '0'
           history: 7d
-          description: 'Total number of service tokens that were created by a auth method'
+          description: 'Total number of service tokens that were created by a auth method.'
           applications:
             -
               name: Vault
@@ -3336,7 +3371,7 @@ zabbix_export:
           key: vault.metrics.token.by_policy
           delay: '0'
           history: 7d
-          description: 'Total number of service tokens that have a policy attached'
+          description: 'Total number of service tokens that have a policy attached.'
           applications:
             -
               name: Vault
@@ -3383,7 +3418,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The time taken to create a token'
+          description: 'The time taken to create a token.'
           applications:
             -
               name: Vault
@@ -3404,7 +3439,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'The time taken to create a token'
+          description: 'The time taken to create a token.'
           applications:
             -
               name: Vault
@@ -3426,12 +3461,12 @@ zabbix_export:
         -
           name: 'Vault: Token create, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.token.create.pct_90
+          key: vault.metrics.token.create.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'The time taken to create a token'
+          description: 'The time taken to create a token.'
           applications:
             -
               name: Vault
@@ -3457,7 +3492,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The time taken to create a token accessor'
+          description: 'The time taken to create a token accessor.'
           applications:
             -
               name: Vault
@@ -3478,7 +3513,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'The time taken to create a token accessor'
+          description: 'The time taken to create a token accessor.'
           applications:
             -
               name: Vault
@@ -3500,12 +3535,12 @@ zabbix_export:
         -
           name: 'Vault: Token createAccessor, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.token.createAccessor.pct_90
+          key: vault.metrics.token.createAccessor.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'The time taken to create a token accessor'
+          description: 'The time taken to create a token accessor.'
           applications:
             -
               name: Vault
@@ -3531,7 +3566,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of service or batch tokens created'
+          description: 'Number of service or batch tokens created.'
           applications:
             -
               name: Vault
@@ -3560,7 +3595,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'The time taken to look up a token'
+          description: 'The time taken to look up a token.'
           applications:
             -
               name: Vault
@@ -3582,12 +3617,12 @@ zabbix_export:
         -
           name: 'Vault: Token lookup, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.token.lookup.pct_90
+          key: vault.metrics.token.lookup.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'The time taken to look up a token'
+          description: 'The time taken to look up a token.'
           applications:
             -
               name: Vault
@@ -3613,7 +3648,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The time taken to look up a token'
+          description: 'Number of token look up.'
           applications:
             -
               name: Vault
@@ -3637,7 +3672,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The time taken to look up a token'
+          description: 'The time taken to look up a token.'
           applications:
             -
               name: Vault
@@ -3658,7 +3693,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke a token'
+          description: 'Time taken to revoke a token.'
           applications:
             -
               name: Vault
@@ -3680,12 +3715,12 @@ zabbix_export:
         -
           name: 'Vault: Token revoke, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.token.revoke.pct_90
+          key: vault.metrics.token.revoke.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke a token'
+          description: 'Time taken to revoke a token.'
           applications:
             -
               name: Vault
@@ -3711,7 +3746,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to revoke a token tree'
+          description: 'Time taken to revoke a token tree.'
           applications:
             -
               name: Vault
@@ -3732,7 +3767,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke a token tree'
+          description: 'Time taken to revoke a token tree.'
           applications:
             -
               name: Vault
@@ -3754,12 +3789,12 @@ zabbix_export:
         -
           name: 'Vault: Token revoke tree, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.token.revoke.tree.pct_90
+          key: vault.metrics.token.revoke.tree.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to revoke a token tree'
+          description: 'Time taken to revoke a token tree.'
           applications:
             -
               name: Vault
@@ -3785,7 +3820,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Time taken to store an updated token entry without writing to the secondary index'
+          description: 'Time taken to store an updated token entry without writing to the secondary index.'
           applications:
             -
               name: Vault
@@ -3806,7 +3841,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to store an updated token entry without writing to the secondary index'
+          description: 'Time taken to store an updated token entry without writing to the secondary index.'
           applications:
             -
               name: Vault
@@ -3828,12 +3863,12 @@ zabbix_export:
         -
           name: 'Vault: Token store, 90th percentile'
           type: DEPENDENT
-          key: vault.metrics.token.store.pct_90
+          key: vault.metrics.token.store.p90
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Time taken to store an updated token entry without writing to the secondary index'
+          description: 'Time taken to store an updated token entry without writing to the secondary index.'
           applications:
             -
               name: Vault
@@ -3859,7 +3894,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: s
-          description: 'The total garbage collector pause time since Vault was last started'
+          description: 'The total garbage collector pause time since Vault was last started.'
           applications:
             -
               name: Vault
@@ -3883,7 +3918,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Duration of time taken by GET operations at the barrier'
+          description: 'Number of GET operations at the barrier.'
           applications:
             -
               name: Vault
@@ -3906,7 +3941,7 @@ zabbix_export:
           type: DEPENDENT
           key: vault.mountpoint.discovery
           delay: '0'
-          description: 'Mountpoint metrics discovery'
+          description: 'Mountpoint metrics discovery.'
           item_prototypes:
             -
               name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, median'
@@ -3916,7 +3951,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              description: 'Time taken to perform a rollback operation on the given mount point'
+              description: 'Time taken to perform a rollback operation on the given mount point.'
               application_prototypes:
                 -
                   name: 'Vault: Mountpoint {#MOUNTPOINT}'
@@ -3938,12 +3973,12 @@ zabbix_export:
             -
               name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, 90th percentile'
               type: DEPENDENT
-              key: 'vault.metrics.rollback.attempt.pct_90[{#MOUNTPOINT}]'
+              key: 'vault.metrics.rollback.attempt.p90[{#MOUNTPOINT}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: ms
-              description: 'Time taken to perform a rollback operation on the given mount point'
+              description: 'Time taken to perform a rollback operation on the given mount point.'
               application_prototypes:
                 -
                   name: 'Vault: Mountpoint {#MOUNTPOINT}'
@@ -3969,7 +4004,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Time taken to perform a rollback operation on the given mount point'
+              description: 'Number of operations to perform a rollback operation on the given mount point.'
               application_prototypes:
                 -
                   name: 'Vault: Mountpoint {#MOUNTPOINT}'
@@ -4020,7 +4055,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Time taken to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
+              description: 'Number of operations to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
               application_prototypes:
                 -
                   name: 'Vault: Mountpoint {#MOUNTPOINT}'
@@ -4040,7 +4075,7 @@ zabbix_export:
             -
               name: 'Vault: Route rollback [{#MOUNTPOINT}] ops, 90th percentile'
               type: DEPENDENT
-              key: 'vault.metrics.rroute.rollback.pct_90[{#MOUNTPOINT}]'
+              key: 'vault.metrics.rroute.rollback.p90[{#MOUNTPOINT}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -4071,7 +4106,7 @@ zabbix_export:
           type: DEPENDENT
           key: vault.replication.discovery
           delay: '0'
-          description: 'Discovery for replication metrics'
+          description: 'Discovery for replication metrics.'
           item_prototypes:
             -
               name: 'Vault: Stream WAL guard found, count{#SINGLETON}'
@@ -4120,7 +4155,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The index of the last remote WAL'
+              description: 'The index of the last remote WAL.'
               application_prototypes:
                 -
                   name: 'Vault: Replication'
@@ -4140,7 +4175,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The last committed index in the Merkle Tree'
+              description: 'The last committed index in the Merkle Tree.'
               application_prototypes:
                 -
                   name: 'Vault: Replication'
@@ -4160,7 +4195,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The index of the last DR WAL'
+              description: 'The index of the last DR WAL.'
               application_prototypes:
                 -
                   name: 'Vault: Replication'
@@ -4180,7 +4215,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The index of the last Performance WAL'
+              description: 'The index of the last Performance WAL.'
               application_prototypes:
                 -
                   name: 'Vault: Replication'
@@ -4200,7 +4235,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The index of the last WAL'
+              description: 'The index of the last WAL.'
               application_prototypes:
                 -
                   name: 'Vault: Replication'
@@ -4227,7 +4262,7 @@ zabbix_export:
                 macro: '{#STORAGE}'
                 value: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
                 formulaid: A
-          description: 'Storage backend metrics discovery'
+          description: 'Storage backend metrics discovery.'
           item_prototypes:
             -
               name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, median'
@@ -4259,7 +4294,7 @@ zabbix_export:
             -
               name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, 90th percentile'
               type: DEPENDENT
-              key: 'vault.metrics.storage.pct_90[{#STORAGE}, {#OPERATION}]'
+              key: 'vault.metrics.storage.p90[{#STORAGE}, {#OPERATION}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -4290,7 +4325,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Duration of a {#OPERATION} operation against the {#STORAGE} storage backend'
+              description: 'Number of a {#OPERATION} operation against the {#STORAGE} storage backend'
               application_prototypes:
                 -
                   name: 'Vault: Storage {#STORAGE}'
@@ -4314,7 +4349,7 @@ zabbix_export:
           type: DEPENDENT
           key: vault.wal.discovery
           delay: '0'
-          description: 'Discovery for WAL metrics'
+          description: 'Discovery for WAL metrics.'
           item_prototypes:
             -
               name: 'Vault: Delete WALs, median{#SINGLETON}'
@@ -4346,7 +4381,7 @@ zabbix_export:
             -
               name: 'Vault: Delete WALs, 90th percentile{#SINGLETON}'
               type: DEPENDENT
-              key: 'vault.metrics.wal.deletewals.pct_90[{#SINGLETON}]'
+              key: 'vault.metrics.wal.deletewals.p90[{#SINGLETON}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -4420,7 +4455,7 @@ zabbix_export:
             -
               name: 'Vault: Flush ready WAL, 90th percentile{#SINGLETON}'
               type: DEPENDENT
-              key: 'vault.metrics.wal.flushready.pct_90[{#SINGLETON}]'
+              key: 'vault.metrics.wal.flushready.p90[{#SINGLETON}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -4534,7 +4569,7 @@ zabbix_export:
             -
               name: 'Vault: Load WALs, 90th percentile{#SINGLETON}'
               type: DEPENDENT
-              key: 'vault.metrics.wal.loadWAL.pct_90[{#SINGLETON}]'
+              key: 'vault.metrics.wal.loadWAL.p90[{#SINGLETON}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -4608,7 +4643,7 @@ zabbix_export:
             -
               name: 'Vault: Persist WALs, 90th percentile{#SINGLETON}'
               type: DEPENDENT
-              key: 'vault.metrics.wal.persistwals.pct_90[{#SINGLETON}]'
+              key: 'vault.metrics.wal.persistwals.p90[{#SINGLETON}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -4658,37 +4693,37 @@ zabbix_export:
         -
           macro: '{$VAULT.API.PORT}'
           value: '8200'
-          description: 'Vault port'
+          description: 'Vault port.'
         -
           macro: '{$VAULT.API.SCHEME}'
           value: http
-          description: 'Vault API scheme'
+          description: 'Vault API scheme.'
         -
           macro: '{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of Vault leadership losses'
+          description: 'Maximum number of Vault leadership losses.'
         -
           macro: '{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of Vault leadership setyp failed'
+          description: 'Maximum number of Vault leadership setyp failed.'
         -
           macro: '{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of Vault leadership step downs'
+          description: 'Maximum number of Vault leadership step downs.'
         -
           macro: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
           value: .+
-          description: 'Filter of discoverable storage backends'
+          description: 'Filter of discoverable storage backends.'
         -
           macro: '{$VAULT.OPEN.FDS.MAX.WARN}'
           value: '90'
           description: 'Maximum percentage of used file descriptors for trigger expression'
         -
           macro: '{$VAULT.TOKEN}'
-          description: 'Vault auth token'
+          description: 'Vault auth token.'
   triggers:
     -
-      expression: '{Template App HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{Template App HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
+      expression: '{HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
       name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
   graphs:
@@ -4699,21 +4734,21 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.cache.hit.rate
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.cache.miss.rate
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.cache.write.rate
     -
       name: 'Vault: Expiring leases'
@@ -4722,7 +4757,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.expire.num_leases
     -
       name: 'Vault: K/V secret engine entries'
@@ -4731,7 +4766,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.secret.kv.count
     -
       name: 'Vault: Requests rate'
@@ -4740,7 +4775,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 34bdeb
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.core.handle.request
     -
       name: 'Vault: Runtime memory'
@@ -4749,21 +4784,21 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.runtime.alloc.bytes
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.process.resident_memory.bytes
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.process.virtual_memory.bytes
     -
       name: 'Vault: Token checks'
@@ -4772,7 +4807,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.core.check.token.rate
     -
       name: 'Vault: Token lookup'
@@ -4781,7 +4816,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.token.lookup.rate
     -
       name: 'Vault: Tokens count'
@@ -4790,7 +4825,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Template App HashiCorp Vault by HTTP'
+            host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.token
   value_maps:
     -
