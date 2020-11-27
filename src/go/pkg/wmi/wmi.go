@@ -100,7 +100,17 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 // * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
 //   its Qualifiers_ property list
 func (r *valueResult) write(rs *ole.IDispatch) (err error) {
+	v, err := oleutil.GetProperty(rs, "Count")
+	if err != nil {
+		return err
+	}
+	defer v.Clear()
+	if v.Val == 0 {
+		return errors.New("Empty WMI search result.")
+	}
+
 	var propertyKeyFieldValue interface{}
+
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
 		defer row.Release()
@@ -129,6 +139,10 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 				return
 			}
 			defer clearOle(propsVal)
+
+			if propsVal.Value() == nil {
+				return errors.New("Empty WMI search result.")
+			}
 
 			isKeyProperty, err := isPropertyKeyProperty(propsCol)
 			if err != nil {
@@ -174,15 +188,21 @@ func variantToValue(v *ole.VARIANT) (result interface{}) {
 // uses the wmi enumerator and can set the WBEM_FLAG_NONSYSTEM_ONLY flag that would filter it. Ole library has only
 // the basic enumerator that cannot set any flags.
 // So that, we end up with these results for wmi.getAll where cases 1 and 2 are inconsistent with agent 1:
-//   1) 1 non-Key qualifier field selected 	- key qualifier attached to the result, 2 elements are returned
+//   1) 1 non-Key qualifier field selected	- key qualifier attached to the result, 2 elements are returned
 //   2) N non-Key qualifier fields selected	- key qualifier attached to the result, N+1 elements are returned
-//   3) Key qualifier field selected 		- single key qualifier element is returned
+//   3) Key qualifier field selected		- single key qualifier element is returned
 //   4) 1 non-Key qualifier and 1 Key qualifier elements selected
 //						- 2 elements are returned
 //   5) N fields selected and one of them is a Key-qualifier
 //						- N elements are returned
 //   6) * is selected				- all elements are returned (including the Key-qualifier)
 func (r *tableResult) write(rs *ole.IDispatch) (err error) {
+	v, err := oleutil.GetProperty(rs, "Count")
+	if err != nil {
+		return err
+	}
+	defer v.Clear()
+
 	r.data = make([]map[string]interface{}, 0)
 
 	oleErr := oleutil.ForEach(rs, func(v *ole.VARIANT) (err error) {
@@ -274,12 +294,6 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 	}
 	result := raw.ToIDispatch()
 	defer raw.Clear()
-
-	v, err := oleutil.GetProperty(result, "Count")
-	if err != nil {
-		return err
-	}
-	defer v.Clear()
 
 	return w.write(result)
 }
