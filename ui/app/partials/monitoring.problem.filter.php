@@ -269,7 +269,7 @@ $right_column = (new CFormList())
 				->setChecked($data['show_timeline'] == 1)
 				->setEnabled($data['compact_view'] == 0)
 				->setUncheckedValue(0)
-				->setId('show_timeline_#{uniqid}'),
+				->setId('show_timeline_#{uniqid}')
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	])
 	->addRow(_('Show details'), [

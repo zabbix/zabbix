@@ -20,9 +20,9 @@
 
 
 /**
- * Class containing operations with user edit form.
+ * Class containing operations with userrole update form.
  */
-class CControllerUserroleUpdate extends CController {
+class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 
 	protected $role = [];
 
@@ -131,49 +131,11 @@ class CControllerUserroleUpdate extends CController {
 	protected function doAction() {
 		$role = [
 			'roleid' => $this->getInput('roleid', '0'),
-			'name' => $this->getInput('name'),
+			'name' => trim($this->getInput('name')),
 			'type' => $this->getInput('type', USER_TYPE_ZABBIX_USER)
 		];
 
-		$rules = [
-			CRoleHelper::UI_DEFAULT_ACCESS => $this->getInput('ui_default_access'),
-			CRoleHelper::ACTIONS_DEFAULT_ACCESS => $this->getInput('actions_default_access'),
-			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access'),
-		];
-
-		$rules[CRoleHelper::SECTION_UI] = array_map(function (string $rule): array {
-			return [
-				'name' => str_replace(CRoleHelper::SECTION_UI.'.', '', $rule),
-				'status' => $this->getInput(str_replace('.', '_', $rule))
-			];
-		}, CRoleHelper::getAllUiElements((int) $role['type']));
-
-		$rules[CRoleHelper::SECTION_ACTIONS] = array_map(function (string $rule): array {
-			return [
-				'name' => str_replace(CRoleHelper::SECTION_ACTIONS.'.', '', $rule),
-				'status' => $this->getInput(str_replace('.', '_', $rule))
-			];
-		}, CRoleHelper::getAllActions((int) $role['type']));
-
-		$moduelids = $this->getModuleIds();
-		if ($moduelids) {
-			$modules = $this->getInput(CRoleHelper::SECTION_MODULES);
-			$rules[CRoleHelper::SECTION_MODULES] = array_map(function (string $moduleid) use ($modules): array {
-				return [
-					'moduleid' => $moduleid,
-					'status' => $modules[$moduleid]
-				];
-			}, $moduelids);
-		}
-
-		$rules[CRoleHelper::API_ACCESS] = $this->getInput('api_access');
-		$rules[CRoleHelper::API_MODE] = $this->getInput('api_mode');
-
-		if ($this->hasInput('api_methods')) {
-			$rules[CRoleHelper::SECTION_API] = $this->getInput('api_methods');
-		}
-
-		$role['rules'] = $rules;
+		$role['rules'] = $this->getRules((int) $role['type']);
 
 		$result = API::Role()->update($role);
 
@@ -197,20 +159,5 @@ class CControllerUserroleUpdate extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	private function getModuleIds(): array {
-		$response = API::Module()->get([
-			'output' => ['moduleid'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
-
-		if (!$response) {
-			return [];
-		}
-
-		return array_column($response, 'moduleid');
 	}
 }

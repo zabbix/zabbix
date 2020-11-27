@@ -4804,7 +4804,6 @@ span.is-loading {
 .dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
 .dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
   cursor: move;
-  /* fallback if grab cursor is unsupported */
   cursor: grab; }
 
 .ui-draggable-dragging .drag-icon,
@@ -4812,7 +4811,6 @@ span.is-loading {
 .ui-draggable-dragging .dashbrd-grid-widget-head,
 .ui-draggable-dragging .dashbrd-grid-iterator-head, .cursor-dragging {
   cursor: move;
-  /* fallback if grabbing cursor is unsupported */
   cursor: grabbing; }
 
 .cursor-move {
@@ -5894,13 +5892,16 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-#mediatype_testlog .logitems {
-  overflow: auto;
-  margin-bottom: 10px; }
-  #mediatype_testlog .logitems pre {
-    white-space: nowrap; }
-#mediatype_testlog .logtotalms {
-  margin-bottom: 10px; }
+.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
+  overflow-x: auto; }
+  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
+    height: 9px; }
+.mediatypetest-modal .logitems pre {
+  white-space: nowrap; }
+.mediatypetest-modal .logtotalms {
+  color: #737373;
+  float: left;
+  line-height: 24px; }
 
 #itemsTable .table-col-handle {
   width: 26px; }

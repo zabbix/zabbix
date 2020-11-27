@@ -90,7 +90,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.test      '],
 						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\n   Test line   2\n   Test line 3   "],
 						['type' => 'Does not match regular expression', 'parameter_1' => '    Pattern     '],
-						['type' => 'Check for error in JSON', 'parameter_1' => '    $.new.path    '],
+						['type' => 'Check for error in JSON', 'parameter_1' => '    $.new.path    ']
 					]
 				]
 			],

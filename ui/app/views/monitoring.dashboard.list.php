@@ -120,7 +120,8 @@ $form->addItem([
 	new CActionButtonList('action', 'dashboardids', [
 		'dashboard.delete' => [
 			'name' => _('Delete'),
-			'confirm' => _('Delete selected dashboards?')
+			'confirm' => _('Delete selected dashboards?'),
+			'disabled' => !$data['allowed_edit']
 		]
 	], 'dashboard')
 ]);

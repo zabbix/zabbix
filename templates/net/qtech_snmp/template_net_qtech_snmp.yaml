@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:35Z'
+  date: '2020-10-23T09:11:40Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -215,7 +215,6 @@ zabbix_export:
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
-              recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'

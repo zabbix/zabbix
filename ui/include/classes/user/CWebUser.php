@@ -57,8 +57,7 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			// TODO: fix me
-			API::getWrapper()->auth = CSessionHelper::getId();
+			API::getWrapper()->auth = self::$data['sessionid'];
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));
@@ -87,8 +86,6 @@ class CWebUser {
 	 * Log-out the current user.
 	 */
 	public static function logout(): void {
-		self::$data['sessionid'] = CSessionHelper::getId();
-
 		if (API::User()->logout([])) {
 			self::$data = null;
 			session_destroy();
@@ -103,6 +100,7 @@ class CWebUser {
 			]);
 
 			if (empty(self::$data)) {
+				CMessageHelper::clear();
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -110,7 +108,6 @@ class CWebUser {
 				]);
 
 				if (empty(self::$data)) {
-					CMessageHelper::clear();
 					throw new Exception();
 				}
 			}
@@ -150,6 +147,7 @@ class CWebUser {
 	 */
 	public static function setDefault(): void {
 		self::$data = [
+			'sessionid' => CEncryptHelper::generateKey(),
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),

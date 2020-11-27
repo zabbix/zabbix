@@ -76,7 +76,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	public function testFormHostGroup_UpdateEmpty() {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->page->waitUntilReady();
-		$this->zbxTestClickLinkTextWait($this->hostGroup);
+		$this->query('link', $this->hostGroup)->waitUntilVisible()->one()->forceClick();
 
 		$this->zbxTestInputTypeOverwrite('name', ' ');
 		$this->zbxTestClickWait('update');
@@ -92,7 +92,7 @@ class testFormHostGroup extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hostgroups.php');
 		$this->page->waitUntilReady();
-		$this->zbxTestClickLinkTextWait($this->hostGroup);
+		$this->query('link', $this->hostGroup)->waitUntilVisible()->one()->forceClick();
 
 		$this->zbxTestInputTypeOverwrite('name', $hostGroup['name']);
 		$this->zbxTestClickWait('update');
@@ -103,7 +103,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	public function testFormHostGroup_Update() {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->page->waitUntilReady();
-		$this->zbxTestClickLinkTextWait($this->hostGroup);
+		$this->query('link', $this->hostGroup)->waitUntilVisible()->one()->forceClick();
 
 		$this->zbxTestInputTypeOverwrite('name', $this->hostGroup.' 2');
 		$this->zbxTestClickWait('update');
@@ -119,7 +119,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	public function testFormHostGroup_Delete() {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->page->waitUntilReady();
-		$this->zbxTestClickLinkTextWait($this->hostGroup.' 2');
+		$this->query('link', $this->hostGroup.' 2')->waitUntilVisible()->one()->forceClick();
 
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();

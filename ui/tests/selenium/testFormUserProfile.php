@@ -25,7 +25,7 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormUserProfile extends CLegacyWebTest {
 
 	public function testFormUserProfile_SimpleUpdate() {
-		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
+		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -40,7 +40,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	}
 
 	public function testFormUserProfile_Cancel() {
-		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
+		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
@@ -83,7 +83,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_GOOD,
 				'password1' => PHPUNIT_LOGIN_PWD,
 				'password2' => PHPUNIT_LOGIN_PWD
-			]],
+			]]
 		];
 	}
 

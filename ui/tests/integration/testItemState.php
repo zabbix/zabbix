@@ -226,7 +226,7 @@ class testItemState extends CIntegrationTest {
 				$items[] = [
 					'itemid' => $itemid,
 					'status' => ITEM_STATUS_ACTIVE,
-					'delay' => $delay,
+					'delay' => $delay
 				];
 			} else {
 				$items[] = [
@@ -316,33 +316,9 @@ class testItemState extends CIntegrationTest {
 			$refresh += self::REFRESH_ACT_CHKS_INTERVAL;
 		}
 
-		if ($state === ITEM_STATE_NOTSUPPORTED) {
-			$exp_nextcheck_item = $check;
-			while ($refresh < $exp_nextcheck_item) {
-				$refresh += self::REFRESH_ACT_CHKS_INTERVAL;
-			}
-
-			$exp_nextcheck_process = $check;
-			while ($exp_nextcheck_process < $refresh) {
-				$exp_nextcheck_process += self::PROCESS_ACT_CHKS_DELAY;
-			}
-
-			if ($scenario['delay_s'] > self::PROCESS_ACT_CHKS_DELAY) {
-				$exp_nextcheck_item = $check;
-
-				while ($exp_nextcheck_item < $exp_nextcheck_process) {
-					$exp_nextcheck_item += $scenario['delay_s'];
-				}
-			} else {
-				$exp_nextcheck_item = $exp_nextcheck_process;
-			}
-
-			$this->assertTrue($next_check <= $exp_nextcheck_item + 1 && $next_check >= $exp_nextcheck_item - 1);
-		} else {
-			$this->assertTrue($next_check <= $check + $scenario['delay_s'] + 1
-					&& $next_check >= $check + $scenario['delay_s'] - 1
-			);
-		}
+		$this->assertTrue($next_check <= $check + $scenario['delay_s'] + 1
+				&& $next_check >= $check + $scenario['delay_s'] - 1
+		);
 
 		return $refresh;
 	}

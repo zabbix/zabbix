@@ -847,7 +847,7 @@ class CUser extends CApiService {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
 				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their role.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change own role.'));
 				}
 
 				if (array_key_exists('usrgrps', $user)) {
@@ -1296,10 +1296,6 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
-		if (!$sessionid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
-		}
-
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
@@ -1362,7 +1358,7 @@ class CUser extends CApiService {
 
 			if ($sec_left > 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $sec_left)
+					_('Incorrect user name or password or account is temporarily blocked.')
 				);
 			}
 		}
@@ -1375,7 +1371,9 @@ class CUser extends CApiService {
 
 				case ZBX_AUTH_INTERNAL:
 					if (!self::verifyPassword($user['password'], $db_user)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('Incorrect user name or password or account is temporarily blocked.')
+						);
 					}
 					break;
 
@@ -1405,7 +1403,7 @@ class CUser extends CApiService {
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)))
+					_('Incorrect user name or password or account is temporarily blocked.')
 				);
 			}
 
@@ -1414,9 +1412,6 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-
-		CSessionHelper::regenerateId();
-
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
@@ -1472,9 +1467,6 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-
-		CSessionHelper::regenerateId();
-
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
@@ -1516,10 +1508,8 @@ class CUser extends CApiService {
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
-		// If session not created.
 		if (!$db_sessions) {
-			// After created new session return empty array.
-			return [];
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		$db_session = $db_sessions[0];
@@ -1727,7 +1717,7 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function createSession(array $db_user): array {
-		$db_user['sessionid'] = CSessionHelper::getId();
+		$db_user['sessionid'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
@@ -1800,7 +1790,9 @@ class CUser extends CApiService {
 		}
 
 		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 		elseif (count($db_users) > 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,

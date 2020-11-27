@@ -418,6 +418,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getSelectedCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isSelected();
+		};
+	}
+
+	/**
 	 * Check if text is present.
 	 *
 	 * @param string $text    text to be present
@@ -509,8 +520,19 @@ class CElement extends CBaseElement implements IWaitable {
 				throw $exception;
 			}
 
-			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+			$this->forceClick();
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Force click on element.
+	 *
+	 * @return $this
+	 */
+	public function forceClick() {
+		CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 
 		return $this;
 	}

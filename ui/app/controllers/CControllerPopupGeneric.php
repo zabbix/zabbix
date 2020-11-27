@@ -108,6 +108,13 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $group_preselect_required;
 
+	/**
+	 * Set of disabled options.
+	 *
+	 * @var array
+	 */
+	protected $disableids = [];
+
 	protected function init() {
 		$this->disableSIDvalidation();
 
@@ -387,9 +394,9 @@ class CControllerPopupGeneric extends CController {
 				]
 			],
 			'api_methods' => [
-				'title' => _('Api methods'),
+				'title' => _('API methods'),
 				'min_user_type' => USER_TYPE_SUPER_ADMIN,
-				'allowed_src_fields' => 'id,name',
+				'allowed_src_fields' => 'name',
 				'form' => [
 					'name' => 'apimethodform',
 					'id' => 'apimethods'
@@ -397,7 +404,7 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
-			],
+			]
 		];
 	}
 
@@ -472,6 +479,11 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		$ret = $this->validateInput($fields);
+
+		// Set disabled options to property for ability to modify them in result fetching.
+		if ($ret && $this->hasInput('disableids')) {
+			$this->disableids = $this->getInput('disableids');
+		}
 
 		if ($ret && $this->getInput('value_types', [])) {
 			foreach ($this->getInput('value_types') as $value_type) {
@@ -852,9 +864,7 @@ class CControllerPopupGeneric extends CController {
 	 * @param array $records
 	 */
 	protected function applyDisableids(array &$records) {
-		$disableids = $this->getInput('disableids', []);
-
-		foreach ($disableids as $disableid) {
+		foreach ($this->disableids as $disableid) {
 			if (array_key_exists($disableid, $records)) {
 				$records[$disableid]['_disabled'] = true;
 			}
@@ -1313,8 +1323,21 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
 			case 'api_methods':
-				// $api_methods = CRoleHelper::getApiMethods($this->getInput('user_type', USER_TYPE_ZABBIX_USER));
-				$api_methods = CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN);
+				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
+				$api_methods = CRoleHelper::getApiMethods($user_type);
+				$api_mask_methods = CRoleHelper::getApiMaskMethods($user_type);
+				$modified_disableids = [];
+
+				foreach ($this->disableids as $disableid) {
+					if (array_key_exists($disableid, $api_mask_methods)) {
+						$modified_disableids = array_merge($modified_disableids, $api_mask_methods[$disableid]);
+					}
+					else if (!in_array($disableid, $modified_disableids)) {
+						$modified_disableids[] = $disableid;
+					}
+				}
+
+				$this->disableids = $modified_disableids;
 
 				foreach ($api_methods as $api_method) {
 					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];

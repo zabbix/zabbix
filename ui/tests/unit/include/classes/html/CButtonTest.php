@@ -48,7 +48,7 @@ class CButtonTest extends CTagTest {
 			[
 				['button"&"'],
 				'<button type="button" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;"></button>'
-			],
+			]
 		];
 	}
 

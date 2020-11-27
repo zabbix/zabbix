@@ -20,9 +20,9 @@
 
 
 /**
- * Class containing operations with user edit form.
+ * Class containing operations with userrole edit form.
  */
-class CControllerUserroleEdit extends CController {
+class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 	protected $role = [];
 
@@ -32,7 +32,58 @@ class CControllerUserroleEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'roleid' => 'db users.roleid'
+			'roleid' => 'db users.roleid',
+			'name' => 'db role.name',
+			'type' => 'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'ui_monitoring_dashboard' => 'in 0,1',
+			'ui_monitoring_problems' => 'in 0,1',
+			'ui_monitoring_hosts' => 'in 0,1',
+			'ui_monitoring_overview' => 'in 0,1',
+			'ui_monitoring_latest_data' => 'in 0,1',
+			'ui_monitoring_screens' => 'in 0,1',
+			'ui_monitoring_maps' => 'in 0,1',
+			'ui_monitoring_discovery' => 'in 0,1',
+			'ui_monitoring_services' => 'in 0,1',
+			'ui_inventory_overview' => 'in 0,1',
+			'ui_inventory_hosts' => 'in 0,1',
+			'ui_reports_system_info' => 'in 0,1',
+			'ui_reports_availability_report' => 'in 0,1',
+			'ui_reports_top_triggers' => 'in 0,1',
+			'ui_reports_audit' => 'in 0,1',
+			'ui_reports_action_log' => 'in 0,1',
+			'ui_reports_notifications' => 'in 0,1',
+			'ui_configuration_host_groups' => 'in 0,1',
+			'ui_configuration_templates' => 'in 0,1',
+			'ui_configuration_hosts' => 'in 0,1',
+			'ui_configuration_maintenance' => 'in 0,1',
+			'ui_configuration_actions' => 'in 0,1',
+			'ui_configuration_event_correlation' => 'in 0,1',
+			'ui_configuration_discovery' => 'in 0,1',
+			'ui_configuration_services' => 'in 0,1',
+			'ui_administration_general' => 'in 0,1',
+			'ui_administration_proxies' => 'in 0,1',
+			'ui_administration_authentication' => 'in 0,1',
+			'ui_administration_user_groups' => 'in 0,1',
+			'ui_administration_user_roles' => 'in 0,1',
+			'ui_administration_users' => 'in 0,1',
+			'ui_administration_media_types' => 'in 0,1',
+			'ui_administration_scripts' => 'in 0,1',
+			'ui_administration_queue' => 'in 0,1',
+			'actions_edit_dashboards' => 'in 0,1',
+			'actions_edit_maps' => 'in 0,1',
+			'actions_edit_maintenance' => 'in 0,1',
+			'actions_acknowledge_problems' => 'in 0,1',
+			'actions_close_problems' => 'in 0,1',
+			'actions_change_severity' => 'in 0,1',
+			'actions_add_problem_comments' => 'in 0,1',
+			'actions_execute_scripts' => 'in 0,1',
+			'ui_default_access' => 'in 0,1',
+			'modules_default_access' => 'in 0,1',
+			'actions_default_access' => 'in 0,1',
+			'modules' => 'array',
+			'api_access' => 'in 0,1',
+			'api_mode' => 'in 0,1',
+			'api_methods' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -70,9 +121,9 @@ class CControllerUserroleEdit extends CController {
 		$db_defaults = DB::getDefaults('role');
 
 		$section_labels = CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN);
-		$rules_labels = $this->getRulesLabels($section_labels);
+		$rules_labels = $this->getUiLabels($section_labels);
 		$actions_labels = CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN);
-		$module_labels = $this->getModuleLabels();
+		$module_labels = $this->getModulesLabels();
 
 		$data = [
 			'roleid' => 0,
@@ -82,40 +133,8 @@ class CControllerUserroleEdit extends CController {
 			'labels' => [
 				'sections' => $section_labels,
 				'rules' => $rules_labels,
-				'actions' => $actions_labels,
-				'modules' => $module_labels
-			],
-			'rules' => [
-				CRoleHelper::UI_DEFAULT_ACCESS => true,
-				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
-				CRoleHelper::API_ACCESS => true,
-				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
-				CRoleHelper::SECTION_API => [],
-				CRoleHelper::SECTION_MODULES => [],
-				CRoleHelper::SECTION_UI => [
-					CRoleHelper::UI_MONITORING_DASHBOARD => true,
-					CRoleHelper::UI_MONITORING_PROBLEMS => true,
-					CRoleHelper::UI_MONITORING_HOSTS => true,
-					CRoleHelper::UI_MONITORING_OVERVIEW => true,
-					CRoleHelper::UI_MONITORING_LATEST_DATA => true,
-					CRoleHelper::UI_MONITORING_SCREENS => true,
-					CRoleHelper::UI_MONITORING_MAPS => true,
-					CRoleHelper::UI_MONITORING_SERVICES => true,
-					CRoleHelper::UI_INVENTORY_OVERVIEW => true,
-					CRoleHelper::UI_INVENTORY_HOSTS => true,
-					CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => true,
-					CRoleHelper::UI_REPORTS_TOP_TRIGGERS => true,
-				],
-				CRoleHelper::SECTION_ACTIONS => [
-					CRoleHelper::ACTIONS_EDIT_DASHBOARDS => true,
-					CRoleHelper::ACTIONS_EDIT_MAPS => true,
-					CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS => true,
-					CRoleHelper::ACTIONS_CLOSE_PROBLEMS => true,
-					CRoleHelper::ACTIONS_CHANGE_SEVERITY => true,
-					CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => true,
-					CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => true
-				]
+				'modules' => $module_labels,
+				'actions' => $actions_labels
 			]
 		];
 
@@ -124,96 +143,33 @@ class CControllerUserroleEdit extends CController {
 			$data['name'] = $this->role['name'];
 			$data['type'] = $this->role['type'];
 			$data['readonly'] = $this->role['readonly'];
-			$data['rules'] = $this->getRulesValue((int) $this->role['roleid']) + $data['rules'];
+		}
+		else {
+			// The input value will be set in case of read-only role cloning.
+			$data['type'] = $this->getInput('type', $data['type']);
 		}
 
-		// TODO: Overwrite with input variables.
-		// $this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
+		$data['rules'] = [
+			CRoleHelper::UI_DEFAULT_ACCESS => true,
+			CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
+			CRoleHelper::MODULES_DEFAULT_ACCESS => true,
+			CRoleHelper::SECTION_UI => array_fill_keys(CRoleHelper::getAllUiElements((int) $data['type']), true),
+			CRoleHelper::SECTION_ACTIONS => array_fill_keys(CRoleHelper::getAllActions((int) $data['type']), true),
+			CRoleHelper::SECTION_MODULES => [],
+			CRoleHelper::API_ACCESS => true,
+			CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
+			CRoleHelper::SECTION_API => []
+		];
+
+		if ($this->getInput('roleid', 0) != 0) {
+			$data['rules'] = array_merge($data['rules'], $this->getRulesValue((int) $this->role['roleid']));
+		}
+
+		$data['is_own_role'] = ($data['roleid'] == CWebUser::$data['roleid']);
+		$data = $this->overwriteInputs($data);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
 		$this->setResponse($response);
-	}
-
-	private function getRulesLabels(array $sections): array {
-		$rules_labels = [];
-		foreach (array_keys($sections) as $section) {
-			$rules_labels[$section] = CRoleHelper::getUiSectionRulesLabels($section, USER_TYPE_SUPER_ADMIN);
-		}
-
-		return $rules_labels;
-	}
-
-	private function getModuleLabels(): array {
-		$response = API::Module()->get([
-			'output' => ['moduleid', 'relative_path'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
-
-		if (!$response) {
-			return [];
-		}
-
-		$modules = [];
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
-
-		foreach ($response as $module) {
-			$manifest = $module_manager->addModule($module['relative_path']);
-			$modules[$module['moduleid']] = $manifest['name'];
-		}
-
-		return $modules;
-	}
-
-	private function getRulesValue(int $roleid) {
-		$result = [];
-
-		$response = API::Role()->get([
-			'output' => ['roleid'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',
-				'api', 'actions', 'actions.default_access'
-			],
-			'roleids' => $roleid
-		]);
-		$response = $response[0];
-
-		if (count($response['rules'][CRoleHelper::SECTION_UI])) {
-			foreach ($response['rules'][CRoleHelper::SECTION_UI] as $ui_rule) {
-				$result[CRoleHelper::SECTION_UI][CRoleHelper::SECTION_UI.'.'.$ui_rule['name']] = $ui_rule['status'];
-			}
-		}
-
-		if (count($response['rules'][CRoleHelper::SECTION_ACTIONS])) {
-			foreach ($response['rules'][CRoleHelper::SECTION_ACTIONS] as $action_rule) {
-				$result[CRoleHelper::SECTION_ACTIONS][CRoleHelper::SECTION_ACTIONS.'.'.$action_rule['name']] = $action_rule['status'];
-			}
-		}
-
-		if (count($response['rules'][CRoleHelper::SECTION_MODULES])) {
-			foreach ($response['rules'][CRoleHelper::SECTION_MODULES] as $module_rule) {
-				$result[CRoleHelper::SECTION_MODULES][$module_rule['moduleid']] = $module_rule['status'];
-			}
-		}
-
-		if (count($response['rules'][CRoleHelper::SECTION_API])) {
-			$result[CRoleHelper::SECTION_API] = array_map(function (string $method): array {
-				return [
-					'id' => $method,
-					'name' => $method
-				];
-			}, $response['rules'][CRoleHelper::SECTION_API]);
-		}
-
-		// TODO: add mapping for api methods.
-
-		$result[CRoleHelper::UI_DEFAULT_ACCESS] = $response['rules']['ui.default_access'];
-		$result[CRoleHelper::MODULES_DEFAULT_ACCESS] = $response['rules']['modules.default_access'];
-		$result[CRoleHelper::ACTIONS_DEFAULT_ACCESS] = $response['rules']['actions.default_access'];
-		$result[CRoleHelper::API_ACCESS] = $response['rules']['api.access'];
-		$result[CRoleHelper::API_MODE] = $response['rules']['api.mode'];
-
-		return $result;
 	}
 }

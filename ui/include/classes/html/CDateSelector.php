@@ -57,6 +57,13 @@ class CDateSelector extends CTag {
 	private $value = null;
 
 	/**
+	 * Readonly state of HTML element.
+	 *
+	 * @var bool
+	 */
+	private $readonly = false;
+
+	/**
 	 * Enabled or disabled state of HTML element.
 	 *
 	 * @var bool
@@ -119,6 +126,19 @@ class CDateSelector extends CTag {
 	}
 
 	/**
+	 * Enable or disable readonly mode for the element.
+	 *
+	 * @param bool $value
+	 *
+	 * @return self
+	 */
+	public function setReadonly(bool $value): self {
+		$this->readonly = $value;
+
+		return $this;
+	}
+
+	/**
 	 * Set enabled or disabled  state to field.
 	 *
 	 * @param bool $enabled  Field state.
@@ -146,10 +166,11 @@ class CDateSelector extends CTag {
 					->setAttribute('placeholder', $this->placeholder)
 					->setAriaRequired($this->is_required)
 					->setEnabled($this->enabled)
+					->setReadonly($this->readonly)
 			)
 			->addItem((new CButton($this->name.'_calendar'))
 				->addClass(ZBX_STYLE_ICON_CAL)
-				->setEnabled($this->enabled)
+				->setEnabled($this->enabled && !$this->readonly)
 				->onClick('toggleCalendar(this, "'.$this->name.'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);

@@ -112,14 +112,14 @@ $table = (new CFormList('maintenanceFormList'))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
-			->setEnabled($data['allowed_edit'])
+			->setReadonly(!$data['allowed_edit'])
 	)
 	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
 		(new CDateSelector('active_till', $data['active_till']))
 			->setDateFormat(ZBX_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
-			->setEnabled($data['allowed_edit'])
+			->setReadonly(!$data['allowed_edit'])
 	)
 	->addRow(
 		(new CLabel(_('Periods'), $periods_container->getId()))->setAsteriskMark(), $periods_container
