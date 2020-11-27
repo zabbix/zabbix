@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-20 19:55+0200\n"
-"PO-Revision-Date: 2020-11-16 01:36+0300\n"
+"PO-Revision-Date: 2020-11-23 13:11+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1605483414.000000\n"
+"X-POOTLE-MTIME: 1606129874.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -18586,7 +18586,7 @@ msgstr "ユーザーは無効のグループやGUIアクセスが無効のグル
 #: app/views/administration.user.edit.php:347
 #: include/classes/api/services/CUser.php:850
 msgid "User cannot change own role."
-msgstr ""
+msgstr "ユーザーは自分の役割を変更できません。"
 
 #: app/views/administration.userrole.edit.php:63
 #: include/classes/api/services/CRole.php:401
