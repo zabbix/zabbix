@@ -3422,14 +3422,15 @@ static int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *
 void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities)
 {
 	int	txn_error;
+	char	*sql = NULL;
+	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
+	int	i;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	do
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-		int	i;
-
-		sql = (char *)zbx_malloc(sql, sql_alloc);
+		size_t	sql_offset = 0;
 
 		DBbegin();
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3452,10 +3453,10 @@ void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabiliti
 			DBexecute("%s", sql);
 
 		txn_error = DBcommit();
-
-		zbx_free(sql);
 	}
 	while (ZBX_DB_DOWN == txn_error);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
