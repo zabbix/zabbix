@@ -33,7 +33,7 @@ else {
 	$table = (new CTable())
 		->setId('tbl_macros')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-		->addClass('inherted-macros-table');
+		->addClass('inherited-macros-table');
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = (new CLink(_('configure'), (new CUrl('zabbix.php'))

@@ -5978,7 +5978,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background: #ffffff;
   z-index: 3; }
 
-.global-macro-table .table-col-value, .inherted-macros-table .table-col-value {
+.global-macro-table .table-col-value, .inherited-macros-table .table-col-value {
   width: 300px; }
-.global-macro-table .table-col-template-value, .inherted-macros-table .table-col-template-value {
+.global-macro-table .table-col-template-value, .inherited-macros-table .table-col-template-value {
   width: 300px; }
