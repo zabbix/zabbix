@@ -38,12 +38,11 @@ $table = (new CTable())
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->addClass('global-macro-table')
 	->setColumns([
-		(new CTableColumn())->addClass('table-col-macro'),
-		(new CTableColumn())->addClass('table-col-value'),
-		(new CTableColumn())->addClass('table-col-description'),
-		(new CTableColumn())->addClass('table-col-action'),
-	])
-	->setHeader([_('Macro'), _('Value'), _('Description'), '']);
+		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
+		(new CTableColumn(_('Value')))->addClass('table-col-value'),
+		(new CTableColumn(_('Description')))->addClass('table-col-description'),
+		(new CTableColumn(''))->addClass('table-col-action')
+	]);
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))

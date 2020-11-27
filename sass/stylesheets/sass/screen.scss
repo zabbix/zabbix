@@ -7464,8 +7464,12 @@ z-select,
 }
 
 
-.global-macro-table {
+.global-macro-table, .inherted-macros-table {
 	.table-col-value {
+		min-width: 300px;
+	}
+
+	.table-col-template-value {
 		min-width: 300px;
 	}
 }
