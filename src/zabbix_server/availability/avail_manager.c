@@ -24,6 +24,7 @@
 #include "zbxipcservice.h"
 #include "avail_manager.h"
 #include "daemon.h"
+#include "sighandler.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "avail_protocol.h"
@@ -73,7 +74,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_AVAILABILITY, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start preprocessing service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start availability manager service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

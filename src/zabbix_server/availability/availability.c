@@ -34,14 +34,14 @@ void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 
 		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_AVAILABILITY, SEC_PER_MIN, &error))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to availability manager service: %s", error);
 			exit(EXIT_FAILURE);
 		}
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_AVAILABILITY_REQUEST, data, size))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to availability manager service");
 		exit(EXIT_FAILURE);
 	}
 }

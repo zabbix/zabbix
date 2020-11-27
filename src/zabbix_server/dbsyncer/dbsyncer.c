@@ -23,6 +23,7 @@
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "sighandler.h"
 
 #include "dbcache.h"
 #include "dbsyncer.h"
