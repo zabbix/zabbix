@@ -1988,7 +1988,11 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		foreach($this->getCommonCustomOnFailData() as $packed) {
 			$case = $packed[0];
-			$case['preprocessing'] = array_merge($case['preprocessing'], [
+			$case['preprocessing'] = array_merge([
+				[
+					'type' => 'Check for not supported value',
+					'on_fail' => true
+				],
 				[
 					'type' => 'Trim',
 					'parameter_1' => '111'
@@ -2024,12 +2028,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					'parameter_1' => 'expression',
 					'parameter_2' => 'output',
 					'on_fail' => true
-				],
-				[
-					'type' => 'Check for not supported value',
-					'on_fail' => true
 				]
-			]);
+			], $case['preprocessing']);
 
 			$data[] = [self::appendErrorHandler($case)];
 		}
@@ -2333,13 +2333,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public function getItemInheritancePreprocessing() {
 		$data = $this->getCommonInheritancePreprocessing();
-		$data[0][0]['preprocessing'] =  array_merge($data[0][0]['preprocessing'], [
+		$data[0][0]['preprocessing'] =  array_merge([
+					[
+						'type' => 'Check for not supported value'
+					],
 					[
 						'type' => 'Right trim',
 						'parameter_1' => '5'
-					],
-					[
-						'type' => 'Check for not supported value'
 					],
 					[
 						'type' => 'Custom multiplier',
@@ -2372,7 +2372,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'error_handler' => 'Set error to',
 						'error_handler_params' => 'Custom_text'
 					]
-		]);
+				], $data[0][0]['preprocessing']);
 
 		return $data;
 	}
