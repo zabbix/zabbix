@@ -171,7 +171,7 @@ tests: tests_build
 	tests/tests_run.pl
 
 clean: clean-recursive
-	(cd tests && make clean)
+	(cd tests && $(MAKE) clean)
 endif
 
 .PHONY: test tests clean
