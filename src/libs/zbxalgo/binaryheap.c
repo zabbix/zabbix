@@ -241,7 +241,6 @@ void	zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *ele
 
 	if (HAS_DIRECT_OPTION(heap) && index == heap->elems_num - 1)
 		zbx_hashmap_set(heap->key_index, elem->key, index);
-
 }
 
 void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem)

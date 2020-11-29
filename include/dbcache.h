@@ -790,7 +790,7 @@ void	zbx_config_clean(zbx_config_t *cfg);
 
 int	DCset_interfaces_availability(zbx_vector_ptr_t *availabilities);
 
-int	DCreset_interfaces_availability(zbx_vector_ptr_t *interfaces);
+int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 void	DCupdate_interfaces_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
@@ -1002,6 +1002,6 @@ void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 
-void	zbx_get_host_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
+void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
 
 #endif

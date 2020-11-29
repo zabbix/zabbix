@@ -32,6 +32,7 @@
 #include "cfg.h"
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
+#include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -320,13 +321,16 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	return itemid;
 }
 
-static int	DCget_disable_until(const ZBX_DC_INTERFACE *interface);
-
 #define ZBX_ITEM_COLLECTED		0x01	/* force item rescheduling after new value collection */
 #define ZBX_HOST_UNREACHABLE		0x02
 #define ZBX_ITEM_KEY_CHANGED		0x04
 #define ZBX_ITEM_TYPE_CHANGED		0x08
 #define ZBX_ITEM_DELAY_CHANGED		0x10
+
+static int	DCget_disable_until(const ZBX_DC_INTERFACE *interface)
+{
+	return (NULL == interface) ? 0 : interface->disable_until;
+}
 
 static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 		char **error)
@@ -410,11 +414,6 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	{
 		dc_item->poller_type = poller_type;
 	}
-}
-
-static int	DCget_disable_until(const ZBX_DC_INTERFACE *interface)
-{
-	return (NULL == interface) ? 0 : interface->disable_until;
 }
 
 static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
@@ -8910,7 +8909,7 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 	return nextcheck;
 }
 
-static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host,const ZBX_DC_INTERFACE *dc_interface,
+static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, const ZBX_DC_INTERFACE *dc_interface,
 		int flags, int lastclock)
 {
 	unsigned char	old_poller_type;
@@ -9037,7 +9036,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,&dc_item->interfaceid);
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
@@ -9497,7 +9496,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
  *                                                                            *
  * Parameters: dc_interface - [OUT] the interface                             *
  *             now          - [IN] current timestamp                          *
- *             availability - [IN/OUT] the host availability data             *
+ *             agent        - [IN/OUT] the interface availability data        *
  *                                                                            *
  * Return value: SUCCEED - at least one availability field was updated        *
  *               FAIL    - no availability fields were updated                *
@@ -9530,7 +9529,7 @@ static int	DCinterface_set_agent_availability(ZBX_DC_INTERFACE *dc_interface, in
  * Purpose: set interface availability data in configuration cache            *
  *                                                                            *
  * Parameters: dc_interface - [OUT] the interface                             *
- *             availability - [IN/OUT] the interface availability data        *
+ *             ia           - [IN/OUT] the interface availability data        *
  *                                                                            *
  * Return value: SUCCEED - at least one availability field was updated        *
  *               FAIL    - no availability fields were updated                *
@@ -9604,20 +9603,18 @@ void	zbx_interface_availability_free(zbx_interface_availability_t *availability)
 	zbx_free(availability);
 }
 
+ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *);
 /******************************************************************************
  *                                                                            *
  * Function: zbx_agent_availability_init                                      *
  *                                                                            *
  * Purpose: initializes agent availability with the specified data            *
  *                                                                            *
- * Parameters: availability  - [IN/OUT] agent availability data               *
- *             hostid        - [IN] the host identifier                       *
- *             flags         - [IN] the availability flags indicating which   *
- *                                  availability fields to set                *
+ * Parameters: agent         - [IN/OUT] agent availability data               *
  *             available     - [IN] the availability data                     *
- *             error         - [IN]                                           *
- *             errors_from   - [IN]                                           *
- *             disable_until - [IN]                                           *
+ *             error         - [IN] the availability error                    *
+ *             errors_from   - [IN] error starting timestamp                  *
+ *             disable_until - [IN] disable until timestamp                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
@@ -9636,7 +9633,7 @@ static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigne
  *                                                                            *
  * Purpose: checks interface availability if agent availability field is set  *
  *                                                                            *
- * Parameters: availability - [IN] interface availability data                *
+ * Parameters: ia - [IN] interface availability data                          *
  *                                                                            *
  * Return value: SUCCEED - an agent availability field is set                 *
  *               FAIL - no agent availability field is set                    *
@@ -9695,7 +9692,7 @@ int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia)
  *                                                                             *
  * Purpose: set interface as available based on the agent availability data    *
  *                                                                             *
- * Parameters: interfaceid - [IN] the host identifier                          *
+ * Parameters: interfaceid - [IN] the interface identifier                     *
  *             ts          - [IN] the last timestamp                           *
  *             in          - [IN/OUT] IN: the caller's agent availability data *
  *                                   OUT: the agent availability data in cache *
@@ -9717,7 +9714,7 @@ int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts,
 	ZBX_DC_HOST		*dc_host;
 	ZBX_DC_INTERFACE	*dc_interface;
 
-	/* don't try activating host if there were no errors detected */
+	/* don't try activating interface if there were no errors detected */
 	if (0 == in->errors_from && INTERFACE_AVAILABLE_TRUE == in->available)
 		goto out;
 
@@ -9729,9 +9726,9 @@ int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts,
 	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_interface->hostid)))
 		goto unlock;
 
-	/* Don't try activating host if:                  */
-	/* - (server, proxy) it's not monitored any more; */
-	/* - (server) it's monitored by proxy.            */
+	/* Don't try activating interface if:                */
+	/* - (server, proxy) host is not monitored any more; */
+	/* - (server) host is monitored by proxy.            */
 	if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
 			HOST_STATUS_MONITORED != dc_host->status)
 	{
@@ -9740,9 +9737,9 @@ int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts,
 
 	DCinterface_get_agent_availability(dc_interface, in);
 	zbx_agent_availability_init(out, INTERFACE_AVAILABLE_TRUE, "", 0, 0);
-	DCinterface_set_agent_availability(dc_interface, ts->sec, out);
 
-	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
+	if (SUCCEED == DCinterface_set_agent_availability(dc_interface, ts->sec, out) &&
+			ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
 		ret = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
@@ -9775,13 +9772,13 @@ out:
 int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out, const char *error_msg)
 {
-	int			ret = FAIL, errors_from,disable_until;
+	int			ret = FAIL, errors_from, disable_until;
 	const char		*error;
 	unsigned char		available;
 	ZBX_DC_HOST		*dc_host;
 	ZBX_DC_INTERFACE	*dc_interface;
 
-	/* don't try deactivating host if the unreachable delay has not passed since the first error */
+	/* don't try deactivating interface if the unreachable delay has not passed since the first error */
 	if (CONFIG_UNREACHABLE_DELAY > ts->sec - in->errors_from)
 		goto out;
 
@@ -9793,9 +9790,9 @@ int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, z
 	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_interface->hostid)))
 		goto unlock;
 
-	/* Don't try deactivating interface if:                */
-	/* - (server, proxy) host it's not monitored any more; */
-	/* - (server) host it's monitored by proxy.            */
+	/* Don't try deactivating interface if:               */
+	/* - (server, proxy) host is not monitored any more;  */
+	/* - (server) host is monitored by proxy.             */
 	if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
 			HOST_STATUS_MONITORED != dc_host->status)
 	{
@@ -9840,9 +9837,9 @@ int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, z
 	}
 
 	zbx_agent_availability_init(out, available, error, errors_from, disable_until);
-	DCinterface_set_agent_availability(dc_interface, ts->sec, out);
 
-	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
+	if (SUCCEED == DCinterface_set_agent_availability(dc_interface, ts->sec, out) &&
+			ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
 		ret = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
@@ -9861,7 +9858,7 @@ out:
  *                                                                            *
  * Return value: SUCCEED - at least one interface availability data           *
  *                         was updated                                        *
- *               FAIL    - no hosts were updated                              *
+ *               FAIL    - no interfaces were updated                         *
  *                                                                            *
  ******************************************************************************/
 int	DCset_interfaces_availability(zbx_vector_ptr_t *availabilities)
@@ -10921,7 +10918,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
 				&dc_item->interfaceid)))
 		{
-				continue;
+			continue;
 		}
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
@@ -11799,16 +11796,17 @@ void	zbx_config_clean(zbx_config_t *cfg)
  *                                                                               *
  * Parameters: interfaces - [OUT] changed interface availability data            *
  *                                                                               *
- * Return value: SUCCEED - interface availability was reset for at least once    *
+ * Return value: SUCCEED - interface availability was reset for at least one     *
+ *                         interface                                             *
  *               FAIL    - no interfaces required availability reset             *
  *                                                                               *
  * Comments: This function resets interface availability in configuration cache. *
  *           The caller must perform corresponding database updates based on     *
- *           returned host availability reset data. On server the function skips *
- *           hosts handled by proxies.                                           *
+ *           returned interface availability reset data. On server the function  *
+ *           skips hosts handled by proxies.                                     *
  *                                                                               *
  ********************************************************************************/
-int	DCreset_interfaces_availability(zbx_vector_ptr_t *interfaces)
+int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
 	ZBX_DC_HOST			*host;
 	ZBX_DC_INTERFACE		*interface;
@@ -11830,7 +11828,6 @@ int	DCreset_interfaces_availability(zbx_vector_ptr_t *interfaces)
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
 			continue;
-
 
 		/* On server skip hosts handled by proxies. They are handled directly */
 		/* when receiving hosts' availability data from proxies.              */
@@ -11893,7 +11890,7 @@ int	DCreset_interfaces_availability(zbx_vector_ptr_t *interfaces)
 		{
 			if (SUCCEED == DCinterface_set_availability(interface, now, ia))
 			{
-				zbx_vector_ptr_append(interfaces, ia);
+				zbx_vector_availability_ptr_append(interfaces, ia);
 				ia = NULL;
 			}
 			else
@@ -11906,28 +11903,28 @@ int	DCreset_interfaces_availability(zbx_vector_ptr_t *interfaces)
 
 	zbx_free(ia);
 
-	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_availability_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, interfaces->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
 	return 0 == interfaces->values_num ? FAIL : SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCget_interfaces_availability                                    *
- *                                                                            *
- * Purpose: gets availability data for interfaces with availability data      *
- *          changed in period from last availability update to the specified  *
- *          timestamp                                                         *
- *                                                                            *
- * Parameters: interfaces - [OUT] changed interfaces availability data        *
- *             ts    - [OUT] the availability diff timestamp                  *
- *                                                                            *
- * Return value: SUCCEED - availability was changed for at least one host     *
- *               FAIL    - no host availability was changed                   *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Function: DCget_interfaces_availability                                     *
+ *                                                                             *
+ * Purpose: gets availability data for interfaces with availability data       *
+ *          changed in period from last availability update to the specified   *
+ *          timestamp                                                          *
+ *                                                                             *
+ * Parameters: interfaces - [OUT] changed interfaces availability data         *
+ *             ts    - [OUT] the availability diff timestamp                   *
+ *                                                                             *
+ * Return value: SUCCEED - availability was changed for at least one interface *
+ *               FAIL    - no interface availability was changed               *
+ *                                                                             *
+ *******************************************************************************/
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts)
 {
 	const ZBX_DC_INTERFACE		*interface;
@@ -11960,7 +11957,7 @@ int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts)
 
 	zbx_vector_ptr_sort(interfaces, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __func__, interfaces->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
 	return 0 == interfaces->values_num ? FAIL : SUCCEED;
 }
@@ -11970,7 +11967,7 @@ int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts)
  * Function: DCtouch_interfaces_availability                                  *
  *                                                                            *
  * Purpose: sets availability timestamp to current time for the specified     *
- *          interface                                                         *
+ *          interfaces                                                        *
  *                                                                            *
  * Parameters: interfaceids - [IN] the interfaces identifiers                 *
  *                                                                            *
@@ -11980,7 +11977,7 @@ void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids)
 	ZBX_DC_INTERFACE	*dc_interface;
 	int			i, now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostids:%d", __func__, interfaceids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceids:%d", __func__, interfaceids->values_num);
 
 	now = time(NULL);
 
@@ -12689,17 +12686,13 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		if (NULL == (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
-				&dc_item->interfaceid)))
-		{
-					continue;
-		}
-
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
 		if (ZBX_LOC_NOWHERE != dc_item->location)
 			continue;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
@@ -13738,18 +13731,15 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_get_host_availability                                           *
+ * Function: zbx_get_host_interfaces_availability                                *
  *                                                                               *
  * Purpose: get host interfaces availability                                     *
  *                                                                               *
  * Parameters: hostid               - [IN] the host id                           *
- *             agent                - [OUT] Zabbix agent availability            *
- *             ipmi                 - [OUT] IPMI availability                    *
- *             jmx                  - [OUT] JMX availability                     *
- *             snmp                 - [OUT] SNMP availability                    *
+ *             agents               - [OUT] Zabbix agent availability            *
  *                                                                               *
  ********************************************************************************/
-void	zbx_get_host_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents)
+void	zbx_get_host_interfaces_availability(zbx_uint64_t hostid, zbx_agent_availability_t *agents)
 {
 	const ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
@@ -13778,13 +13768,11 @@ void	zbx_get_host_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *ag
 			i = ZBX_AGENT_IPMI;
 		else if (INTERFACE_TYPE_JMX == interface->type)
 			i = ZBX_AGENT_JMX;
-		else if (INTERFACE_TYPE_JMX == interface->type)
+		else if (INTERFACE_TYPE_SNMP == interface->type)
 			i = ZBX_AGENT_SNMP;
 
 		if (ZBX_AGENT_UNKNOWN != i)
-		{
 			DCinterface_get_agent_availability(interface, &agents[i]);
-		}
 	}
 
 	UNLOCK_CACHE;

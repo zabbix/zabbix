@@ -1246,6 +1246,7 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 
 	if (FAIL == dbsync_compare_int(dbrow[11], interface->errors_from))
 		return FAIL;
+	/*reset_availability and availability_ts are excluded from the comparison*/
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&dbsync_env.cache->interfaces_snmp,
 			&interface->interfaceid);
@@ -1323,7 +1324,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 18, NULL);
+	dbsync_prepare(sync, 22, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

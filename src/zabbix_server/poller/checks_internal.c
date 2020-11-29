@@ -330,9 +330,9 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<type>,"available"] */
 		{
 			zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
-			int 				i;
+			int				i;
 
-			zbx_get_host_availability(item->host.hostid, agents);
+			zbx_get_host_interfaces_availability(item->host.hostid, agents);
 
 			for (i = 0; i < ZBX_AGENT_MAX; i++)
 				zbx_free(agents[i].error);

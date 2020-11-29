@@ -735,8 +735,10 @@ typedef struct
 }
 zbx_interface_availability_t;
 
-int	zbx_sql_add_interface_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const zbx_interface_availability_t *ia);
+ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *);
+
+int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql, size_t *sql_alloc,
+		size_t *sql_offset);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 typedef struct

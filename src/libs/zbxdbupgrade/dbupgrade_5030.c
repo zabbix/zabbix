@@ -31,7 +31,7 @@ extern unsigned char	program_type;
 
 static int	DBpatch_5030000(void)
 {
-	const ZBX_FIELD	field = {"available", 0, NULL, NULL, 5, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
@@ -45,14 +45,14 @@ static int	DBpatch_5030001(void)
 
 static int	DBpatch_5030002(void)
 {
-	const ZBX_FIELD	field = {"errors_from", 0, NULL, NULL, 5, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"errors_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030003(void)
 {
-	const ZBX_FIELD	field = {"disable_until", 0, NULL, NULL, 5, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"disable_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }

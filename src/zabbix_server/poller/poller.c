@@ -70,7 +70,7 @@ static int	db_interface_update_availability(const zbx_interface_availability_t *
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 
-	if (SUCCEED == zbx_sql_add_interface_availability(&sql, &sql_alloc, &sql_offset, ia))
+	if (SUCCEED == zbx_sql_add_interface_availability(ia, &sql, &sql_alloc, &sql_offset))
 	{
 		DBbegin();
 		DBexecute("%s", sql);
@@ -93,10 +93,8 @@ static int	db_interface_update_availability(const zbx_interface_availability_t *
  * Parameters: dc_interface - [IN] the interface                              *
  *             ia           - [OUT] the interface availability data           *
  *                                                                            *
- * Return value: SUCCEED - the interface availability data was retrieved      *
- *                         successfully                                       *
  ******************************************************************************/
-static int	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_interface_availability_t *ia)
+static void	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_interface_availability_t *ia)
 {
 	zbx_agent_availability_t	*availability = &ia->agent;
 
@@ -108,8 +106,6 @@ static int	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_inte
 	availability->disable_until = dc_interface->disable_until;
 
 	ia->interfaceid = dc_interface->interfaceid;
-
-	return SUCCEED;
 }
 
 /********************************************************************************
@@ -121,9 +117,8 @@ static int	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_inte
  * Parameters: dc_interface - [IN/OUT] the interface                            *
  *             ia           - [IN] the interface availability data              *
  *                                                                              *
- * Return value: SUCCEED - the interface availability data was set successfully *
  *******************************************************************************/
-static int	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_interface_availability_t *ia)
+static void	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_interface_availability_t *ia)
 {
 	const zbx_agent_availability_t	*availability = &ia->agent;
 	unsigned char			*pavailable;
@@ -146,8 +141,6 @@ static int	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_inte
 
 	if (0 != (availability->flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
 		*pdisable_until = availability->disable_until;
-
-	return SUCCEED;
 }
 
 static unsigned char	host_availability_agent_by_item_type(unsigned char type)
@@ -191,8 +184,7 @@ void	zbx_activate_item_interface(DC_ITEM *item, zbx_timespec_t *ts)
 	zbx_interface_availability_init(&in, item->interface.interfaceid);
 	zbx_interface_availability_init(&out, item->interface.interfaceid);
 
-	if (FAIL == interface_get_availability(&item->interface, &in))
-		goto out;
+	interface_get_availability(&item->interface, &in);
 
 	if (FAIL == DCinterface_activate(item->interface.interfaceid, ts, &in.agent, &out.agent))
 		goto out;
@@ -223,7 +215,7 @@ out:
  *                                                                              *
  * Function: zbx_deactivate_item_interface                                      *
  *                                                                              *
- * Purpose: activate item interface                                             *
+ * Purpose: deactivate item interface                                           *
  *                                                                              *
  * Parameters: item  - [IN/OUT] the item                                        *
  *             ts    - [IN] the timestamp                                       *
@@ -233,7 +225,6 @@ out:
 void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	zbx_interface_availability_t	in, out;
-	unsigned char			agent_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__func__, item->interface.interfaceid, item->itemid, (int)item->type);
@@ -241,11 +232,10 @@ void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char
 	zbx_interface_availability_init(&in, item->interface.interfaceid);
 	zbx_interface_availability_init(&out,item->interface.interfaceid);
 
-	if (ZBX_AGENT_UNKNOWN == (agent_type = host_availability_agent_by_item_type(item->type)))
+	if (ZBX_AGENT_UNKNOWN == host_availability_agent_by_item_type(item->type))
 		goto out;
 
-	if (FAIL == interface_get_availability(&item->interface, &in))
-		goto out;
+	interface_get_availability(&item->interface, &in);
 
 	if (FAIL == DCinterface_deactivate(item->interface.interfaceid, ts, &in.agent, &out.agent, error))
 		goto out;
@@ -262,23 +252,20 @@ void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char
 				zbx_agent_type_string(item->type), item->key_orig, item->host.host,
 				out.agent.disable_until - ts->sec);
 	}
-	else
+	else if (INTERFACE_AVAILABLE_FALSE != in.agent.available)
 	{
-		if (INTERFACE_AVAILABLE_FALSE != in.agent.available)
+		if (INTERFACE_AVAILABLE_FALSE != out.agent.available)
 		{
-			if (INTERFACE_AVAILABLE_FALSE != out.agent.available)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
-						" another network error, wait for %d seconds",
-						zbx_agent_type_string(item->type), item->key_orig, item->host.host,
-						out.agent.disable_until - ts->sec);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
-						" interface unavailable",
-						zbx_agent_type_string(item->type), item->host.host);
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
+					" another network error, wait for %d seconds",
+					zbx_agent_type_string(item->type), item->key_orig, item->host.host,
+					out.agent.disable_until - ts->sec);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "temporarily disabling %s checks on host \"%s\":"
+					" interface unavailable",
+					zbx_agent_type_string(item->type), item->host.host);
 		}
 	}
 
@@ -791,6 +778,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
+ *             nextcheck   - [OUT] item nextcheck                             *
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *

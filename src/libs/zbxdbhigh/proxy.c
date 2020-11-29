@@ -1380,7 +1380,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	zbx_id_offset_t		id_offset, *p_id_offset = NULL;
 	zbx_db_insert_t		db_insert;
 	zbx_vector_ptr_t	values;
-	static zbx_vector_ptr_t	skip_fields, availability_fields;
+	static zbx_vector_ptr_t	skip_fields;
 	static const ZBX_TABLE	*table_items, *table_interface;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __func__, table->table);
@@ -1430,14 +1430,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	}
 
 	if (NULL == table_interface)
-	{
 		table_interface = DBget_table("interface");
-
-		/* do not update existing lastlogsize and mtime fields */
-		zbx_vector_ptr_create(&availability_fields);
-		zbx_vector_ptr_append(&availability_fields, (void *)DBget_field(table_interface, "available"));
-		zbx_vector_ptr_sort(&availability_fields, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-	}
 
 	/* get table columns (line 3 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, "fields", &jp_data))
@@ -1886,8 +1879,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				continue;
 			}
 
-			if (table == table_interface && FAIL != zbx_vector_ptr_bsearch(&availability_fields,
-					fields[f], ZBX_DEFAULT_PTR_COMPARE_FUNC))
+			if (table == table_interface && 0 == strcmp(fields[f]->name, "available"))
 			{
 				/* host availability on server differs from local (proxy) availability - */
 				/* reset availability timestamp to re-send availability data to server   */
@@ -2109,10 +2101,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_availability_data                                       *
+ * Function: get_interface_availability_data                                  *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - no host availability has been changed                *
+ *                FAIL - no interface availability has been changed           *
  *                                                                            *
  ******************************************************************************/
 int	get_interface_availability_data(struct zbx_json *json, int *ts)
@@ -2180,7 +2172,7 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 
 	zbx_vector_ptr_create(&interfaces);
 
-	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the host entries */
+	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the interface entries */
 	{
 		if (SUCCEED != (ret = zbx_json_brackets_open(p, &jp_row)))
 		{
@@ -2197,24 +2189,24 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 
 		if (SUCCEED != (ret = is_uint64(tmp, &interfaceid)))
 		{
-			*error = zbx_strdup(*error, "interfacetid is not a valid numeric");
+			*error = zbx_strdup(*error, "interfaceid is not a valid numeric");
 			goto out;
 		}
 
 		ia = (zbx_interface_availability_t *)zbx_malloc(NULL, sizeof(zbx_interface_availability_t));
 		zbx_interface_availability_init(ia, interfaceid);
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_AVAILABLE, &tmp, &tmp_alloc, NULL))
-			continue;
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_AVAILABLE, &tmp, &tmp_alloc, NULL))
+		{
+			ia->agent.available = atoi(tmp);
+			ia->agent.flags |= ZBX_FLAGS_AGENT_STATUS_AVAILABLE;
+		}
 
-		ia->agent.available = atoi(tmp);
-		ia->agent.flags |= ZBX_FLAGS_AGENT_STATUS_AVAILABLE;
-
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &tmp, &tmp_alloc, NULL))
-			continue;
-
-		ia->agent.error = zbx_strdup(NULL, tmp);
-		ia->agent.flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &tmp, &tmp_alloc, NULL))
+		{
+			ia->agent.error = zbx_strdup(NULL, tmp);
+			ia->agent.flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
+		}
 
 		if (SUCCEED != (ret = zbx_interface_availability_is_set(ia)))
 		{
@@ -2239,8 +2231,9 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 
 		for (i = 0; i < interfaces.values_num; i++)
 		{
-			if (SUCCEED != zbx_sql_add_interface_availability(&sql, &sql_alloc, &sql_offset,
-					(zbx_interface_availability_t *)interfaces.values[i]))
+			if (SUCCEED != zbx_sql_add_interface_availability(
+					(zbx_interface_availability_t *)interfaces.values[i],&sql, &sql_alloc,
+					&sql_offset))
 			{
 				continue;
 			}
@@ -2265,40 +2258,6 @@ out:
 	zbx_vector_ptr_destroy(&interfaces);
 
 	zbx_free(tmp);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: process_interface_availability                                   *
- *                                                                            *
- * Purpose: update proxy interfaces availability                              *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
-int	process_interface_availability(struct zbx_json_parse *jp, char **error)
-{
-	struct zbx_json_parse	jp_data;
-	int			ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
-	}
-
-	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
-		goto out;
-
-	ret = process_interfaces_availability_contents(&jp_data, error);
-
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

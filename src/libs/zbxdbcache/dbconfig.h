@@ -455,16 +455,16 @@ typedef struct
 	const char	*ip;
 	const char	*dns;
 	const char	*port;
+	const char	*error;
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	useip;
 	unsigned char	available;
 	int		disable_until;
-	const char	*error;
 	int		errors_from;
 	/* timestamp of last availability status (available/error) field change on interface */
 	int		availability_ts;
-	/* flag to reset host availability to unknown */
+	/* flag to reset interface availability to unknown */
 	unsigned char	reset_availability;
 }
 ZBX_DC_INTERFACE;

@@ -3348,18 +3348,21 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
  *                                                                            *
  * Function: zbx_sql_add_interface_availability                               *
  *                                                                            *
- * Purpose: adds host availability update to sql statement                    *
+ * Purpose: adds interface availability update to sql statement               *
  *                                                                            *
- * Parameters: sql        - [IN/OUT] the sql statement                        *
+ * Parameters: ia           [IN] the interface availability data              *
+ *             sql        - [IN/OUT] the sql statement                        *
  *             sql_alloc  - [IN/OUT] the number of bytes allocated for sql    *
  *                                   statement                                *
  *             sql_offset - [IN/OUT] the number of bytes used in sql          *
  *                                   statement                                *
- *             ia           [IN] the interface availability data              *
+ *                                                                            *
+ * Return value: SUCCEED - sql statement is created                           *
+ *               FAIL    - no interface availability is set                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_sql_add_interface_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const zbx_interface_availability_t *ia)
+int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	char		delim = ' ';
 
@@ -3391,9 +3394,7 @@ int	zbx_sql_add_interface_availability(char **sql, size_t *sql_alloc, size_t *sq
 	}
 
 	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
-	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cdisable_until=%d", delim, ia->agent.disable_until);
-	}
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64, ia->interfaceid);
 

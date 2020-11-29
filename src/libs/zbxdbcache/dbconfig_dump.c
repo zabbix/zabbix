@@ -411,11 +411,12 @@ static void	DCdump_interfaces(void)
 
 		zbx_snprintf_alloc(&if_msg, &alloc, &offset, "interfaceid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64
 				" ip:'%s' dns:'%s' port:'%s' type:%u main:%u useip:%u"
-				" available:%u, errors_from:%d disable_until:%d error:'%s' availability_ts:%d",
+				" available:%u errors_from:%d disable_until:%d error:'%s' availability_ts:%d"
+				" reset_availability:%d",
 				interface->interfaceid, interface->hostid, interface->ip, interface->dns,
 				interface->port, interface->type, interface->main, interface->useip,
 				interface->available, interface->errors_from, interface->disable_until,
-				interface->error, interface->availability_ts);
+				interface->error, interface->availability_ts, interface->reset_availability);
 
 		if (INTERFACE_TYPE_SNMP == interface->type &&
 				NULL != (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
