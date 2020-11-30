@@ -766,7 +766,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	// acknowledge
-	if (options.allowed_ack && typeof options.acknowledge !== 'undefined' && options.acknowledge) {
+	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
 		items[items.length] = {
 			label: t('Acknowledge'),
 			clickCallback: function() {

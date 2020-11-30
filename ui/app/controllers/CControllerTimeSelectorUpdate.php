@@ -201,7 +201,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME),
 			'to' => $value['to'],
 			'to_ts' => $ts['to'],
-			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME),
+			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME)
 		] + getTimeselectorActions($value['from'], $value['to']))]));
 	}
 

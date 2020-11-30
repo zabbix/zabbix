@@ -83,7 +83,7 @@ class testPageLatestData extends CLegacyWebTest {
 				[
 					'host group' => '15003',
 					'Item name' => 'item_testPageHistory_CheckLayout_Text',
-					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career',
+					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career'
 				]
 			],
 			// Item with underscore in macros name and one non existing macros  in description .
