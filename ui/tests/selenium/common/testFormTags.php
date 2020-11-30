@@ -70,7 +70,8 @@ class testFormTags extends CWebTest {
 						],
 						[
 							'tag' => '{$MACRO}',
-							'value' => '{$MACRO}'],
+							'value' => '{$MACRO}'
+						],
 						[
 							'tag' => 'Таг',
 							'value' => 'Значение'
@@ -126,7 +127,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details'=>'Incorrect value for field "tag": cannot be empty.'
+					'trigger_error_details' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
 			[
@@ -160,21 +161,25 @@ class testFormTags extends CWebTest {
 	 * @param string   $expression   trigger or trigger prototype expression
 	 */
 	public function checkTagsCreate($data, $object, $expression = null) {
-		$sql = ($object === 'host' || $object === 'template')
-			? 'SELECT * FROM hosts ORDER BY hostid'
-			: 'SELECT * FROM triggers ORDER BY triggerid';
-		$old_hash = CDBHelper::getHash($sql);
+		if ($data['expected'] === TEST_BAD) {
+			$sql = ($object === 'host' || $object === 'template')
+				? 'SELECT * FROM hosts ORDER BY hostid'
+				: 'SELECT * FROM triggers ORDER BY triggerid';
+			$old_hash = CDBHelper::getHash($sql);
+		}
+
+		if ($object === 'host' || $object === 'template') {
+			$locator = 'id:'.$object.'sForm';
+			$fields = [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers'];
+		}
+		else {
+			$locator = 'name:triggersForm';
+			$fields = ['Name' => $data['name'], 'Expression' => $expression];
+		}
 
 		$this->page->login()->open($this->link);
-		$this->query('button:Create '.$object)->waitUntilPresent()->one()->click();
-
-		$locator = ($object === 'host' || $object === 'template') ? 'id:'.$object.'sForm' : 'name:triggersForm' ;
+		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
 		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
-
-		$fields = ($object === 'host' || $object === 'template')
-			? [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers']
-			: ['Name' => $data['name'], 'Expression' => $expression];
-
 		$form->fill($fields);
 
 		$form->selectTab('Tags');
@@ -194,6 +199,7 @@ class testFormTags extends CWebTest {
 				// Check the results in form.
 				$this->checkTagFields($data, $object, $form);
 				break;
+
 			case TEST_BAD:
 				$error_details = ($object === 'host' || $object === 'template')
 					? $data['error_details']
@@ -282,15 +288,17 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger or prototype
 	 */
 	public function checkTagsUpdate($data, $object) {
-		$sql = ($object === 'host' || $object === 'template')
-			? 'SELECT * FROM hosts ORDER BY hostid'
-			: 'SELECT * FROM triggers ORDER BY triggerid';
-		$old_hash = CDBHelper::getHash($sql);
+		if ($data['expected'] === TEST_BAD) {
+			$sql = ($object === 'host' || $object === 'template')
+				? 'SELECT * FROM hosts ORDER BY hostid'
+				: 'SELECT * FROM triggers ORDER BY triggerid';
+			$old_hash = CDBHelper::getHash($sql);
+		}
 
 		$data['name'] = $this->update_name;
 
 		$this->page->login()->open($this->link);
-		$this->query('link', $this->update_name)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 
 		$locator = ($object === 'host' || $object === 'template') ? 'id:'.$object.'sForm' : 'name:triggersForm' ;
 		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
@@ -312,6 +320,7 @@ class testFormTags extends CWebTest {
 				// Check the results in form.
 				$this->checkTagFields($data, $object, $form);
 				break;
+
 			case TEST_BAD:
 				$error_details = ($object === 'host' || $object === 'template')
 					? $data['error_details']
@@ -334,50 +343,41 @@ class testFormTags extends CWebTest {
 		$new_name = $object.$action;
 
 		$this->page->login()->open($this->link);
-		$this->query('link', $this->clone_name)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
-		$locator = ($object === 'host' || $object === 'template') ? 'id:'.$object.'sForm' : 'name:triggersForm' ;
+		if ($object === 'host' || $object === 'template') {
+			$locator = 'id:'.$object.'sForm';
+			$fields = [ucfirst($object).' name' => $new_name];
+			$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
+			$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
+			$name = ucfirst($object).' name';
+		}
+		else {
+			$locator = 'name:triggersForm';
+			$fields = ['Name' => $new_name];
+			$sql_old_name = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name);
+			$sql_new_name = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name);
+			$name = 'Name';
+		}
+
 		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
-
-		$fields = ($object === 'host' || $object === 'template')
-			? [ucfirst($object).' name' => $new_name]
-			: ['Name' => $new_name];
-
 		$form->fill($fields);
-
 		$form->selectTab('Tags');
 		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
-
 		$this->query('button:'.$action)->one()->click();
 		$form->submit();
 		$this->page->waitUntilReady();
-
 		$this->assertMessage(TEST_GOOD, ucfirst($object).' added');
 
 		// Check the results in DB.
-		$sql_old_name = ($object === 'host' || $object === 'template')
-			? 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name)
-			: 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name);
-
 		$this->assertEquals(1, CDBHelper::getCount($sql_old_name));
-
-		$sql_new_name = ($object === 'host' || $object === 'template')
-			? 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name)
-			: 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name);
-
 		$this->assertEquals(1, CDBHelper::getCount($sql_new_name));
 
 		// Check created clone.
 		$this->query('link', $new_name)->one()->click();
 		$form->invalidate();
-
-		$name = ($object === 'host' || $object === 'template')
-			? ucfirst($object).' name'
-			: 'Name';
-
 		$this->assertEquals($new_name, $form->getField($name)->getValue());
-
 		$form->selectTab('Tags');
 		$element->checkValue($tags);
 	}
