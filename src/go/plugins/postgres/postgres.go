@@ -34,7 +34,7 @@ const (
 	pluginName = "Postgres"
 	sqlExt     = ".sql"
 	hkInterval = 10
-	// Common params: [connString][,user][,password][,database]
+	// Common params: [connString][,user][,password][,database].
 	commonParamsNum = 4
 )
 

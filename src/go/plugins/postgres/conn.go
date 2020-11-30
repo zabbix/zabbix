@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net"
 	"strconv"
@@ -28,8 +29,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/omeid/go-yarn"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/zbxerr"
@@ -41,16 +42,16 @@ var errorQueryNotFound = "query %q not found"
 
 type PostgresClient interface {
 	PostgresVersion() int
-	QueryRow(ctx context.Context, query string, args ...interface{}) (row pgx.Row, err error)
-	QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row pgx.Row, err error)
-	Query(ctx context.Context, query string, args ...interface{}) (row pgx.Rows, err error)
-	QueryByName(ctx context.Context, queryName string, args ...interface{}) (row pgx.Rows, err error)
+	QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error)
+	QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error)
+	Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error)
+	QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error)
 }
 
 // PostgresConn holds pointer to the Pool of Postgres Instance.
 type PostgresConn struct {
 	sync.Mutex
-	postgresPool   *pgxpool.Pool
+	client         *sql.DB
 	timeout        time.Duration
 	ctx            context.Context
 	lastTimeAccess time.Time
@@ -65,8 +66,8 @@ func (conn *PostgresConn) PostgresVersion() int {
 }
 
 // QueryRow wraps pgxpool.QueryRow.
-func (conn *PostgresConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row pgx.Row, err error) {
-	row = conn.postgresPool.QueryRow(ctx, query, args...)
+func (conn *PostgresConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error) {
+	row = conn.client.QueryRowContext(ctx, query, args...)
 
 	if ctxErr := ctx.Err(); ctxErr != nil {
 		return row, ctxErr
@@ -76,7 +77,7 @@ func (conn *PostgresConn) QueryRow(ctx context.Context, query string, args ...in
 }
 
 // QueryRowByName executes a query from queryStorage by its name and returns a singe row.
-func (conn *PostgresConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row pgx.Row, err error) {
+func (conn *PostgresConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
@@ -87,8 +88,8 @@ func (conn *PostgresConn) QueryRowByName(ctx context.Context, queryName string, 
 }
 
 // Query wraps pgxpool.Query.
-func (conn *PostgresConn) Query(ctx context.Context, query string, args ...interface{}) (rows pgx.Rows, err error) {
-	rows, err = conn.postgresPool.Query(ctx, query, args...)
+func (conn *PostgresConn) Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
+	rows, err = conn.client.QueryContext(ctx, query, args...)
 
 	if ctxErr := ctx.Err(); ctxErr != nil {
 		return rows, ctxErr
@@ -98,7 +99,7 @@ func (conn *PostgresConn) Query(ctx context.Context, query string, args ...inter
 }
 
 // QueryByName executes a query from queryStorage by its name and returns a singe row.
-func (conn *PostgresConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows pgx.Rows, err error) {
+func (conn *PostgresConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
@@ -113,18 +114,24 @@ func (conn *PostgresConn) updateAccessTime() {
 	conn.lastTimeAccess = time.Now()
 }
 
+func openPgxStd(config *pgxpool.Config) (*sql.DB, error) {
+	db := stdlib.OpenDB(*config.ConnConfig)
+
+	return db, db.Ping()
+}
+
 func (conn *PostgresConn) finalize() (err error) {
 	conn.Lock()
 	defer conn.Unlock()
 
-	if conn.postgresPool != nil {
+	if conn.client != nil {
 		return
 	}
 
 	// get conn pool using url created in postgres.go
 	config, err := pgxpool.ParseConfig(conn.connString)
 	if err != nil {
-		return fmt.Errorf(err.Error(), conn.connString)
+		return err
 	}
 
 	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
@@ -138,7 +145,8 @@ func (conn *PostgresConn) finalize() (err error) {
 		return conn, err
 	}
 
-	newConn, err := pgxpool.ConnectConfig(context.Background(), config)
+	newConn, err := openPgxStd(config)
+
 	if err != nil {
 		return
 	}
@@ -164,7 +172,7 @@ func (conn *PostgresConn) finalize() (err error) {
 	}
 
 	conn.version = version
-	conn.postgresPool = newConn
+	conn.client = newConn
 	conn.ctx = context.Background()
 
 	return nil
@@ -174,9 +182,9 @@ func (conn *PostgresConn) close() {
 	conn.Lock()
 	defer conn.Unlock()
 
-	if conn.postgresPool != nil {
-		conn.postgresPool.Close()
-		conn.postgresPool = nil
+	if conn.client != nil {
+		conn.client.Close()
+		conn.client = nil
 	}
 }
 
@@ -232,7 +240,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 func (c *ConnManager) closeAll() {
 	c.connMutex.Lock()
 	for uri, conn := range c.connections {
-		conn.postgresPool.Close()
+		conn.client.Close()
 		delete(c.connections, uri)
 	}
 	c.connMutex.Unlock()
@@ -286,8 +294,8 @@ func (c *ConnManager) GetPostgresConnection(connString string) (conn *PostgresCo
 }
 
 // GetPostgresVersion exec query to get PG version from PG we connected to.
-func GetPostgresVersion(conn *pgxpool.Pool) (versionPG string, err error) {
-	err = conn.QueryRow(context.Background(), "select current_setting('server_version_num');").Scan(&versionPG)
+func GetPostgresVersion(conn *sql.DB) (versionPG string, err error) {
+	err = conn.QueryRow("select current_setting('server_version_num');").Scan(&versionPG)
 	if err != nil {
 		return versionPG, err
 	}

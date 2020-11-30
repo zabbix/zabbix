@@ -63,7 +63,7 @@ func (u *URI) User() string {
 // URI creates connection uri string as
 // https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 // postgresql://[user[:password]@][netloc][:port][,...][/dbname][?param1=value1&...]
-// for unix socket host=socket_name as param
+// for unix socket host=socket_name as param.
 func (u *URI) URI() string {
 	if len(u.user) == 0 && len(u.password) == 0 {
 		return "postgresql" + "://" + u.Addr()

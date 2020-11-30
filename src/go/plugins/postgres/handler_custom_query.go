@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -37,7 +38,7 @@ const (
 func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
 	var (
 		err  error
-		rows pgx.Rows
+		rows *sql.Rows
 		data []string
 	)
 	// for now we are expecting at least one parameter
@@ -62,14 +63,12 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 	}
 	defer rows.Close()
 
-	fields := rows.FieldDescriptions()
-
-	columnNames := make([]string, len(fields))
-	for i, fd := range fields {
-		columnNames[i] = string(fd.Name)
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	values := make([]interface{}, len(columnNames))
+	values := make([]interface{}, len(columns))
 	valuePointers := make([]interface{}, len(values))
 
 	for i := range values {
@@ -89,7 +88,7 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 		}
 
 		for i, value := range values {
-			results[columnNames[i]] = value
+			results[columns[i]] = value
 		}
 
 		jsonRes, _ := json.Marshal(results)

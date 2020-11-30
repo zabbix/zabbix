@@ -22,14 +22,12 @@
 package postgres
 
 import (
-	"context"
+	"database/sql"
 	"strconv"
 	"testing"
 	"time"
 
 	"zabbix.com/pkg/log"
-
-	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 var sharedConn *PostgresConn
@@ -40,28 +38,29 @@ func getConnPool(t testing.TB) (*PostgresConn, error) {
 
 func сreateConnection() error {
 	connString := "postgresql://postgres:postgres@localhost:5432/postgres"
-	newConn, err := pgxpool.Connect(context.Background(), connString)
 
+	newConn, err := sql.Open("pgx", connString)
 	if err != nil {
 		log.Critf("[сreateConnection] cannot create connection to Postgres: %s", err.Error())
+
 		return err
 	}
 
 	versionPG, err := GetPostgresVersion(newConn)
-
 	if err != nil {
 		log.Critf("[сreateConnection] cannot get Postgres version: %s", err.Error())
+
 		return err
 	}
 
 	version, err := strconv.Atoi(versionPG)
-
 	if err != nil {
 		log.Critf("[сreateConnection] invalid Postgres version: %s", err.Error())
+
 		return err
 	}
 
-	sharedConn = &PostgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
+	sharedConn = &PostgresConn{client: newConn, lastTimeAccess: time.Now(), version: version, connString: connString, timeout: 30}
 
 	return nil
 }
