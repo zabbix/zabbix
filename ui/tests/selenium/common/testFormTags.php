@@ -71,7 +71,8 @@ class testFormTags extends CWebTest {
 						],
 						[
 							'tag' => '{$MACRO}',
-							'value' => '{$MACRO}'],
+							'value' => '{$MACRO}'
+						],
 						[
 							'tag' => 'Таг',
 							'value' => 'Значение'
@@ -127,7 +128,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details'=>'Incorrect value for field "tag": cannot be empty.',
+					'trigger_error_details' => 'Incorrect value for field "tag": cannot be empty.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -163,27 +164,22 @@ class testFormTags extends CWebTest {
 	 * @param string   $expression   trigger or trigger prototype expression
 	 */
 	public function checkTagsCreate($data, $object, $expression = null) {
-		$sql = ($object === 'trigger' || $object === 'trigger prototype')
-			? 'SELECT * FROM triggers ORDER BY triggerid'
-			: 'SELECT * FROM hosts ORDER BY hostid';
-		$old_hash = CDBHelper::getHash($sql);
+		if ($object === 'trigger' || $object === 'trigger prototype') {
+			$sql = 'SELECT * FROM triggers ORDER BY triggerid';
+			$locator = 'name:triggersForm';
+		}
+		else {
+			$sql = 'SELECT * FROM hosts ORDER BY hostid';
+			$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
+		}
+
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash($sql);
+		}
 
 		$this->page->login()->open($this->link);
-		$this->query('button:Create '.$object)->waitUntilPresent()->one()->click();
-
-		switch ($object) {
-			case 'host':
-			case 'template':
-			case 'trigger':
-				$form = $this->query('name:'.$object.'sForm')->waitUntilPresent()->asForm()->one();
-				break;
-			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
-				break;
-			case 'trigger prototype':
-				$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
-				break;
-		}
+		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
+		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
 
 		$fields = ($object === 'host' || $object === 'template')
 			? [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers']
@@ -216,16 +212,19 @@ class testFormTags extends CWebTest {
 				// Check the results in form.
 				$this->checkTagFields($data, $object, $form);
 				break;
+
 			case TEST_BAD:
 				switch ($object) {
 					case 'host':
 					case 'template':
 						$error_details = $data['error_details'];
 						break;
+
 					case 'trigger':
 					case 'trigger prototype':
 						$error_details = $data['trigger_error_details'];
 						break;
+
 					case 'host prototype':
 						$error_details = $data['host_prototype_error_details'];
 						break;
@@ -252,7 +251,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details'=>'Incorrect value for field "tag": cannot be empty.',
+					'trigger_error_details' => 'Incorrect value for field "tag": cannot be empty.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -316,30 +315,23 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger or prototype
 	 */
 	public function checkTagsUpdate($data, $object) {
-		$sql = ($object === 'trigger' || $object === 'trigger prototype')
-			? 'SELECT * FROM triggers ORDER BY triggerid'
-			: 'SELECT * FROM hosts ORDER BY hostid';
-		$old_hash = CDBHelper::getHash($sql);
-
-		$data['name'] = $this->update_name;
-
-		$this->page->login()->open($this->link);
-		$this->query('link', $this->update_name)->waitUntilPresent()->one()->click();
-
-		switch ($object) {
-			case 'host':
-			case 'template':
-			case 'trigger':
-				$form = $this->query('name:'.$object.'sForm')->waitUntilPresent()->asForm()->one();
-				break;
-			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
-				break;
-			case 'trigger prototype':
-				$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
-				break;
+		if ($object === 'trigger' || $object === 'trigger prototype') {
+			$sql = 'SELECT * FROM triggers ORDER BY triggerid';
+			$locator = 'name:triggersForm';
+		}
+		else {
+			$sql = 'SELECT * FROM hosts ORDER BY hostid';
+			$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
 		}
 
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash($sql);
+		}
+
+		$data['name'] = $this->update_name;
+		$this->page->login()->open($this->link);
+		$this->query('link', $this->update_name)->waitUntilPresent()->one()->click();
+		$form = $this->query($locator)->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
 		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
 		$form->submit();
@@ -357,16 +349,19 @@ class testFormTags extends CWebTest {
 				// Check the results in form.
 				$this->checkTagFields($data, $object, $form);
 				break;
+
 			case TEST_BAD:
 				switch ($object) {
 					case 'host':
 					case 'template':
 						$error_details = $data['error_details'];
 						break;
+
 					case 'trigger':
 					case 'trigger prototype':
 						$error_details = $data['trigger_error_details'];
 						break;
+
 					case 'host prototype':
 						$error_details = $data['host_prototype_error_details'];
 						break;
@@ -389,33 +384,25 @@ class testFormTags extends CWebTest {
 		$new_name = $this->new_name.$action;
 
 		$this->page->login()->open($this->link);
-		$this->query('link', $this->clone_name)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
 		switch ($object) {
-			case 'host':
-			case 'template':
 			case 'trigger':
-				$form = $this->query('name:'.$object.'sForm')->waitUntilPresent()->asForm()->one();
-				break;
-			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
-				break;
 			case 'trigger prototype':
-				$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
+				$form = $this->query('name:triggersForm')->asForm()->waitUntilPresent()->one();
+				$form->fill(['Name' => $new_name]);
 				break;
-		}
 
-		switch ($object) {
 			case 'host':
 			case 'host prototype':
+				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:hostsForm';
+				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
 				$form->fill(['Host name' => $new_name]);
 				break;
+
 			case 'template':
+				$form = $this->query('name:templatesForm')->asForm()->waitUntilPresent()->one();
 				$form->fill(['Template name' => $new_name]);
-				break;
-			case 'trigger prototype':
-			case 'trigger':
-				$form->fill(['Name' => $new_name]);
 				break;
 		}
 
@@ -451,9 +438,11 @@ class testFormTags extends CWebTest {
 			case 'host prototype':
 				$this->assertEquals($new_name, $form->getField('Host name')->getValue());
 				break;
+
 			case 'template':
 				$this->assertEquals($new_name, $form->getField('Template name')->getValue());
 				break;
+
 			case 'trigger prototype':
 			case 'trigger':
 				$this->assertEquals($new_name, $form->getField('Name')->getValue());
