@@ -179,7 +179,7 @@ class testFormTags extends CWebTest {
 
 		$this->page->login()->open($this->link);
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
-		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($locator)->asForm()->waitUntilPresent()->one();
 		$form->fill($fields);
 
 		$form->selectTab('Tags');
@@ -301,7 +301,7 @@ class testFormTags extends CWebTest {
 		$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 
 		$locator = ($object === 'host' || $object === 'template') ? 'id:'.$object.'sForm' : 'name:triggersForm' ;
-		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($locator)->asForm()->waitUntilPresent()->one();
 
 		$form->selectTab('Tags');
 		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
@@ -360,7 +360,7 @@ class testFormTags extends CWebTest {
 			$name = 'Name';
 		}
 
-		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
+		$form = $this->query($locator)->asForm()->waitUntilPresent()->one();
 		$form->fill($fields);
 		$form->selectTab('Tags');
 		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
