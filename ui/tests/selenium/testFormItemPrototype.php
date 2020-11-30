@@ -944,10 +944,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestDropdownHasOptions('valuemapid', $options);
 			}
 			else {
-				$this->zbxTestAssertVisibleId('label-valuemap');
-				$this->zbxTestAssertAttribute("//input[@id='label-valuemap']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='label-valuemap']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='label-valuemap']", 'readonly');
+				$this->zbxTestAssertVisibleId('valuemapid');
+				$this->zbxTestAssertAttribute("//z-select[@id='valuemapid']", 'readonly');
 			}
 		}
 		else {

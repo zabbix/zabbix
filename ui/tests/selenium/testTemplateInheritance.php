@@ -397,7 +397,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->zbxTestAssertElementValue('label-valuemap', 'APC Battery Status');
+		$this->zbxTestDropdownAssertSelected('valuemapid', 'APC Battery Status');
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
