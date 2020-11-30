@@ -20,7 +20,12 @@
 
 require_once dirname(__FILE__).'/common/testFormFilter.php';
 
+/**
+ *
+ * @backup profiles
+ */
 class testFormFilterProblems extends testFormFilter {
+
 
 public static function getCheckCreatedFilterData() {
 		return [
@@ -128,7 +133,7 @@ public static function getCheckCreatedFilterData() {
 	}
 
 	/**
-	 * @depends  testFormFilterHosts_CheckCreatedFilter
+	 * @depends  testFormFilterProblems_CheckCreatedFilter
 	 *
 	 * Delete created filters.
 	 */
