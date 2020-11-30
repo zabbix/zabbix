@@ -41,6 +41,7 @@ class CControllerCorrelationEnable extends CController {
 		}
 
 		$correlations = API::Correlation()->get([
+			'output' => [],
 			'countOutput' => true,
 			'correlationids' => $this->getInput('correlationids'),
 			'editable' => true
