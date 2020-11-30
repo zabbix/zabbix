@@ -76,16 +76,13 @@ class CInputSecret extends CInput {
 
 		if ($value !== null) {
 			$passbox = ($maxlength !== null) ? new CPassBox($name, $value, $maxlength) : new CPassBox($name, $value);
-			$node->addItem($passbox->setAttribute('autocomplete', 'off'));
 		}
 		else {
 			$passbox = ($maxlength !== null)
 				? new CPassBox($name, ZBX_SECRET_MASK, $maxlength)
 				: new CPassBox($name, ZBX_SECRET_MASK);
 			$node->addItem([
-				$passbox
-					->setAttribute('disabled', 'disabled')
-					->setAttribute('autocomplete', 'off'),
+				$passbox->setAttribute('disabled', 'disabled'),
 				(new CButton(null, _('Set new value')))
 					->setId(zbx_formatDomId($name.'[btn]'))
 					->setAttribute('disabled', $this->getAttribute('disabled'))

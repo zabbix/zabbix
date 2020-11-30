@@ -64,6 +64,7 @@ zbx_libxml_error_t;
 #define ZBX_REQUEST_ITEM_DESCRIPTION_ORIG	111
 #define ZBX_REQUEST_PROXY_NAME			112
 #define ZBX_REQUEST_PROXY_DESCRIPTION		113
+#define ZBX_REQUEST_ITEM_VALUETYPE		114
 
 /* DBget_history_log_value() */
 #define ZBX_REQUEST_ITEM_LOG_DATE		201
@@ -967,7 +968,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	}
 
 	result = DBselect(
-			"select h.proxy_hostid,h.description,i.itemid,i.name,i.key_,i.description"
+			"select h.proxy_hostid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 			" where i.itemid=" ZBX_FS_UI64, itemid);
@@ -1050,6 +1051,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				}
 				else
 					ret = DBget_host_value(proxy_hostid, replace_to, "description");
+				break;
+			case ZBX_REQUEST_ITEM_VALUETYPE:
+				*replace_to = zbx_strdup(*replace_to, row[6]);
+				ret = SUCCEED;
 				break;
 		}
 	}
@@ -1853,6 +1858,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
+#define MVAR_ITEM_VALUETYPE		"{ITEM.VALUETYPE}"
 #define MVAR_ITEM_ID			"{ITEM.ID}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
 #define MVAR_ITEM_NAME_ORIG		"{ITEM.NAME.ORIG}"
@@ -2046,7 +2052,7 @@ static const char	*ex_macros[] =
 	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_STATE,
-	MVAR_ITEM_VALUE,
+	MVAR_ITEM_VALUE, MVAR_ITEM_VALUETYPE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
 	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
 	NULL
@@ -2995,7 +3001,6 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char 
 						else
 							*replace_to = zbx_strdcat(*replace_to, STR_UNKNOWN_VARIABLE);
 					}
-
 					ZBX_FALLTHROUGH;
 				case ZBX_TOKEN_USER_MACRO:
 				case ZBX_TOKEN_SIMPLE_MACRO:
@@ -3074,9 +3079,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_LLD_MACRO:
-				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				/* neither lld nor {123123} macros are processed by this function, skip them */
 				pos = token.loc.r + 1;
@@ -3127,7 +3130,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				m = NULL;
 				break;
 			case ZBX_TOKEN_REFERENCE:
-				ZBX_FALLTHROUGH;
 			case ZBX_TOKEN_EXPRESSION_MACRO:
 				/* These macros (and probably all other in the future) must be resolved using only */
 				/* information stored in token.data union. For now, force crash if they rely on m. */
@@ -3322,6 +3324,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = get_history_log_value(m, c_event->trigger.expression, &replace_to,
 							N_functionid, c_event->clock, c_event->ns, tz);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_VALUETYPE);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
@@ -3571,6 +3578,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_VALUETYPE);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
@@ -4009,6 +4021,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (0 == strcmp(m, MVAR_ITEM_STATE))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_item_state_string(c_event->value));
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUETYPE))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_ITEM_VALUETYPE);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{

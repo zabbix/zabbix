@@ -38,7 +38,7 @@ extern int get_cpu_num_win32(void);
 #	include "ipc.h"
 #endif
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 #	include "zbxkstat.h"
 #endif
 
@@ -207,7 +207,7 @@ int	init_collector_data(char **error)
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 	if (SUCCEED != zbx_kstat_init(&collector->kstat, error))
 		goto out;
 #endif
@@ -256,7 +256,7 @@ void	free_collector_data(void)
 	zbx_mutex_destroy(&diskstats_lock);
 #endif
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 	zbx_kstat_destroy();
 #endif
 
@@ -473,7 +473,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 			collect_vmstat_data(&collector->vmstat);
 #endif
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 		zbx_kstat_collect(&collector->kstat);
 #endif
 		zbx_setproctitle("collector [idle 1 sec]");

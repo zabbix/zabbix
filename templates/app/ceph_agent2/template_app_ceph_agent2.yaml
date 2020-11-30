@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:32:59Z'
+  date: '2020-10-21T12:49:04Z'
   groups:
     -
       name: Templates/Applications
@@ -1140,7 +1140,7 @@ zabbix_export:
             -
               name: 'Ceph: [{#POOLNAME}] Pool Used'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},bytes_used]'
+              key: 'ceph.pool["{#POOLNAME}",bytes_used]'
               delay: '0'
               history: 7d
               units: B
@@ -1152,13 +1152,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.bytes_used'
+                    - '$.pools["{#POOLNAME}"].bytes_used'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
             -
               name: 'Ceph: [{#POOLNAME}] Max available'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},max_avail]'
+              key: 'ceph.pool["{#POOLNAME}",max_avail]'
               delay: '0'
               history: 7d
               units: B
@@ -1170,13 +1170,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.max_avail'
+                    - '$.pools["{#POOLNAME}"].max_avail'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
             -
               name: 'Ceph: [{#POOLNAME}] Pool objects'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},objects]'
+              key: 'ceph.pool["{#POOLNAME}",objects]'
               delay: '0'
               history: 7d
               description: 'Number of objects in the pool.'
@@ -1187,13 +1187,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.objects'
+                    - '$.pools["{#POOLNAME}"].objects'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
             -
               name: 'Ceph: [{#POOLNAME}] Pool Percent Used'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},percent_used]'
+              key: 'ceph.pool["{#POOLNAME}",percent_used]'
               delay: '0'
               history: 7d
               units: '%'
@@ -1205,13 +1205,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.percent_used'
+                    - '$.pools["{#POOLNAME}"].percent_used'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
             -
               name: 'Ceph: [{#POOLNAME}] Pool Read bandwidth'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},rd_bytes.rate]'
+              key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1224,7 +1224,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.rd_bytes'
+                    - '$.pools["{#POOLNAME}"].rd_bytes'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1234,7 +1234,7 @@ zabbix_export:
             -
               name: 'Ceph: [{#POOLNAME}] Pool Read operations'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},rd_ops.rate]'
+              key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1247,7 +1247,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.rd_ops'
+                    - '$.pools["{#POOLNAME}"].rd_ops'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1257,7 +1257,7 @@ zabbix_export:
             -
               name: 'Ceph: [{#POOLNAME}] Pool RAW Used'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},stored_raw]'
+              key: 'ceph.pool["{#POOLNAME}",stored_raw]'
               delay: '0'
               history: 7d
               units: B
@@ -1269,13 +1269,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.stored_raw'
+                    - '$.pools["{#POOLNAME}"].stored_raw'
               master_item:
                 key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
             -
               name: 'Ceph: [{#POOLNAME}] Pool Write bandwidth'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},wr_bytes.rate]'
+              key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1288,7 +1288,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.wr_bytes'
+                    - '$.pools["{#POOLNAME}"].wr_bytes'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1298,7 +1298,7 @@ zabbix_export:
             -
               name: 'Ceph: [{#POOLNAME}] Pool Write operations'
               type: DEPENDENT
-              key: 'ceph.pool[{#POOLNAME},wr_ops.rate]'
+              key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -1311,7 +1311,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.pools.{#POOLNAME}.wr_ops'
+                    - '$.pools["{#POOLNAME}"].wr_ops'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -1326,13 +1326,13 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},rd_bytes.rate]'
+                    key: 'ceph.pool["{#POOLNAME}",rd_bytes.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},wr_bytes.rate]'
+                    key: 'ceph.pool["{#POOLNAME}",wr_bytes.rate]'
             -
               name: 'Ceph: [{#POOLNAME}] Pool I/O'
               graph_items:
@@ -1340,13 +1340,13 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},rd_ops.rate]'
+                    key: 'ceph.pool["{#POOLNAME}",rd_ops.rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},wr_ops.rate]'
+                    key: 'ceph.pool["{#POOLNAME}",wr_ops.rate]'
             -
               name: 'Ceph: [{#POOLNAME}] Pool Usage'
               graph_items:
@@ -1354,19 +1354,19 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},bytes_used]'
+                    key: 'ceph.pool["{#POOLNAME}",bytes_used]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},max_avail]'
+                    key: 'ceph.pool["{#POOLNAME}",max_avail]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'Ceph by Zabbix Agent2'
-                    key: 'ceph.pool[{#POOLNAME},stored_raw]'
+                    key: 'ceph.pool["{#POOLNAME}",stored_raw]'
       macros:
         -
           macro: '{$CEPH.API.KEY}'

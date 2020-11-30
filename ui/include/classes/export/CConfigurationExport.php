@@ -1239,7 +1239,7 @@ class CConfigurationExport {
 			$image = [
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
-				'encodedImage' => $image['image'],
+				'encodedImage' => $image['image']
 			];
 		}
 		unset($image);

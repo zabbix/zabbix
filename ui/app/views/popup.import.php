@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-include dirname(__FILE__).'/js/conf.import.js.php';
-
 $rulesTable = (new CTable())
 	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')]);
 
@@ -124,7 +122,6 @@ foreach ($titles as $key => $title) {
 	]);
 }
 
-// form list
 $form_list = (new CFormList())
 	->addRow((new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
 		(new CFile('import_file'))
@@ -134,22 +131,31 @@ $form_list = (new CFormList())
 	)
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
-// tab
-$tab_view = (new CTabView())->addTab('importTab', _('Import'), $form_list);
-
-// form
-$tab_view->setFooter(makeFormFooter(
-	new CSubmit('import', _('Import')),
-	[new CRedirectButton(_('Cancel'), $data['backurl'])]
-));
-
 $form = (new CForm('post', null, 'multipart/form-data'))
+	->setId('import-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
-	->addItem($tab_view);
+	->addItem($form_list);
 
-// widget
-(new CWidget())
-	->setTitle(_('Import'))
-	->addItem($form)
-	->show();
+$output = [
+	'header' => $data['title'],
+	'script_inline' => trim($this->readJsFile('popup.import.js.php')),
+	'body' => $form->toString(),
+	'buttons' => [
+		[
+			'title' => _('Import'),
+			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'return confirmSubmit(overlay);'
+		]
+	]
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

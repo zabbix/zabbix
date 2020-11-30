@@ -32,16 +32,14 @@
 		))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 		(new CSpan('#0:'))->addClass('rowNum'),
 		(new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]', null, null, $data['inventory_list']))
-			->setId('iconmap_mappings_#{iconmappingid}_inventory_link')
-			->setAttribute('autocomplete', 'off'),
+			->setId('iconmap_mappings_#{iconmappingid}_inventory_link'),
 		(new CTextBox('iconmap[mappings][#{iconmappingid}][expression]', '', false, 64))
 			->setId('iconmap_mappings_#{iconmappingid}_expression')
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		(new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', null, null, $data['icon_list']))
 			->setId('iconmap_mappings_#{iconmappingid}_iconid')
-			->addClass('mappingIcon')
-			->setAttribute('autocomplete', 'off'),
+			->addClass('mappingIcon'),
 		(new CCol(
 			(new CImg('imgstore.php?iconid='.$data['default_imageid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 				'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))

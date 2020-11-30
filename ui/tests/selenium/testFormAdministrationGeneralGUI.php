@@ -884,12 +884,12 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		return [
 			[
 				[
-					'action' => 'Reset defaults',
+					'action' => 'Reset defaults'
 				]
 			],
 			[
 				[
-					'action' => 'Cancel',
+					'action' => 'Cancel'
 				]
 			]
 		];

@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:49Z'
   media_types:
     -
@@ -140,7 +140,7 @@ zabbix_export:
                 params.event_nseverity = '7';
             }
         
-            var request = new CurlHttpRequest(),
+            var request = new HttpRequest(),
                 facts = [],
                 body = {
                     themeColor: SEVERITY_COLORS[params.event_nseverity].replace('#', ''),
@@ -251,28 +251,28 @@ zabbix_export:
         
             body.sections[0].text = body.sections[0].text.replace(/(?:\r\n|\r|\n)/g, '<br>');
         
-            request.AddHeader('Content-Type: application/json');
+            request.addHeader('Content-Type: application/json');
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy !== '') {
-                request.SetProxy(params.HTTPProxy);
+                request.setProxy(params.HTTPProxy);
             }
         
-            Zabbix.Log(4, '[ MS Teams Webhook ] JSON: ' + JSON.stringify(body));
+            Zabbix.log(4, '[ MS Teams Webhook ] JSON: ' + JSON.stringify(body));
         
-            var response = request.Post(params.teams_endpoint, JSON.stringify(body));
+            var response = request.post(params.teams_endpoint, JSON.stringify(body));
         
-            Zabbix.Log(4, '[ MS Teams Webhook ] Response: ' + response);
+            Zabbix.log(4, '[ MS Teams Webhook ] Response: ' + response);
         
             if (response === '1') {
                 return 'OK';
             }
             else {
-                Zabbix.Log(4, '[ MS Teams Webhook ] FAILED with response: ' + response);
+                Zabbix.log(4, '[ MS Teams Webhook ] FAILED with response: ' + response);
                 throw response;
             }
         }
         catch (error) {
-            Zabbix.Log(3, '[ MS Teams Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ MS Teams Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       message_templates:

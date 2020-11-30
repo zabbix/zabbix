@@ -274,6 +274,14 @@ static zbx_uint64_t	evt_req_chunk_size;
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
 
+#define ZBX_XPATH_HV_IP(nicType, addr)									\
+	ZBX_XPATH_PROP_NAME("config.virtualNicManagerInfo.netConfig")					\
+		"/*[local-name()='VirtualNicManagerNetConfig'][*[local-name()='nicType'][text()='"	\
+		nicType "']]//*[local-name()='ip']/*[local-name()='" addr "']"
+#define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
+#define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")				\
+		"/*[local-name()='ipV6Address']/*[local-name()='ipAddress']"
+
 #define ZBX_XPATH_EVT_INFO(param)									\
 	"*[local-name()='" param "']/*[local-name()='name']"
 
@@ -348,7 +356,11 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_PROPMAP("summary.storage.committed"),		/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
 	ZBX_PROPMAP("summary.storage.unshared"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
 	ZBX_PROPMAP("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
-	ZBX_PROPMAP("summary.quickStats.uptimeSeconds")		/* ZBX_VMWARE_VMPROP_UPTIME */
+	ZBX_PROPMAP("summary.quickStats.uptimeSeconds"),	/* ZBX_VMWARE_VMPROP_UPTIME */
+	ZBX_PROPMAP("guest.ipAddress"),				/* ZBX_VMWARE_VMPROP_IPADDRESS */
+	ZBX_PROPMAP("guest.hostName"),				/* ZBX_VMWARE_VMPROP_GUESTHOSTNAME */
+	ZBX_PROPMAP("guest.guestFamily"),			/* ZBX_VMWARE_VMPROP_GUESTFAMILY */
+	ZBX_PROPMAP("guest.guestFullName")			/* ZBX_VMWARE_VMPROP_GUESTFULLNAME */
 };
 
 /* hypervisor hashset support */
@@ -1061,6 +1073,9 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 	if (NULL != hv->parent_type)
 		vmware_shared_strfree(hv->parent_type);
 
+	if (NULL != hv->ip)
+		vmware_shared_strfree(hv->ip);
+
 	vmware_props_shared_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
@@ -1448,9 +1463,8 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
  *                                                                            *
  * Purpose: copies vmware hypervisor object into shared memory                *
  *                                                                            *
- * Parameters: src   - [IN] the vmware hypervisor object                      *
- *                                                                            *
- * Return value: a duplicated vmware hypervisor object                        *
+ * Parameters: dst - [OUT] the vmware hypervisor object into shared memory    *
+ *             src - [IN] the vmware hypervisor object                        *
  *                                                                            *
  ******************************************************************************/
 static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *src)
@@ -1469,7 +1483,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	dst->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_HVPROPS_NUM);
 	dst->datacenter_name = vmware_shared_strdup(src->datacenter_name);
 	dst->parent_name = vmware_shared_strdup(src->parent_name);
-	dst->parent_type= vmware_shared_strdup(src->parent_type);
+	dst->parent_type = vmware_shared_strdup(src->parent_type);
+	dst->ip = vmware_shared_strdup(src->ip);
 
 	for (i = 0; i < src->ds_names.values_num; i++)
 		zbx_vector_str_append(&dst->ds_names, vmware_shared_strdup(src->ds_names.values[i]));
@@ -1690,6 +1705,7 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 	zbx_free(hv->datacenter_name);
 	zbx_free(hv->parent_name);
 	zbx_free(hv->parent_type);
+	zbx_free(hv->ip);
 	vmware_props_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
@@ -2537,7 +2553,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		"</ns0:RetrievePropertiesEx>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char	tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *vmid_esc;
+	char	tmp[MAX_STRING_LEN + ZBX_VMWARE_VMPROPS_NUM * 100], props[MAX_STRING_LEN], *vmid_esc;
 	int	i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __func__, vmid);
@@ -2826,6 +2842,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:pathSet>vm</ns0:pathSet>"					\
 					"<ns0:pathSet>parent</ns0:pathSet>"				\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
+					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
 					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:propSet>"								\
@@ -2849,7 +2866,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char	tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *hvid_esc;
+	char	tmp[MAX_STRING_LEN + ZBX_VMWARE_HVPROPS_NUM * 100], props[MAX_STRING_LEN], *hvid_esc;
 	int	i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __func__, hvid);
@@ -3199,6 +3216,12 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	if (NULL != (value = zbx_xml_read_doc_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
+
+	if (NULL != (value = zbx_xml_read_doc_value(details, ZBX_XPATH_HV_IPV4("management"))) ||
+			NULL != (value = zbx_xml_read_doc_value(details, ZBX_XPATH_HV_IPV6("management"))))
+	{
+		hv->ip = value;
+	}
 
 	if (SUCCEED != vmware_hv_get_parent_data(service, easyhandle, hv, error))
 		goto out;

@@ -45,7 +45,7 @@ func archiveHandler(ctx context.Context, conn OraClient, params []string) (inter
 						'log_sequence' VALUE d.LOG_SEQUENCE,
 						'error'        VALUE NVL(TO_CHAR(d.ERROR), ' ')
 					)
-				)
+				) RETURNING CLOB 
 			)		
 		FROM
 			V$ARCHIVE_DEST d,

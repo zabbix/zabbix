@@ -52,6 +52,7 @@ require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
+require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testPageLowLevelDiscovery.php';
 /*
@@ -96,19 +97,18 @@ require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
+require_once dirname(__FILE__).'/testFormHostLinkTemplates.php';
 require_once dirname(__FILE__).'/testFormHostMacros.php';
 require_once dirname(__FILE__).'/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/testFormHostPrototypeMacros.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
 require_once dirname(__FILE__).'/testFormItemPreprocessing.php';
-// Uncomment after DEV-1718 is ready.
-//require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
+require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormItemPrototypePreprocessing.php';
-// Uncomment after DEV-1718 is ready.
-//require_once dirname(__FILE__).'/testFormItemTestHost.php';
-//require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
+require_once dirname(__FILE__).'/testFormItemTestHost.php';
+require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
@@ -200,6 +200,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
+		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testPageOverview');
 /*
@@ -245,19 +246,18 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
+		$suite->addTestSuite('testFormHostLinkTemplates');
 		$suite->addTestSuite('testFormHostMacros');
 		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testFormHostPrototypeMacros');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
 		$suite->addTestSuite('testFormItemPreprocessing');
-		// Uncomment after DEV-1718 is ready.
-//		$suite->addTestSuite('testFormItemPreprocessingTest');
+		$suite->addTestSuite('testFormItemPreprocessingTest');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormItemPrototypePreprocessing');
-		// Uncomment after DEV-1718 is ready.
-//		$suite->addTestSuite('testFormItemTestHost');
-//		$suite->addTestSuite('testFormItemTestTemplate');
+		$suite->addTestSuite('testFormItemTestHost');
+		$suite->addTestSuite('testFormItemTestTemplate');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');

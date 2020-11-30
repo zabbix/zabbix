@@ -218,7 +218,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						'Selenium user group for tag permissions AAA' => [
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle']
 				]
 			],
 			[
@@ -253,7 +253,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL'],
+					'trigger_names' => ['Trigger for tag permissions MySQL']
 				]
 			],
 			[
@@ -265,7 +265,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle']
 				]
 			]
 		];
@@ -335,7 +335,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions Oracle']
 				]
 			],
 			[
@@ -350,7 +350,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 							]
 						]
 					],
-					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle'],
+					'trigger_names' => ['Trigger for tag permissions MySQL', 'Trigger for tag permissions Oracle']
 				]
 			],
 			[

@@ -1,0 +1,1 @@
+.D.....PS. [ZBXNEXT-782] moved calculated, aggregated and internal checks to new history poller process; moved availability updates to availability manager; removed database connections from pollers, unreachable pollers and Java pollers (vso)
