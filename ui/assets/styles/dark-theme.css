@@ -5989,7 +5989,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background: #2b2b2b;
   z-index: 3; }
 
-.global-macro-table .table-col-value, .global-macro-table .table-col-template-value, .inherited-macros-table .table-col-value, .inherited-macros-table .table-col-template-value {
+.global-macro-table .table-col-value, .global-macro-table .table-col-template-value, .inherited-macros-table .table-col-value, .inherited-macros-table .table-col-template-value, .host-macros-table .table-col-value, .host-macros-table .table-col-template-value {
   width: 300px; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
