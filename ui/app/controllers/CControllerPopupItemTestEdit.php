@@ -97,10 +97,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
 							|| $params_num > 4 || $params_num < 3
 							|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
-							|| !str_in_array($item_key_parser->getParam(2), ['last', 'min', 'max', 'avg', 'sum',
-									'count'
-								])
-					) {
+							|| !str_in_array($item_key_parser->getParam(2),
+									['last', 'min', 'max', 'avg', 'sum', 'count'])) {
 						error(_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
 							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()
 						));
