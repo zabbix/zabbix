@@ -41,7 +41,7 @@ $table = (new CTable())
 		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
 		(new CTableColumn(_('Value')))->addClass('table-col-value'),
 		(new CTableColumn(_('Description')))->addClass('table-col-description'),
-		(new CTableColumn(''))->addClass('table-col-action')
+		(new CTableColumn())->addClass('table-col-action')
 	]);
 
 foreach ($data['macros'] as $i => $macro) {

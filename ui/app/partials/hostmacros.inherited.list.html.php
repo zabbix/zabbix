@@ -48,11 +48,11 @@ else {
 		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
 		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
 		(new CTableColumn($data['readonly'] ? null : ''))->addClass('table-col-action'),
-		$is_hostprototype ? (new CTableColumn(''))->addClass('table-col-arrow') : null,
+		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
 		$is_hostprototype ? (new CTableColumn())->addClass('table-col-parent-value') : null,
-		(new CTableColumn(''))->addClass('table-col-arrow'),
+		(new CTableColumn())->addClass('table-col-arrow'),
 		(new CTableColumn(_('Template value')))->addClass('table-col-template-value'),
-		(new CTableColumn(''))->addClass('table-col-arrow'),
+		(new CTableColumn())->addClass('table-col-arrow'),
 		(new CTableColumn([_('Global value'), $link]))->addClass('table-col-global-value')
 	]);
 
