@@ -682,84 +682,84 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 122
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 123
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_HISTORY
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 124
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_HISTORY
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 125
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 126
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 127
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 128
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 129
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 130
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 131
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 132
     access: DIRECT
     type: ITEM_TYPE_INTERNAL
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 157
     access: DIRECT
     type: ITEM_TYPE_ZABBIX_ACTIVE
@@ -850,84 +850,84 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 170
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 171
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 172
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 173
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 174
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 175
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 176
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 177
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 178
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 179
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 180
     access: DIRECT
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 181
     access: DIRECT
     type: ITEM_TYPE_HTTPTEST
@@ -1522,84 +1522,84 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 266
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 267
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 268
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 269
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 270
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 271
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 272
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 273
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 274
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 275
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 276
     access: DIRECT
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 277
     access: DIRECT
     type: ITEM_TYPE_JMX
@@ -2786,84 +2786,84 @@ in:
     key: zabbix[host,,items]
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 146
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 147
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_HISTORY
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 148
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_HISTORY
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 149
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 150
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 151
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 152
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 153
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 154
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 155
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 156
     access: PROXY
     type: ITEM_TYPE_INTERNAL
     key: zabbix[host,,items]
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 157
     access: PROXY
     type: ITEM_TYPE_INTERNAL
@@ -3206,84 +3206,84 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 230
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 231
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 232
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 233
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 234
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 235
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 236
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 237
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 238
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 239
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 240
     access: PROXY
     type: ITEM_TYPE_AGGREGATE
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 241
     access: PROXY
     type: ITEM_TYPE_HTTPTEST
@@ -4298,84 +4298,84 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 386
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 387
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 388
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_NORMAL
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 389
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 390
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 391
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 392
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 393
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 394
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 395
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 396
     access: PROXY
     type: ITEM_TYPE_CALCULATED
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_HISTORY
   - ref: 397
     access: PROXY
     type: ITEM_TYPE_JMX

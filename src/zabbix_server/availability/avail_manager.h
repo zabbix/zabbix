@@ -17,13 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SIGHANDLER_H
-#define ZABBIX_SIGHANDLER_H
+#ifndef ZABBIX_AVAIL_MANAGER_H
+#define ZABBIX_AVAIL_MANAGER_H
 
-void	zbx_set_common_signal_handlers(void);
-void	zbx_set_child_signal_handler(void);
-void	zbx_set_metric_thread_signal_handler(void);
-void	zbx_block_signals(sigset_t *orig_mask);
-void	zbx_unblock_signals(const sigset_t *orig_mask);
+#include "common.h"
+#include "threads.h"
+
+ZBX_THREAD_ENTRY(availability_manager_thread, args);
 
 #endif

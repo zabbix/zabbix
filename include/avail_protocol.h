@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SIGHANDLER_H
-#define ZABBIX_SIGHANDLER_H
+#ifndef ZABBIX_AVAIL_PROTOCOL_H
+#define ZABBIX_AVAIL_PROTOCOL_H
 
-void	zbx_set_common_signal_handlers(void);
-void	zbx_set_child_signal_handler(void);
-void	zbx_set_metric_thread_signal_handler(void);
-void	zbx_block_signals(sigset_t *orig_mask);
-void	zbx_unblock_signals(const sigset_t *orig_mask);
+#include "common.h"
+#include "db.h"
+#include "zbxalgo.h"
 
+void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_host_availability_t *host_availability);
+void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *host_availabilities);
 #endif
