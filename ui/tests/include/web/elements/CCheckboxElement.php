@@ -36,6 +36,13 @@ class CCheckboxElement extends CElement {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function isVisible($visible = true) {
+		return $this->parents()->query('tag:label')->one(false)->isVisible($visible);
+	}
+
+	/**
 	 * Set checkbox state.
 	 *
 	 * @param boolean $checked    checked or not

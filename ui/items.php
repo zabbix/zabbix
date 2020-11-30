@@ -645,7 +645,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'applications' => $applications,
 				'inventory_link' => getRequest('inventory_link', 0),
 				'description' => getRequest('description', ''),
-				'status' => getRequest('status', ITEM_STATUS_DISABLED),
+				'status' => getRequest('status', ITEM_STATUS_DISABLED)
 			];
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {

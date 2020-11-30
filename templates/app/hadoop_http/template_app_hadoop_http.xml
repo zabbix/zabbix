@@ -1,0 +1,1705 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-11-19T14:30:08Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App Hadoop by HTTP</template>
+         <name>Template App Hadoop by HTTP</name>
+         <description>The template gets the Hadoop metrics from cluster's hosts (ResourceManager, NodeManagers, NameNode, DataNodes) by HTTP agent. You should define the IP address (or FQDN) and Web-UI port for the ResourceManager in {$HADOOP.RESOURCEMANAGER.HOST} and {$HADOOP.RESOURCEMANAGER.PORT} macros and for the NameNode in {$HADOOP.NAMENODE.HOST} and {$HADOOP.NAMENODE.PORT} macros respectively. Macros can be set in the template or overridden at the host level.&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/413459-discussion-thread-for-official-zabbix-template-hadoop&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Hadoop</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Get DataNodes states</name>
+               <type>HTTP_AGENT</type>
+               <key>hadoop.datanodes.get</key>
+               <history>0h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>try {
+  parsed = JSON.parse(value);
+  var result = [];
+
+  function getNodes(nodes, state) {
+      Object.keys(nodes).forEach(function (field) {
+          var Node = {};
+          Node['HostName'] = field || '';
+          Node['adminState'] = nodes[field].adminState || '';
+          Node['operState'] = state || '';
+          Node['version'] = nodes[field].version || '';
+          result.push(Node);
+      });
+  }
+
+  getNodes(JSON.parse(parsed.beans[0].LiveNodes), 'Live');
+  getNodes(JSON.parse(parsed.beans[0].DeadNodes), 'Dead');
+  getNodes(JSON.parse(parsed.beans[0].DecomNodes), 'Decommission');
+  getNodes(JSON.parse(parsed.beans[0].EnteringMaintenanceNodes), 'Maintenance');
+
+  return JSON.stringify(result);
+}
+catch (error) {
+  throw 'Failed to process response received from Hadoop';
+}
+</params>
+                  </step>
+               </preprocessing>
+               <url>{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo</url>
+            </item>
+            <item>
+               <name>NameNode: Blocks allocable</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.block_capacity</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Maximum number of blocks allocable.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].BlockCapacity.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Total blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.blocks_total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of blocks tracked by NameNode.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].BlocksTotal.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Capacity remaining</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.capacity_remaining</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>Available capacity.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].CapacityRemaining.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Corrupt blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.corrupt_blocks</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of corrupt blocks.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].CorruptBlocks.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Total files</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.files_total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Total count of files tracked by the NameNode.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].FilesTotal.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Get NameNode stats</name>
+               <type>HTTP_AGENT</type>
+               <key>hadoop.namenode.get</key>
+               <history>0h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx</url>
+            </item>
+            <item>
+               <name>NameNode: Missing blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.missing_blocks</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of missing blocks.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].MissingBlocks.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)}&gt;0</expression>
+                     <name>NameNode: Cluster has missing blocks</name>
+                     <priority>AVERAGE</priority>
+                     <description>A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Dead DataNodes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.num_dead_data_nodes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of dead DataNodes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumDeadDataNodes.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;0</expression>
+                     <name>NameNode: Cluster has DataNodes in Dead state</name>
+                     <priority>AVERAGE</priority>
+                     <description>The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Alive DataNodes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.num_live_data_nodes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Count of alive DataNodes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].NumLiveDataNodes.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Stale DataNodes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.num_stale_data_nodes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].StaleDataNodes.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Block Pool Renaming</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.percent_block_pool_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=NameNodeInfo')].PercentBlockPoolUsed.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Percent capacity remaining</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.percent_remaining</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Available capacity in percent.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=NameNodeInfo')].PercentRemaining.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(15m)}&lt;{$HADOOP.CAPACITY_REMAINING.MIN.WARN}</expression>
+                     <name>NameNode: Cluster capacity remaining is low (below {$HADOOP.CAPACITY_REMAINING.MIN.WARN}% for 15m)</name>
+                     <priority>WARNING</priority>
+                     <description>A good practice is to ensure that disk use never exceeds 80 percent capacity.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: RPC queue &amp; processing time</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.rpc_processing_time_avg</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Average time spent on processing RPC requests.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=RpcActivityForPort9000')].RpcProcessingTimeAvgTime.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Total load</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.total_load</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The current number of concurrent file accesses (read/write) across all DataNodes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].TotalLoad.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Transactions since last checkpoint</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.transactions_since_last_checkpoint</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Total number of transactions since last checkpoint.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].TransactionsSinceLastCheckpoint.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Under-replicated blocks</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.under_replicated_blocks</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of blocks with insufficient replication.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].UnderReplicatedBlocks.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>NameNode: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>NameNode: Service has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>NameNode: Failed to fetch NameNode API page (or no data for 30m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>NameNode: Service is unavailable</name>
+                           <expression>{Template App Hadoop by HTTP:net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Failed volumes</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.namenode.volume_failures_total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of failed volumes.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=NameNode,name=FSNamesystem')].VolumeFailuresTotal.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.namenode.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)}&gt;0</expression>
+                     <name>NameNode: Cluster has volume failures</name>
+                     <priority>AVERAGE</priority>
+                     <description>HDFS now allows for disks to fail in place, without affecting DataNode operations, until a threshold value is reached. This is set on each DataNode via the dfs.datanode.failed.volumes.tolerated property; it defaults to 0, meaning that any volume failure will shut down the DataNode; on a production cluster where DataNodes typically have 6, 8, or 12 disks, setting this parameter to 1 or 2 is typically the best practice.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Get NodeManagers states</name>
+               <type>HTTP_AGENT</type>
+               <key>hadoop.nodemanagers.get</key>
+               <history>0h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(JSON.parse(JSON.parse(value).beans[0].LiveNodeManagers))</params>
+                  </step>
+               </preprocessing>
+               <url>{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo</url>
+            </item>
+            <item>
+               <name>Get ResourceManager stats</name>
+               <type>HTTP_AGENT</type>
+               <key>hadoop.resourcemanager.get</key>
+               <history>0h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx</url>
+            </item>
+            <item>
+               <name>ResourceManager: Active NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_active_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Active NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumActiveNMs.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(5m)}=0</expression>
+                     <name>ResourceManager: Cluster has no active NodeManagers</name>
+                     <priority>HIGH</priority>
+                     <description>Cluster is unable to execute any jobs without at least one NodeManager.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ResourceManager: Decommissioned NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_decommissioned_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Decommissioned NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumDecommissionedNMs.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>ResourceManager: Decommissioning NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_decommissioning_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Decommissioning NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumDecommissioningNMs.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>ResourceManager: Lost NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_lost_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Lost NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumLostNMs.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>ResourceManager: Rebooted NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_rebooted_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Rebooted NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumRebootedNMs.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>ResourceManager: Shutdown NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_shutdown_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Shutdown NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumShutdownNMs.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>ResourceManager: Unhealthy NMs</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.num_unhealthy_nm</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of Unhealthy NodeManagers.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=ClusterMetrics')].NumUnhealthyNMs.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(15m)}&gt;0</expression>
+                     <name>ResourceManager: Cluster has unhealthy NodeManagers</name>
+                     <priority>AVERAGE</priority>
+                     <description>YARN considers any node with disk utilization exceeding the value specified under the property yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage (in yarn-site.xml) to be unhealthy. Ample disk space is critical to ensure uninterrupted operation of a Hadoop cluster, and large numbers of unhealthyNodes (the number to alert on depends on the size of your cluster) should be quickly investigated and resolved.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ResourceManager: RPC queue &amp; processing time</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.rpc_processing_time_avg</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Average time spent on processing RPC requests.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='Hadoop:service=ResourceManager,name=RpcActivityForPort8031')].RpcProcessingTimeAvgTime.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>ResourceManager: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>hadoop.resourcemanager.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>hadoop.resourcemanager.get</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>ResourceManager: Service has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>ResourceManager: Service is unavailable</name>
+                           <expression>{Template App Hadoop by HTTP:net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Service response time</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Hadoop NameNode API performance.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}</expression>
+                     <name>NameNode: Service response time is too high (over {$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN} for 5m)</name>
+                     <priority>WARNING</priority>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>NameNode: Service is unavailable</name>
+                           <expression>{Template App Hadoop by HTTP:net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ResourceManager: Service response time</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Hadoop ResourceManager API performance.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}</expression>
+                     <name>ResourceManager: Service response time is too high (over {$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN} for 5m)</name>
+                     <priority>WARNING</priority>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>ResourceManager: Service is unavailable</name>
+                           <expression>{Template App Hadoop by HTTP:net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>NameNode: Service status</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]</key>
+               <history>7d</history>
+               <description>Hadoop NameNode API port availability.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>NameNode: Service is unavailable</name>
+                     <priority>AVERAGE</priority>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>ResourceManager: Service status</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]</key>
+               <history>7d</history>
+               <description>Hadoop ResourceManager API port availability.</description>
+               <applications>
+                  <application>
+                     <name>Hadoop</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>ResourceManager: Service is unavailable</name>
+                     <priority>AVERAGE</priority>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Data node discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>hadoop.datanode.discovery</key>
+               <delay>1h</delay>
+               <url>{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Admin state</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.admin_state[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Administrative state.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.HostName=='{#HOSTNAME}')].adminState.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanodes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Used</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.dfs_used[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Used disk space.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=DataNode,name=FSDatasetState')].DfsUsed.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Hadoop DataNode {#HOSTNAME}: Get stats</name>
+                     <type>HTTP_AGENT</type>
+                     <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     <history>0h</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <url>{#INFOADDR}/jmx</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: JVM Garbage collection time</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.jvm.gc_time[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!ms</units>
+                     <description>The JVM garbage collection time in milliseconds.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=DataNode,name=JvmMetrics')].GcTimeMillis.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: JVM Heap usage</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.jvm.mem_heap_used[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!MB</units>
+                     <description>The JVM heap usage in MBytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=DataNode,name=JvmMetrics')].MemHeapUsedM.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: JVM Threads</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.jvm.threads[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The number of JVM threads.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='java.lang:type=Threading')].ThreadCount.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Number of failed volumes</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.numfailedvolumes[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of failed storage volumes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=DataNode,name=FSDatasetState')].NumFailedVolumes.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Oper state</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.oper_state[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Operational state.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.HostName=='{#HOSTNAME}')].operState.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanodes.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;&gt;"Live"</expression>
+                           <name>{#HOSTNAME}: DataNode has state {ITEM.VALUE}.</name>
+                           <priority>AVERAGE</priority>
+                           <description>The state is different from normal.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Remaining</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.remaining[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Remaining disk space.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=DataNode,name=FSDatasetState')].Remaining.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Uptime</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.uptime[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanode.get[{#HOSTNAME}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>{#HOSTNAME}: Service has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{nodata(30m)}=1</expression>
+                           <name>{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)</name>
+                           <priority>WARNING</priority>
+                           <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#HOSTNAME}: DataNode has state {ITEM.VALUE}.</name>
+                                 <expression>{Template App Hadoop by HTTP:hadoop.datanode.oper_state[{#HOSTNAME}].last()}&lt;&gt;"Live"</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Version</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.datanode.version[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>DataNode software version.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop DataNode {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.HostName=='{#HOSTNAME}')].version.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.datanodes.get</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#HOSTNAME}: DataNode {#HOSTNAME} DFS size</name>
+                     <type>STACKED</type>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>FILLED_REGION</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Hadoop by HTTP</host>
+                              <key>hadoop.datanode.dfs_used[{#HOSTNAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>FILLED_REGION</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Hadoop by HTTP</host>
+                              <key>hadoop.datanode.remaining[{#HOSTNAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>try{
+  parsed = JSON.parse(value);
+  var result = [];
+
+  function getNodes(nodes) {
+      Object.keys(nodes).forEach(function (field) {
+          var Node = {};
+          Node['{#HOSTNAME}'] = field || '';
+          Node['{#INFOADDR}'] = nodes[field].infoAddr || '';
+          result.push(Node);
+      });
+  }
+
+  getNodes(JSON.parse(parsed.beans[0].LiveNodes));
+  getNodes(JSON.parse(parsed.beans[0].DeadNodes));
+  getNodes(JSON.parse(parsed.beans[0].DecomNodes));
+  getNodes(JSON.parse(parsed.beans[0].EnteringMaintenanceNodes));
+
+  return JSON.stringify(result);
+}
+catch (error) {
+  throw 'Failed to process response received from Hadoop.';
+}
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Node manager discovery</name>
+               <type>HTTP_AGENT</type>
+               <key>hadoop.nodemanager.discovery</key>
+               <delay>1h</delay>
+               <url>{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo</url>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Available memory</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.availablememory[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!MB</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.HostName=='{#HOSTNAME}')].AvailableMemoryMB.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanagers.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Container launch avg duration</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.container_launch_duration_avg[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=NodeManager,name=NodeManagerMetrics')].ContainerLaunchDurationAvgTime.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Hadoop NodeManager {#HOSTNAME}: Get stats</name>
+                     <type>HTTP_AGENT</type>
+                     <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     <history>0h</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <url>{#NODEHTTPADDRESS}/jmx</url>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: JVM Garbage collection time</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.jvm.gc_time[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!ms</units>
+                     <description>The JVM garbage collection time in milliseconds.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=NodeManager,name=JvmMetrics')].GcTimeMillis.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: JVM Heap usage</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.jvm.mem_heap_used[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!MB</units>
+                     <description>The JVM heap usage in MBytes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=NodeManager,name=JvmMetrics')].MemHeapUsedM.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: JVM Threads</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.jvm.threads[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The number of JVM threads.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='java.lang:type=Threading')].ThreadCount.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Number of containers</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.numcontainers[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.HostName=='{#HOSTNAME}')].NumContainers.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanagers.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: RPC queue &amp; processing time</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.rpc_processing_time_avg[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Average time spent on processing RPC requests.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='Hadoop:service=NodeManager,name=RpcActivityForPort8040')].RpcProcessingTimeAvgTime.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: State</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.state[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>State of the node - valid values are: NEW, RUNNING, UNHEALTHY, DECOMMISSIONING, DECOMMISSIONED, LOST, REBOOTED, SHUTDOWN.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.HostName=='{#HOSTNAME}')].State.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanagers.get</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;&gt;"RUNNING"</expression>
+                           <name>{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.</name>
+                           <priority>AVERAGE</priority>
+                           <description>The state is different from normal.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Uptime</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.uptime[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanager.get[{#HOSTNAME}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>{#HOSTNAME}: Service has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{nodata(30m)}=1</expression>
+                           <name>{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)</name>
+                           <priority>WARNING</priority>
+                           <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.</name>
+                                 <expression>{Template App Hadoop by HTTP:hadoop.nodemanager.state[{#HOSTNAME}].last()}&lt;&gt;"RUNNING"</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Used memory</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.usedmemory[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!MB</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.HostName=='{#HOSTNAME}')].UsedMemoryMB.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanagers.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#HOSTNAME}: Version</name>
+                     <type>DEPENDENT</type>
+                     <key>hadoop.nodemanager.version[{#HOSTNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Hadoop NodeManager {#HOSTNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.HostName=='{#HOSTNAME}')].NodeManagerVersion.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>hadoop.nodemanagers.get</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>try {
+  parsed = JSON.parse(value);
+  var result = [];
+
+  function getNodes(nodes) {
+      Object.keys(nodes).forEach(function (field) {
+          var Node = {};
+          Node['{#HOSTNAME}'] = nodes[field].HostName || '';
+          Node['{#NODEHTTPADDRESS}'] = nodes[field].NodeHTTPAddress || '';
+          result.push(Node);
+      });
+  }
+
+  getNodes(JSON.parse(parsed.beans[0].LiveNodeManagers));
+
+  return JSON.stringify(result);
+}
+catch (error) {
+  throw 'Failed to process response received from Hadoop.';
+}
+</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$HADOOP.CAPACITY_REMAINING.MIN.WARN}</macro>
+               <value>20</value>
+               <description>The Hadoop cluster capacity remaining percent for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$HADOOP.NAMENODE.HOST}</macro>
+               <value>NameNode</value>
+               <description>The Hadoop NameNode host IP address or FQDN.</description>
+            </macro>
+            <macro>
+               <macro>{$HADOOP.NAMENODE.PORT}</macro>
+               <value>9870</value>
+               <description>The Hadoop NameNode Web-UI port.</description>
+            </macro>
+            <macro>
+               <macro>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}</macro>
+               <value>10s</value>
+               <description>The Hadoop NameNode API page maximum response time in seconds for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$HADOOP.RESOURCEMANAGER.HOST}</macro>
+               <value>ResourceManager</value>
+               <description>The Hadoop ResourceManager host IP address or FQDN.</description>
+            </macro>
+            <macro>
+               <macro>{$HADOOP.RESOURCEMANAGER.PORT}</macro>
+               <value>8088</value>
+               <description>The Hadoop ResourceManager Web-UI port.</description>
+            </macro>
+            <macro>
+               <macro>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}</macro>
+               <value>10s</value>
+               <description>The Hadoop ResourceManager API page maximum response time in seconds for trigger expression.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

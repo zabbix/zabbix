@@ -149,7 +149,7 @@ function update_config($config) {
 			'max' => 25 * SEC_PER_YEAR,
 			'allow_zero' => false,
 			'message' => _s('Invalid parameter "%1$s": %2$s.', _('Compress records older than'), '%1$s')
-		],
+		]
 	];
 
 	if (array_key_exists('compression_status', $config) && $config['compression_status'] === 0) {

@@ -618,7 +618,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'itemValueType' => $item_value_type,
 			'selectedFunction' => null,
 			'groupid' => $this->getInput('groupid', 0),
-			'hostid' => $this->getInput('hostid', 0),
+			'hostid' => $this->getInput('hostid', 0)
 		];
 
 		// Check if submitted function is usable with selected item.

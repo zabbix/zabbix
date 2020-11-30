@@ -41,7 +41,7 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 						'clock' => strtotime('30 March 2014 6:00'),
 						'value' => 0,
 						'servicealarmid' => 2
-					],
+					]
 				],
 				[
 					// downtime during DST
@@ -81,7 +81,7 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 						'clock' => strtotime('30 March 2014 6:00'),
 						'value' => 0,
 						'servicealarmid' => 2
-					],
+					]
 				],
 				[
 					// downtime during DST

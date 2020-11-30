@@ -90,7 +90,7 @@ class testPageOverview extends CLegacyWebTest {
 					'view_style' => 'Left',
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
-						'Minimum severity' => 'Information',
+						'Minimum severity' => 'Information'
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview'
@@ -107,7 +107,7 @@ class testPageOverview extends CLegacyWebTest {
 					'view_style' => 'Top',
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
-						'Minimum severity' => 'Warning',
+						'Minimum severity' => 'Warning'
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview'
@@ -123,7 +123,7 @@ class testPageOverview extends CLegacyWebTest {
 					'general_filter' => 'Trigger overview',
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
-						'Minimum severity' => 'Average',
+						'Minimum severity' => 'Average'
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview'
@@ -138,7 +138,7 @@ class testPageOverview extends CLegacyWebTest {
 					'general_filter' => 'Trigger overview',
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
-						'Minimum severity' => 'High',
+						'Minimum severity' => 'High'
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview'
@@ -153,7 +153,7 @@ class testPageOverview extends CLegacyWebTest {
 					'general_filter' => 'Trigger overview',
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
-						'Minimum severity' => 'Disaster',
+						'Minimum severity' => 'Disaster'
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview'

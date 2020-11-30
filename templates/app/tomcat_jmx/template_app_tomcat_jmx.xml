@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-11-23T08:33:45Z</date>
+   <groups>
+      <group>
+         <name>Templates/Applications</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template App Apache Tomcat JMX</template>
+         <name>Template App Apache Tomcat JMX</name>
+         <description>The template to monitor Apache Tomcat by Zabbix that work without any external scripts.&#13;
+The metrics are collected by JMX.&#13;
+&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Applications</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Tomcat</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Tomcat: Version</name>
+               <type>JMX</type>
+               <key>jmx["Catalina:type=Server",serverInfo]</key>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <username>{$TOMCAT.USER}</username>
+               <password>{$TOMCAT.PASSWORD}</password>
+               <description>The version of the Tomcat.</description>
+               <applications>
+                  <application>
+                     <name>Tomcat</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Tomcat: Version has been changed</name>
+                     <priority>INFO</priority>
+                     <description>Tomcat version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Protocol handlers discovery</name>
+               <type>JMX</type>
+               <key>jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]</key>
+               <delay>1h</delay>
+               <username>{$TOMCAT.USER}</username>
+               <password>{$TOMCAT.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXATTR}</macro>
+                        <value>^name$</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery for ProtocolHandler</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#JMXVALUE}: Gzip compression status</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},compression]</key>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: ProtocolHandler {#JMXVALUE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{str(off)} = 1</expression>
+                           <name>{#JMXVALUE}: Gzip compression is disabled</name>
+                           <priority>INFO</priority>
+                           <description>gzip compression is disabled for connector {#JMXVALUE}.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Global request processors discovery</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]</key>
+               <delay>1h</delay>
+               <username>{$TOMCAT.USER}</username>
+               <password>{$TOMCAT.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery for GlobalRequesProcessor</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Bytes received per second</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},bytesReceived]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Bytes received rate by processor {#JMXNAME}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Bytes sent per second</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},bytesSent]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Bytes sent rate by processor {#JMXNAME}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Errors per second</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},errorCount]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Error rate of request processor {#JMXNAME}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Requests processing time</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},processingTime]</key>
+                     <history>7d</history>
+                     <units>s</units>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>The total time to process all incoming requests of request processor {#JMXNAME}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Requests per second</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},requestCount]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Rate of requests served by request processor {#JMXNAME}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#JMXNAME}: Traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},bytesSent]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},bytesReceived]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Contexts discovery</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]</key>
+               <delay>1h</delay>
+               <username>{$TOMCAT.USER}</username>
+               <password>{$TOMCAT.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXHOST}</macro>
+                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXHOST}</macro>
+                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery for contexts</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#JMXHOST}{#JMXCONTEXT}: Sessions active</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},activeSessions]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Active sessions of the application.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXHOST}{#JMXCONTEXT}: Sessions active maximum so far</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},maxActive]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Maximum number of active sessions so far.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXHOST}{#JMXCONTEXT}: Sessions allowed maximum</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},maxActiveSessions]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>The maximum number of active Sessions allowed, or -1 for no limit.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},rejectedSessions]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Rate of sessions we rejected due to maxActive being reached.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXHOST}{#JMXCONTEXT}: Sessions created per second</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},sessionCounter]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Rate of sessions created by this application per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: Context {#JMXHOST}{#JMXCONTEXT}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#JMXHOST}{#JMXCONTEXT}: Sessions</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},maxActive]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},activeSessions]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},rejectedSessions]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},maxActiveSessions]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Thread pools discovery</name>
+               <type>JMX</type>
+               <key>jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]</key>
+               <delay>1h</delay>
+               <username>{$TOMCAT.USER}</username>
+               <password>{$TOMCAT.PASSWORD}</password>
+               <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#JMXNAME}</macro>
+                        <value>{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery for ThreadPool</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Threads count</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},currentThreadCount]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Amount of threads the thread pool has right now, both busy and free.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>10m</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Threads busy</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},currentThreadsBusy]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Number of the requests that are being currently handled.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#JMXNAME}: Threads limit</name>
+                     <type>JMX</type>
+                     <key>jmx[{#JMXOBJ},maxThreads]</key>
+                     <history>7d</history>
+                     <username>{$TOMCAT.USER}</username>
+                     <password>{$TOMCAT.PASSWORD}</password>
+                     <description>Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Tomcat: {#JMXTYPE} {#JMXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>10m</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}&gt;{Template App Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100</expression>
+                     <name>{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}</name>
+                     <priority>HIGH</priority>
+                     <description>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</description>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#JMXNAME}: Worker threads</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},maxThreads]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},currentThreadCount]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template App Apache Tomcat JMX</host>
+                              <key>jmx[{#JMXOBJ},currentThreadsBusy]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$TOMCAT.LLD.FILTER.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter for discoverable objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"</description>
+            </macro>
+            <macro>
+               <macro>{$TOMCAT.LLD.FILTER.NOT_MATCHES}</macro>
+               <value>CHANGE IF NEEDED</value>
+               <description>Filter to exclude discovered objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"</description>
+            </macro>
+            <macro>
+               <macro>{$TOMCAT.PASSWORD}</macro>
+               <description>Password for JMX</description>
+            </macro>
+            <macro>
+               <macro>{$TOMCAT.THREADS.MAX.PCT}</macro>
+               <value>75</value>
+               <description>Threshold for busy worker threads trigger. Can be used with {#JMXNAME} as context.</description>
+            </macro>
+            <macro>
+               <macro>{$TOMCAT.THREADS.MAX.TIME}</macro>
+               <value>5m</value>
+               <description>The time during which the number of busy threads can exceed the threshold. Can be used with {#JMXNAME} as context.</description>
+            </macro>
+            <macro>
+               <macro>{$TOMCAT.USER}</macro>
+               <description>User for JMX</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+</zabbix_export>

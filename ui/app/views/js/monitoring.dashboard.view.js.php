@@ -52,7 +52,7 @@
 <?= (new CRow([
 	new CCol([
 		(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
-		'#{name}',
+		'#{name}'
 	]),
 	new CCol(
 		(new CRadioButtonList('users[#{id}][permission]', PERM_READ))
