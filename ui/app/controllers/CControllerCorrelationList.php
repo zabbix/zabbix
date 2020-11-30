@@ -85,14 +85,14 @@ class CControllerCorrelationList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['correlations'] = API::Correlation()->get([
 			'output' => ['correlationid', 'name', 'description', 'status'],
+			'selectFilter' => ['formula', 'conditions', 'evaltype', 'eval_formula'],
+			'selectOperations' => ['type'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 			],
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
-			'selectFilter' => ['formula', 'conditions', 'evaltype', 'eval_formula'],
-			'selectOperations' => ['type'],
 			'editable' => true,
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,

@@ -60,9 +60,9 @@ class CControllerCorrelationEdit extends CController {
 		if ($this->hasInput('correlationid') && !$this->hasInput('form_refresh')) {
 			$correlations = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
-				'correlationids' => $this->getInput('correlationid'),
 				'selectFilter' => ['formula', 'conditions', 'evaltype', 'eval_formula'],
 				'selectOperations' => ['type'],
+				'correlationids' => $this->getInput('correlationid'),
 				'editable' => true
 			]);
 
