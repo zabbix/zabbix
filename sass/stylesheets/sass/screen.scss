@@ -7465,11 +7465,7 @@ z-select,
 
 
 .global-macro-table, .inherited-macros-table {
-	.table-col-value {
-		width: 300px;
-	}
-
-	.table-col-template-value {
+	.table-col-value, .table-col-template-value {
 		width: 300px;
 	}
 }

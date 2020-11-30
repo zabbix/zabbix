@@ -163,7 +163,6 @@ class CMacroValue extends CInput {
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)
-			->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->addItem($elements);
 
 		if ($this->add_post_js) {

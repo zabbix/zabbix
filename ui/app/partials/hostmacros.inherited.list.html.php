@@ -126,7 +126,7 @@ else {
 		if ($is_hostprototype) {
 			$row[] = array_key_exists('parent_host', $macro) ? '&lArr;' : '';
 			$row[] = (new CDiv(array_key_exists('parent_host', $macro) ? '"'.$macro['parent_host']['value'].'"' : null))
-				->setAdaptiveWidth($inherited_width)
+				// ->setAdaptiveWidth($inherited_width)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 		}
 
