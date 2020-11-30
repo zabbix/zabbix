@@ -36,7 +36,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		connMgr.closeUnused()
 		if len(connMgr.connections) != 0 {
-			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
 	})
 }
@@ -51,7 +51,7 @@ func TestConnManager_closeAll(t *testing.T) {
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		connMgr.closeAll()
 		if len(connMgr.connections) != 0 {
-			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
 	})
 }
@@ -70,7 +70,7 @@ func TestConnManager_closeAll(t *testing.T) {
 //
 //	t.Run("Unused connections should have been deleted by housekeeper", func(t *testing.T) {
 //		if len(connMgr.connections) != 0 {
-//			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+//			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 //		}
 //	})
 //}

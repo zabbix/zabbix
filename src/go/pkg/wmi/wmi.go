@@ -83,7 +83,7 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 				r.data = val.Value()
 				return stopErrorCol
 			} else {
-				// remeber deviceid value in the case it was the only selected column
+				// remember deviceid value in the case it was the only selected column
 				deviceID = val.Value()
 			}
 			return
