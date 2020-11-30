@@ -107,13 +107,16 @@ class CControllerCorrelationConditionAdd extends CController {
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 				$hash[] = $condition['tag'];
 				break;
+
 			case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 				$hash[] = $condition['groupid'];
 				break;
+
 			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 				$hash[] = $condition['oldtag'];
 				$hash[] = $condition['newtag'];
 				break;
+
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 				$hash[] = $condition['tag'];
