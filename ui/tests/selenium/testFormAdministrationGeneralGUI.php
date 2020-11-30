@@ -30,7 +30,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public $default = [
 		'Default language' => 'English (en_GB)',
-		'Default time zone' => 'System',
+		'Default time zone' => 'System: (UTC+02:00) Europe/Riga',
 		'Default theme' => 'Blue',
 		'Limit for search and filter results' => '1000',
 		'Max number of columns and rows in overview tables' => '50',
@@ -123,7 +123,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Default language' => 'English (en_US)',
-						'Default time zone' => 'Africa/Bissau',
+						'Default time zone' => '(UTC+00:00) UTC',
 						'Default theme' => 'Dark',
 						'Limit for search and filter results' => '1',
 						'Max number of columns and rows in overview tables' => '5',
@@ -137,7 +137,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					],
 					'db' => [
 						'default_lang' => 'en_US',
-						'default_timezone' => 'Africa/Bissau',
+						'default_timezone' => 'UTC',
 						'default_theme' => 'dark-theme',
 						'search_limit' => 1,
 						'max_overview_table_size' => 5,
@@ -270,14 +270,14 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Default time zone' => 'Europe/Riga',
+						'Default time zone' => 'System: (UTC+02:00) Europe/Riga',
 						'Default theme' => 'High-contrast dark',
 						'Max history display period' => '604800',
 						'Time filter default period' => '315360000',
 						'Max period' => '315360000'
 					],
 					'db' => [
-						'default_timezone' => 'Europe/Riga',
+						'default_timezone' => 'system',
 						'default_theme' => 'hc-dark',
 						'history_period' => '604800',
 						'period_default' => '315360000',
@@ -352,7 +352,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Default time zone' => 'UTC',
+						'Default time zone' => '(UTC+14:00) Pacific/Kiritimati',
 						'Default theme' => 'High-contrast light',
 						'Limit for search and filter results' => '999999',
 						'Max number of columns and rows in overview tables' => '999999',
@@ -362,7 +362,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period' => '10y'
 					],
 					'db' => [
-						'default_timezone' => 'UTC',
+						'default_timezone' => 'Pacific/Kiritimati',
 						'default_theme' => 'hc-light',
 						'search_limit' => 999999,
 						'max_overview_table_size' => 999999,
