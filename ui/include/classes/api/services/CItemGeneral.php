@@ -1719,14 +1719,10 @@ abstract class CItemGeneral extends CApiService {
 			if (array_key_exists('preprocessing', $item)) {
 				$step = 1;
 
-				usort($item['preprocessing'], function () {
-					return (func_get_arg(1)['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 1 : 0;
-				});
-
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
-						'step' => $step++,
+						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],
 						'error_handler' => $preprocessing['error_handler'],
@@ -1756,14 +1752,10 @@ abstract class CItemGeneral extends CApiService {
 				$item_preprocids[] = $item['itemid'];
 				$step = 1;
 
-				usort($item['preprocessing'], function () {
-					return (func_get_arg(1)['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 1 : 0;
-				});
-
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
-						'step' => $step++,
+						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],
 						'error_handler' => $preprocessing['error_handler'],
