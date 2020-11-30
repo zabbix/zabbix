@@ -91,6 +91,22 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
 					$ret = false;
 				}
+				elseif ($this->item_type == ITEM_TYPE_AGGREGATE) {
+					$params_num = $item_key_parser->getParamsNum();
+
+					if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
+							|| $params_num > 4 || $params_num < 3
+							|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
+							|| !str_in_array($item_key_parser->getParam(2), ['last', 'min', 'max', 'avg', 'sum',
+									'count'
+								])
+					) {
+						error(_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
+							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()
+						));
+						$ret = false;
+					}
+				}
 			}
 
 			/*
