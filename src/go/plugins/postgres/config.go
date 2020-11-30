@@ -68,7 +68,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	// if no Timeout was given throught options interface
+	// if no Timeout was given through options interface
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
