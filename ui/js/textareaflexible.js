@@ -65,6 +65,10 @@
 		$(window).scrollTop(scroll_pos);
 	}
 
+	function handleResize() {
+		$(window).resize();
+	}
+
 	var methods = {
 		init: function(options) {
 			var settings = $.extend({}, options);
@@ -75,6 +79,8 @@
 				$textarea
 					.off('input keydown paste', update)
 					.on('input keydown paste', update)
+					.off('focusout', handleResize)
+					.on('focusout', handleResize)
 					.trigger('input');
 			});
 		},
