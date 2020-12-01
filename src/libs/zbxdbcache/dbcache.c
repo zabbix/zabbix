@@ -37,7 +37,7 @@
 #include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
-#include "availability.h"
+#include "zbxavailability.h"
 #include "zbxtrends.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
