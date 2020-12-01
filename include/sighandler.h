@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SIGHANDLER_H
 #define ZABBIX_SIGHANDLER_H
 
-#if defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_set_common_signal_handlers(void);
 void	zbx_set_child_signal_handler(void);
 void	zbx_set_metric_thread_signal_handler(void);
