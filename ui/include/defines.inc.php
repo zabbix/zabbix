@@ -1362,6 +1362,9 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
+define('ZBX_AUTH_TOKEN_ENABLED', 0);
+define('ZBX_AUTH_TOKEN_DISABLED', 1);
+
 define('ZBX_JAN_2038', 2145916800);
 
 define('DAY_IN_YEAR', 365);
