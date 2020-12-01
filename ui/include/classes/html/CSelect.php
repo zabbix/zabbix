@@ -156,6 +156,15 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @return self
+	 */
+	public function setWidthAuto(): self {
+		$this->setAttribute('width', 'auto');
+
+		return $this;
+	}
+
+	/**
 	 * Set custom template for options.
 	 *
 	 * @param string $template
