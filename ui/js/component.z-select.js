@@ -94,8 +94,14 @@ class ZSelect extends HTMLElement {
 				break;
 
 			case 'width':
-				this._button.style.width = `${new_value}px`;
-				this._list.style.width = `${new_value}px`;
+				if (new_value === 'auto') {
+					this.style.width = `100%`;
+					this._button.style.width = `100%`;
+				}
+				else {
+					this.style.width = '';
+					this._button.style.width = `${new_value}px`;
+				}
 				break;
 		}
 	}
@@ -307,6 +313,7 @@ class ZSelect extends HTMLElement {
 				this._list.style.maxHeight = `${space_above - offset_top}px`;
 			}
 		}
+		this._list.style.width = `${this.scrollWidth}px`;
 
 		this._highlight(this._preselected_index);
 

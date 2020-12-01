@@ -1236,7 +1236,8 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		$preproc_types_select = (new CSelect('preprocessing['.$i.'][type]'))
 			->setId('preprocessing_'.$i.'_type')
 			->setValue($step['type'])
-			->setReadonly($readonly);
+			->setReadonly($readonly)
+			->setWidthAuto();
 
 		foreach (get_preprocessing_types(null, true, $types) as $group) {
 			$opt_group = new CSelectOptionGroup($group['label']);
