@@ -152,6 +152,20 @@ class testFormTags extends CWebTest {
 					'trigger_error_details' => 'Tag "tag" with value "value" already exists.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'With trailing spaces',
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => '    trimmed tag    ',
+							'value' => '   trimmed value    '
+						]
+					]
+				]
 			]
 		];
 	}
@@ -269,6 +283,26 @@ class testFormTags extends CWebTest {
 					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
 					'trigger_error_details' => 'Tag "action" with value "update" already exists.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'case_name' => 'With trailing spaces',
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'new tag       ',
+							'value' => '   trimmed value    '
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'tag' => '    trimmed tag    ',
+							'value' => '        new value'
+						]
+					]
 				]
 			],
 			[
@@ -471,6 +505,19 @@ class testFormTags extends CWebTest {
 		$expected = $data['tags'];
 		foreach ($expected as &$tag) {
 			unset($tag['action'], $tag['index']);
+
+			// Remove trailing spaces from tag and value.
+			if (strstr($data['name'], 'With trailing spaces') ||
+						CTestArrayHelper::get($data, 'case_name') === 'With trailing spaces') {
+				foreach ($expected as $i => &$options) {
+					foreach (['tag', 'value'] as $parameter) {
+						if (array_key_exists($parameter, $options)) {
+							$options[$parameter] = trim($options[$parameter]);
+						}
+					}
+				}
+				unset($options);
+			}
 		}
 		unset($tag);
 
