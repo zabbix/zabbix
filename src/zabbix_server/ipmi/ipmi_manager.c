@@ -36,6 +36,7 @@
 #include "ipmi.h"
 
 #include "../poller/poller.h"
+#include "availability.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
@@ -672,15 +673,23 @@ static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, const DC_INTER
  ******************************************************************************/
 static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uint64_t itemid, zbx_timespec_t *ts)
 {
-	DC_ITEM	item;
-	int	errcode;
+	DC_ITEM		item;
+	int		errcode;
+	unsigned char	*data = NULL;
+	size_t		data_alloc = 0, data_offset = 0;
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	zbx_activate_item_interface(&item, ts);
+	zbx_activate_item_interface(ts, &item, &data, &data_alloc, &data_offset);
 	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 
 	DCconfig_clean_items(&item, &errcode, 1);
+
+	if (NULL != data)
+	{
+		zbx_availability_flush(data, data_offset);
+		zbx_free(data);
+	}
 }
 
 /******************************************************************************
@@ -699,15 +708,23 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_uint64_t itemid, zbx_timespec_t *ts,
 		const char *error)
 {
-	DC_ITEM	item;
-	int	errcode;
+	DC_ITEM		item;
+	int		errcode;
+	unsigned char	*data = NULL;
+	size_t		data_alloc = 0, data_offset = 0;
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	zbx_deactivate_item_interface(&item, ts, error);
+	zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, error);
 	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 
 	DCconfig_clean_items(&item, &errcode, 1);
+
+	if (NULL != data)
+	{
+		zbx_availability_flush(data, data_offset);
+		zbx_free(data);
+	}
 }
 
 /******************************************************************************

@@ -29,7 +29,7 @@ class CCollectionValidatorTest extends CValidatorTest {
 				'uniqueField2' => 'field',
 				'messageInvalid' => 'Not an array',
 				'messageEmpty' => 'Empty collection',
-				'messageDuplicate' => 'Collection has duplicate values',
+				'messageDuplicate' => 'Collection has duplicate values'
 			]]
 		];
 	}
@@ -58,7 +58,7 @@ class CCollectionValidatorTest extends CValidatorTest {
 					['type' => 1, 'subtype' => 1],
 					['type' => 1, 'subtype' => 2],
 					['type' => 2, 'subtype' => 1],
-					['type' => 2, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2]
 				]
 			],
 			[
@@ -110,10 +110,10 @@ class CCollectionValidatorTest extends CValidatorTest {
 					['type' => 1, 'subtype' => 1],
 					['type' => 1, 'subtype' => 2],
 					['type' => 2, 'subtype' => 2],
-					['type' => 2, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2]
 				],
 				'Duplicate type "2" and subtype "2"'
-			],
+			]
 		];
 	}
 
@@ -155,10 +155,10 @@ class CCollectionValidatorTest extends CValidatorTest {
 					['type' => 1, 'subtype' => 1],
 					['type' => 1, 'subtype' => 2],
 					['type' => 2, 'subtype' => 2],
-					['type' => 2, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2]
 				],
 				'Duplicate type "2" and subtype "2" for "object"'
-			],
+			]
 		];
 	}
 

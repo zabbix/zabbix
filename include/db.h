@@ -730,15 +730,14 @@ zbx_agent_availability_t;
 typedef struct
 {
 	zbx_uint64_t			interfaceid;
-
 	zbx_agent_availability_t	agent;
+	int				id;	/* ensure chronological order in case of flapping host availability */
 }
 zbx_interface_availability_t;
 
 ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *);
 
-int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql, size_t *sql_alloc,
-		size_t *sql_offset);
+void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 typedef struct

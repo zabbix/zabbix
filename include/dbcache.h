@@ -36,7 +36,8 @@
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_JAVA		4
-#define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
+#define	ZBX_POLLER_TYPE_HISTORY		5
+#define	ZBX_POLLER_TYPE_COUNT		6	/* number of poller types */
 
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
@@ -68,6 +69,7 @@ extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
+extern int	CONFIG_HISTORYPOLLER_FORKS;
 
 typedef struct
 {
@@ -788,7 +790,7 @@ unsigned int	DCget_internal_action_count(void);
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
-int	DCset_interfaces_availability(zbx_vector_ptr_t *availabilities);
+int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
 int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 void	DCupdate_interfaces_availability(void);

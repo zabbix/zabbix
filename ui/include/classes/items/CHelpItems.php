@@ -1171,6 +1171,10 @@ class CHelpItems {
 					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
 				],
 				[
+					'key' => 'zabbix[tcache, cache, <parameter>]',
+					'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests.')
+				],
+				[
 					'key' => 'zabbix[trends]',
 					'description' => _('Number of values stored in table TRENDS.')
 				],

@@ -37,6 +37,8 @@
 #include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
+#include "availability.h"
+#include "zbxtrends.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -3036,6 +3038,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				DCconfig_items_apply_changes(&item_diff);
 				DCmass_update_trends(history, history_num, &trends, &trends_num, compression_age);
 
+				if (0 != trends_num)
+					zbx_tfc_invalidate_trends(trends, trends_num);
+
 				do
 				{
 					DBbegin();
@@ -4558,9 +4563,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 void	DCupdate_interfaces_availability(void)
 {
 	zbx_vector_availability_ptr_t		interfaces;
-	char					*sql_buf = NULL;
-	size_t					sql_buf_alloc = 0, sql_buf_offset = 0;
-	int					i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4569,29 +4571,7 @@ void	DCupdate_interfaces_availability(void)
 	if (SUCCEED != DCreset_interfaces_availability(&interfaces))
 		goto out;
 
-	DBbegin();
-	DBbegin_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-
-	for (i = 0; i < interfaces.values_num; i++)
-	{
-		if (SUCCEED != zbx_sql_add_interface_availability(interfaces.values[i], &sql_buf, &sql_buf_alloc,
-				&sql_buf_offset))
-		{
-			continue;
-		}
-
-		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
-		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-	}
-
-	DBend_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-
-	if (16 < sql_buf_offset)
-		DBexecute("%s", sql_buf);
-
-	DBcommit();
-
-	zbx_free(sql_buf);
+	zbx_availabilities_flush(&interfaces);
 out:
 	zbx_vector_availability_ptr_clear_ext(&interfaces, zbx_interface_availability_free);
 	zbx_vector_availability_ptr_destroy(&interfaces);

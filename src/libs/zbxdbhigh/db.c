@@ -3361,8 +3361,8 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
  *               FAIL    - no interface availability is set                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql, size_t *sql_alloc,
-		size_t *sql_offset)
+static int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql,
+		size_t *sql_alloc, size_t *sql_offset)
 {
 	char		delim = ' ';
 
@@ -3399,6 +3399,55 @@ int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, c
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64, ia->interfaceid);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_update_interface_availabilities                           *
+ *                                                                            *
+ * Purpose: sync interface availabilities updates into database               *
+ *                                                                            *
+ * Parameters: interface_availabilities [IN] the interface availability data  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities)
+{
+	int	txn_error;
+	char	*sql = NULL;
+	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
+	int	i;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	do
+	{
+		size_t	sql_offset = 0;
+
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < interface_availabilities->values_num; i++)
+		{
+			if (SUCCEED != zbx_sql_add_interface_availability(interface_availabilities->values[i], &sql,
+					&sql_alloc, &sql_offset))
+			{
+				continue;
+			}
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+
+		txn_error = DBcommit();
+	}
+	while (ZBX_DB_DOWN == txn_error);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************

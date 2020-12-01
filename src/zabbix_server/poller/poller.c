@@ -45,6 +45,8 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
+#include "avail_protocol.h"
+#include "availability.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -55,33 +57,28 @@ static volatile sig_atomic_t	snmp_cache_reload_requested;
 
 /******************************************************************************
  *                                                                            *
- * Function: db_interface_update_availability                                 *
+ * Function: update_interface_availability                                    *
  *                                                                            *
  * Purpose: write interface availability changes into database                *
  *                                                                            *
- * Parameters: ia    - [IN] the interface availability data                   *
+ * Parameters: data        - [IN/OUT] the serialized availability data        *
+ *             data_alloc  - [IN/OUT] the serialized availability data size   *
+ *             data_alloc  - [IN/OUT] the serialized availability data offset *
+ *             ia          - [IN] the interface availability data             *
  *                                                                            *
  * Return value: SUCCEED - the availability changes were written into db      *
  *               FAIL    - no changes in availability data were detected      *
  *                                                                            *
  ******************************************************************************/
-static int	db_interface_update_availability(const zbx_interface_availability_t *ia)
+static int	update_interface_availability(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_interface_availability_t *ia)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
+	if (FAIL == zbx_interface_availability_is_set(ia))
+		return FAIL;
 
-	if (SUCCEED == zbx_sql_add_interface_availability(ia, &sql, &sql_alloc, &sql_offset))
-	{
-		DBbegin();
-		DBexecute("%s", sql);
-		DBcommit();
+	zbx_availability_serialize(data, data_alloc, data_offset, ia);
 
-		zbx_free(sql);
-
-		return SUCCEED;
-	}
-
-	return FAIL;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -170,11 +167,16 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
  *                                                                              *
  * Purpose: activate item interface                                             *
  *                                                                              *
- * Parameters: item - [IN/OUT] the item                                         *
- *             ts   - [IN] the timestamp                                        *
+ * Parameters: ts         - [IN] the timestamp                                  *
+ *             item       - [IN/OUT] the item                                   *
+ *             data       - [IN/OUT] the serialized availability data           *
+ *             data_alloc - [IN/OUT] the serialized availability data size      *
+ *             data_alloc - [IN/OUT] the serialized availability data offset    *
+ *             ts         - [IN] the timestamp                                  *
  *                                                                              *
  *******************************************************************************/
-void	zbx_activate_item_interface(DC_ITEM *item, zbx_timespec_t *ts)
+void	zbx_activate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned char **data, size_t *data_alloc,
+		size_t *data_offset)
 {
 	zbx_interface_availability_t	in, out;
 
@@ -189,7 +191,7 @@ void	zbx_activate_item_interface(DC_ITEM *item, zbx_timespec_t *ts)
 	if (FAIL == DCinterface_activate(item->interface.interfaceid, ts, &in.agent, &out.agent))
 		goto out;
 
-	if (FAIL == db_interface_update_availability(&out))
+	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
 	interface_set_availability(&item->interface, &out);
@@ -217,12 +219,16 @@ out:
  *                                                                              *
  * Purpose: deactivate item interface                                           *
  *                                                                              *
- * Parameters: item  - [IN/OUT] the item                                        *
- *             ts    - [IN] the timestamp                                       *
- *             error - [IN] the error message                                   *
+ * Parameters: ts         - [IN] the timestamp                                  *
+ *             item       - [IN/OUT] the item                                   *
+ *             data       - [IN/OUT] the serialized availability data           *
+ *             data_alloc - [IN/OUT] the serialized availability data size      *
+ *             data_alloc - [IN/OUT] the serialized availability data offset    *
+ *             ts         - [IN] the timestamp                                  *
  *                                                                              *
  *******************************************************************************/
-void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
+void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset, const char *error)
 {
 	zbx_interface_availability_t	in, out;
 
@@ -240,7 +246,7 @@ void	zbx_deactivate_item_interface(DC_ITEM *item, zbx_timespec_t *ts, const char
 	if (FAIL == DCinterface_deactivate(item->interface.interfaceid, ts, &in.agent, &out.agent, error))
 		goto out;
 
-	if (FAIL == db_interface_update_availability(&out))
+	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
 	interface_set_availability(&item->interface, &out);
@@ -796,6 +802,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_timespec_t		timespec;
 	int			i, num, last_available = INTERFACE_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -824,7 +832,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case AGENT_ERROR:
 				if (INTERFACE_AVAILABLE_TRUE != last_available)
 				{
-					zbx_activate_item_interface(&items[i], &timespec);
+					zbx_activate_item_interface(&timespec, &items[i], &data, &data_alloc,
+							&data_offset);
 					last_available = INTERFACE_AVAILABLE_TRUE;
 				}
 				break;
@@ -833,7 +842,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case TIMEOUT_ERROR:
 				if (INTERFACE_AVAILABLE_FALSE != last_available)
 				{
-					zbx_deactivate_item_interface(&items[i], &timespec, results[i].msg);
+					zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
+							&data_offset, results[i].msg);
 					last_available = INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
@@ -904,6 +914,12 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	DCconfig_clean_items(items, NULL, num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
+
+	if (NULL != data)
+	{
+		zbx_availability_flush(data, data_offset);
+		zbx_free(data);
+	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
@@ -950,10 +966,14 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
 #endif
-	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = time(NULL);
+	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
+	{
+		zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+	}
+	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
+	last_stat_time = time(NULL);
 
 	zbx_set_sigusr_handler(zbx_poller_sigusr_handler);
 

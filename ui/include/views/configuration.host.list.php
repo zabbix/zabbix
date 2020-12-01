@@ -35,7 +35,9 @@ $widget = (new CWidget())
 			))
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'host']).', null), null, this);'
+					)
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))

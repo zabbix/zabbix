@@ -27,7 +27,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 		$this->setType(WIDGET_HOST_AVAIL);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
+			'fields' => 'json'
 		]);
 	}
 

@@ -197,7 +197,7 @@ func (c *connManager) GetPostgresConnection(connString string) (conn *postgresCo
 	return
 }
 
-// GetPostgresVersion exec query to get PG version from PG we conected to
+// GetPostgresVersion exec query to get PG version from PG we connected to
 func GetPostgresVersion(conn *pgxpool.Pool) (versionPG string, err error) {
 	err = conn.QueryRow(context.Background(), "select current_setting('server_version_num');").Scan(&versionPG)
 	if err != nil {

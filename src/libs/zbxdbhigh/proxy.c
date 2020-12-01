@@ -33,6 +33,7 @@
 #include "zbxlld.h"
 #include "events.h"
 #include "zbxvault.h"
+#include "availability.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
@@ -2165,12 +2166,12 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 	char				*tmp = NULL;
 	size_t				tmp_alloc = 129;
 	zbx_interface_availability_t	*ia = NULL;
-	zbx_vector_ptr_t		interfaces;
-	int				i, ret;
+	zbx_vector_availability_ptr_t	interfaces;
+	int				ret;
 
 	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
 
-	zbx_vector_ptr_create(&interfaces);
+	zbx_vector_availability_ptr_create(&interfaces);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))	/* iterate the interface entries */
 	{
@@ -2216,46 +2217,16 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 			goto out;
 		}
 
-		zbx_vector_ptr_append(&interfaces, ia);
+		zbx_vector_availability_ptr_append(&interfaces, ia);
 	}
 
 	if (0 < interfaces.values_num && SUCCEED == DCset_interfaces_availability(&interfaces))
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		for (i = 0; i < interfaces.values_num; i++)
-		{
-			if (SUCCEED != zbx_sql_add_interface_availability(
-					(zbx_interface_availability_t *)interfaces.values[i], &sql, &sql_alloc,
-					&sql_offset))
-			{
-				continue;
-			}
-
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		DBcommit();
-
-		zbx_free(sql);
-	}
+		zbx_availabilities_flush(&interfaces);
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
-	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_availability_ptr_clear_ext(&interfaces, zbx_interface_availability_free);
+	zbx_vector_availability_ptr_destroy(&interfaces);
 
 	zbx_free(tmp);
 

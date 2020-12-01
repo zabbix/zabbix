@@ -1525,7 +1525,7 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::delete('opcommand_hst', [
-			'hostid' => $hostIds,
+			'hostid' => $hostIds
 		]);
 
 		// delete empty operations
@@ -1540,7 +1540,7 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::delete('operations', [
-			'operationid' => $delOperationids,
+			'operationid' => $delOperationids
 		]);
 
 		$hosts = API::Host()->get([

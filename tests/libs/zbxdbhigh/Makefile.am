@@ -25,6 +25,8 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -77,6 +79,9 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
+	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(COMMON_LIB)
 

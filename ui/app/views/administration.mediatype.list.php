@@ -32,7 +32,13 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
-			->addItem(new CRedirectButton(_('Import'), 'conf.import.php?rules_preset=mediatype'))
+			->addItem(
+				(new CButton('', _('Import')))
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'mediatype']).', null), null, this);'
+					)
+					->removeId()
+			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)

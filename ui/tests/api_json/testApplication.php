@@ -38,7 +38,7 @@ class testApplication extends CAPITest {
 			// Check application hostid.
 			[
 				'application' => [
-					'name' => 'application without hostid',
+					'name' => 'application without hostid'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "hostid" is missing.'
 			],
@@ -217,12 +217,12 @@ class testApplication extends CAPITest {
 			[
 				'template_application' => [
 					'applicationid' => '369',
-					'name' => 'API templated application update',
+					'name' => 'API templated application update'
 				],
 				'new_template_application' => false,
 				'host_application_id' => '370',
 				'method' => 'application.update'
-			],
+			]
 		];
 	}
 
@@ -543,7 +543,7 @@ class testApplication extends CAPITest {
 				],
 				'get_result' =>[
 				],
-				'expected_error' => true,
+				'expected_error' => true
 			],
 			[
 				'application' => [
@@ -610,7 +610,7 @@ class testApplication extends CAPITest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'application' => [
 					'applicationid' => '376',
-					'name' => 'API application update as zabbix admin',
+					'name' => 'API application update as zabbix admin'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -636,7 +636,7 @@ class testApplication extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'application' => [
 					'applicationid' => '376',
-					'name' => 'API application update as zabbix user',
+					'name' => 'API application update as zabbix user'
 				],
 				'expected_error' => 'No permissions to call "application.update".'
 			],
