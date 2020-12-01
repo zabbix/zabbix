@@ -276,12 +276,23 @@ class CProxy extends CApiService {
 
 		$db_proxies = $this->get([
 			'output' => ['proxyid', 'hostid', 'host', 'status', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject', 'tls_psk_identity', 'tls_psk'
+				'tls_subject'
 			],
 			'proxyids' => $proxyids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		// Load existing values of PSK fields of proxies independently from APP mode.
+		$proxies_psk_fields = DB::select($this->tableName(), [
+			'output' => ['tls_psk_identity', 'tls_psk'],
+			'hostids' => array_keys($db_proxies),
+			'preservekeys' => true
+		]);
+
+		foreach ($proxies_psk_fields as $hostid => $psk_fields) {
+			$db_proxies[$hostid] += $psk_fields;
+		}
 
 		$this->validateUpdate($proxies, $db_proxies);
 
@@ -493,6 +504,21 @@ class CProxy extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$api_call = APP::getMode() === APP::EXEC_MODE_API;
+		$output_is_array = is_array($options['output']);
+		$no_psk_fields_in_output = $output_is_array && !in_array('tls_psk_identity', $options['output'])
+				&& !in_array('tls_psk', $options['output']);
+
+		// Cleaning the output from write-only properties.
+		if ((!$options['countOutput'] || $this->requiresPostSqlFiltering($options))
+				&& (($output_is_array && ($api_call || $no_psk_fields_in_output))
+					|| $options['output'] === API_OUTPUT_EXTEND)) {
+			$options['output'] = array_diff(
+				is_array($options['output']) ? $options['output'] : array_keys(DB::getSchema($tableName)['fields']),
+				['tls_psk_identity', 'tls_psk']
+			);
+		}
+
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput'] && $options['selectInterface'] !== null) {

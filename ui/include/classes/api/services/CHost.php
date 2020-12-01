@@ -813,13 +813,22 @@ class CHost extends CHostGeneral {
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-				'tls_psk_identity', 'tls_psk'
-			],
+			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		// Load existing values of PSK fields of hosts independently from APP mode.
+		$hosts_psk_fields = DB::select($this->tableName(), [
+			'output' => ['tls_psk_identity', 'tls_psk'],
+			'hostids' => array_keys($db_hosts),
+			'preservekeys' => true
+		]);
+
+		foreach ($hosts_psk_fields as $hostid => $psk_fields) {
+			$db_hosts[$hostid] += $psk_fields;
+		}
 
 		$hosts = $this->validateUpdate($hosts, $db_hosts);
 

@@ -45,7 +45,8 @@ $frmHost = (new CForm())
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
 	->addItem((new CVar('tls_connect', $data['tls_connect']))->removeId())
-	->addVar('tls_accept', $data['tls_accept']);
+	->addVar('tls_accept', $data['tls_accept'])
+	->addVar('psk_edit_mode', $data['psk_edit_mode']);
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -205,7 +206,7 @@ $hostList->addRow(_('Enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
 );
 
-if ($data['clone_hostid'] != 0) {
+if ($data['form'] === 'full_clone' && $data['clone_hostid'] != 0) {
 	// host applications
 	$hostApps = API::Application()->get([
 		'output' => ['name'],
@@ -721,20 +722,38 @@ $encryption_form_list = (new CFormList('encryption'))
 				->setLabel(_('Certificate'))
 				->setEnabled(!$data['readonly'])
 			)
-	)
-	->addRow(
-		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['readonly'], 128))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(
-		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
-		(new CTextBox('tls_psk', $data['tls_psk'], $data['readonly'], 512))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired()
-			->disableAutocomplete()
-	)
+	);
+
+if ($data['psk_edit_mode']) {
+	$encryption_form_list
+		->addRow(
+			(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
+			(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAriaRequired()
+		)
+		->addRow(
+			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+			(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAriaRequired()
+				->disableAutocomplete()
+		);
+}
+else {
+	$encryption_form_list
+		->addRow(
+			(new CLabel(_('PSK')))->setAsteriskMark(),
+			(new CSimpleButton(_('Change PSK')))
+				->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "psk_edit_mode", "1");')
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->setEnabled(!$data['readonly']),
+			null,
+			'tls_psk'
+		);
+}
+
+$encryption_form_list
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['readonly'], 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)

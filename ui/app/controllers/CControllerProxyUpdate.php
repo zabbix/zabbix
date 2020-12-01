@@ -41,9 +41,10 @@ class CControllerProxyUpdate extends CController {
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_issuer' => 	'db       hosts.tls_issuer',
-			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
+			'tls_psk' =>		'db       hosts.tls_psk',
+			'psk_edit_mode' =>	'in 0,1',
+			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_subject' => 	'db       hosts.tls_subject',
 			'form_refresh' =>	'int32'
 		];
