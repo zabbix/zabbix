@@ -297,11 +297,6 @@ FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_PROXY
 INDEX		|1		|hostid,type
 INDEX		|2		|ip,dns
 
-TABLE|valuemaps|valuemapid|ZBX_TEMPLATE
-FIELD		|valuemapid	|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
-UNIQUE		|1		|name
-
 TABLE|items|itemid|ZBX_TEMPLATE
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -319,7 +314,7 @@ FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
-FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemaps	|		|RESTRICT
+FIELD		|valumapname	|t_varchar(64)	|''	|NOT NULL	|0			|-|valuemap	|name
 FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -357,7 +352,6 @@ FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|hostid,key_(1021)
 INDEX		|3		|status
 INDEX		|4		|templateid
-INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 
@@ -801,13 +795,6 @@ FIELD		|applicationid	|t_id		|	|NOT NULL	|0			|1|applications
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|2|items
 UNIQUE		|1		|applicationid,itemid
 INDEX		|2		|itemid
-
-TABLE|mappings|mappingid|ZBX_TEMPLATE
-FIELD		|mappingid	|t_id		|	|NOT NULL	|0
-FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemaps
-FIELD		|value		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|newvalue	|t_varchar(64)	|''	|NOT NULL	|0
-INDEX		|1		|valuemapid
 
 TABLE|media|mediaid|ZBX_DATA
 FIELD		|mediaid	|t_id		|	|NOT NULL	|0
@@ -1879,6 +1866,19 @@ FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
 INDEX		|1		|roleid
 INDEX		|2		|value_moduleid
+
+TABLE|valuemap|valuemapid|ZBX_TEMPLATE
+FIELD		|valuemapid	|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|0		|1|hosts
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
+UNIQUE		|1		|hostid,name
+
+TABLE|valuemap_field|valuemap_fieldid|ZBX_TEMPLATE
+FIELD		|valuemap_fieldid	|t_id		|	|NOT NULL	|0
+FIELD		|valuemapid		|t_id		|	|NOT NULL	|0			|1|valuemap
+FIELD		|value			|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|newvalue		|t_varchar(64)	|''	|NOT NULL	|0
+INDEX		|1			|valuemapid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
