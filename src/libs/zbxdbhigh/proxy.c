@@ -2232,7 +2232,7 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 		for (i = 0; i < interfaces.values_num; i++)
 		{
 			if (SUCCEED != zbx_sql_add_interface_availability(
-					(zbx_interface_availability_t *)interfaces.values[i],&sql, &sql_alloc,
+					(zbx_interface_availability_t *)interfaces.values[i], &sql, &sql_alloc,
 					&sql_offset))
 			{
 				continue;

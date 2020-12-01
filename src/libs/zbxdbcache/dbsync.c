@@ -662,6 +662,7 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
  * Function: zbx_dbsync_compare_hosts                                         *
  *                                                                            *
  * Purpose: compares hosts table with cached configuration data               *
+ *          and populates the changeset                                       *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
  *                                                                            *
@@ -1246,7 +1247,7 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 
 	if (FAIL == dbsync_compare_int(dbrow[11], interface->errors_from))
 		return FAIL;
-	/*reset_availability and availability_ts are excluded from the comparison*/
+	/* reset_availability and availability_ts are excluded from the comparison */
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&dbsync_env.cache->interfaces_snmp,
 			&interface->interfaceid);

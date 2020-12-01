@@ -9740,7 +9740,9 @@ int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts,
 
 	if (SUCCEED == DCinterface_set_agent_availability(dc_interface, ts->sec, out) &&
 			ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
+	{
 		ret = SUCCEED;
+	}
 unlock:
 	UNLOCK_CACHE;
 out:
@@ -9840,7 +9842,9 @@ int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, z
 
 	if (SUCCEED == DCinterface_set_agent_availability(dc_interface, ts->sec, out) &&
 			ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
+	{
 		ret = SUCCEED;
+	}
 unlock:
 	UNLOCK_CACHE;
 out:
