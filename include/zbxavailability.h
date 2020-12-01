@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AVAILABILITY_H
 #define ZABBIX_AVAILABILITY_H
 
-#include "common.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 #define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
