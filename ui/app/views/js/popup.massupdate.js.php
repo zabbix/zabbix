@@ -70,6 +70,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tbl_macros'))
 		.on('afteradd.dynamicRows', () => {
 			$('.input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
+			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 		});
 
 	$(obj.querySelector('#tbl_macros'))
