@@ -17,12 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
+/**
+ * @event afterresize - Event fire after textare change size.
+ */
 (function($) {
 	'use strict';
 
 	function update(e) {
-		var $textarea = $(this);
+		const $textarea = $(this);
+		const is_maxheight = !!$textarea.data('maxheight');
+		let maxheight;
+
+		if (is_maxheight) {
+			maxheight = $textarea.data('maxheight');
+		}
 
 		if (e.which === 13) {
 			// Simulate input behavior by submitting form on enter key.
@@ -58,15 +66,24 @@
 		}
 
 		// Resize textarea.
-		$textarea
-			.height(0)
-			.innerHeight($textarea[0].scrollHeight);
+		$textarea.height(0);
+
+		let height = $textarea[0].scrollHeight;
+
+		if (is_maxheight && height >= maxheight) {
+			height = maxheight;
+			$textarea.css({'overflow-y': 'scroll'});
+		}
+		else {
+			$textarea.css({'overflow-y': 'unset'});
+		}
+
+		$textarea.innerHeight(height);
+
+		// Fire event after resize.
+		$textarea.trigger('afterresize')
 
 		$(window).scrollTop(scroll_pos);
-	}
-
-	function handleResize() {
-		$(window).resize();
 	}
 
 	var methods = {
@@ -79,8 +96,6 @@
 				$textarea
 					.off('input keydown paste', update)
 					.on('input keydown paste', update)
-					.off('focusout', handleResize)
-					.on('focusout', handleResize)
 					.trigger('input');
 			});
 		},

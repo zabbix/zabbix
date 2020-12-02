@@ -33,7 +33,7 @@ if (typeof MassUpdateMacros != 'function') {
 			[...document.querySelectorAll('[name=mass_update_macros]')]
 				.map((el) => el.addEventListener('click', this.eventHandler));
 
-			// If form updated select proper checkbox blocks.
+			// Select proper checkbox blocks after form update.
 			this.eventHandler();
 		}
 
@@ -56,6 +56,9 @@ if (typeof MassUpdateMacros != 'function') {
 			if (value == <?= ZBX_ACTION_REMOVE_ALL ?>) {
 				macro_table.style.display = 'none';
 			}
+
+			// Resize popup after change checkbox tab.
+			$(window).resize();
 		}
 
 		showCheckboxBlock(type) {

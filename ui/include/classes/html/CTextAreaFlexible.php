@@ -34,7 +34,8 @@ class CTextAreaFlexible extends CTextArea {
 		'add_post_js' => true,
 		'maxlength' => 255,
 		'readonly' => false,
-		'rows' => 1
+		'rows' => 1,
+		'maxheight' => 0
 	];
 
 	/**
@@ -47,6 +48,7 @@ class CTextAreaFlexible extends CTextArea {
 	 * @param int    $options['maxlength']    (optional)
 	 * @param bool   $options['readonly']     (optional)
 	 * @param int    $options['rows']         (optional)
+	 * @param int    $options['maxheight']    (optional)
 	 */
 	public function __construct($name, $value = '', array $options = []) {
 		$this->options = array_merge($this->options, $options);
@@ -57,6 +59,10 @@ class CTextAreaFlexible extends CTextArea {
 
 		if ($this->options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
+		}
+
+		if ($this->options['maxheight'] > 0) {
+			$this->setAttribute('data-maxheight', $this->options['maxheight']);
 		}
 	}
 
