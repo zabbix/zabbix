@@ -2098,10 +2098,16 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		foreach ($data['preprocessing'] as $i => $options) {
 			// Check "Custom on fail" value in DB.
-			$expected = (!array_key_exists('on_fail', $options) || !$options['on_fail'])
+			if ($options['type'] === 'Check for not supported value') {
+				$expected =  (!array_key_exists('on_fail', $options) || !$options['on_fail'])
+					? 1 : $data['value'];
+			}
+			else {
+				$expected = (!array_key_exists('on_fail', $options) || !$options['on_fail'])
 					? ZBX_PREPROC_FAIL_DEFAULT : $data['value'];
+			}
 
-			$this->assertEquals($expected, $rows[$i + 1]);
+			$this->assertEquals($expected, $rows[$i]);
 
 			if (in_array($options['type'], [
 				'Trim',

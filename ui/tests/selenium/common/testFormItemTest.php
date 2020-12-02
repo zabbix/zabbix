@@ -513,8 +513,18 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix aggregate',
-						'Key' => 'test.zabbix.aggregate'
+						'Key' => 'grpsum["MySQL Servers","vfs.fs.size[/,total]",last]'
 					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Zabbix aggregate',
+						'Key' => 'key'
+					],
+					'error' => 'Key "key" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"].'
 				]
 			],
 			[
