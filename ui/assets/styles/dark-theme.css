@@ -1015,7 +1015,7 @@ z-select,
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
-pre, pre a, pre td, pre span {
+pre, pre a, pre td, pre span, .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word; }
@@ -3499,12 +3499,10 @@ z-select[disabled] button, z-select[readonly] button,
   .overlay-dialogue .table-paging {
     border: 0;
     border-top: 1px solid #383838; }
-  .overlay-dialogue .table-forms-td-right {
-    white-space: normal; }
-    .overlay-dialogue .table-forms-td-right td {
-      vertical-align: middle; }
-      .overlay-dialogue .table-forms-td-right td label {
-        display: block; }
+  .overlay-dialogue .table-forms-td-right td {
+    vertical-align: middle; }
+    .overlay-dialogue .table-forms-td-right td label {
+      display: block; }
   .overlay-dialogue .dashbrd-widget-head {
     margin: -10px -10px 6px; }
   .overlay-dialogue .maps-container {
