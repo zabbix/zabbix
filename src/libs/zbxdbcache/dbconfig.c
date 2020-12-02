@@ -1441,11 +1441,6 @@ done:
 			host->data_expected_from = now;
 			host->update_items = 0;
 
-			host->items_num = 0;
-			host->snmp_items_num = 0;
-			host->ipmi_items_num = 0;
-			host->jmx_items_num = 0;
-
 			zbx_vector_ptr_create_ext(&host->interfaces_v, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
 		}
@@ -2455,6 +2450,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->error, row[10]));
 
 		interface->reset_availability = 0;
+		interface->items_num = 0;
 
 		/* update interfaces_ht index using new data, if not done already */
 
@@ -2670,31 +2666,18 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_host_update_agent_stats                                       *
+ * Function: dc_interface_update_agent_stats                                  *
  *                                                                            *
  * Purpose: update number of items per agent statistics                       *
  *                                                                            *
- * Parameters: host - [IN] the host                                           *
- *             type - [IN] the item type (ITEM_TYPE_*)                        *
- *             num  - [IN] the number of items (+) added, (-) removed         *
+ * Parameters: interface - [IN] the interface                                 *
+ *             num       - [IN] the number of items (+) added, (-) removed    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_host_update_agent_stats(ZBX_DC_HOST *host, unsigned char type, int num)
+static void	dc_interface_update_agent_stats(ZBX_DC_INTERFACE *interface, int num)
 {
-	switch (type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			host->items_num += num;
-			break;
-		case ITEM_TYPE_SNMP:
-			host->snmp_items_num += num;
-			break;
-		case ITEM_TYPE_IPMI:
-			host->ipmi_items_num += num;
-			break;
-		case ITEM_TYPE_JMX:
-			host->jmx_items_num += num;
-	}
+	if (NULL != interface)
+		interface->items_num += num;
 }
 
 static void	DCsync_items(zbx_dbsync_t *sync, int flags)
@@ -2798,6 +2781,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item->flags = (unsigned char)atoi(row[18]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[19]);
 
+		interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
+
 		if (SUCCEED != is_time_suffix(row[22], &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
 
@@ -2842,11 +2827,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				item->data_expected_from = now;
 
 			if (ITEM_STATUS_ACTIVE == item->status)
-				dc_host_update_agent_stats(host, item->type, -1);
+				dc_interface_update_agent_stats(interface, -1);
 		}
 
 		if (ITEM_STATUS_ACTIVE == status)
-			dc_host_update_agent_stats(host, type, 1);
+			dc_interface_update_agent_stats(interface, 1);
 
 		item->type = type;
 		item->status = status;
@@ -3217,9 +3202,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				char	*error = NULL;
 
-				interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
-						&item->interfaceid);
-
 				if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
@@ -3283,11 +3265,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
 
-		if (ITEM_STATUS_ACTIVE == item->status &&
-				NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
-		{
-			dc_host_update_agent_stats(host, item->type, -1);
-		}
+		if (ITEM_STATUS_ACTIVE == item->status)
+			dc_interface_update_agent_stats(interface, -1);
 
 		itemid = item->itemid;
 
@@ -11832,7 +11811,7 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 
 	while (NULL != (interface = (ZBX_DC_INTERFACE *)zbx_hashset_iter_next(&iter)))
 	{
-		int	items_num = 0, snmp_items_num = 0, ipmi_items_num = 0, jmx_items_num = 0;
+		int	items_num = 0;
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
 			continue;
@@ -11863,36 +11842,10 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 		zbx_interface_availability_init(ia, interface->interfaceid);
 
 		if (0 == interface->reset_availability)
-		{
-			items_num = host->items_num;
-			snmp_items_num = host->snmp_items_num;
-			ipmi_items_num = host->ipmi_items_num;
-			jmx_items_num = host->jmx_items_num;
-		}
+			items_num = interface->items_num;
 
-		if (0 == items_num && INTERFACE_AVAILABLE_UNKNOWN != interface->available &&
-				INTERFACE_TYPE_AGENT == interface->type)
-		{
+		if (0 == items_num && INTERFACE_AVAILABLE_UNKNOWN != interface->available)
 			zbx_agent_availability_init(&ia->agent, INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
-		}
-
-		if (0 == snmp_items_num && INTERFACE_AVAILABLE_UNKNOWN != interface->available &&
-				INTERFACE_TYPE_SNMP == interface->type)
-		{
-			zbx_agent_availability_init(&ia->agent, INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
-		}
-
-		if (0 == ipmi_items_num && INTERFACE_AVAILABLE_UNKNOWN != interface->available &&
-				INTERFACE_TYPE_IPMI == interface->type)
-		{
-			zbx_agent_availability_init(&ia->agent, INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
-		}
-
-		if (0 == jmx_items_num && INTERFACE_AVAILABLE_UNKNOWN != interface->available &&
-				INTERFACE_TYPE_JMX == interface->type)
-		{
-			zbx_agent_availability_init(&ia->agent, INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
-		}
 
 		if (SUCCEED == zbx_interface_availability_is_set(ia))
 		{

@@ -110,9 +110,6 @@ static void	DCdump_hosts(void)
 				" maintenance_from:%d", host->maintenanceid, host->maintenance_status,
 				host->maintenance_type, host->maintenance_from);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  number of items: zabbix:%d snmp:%d ipmi:%d jmx:%d", host->items_num,
-				host->snmp_items_num, host->ipmi_items_num, host->jmx_items_num);
-
 		/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 		zabbix_log(LOG_LEVEL_TRACE, "  tls:[connect:%u accept:%u]", host->tls_connect, host->tls_accept);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -412,11 +409,12 @@ static void	DCdump_interfaces(void)
 		zbx_snprintf_alloc(&if_msg, &alloc, &offset, "interfaceid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64
 				" ip:'%s' dns:'%s' port:'%s' type:%u main:%u useip:%u"
 				" available:%u errors_from:%d disable_until:%d error:'%s' availability_ts:%d"
-				" reset_availability:%d",
+				" reset_availability:%d items_num %d",
 				interface->interfaceid, interface->hostid, interface->ip, interface->dns,
 				interface->port, interface->type, interface->main, interface->useip,
 				interface->available, interface->errors_from, interface->disable_until,
-				interface->error, interface->availability_ts, interface->reset_availability);
+				interface->error, interface->availability_ts, interface->reset_availability,
+				interface->items_num);
 
 		if (INTERFACE_TYPE_SNMP == interface->type &&
 				NULL != (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,

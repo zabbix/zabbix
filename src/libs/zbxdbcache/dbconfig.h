@@ -311,12 +311,6 @@ typedef struct
 	int		maintenance_from;
 	int		data_expected_from;
 
-	/* item statistics per interface type */
-	int		items_num;
-	int		snmp_items_num;
-	int		ipmi_items_num;
-	int		jmx_items_num;
-
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	status;
@@ -466,6 +460,8 @@ typedef struct
 	int		availability_ts;
 	/* flag to reset interface availability to unknown */
 	unsigned char	reset_availability;
+	/* item statistics per interface */
+	int		items_num;
 }
 ZBX_DC_INTERFACE;
 
