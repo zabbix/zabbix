@@ -24,6 +24,13 @@ class CWidget {
 	private $title = null;
 	private $title_submenu = null;
 	private $controls = null;
+	private const ZBX_STYLE_HEADER_NAVIGATION = 'header-navigation';
+
+	/**
+	 * Navigation menu, displayed only in ZBX_LAYOUT_NORMAL mode
+	 *
+	 * @var mixed
+	 */
 	private $navigation = null;
 
 	/**
@@ -71,10 +78,15 @@ class CWidget {
 		return $this;
 	}
 
+	/**
+	 * Set navigation menu
+	 *
+	 * @param $navigation
+	 *
+	 * @return $this
+	 */
 	public function setNavigation($navigation) {
-		if ($navigation !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
-			$this->navigation = $navigation;
-		}
+		$this->navigation = $navigation;
 
 		return $this;
 	}
@@ -112,7 +124,9 @@ class CWidget {
 			'with_current_messages' => true
 		]);
 
-		$navigation = (new CDiv($this->navigation))->addClass(ZBX_STYLE_HEADER_NAVIGATION);
+		$navigation = ($this->navigation !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL)
+			? (new CDiv($this->navigation))->addClass(self::ZBX_STYLE_HEADER_NAVIGATION)
+			: null;
 		$items[] = new CTag('main', true, [$navigation, $this->body]);
 
 		return unpack_object($items);

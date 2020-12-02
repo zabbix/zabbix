@@ -25,7 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
-	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
+	->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 
 $form = (new CForm())
 	->setName('item_prototype_form')

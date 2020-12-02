@@ -80,6 +80,6 @@ $form->addItem([
 				->getUrl()
 		)))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('dashboards', $data['templateid']))
+	->setNavigation(getHostNavigation('dashboards', $data['templateid']))
 	->addItem($form)
 	->show();

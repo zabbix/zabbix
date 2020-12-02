@@ -184,14 +184,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	background: url($sprite-path) no-repeat -540px -400px;
 }
 
-.header-navigation {
-	min-height: 24px;
-	line-height: 24px;
-	padding: 10px 0 6px;
-	position: relative;
-	vertical-align: top;
-}
-
 .dashbrd-edit {
 	background-color: $ui-bg-color;
 	box-shadow: 0 0 0 4px $ui-bg-color;
@@ -226,32 +218,27 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	}
 }
 
-// Object group navigation.
-.header-navigation {
-	margin-bottom: -1px;
-
+.hor-list {
 	li {
-		float: left;
-		margin-right: 5px;
+		display: inline-block;
+		margin: 0 6px 0 0;
 
-		span {
-			display: inline-block;
-			padding: 0 7px;
-		}
-
-		.status-container,
-		.rel-container {
-			margin: 0 5px 0 0;
-
-			span {
-				padding: 2px 3px 1px;
-			}
-		}
-
-		.rel-container {
+		&:last-child {
 			margin: 0;
 		}
 	}
+}
+
+.header-navigation {
+	display: inline-block;
+	z-index: 3;
+	max-width: calc(100vw - 200px);
+	min-height: 24px;
+	line-height: 24px;
+	padding: 0 0 6px;
+	position: relative;
+	vertical-align: top;
+	margin-bottom: -1px;
 
 	.selected {
 		background-color: $ui-bg-color;
@@ -270,38 +257,33 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	.btn-link {
 		line-height: 14px;
 	}
-}
-
-.hor-list {
-	li {
-		display: inline-block;
-		margin: 0 6px 0 0;
-
-		&:last-child {
-			margin: 0;
-		}
-	}
-
-	.header-navigation {
-		margin: 0;
-	}
-}
-
-// Breadcrumbs inline with filter block.
-.header-navigation {
-	display: inline-block;
-	padding-top: 0;
-	z-index: 3;
-	max-width: calc(100vw - 200px);
 
 	li {
+		float: left;
+		margin-right: 5px;
 		line-height: 14px;
-		vertical-align: middle;
-		float: none;
+		vertical-align: top;
 		display: inline-block;
 
 		.status-container {
 			padding-top: 3px;
+		}
+
+		.rel-container {
+			margin: 0;
+		}
+
+		.status-container,
+		.rel-container {
+			margin: 0 5px 0 0;
+
+			span {
+				padding: 2px 3px 1px;
+			}
+		}
+
+		.rel-container {
+			margin: 0;
 		}
 
 		> span {
@@ -325,7 +307,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 		}
 	}
 
-	> li {
+	> ul > li {
 		padding: 1px 0;
 		line-height: 22px;
 		white-space: nowrap;
@@ -7422,5 +7404,9 @@ z-select,
 
 	&>:last-child::after {
 		content: "";
+	}
+
+	li {
+		margin-right: 0;
 	}
 }

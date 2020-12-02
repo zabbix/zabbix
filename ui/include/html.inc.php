@@ -196,7 +196,7 @@ function get_icon($type, $params = []) {
  *
  * @return object
  */
-function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
+function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
@@ -266,12 +266,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	/*
 	 * list and host (template) name
 	 */
-	$list = (new CList())
-		->addClass(ZBX_STYLE_HEADER_NAVIGATION);
+	$list = (new CList());
 
-	$breadcrumbs = (new CListItem(null))
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
+	$breadcrumbs = new CBreadcrumbs();
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -282,11 +279,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$template->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$breadcrumbs->addItem([
-			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
-			'/',
-			$template
-		]);
+		$breadcrumbs->addItem(new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))));
+		$breadcrumbs->addItem($template);
+
 
 		$db_host['hostid'] = $db_host['templateid'];
 		$list->addItem($breadcrumbs);
@@ -317,11 +312,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$host->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$breadcrumbs->addItem([
-			new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))),
-			'/',
-			$host
-		]);
+		$breadcrumbs->addItem(new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))));
+		$breadcrumbs->addItem($host);
 		$list->addItem($breadcrumbs);
 		$list->addItem($status);
 		$list->addItem(getHostAvailabilityTable($db_host));
@@ -451,16 +443,16 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$list->addItem([
-			(new CSpan())->addItem(
-				new CLink(_('Discovery list'), (new CUrl('host_discovery.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$db_host['hostid']])
-				)
-			),
-			'/',
-			$discovery_rule
-		]);
+		$list->addItem(
+			(new CBreadcrumbs([
+					(new CSpan())->addItem(
+						new CLink(_('Discovery list!'), (new CUrl('host_discovery.php'))
+							->setArgument('filter_set', '1')
+							->setArgument('filter_hostids', [$db_host['hostid']])
+						)
+					),
+					$discovery_rule
+				])));
 
 		// item prototypes
 		$item_prototypes = new CSpan([
@@ -522,7 +514,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  * @return object
  */
 
-function get_header_sysmap_table($sysmapid, $name, $severity_min) {
+function getSysmapNavigation($sysmapid, $name, $severity_min) {
 	$list = (new CBreadcrumbs([
 			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
 			(new CSpan())
@@ -541,9 +533,7 @@ function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 	$parent_sysmaps = get_parent_sysmaps($sysmapid);
 	if ($parent_sysmaps) {
 		$parent_maps = (new CList())
-			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _('Upper level maps'))
-			->addClass(ZBX_STYLE_HEADER_NAVIGATION)
 			->addItem((new CSpan())->addItem(_('Upper level maps').':'));
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
@@ -568,7 +558,7 @@ function get_header_sysmap_table($sysmapid, $name, $severity_min) {
  * @param CButtonInterface 		$main_button	main button that will be displayed on the left
  * @param CButtonInterface[] 	$other_buttons
  *
- * @return CDiv
+ * @return CList
  *
  * @throws InvalidArgumentException	if an element of $other_buttons contain something other than CButtonInterface
  */
@@ -659,7 +649,7 @@ function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the host
  *
- * @return CDiv
+ * @return CSpan
  */
 function getHostLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -686,7 +676,7 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the application
  *
- * @return CDiv
+ * @return CSpan
  */
 function getApplicationLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -713,7 +703,7 @@ function getApplicationLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the graph
  *
- * @return CDiv
+ * @return CSpan
  */
 function getGraphLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -740,7 +730,7 @@ function getGraphLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the trigger
  *
- * @return CDiv
+ * @return CSpan
  */
 function getTriggerLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -767,7 +757,7 @@ function getTriggerLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the item
  *
- * @return CDiv
+ * @return CSpan
  */
 function getItemLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -824,7 +814,7 @@ function makeLogo(int $type): ?CTag {
  *
  * @param bool $with_version
  *
- * @return CDiv
+ * @return CTag
  */
 function makePageFooter($with_version = true) {
 	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))

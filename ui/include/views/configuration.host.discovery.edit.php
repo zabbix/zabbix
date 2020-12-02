@@ -25,7 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->addItem(get_header_host_table('discoveries', $data['hostid'],
+	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
 

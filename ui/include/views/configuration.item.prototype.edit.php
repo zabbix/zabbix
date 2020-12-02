@@ -26,7 +26,7 @@
 $widget = (new CWidget())->setTitle(_('Item prototypes'));
 
 if (!empty($data['hostid'])) {
-	$widget->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
+	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 }
 
 $form = (new CForm())

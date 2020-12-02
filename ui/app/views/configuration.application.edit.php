@@ -27,7 +27,7 @@ $this->includeJsFile('configuration.applications.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Applications'))
-	->addItem(get_header_host_table('applications', $data['hostid']));
+	->setNavigation(getHostNavigation('applications', $data['hostid']));
 
 $application_form = (new CForm())
 	->setId('application-form')

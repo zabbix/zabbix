@@ -18,10 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CBreadcrumbs extends CList {
 	private const ZBX_STYLE_BREADCRUMBS = 'breadcrumbs';
 
-	public function __construct($values = null) {
+	/**
+	 * CBreadcrumbs constructor creates list with 'breadcrumbs' class and special attributes.
+	 *
+	 * @param array $values
+	 */
+	public function __construct(array $values = []) {
 		parent::__construct($values);
 		$this
 			->addClass(self::ZBX_STYLE_BREADCRUMBS)

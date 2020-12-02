@@ -1235,13 +1235,6 @@ pre, pre a, pre td, pre span {
   height: 24px;
   background: url("../img/icon-sprite.svg?20200407") no-repeat -540px -400px; }
 
-.header-navigation {
-  min-height: 24px;
-  line-height: 24px;
-  padding: 10px 0 6px;
-  position: relative;
-  vertical-align: top; }
-
 .dashbrd-edit {
   background-color: #000000;
   box-shadow: 0 0 0 4px #000000;
@@ -1265,22 +1258,22 @@ pre, pre a, pre td, pre span {
     .dashbrd-edit ul li .btn-dashbrd-conf {
       vertical-align: middle; }
 
+.hor-list li {
+  display: inline-block;
+  margin: 0 6px 0 0; }
+  .hor-list li:last-child {
+    margin: 0; }
+
 .header-navigation {
+  display: inline-block;
+  z-index: 3;
+  max-width: calc(100vw - 200px);
+  min-height: 24px;
+  line-height: 24px;
+  padding: 0 0 6px;
+  position: relative;
+  vertical-align: top;
   margin-bottom: -1px; }
-  .header-navigation li {
-    float: left;
-    margin-right: 5px; }
-    .header-navigation li span {
-      display: inline-block;
-      padding: 0 7px; }
-    .header-navigation li .status-container,
-    .header-navigation li .rel-container {
-      margin: 0 5px 0 0; }
-      .header-navigation li .status-container span,
-      .header-navigation li .rel-container span {
-        padding: 2px 3px 1px; }
-    .header-navigation li .rel-container {
-      margin: 0; }
   .header-navigation .selected {
     background-color: #000000;
     border-radius: 2px;
@@ -1291,27 +1284,24 @@ pre, pre a, pre td, pre span {
     line-height: 22px; }
   .header-navigation .btn-link, .header-navigation .interface-container .interface-row .interface-cell .interface-btn-toggle, .interface-container .interface-row .interface-cell .header-navigation .interface-btn-toggle {
     line-height: 14px; }
-
-.hor-list li {
-  display: inline-block;
-  margin: 0 6px 0 0; }
-  .hor-list li:last-child {
-    margin: 0; }
-.hor-list .header-navigation {
-  margin: 0; }
-
-.header-navigation {
-  display: inline-block;
-  padding-top: 0;
-  z-index: 3;
-  max-width: calc(100vw - 200px); }
   .header-navigation li {
+    float: left;
+    margin-right: 5px;
     line-height: 14px;
     vertical-align: top;
-    float: none;
     display: inline-block; }
     .header-navigation li .status-container {
       padding-top: 3px; }
+    .header-navigation li .rel-container {
+      margin: 0; }
+    .header-navigation li .status-container,
+    .header-navigation li .rel-container {
+      margin: 0 5px 0 0; }
+      .header-navigation li .status-container span,
+      .header-navigation li .rel-container span {
+        padding: 2px 3px 1px; }
+    .header-navigation li .rel-container {
+      margin: 0; }
     .header-navigation li > span {
       display: inline-block;
       height: 18px;
@@ -1326,13 +1316,13 @@ pre, pre a, pre td, pre span {
         margin-bottom: -1px; }
         .header-navigation li > span a:focus {
           margin-bottom: -2px; }
-  .header-navigation > li {
+  .header-navigation > ul > li {
     padding: 1px 0;
     line-height: 22px;
     white-space: nowrap; }
-    .header-navigation > li .status-container {
+    .header-navigation > ul > li .status-container {
       line-height: 14px; }
-    .header-navigation > li > span a {
+    .header-navigation > ul > li > span a {
       margin-top: 1px;
       line-height: 13px; }
   .header-navigation + .filter-space {
@@ -5910,6 +5900,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   content: " /"; }
 .breadcrumbs > :last-child::after {
   content: ""; }
+.breadcrumbs li {
+  margin-right: 0; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }

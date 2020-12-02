@@ -43,7 +43,7 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->addItem(get_header_host_table('discoveries', $data['hostid']));
+	$widget->setNavigation(getHostNavigation('discoveries', $data['hostid']));
 }
 
 // Add filter tab.

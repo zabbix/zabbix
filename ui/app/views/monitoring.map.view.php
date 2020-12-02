@@ -66,7 +66,7 @@ $web_layout_mode = $this->getLayoutMode();
 			->setAttribute('aria-label', _('Content controls'))
 	]))
 	->setNavigation(
-		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['severity_min'])
+		getSysmapNavigation($data['map']['sysmapid'], $data['map']['name'], $data['severity_min'])
 	)
 	->addItem(
 		(new CDiv())

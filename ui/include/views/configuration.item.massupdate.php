@@ -26,7 +26,7 @@
 $widget = (new CWidget())->setTitle(_('Items'));
 
 if ($data['hostid'] != 0) {
-	$widget->addItem(get_header_host_table('items', $data['hostid']));
+	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 
 // Create form.
