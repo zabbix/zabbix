@@ -1,6 +1,7 @@
 Changes for 5.4.0alpha1
 
 New features:
+........S. [ZBXNEXT-6332] added {ITEM.VALUETYPE} macro (arimdjonoks)
 .........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
 .......PS. [ZBXNEXT-6269] added hv ip to vmware.hv.discovery and vm metrics for FQDN template (MVekslers)
 .........T [ZBXNEXT-6272] added template VMWare FQDN and updated template VMWare (tuskov)
@@ -21,6 +22,7 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+A.F....... [ZBX-18470] fixed unusefull timezone formatting; replaced comboboxes by CSelect elements for timezone selection (miks)
 ..F....... [ZBX-18636] fixed import converter non static method error (rlataria)
 ........S. [ZBX-18599] fixed potential server crash during upgrade to 5.2, mainly on ARM (kalimulin)
 .........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
@@ -57,6 +59,18 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 .........T [ZBX-18531] fixed template "Ceph by Zabbix Agent2" pool discovery (ychukina)
 .........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
 .........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.3rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.2.2
+
+5.2.2rc1 was released as 5.2.2 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.2.2rc1
@@ -331,6 +345,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.6
+
+5.0.6rc1 was released as 5.0.6 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.6rc1
@@ -2173,6 +2199,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.28rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.27
+
+4.0.27rc1 was released as 4.0.27 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.27rc1

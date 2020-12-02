@@ -10,7 +10,7 @@ Official JMX Template for Apache Tomcat.
 This template was tested on:
 
 - Apache Tomcat, version 8.5.59
-- Zabbix, version 5.0, 5.2
+- Zabbix, version 5.4
 
 ## Setup
 

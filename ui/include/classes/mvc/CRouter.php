@@ -173,7 +173,6 @@ class CRouter {
 		'problem.view.refresh'				=> ['CControllerProblemViewRefresh',				'layout.json',			null],
 		'problem.view.csv'					=> ['CControllerProblemView',						'layout.csv',			'monitoring.problem.view'],
 		'profile.update'					=> ['CControllerProfileUpdate',						'layout.json',			null],
-		'tabfilter.profile.update'			=> ['CControllerTabFilterProfileUpdate',			'layout.json',			null],
 		'proxy.create'						=> ['CControllerProxyCreate',						null,					null],
 		'proxy.delete'						=> ['CControllerProxyDelete',						null,					null],
 		'proxy.edit'						=> ['CControllerProxyEdit',							'layout.htmlpage',		'administration.proxy.edit'],
@@ -196,6 +195,7 @@ class CRouter {
 		'script.update'						=> ['CControllerScriptUpdate',						null,					null],
 		'search'							=> ['CControllerSearch',							'layout.htmlpage',		'search'],
 		'system.warning'					=> ['CControllerSystemWarning',						'layout.warning',		'system.warning'],
+		'tabfilter.profile.update'			=> ['CControllerTabFilterProfileUpdate',			'layout.json',			null],
 		'template.dashboard.delete'			=> ['CControllerTemplateDashboardDelete',			null,					null],
 		'template.dashboard.edit'			=> ['CControllerTemplateDashboardEdit',				'layout.htmlpage',		'configuration.dashboard.edit'],
 		'template.dashboard.list'			=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
@@ -253,6 +253,10 @@ class CRouter {
 		'widget.trigover.view'				=> ['CControllerWidgetTrigOverView',				'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'					=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'					=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
+		'queue.details'						=> ['CControllerQueueDetails',						'layout.htmlpage',		'administration.queue.details'],
+		'queue.overview'					=> ['CControllerQueueOverview',						'layout.htmlpage',		'administration.queue.overview'],
+		'queue.overview.proxy'				=> ['CControllerQueueOverviewProxy',				'layout.htmlpage',		'administration.queue.overview.proxy'],
+
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
@@ -301,7 +305,6 @@ class CRouter {
 		'map.import.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'overview.php'					=> ['CLegacyAction', null, null],
-		'queue.php'						=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],
 		'screen.import.php'				=> ['CLegacyAction', null, null],

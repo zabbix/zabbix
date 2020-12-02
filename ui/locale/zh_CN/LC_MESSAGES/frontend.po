@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-20 20:01+0200\n"
+"POT-Creation-Date: 2020-11-27 19:56+0200\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -200,7 +200,7 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] "剩余%1$s 重试次数"
 
-#: app/views/administration.user.edit.php:499
+#: app/views/administration.user.edit.php:504
 #: include/classes/widgets/CWidgetConfig.php:213
 #: include/classes/widgets/CWidgetConfig.php:214 jsLoader.php:313
 #: jsLoader.php:314
@@ -399,22 +399,22 @@ msgstr "访问拒绝"
 msgid "Access denied!"
 msgstr "访问拒绝!"
 
-#: app/views/administration.user.edit.php:437
+#: app/views/administration.user.edit.php:442
 #: app/views/administration.userrole.edit.php:181
 msgid "Access to API"
 msgstr ""
 
-#: app/views/administration.user.edit.php:392
+#: app/views/administration.user.edit.php:397
 #: app/views/administration.userrole.edit.php:78
 msgid "Access to UI elements"
 msgstr ""
 
-#: app/views/administration.user.edit.php:464
+#: app/views/administration.user.edit.php:469
 #: app/views/administration.userrole.edit.php:235
 msgid "Access to actions"
 msgstr ""
 
-#: app/views/administration.user.edit.php:411
+#: app/views/administration.user.edit.php:416
 #: app/views/administration.userrole.edit.php:130
 msgid "Access to modules"
 msgstr ""
@@ -460,7 +460,7 @@ msgstr "确认已解决的事件"
 #: app/views/administration.mediatype.edit.php:151
 #: app/views/administration.mediatype.list.php:84
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:235
+#: app/views/administration.user.edit.php:240
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.share.edit.php:29 app/views/dashboard.share.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
@@ -644,8 +644,8 @@ msgstr "启用直到"
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:132
-#: app/views/administration.user.edit.php:308
-#: app/views/administration.user.edit.php:598
+#: app/views/administration.user.edit.php:313
+#: app/views/administration.user.edit.php:603
 #: app/views/administration.usergroup.edit.php:144
 #: app/views/administration.usergroup.edit.php:195
 #: app/views/administration.usergroup.edit.php:234
@@ -950,8 +950,8 @@ msgid "All dashboards"
 msgstr "添加仪表盘"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:367
-#: app/views/administration.user.edit.php:373
+#: app/views/administration.user.edit.php:372
+#: app/views/administration.user.edit.php:378
 msgid "All groups"
 msgstr "所有组"
 
@@ -1013,11 +1013,11 @@ msgstr "允许手动关闭"
 msgid "Allowed hosts"
 msgstr "允许的主机"
 
-#: app/views/administration.user.edit.php:457
+#: app/views/administration.user.edit.php:462
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:656
 msgid "Alternatively, you can install it manually:"
 msgstr "另外，您也可以手动安装:"
 
@@ -1402,7 +1402,7 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "自动"
 
-#: app/views/administration.user.edit.php:196
+#: app/views/administration.user.edit.php:201
 msgid "Auto-login"
 msgstr "自动登录"
 
@@ -1410,7 +1410,7 @@ msgstr "自动登录"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "自动登录和自动注销功能不能同时使用。"
 
-#: app/views/administration.user.edit.php:201
+#: app/views/administration.user.edit.php:206
 msgid "Auto-logout"
 msgstr "自动注销"
 
@@ -1475,7 +1475,7 @@ msgid "Axes"
 msgstr "坐标轴"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 msgid "Back"
 msgstr "返回"
 
@@ -1567,7 +1567,7 @@ msgstr "边框类型"
 msgid "Border width"
 msgstr "边框宽度"
 
-#: app/controllers/CControllerUserUpdateGeneral.php:93
+#: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr ""
 
@@ -1687,8 +1687,8 @@ msgstr "无法被删除"
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:126
-#: app/views/administration.user.edit.php:577
-#: app/views/administration.user.edit.php:608
+#: app/views/administration.user.edit.php:582
+#: app/views/administration.user.edit.php:613
 #: app/views/administration.usergroup.edit.php:214
 #: app/views/administration.userrole.edit.php:272
 #: app/views/administration.valuemap.edit.php:92
@@ -1886,8 +1886,8 @@ msgstr "无法添加触发器"
 msgid "Cannot add trigger prototype"
 msgstr "无法添加触发器模板"
 
-#: app/controllers/CControllerUserCreate.php:65
-#: app/controllers/CControllerUserCreate.php:121
+#: app/controllers/CControllerUserCreate.php:63
+#: app/controllers/CControllerUserCreate.php:119
 msgid "Cannot add user"
 msgstr "无法添加用户"
 
@@ -2027,7 +2027,7 @@ msgstr "无法创建新的应用集, web 场景已分配给应用集."
 msgid "Cannot create template."
 msgstr "无法创建新的模板"
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:654
 msgid "Cannot create the configuration file."
 msgstr "无法创建配置文件。"
 
@@ -2891,8 +2891,8 @@ msgstr "无法更新验证信息"
 
 #: app/controllers/CControllerAutoregUpdate.php:41
 #: app/controllers/CControllerAutoregUpdate.php:73
-#: app/controllers/CControllerGuiUpdate.php:51
-#: app/controllers/CControllerGuiUpdate.php:99
+#: app/controllers/CControllerGuiUpdate.php:53
+#: app/controllers/CControllerGuiUpdate.php:101
 #: app/controllers/CControllerHousekeepingUpdate.php:67
 #: app/controllers/CControllerHousekeepingUpdate.php:140
 #: app/controllers/CControllerMiscConfigUpdate.php:57
@@ -3096,10 +3096,10 @@ msgstr "无法更新触发器模板 \"%1$s\": %2$s。"
 msgid "Cannot update trigger prototypes"
 msgstr "无法更新触发器模板"
 
-#: app/controllers/CControllerUserProfileUpdate.php:65
-#: app/controllers/CControllerUserProfileUpdate.php:125
-#: app/controllers/CControllerUserUpdate.php:69
-#: app/controllers/CControllerUserUpdate.php:133
+#: app/controllers/CControllerUserProfileUpdate.php:63
+#: app/controllers/CControllerUserProfileUpdate.php:123
+#: app/controllers/CControllerUserUpdate.php:67
+#: app/controllers/CControllerUserUpdate.php:131
 msgid "Cannot update user"
 msgstr "无法更新用户"
 
@@ -3617,12 +3617,12 @@ msgstr "配置"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "配置缓存统计.缓存—缓冲(模式：空闲的百分数，总计，已使用，未使用"
 
-#: include/classes/setup/CSetupWizard.php:672
+#: include/classes/setup/CSetupWizard.php:674
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "配置文件 \"%1$s\" 已创建。"
 
-#: app/controllers/CControllerGuiEdit.php:86
+#: app/controllers/CControllerGuiEdit.php:96
 msgid "Configuration of GUI"
 msgstr "图形接口的配置"
 
@@ -3765,7 +3765,7 @@ msgstr "配置用户组"
 msgid "Configuration of user roles"
 msgstr ""
 
-#: app/controllers/CControllerUserEdit.php:209
+#: app/controllers/CControllerUserEdit.php:208
 #: app/controllers/CControllerUserList.php:170
 msgid "Configuration of users"
 msgstr "配置用户"
@@ -3780,7 +3780,7 @@ msgid "Configuration of web monitoring"
 msgstr "配置 web 监控"
 
 #: app/controllers/CControllerAutoregUpdate.php:69
-#: app/controllers/CControllerGuiUpdate.php:95
+#: app/controllers/CControllerGuiUpdate.php:97
 #: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:115
 #: app/controllers/CControllerTrigDisplayUpdate.php:108
@@ -3796,7 +3796,7 @@ msgstr "配置DB连接"
 msgid "Confirmation text"
 msgstr "确认文字"
 
-#: include/classes/setup/CSetupWizard.php:670
+#: include/classes/setup/CSetupWizard.php:672
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "恩！不错zabbix前端已经配置好了！千山万水第一步！加油，少年！"
 
@@ -4527,15 +4527,15 @@ msgid "Data storage period"
 msgstr "数据存储期"
 
 #: include/classes/setup/CSetupWizard.php:380
-#: include/classes/setup/CSetupWizard.php:519
-#: include/classes/setup/CSetupWizard.php:712
+#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:714
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:392
-#: include/classes/setup/CSetupWizard.php:525
-#: include/classes/setup/CSetupWizard.php:720
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:722
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4544,18 +4544,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:404
-#: include/classes/setup/CSetupWizard.php:533
+#: include/classes/setup/CSetupWizard.php:535
 msgid "Database TLS cipher list"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:362
-#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:517
 msgid "Database TLS encryption"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:386
-#: include/classes/setup/CSetupWizard.php:522
-#: include/classes/setup/CSetupWizard.php:716
+#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:718
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4568,7 +4568,7 @@ msgid "Database host"
 msgstr "数据库主机"
 
 #: include/classes/setup/CSetupWizard.php:398
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database host verification"
 msgstr ""
 
@@ -4577,34 +4577,34 @@ msgid "Database monitor"
 msgstr "数据库监控"
 
 #: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:495 setup.php:45
+#: include/classes/setup/CSetupWizard.php:497 setup.php:45
 msgid "Database name"
 msgstr "数据库名称"
 
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:499
 msgid "Database password"
 msgstr "数据库密码"
 
 #: include/classes/setup/CSetupWizard.php:298
-#: include/classes/setup/CSetupWizard.php:494 setup.php:44
+#: include/classes/setup/CSetupWizard.php:496 setup.php:44
 msgid "Database port"
 msgstr "数据库端口"
 
 #: include/classes/setup/CSetupWizard.php:311
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Database schema"
 msgstr "数据库概要"
 
-#: include/classes/setup/CSetupWizard.php:493
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database server"
 msgstr "数据库服务器"
 
 #: include/classes/setup/CSetupWizard.php:289
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:482
 msgid "Database type"
 msgstr "数据库类型"
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:498
 msgid "Database user"
 msgstr "数据库用户"
 
@@ -4704,7 +4704,7 @@ msgstr "默认延迟"
 msgid "Default host inventory mode"
 msgstr "默认主机资产记录模式"
 
-#: app/views/administration.gui.edit.php:68
+#: app/views/administration.gui.edit.php:67
 #: include/classes/setup/CSetupWizard.php:220
 msgid "Default language"
 msgstr ""
@@ -4721,13 +4721,13 @@ msgstr "默认媒介类型"
 msgid "Default operation step duration"
 msgstr "默认操作步骤持续时间"
 
-#: app/views/administration.gui.edit.php:78
-#: include/classes/setup/CSetupWizard.php:465
+#: app/views/administration.gui.edit.php:79
+#: include/classes/setup/CSetupWizard.php:467
 msgid "Default theme"
 msgstr "默认主题"
 
-#: app/views/administration.gui.edit.php:73
-#: include/classes/setup/CSetupWizard.php:460
+#: app/views/administration.gui.edit.php:72
+#: include/classes/setup/CSetupWizard.php:461
 msgid "Default time zone"
 msgstr ""
 
@@ -4754,7 +4754,7 @@ msgstr "被延迟由于"
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:142
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:586
+#: app/views/administration.user.edit.php:591
 #: app/views/administration.usergroup.edit.php:223
 #: app/views/administration.usergroup.list.php:236
 #: app/views/administration.user.list.php:244
@@ -5032,7 +5032,7 @@ msgstr "删除所选的触发器原型？"
 msgid "Delete selected triggers?"
 msgstr "删除所选的触发器?"
 
-#: app/views/administration.user.edit.php:588
+#: app/views/administration.user.edit.php:593
 msgid "Delete selected user?"
 msgstr "删除所选的用户?"
 
@@ -5102,7 +5102,7 @@ msgstr "已删除: 模板 \"%1$s\"."
 msgid "Delimiter"
 msgstr "分隔符"
 
-#: app/views/administration.user.edit.php:457
+#: app/views/administration.user.edit.php:462
 msgid "Denied methods"
 msgstr ""
 
@@ -5315,8 +5315,8 @@ msgstr "禁用所选定的web场景？"
 #: app/views/administration.miscconfig.edit.php:54
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:245
-#: app/views/administration.user.edit.php:438
+#: app/views/administration.user.edit.php:250
+#: app/views/administration.user.edit.php:443
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5636,7 +5636,7 @@ msgstr "下"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:656
+#: include/classes/setup/CSetupWizard.php:658
 msgid "Download the configuration file"
 msgstr "下载配置文件"
 
@@ -5781,7 +5781,7 @@ msgstr "每个URL必须是唯一的. 请确保只有一个被命名的 URL."
 msgid "Each item"
 msgstr ""
 
-#: app/views/administration.user.edit.php:293
+#: app/views/administration.user.edit.php:298
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:261
 #: include/views/configuration.action.edit.php:282
@@ -6106,8 +6106,8 @@ msgstr "启用trapping"
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:239
-#: app/views/administration.user.edit.php:438
+#: app/views/administration.user.edit.php:244
+#: app/views/administration.user.edit.php:443
 #: app/views/administration.usergroup.edit.php:80
 #: app/views/administration.usergroup.edit.php:92
 #: app/views/administration.usergroup.edit.php:93
@@ -6541,7 +6541,7 @@ msgstr "字段 \"%1$s\"不能被设置为空"
 #: app/controllers/CControllerDashboardPropertiesCheck.php:38
 #: app/controllers/CControllerDashboardPropertiesEdit.php:38
 #: app/controllers/CControllerPopupTriggerWizard.php:236
-#: app/controllers/CControllerUserUpdateGeneral.php:113
+#: app/controllers/CControllerUserUpdateGeneral.php:126
 #: include/classes/api/services/CAction.php:1692
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:325
@@ -6833,7 +6833,7 @@ msgstr "自从"
 msgid "Frontend access"
 msgstr "前端访问"
 
-#: app/views/administration.user.edit.php:487
+#: app/views/administration.user.edit.php:492
 msgid "Frontend messaging"
 msgstr "前端信息中"
 
@@ -6868,8 +6868,8 @@ msgstr "GMT %1$s"
 msgid "GSM modem"
 msgstr "GSM 调制解调器"
 
-#: app/views/administration.gui.edit.php:29
-#: app/views/administration.gui.edit.php:133 include/html.inc.php:893
+#: app/views/administration.gui.edit.php:30
+#: app/views/administration.gui.edit.php:134 include/html.inc.php:893
 msgid "GUI"
 msgstr "界面设置"
 
@@ -6878,7 +6878,7 @@ msgid "GUI access disabled."
 msgstr "图形化界面已经被禁用。"
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:470
+#: include/classes/setup/CSetupWizard.php:472
 msgid "GUI settings"
 msgstr ""
 
@@ -7639,7 +7639,7 @@ msgstr[0] "主机已启用"
 #: app/partials/popup.operations.php:181
 #: app/views/administration.script.edit.php:92
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:364
+#: app/views/administration.user.edit.php:369
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
@@ -8715,9 +8715,9 @@ msgstr "不正确的栏位名称\"%1$s\"或用于资料表\"%2$s\"的where描述
 msgid "Incorrect fields for sysmap."
 msgstr "错误的sysmap字段."
 
-#: include/classes/setup/CSetupWizard.php:712
-#: include/classes/setup/CSetupWizard.php:716
-#: include/classes/setup/CSetupWizard.php:720
+#: include/classes/setup/CSetupWizard.php:714
+#: include/classes/setup/CSetupWizard.php:718
+#: include/classes/setup/CSetupWizard.php:722
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9237,7 +9237,7 @@ msgstr "\"%1$s\" 字段的值不正确。"
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
-#: app/controllers/CControllerUserUpdateGeneral.php:98 correlation.php:225
+#: app/controllers/CControllerUserUpdateGeneral.php:111 correlation.php:225
 #: correlation.php:235 correlation.php:241 correlation.php:261
 #: correlation.php:265 correlation.php:278
 #: include/classes/api/services/CAction.php:1724
@@ -9563,11 +9563,11 @@ msgid "Insert expression"
 msgstr "插入表达式"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:679
 msgid "Install"
 msgstr "安装"
 
-#: setup.php:171
+#: setup.php:172
 msgid "Installation"
 msgstr "安装"
 
@@ -10529,7 +10529,7 @@ msgstr "标签"
 msgid "Label location"
 msgstr "标签位置"
 
-#: app/views/administration.user.edit.php:188
+#: app/views/administration.user.edit.php:193
 msgid "Language"
 msgstr "语言"
 
@@ -10704,11 +10704,11 @@ msgstr "修整左边"
 msgid "Legend"
 msgstr "图例"
 
-#: setup.php:194
+#: setup.php:195
 msgid "Licensed under"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:81
+#: app/views/administration.gui.edit.php:82
 msgid "Limit for search and filter results"
 msgstr "搜索/过滤组件限制"
 
@@ -11328,19 +11328,19 @@ msgstr "最大"
 msgid "Max columns"
 msgstr "最大列数"
 
-#: app/views/administration.gui.edit.php:93
+#: app/views/administration.gui.edit.php:94
 msgid "Max count of elements to show inside table cell"
 msgstr "表格位中最多可展示的的组件数量."
 
-#: app/views/administration.gui.edit.php:114
+#: app/views/administration.gui.edit.php:115
 msgid "Max history display period"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:87
+#: app/views/administration.gui.edit.php:88
 msgid "Max number of columns and rows in overview tables"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:126
+#: app/views/administration.gui.edit.php:127
 msgid "Max period"
 msgstr ""
 
@@ -11378,8 +11378,8 @@ msgid "May"
 msgstr "五月"
 
 #: app/controllers/CControllerPopupMedia.php:167
-#: app/views/administration.user.edit.php:305
-#: app/views/administration.user.edit.php:320 app/views/popup.media.php:65
+#: app/views/administration.user.edit.php:310
+#: app/views/administration.user.edit.php:325 app/views/popup.media.php:65
 msgid "Media"
 msgstr "报警媒介"
 
@@ -11506,8 +11506,8 @@ msgstr ""
 msgid "Message templates"
 msgstr ""
 
-#: app/views/administration.user.edit.php:492
-#: app/views/administration.user.edit.php:500
+#: app/views/administration.user.edit.php:497
+#: app/views/administration.user.edit.php:505
 msgid "Message timeout"
 msgstr "消息超时"
 
@@ -11525,7 +11525,7 @@ msgstr "信息/命令"
 msgid "Messages"
 msgstr "消息"
 
-#: app/views/administration.user.edit.php:572
+#: app/views/administration.user.edit.php:577
 msgid "Messaging"
 msgstr "正在发送消息"
 
@@ -12101,7 +12101,7 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:142
 #: include/classes/setup/CSetupWizard.php:421
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 msgid "Next step"
 msgstr "下一步"
 
@@ -12295,7 +12295,7 @@ msgstr "没有细节"
 msgid "No discovery rule IDs given."
 msgstr "没有所称的自动发现规则ID"
 
-#: app/views/administration.user.edit.php:414
+#: app/views/administration.user.edit.php:419
 #: app/views/administration.userrole.edit.php:163
 msgid "No enabled modules found."
 msgstr ""
@@ -12473,7 +12473,7 @@ msgstr ""
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:56
 #: app/controllers/CControllerPopupMediatypeTestSend.php:73
 #: app/controllers/CControllerPopupScriptExec.php:103
-#: app/controllers/CControllerUserUpdateGeneral.php:121
+#: app/controllers/CControllerUserUpdateGeneral.php:134
 #: app/controllers/CControllerWidgetClockView.php:111
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:303
@@ -13106,7 +13106,7 @@ msgstr "开"
 msgid "On status change triggers blink for"
 msgstr "于状态改变时, 触发器因此闪烁于"
 
-#: app/views/administration.user.edit.php:498
+#: app/views/administration.user.edit.php:503
 msgid "Once"
 msgstr "一次"
 
@@ -13807,7 +13807,7 @@ msgstr "解析错误"
 msgid "Passive"
 msgstr "被动式"
 
-#: app/controllers/CControllerUserUpdateGeneral.php:98
+#: app/controllers/CControllerUserUpdateGeneral.php:111
 #: app/partials/popup.operations.php:245 app/partials/popup.operations.php:289
 #: app/views/administration.mediatype.edit.php:200
 #: app/views/administration.user.edit.php:113
@@ -13915,9 +13915,9 @@ msgid "Periods"
 msgstr "期间"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:364
-#: app/views/administration.user.edit.php:384
-#: app/views/administration.user.edit.php:481
+#: app/views/administration.user.edit.php:369
+#: app/views/administration.user.edit.php:389
+#: app/views/administration.user.edit.php:486
 #: app/views/administration.usergroup.edit.php:106
 #: app/views/administration.usergroup.edit.php:157
 #: app/views/administration.usergroup.edit.php:208
@@ -13931,7 +13931,7 @@ msgstr "期间"
 msgid "Permissions"
 msgstr "权限"
 
-#: app/views/administration.user.edit.php:389
+#: app/views/administration.user.edit.php:394
 msgid "Permissions can be assigned for user groups only."
 msgstr "权限只能被指派给用户群组"
 
@@ -13953,16 +13953,16 @@ msgstr "置入演算法"
 msgid "Plain text"
 msgstr "文本"
 
-#: app/views/administration.user.edit.php:516
-#: app/views/administration.user.edit.php:548
+#: app/views/administration.user.edit.php:521
+#: app/views/administration.user.edit.php:553
 msgid "Play"
 msgstr "播放"
 
-#: app/views/administration.user.edit.php:496
+#: app/views/administration.user.edit.php:501
 msgid "Play sound"
 msgstr "播放声音"
 
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "请检查配置参数。如果无误请按%1$s\" ，如果需要修改请按 \"%2$s\" "
@@ -13976,7 +13976,7 @@ msgstr ""
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "请手动创建数据并且完成一些必要的设置。完成后按\"%1$s\"来结束。"
 
-#: include/classes/setup/CSetupWizard.php:860
+#: include/classes/setup/CSetupWizard.php:862
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -14055,7 +14055,7 @@ msgid "Post type"
 msgstr "发布类型"
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:550
+#: include/classes/setup/CSetupWizard.php:552
 msgid "Pre-installation summary"
 msgstr "安装前汇总"
 
@@ -14546,7 +14546,7 @@ msgstr "接收者(降序)"
 msgid "Recipients"
 msgstr ""
 
-#: app/views/administration.user.edit.php:510
+#: app/views/administration.user.edit.php:515
 #: include/classes/screens/CScreenProblem.php:1086
 #: include/views/configuration.item.list.php:175
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14586,7 +14586,7 @@ msgstr "恢复时间"
 msgid "Rectangle"
 msgstr "矩形"
 
-#: app/views/administration.user.edit.php:211
+#: app/views/administration.user.edit.php:216
 msgid "Refresh"
 msgstr "刷新"
 
@@ -14680,7 +14680,7 @@ msgstr "远程命令"
 #: app/views/administration.mediatype.edit.php:165
 #: app/views/administration.mediatype.edit.php:184
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:296
+#: app/views/administration.user.edit.php:301
 #: app/views/administration.valuemap.edit.php:65
 #: app/views/js/administration.iconmap.edit.js.php:52
 #: app/views/js/administration.macros.edit.js.php:45
@@ -14949,7 +14949,7 @@ msgstr "重设所有的栏位为默认值?"
 msgid "Reset confirmation"
 msgstr "重设确认"
 
-#: app/views/administration.gui.edit.php:136
+#: app/views/administration.gui.edit.php:137
 #: app/views/administration.housekeeping.edit.php:191
 #: app/views/administration.miscconfig.edit.php:177
 #: app/views/administration.trigdisplay.edit.php:168
@@ -15150,8 +15150,8 @@ msgstr "Right Y"
 msgid "Right trim"
 msgstr "修整右边"
 
-#: app/views/administration.user.edit.php:344
-#: app/views/administration.user.edit.php:354
+#: app/views/administration.user.edit.php:349
+#: app/views/administration.user.edit.php:359
 msgid "Role"
 msgstr ""
 
@@ -15176,7 +15176,7 @@ msgstr "行宽度"
 msgid "Rows"
 msgstr "行"
 
-#: app/views/administration.user.edit.php:216
+#: app/views/administration.user.edit.php:221
 msgid "Rows per page"
 msgstr "每页行数"
 
@@ -15481,7 +15481,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "保存设置"
 
-#: include/classes/setup/CSetupWizard.php:657
+#: include/classes/setup/CSetupWizard.php:659
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "保存为 \"%1$s\""
@@ -15829,7 +15829,7 @@ msgstr "发送消息给用户"
 msgid "Send only to"
 msgstr "仅送到"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:68
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:68
 #: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "收件人"
@@ -16209,7 +16209,7 @@ msgstr ""
 #: app/partials/common.filter.trigger.php:168
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.problem.filter.php:247
-#: app/views/administration.user.edit.php:566
+#: app/views/administration.user.edit.php:571
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:102
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:154
@@ -16225,7 +16225,7 @@ msgstr "显示处理的问题"
 msgid "Show tags"
 msgstr "显示标签"
 
-#: app/views/administration.gui.edit.php:108
+#: app/views/administration.gui.edit.php:109
 msgid "Show technical errors"
 msgstr ""
 
@@ -16261,7 +16261,7 @@ msgstr "显示不可用的地图"
 msgid "Show value"
 msgstr "查看值"
 
-#: app/views/administration.gui.edit.php:98
+#: app/views/administration.gui.edit.php:99
 msgid "Show warning if Zabbix server is down"
 msgstr "当Zabbix服务器停机时显示警告"
 
@@ -16698,8 +16698,8 @@ msgstr "名字为\"%1$s\"的步骤已经存在."
 msgid "Steps"
 msgstr "步骤"
 
-#: app/views/administration.user.edit.php:521
-#: app/views/administration.user.edit.php:553
+#: app/views/administration.user.edit.php:526
+#: app/views/administration.user.edit.php:558
 msgid "Stop"
 msgstr "停止"
 
@@ -16724,8 +16724,8 @@ msgstr ""
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:485
-#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:487
+#: include/classes/setup/CSetupWizard.php:488
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16838,8 +16838,7 @@ msgstr "瑞士(sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此会话之外的所有会话!继续吗?"
 
-#: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:462
+#: include/classes/helpers/CDateTimeZoneHelper.php:97
 msgid "System"
 msgstr ""
 
@@ -16849,8 +16848,9 @@ msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "系统启动时间。返回时间戳"
 
 #: app/views/administration.user.edit.php:138
-#: app/views/administration.user.edit.php:139
-#: app/views/administration.user.edit.php:140 include/users.inc.php:81
+#: app/views/administration.user.edit.php:140
+#: include/classes/helpers/CDateTimeZoneHelper.php:74
+#: include/classes/helpers/CDateTimeZoneHelper.php:80 include/users.inc.php:81
 msgid "System default"
 msgstr "系统默认"
 
@@ -17356,7 +17356,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "web 场景应用属于一个不同的主机而不是 web 场景主机."
 
-#: app/views/administration.user.edit.php:190
+#: app/views/administration.user.edit.php:195
 msgid "Theme"
 msgstr "主题"
 
@@ -17471,7 +17471,7 @@ msgstr "乘以一个特定的 Zabbix 进程或一组进程（由 <type> 和 <mod
 msgid "Time elapsed:"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:120
+#: app/views/administration.gui.edit.php:121
 msgid "Time filter default period"
 msgstr ""
 
@@ -17505,7 +17505,7 @@ msgstr "时间类型"
 msgid "Time units in period shift must be greater or equal to period time unit."
 msgstr ""
 
-#: app/views/administration.user.edit.php:189
+#: app/views/administration.user.edit.php:194
 msgid "Time zone"
 msgstr ""
 
@@ -17849,7 +17849,7 @@ msgstr "触发器模板已更新"
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr "必须包含至少一个触发恢复表达式，例子 host:key 。"
 
-#: app/views/administration.user.edit.php:565 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:570 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "触发器示警度"
 
@@ -17936,7 +17936,7 @@ msgstr "应选择两个拓扑元素"
 #: app/views/administration.mediatype.list.php:80
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:235
+#: app/views/administration.user.edit.php:240
 #: app/views/dashboard.share.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -18054,7 +18054,7 @@ msgstr "未知的"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:221
+#: app/views/administration.user.edit.php:226
 msgid "URL (after login)"
 msgstr "URL (登录后)"
 
@@ -18376,7 +18376,7 @@ msgstr "上"
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:266
 #: app/views/administration.autoreg.edit.php:90
-#: app/views/administration.gui.edit.php:135
+#: app/views/administration.gui.edit.php:136
 #: app/views/administration.housekeeping.edit.php:190
 #: app/views/administration.iconmap.edit.php:132
 #: app/views/administration.image.edit.php:77
@@ -18388,8 +18388,8 @@ msgstr "上"
 #: app/views/administration.regex.edit.php:141
 #: app/views/administration.script.edit.php:140
 #: app/views/administration.trigdisplay.edit.php:167
-#: app/views/administration.user.edit.php:584
-#: app/views/administration.user.edit.php:607
+#: app/views/administration.user.edit.php:589
+#: app/views/administration.user.edit.php:612
 #: app/views/administration.usergroup.edit.php:221
 #: app/views/administration.userrole.edit.php:298
 #: app/views/administration.valuemap.edit.php:110
@@ -18510,7 +18510,7 @@ msgstr "使用大量请求"
 msgid "Use custom event status colours"
 msgstr "使用自定义事件状态颜色"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:84
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "如果存在严重性则使用"
 
@@ -18528,7 +18528,7 @@ msgstr "用于监控项"
 
 #: app/controllers/CControllerAuditLogList.php:184
 #: app/partials/popup.operations.php:103
-#: app/views/administration.user.edit.php:225
+#: app/views/administration.user.edit.php:230
 #: app/views/reports.auditlog.list.php:87 httpconf.php:66
 #: include/actions.inc.php:1700 include/actions.inc.php:1753
 #: include/actions.inc.php:1967 include/classes/setup/CSetupWizard.php:350
@@ -18571,7 +18571,7 @@ msgstr "用户 \"%1$s\" 用于 \"%2$s\" 操作。"
 msgid "User action"
 msgstr "用户动作"
 
-#: app/controllers/CControllerUserCreate.php:114
+#: app/controllers/CControllerUserCreate.php:112
 msgid "User added"
 msgstr "添加用户"
 
@@ -18584,7 +18584,7 @@ msgstr "用户代理字符串"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "用户不能将自己加进一个取消的群组或已关闭图形接口访问权的群组."
 
-#: app/views/administration.user.edit.php:347
+#: app/views/administration.user.edit.php:352
 #: include/classes/api/services/CUser.php:850
 msgid "User cannot change own role."
 msgstr ""
@@ -18710,7 +18710,7 @@ msgstr "用户名称"
 msgid "User password"
 msgstr "用户密码"
 
-#: app/controllers/CControllerUserProfileEdit.php:138
+#: app/controllers/CControllerUserProfileEdit.php:137
 #: app/views/administration.user.edit.php:38
 msgid "User profile"
 msgstr "用户基本资料"
@@ -18773,7 +18773,7 @@ msgstr "拓扑图 \"%2$s\" 用户共享缺少参数 %1$s "
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "聚合图形 \"%2$s\" 用户共享缺少参数 %1$s 。"
 
-#: app/views/administration.user.edit.php:358
+#: app/views/administration.user.edit.php:363
 #: app/views/administration.userrole.edit.php:55
 #: app/views/administration.userrole.edit.php:70
 msgid "User type"
@@ -18784,8 +18784,8 @@ msgid "User unblocked"
 msgid_plural "Users unblocked"
 msgstr[0] ""
 
-#: app/controllers/CControllerUserProfileUpdate.php:120
-#: app/controllers/CControllerUserUpdate.php:126
+#: app/controllers/CControllerUserProfileUpdate.php:118
+#: app/controllers/CControllerUserUpdate.php:124
 msgid "User updated"
 msgstr "用户已更新"
 
@@ -18816,8 +18816,8 @@ msgstr "用户名称"
 msgid "Username and password"
 msgstr "用户名和密码"
 
-#: include/classes/setup/CSetupWizard.php:585
-#: include/classes/setup/CSetupWizard.php:878
+#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -19255,17 +19255,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "具体处理的各个信息。返回浮点数"
 
 #: include/classes/setup/CSetupWizard.php:327
-#: include/classes/setup/CSetupWizard.php:504
+#: include/classes/setup/CSetupWizard.php:506
 msgid "Vault API endpoint"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:874 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:876 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -19274,7 +19274,7 @@ msgid "Vault secret"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:509
 msgid "Vault secret path"
 msgstr ""
 
@@ -19474,7 +19474,7 @@ msgstr "欢迎"
 msgid "Welcome to"
 msgstr "欢迎来到"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:79
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:79
 msgid "When active"
 msgstr "当启用时"
 
@@ -19548,7 +19548,7 @@ msgstr "无触发器"
 msgid "Wizard"
 msgstr "Wizard"
 
-#: app/views/administration.gui.edit.php:103
+#: app/views/administration.gui.edit.php:104
 msgid "Working time"
 msgstr "工作时间"
 
@@ -19795,8 +19795,8 @@ msgstr "昨天"
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\" 欢迎登入."
 
-#: app/views/administration.gui.edit.php:62
-#: app/views/administration.user.edit.php:175
+#: app/views/administration.gui.edit.php:63
+#: app/views/administration.user.edit.php:178
 #: include/classes/setup/CSetupWizard.php:216
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语言并未安装在web服务器上。"
@@ -19919,7 +19919,7 @@ msgstr "Zabbix 登录表单"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:878
-#: include/classes/setup/CSetupWizard.php:541
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Zabbix server"
 msgstr "zabbix服务器"
 
@@ -19949,11 +19949,11 @@ msgstr "Zabbix server is not running: the information displayed may not be curre
 msgid "Zabbix server is running"
 msgstr "Zabbix服务器端运行中"
 
-#: include/classes/setup/CSetupWizard.php:545
+#: include/classes/setup/CSetupWizard.php:547
 msgid "Zabbix server name"
 msgstr "Zabbix主机名称"
 
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:544
 msgid "Zabbix server port"
 msgstr "Zabbix主机端口"
 
@@ -20263,7 +20263,7 @@ msgstr "不能变更"
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
-#: app/controllers/CControllerUserUpdateGeneral.php:98 correlation.php:225
+#: app/controllers/CControllerUserUpdateGeneral.php:111 correlation.php:225
 #: correlation.php:235 correlation.php:241 correlation.php:261
 #: correlation.php:265 correlation.php:278
 #: include/classes/api/services/CAction.php:1898
@@ -20443,7 +20443,7 @@ msgid "days"
 msgstr "日"
 
 #: app/controllers/CControllerMapView.php:123
-#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:484
 #: include/classes/widgets/CWidgetHelper.php:63
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -20636,7 +20636,7 @@ msgid "in"
 msgstr "在"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:374
+#: app/views/administration.user.edit.php:379
 msgid "including subgroups"
 msgstr "包括子组"
 
@@ -20999,7 +20999,7 @@ msgstr "数字"
 msgid "of"
 msgstr "其"
 
-#: app/views/administration.user.edit.php:270
+#: app/views/administration.user.edit.php:275
 #: include/classes/setup/CFrontendSetup.php:238
 #: include/classes/setup/CFrontendSetup.php:291
 #: include/classes/setup/CFrontendSetup.php:308
@@ -21022,7 +21022,7 @@ msgstr "其"
 msgid "off"
 msgstr "关闭"
 
-#: app/views/administration.user.edit.php:270
+#: app/views/administration.user.edit.php:275
 #: app/views/monitoring.host.dashboard.view.php:51
 #: include/classes/setup/CFrontendSetup.php:291
 #: include/classes/setup/CFrontendSetup.php:308

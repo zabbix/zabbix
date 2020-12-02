@@ -36,7 +36,8 @@
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_JAVA		4
-#define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
+#define	ZBX_POLLER_TYPE_HISTORY		5
+#define	ZBX_POLLER_TYPE_COUNT		6	/* number of poller types */
 
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
@@ -68,6 +69,7 @@ extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
+extern int	CONFIG_HISTORYPOLLER_FORKS;
 
 typedef struct
 {

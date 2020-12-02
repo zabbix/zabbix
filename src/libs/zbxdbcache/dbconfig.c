@@ -214,19 +214,23 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 			ZBX_FALLTHROUGH;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMP:
-		case ITEM_TYPE_INTERNAL:
-		case ITEM_TYPE_AGGREGATE:
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_DB_MONITOR:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
-		case ITEM_TYPE_CALCULATED:
 		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_AGGREGATE:
+		case ITEM_TYPE_INTERNAL:
+			if (0 == CONFIG_HISTORYPOLLER_FORKS)
+				break;
+
+			return ZBX_POLLER_TYPE_HISTORY;
 		case ITEM_TYPE_IPMI:
 			if (0 == CONFIG_IPMIPOLLER_FORKS)
 				break;

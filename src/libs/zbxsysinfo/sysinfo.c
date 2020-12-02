@@ -24,7 +24,9 @@
 #include "cfg.h"
 #include "alias.h"
 #include "threads.h"
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "sighandler.h"
+#endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 
