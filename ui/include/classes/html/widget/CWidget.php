@@ -79,11 +79,11 @@ class CWidget {
 	}
 
 	/**
-	 * Set navigation menu
+	 * Set navigation to be displayed in ZBX_LAYOUT_NORMAL mode.
 	 *
-	 * @param $navigation
+	 * @param mixed $navigation
 	 *
-	 * @return $this
+	 * @return CWidget
 	 */
 	public function setNavigation($navigation) {
 		$this->navigation = $navigation;
