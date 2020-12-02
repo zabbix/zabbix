@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CTestArrayHelper.php';
 
 /**
  * Base class for Preprocessing tests.
@@ -2062,7 +2063,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
-	public function checkCustomOnFail($data) {
+	public function checkCustomOnFail($data, $lld = null) {
 		$form = $this->addItemWithPreprocessing($data);
 		$steps = $this->getPreprocessingSteps();
 
@@ -2098,16 +2099,11 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		foreach ($data['preprocessing'] as $i => $options) {
 			// Check "Custom on fail" value in DB.
-			if ($options['type'] === 'Check for not supported value') {
-				$expected =  (!array_key_exists('on_fail', $options) || !$options['on_fail'])
-					? 1 : $data['value'];
-			}
-			else {
-				$expected = (!array_key_exists('on_fail', $options) || !$options['on_fail'])
-					? ZBX_PREPROC_FAIL_DEFAULT : $data['value'];
-			}
+			$expected = CTestArrayHelper::get($options, 'on_fail', false) === false
+				? (($options['type'] === 'Check for not supported value') ? 1 : ZBX_PREPROC_FAIL_DEFAULT)
+				: $data['value'];
 
-			$this->assertEquals($expected, $rows[$i]);
+			$this->assertEquals($expected, $lld ? $rows[$i+1] : $rows[$i]);
 
 			if (in_array($options['type'], [
 				'Trim',
