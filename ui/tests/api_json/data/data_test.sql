@@ -1425,3 +1425,6 @@ INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99012, 99011, '
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50026, 99010, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027, 50026);
+
+-- token
+INSERT INTO token (tokenid, userid, name) VALUES (1, 2, 'token-exists');

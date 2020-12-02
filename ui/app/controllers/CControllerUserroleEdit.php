@@ -161,7 +161,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 					CRoleHelper::ACTIONS_CLOSE_PROBLEMS => true,
 					CRoleHelper::ACTIONS_CHANGE_SEVERITY => true,
 					CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => true,
-					CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => true
+					CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => true,
+					CRoleHelper::ACTIONS_MANAGE_API_TOKENS => true
 				],
 				CRoleHelper::SECTION_MODULES => [],
 				CRoleHelper::API_ACCESS => true,

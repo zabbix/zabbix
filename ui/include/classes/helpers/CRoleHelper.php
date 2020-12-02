@@ -76,6 +76,7 @@ class CRoleHelper {
 	public const ACTIONS_CHANGE_SEVERITY = 'actions.change_severity';
 	public const ACTIONS_ADD_PROBLEM_COMMENTS = 'actions.add_problem_comments';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
+	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 	public const DEFAULT_ACCESS_DISABLED = 0;
 	public const DEFAULT_ACCESS_ENABLED = 1;
@@ -326,6 +327,7 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$rules[] = self::ACTIONS_EDIT_MAINTENANCE;
+			$rules[] = self::ACTIONS_MANAGE_API_TOKENS;
 		}
 
 		return $rules;
@@ -490,7 +492,8 @@ class CRoleHelper {
 			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
 			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
 			self::ACTIONS_ADD_PROBLEM_COMMENTS => _('Add problem comments'),
-			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts')
+			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts'),
+			self::ACTIONS_MANAGE_API_TOKENS => _('Manage API tokens')
 		];
 
 		return $labels;

@@ -403,6 +403,13 @@ class API {
 	}
 
 	/**
+	 * @return CToken
+	 */
+	public static function Token() {
+		return self::getApi('token');
+	}
+
+	/**
 	 * @return CTrend
 	 */
 	public static function Trend() {
