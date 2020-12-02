@@ -18,20 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
- * Class CBreadcrumbs
- * Class for breadcrumb navigation
+ * Class for breadcrumbs-style navigation.
  */
 class CBreadcrumbs extends CList {
+
 	private const ZBX_STYLE_BREADCRUMBS = 'breadcrumbs';
 
 	/**
-	 * CBreadcrumbs constructor creates list with 'breadcrumbs' class and special attributes.
+	 * Create a CBreadcrumbs instance for the specified item list.
 	 *
-	 * @param array $values
+	 * @param array $values  Breadcrumb list.
 	 */
-	public function __construct(array $values = []) {
-		parent::__construct($values);
+	public function __construct(array $list = []) {
+		parent::__construct($list);
+
 		$this
 			->addClass(self::ZBX_STYLE_BREADCRUMBS)
 			->setAttribute('role', 'navigation')
