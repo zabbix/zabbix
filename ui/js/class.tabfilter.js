@@ -41,10 +41,6 @@ class CTabFilter extends CBaseComponent {
 		this.registerEvents();
 		this.initItemUnsavedState(this._active_item, this._active_item._data);
 
-		if (this._active_item instanceof CTabFilterItem) {
-			this._active_item.setFocused();
-		}
-
 		if (this._timeselector instanceof CTabFilterItem) {
 			this._timeselector._data = options.timeselector;
 			this.updateTimeselector(this._active_item, this._timeselector._data.disabled);
