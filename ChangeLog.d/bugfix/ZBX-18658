@@ -1,0 +1,1 @@
+.........T [ZBX-18658] changed {$AMI.PORT} macro value to 5038, added handling the "Follows" response and situations with unloaded modules (mchudinov)
