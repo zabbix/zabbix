@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
- * @event afterresize - Event fire after textare change size.
+ * @event afterresize - Event fired on textarea size change.
  */
 (function($) {
 	'use strict';
@@ -75,7 +76,7 @@
 			$textarea.css({'overflow-y': 'scroll'});
 		}
 		else {
-			$textarea.css({'overflow-y': 'unset'});
+			$textarea.css({'overflow-y': ''});
 		}
 
 		$textarea.innerHeight(height);
