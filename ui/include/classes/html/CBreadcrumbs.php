@@ -18,7 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
+/**
+ * Class CBreadcrumbs
+ * Class for breadcrumb navigation
+ */
 class CBreadcrumbs extends CList {
 	private const ZBX_STYLE_BREADCRUMBS = 'breadcrumbs';
 
