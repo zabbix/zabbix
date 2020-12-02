@@ -26,10 +26,10 @@
 
 	function update(e) {
 		const $textarea = $(this);
-		const is_maxheight = !!$textarea.data('maxheight');
+		const has_maxheight = !!$textarea.data('maxheight');
 		let maxheight;
 
-		if (is_maxheight) {
+		if (has_maxheight) {
 			maxheight = $textarea.data('maxheight');
 		}
 
@@ -71,7 +71,7 @@
 
 		let height = $textarea[0].scrollHeight;
 
-		if (is_maxheight && height >= maxheight) {
+		if (has_maxheight && height >= maxheight) {
 			height = maxheight;
 			$textarea.css({'overflow-y': 'scroll'});
 		}
