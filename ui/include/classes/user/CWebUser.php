@@ -154,7 +154,8 @@ class CWebUser {
 			'type' => 0,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
 			'debug_mode' => false,
-			'roleid' => 0
+			'roleid' => 0,
+			'autologin' => 0
 		];
 	}
 
