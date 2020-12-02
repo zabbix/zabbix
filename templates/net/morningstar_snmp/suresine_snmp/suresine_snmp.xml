@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-11-09T12:44:51Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Net Morningstar SureSine SNMP</template>
+         <name>Template Net Morningstar SureSine SNMP</name>
+         <description>MIBs used:&#13;
+SURESINE&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Battery</name>
+            </application>
+            <application>
+               <name>Load</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Battery: Battery Voltage discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.9.30.0</snmp_oid>
+               <key>battery.voltage.discovery[batteryVoltageSlow.0]</key>
+               <delay>15m</delay>
+               <history>0</history>
+               <value_type>FLOAT</value_type>
+               <units>V</units>
+               <description>MIB: SURESINE</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>2.581787109375E-4</params>
+                  </step>
+                  <step>
+                     <type>REGEX</type>
+                     <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Load: A/C Current</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.9.31.0</snmp_oid>
+               <key>load.ac_current[acCurrent.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>MIB: SURESINE&#13;
+Description:AC Output Current&#13;
+Scaling Factor:0.0001953125&#13;
+Units:A&#13;
+Range:[0.0, 17]&#13;
+Modbus address:0x0005</description>
+               <applications>
+                  <application>
+                     <name>Load</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1.953125E-4</params>
+                  </step>
+                  <step>
+                     <type>REGEX</type>
+                     <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Load: State</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.9.33.0</snmp_oid>
+               <key>load.state[loadState.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>MIB: SURESINE&#13;
+Description:Load State&#13;
+Modbus address:0x000B&#13;
+&#13;
+ 0: Start&#13;
+1: LoadOn&#13;
+2: LvdWarning&#13;
+3: LowVoltageDisconnect&#13;
+4: Fault&#13;
+5: Disconnect&#13;
+6: NormalOff&#13;
+7: UnknownState&#13;
+8: Standby</description>
+               <applications>
+                  <application>
+                     <name>Load</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>SureSine load state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}={$LOAD.STATE.WARN:"lvdWarning"}  or {last()}={$LOAD.STATE.WARN:"override"}</expression>
+                     <name>Load: Device load in warning state</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>Load: Device load in critical state</name>
+                           <expression>{Template Net Morningstar SureSine SNMP:load.state[loadState.0].last()}={$LOAD.STATE.CRIT:"lvd"} or {Template Net Morningstar SureSine SNMP:load.state[loadState.0].last()}={$LOAD.STATE.CRIT:"fault"}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}</expression>
+                     <name>Load: Device load in critical state</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Status: Alarms</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.9.34.0</snmp_oid>
+               <key>status.alarms[alarms.0]</key>
+               <history>1h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>MIB: SURESINE&#13;
+Description:Faults&#13;
+Modbus address:0x0007</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var FIELDS = [
+  'heatsinkTempSensorOpen',
+  'heatsinkTempSensorShort',
+  'unknownAlarm',
+  'suresineHot'
+];
+
+var flags = parseInt(value.replace(/\x20/g, ''), 16),
+  result = [];
+
+for (var i = 0, f = 1 &lt;&lt; 31 &gt;&gt;&gt; 0, l = FIELDS.length; i &lt; l; i++, f &gt;&gt;&gt;= 1) {
+    if (flags &amp; f) {
+        result.push(FIELDS[i]);
+    }
+}
+
+return result.length ? result.join('\n') : 'No alarms';
+</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{count(#3,"heatsinkTempSensorOpen","like")}=2</expression>
+                     <name>Status: Device has "heatsinkTempSensorOpen" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"heatsinkTempSensorShort","like")}=2</expression>
+                     <name>Status: Device has "heatsinkTempSensorShort" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"unknownAlarm","like")}=2</expression>
+                     <name>Status: Device has "unknownAlarm" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"suresineHot","like")}=2</expression>
+                     <name>Status: Device has "suresineHot" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Status: Faults</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.9.35.0</snmp_oid>
+               <key>status.faults[faults.0]</key>
+               <history>1h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>MIB: SURESINE&#13;
+Description:Faults&#13;
+Modbus address:0x0007</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var FIELDS = [
+  'reset',
+  'overcurrent',
+  'unknownFault',
+  'software',
+  'highVoltageDisconnect',
+  'suresineHot',
+  'dipSwitchChanged',
+  'customSettingsEdit'
+];
+
+var flags = parseInt(value.replace(/\x20/g, ''), 16),
+  result = [];
+
+for (var i = 0, f = 1 &lt;&lt; 31 &gt;&gt;&gt; 0, l = FIELDS.length; i &lt; l; i++, f &gt;&gt;&gt;= 1) {
+    if (flags &amp; f) {
+        result.push(FIELDS[i]);
+    }
+}
+
+return result.length ? result.join('\n') : 'No faults';
+</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{count(#3,"reset","like")}=2</expression>
+                     <name>Status: Device has "reset" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"overcurrent","like")}=2</expression>
+                     <name>Status: Device has "overcurrent" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"unknownFault","like")}=2</expression>
+                     <name>Status: Device has "unknownFault" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"software","like")}=2</expression>
+                     <name>Status: Device has "software" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
+                     <name>Status: Device has "highVoltageDisconnect" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"suresineHot","like")}=2</expression>
+                     <name>Status: Device has "suresineHot" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"dipSwitchChanged","like")}=2</expression>
+                     <name>Status: Device has "dipSwitchChanged" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"customSettingsEdit","like")}=2</expression>
+                     <name>Status: Device has "customSettingsEdit" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Status: Uptime</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+               <key>status.uptime</key>
+               <history>7d</history>
+               <units>uptime</units>
+               <description>Device uptime in seconds</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Status: Device has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(5m)}=1</expression>
+                     <name>Status: Failed to fetch data (or no data for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 5 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Temperature: Heatsink</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.9.32.0</snmp_oid>
+               <key>temp.heatsink[heatsinkTemperature.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>C</units>
+               <description>MIB: SURESINE&#13;
+Description:Heatsink Temperature&#13;
+Scaling Factor:1&#13;
+Units:C&#13;
+Range:[-128, 127]&#13;
+Modbus address:0x0006</description>
+               <applications>
+                  <application>
+                     <name>Temperature</name>
+                  </application>
+               </applications>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Battery voltage discovery</name>
+               <type>DEPENDENT</type>
+               <key>battery.voltage.discovery</key>
+               <delay>0</delay>
+               <description>Discovery for battery voltage triggers</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Battery: Voltage{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.9.30.0</snmp_oid>
+                     <key>battery.voltage[batteryVoltageSlow.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: SURESINE&#13;
+Description:Battery Voltage(slow)&#13;
+Scaling Factor:0.0002581787109375&#13;
+Units:V&#13;
+Range:[0.0, 17.0]&#13;
+Modbus address:0x0004</description>
+                     <applications>
+                        <application>
+                           <name>Battery</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>2.581787109375E-4</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.WARN}</expression>
+                           <name>Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
+                                 <expression>{Template Net Morningstar SureSine SNMP:battery.voltage[batteryVoltageSlow.0{#SINGLETON}].max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
+                           <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.WARN}</expression>
+                           <name>Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
+                                 <expression>{Template Net Morningstar SureSine SNMP:battery.voltage[batteryVoltageSlow.0{#SINGLETON}].min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
+                           <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Voltage: Battery{#SINGLETON}</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Morningstar SureSine SNMP</host>
+                              <key>battery.voltage[batteryVoltageSlow.0{#SINGLETON}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>battery.voltage.discovery[batteryVoltageSlow.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var v_range = [
+      [[0, 18], [12, 15, 11.5, 15.5]],
+      [[18, 36], [24, 30, 23, 31]],
+      [[36, 99], [48, 60, 46, 62]],
+  ],
+  result = [];
+
+for (var idx in v_range) {
+    if (v_range[idx][0][0] &lt; value &amp;&amp; value &lt;= v_range[idx][0][1]) {
+        result = [{
+            '{#VOLTAGE.MIN.WARN}': parseInt({$VOLTAGE.MIN.WARN}) || v_range[idx][1][0],
+            '{#VOLTAGE.MAX.WARN}': parseInt({$VOLTAGE.MAX.WARN}) || v_range[idx][1][1],
+            '{#VOLTAGE.MIN.CRIT}': parseInt({$VOLTAGE.MIN.CRIT}) || v_range[idx][1][2],
+            '{#VOLTAGE.MAX.CRIT}': parseInt({$VOLTAGE.MAX.CRIT}) || v_range[idx][1][3],
+            '{#SINGLETON}': ''
+        }];
+        break;
+    }
+}
+
+return JSON.stringify(result);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$BATTERY.TEMP.MAX.CRIT}</macro>
+               <value>60</value>
+               <description>Battery high temperature critical value</description>
+            </macro>
+            <macro>
+               <macro>{$BATTERY.TEMP.MAX.WARN}</macro>
+               <value>45</value>
+               <description>Battery high temperature warning value</description>
+            </macro>
+            <macro>
+               <macro>{$BATTERY.TEMP.MIN.CRIT}</macro>
+               <value>-20</value>
+               <description>Battery low temperature critical value</description>
+            </macro>
+            <macro>
+               <macro>{$BATTERY.TEMP.MIN.WARN}</macro>
+               <value>0</value>
+               <description>Battery low temperature warning value</description>
+            </macro>
+            <macro>
+               <macro>{$CHARGE.STATE.CRIT}</macro>
+               <value>4</value>
+               <description>fault</description>
+            </macro>
+            <macro>
+               <macro>{$CHARGE.STATE.WARN}</macro>
+               <value>2</value>
+               <description>disconnect</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.CRIT:"fault"}</macro>
+               <value>4</value>
+               <description>fault</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.CRIT:"lvd"}</macro>
+               <value>3</value>
+               <description>lvd</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.WARN:"disconnect"}</macro>
+               <value>5</value>
+               <description>disconnect</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.WARN:"lvdWarning"}</macro>
+               <value>2</value>
+               <description>lvdWarning</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.WARN:"override"}</macro>
+               <value>7</value>
+               <description>override</description>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MAX.CRIT}</macro>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MAX.WARN}</macro>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MIN.CRIT}</macro>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MIN.WARN}</macro>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>Current: A/C Load</name>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template Net Morningstar SureSine SNMP</host>
+                  <key>load.ac_current[acCurrent.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Temperature: Heatsink</name>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template Net Morningstar SureSine SNMP</host>
+                  <key>temp.heatsink[heatsinkTemperature.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>SureSine load state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Start</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>LoadOn</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>LvdWarning</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>LowVoltageDisconnect</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Fault</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Disconnect</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>NormalOff</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>UnknownState</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>Standby</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

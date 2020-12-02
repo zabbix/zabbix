@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2020-04-17T09:24:29Z</date>
+   <version>5.0</version>
+   <date>2020-10-05T10:44:12Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -24,7 +24,7 @@ Example configuration of HAProxy:        &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -525,6 +525,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: TCP Backend {#PXNAME} Redispatched requests and retried connections per second</name>
@@ -566,7 +567,7 @@ catch (error) {
                </lld_macro_paths>
             </discovery_rule>
             <discovery_rule>
-               <name>BACKEND discovery</name>
+               <name>Backend discovery</name>
                <type>DEPENDENT</type>
                <key>haproxy.backend.discovery</key>
                <delay>0</delay>
@@ -868,6 +869,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second</name>
@@ -1177,6 +1179,7 @@ catch (error) {
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: TCP Frontend {#PXNAME} Errors and denials per second</name>
@@ -1658,6 +1661,7 @@ catch (error) {
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: Frontend {#PXNAME} Errors and denials per second</name>
@@ -2089,6 +2093,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: TCP {#PXNAME} {#SVNAME} Response time and time in queue</name>
@@ -2485,6 +2490,7 @@ catch (error) {
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue</name>
@@ -2559,7 +2565,7 @@ catch (error) {
             </macro>
             <macro>
                <macro>{$HAPROXY.FRONT_SUTIL.MAX.WARN}</macro>
-               <value>80%</value>
+               <value>80</value>
                <description>Maximum of session usage percentage on frontend for trigger expression.</description>
             </macro>
             <macro>

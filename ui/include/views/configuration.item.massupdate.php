@@ -192,7 +192,9 @@ $item_form_list
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name'))
 			->setChecked(isset($data['visible']['username'])),
-		(new CTextBox('username', $data['username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('username', $data['username']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete()
 	)
 	// Append publickey to item form list.
 	->addRow(
@@ -213,7 +215,9 @@ $item_form_list
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))
 			->setLabel(_('Password'))
 			->setChecked(isset($data['visible']['password'])),
-		(new CTextBox('password', $data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('password', $data['password']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete()
 	);
 
 // Create preprocessing form list.
@@ -517,8 +521,10 @@ $form->addItem($tabs);
 $widget->addItem($form);
 
 $interface_ids_by_types = [];
-foreach ($data['hosts']['interfaces'] as $interface) {
-	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+if ($data['displayInterfaces']) {
+	foreach ($data['hosts']['interfaces'] as $interface) {
+		$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+	}
 }
 
 require_once dirname(__FILE__).'/js/configuration.item.massupdate.js.php';

@@ -2770,7 +2770,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]) && 0 == host->proxy_hostid)
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
 		{
 			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
 					sizeof(ZBX_DC_DEPENDENTITEM), &found);

@@ -60,7 +60,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 					'output' => ['itemid', 'name', 'key_', 'hostid'],
 					'hostids' => [$itemPrototype['discoveryRule']['hostid']],
 					'selectItemDiscovery' => ['itemid', 'parent_itemid'],
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 				]);
 
 				// collect those items where parent item is item prototype selected for this screen item as resource

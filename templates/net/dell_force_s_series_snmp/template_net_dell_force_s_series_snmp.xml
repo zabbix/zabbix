@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:11Z</date>
+   <date>2020-10-20T07:15:10Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 F10-S-SERIES-CHASSIS-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -103,6 +103,7 @@ The status of the fan tray {#SNMPVALUE}.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>CPU and Memory and Flash Discovery</name>
@@ -161,6 +162,7 @@ Total memory usage in percentage.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -244,6 +246,7 @@ The status of the power supply {#SNMPVALUE}</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Stack Unit Discovery</name>
@@ -406,7 +409,6 @@ Current code version of this unit.</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                           <recovery_mode>NONE</recovery_mode>
                            <name>#{#SNMPVALUE}: Operating system description has changed</name>
                            <priority>INFO</priority>
                            <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
@@ -415,6 +417,7 @@ Current code version of this unit.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

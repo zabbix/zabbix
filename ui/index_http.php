@@ -83,7 +83,7 @@ if ($http_user) {
 	}
 }
 else {
-	error(_('Login name or password is incorrect.'));
+	error(_('Incorrect user name or password or account is temporarily blocked.'));
 }
 
 echo (new CView('general.warning', [

@@ -406,7 +406,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host' => 'Host for inheritance host prototype tests',
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
-					'cloned_name' => 'Cloned host prototype with minimum changed fields {#TEST}',
+					'cloned_name' => 'Cloned host prototype with minimum changed fields {#TEST}'
 				]
 			],
 			[

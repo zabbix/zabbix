@@ -1,8 +1,109 @@
-Changes for 5.0.5rc1
+Changes for 5.0.7rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.6
+
+5.0.6rc1 was released as 5.0.6 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.6rc1
+
+New features:
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
+...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
+........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
+.........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
+
+Bug fixes:
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
+..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+..F....... [ZBX-18518] fixed characters counter which were removed in script modal window (gcalenko)
+..F....... [ZBX-18414] fixed override be saved with custom expression even when all rows are removed (miks)
+..F....... [ZBX-18497] fixed macro resolving in http basic authentication username and macros fields (miks)
+..F....... [ZBX-18143] fixed ability to download image of non-existent graph (agriscenko)
+....I..... [ZBX-18359] fixed long data row formatting for OracleDB (kalimulin, viktors)
+...G...... [ZBX-18581] fixed ORA-40478 exception in queries (ychukina)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
+...G...... [ZBX-18505] fixed build failing to compile for Zabbix agent 2 on ARM/v7 and ARM/v6 (esneiders)
+.........T [ZBX-18380] changed trigger of the net.if.speed item in the Windows network module template (mchudinov)
+.........T [ZBX-18494] removed recovery mode NONE in trigger "Operating system description has changed" (mchudinov)
+.........T [ZBX-18531] fixed "Template App Ceph by Zabbix Agent2" pool discovery (ychukina)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
+.........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
+.........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.5
+
+5.0.5rc1 was released as 5.0.5 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.5rc1
+
+New features:
+.D.....PS. [ZBXNEXT-6245] added locks section to diaginfo runtime command to log adresses of the mutexes and read write locks (vso)
+.........T [ZBXNEXT-6232] added LTE monitoring in Template Net Mikrotik SNMP (mchudinov)
+.........T [ZBXNEXT-6189] added "Template Tel Asterisk by HTTP" (mchudinov)
+.........T [ZBXNEXT-6020] added template "Template App Ceph by Zabbix Agent2" (ychukina)
+.........T [ZBXNEXT-6180] added Squid template (tuskov)
+...G...... [ZBXNEXT-6142] added Ceph monitoring plugin (vadimipatov)
+A.F....PS. [ZBXNEXT-6167,ZBXNEXT-6168] implemented ability to dump the history cache contents (miks, wiper)
+.........T [ZBXNEXT-6159] added "Template App PHP-FPM by HTTP" and "Template App PHP-FPM by Zabbix agent" (ychukina)
+..F....... [ZBXNEXT-6157] reworked UI for setup to simplify db encryption configuration (rlataria)
+.........T [ZBXNEXT-6118] added template "Template DB Oracle by Zabbix Agent 2" (ychukina)
+...G...... [ZBXNEXT-6258] added system.swap.size metrics native support to Agent 2 (esneiders)
+
+Bug fixes:
+..F....... [ZBX-18396] fixed undefined offset in item test form (Ivo)
+..F....... [ZBX-18415] fixed value caching for item test dialog when opened by 'Test all steps' button (miks)
+...G...... [ZBX-17975] fixed Hostname and HostnameItem for Zabbix Agent 2 test and print execution (esneiders)
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
+........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
+..F....... [ZBX-18443] fixed undefined index in item prototype form when creating dependent item using wizard (Ivo)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
+..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
+.......PS. [ZBX-17178] fixed multi-line value truncation in snmp lld (asestakovs)
+..F....... [ZBX-18378] fixed map context menu not opening for images with URLs (vmurzins)
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
+........S. [ZBX-18118] sorted event tag macro selection (arimdjonoks)
+..F....... [ZBX-18456] fixed encryption field sent in form for non-supported encryption database (rlataria)
+.......PS. [ZBX-18407] fixed dependent items not working if it's master item is calculated and host is monitored by Zabbix proxy (vso)
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)
+........S. [ZBX-18210] fixed preprocessor crashing on Solaris due to incorrect byteorder (arimdjonoks)
+.........T [ZBX-18383] fixed the value of the {$HAPROXY.FRONT_SUTIL.MAX.WARN} macro in Template App HAProxy by HTTP (mchudinov)
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+...G...... [ZBX-18385] fixed segmentation violation in oracle plugin (vadimipatov)
+.......PS. [ZBX-18193] added logging for snmp_cache_reload (arimdjonoks)
+.......PS. [ZBX-18400] fixed http(s) requests from JavaScript to use SourceIP parameter in connections (Andris)
+..F....... [ZBX-17877] fixed details not displayed on SNMP interfaces within select element (ashubin, talbergs)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+A......... [ZBX-18417] fixed unexpected tag errors while importing JSON-exported data (averza)
+.......PS. [ZBX-17916] removed inserting of "wait" into "system.run[]" when executing frontend scripts (Andris)
+........S. [ZBX-18386] fixed server crash after removing snmp host interface from parent host (arimdjonoks)
+...G...... [ZBX-18199] changed the default log filename for agent2 on windows (arimdjonoks)
+...G...... [ZBX-18366] fixed agent reporting absence of 'Processor Information' counter on old Windows systems (arimdjonoks)
+..F....... [ZBX-18238] fixed JavaScript error when "invalid URL" error is displayed (talbergs)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.4
@@ -1751,11 +1852,52 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.26rc1
+Changes for 4.0.28rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.27
+
+4.0.27rc1 was released as 4.0.27 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.27rc1
+
+New features:
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
+
+Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
+...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
+A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
+A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
+..F....... [ZBX-18058] updated the list of item keys and their descriptions (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.26
+
+4.0.26rc1 was released as 4.0.26 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.26rc1
+
+Bug fixes:
+..F....... [ZBX-18464] fixed javascript Uncaught TypeError when clicking on disabled multiselect item (miks)
+........S. [ZBX-18411] set maxQueryMetrics default values for vcenter depending on its version (arimdjonoks)
+..F....... [ZBX-18438] fixed missing asterisk mark for "timeout" field in item, item prototype and LLD rule edit forms (Ivo)
+..F....... [ZBX-18327] fixed undefined index when invalid URL is given (Ivo)
+.......PS. [ZBX-17178] fixed multi-line value truncation in snmp lld (asestakovs)
+.......PS. [ZBX-18462] fixed inconsistent auto-registration behaviour for hosts without metadata on Oracle DB compared to other databases when using Zabbix proxy (viktors)
+.......PS. [ZBX-18364] fixed inconsistency with autoregistration behaviour for hosts without metadata on Oracle compared to other databases (viktors)
+.......PS. [ZBX-18365] added Fping 5.0 support to Zabbix (dimir)
+........S. [ZBX-17493] added discarding of incoming values outside history/trends storage periods on server (wiper)
+..F....... [ZBX-18343] fixed in screen "host issue" problem stay even after problem resolved (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.25

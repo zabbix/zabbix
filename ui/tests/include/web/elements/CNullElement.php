@@ -125,6 +125,13 @@ class CNullElement {
 	/**
 	 * @inheritdoc
 	 */
+	public function getSelectedCondition() {
+		return self::getFailCondition();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getTextPresentCondition($text) {
 		return self::getFailCondition();
 	}

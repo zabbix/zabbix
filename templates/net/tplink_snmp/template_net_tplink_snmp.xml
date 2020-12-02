@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:29:13Z</date>
+   <date>2020-10-16T09:13:58Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Net TP-LINK SNMP</template>
          <name>Template Net TP-LINK SNMP</name>
-         <description>Template Net TP-LINK JetStream&#13;
+         <description>Template Net TP-LINK&#13;
 &#13;
 MIBs used:&#13;
 TPLINK-SYSINFO-MIB&#13;
@@ -19,15 +19,15 @@ TPLINK-SYSMONITOR-MIB&#13;
 &#13;
 Known Issues:&#13;
 &#13;
-  Description: default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch(TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firware: http://www.tp-linkru.com/download/T2600G-28TS.html#Firmware&#13;
-  Version: 2.0.0 Build 20170628 Rel.55184(Beta)&#13;
+  Description: Default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch (TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firmware: https://www.tp-link.com/en/support/download/t2600g-28ts/#Firmware&#13;
+  Version: 2.0.0 Build 20170628 Rel.55184 (Beta)&#13;
   Device: T2600G-28TS 2.0&#13;
 &#13;
-  Description: The Serial number of the product(tpSysInfoSerialNum) is missing in HW versions prior to V2_170323&#13;
-  Version: prior to version V2_170323&#13;
+  Description: The Serial number of the product (tpSysInfoSerialNum) is missing in HW versions prior to V2_170323&#13;
+  Version: Prior to version V2_170323&#13;
   Device: T2600G-28TS 2.0&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -203,6 +203,7 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: CPU utilization</name>
@@ -255,6 +256,7 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory utilization</name>

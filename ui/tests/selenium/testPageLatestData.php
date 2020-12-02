@@ -77,7 +77,7 @@ class testPageLatestData extends CLegacyWebTest {
 			[
 				[
 					'Item name' => 'item_testPageHistory_CheckLayout_Text',
-					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career',
+					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career'
 				]
 			]
 		];

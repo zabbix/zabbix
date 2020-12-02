@@ -83,7 +83,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_GOOD,
 				'password1' => PHPUNIT_LOGIN_PWD,
 				'password2' => PHPUNIT_LOGIN_PWD
-			]],
+			]]
 		];
 	}
 
