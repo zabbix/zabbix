@@ -1267,15 +1267,14 @@ pre, pre a, pre td, pre span {
 .header-navigation {
   display: inline-block;
   position: relative;
+  margin: 0 0 5px;
   z-index: 3;
   max-width: calc(100% - 200px);
   min-height: 24px; }
   .header-navigation > ul {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    margin: 0 0 5px;
-    padding: 0; }
+    align-items: baseline; }
     .header-navigation > ul > li {
       margin-right: 5px;
       line-height: 24px; }

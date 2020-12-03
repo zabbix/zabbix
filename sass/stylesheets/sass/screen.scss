@@ -232,6 +232,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 .header-navigation {
 	display: inline-block;
 	position: relative;
+	margin: 0 0 5px;
 	z-index: 3;
 	max-width: calc(100% - 200px);
 	min-height: 24px;
@@ -240,8 +241,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
-		margin: 0 0 5px;
-		padding: 0;
 
 		& > li {
 			margin-right: 5px;
