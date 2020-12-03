@@ -1047,7 +1047,7 @@ footer {
 
 z-select,
 .z-select {
-  display: inline-block; }
+  display: inline-grid; }
   z-select:focus,
   .z-select:focus {
     outline: none; }
@@ -1102,7 +1102,7 @@ z-select,
       line-height: normal;
       color: #000000;
       text-overflow: ellipsis;
-      word-break: break-all;
+      word-break: break-word;
       white-space: pre-wrap;
       user-select: none; }
       z-select .list li.hover,
