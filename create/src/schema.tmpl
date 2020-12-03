@@ -1890,7 +1890,7 @@ FIELD	|lastaccess	|t_integer	|'0'	|NOT NULL	|0
 FIELD	|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD	|expires_at	|t_time		|'0'	|NOT NULL	|0
 FIELD	|created_at	|t_time		|'0'	|NOT NULL	|0
-FIELD	|creator_userid	|t_id		|	|NULL		|0	|2	|users	|userid
+FIELD	|creator_userid	|t_id		|	|NULL		|0	|2	|users	|userid	|RESTRICT
 INDEX	|1		|name
 UNIQUE	|2		|userid,name
 INDEX	|3		|token
@@ -1899,4 +1899,4 @@ INDEX	|4		|creator_userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030004	|5030004
+ROW		|5030006	|5030006

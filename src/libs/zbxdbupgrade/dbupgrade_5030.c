@@ -72,6 +72,20 @@ static int	DBpatch_5030004(void)
 	return DBcreate_index("token", "token_4", "creator_userid", 0);
 }
 
+static int	DBpatch_5030005(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("token", 1, &field);
+}
+
+static int	DBpatch_5030006(void)
+{
+	const ZBX_FIELD field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("token", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -83,5 +97,7 @@ DBPATCH_ADD(5030001, 0, 1)
 DBPATCH_ADD(5030002, 0, 1)
 DBPATCH_ADD(5030003, 0, 1)
 DBPATCH_ADD(5030004, 0, 1)
+DBPATCH_ADD(5030005, 0, 1)
+DBPATCH_ADD(5030006, 0, 1)
 
 DBPATCH_END()

@@ -25,8 +25,27 @@
 #include "trapper_preproc.h"
 #include "trapper.h"
 #include "../preprocessor/preproc_history.h"
+#include "sha512crypt.h"
 
 extern int	CONFIG_DOUBLE_PRECISION;
+
+// takes a 64 char token, hashes it with sha-512 and then formats the resulting binary into the printable hex string
+static void	format_auth_token_hash(const char *auth_token, char *hash_res_stringhexes)
+{
+	char		hash_res[ZBX_SID_AUTH_TOKEN_LENGTH];
+
+	sha512_hash(auth_token, hash_res);
+
+	for (int i = 0 ; i < ZBX_SID_AUTH_TOKEN_LENGTH; i++)
+	{
+		char z[3];
+		zbx_snprintf(z, 3, "%02x", hash_res[i] & 0xFF);
+		hash_res_stringhexes[i * 2] = z[0];
+		hash_res_stringhexes[i * 2 + 1] = z[1];
+	}
+
+	hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2] = '\0';
+}
 
 int	get_user(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
 {
@@ -35,25 +54,33 @@ int	get_user(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_AUTH_SID, buffer, sizeof(buffer), NULL) || SUCCEED ==
-			zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID_DEPRECATED, buffer, sizeof(buffer), NULL))
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL))
 	{
-		ret = DBget_user_by_active_session(buffer, user);
-	}
-	else if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_AUTH_TOKEN, buffer, sizeof(buffer), NULL))
-	{
-		ret = DBget_user_by_auth_token(buffer, user);
+		size_t	buf_len = strlen(buffer);
+
+		if (ZBX_SID_SESSION_LENGTH == buf_len)
+		{
+			ret = DBget_user_by_active_session(buffer, user);
+		}
+		else if (ZBX_SID_AUTH_TOKEN_LENGTH == buf_len)
+		{
+			char	hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2 + 1];
+			format_auth_token_hash(buffer, hash_res_stringhexes);
+			ret = DBget_user_by_auth_token(hash_res_stringhexes, user);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse %s token, invalid length: %zu",
+					ZBX_PROTO_TAG_SID, buf_len);
+			ret = FAIL;
+		}
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse either %s or %s or %s tag", ZBX_PROTO_TAG_AUTH_SID,
-				ZBX_PROTO_TAG_SID_DEPRECATED, ZBX_PROTO_TAG_AUTH_SID);
+		zabbix_log(LOG_LEVEL_DEBUG, "Failed to parse %s tag", ZBX_PROTO_TAG_SID);
 
 		if (NULL != result)
-		{
-			*result = zbx_dsprintf(*result, "Failed to parse either %s or %s or %s tag",
-					ZBX_PROTO_TAG_AUTH_SID, ZBX_PROTO_TAG_SID_DEPRECATED, ZBX_PROTO_TAG_AUTH_SID);
-		}
+			*result = zbx_dsprintf(*result, "Failed to parse %s tag", ZBX_PROTO_TAG_SID);
 
 		ret = FAIL;
 		goto out;

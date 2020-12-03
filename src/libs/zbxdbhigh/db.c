@@ -3470,23 +3470,20 @@ out:
  * Purpose: validate that token is not expired and is active and then get     *
  *          associated user data                                              *
  *                                                                            *
- * Parameters: authtoken - [IN] auth token to validate                        *
- *             user      - [OUT] user information                             *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             user                      - [OUT] user information             *
  *                                                                            *
  * Return value:  SUCCEED - token is valid and user data was retrieved        *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-int	DBget_user_by_auth_token(const char *auth_token, zbx_user_t *user)
+int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
-	char		*auth_token_esc;
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, auth_token);
-
-	auth_token_esc = DBdyn_escape_string(auth_token);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
 
 	if (NULL == (result = DBselect(
 			"select u.userid,u.roleid,r.type,t.expires_at "
@@ -3495,8 +3492,8 @@ int	DBget_user_by_auth_token(const char *auth_token, zbx_user_t *user)
 				" and t.token='%s'"
 				" and u.roleid=r.roleid"
 				" and t.status=%d"
-				" and (t.expires_at=%d or t.expires_at > %lu')",
-			auth_token_esc, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES, time(NULL))))
+				" and (t.expires_at=%d or t.expires_at > %lu)",
+			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES, time(NULL))))
 	{
 		goto out;
 	}
@@ -3507,11 +3504,9 @@ int	DBget_user_by_auth_token(const char *auth_token, zbx_user_t *user)
 	ZBX_STR2UINT64(user->userid, row[0]);
 	ZBX_STR2UINT64(user->roleid, row[1]);
 	user->type = atoi(row[2]);
-
 	ret = SUCCEED;
 out:
 	DBfree_result(result);
-	zbx_free(auth_token_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

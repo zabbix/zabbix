@@ -1380,6 +1380,9 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 #define ZBX_AUTH_TOKEN_DISABLED		1
 #define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
 
+#define	ZBX_SID_SESSION_LENGTH		32
+#define	ZBX_SID_AUTH_TOKEN_LENGTH	64
+
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
