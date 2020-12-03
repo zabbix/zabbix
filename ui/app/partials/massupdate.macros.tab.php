@@ -51,7 +51,7 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_value->setAttribute('value', $macro['value']);
 	}
 
-	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description'], ['maxheight' => 200]))
+	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 		->setAttribute('placeholder', _('description'));

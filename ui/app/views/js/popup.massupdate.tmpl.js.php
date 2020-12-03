@@ -36,7 +36,7 @@
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false, 'maxheight' => 200]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setAttribute('placeholder', _('description'))

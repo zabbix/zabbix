@@ -5991,6 +5991,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   top: 0;
   background: #2b2b2b;
   z-index: 3; }
+.modal-popup-static .textarea-flexible,
+.modal-popup-preprocessing .textarea-flexible {
+  max-height: 200px;
+  overflow-y: auto; }
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,

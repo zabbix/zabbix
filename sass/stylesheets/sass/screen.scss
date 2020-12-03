@@ -7462,8 +7462,12 @@ z-select,
 		background: $header-bg-color;
 		z-index: 3;
 	}
-}
 
+	.textarea-flexible {
+		max-height: 200px;
+		overflow-y: auto;
+	}
+}
 
 .global-macro-table,
 .inherited-macros-table,

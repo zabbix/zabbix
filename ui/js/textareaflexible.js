@@ -26,12 +26,6 @@
 
 	function update(e) {
 		const $textarea = $(this);
-		const has_maxheight = !!$textarea.data('maxheight');
-		let maxheight;
-
-		if (has_maxheight) {
-			maxheight = $textarea.data('maxheight');
-		}
 
 		if (e.which === 13) {
 			// Simulate input behavior by submitting form on enter key.
@@ -67,22 +61,9 @@
 		}
 
 		// Resize textarea.
-		$textarea.height(0);
-
-		let height = $textarea[0].scrollHeight;
-
-		if (has_maxheight && height >= maxheight) {
-			height = maxheight;
-			$textarea.css({'overflow-y': 'scroll'});
-		}
-		else {
-			$textarea.css({'overflow-y': ''});
-		}
-
-		$textarea.innerHeight(height);
-
-		// Fire event.
-		$textarea.trigger('resize')
+		$textarea
+			.height(0)
+			.innerHeight($textarea[0].scrollHeight);
 
 		$(window).scrollTop(scroll_pos);
 	}
