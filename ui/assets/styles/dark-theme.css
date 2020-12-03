@@ -5158,8 +5158,6 @@ svg {
       padding-left: 30px; }
   .preprocessing-list .preprocessing-list-item .step-name {
     padding-left: 10px; }
-    .preprocessing-list .preprocessing-list-item .step-name > z-select[width="auto"] {
-      max-width: 260px; }
   .preprocessing-list .preprocessing-list-foot {
     justify-content: space-between; }
     .preprocessing-list .preprocessing-list-foot .step-action {
