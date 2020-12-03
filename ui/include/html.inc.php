@@ -778,7 +778,7 @@ function makeServerStatusOutput() {
 *
 * @param int $type  LOGO_TYPE_NORMAL | LOGO_TYPE_SIDEBAR | LOGO_TYPE_SIDEBAR_COMPACT.
 *
- * @return CDiv
+* @return CTag
 */
 function makeLogo(int $type): ?CTag {
 	static $zabbix_logo_classes = [
@@ -802,7 +802,7 @@ function makeLogo(int $type): ?CTag {
  *
  * @param bool $with_version
  *
- * @return CTag
+ * @return CDiv
  */
 function makePageFooter($with_version = true) {
 	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))
