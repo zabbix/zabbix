@@ -1,0 +1,1 @@
+.......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)
