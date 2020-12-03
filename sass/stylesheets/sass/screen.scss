@@ -250,7 +250,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 				display: flex;
 				align-items: baseline;
 
-				& > li {
+				li {
 					margin-right: 5px;
 				}
 
@@ -270,10 +270,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			.status-container {
 				margin-right: 5px;
 			}
-
-			.btn-link {
-				min-height: 0;
-			}
 		}
 
 		li > span {
@@ -288,7 +284,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 				max-width: 200px;
 				line-height: 14px;
 				vertical-align: top;
-				white-space: nowrap;
 				text-overflow: ellipsis;
 				overflow: hidden;
 			}

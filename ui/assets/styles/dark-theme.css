@@ -1307,7 +1307,7 @@ pre, pre a, pre td, pre span {
       .header-navigation > ul > li ul {
         display: flex;
         align-items: baseline; }
-        .header-navigation > ul > li ul > li {
+        .header-navigation > ul > li ul li {
           margin-right: 5px; }
         .header-navigation > ul > li ul.breadcrumbs > li {
           margin-right: 0; }
@@ -1317,8 +1317,6 @@ pre, pre a, pre td, pre span {
             content: ""; }
       .header-navigation > ul > li .status-container {
         margin-right: 5px; }
-      .header-navigation > ul > li .btn-link, .header-navigation > ul > li .interface-container .interface-row .interface-cell .interface-btn-toggle, .interface-container .interface-row .interface-cell .header-navigation > ul > li .interface-btn-toggle {
-        min-height: 0; }
     .header-navigation > ul li > span {
       display: inline-block;
       padding: 2px 7px;
@@ -1330,7 +1328,6 @@ pre, pre a, pre td, pre span {
         max-width: 200px;
         line-height: 14px;
         vertical-align: top;
-        white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden; }
       .header-navigation > ul li > span.selected {
