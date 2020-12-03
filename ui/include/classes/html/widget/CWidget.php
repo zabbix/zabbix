@@ -24,16 +24,16 @@ class CWidget {
 	private const ZBX_STYLE_HEADER_NAVIGATION = 'header-navigation';
 	private const ZBX_STYLE_HEADER_CONTROLS = 'header-controls';
 
-	private $title = null;
-	private $title_submenu = null;
-	private $controls = null;
+	private $title;
+	private $title_submenu;
+	private $controls;
 
 	/**
 	 * Navigation, displayed exclusively in ZBX_LAYOUT_NORMAL mode.
 	 *
 	 * @var mixed
 	 */
-	protected $navigation;
+	private $navigation;
 
 	/**
 	 * The contents of the body of the widget.
