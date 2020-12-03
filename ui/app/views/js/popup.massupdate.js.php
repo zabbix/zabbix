@@ -71,6 +71,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		.on('afteradd.dynamicRows', () => {
 			$('.input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
 			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $(obj.querySelector('#tbl_macros'))).textareaFlexible();
+			obj.querySelector('#macro_add').scrollIntoView({block: 'nearest'});
 		});
 
 	$(obj.querySelector('#tbl_macros'))
