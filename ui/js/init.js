@@ -55,8 +55,6 @@ window.ZABBIX = Object.create({
 
 jQuery(function($) {
 
-	$(document).on('mouseup', 'textarea', () => $(window).trigger('resize'));
-
 	$.propHooks.disabled = {
 		set: function (el, val) {
 			if (el.disabled !== val) {
