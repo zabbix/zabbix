@@ -6209,6 +6209,10 @@ svg {
 	.preprocessing-list-item {
 		.step-name {
 			padding-left: 10px;
+
+			>z-select[width="auto"] {
+				max-width: 260px;
+			}
 		}
 	}
 
