@@ -64,7 +64,7 @@ static int	DBpatch_5030002(void)
 
 static int	DBpatch_5030003(void)
 {
-	return DBcreate_index("token", "token_3", "token", 0);
+	return DBcreate_index("token", "token_3", "token", 1);
 }
 
 static int	DBpatch_5030004(void)
