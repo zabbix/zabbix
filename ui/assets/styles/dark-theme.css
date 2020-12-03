@@ -1291,9 +1291,10 @@ pre, pre a, pre td, pre span {
     margin: 0; }
 
 .header-navigation {
+  display: inline-block;
   position: relative;
   z-index: 3;
-  max-width: calc(100vw - 200px);
+  max-width: calc(100% - 200px);
   min-height: 24px; }
   .header-navigation > ul {
     display: flex;

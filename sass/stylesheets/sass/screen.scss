@@ -230,9 +230,10 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 }
 
 .header-navigation {
+	display: inline-block;
 	position: relative;
 	z-index: 3;
-	max-width: calc(100vw - 200px);
+	max-width: calc(100% - 200px);
 	min-height: 24px;
 
 	& > ul {
