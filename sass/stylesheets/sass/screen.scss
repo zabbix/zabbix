@@ -230,101 +230,79 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 }
 
 .header-navigation {
-	display: inline-block;
+	position: relative;
 	z-index: 3;
 	max-width: calc(100vw - 200px);
 	min-height: 24px;
-	line-height: 24px;
-	padding: 0 0 6px;
-	position: relative;
-	vertical-align: top;
-	margin-bottom: -1px;
 
-	.selected {
-		background-color: $ui-bg-color;
-		border-radius: 2px;
-		box-shadow: inset 0 0 0 1px $ui-border-color;
-	}
+	& > ul {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		margin: 0 0 5px;
+		padding: 0;
 
-	.arrow-right {
-		border-left-color: $font-color;
-	}
+		& > li {
+			margin-right: 5px;
+			line-height: 24px;
 
-	button {
-		line-height: 22px;
-	}
+			ul {
+				display: flex;
+				align-items: baseline;
 
-	.btn-link {
-		line-height: 14px;
-	}
+				& > li {
+					margin-right: 5px;
+				}
 
-	li {
-		float: left;
-		margin-right: 5px;
-		line-height: 14px;
-		vertical-align: top;
-		display: inline-block;
+				&.breadcrumbs > li {
+					margin-right: 0;
 
-		.status-container {
-			padding-top: 3px;
-		}
+					&::after {
+						content: "/";
+					}
 
-		.rel-container {
-			margin: 0;
-		}
+					&:last-child::after {
+						content: "";
+					}
+				}
+			}
 
-		.status-container,
-		.rel-container {
-			margin: 0 5px 0 0;
+			.status-container {
+				margin-right: 5px;
+			}
 
-			span {
-				padding: 2px 3px 1px;
+			.btn-link {
+				min-height: 0;
 			}
 		}
 
-		.rel-container {
-			margin: 0;
-		}
-
-		> span {
+		li > span {
 			display: inline-block;
-			height: 18px;
-			padding: 4px 7px 0;
-			line-height: 14px;
+			padding: 2px 7px;
+			line-height: 18px;
+			white-space: nowrap;
 
 			a {
 				display: inline-block;
+				margin-top: 2px;
 				max-width: 200px;
-				overflow: hidden;
-				text-overflow: ellipsis;
+				line-height: 14px;
 				vertical-align: top;
-				margin-bottom: -1px;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+			}
 
-				&:focus {
-					margin-bottom: -2px;
-				}
+			&.selected {
+				background-color: $ui-bg-color;
+				border-radius: 2px;
+				box-shadow: inset 0 0 0 1px $ui-border-color;
 			}
 		}
 	}
 
-	> ul > li {
-		padding: 1px 0;
-		line-height: 22px;
-		white-space: nowrap;
+	& + .filter-space {
 
-		.status-container {
-			line-height: 14px;
-		}
-
-		> span {
-			a {
-				margin-top: 1px;
-				line-height: 13px;
-			}
-		}
-	}
-
-	+ .filter-space {
 		margin-top: -29px;
 	}
 }
@@ -5848,7 +5826,7 @@ svg {
 	border: 10px solid $ui-bg-color;
 	background: $ui-bg-color;
 	display: block;
-	margin: 4px 0;
+	margin-top: 6px;
 
 	.map-container {
 		display: table;
@@ -7395,18 +7373,4 @@ z-select,
 // Used in form lists to separate input elements on sections.
 .input-section-header {
 	padding-top: 10px;
-}
-
-.breadcrumbs {
-	&>::after {
-		content: " /";
-	}
-
-	&>:last-child::after {
-		content: "";
-	}
-
-	li {
-		margin-right: 0;
-	}
 }

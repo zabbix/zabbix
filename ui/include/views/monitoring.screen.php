@@ -40,17 +40,14 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 				]
 			]
 		])
-		->setNavigation(
-			(new CList())
-				->addItem(new CBreadcrumbs([
-					(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-					(new CSpan())
-						->addClass(ZBX_STYLE_SELECTED)
-						->addItem(
-							new CLink($data['screen']['name'], (new CUrl('screens.php'))
-								->setArgument('elementid', $data['screen']['screenid'])
-							))
-				])));
+		->setNavigation((new CList())->addItem(new CBreadcrumbs([
+			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+			(new CSpan())
+				->addItem(new CLink($data['screen']['name'],
+					(new CUrl('screens.php'))->setArgument('elementid', $data['screen']['screenid'])
+				))
+				->addClass(ZBX_STYLE_SELECTED)
+		])));
 }
 
 $controls = new CList();

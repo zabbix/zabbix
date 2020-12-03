@@ -188,13 +188,13 @@ function get_icon($type, $params = []) {
 }
 
 /**
- * Create CDiv with host/template information and references to it's elements
+ * Get host/template configuration navigation.
  *
- * @param string $currentElement
- * @param int $hostid
- * @param int $lld_ruleid
+ * @param string  $current_element
+ * @param int     $hostid
+ * @param int     $lld_ruleid
  *
- * @return object
+ * @return CList|null
  */
 function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
@@ -263,12 +263,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		$db_discovery_rule = reset($db_discovery_rule);
 	}
 
-	/*
-	 * list and host (template) name
-	 */
-	$list = (new CList());
-
-	$breadcrumbs = new CBreadcrumbs();
+	$list = new CList();
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -279,12 +274,12 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 			$template->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$breadcrumbs->addItem(new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))));
-		$breadcrumbs->addItem($template);
-
+		$list->addItem(new CBreadcrumbs([
+			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
+			$template
+		]));
 
 		$db_host['hostid'] = $db_host['templateid'];
-		$list->addItem($breadcrumbs);
 	}
 	else {
 		switch ($db_host['status']) {
@@ -300,7 +295,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 				$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 				break;
 			default:
-				$status = _('Unknown');
+				$status = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_GREY);
 				break;
 		}
 
@@ -312,11 +307,10 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 			$host->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$breadcrumbs->addItem(new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))));
-		$breadcrumbs->addItem($host);
-		$list->addItem($breadcrumbs);
-		$list->addItem($status);
-		$list->addItem(getHostAvailabilityTable($db_host));
+		$list
+			->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))), $host]))
+			->addItem($status)
+			->addItem(getHostAvailabilityTable($db_host));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
@@ -443,16 +437,14 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$list->addItem(
-			(new CBreadcrumbs([
-					(new CSpan())->addItem(
-						new CLink(_('Discovery list!'), (new CUrl('host_discovery.php'))
-							->setArgument('filter_set', '1')
-							->setArgument('filter_hostids', [$db_host['hostid']])
-						)
-					),
-					$discovery_rule
-				])));
+		$list->addItem(new CBreadcrumbs([
+			(new CSpan())->addItem(new CLink(_('Discovery list!'),
+				(new CUrl('host_discovery.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			)),
+			$discovery_rule
+		]));
 
 		// item prototypes
 		$item_prototypes = new CSpan([
@@ -505,28 +497,25 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 }
 
 /**
- * Create breadcrumbs header object with sysmap parents information.
+ * Get map navigation.
  *
  * @param int    $sysmapid      Used as value for sysmaid in map link generation.
  * @param string $name          Used as label for map link generation.
  * @param int    $severity_min  Used as value for severity_min in map link generation.
  *
- * @return object
+ * @return CList
  */
-
 function getSysmapNavigation($sysmapid, $name, $severity_min) {
-	$list = (new CBreadcrumbs([
-			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
-			(new CSpan())
-				->addClass(ZBX_STYLE_SELECTED)
-				->addItem(
-					new CLink($name,
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'map.view')
-							->setArgument('sysmapid', $sysmapid)
-							->setArgument('severity_min', $severity_min)
-					)
-				)
+	$list = (new CList())->addItem(new CBreadcrumbs([
+		(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
+		(new CSpan())
+			->addClass(ZBX_STYLE_SELECTED)
+			->addItem(new CLink($name,
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'map.view')
+					->setArgument('sysmapid', $sysmapid)
+					->setArgument('severity_min', $severity_min)
+			))
 	]));
 
 	// get map parent maps
@@ -537,16 +526,15 @@ function getSysmapNavigation($sysmapid, $name, $severity_min) {
 			->addItem((new CSpan())->addItem(_('Upper level maps').':'));
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
-			$parent_maps->addItem((new CSpan())->addItem(
-				new CLink($parent_sysmap['name'], (new CUrl('zabbix.php'))
+			$parent_maps->addItem((new CSpan())->addItem(new CLink($parent_sysmap['name'],
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
-				))
-			);
+			)));
 		}
 
-		return new CHorList([$list, $parent_maps]);
+		$list->addItem($parent_maps);
 	}
 
 	return $list;
@@ -558,7 +546,7 @@ function getSysmapNavigation($sysmapid, $name, $severity_min) {
  * @param CButtonInterface 		$main_button	main button that will be displayed on the left
  * @param CButtonInterface[] 	$other_buttons
  *
- * @return CList
+ * @return CDiv
  *
  * @throws InvalidArgumentException	if an element of $other_buttons contain something other than CButtonInterface
  */
@@ -649,7 +637,7 @@ function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the host
  *
- * @return CSpan
+ * @return CDiv
  */
 function getHostLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -676,7 +664,7 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the application
  *
- * @return CSpan
+ * @return CDiv
  */
 function getApplicationLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -703,7 +691,7 @@ function getApplicationLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the graph
  *
- * @return CSpan
+ * @return CDiv
  */
 function getGraphLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -730,7 +718,7 @@ function getGraphLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the trigger
  *
- * @return CSpan
+ * @return CDiv
  */
 function getTriggerLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -757,7 +745,7 @@ function getTriggerLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the item
  *
- * @return CSpan
+ * @return CDiv
  */
 function getItemLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -790,7 +778,7 @@ function makeServerStatusOutput() {
 *
 * @param int $type  LOGO_TYPE_NORMAL | LOGO_TYPE_SIDEBAR | LOGO_TYPE_SIDEBAR_COMPACT.
 *
-* @return CTag
+ * @return CDiv
 */
 function makeLogo(int $type): ?CTag {
 	static $zabbix_logo_classes = [

@@ -128,24 +128,20 @@ $widget = (new CWidget())
 					->setAttribute('aria-label', _('Content controls'))
 					->addClass(ZBX_STYLE_DASHBRD_EDIT)
 			]))->addStyle('display: none'))
-	)->setNavigation(
-		(new CList())
-			->addItem(new CBreadcrumbs([
-				(new CSpan())
-					->addItem(
-						new CLink(_('All dashboards'),
-							(new CUrl('zabbix.php'))
-								->setArgument('action', 'dashboard.list')
-								->getUrl()
-						)),
-				(new CSpan())
-					->addItem((new CLink($data['dashboard']['name'], (new CUrl('zabbix.php'))
-						->setArgument('action', 'dashboard.view')
-						->setArgument('dashboardid', $data['dashboard']['dashboardid'])))
-						->setId('dashboard-direct-link')
-					)
-					->addClass(ZBX_STYLE_SELECTED)
-			])));
+	)
+	->setNavigation((new CList())->addItem(new CBreadcrumbs([
+		(new CSpan())->addItem(new CLink(_('All dashboards'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')
+		)),
+		(new CSpan())
+			->addItem((new CLink($data['dashboard']['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('dashboardid', $data['dashboard']['dashboardid'])))
+					->setId('dashboard-direct-link')
+			)
+			->addClass(ZBX_STYLE_SELECTED)
+	])));
 
 if ($data['time_selector'] !== null) {
 	$widget->addItem(

@@ -201,7 +201,7 @@ class testZBX6663 extends CLegacyWebTest {
 		}
 		else {
 			$link = $zbx_data['link'];
-			$this->zbxTestClickXpathWait("//div[contains(@class, 'header-navigation')]//a[text()='$link']");
+			$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='$link']");
 		}
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('selected_count'));

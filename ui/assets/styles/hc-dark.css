@@ -1265,66 +1265,52 @@ pre, pre a, pre td, pre span {
     margin: 0; }
 
 .header-navigation {
-  display: inline-block;
+  position: relative;
   z-index: 3;
   max-width: calc(100vw - 200px);
-  min-height: 24px;
-  line-height: 24px;
-  padding: 0 0 6px;
-  position: relative;
-  vertical-align: top;
-  margin-bottom: -1px; }
-  .header-navigation .selected {
-    background-color: #000000;
-    border-radius: 2px;
-    box-shadow: inset 0 0 0 1px #444444; }
-  .header-navigation .arrow-right {
-    border-left-color: #ffffff; }
-  .header-navigation button {
-    line-height: 22px; }
-  .header-navigation .btn-link, .header-navigation .interface-container .interface-row .interface-cell .interface-btn-toggle, .interface-container .interface-row .interface-cell .header-navigation .interface-btn-toggle {
-    line-height: 14px; }
-  .header-navigation li {
-    float: left;
-    margin-right: 5px;
-    line-height: 14px;
-    vertical-align: top;
-    display: inline-block; }
-    .header-navigation li .status-container {
-      padding-top: 3px; }
-    .header-navigation li .rel-container {
-      margin: 0; }
-    .header-navigation li .status-container,
-    .header-navigation li .rel-container {
-      margin: 0 5px 0 0; }
-      .header-navigation li .status-container span,
-      .header-navigation li .rel-container span {
-        padding: 2px 3px 1px; }
-    .header-navigation li .rel-container {
-      margin: 0; }
-    .header-navigation li > span {
+  min-height: 24px; }
+  .header-navigation > ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin: 0 0 5px;
+    padding: 0; }
+    .header-navigation > ul > li {
+      margin-right: 5px;
+      line-height: 24px; }
+      .header-navigation > ul > li ul {
+        display: flex;
+        align-items: baseline; }
+        .header-navigation > ul > li ul > li {
+          margin-right: 5px; }
+        .header-navigation > ul > li ul.breadcrumbs > li {
+          margin-right: 0; }
+          .header-navigation > ul > li ul.breadcrumbs > li::after {
+            content: "/"; }
+          .header-navigation > ul > li ul.breadcrumbs > li:last-child::after {
+            content: ""; }
+      .header-navigation > ul > li .status-container {
+        margin-right: 5px; }
+      .header-navigation > ul > li .btn-link, .header-navigation > ul > li .interface-container .interface-row .interface-cell .interface-btn-toggle, .interface-container .interface-row .interface-cell .header-navigation > ul > li .interface-btn-toggle {
+        min-height: 0; }
+    .header-navigation > ul li > span {
       display: inline-block;
-      height: 18px;
-      padding: 4px 7px 0;
-      line-height: 14px; }
-      .header-navigation li > span a {
+      padding: 2px 7px;
+      line-height: 18px;
+      white-space: nowrap; }
+      .header-navigation > ul li > span a {
         display: inline-block;
+        margin-top: 2px;
         max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        line-height: 14px;
         vertical-align: top;
-        margin-bottom: -1px; }
-        .header-navigation li > span a:focus {
-          margin-bottom: -2px; }
-  .header-navigation > ul > li {
-    padding: 1px 0;
-    line-height: 22px;
-    white-space: nowrap; }
-    .header-navigation > ul > li .status-container {
-      line-height: 14px; }
-    .header-navigation > ul > li > span a {
-      margin-top: 1px;
-      line-height: 13px; }
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden; }
+      .header-navigation > ul li > span.selected {
+        background-color: #000000;
+        border-radius: 2px;
+        box-shadow: inset 0 0 0 1px #444444; }
   .header-navigation + .filter-space {
     margin-top: -29px; }
 
@@ -4839,7 +4825,7 @@ svg {
   border: 10px solid #000000;
   background: #000000;
   display: block;
-  margin: 4px 0; }
+  margin-top: 6px; }
   .sysmap-scroll-container .map-container {
     display: table; }
   .sysmap-scroll-container .flickerfreescreen {
@@ -5895,13 +5881,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .input-section-header {
   padding-top: 10px; }
-
-.breadcrumbs > ::after {
-  content: " /"; }
-.breadcrumbs > :last-child::after {
-  content: ""; }
-.breadcrumbs li {
-  margin-right: 0; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
