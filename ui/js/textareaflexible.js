@@ -18,9 +18,6 @@
 **/
 
 
-/**
- * @event resize - Event fired on textarea size change.
- */
 (function($) {
 	'use strict';
 
