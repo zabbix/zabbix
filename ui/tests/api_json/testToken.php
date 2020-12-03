@@ -252,11 +252,11 @@ class testToken extends CAPITest {
 						'name' => self::uniqueName()
 					],
 					[
-						'name' => 'token-exists',
+						'name' => 'test-token-exists',
 						'userid' => 2 // Guest user ID.
 					]
 				],
-				'expected_error' => 'API token "token-exists" already exists for user "2".'
+				'expected_error' => 'API token "test-token-exists" already exists for user "2".'
 			],
 			// Admin role.
 			[
@@ -482,6 +482,414 @@ class testToken extends CAPITest {
 		}
 		else {
 			$this->assertEquals($db_tokens_after, $db_tokens_before, 'No tokens got deleted.');
+		}
+	}
+
+	public static function token_get(): array {
+		return [
+			// Input validation.
+			[
+				'request' => [
+					'output' => [],
+					'tokenids' => 'x'
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tokenids": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'tokenids' => ['x']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/tokenids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'userids' => 'x'
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/userids": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'userids' => ['x']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/userids/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'token' => ['x']
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/token": a character string is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'token' => str_repeat('x', 65)
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/token": value is too long.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'valid_at' => 'x'
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/valid_at": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'expired_at' => 'x'
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/expired_at": an integer is expected.',
+					'result' => []
+				]
+			],
+			// Input validation, filter object.
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'tokenid' => ['x']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/tokenid/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'tokenid' => 'x'
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/tokenid": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'userid' => 'x'
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/userid": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'userid' => ['x']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/userid/1": a number is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'lastaccess' => ['x']
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/lastaccess/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'lastaccess' => 'x'
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/lastaccess": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => [2]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": value must be one of 0, 1.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'status' => 2
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/status/1": value must be one of 0, 1.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'expires_at' => ["x"]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/expires_at/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'expires_at' => "x"
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/expires_at": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'created_at' => ["x"]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/created_at/1": an integer is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'created_at' => "x"
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/created_at": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'creator_userid' => "x"
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/creator_userid": an array is expected.',
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'filter' => [
+						'creator_userid' => ["x"]
+					]
+				],
+				'expected' => [
+					'error' => 'Invalid parameter "/filter/creator_userid/1": a number is expected.',
+					'result' => []
+				]
+			],
+			// Correct output using search.
+			[
+				'request' => [
+					'output' => [],
+					'search' => [
+						'name' => 'test-get'
+					],
+					'limit' => 1
+				],
+				'expected' => [
+					'error' => null,
+					'result' => [[]]
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'search' => [
+						'name' => 'test-get'
+					],
+					'countOutput' => true,
+					'sortfield' => ['name', 'userid'] // Should not cause errors when used in conjunction with count.
+				],
+				'expected' => [
+					'error' => null,
+					'result' => 5
+				]
+			],
+			// Correct output using property fields select.
+			[
+				'request' => [
+					'output' => [],
+					'tokenids' => ["1"]
+				],
+				'expected' => [
+					'error' => null,
+					'result' => [[]]
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'userids' => ["12"]
+				],
+				'expected' => [
+					'error' => null,
+					'result' => [[], []]
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'token' => 'a26ddc6178485b5189b103e9775763bdc01e8d19fcbe6c7dea99ae2e2d50ae1a'
+				],
+				'expected' => [
+					'error' => null,
+					'result' => [[]]
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'valid_at' => "123",
+					'tokenids' => "12"
+				],
+				'expected' => [
+					'error' => null,
+					'result' => []
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'valid_at' => "122",
+					'tokenids' => "12"
+				],
+				'expected' => [
+					'error' => null,
+					'result' => [[]]
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'expired_at' => "123",
+					'tokenids' => "12"
+				],
+				'expected' => [
+					'error' => null,
+					'result' => [[]]
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'expired_at' => "122",
+					'tokenids' => "12"
+				],
+				'expected' => [
+					'error' => null,
+					'result' => []
+				]
+			],
+			// Permission check.
+			[
+				'request' => [
+					'output' => [],
+					'search' => [
+						'name' => 'test-get'
+					],
+					'countOutput' => true
+				],
+				'expected' => [
+					'error' => null,
+					'result' => 5
+				],
+				'auth' => [
+					'username' => 'Admin',
+					'password' => 'zabbix'
+				]
+			],
+			[
+				'request' => [
+					'output' => [],
+					'search' => [
+						'name' => 'test-get'
+					],
+					'countOutput' => true
+				],
+				'expected' => [
+					'error' => null,
+					'result' => 2
+				],
+				'auth' => [
+					'username' => 'zabbix-user',
+					'password' => 'zabbix'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider token_get
+	 */
+	public function testToken_Get($request, $expected, array $auth = []): void {
+		if ($auth) {
+			$this->authorize($auth['username'], $auth['password']);
+		}
+
+		$result = $this->call('token.get', $request, $expected['error']);
+
+		if ($expected['error'] === null) {
+			$this->assertEquals($result['result'], $expected['result']);
 		}
 	}
 }

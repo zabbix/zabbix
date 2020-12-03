@@ -1427,8 +1427,18 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027, 50026);
 
 -- token
-INSERT INTO token (tokenid, userid, name) VALUES (1, 2, 'token-exists');
+INSERT INTO token (tokenid, userid, name) VALUES (1, 2, 'test-token-exists');
 INSERT INTO token (tokenid, userid, name) VALUES (2, 5, 'test-delete-1');
 INSERT INTO token (tokenid, userid, name) VALUES (3, 4, 'test-delete-1');
 INSERT INTO token (tokenid, userid, name) VALUES (4, 1, 'test-delete-1');
 INSERT INTO token (tokenid, userid, name) VALUES (5, 5, 'test-delete-2');
+INSERT INTO token (tokenid, userid, name) VALUES (6, 2, 'test-get-1');
+INSERT INTO token (tokenid, userid, name) VALUES (7, 5, 'test-get-1');
+INSERT INTO token (tokenid, userid, name) VALUES (8, 4, 'test-get-1');
+INSERT INTO token (tokenid, userid, name) VALUES (9, 1, 'test-get-1');
+INSERT INTO token (tokenid, userid, name) VALUES (10, 5, 'test-get-2');
+-- original token string: "a26ddc6178485b5189b103e9775763bdc01e8d19fcbe6c7dea99ae2e2d50ae1a"
+INSERT INTO token (tokenid, userid, name, token) VALUES (11, 5, 'test-token', '6e93df66b70c69588aeabe56b77e2c6ed0c2a6854d3a79ed8156dac61ed1bce530043b3afb9699336593832552e1f72564a9991a9ae48616b5ea0c639f3f0460');
+INSERT INTO token (tokenid, userid, name, expires_at) VALUES (12, 5, 'test-expires', 123);
+INSERT INTO token (tokenid, userid, name) VALUES (13, 12, 'test-1');
+INSERT INTO token (tokenid, userid, name) VALUES (14, 12, 'test-2');

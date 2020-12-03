@@ -26,10 +26,17 @@ class CToken extends CApiService {
 
 	public const ACCESS_RULES = [
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
 	];
 
 	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_AUTH_TOKEN;
+
+	protected $tableName = 'token';
+	protected $tableAlias = 't';
+	protected $sortColumns = ['tokenid', 'name', 'description', 'userid', 'lastaccess', 'status', 'expires_at',
+		'created_at', 'creator_userid'
+	];
 
 	/**
 	 * @param array $tokens
@@ -177,5 +184,141 @@ class CToken extends CApiService {
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_tokens);
 
 		return ['tokenids' => $tokenids];
+	}
+
+	/**
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array|int
+	 */
+	public function get(array $options = []) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'tokenids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'token' =>					['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'length' => 64, 'default' => null],
+			'valid_at' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'expired_at' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'tokenid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'lastaccess' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED])],
+				'expires_at' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'created_at' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'creator_userid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'description' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $this->sortColumns), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$sql_parts = [
+			'select' => [],
+			'from'   => [$this->tableName() => $this->tableName().' '.$this->tableAlias()],
+			'where'  => [],
+			'order'  => [],
+			'group'  => []
+		];
+
+		// Fix incorrect postgres query when sort is used together with count.
+		if ($options['countOutput'] && $options['sortfield']) {
+			$options['sortfield'] = [];
+		}
+
+		// Hides token field value from being shown.
+		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $this->getTableSchema()['fields'];
+			unset($options['output']['token']);
+			$options['output'] = array_keys($options['output']);
+		}
+
+		// permissions
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$sql_parts['where'][] = dbConditionInt($this->tableAlias().'.userid', (array) self::$userData['userid']);
+		}
+
+		// tokenids
+		if ($options['tokenids'] !== null) {
+			$sql_parts['where'][] = dbConditionInt($this->tableAlias().'.tokenid', $options['tokenids']);
+		}
+
+		// userids
+		if ($options['userids'] !== null) {
+			$sql_parts['where'][] = dbConditionInt($this->tableAlias().'.userid', $options['userids']);
+		}
+
+		// token
+		if ($options['token'] !== null) {
+			$token = hash('sha512', $options['token']);
+			$sql_parts['where'][] = dbConditionString($this->tableAlias().'.token', (array) $token);
+		}
+
+		// valid_at
+		if ($options['valid_at'] !== null) {
+			$sql_parts['where'][] = '('.$this->tableAlias().'.expires_at=0 OR '.
+				$this->tableAlias().'.expires_at>'.$options['valid_at'].')';
+		}
+
+		// expired_at
+		if ($options['expired_at'] !== null) {
+			$sql_parts['where'][] = '('.$this->tableAlias().'.expires_at!=0 AND '.
+				$this->tableAlias().'.expires_at<='.$options['expired_at'].')';
+		}
+
+		// filter
+		if ($options['filter'] !== null) {
+			$this->dbFilter($this->tableName().' '.$this->tableAlias(), $options, $sql_parts);
+		}
+
+		// search
+		if ($options['search'] !== null) {
+			zbx_db_search($this->tableName().' '.$this->tableAlias(), $options, $sql_parts);
+		}
+
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+
+		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+
+		$db_tokens = [];
+		while ($row = DBfetch($result)) {
+			if ($options['countOutput']) {
+				return $row['rowscount'];
+			}
+
+			$db_tokens[$row['tokenid']] = $row;
+		}
+
+		if (!$db_tokens) {
+			return [];
+		}
+
+		if (!$options['preservekeys']) {
+			$db_tokens = array_values($db_tokens);
+		}
+
+		return $this->unsetExtraFields($db_tokens, ['tokenid'], $options['output']);
 	}
 }
