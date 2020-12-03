@@ -140,25 +140,15 @@ static void	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_int
 		*pdisable_until = availability->disable_until;
 }
 
-static unsigned char	host_availability_agent_by_item_type(unsigned char type)
+static int	interface_availability_by_item_type(unsigned char item_type, unsigned char interface_type)
 {
-	switch (type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return ZBX_AGENT_ZABBIX;
-			break;
-		case ITEM_TYPE_SNMP:
-			return ZBX_AGENT_SNMP;
-			break;
-		case ITEM_TYPE_IPMI:
-			return ZBX_AGENT_IPMI;
-			break;
-		case ITEM_TYPE_JMX:
-			return ZBX_AGENT_JMX;
-			break;
-		default:
-			return ZBX_AGENT_UNKNOWN;
-	}
+	if ((ITEM_TYPE_ZABBIX == item_type && INTERFACE_TYPE_AGENT == interface_type) ||
+	(ITEM_TYPE_SNMP == item_type && INTERFACE_TYPE_SNMP == interface_type) ||
+	(ITEM_TYPE_JMX == item_type && INTERFACE_TYPE_JMX == interface_type) ||
+	(ITEM_TYPE_IPMI == item_type && INTERFACE_TYPE_IPMI == interface_type))
+		return SUCCEED;
+
+	return FAIL;
 }
 
 /********************************************************************************
@@ -185,6 +175,9 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned ch
 
 	zbx_interface_availability_init(&in, item->interface.interfaceid);
 	zbx_interface_availability_init(&out, item->interface.interfaceid);
+
+	if (FAIL == interface_availability_by_item_type(item->type, item->interface.type))
+		goto out;
 
 	interface_get_availability(&item->interface, &in);
 
@@ -238,7 +231,7 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned c
 	zbx_interface_availability_init(&in, item->interface.interfaceid);
 	zbx_interface_availability_init(&out,item->interface.interfaceid);
 
-	if (ZBX_AGENT_UNKNOWN == host_availability_agent_by_item_type(item->type))
+	if (FAIL == interface_availability_by_item_type(item->type, item->interface.type))
 		goto out;
 
 	interface_get_availability(&item->interface, &in);

@@ -2449,8 +2449,11 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->port, row[7]));
 		reset_snmp_stats |= (SUCCEED == DCstrpool_replace(found, &interface->error, row[10]));
 
-		interface->reset_availability = 0;
-		interface->items_num = 0;
+		if (0 == found)
+		{
+			interface->reset_availability = 0;
+			interface->items_num = 0;
+		}
 
 		/* update interfaces_ht index using new data, if not done already */
 
@@ -2671,12 +2674,17 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
  * Purpose: update number of items per agent statistics                       *
  *                                                                            *
  * Parameters: interface - [IN] the interface                                 *
+ * *           type      - [IN] the item type (ITEM_TYPE_*)                   *
  *             num       - [IN] the number of items (+) added, (-) removed    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_interface_update_agent_stats(ZBX_DC_INTERFACE *interface, int num)
+
+static void	dc_interface_update_agent_stats(ZBX_DC_INTERFACE *interface, unsigned char type, int num)
 {
-	if (NULL != interface)
+	if ((NULL != interface) && ((ITEM_TYPE_ZABBIX == type && INTERFACE_TYPE_AGENT == interface->type) ||
+			(ITEM_TYPE_SNMP == type && INTERFACE_TYPE_SNMP == interface->type) ||
+			(ITEM_TYPE_JMX == type && INTERFACE_TYPE_JMX == interface->type) ||
+			(ITEM_TYPE_IPMI == type && INTERFACE_TYPE_IPMI == interface->type)))
 		interface->items_num += num;
 }
 
@@ -2827,11 +2835,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				item->data_expected_from = now;
 
 			if (ITEM_STATUS_ACTIVE == item->status)
-				dc_interface_update_agent_stats(interface, -1);
+				dc_interface_update_agent_stats(interface, item->type, -1);
 		}
 
 		if (ITEM_STATUS_ACTIVE == status)
-			dc_interface_update_agent_stats(interface, 1);
+			dc_interface_update_agent_stats(interface, type, 1);
 
 		item->type = type;
 		item->status = status;
@@ -3266,7 +3274,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			continue;
 
 		if (ITEM_STATUS_ACTIVE == item->status)
-			dc_interface_update_agent_stats(interface, -1);
+			dc_interface_update_agent_stats(interface, item->type, -1);
 
 		itemid = item->itemid;
 
