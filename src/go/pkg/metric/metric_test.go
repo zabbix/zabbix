@@ -27,23 +27,23 @@ import (
 )
 
 var (
-	paramURI              = NewConnParam("URI").WithDefault("localhost:1521").WithSession()
-	paramUsername         = NewConnParam("User").WithDefault("")
-	paramRequiredUsername = NewConnParam("User").SetRequired()
-	paramUserValidation   = NewConnParam("User").WithDefault("").WithValidator(
+	paramURI              = NewConnParam("URI", "Description.").WithDefault("localhost:1521").WithSession()
+	paramUsername         = NewConnParam("User", "Description.").WithDefault("")
+	paramRequiredUsername = NewConnParam("User", "Description.").SetRequired()
+	paramUserValidation   = NewConnParam("User", "Description.").WithDefault("").WithValidator(
 		SetValidator{Set: []string{"", "supervisor", "admin", "guest"}})
-	paramPassword = NewConnParam("Password").WithDefault("")
-	paramGeneral  = NewParam("GeneralParam")
+	paramPassword = NewConnParam("Password", "Description.").WithDefault("")
+	paramGeneral  = NewParam("GeneralParam", "Description.")
 )
 
 var metricSet = MetricSet{
 	"metric.foo": New("Foo description.",
 		[]*Param{paramURI, paramUsername, paramPassword,
-			NewParam("Param1").WithDefault("60").WithValidator(SetValidator{Set: []string{"15", "60"}}),
+			NewParam("Param1", "Description.").WithDefault("60").WithValidator(SetValidator{Set: []string{"15", "60"}}),
 		}, false),
 	"metric.query": New("Query description.",
 		[]*Param{paramURI, paramUsername, paramPassword,
-			NewParam("QueryName").SetRequired(),
+			NewParam("QueryName", "Description.").SetRequired(),
 		}, true),
 	"metric.requiredSessionParam": New("RequiredSessionParam description.",
 		[]*Param{paramURI, paramRequiredUsername, paramPassword}, false),
@@ -225,7 +225,7 @@ func TestNew(t *testing.T) {
 			name: "Must fail if a parameter has a non-unique name",
 			args: args{
 				"Metric description.",
-				[]*Param{paramURI, paramUsername, paramUsername, paramPassword, NewParam("Param")},
+				[]*Param{paramURI, paramUsername, paramUsername, paramPassword, NewParam("Param", "Description.")},
 				false,
 			},
 			want:      nil,
@@ -235,7 +235,7 @@ func TestNew(t *testing.T) {
 			name: "Must fail if a session placed not first",
 			args: args{
 				"Metric description.",
-				[]*Param{paramUsername, paramPassword, paramURI, NewParam("Param")},
+				[]*Param{paramUsername, paramPassword, paramURI, NewParam("Param", "Description.")},
 				false,
 			},
 			want:      nil,
@@ -245,19 +245,7 @@ func TestNew(t *testing.T) {
 			name: "Must fail if parameters describing a connection placed not in a row",
 			args: args{
 				"Metric description.",
-				[]*Param{paramURI, paramUsername, NewParam("Param"), paramPassword},
-				false,
-			},
-			want:      nil,
-			wantPanic: true,
-		},
-		{
-			name: "Must fail if parameter has an invalid default value",
-			args: args{
-				"Metric description.",
-				[]*Param{paramURI, paramUsername, paramPassword,
-					NewParam("Param").WithDefault("WrongDefaultValue").WithValidator(SetValidator{Set: []string{"1", "2", "3"}}),
-				},
+				[]*Param{paramURI, paramUsername, NewParam("Param", "Description."), paramPassword},
 				false,
 			},
 			want:      nil,

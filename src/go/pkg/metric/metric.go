@@ -124,7 +124,18 @@ func (p *Param) WithDefault(value string) *Param {
 
 // WithValidator sets a validator for a parameter
 func (p *Param) WithValidator(validator Validator) *Param {
+	if validator == nil {
+		panic("validator cannot be nil")
+	}
+
 	p.validator = validator
+
+	if p.defaultValue != nil {
+		if err := p.validator.Validate(p.defaultValue); err != nil {
+			panic(fmt.Sprintf("invalid default value %q for parameter %q: %s",
+				*p.defaultValue, p.name, err.Error()))
+		}
+	}
 
 	return p
 }
@@ -233,13 +244,6 @@ func New(description string, params []*Param, varParam bool) *Metric {
 			}
 
 			connParamIdx = i
-		}
-
-		if p.validator != nil && p.defaultValue != nil {
-			if err := p.validator.Validate(p.defaultValue); err != nil {
-				panic(fmt.Sprintf("invalid default value %q for %s parameter %q: %s",
-					*p.defaultValue, ordinalize(i+1), p.name, err.Error()))
-			}
 		}
 	}
 

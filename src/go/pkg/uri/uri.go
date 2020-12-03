@@ -33,10 +33,11 @@ type URI struct {
 	scheme   string
 	host     string
 	port     string
-	resource string
+	rawQuery string
 	socket   string
 	user     string
 	password string
+	rawUri   string
 }
 
 func (u *URI) Scheme() string {
@@ -47,12 +48,21 @@ func (u *URI) Host() string {
 	return u.host
 }
 
+func (u *URI) Socket() string {
+	return u.socket
+}
+
 func (u *URI) Port() string {
 	return u.port
 }
 
-func (u *URI) Resource() string {
-	return u.resource
+func (u *URI) GetParam(key string) string {
+	params, err := url.ParseQuery(u.rawQuery)
+	if err != nil {
+		return ""
+	}
+
+	return params.Get(key)
 }
 
 func (u *URI) Password() string {
@@ -78,7 +88,10 @@ func (u *URI) Addr() string {
 
 // String reassembles the URI to a valid URI string.
 func (u *URI) String() string {
-	t := &url.URL{Scheme: u.scheme}
+	t := &url.URL{
+		Scheme:   u.scheme,
+		RawQuery: u.rawQuery,
+	}
 
 	if u.socket != "" {
 		t.Path = u.socket
@@ -88,7 +101,6 @@ func (u *URI) String() string {
 		} else {
 			t.Host = net.JoinHostPort(u.host, u.port)
 		}
-		t.Path = u.resource
 	}
 
 	if u.user != "" {
@@ -115,35 +127,37 @@ type Defaults struct {
 	Scheme string
 }
 
-// New parses a given rawuri and returns a new filled URI structure.
+// New parses a given rawUri and returns a new filled URI structure.
 // It ignores embedded credentials according to https://www.ietf.org/rfc/rfc3986.txt.
 // Use NewWithCreds to add credentials to a structure.
-func New(rawuri string, defaults *Defaults) (res *URI, err error) {
+func New(rawUri string, defaults *Defaults) (res *URI, err error) {
 	var (
 		isSocket bool
 		noScheme bool
 		port     string
 	)
 
-	res = &URI{}
+	rawUri = strings.TrimSpace(rawUri)
 
-	rawuri = strings.TrimSpace(rawuri)
+	res = &URI{
+		rawUri: rawUri,
+	}
 
 	// https://tools.ietf.org/html/rfc6874#section-2
 	// %25 is allowed to escape a percent sign in IPv6 scoped-address literals
-	if !strings.Contains(rawuri, "%25") {
-		rawuri = strings.Replace(rawuri, "%", "%25", -1)
+	if !strings.Contains(rawUri, "%25") {
+		rawUri = strings.Replace(rawUri, "%", "%25", -1)
 	}
 
-	if noScheme = !strings.Contains(rawuri, "://"); noScheme {
+	if noScheme = !strings.Contains(rawUri, ":/"); noScheme {
 		if defaults != nil && defaults.Scheme != "" {
-			rawuri = defaults.Scheme + "://" + rawuri
+			rawUri = defaults.Scheme + "://" + rawUri
 		} else {
-			rawuri = "tcp://" + rawuri
+			rawUri = "tcp://" + rawUri
 		}
 	}
 
-	u, err := url.Parse(rawuri)
+	u, err := url.Parse(rawUri)
 	if err != nil {
 		return nil, err
 	}
@@ -178,14 +192,15 @@ func New(rawuri string, defaults *Defaults) (res *URI, err error) {
 
 		res.host = u.Hostname()
 		res.port = port
-		res.resource = strings.Trim(u.Path, "/\\")
 	}
+
+	res.rawQuery = u.RawQuery
 
 	return res, err
 }
 
-func NewWithCreds(rawuri, user, password string, defaults *Defaults) (res *URI, err error) {
-	res, err = New(rawuri, defaults)
+func NewWithCreds(rawUri, user, password string, defaults *Defaults) (res *URI, err error) {
+	res, err = New(rawUri, defaults)
 	if err != nil {
 		return nil, err
 	}

@@ -10,10 +10,11 @@ func TestURI_Addr(t *testing.T) {
 		scheme   string
 		host     string
 		port     string
-		resource string
+		rawQuery string
 		socket   string
 		user     string
 		password string
+		rawUri   string
 	}
 	tests := []struct {
 		name   string
@@ -37,10 +38,11 @@ func TestURI_Addr(t *testing.T) {
 				scheme:   tt.fields.scheme,
 				host:     tt.fields.host,
 				port:     tt.fields.port,
-				resource: tt.fields.resource,
+				rawQuery: tt.fields.rawQuery,
 				socket:   tt.fields.socket,
 				user:     tt.fields.user,
 				password: tt.fields.password,
+				rawUri:   tt.fields.rawUri,
 			}
 			if got := u.Addr(); got != tt.want {
 				t.Errorf("Addr() = %v, want %v", got, tt.want)
@@ -54,10 +56,11 @@ func TestURI_String(t *testing.T) {
 		scheme   string
 		host     string
 		port     string
-		resource string
+		rawQuery string
 		socket   string
 		user     string
 		password string
+		rawUri   string
 	}
 	tests := []struct {
 		name   string
@@ -88,8 +91,8 @@ func TestURI_String(t *testing.T) {
 		},
 		{
 			"Should return URI with path",
-			fields{scheme: "oracle", host: "127.0.0.1", port: "1521", resource: "XE"},
-			"oracle://127.0.0.1:1521/XE",
+			fields{scheme: "oracle", host: "127.0.0.1", port: "1521", rawQuery: "dbname=XE"},
+			"oracle://127.0.0.1:1521?dbname=XE",
 		},
 		{
 			"Should return URI without port",
@@ -108,10 +111,11 @@ func TestURI_String(t *testing.T) {
 				scheme:   tt.fields.scheme,
 				host:     tt.fields.host,
 				port:     tt.fields.port,
-				resource: tt.fields.resource,
+				rawQuery: tt.fields.rawQuery,
 				socket:   tt.fields.socket,
 				user:     tt.fields.user,
 				password: tt.fields.password,
+				rawUri:   tt.fields.rawUri,
 			}
 			if got := u.String(); got != tt.want {
 				t.Errorf("String() = %v, want %v", got, tt.want)
@@ -142,37 +146,37 @@ func TestNew(t *testing.T) {
 		{
 			"Parse URI with scheme and port, defaults are not set",
 			args{"http://localhost:80", nil},
-			&URI{scheme: "http", host: "localhost", port: "80"},
+			&URI{scheme: "http", host: "localhost", port: "80", rawUri: "http://localhost:80"},
 			false,
 		},
 		{
 			"Parse URI without scheme and port, defaults are not set",
 			args{"localhost", nil},
-			&URI{scheme: "tcp", host: "localhost"},
+			&URI{scheme: "tcp", host: "localhost", rawUri: "localhost"},
 			false,
 		},
 		{
 			"Parse URI without scheme and port, defaults are empty",
 			args{"localhost", emptyDefaults},
-			&URI{scheme: "tcp", host: "localhost"},
+			&URI{scheme: "tcp", host: "localhost", rawUri: "localhost"},
 			false,
 		},
 		{
 			"Parse URI without scheme and port, defaults are fully set",
 			args{"localhost", defaults},
-			&URI{scheme: "https", host: "localhost", port: "443"},
+			&URI{scheme: "https", host: "localhost", port: "443", rawUri: "localhost"},
 			false,
 		},
 		{
 			"Parse URI without scheme and port, defaults are partly set (only scheme)",
 			args{"localhost", defaultsWithoutPort},
-			&URI{scheme: "https", host: "localhost"},
+			&URI{scheme: "https", host: "localhost", rawUri: "localhost"},
 			false,
 		},
 		{
 			"Parse URI without scheme and port, defaults are partly set (only port)",
 			args{"localhost", defaultsWithoutScheme},
-			&URI{scheme: "tcp", host: "localhost", port: "443"},
+			&URI{scheme: "tcp", host: "localhost", port: "443", rawUri: "localhost"},
 			false,
 		},
 		{
@@ -212,21 +216,29 @@ func TestNew(t *testing.T) {
 			true,
 		},
 		{
-			"Parse URI with resource",
-			args{"oracle://localhost:1521/XE", nil},
-			&URI{scheme: "oracle", host: "localhost", port: "1521", resource: "XE"},
+			"Parse URI with query params",
+			args{"oracle://localhost:1521?dbname=XE", nil},
+			&URI{scheme: "oracle", host: "localhost", port: "1521", rawQuery: "dbname=XE",
+				rawUri: "oracle://localhost:1521?dbname=XE"},
 			false,
 		},
 		{
 			"Parse URI with unix scheme",
 			args{"unix:///var/run/memcached.sock", nil},
-			&URI{scheme: "unix", socket: "/var/run/memcached.sock"},
+			&URI{scheme: "unix", socket: "/var/run/memcached.sock", rawUri: "unix:///var/run/memcached.sock"},
 			false,
 		},
 		{
 			"Parse URI without unix scheme",
 			args{"/var/run/memcached.sock", nil},
-			&URI{scheme: "unix", socket: "/var/run/memcached.sock"},
+			&URI{scheme: "unix", socket: "/var/run/memcached.sock", rawUri: "/var/run/memcached.sock"},
+			false,
+		},
+		{
+			"Parse socket with query params",
+			args{"/var/run/memcached.sock?dbname=postgres", nil},
+			&URI{scheme: "unix", socket: "/var/run/memcached.sock",
+				rawQuery: "dbname=postgres", rawUri: "/var/run/memcached.sock?dbname=postgres"},
 			false,
 		},
 		{
@@ -244,43 +256,51 @@ func TestNew(t *testing.T) {
 		{
 			"Parse URI with ipv6 address. Test 1",
 			args{"tcp://[fe80::1ce7:d24a:97f0:3d83%25en0]:11211", nil},
-			&URI{scheme: "tcp", host: "fe80::1ce7:d24a:97f0:3d83%en0", port: "11211"},
+			&URI{scheme: "tcp", host: "fe80::1ce7:d24a:97f0:3d83%en0", port: "11211",
+				rawUri: "tcp://[fe80::1ce7:d24a:97f0:3d83%25en0]:11211"},
 			false,
 		},
 		{
 			"Parse URI with ipv6 address. Test 2",
 			args{"tcp://[fe80::1ce7:d24a:97f0:3d83%en0]:11211", nil},
-			&URI{scheme: "tcp", host: "fe80::1ce7:d24a:97f0:3d83%en0", port: "11211"},
+			&URI{scheme: "tcp", host: "fe80::1ce7:d24a:97f0:3d83%en0", port: "11211",
+				rawUri: "tcp://[fe80::1ce7:d24a:97f0:3d83%en0]:11211"},
 			false,
 		},
 		{
 			"Parse URI with ipv6 address. Test 3",
 			args{"tcp://[fe80::1%25lo0]:11211", nil},
-			&URI{scheme: "tcp", host: "fe80::1%lo0", port: "11211"},
+			&URI{scheme: "tcp", host: "fe80::1%lo0", port: "11211", rawUri: "tcp://[fe80::1%25lo0]:11211"},
 			false,
 		},
 		{
 			"Parse URI with ipv6 address. Test 4",
 			args{"https://[::1]", defaults},
-			&URI{scheme: "https", host: "::1", port: "443"},
+			&URI{scheme: "https", host: "::1", port: "443", rawUri: "https://[::1]"},
 			false,
 		},
 		{
 			"Parse URI with ipv6 address. Test 5",
 			args{"https://[::1]", nil},
-			&URI{scheme: "https", host: "::1"},
+			&URI{scheme: "https", host: "::1", rawUri: "https://[::1]"},
 			false,
 		},
 		{
 			"Parse URI with ipv6 address. Test 6",
 			args{"tcp://fe80::1:11211", nil},
-			&URI{scheme: "tcp", host: "fe80::1", port: "11211"},
+			&URI{scheme: "tcp", host: "fe80::1", port: "11211", rawUri: "tcp://fe80::1:11211"},
 			false,
 		},
 		{
 			"Parse URI with ipv6 address. Test 7",
 			args{"tcp://::1:11289", nil},
-			&URI{scheme: "tcp", host: "::1", port: "11289"},
+			&URI{scheme: "tcp", host: "::1", port: "11289", rawUri: "tcp://::1:11289"},
+			false,
+		},
+		{
+			"Parse URI with whitespaces",
+			args{"  http://localhost:80  ", nil},
+			&URI{scheme: "http", host: "localhost", port: "80", rawUri: "http://localhost:80"},
 			false,
 		},
 	}
@@ -291,8 +311,9 @@ func TestNew(t *testing.T) {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("New() gotRes = %v, want %v", gotRes, tt.wantRes)
+				t.Errorf("New() gotRes = %#v, want %#v", gotRes, tt.wantRes)
 			}
 		})
 	}
