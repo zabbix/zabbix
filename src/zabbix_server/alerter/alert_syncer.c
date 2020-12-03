@@ -502,15 +502,14 @@ static void	clean_events_tags(zbx_vector_events_tags_t *events_tags)
  *                                                                            *
  * Purpose: adds event tags to sql query                                      *
  *                                                                            *
- * Parameters: eventid     - [IN] problem_tag update db event                 *
- *             params      - [IN] values to process                           *
+ * Parameters: eventid     - [IN]  problem_tag update db event                *
+ *             params      - [IN]  values to process                          *
  *             events_tags - [OUT] vector of events with tags                 *
  *                                                                            *
  * Comments: The event tags are in json object format.                        *
  *                                                                            *
  ******************************************************************************/
-static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params,
-		zbx_vector_events_tags_t *events_tags)
+static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zbx_vector_events_tags_t *events_tags)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -551,8 +550,7 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params,
 
 	local_event_tags.eventid = eventid;
 
-	event_tag_index = zbx_vector_events_tags_search(events_tags, &local_event_tags,
-			zbx_event_tags_compare_func);
+	event_tag_index = zbx_vector_events_tags_search(events_tags, &local_event_tags, zbx_event_tags_compare_func);
 
 	if (FAIL == event_tag_index)
 	{
@@ -741,7 +739,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 					mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid);
 					if (NULL != mediatype && 0 != mediatype->process_tags)
 					{
-						am_db_update_event_tags( result->eventid, result->value,
+						am_db_update_event_tags(result->eventid, result->value,
 								&update_events_tags);
 					}
 				}
