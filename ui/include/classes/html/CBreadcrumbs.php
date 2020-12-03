@@ -29,7 +29,7 @@ class CBreadcrumbs extends CList {
 	/**
 	 * Create a CBreadcrumbs instance for the specified item list.
 	 *
-	 * @param array $values  Breadcrumb list.
+	 * @param array $list  Breadcrumb list.
 	 */
 	public function __construct(array $list = []) {
 		parent::__construct($list);
