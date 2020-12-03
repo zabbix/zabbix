@@ -1428,3 +1428,7 @@ INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027,
 
 -- token
 INSERT INTO token (tokenid, userid, name) VALUES (1, 2, 'token-exists');
+INSERT INTO token (tokenid, userid, name) VALUES (2, 5, 'test-delete-1');
+INSERT INTO token (tokenid, userid, name) VALUES (3, 4, 'test-delete-1');
+INSERT INTO token (tokenid, userid, name) VALUES (4, 1, 'test-delete-1');
+INSERT INTO token (tokenid, userid, name) VALUES (5, 5, 'test-delete-2');

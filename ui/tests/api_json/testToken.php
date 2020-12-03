@@ -402,4 +402,86 @@ class testToken extends CAPITest {
 			}
 		}
 	}
+
+	public static function token_delete(): array {
+		return [
+			[
+				'tokenids' => [2, 3, 4, 5],
+				'expected_error' => 'No permissions to referred object or it does not exist!',
+				'auth' => [
+					'username' => 'zabbix-user',
+					'password' => 'zabbix'
+				]
+			],
+			[
+				'tokenids' => [2, 5],
+				'expected_error' => null,
+				'auth' => [
+					'username' => 'zabbix-user',
+					'password' => 'zabbix'
+				]
+			],
+			[
+				'tokenids' => [2, 5],
+				'expected_error' => 'No permissions to referred object or it does not exist!',
+				'auth' => [
+					'username' => 'zabbix-user',
+					'password' => 'zabbix'
+				]
+			],
+			[
+				'tokenids' => [2, 3, 4, 5],
+				'expected_error' => 'No permissions to referred object or it does not exist!',
+				'auth' => [
+					'username' => 'Admin',
+					'password' => 'zabbix'
+				]
+			],
+			[
+				'tokenids' => [3, 4],
+				'expected_error' => null,
+				'auth' => [
+					'username' => 'Admin',
+					'password' => 'zabbix'
+				]
+			],
+			[
+				'tokenids' => [9, 9],
+				'expected_error' => 'Invalid parameter "/2": value (9) already exists.',
+				'auth' => [
+					'username' => 'Admin',
+					'password' => 'zabbix'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider token_delete
+	 */
+	public function testToken_Delete($tokenids, $expected_error, array $auth = []): void {
+		if ($auth) {
+			$this->authorize($auth['username'], $auth['password']);
+		}
+
+		$db_tokens_before = DB::select('token', [
+			'output' => ['tokenid'],
+			'tokenids' => $tokenids
+		]);
+
+		$result = $this->call('token.delete', $tokenids, $expected_error);
+
+		$db_tokens_after = DB::select('token', [
+			'output' => ['tokenid'],
+			'tokenids' => $tokenids
+		]);
+
+		if ($expected_error === null) {
+			$this->assertEquals($result['result']['tokenids'], $tokenids, 'Response tokenids should match the request.');
+			$this->assertEmpty($db_tokens_after, 'DB records should be deleted.');
+		}
+		else {
+			$this->assertEquals($db_tokens_after, $db_tokens_before, 'No tokens got deleted.');
+		}
+	}
 }

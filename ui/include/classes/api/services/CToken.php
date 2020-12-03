@@ -25,7 +25,8 @@
 class CToken extends CApiService {
 
 	public const ACCESS_RULES = [
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
 	];
 
 	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_AUTH_TOKEN;
@@ -144,5 +145,37 @@ class CToken extends CApiService {
 				));
 			}
 		}
+	}
+
+	/**
+	 * @param array $tokenids
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @return array
+	 */
+	public function delete(array $tokenids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $tokenids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		['type' => $type, 'userid' => $userid] = self::$userData;
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'userid', 'name'],
+			'tokenids' => $tokenids,
+			'filter' => ['userid' => $type == USER_TYPE_SUPER_ADMIN ? null : [$userid]]
+		]);
+
+		if (count($db_tokens) != count($tokenids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		DB::delete('token', ['tokenid' => $tokenids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_tokens);
+
+		return ['tokenids' => $tokenids];
 	}
 }
