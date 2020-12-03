@@ -69,7 +69,9 @@ foreach ($data['macros'] as $i => $macro) {
 		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol($button_cell))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass(ZBX_STYLE_TOP)
 	], 'form_row');
 }
 

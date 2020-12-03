@@ -2038,10 +2038,14 @@ function renderTagTableRow($index, $tag = '', $value = '', array $options = []) 
 				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 				->setAttribute('placeholder', _('value'))
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-			->setEnabled(!$options['readonly'])
+		(new CCol(
+			(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$options['readonly'])
+		))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass(ZBX_STYLE_TOP)
 	]))->addClass('form_row');
 }
 

@@ -4032,7 +4032,7 @@ z-select[disabled] button, z-select[readonly] button,
   border: 1px dashed #383838; }
 
 .top {
-  vertical-align: top; }
+  vertical-align: top !important; }
 
 .right {
   text-align: right !important; }
