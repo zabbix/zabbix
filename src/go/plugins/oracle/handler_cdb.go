@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyCDB = "oracle.cdb.info"
-
-const CDBMaxParams = 0
-
-func CDBHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func cdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var CDBInfo string
-
-	if len(params) > CDBMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
    		SELECT

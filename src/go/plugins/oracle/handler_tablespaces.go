@@ -26,16 +26,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyTablespaces = "oracle.ts.stats"
-
-const tablespacesMaxParams = 0
-
-func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var tablespaces string
-
-	if len(params) > tablespacesMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -149,7 +142,6 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 					dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
 			GROUP BY
 				Y.NAME, Y.CONTENTS, Y.TBS_STATUS
-
 			)
 	`)
 	if err != nil {

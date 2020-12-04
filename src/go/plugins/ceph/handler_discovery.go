@@ -83,7 +83,6 @@ func osdDiscoveryHandler(data map[command][]byte) (interface{}, error) {
 		default:
 			continue
 		}
-
 	}
 
 	jsonLLD, err := json.Marshal(lld)

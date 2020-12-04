@@ -17,31 +17,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package oracle
+package mysql
 
 import (
 	"context"
+	"encoding/json"
 
 	"zabbix.com/pkg/zbxerr"
 )
 
-func procHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
-	var proc string
-
-	row, err := conn.QueryRow(ctx, `
-		SELECT
-			JSON_OBJECT('proc_num' VALUE COUNT(*))
-		FROM
-			V$PROCESS
-	`)
+func statusVarsHandler(ctx context.Context, conn MyClient, _ map[string]string,
+	_ ...string) (interface{}, error) {
+	rows, err := conn.Query(ctx, `SHOW GLOBAL STATUS`)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	err = row.Scan(&proc)
+	data, err := rows2data(rows)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return proc, nil
+	res := make(map[string]string)
+	for _, row := range data {
+		res[row["Variable_name"]] = row["Value"]
+	}
+
+	jsonRes, err := json.Marshal(res)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonRes), nil
 }

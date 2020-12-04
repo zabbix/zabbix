@@ -25,16 +25,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyASMDiskGroups = "oracle.diskgroups.stats"
-
-const ASMDiskGroupsInfoMaxParams = 0
-
-func ASMDiskGroupsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var diskGroups string
-
-	if len(params) > ASMDiskGroupsInfoMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

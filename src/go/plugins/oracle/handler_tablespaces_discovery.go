@@ -25,16 +25,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyTablespacesDiscovery = "oracle.ts.discovery"
-
-const tablespacesDiscoveryMaxParams = 0
-
-func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var lld string
-
-	if len(params) > tablespacesDiscoveryMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

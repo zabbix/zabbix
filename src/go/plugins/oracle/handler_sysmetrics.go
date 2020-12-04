@@ -25,36 +25,28 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keySysMetrics = "oracle.sys.metrics"
-const sysMetricsMaxParams = 1
-
 const (
 	duration60sec = "2"
 	duration15sec = "3"
 )
 
-func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func sysMetricsHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var (
 		sysmetrics string
 		groupID    = duration60sec
 	)
 
-	if len(params) > sysMetricsMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
+	switch params["Duration"] {
+	case "15":
+		groupID = duration15sec
+	case "60":
+		groupID = duration60sec
+	default:
+		return nil, zbxerr.ErrorInvalidParams
 	}
 
-	if len(params) == 1 {
-		switch params[0] {
-		case "15":
-			groupID = duration15sec
-		case "60":
-			groupID = duration60sec
-		default:
-			return nil, zbxerr.ErrorInvalidParams
-		}
-	}
-
-	row, err := conn.Query(ctx, `
+	row, err := conn.QueryRow(ctx, `
 		SELECT
 			JSON_OBJECTAGG(METRIC_NAME VALUE ROUND(VALUE, 3) RETURNING CLOB)
 		FROM
