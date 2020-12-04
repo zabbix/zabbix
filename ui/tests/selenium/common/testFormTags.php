@@ -49,7 +49,6 @@ class testFormTags extends CWebTest {
 		return [
 			[
 				[
-					'expected' => TEST_GOOD,
 					'name' => 'With tags',
 					'tags' => [
 						[
@@ -82,7 +81,6 @@ class testFormTags extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'name' => 'With equal tag names',
 					'tags' => [
 						[
@@ -100,7 +98,6 @@ class testFormTags extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'name' => 'With equal tag values',
 					'tags' => [
 						[
@@ -155,8 +152,8 @@ class testFormTags extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'name' => 'With trailing spaces',
+					'trim' => true,
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -178,6 +175,9 @@ class testFormTags extends CWebTest {
 	 * @param string   $expression   trigger or trigger prototype expression
 	 */
 	public function checkTagsCreate($data, $object, $expression = null) {
+		$sql = null;
+		$old_hash = null;
+
 		if ($object === 'trigger' || $object === 'trigger prototype') {
 			$sql = 'SELECT * FROM triggers ORDER BY triggerid';
 			$locator = 'name:triggersForm';
@@ -187,7 +187,7 @@ class testFormTags extends CWebTest {
 			$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
 		}
 
-		if ($data['expected'] === TEST_BAD) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -214,41 +214,7 @@ class testFormTags extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, ucfirst($object).' added');
-
-				$success_sql = ($object === 'trigger' || $object === 'trigger prototype')
-					? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name'])
-					: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
-
-				$this->assertEquals(1, CDBHelper::getCount($success_sql));
-				// Check the results in form.
-				$this->checkTagFields($data, $object, $form);
-				break;
-
-			case TEST_BAD:
-				switch ($object) {
-					case 'host':
-					case 'template':
-						$error_details = $data['error_details'];
-						break;
-
-					case 'trigger':
-					case 'trigger prototype':
-						$error_details = $data['trigger_error_details'];
-						break;
-
-					case 'host prototype':
-						$error_details = $data['host_prototype_error_details'];
-						break;
-				}
-
-				$this->assertMessage(TEST_BAD, 'Cannot add '.$object, $error_details);
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-				break;
-		}
+		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
 	}
 
 	public static function getUpdateData() {
@@ -287,8 +253,7 @@ class testFormTags extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'case_name' => 'With trailing spaces',
+					'trim' => true,
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -307,7 +272,6 @@ class testFormTags extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -349,6 +313,9 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger or prototype
 	 */
 	public function checkTagsUpdate($data, $object) {
+		$sql = null;
+		$old_hash = null;
+
 		if ($object === 'trigger' || $object === 'trigger prototype') {
 			$sql = 'SELECT * FROM triggers ORDER BY triggerid';
 			$locator = 'name:triggersForm';
@@ -358,7 +325,7 @@ class testFormTags extends CWebTest {
 			$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
 		}
 
-		if ($data['expected'] === TEST_BAD) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -371,42 +338,57 @@ class testFormTags extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, ucfirst($object).' updated');
+		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash);
+	}
 
-				$success_sql = ($object === 'trigger' || $object === 'trigger prototype')
-					? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name'])
-					: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->update_name);
+	/**
+	 * Check result after creating or updating object with tags.
+	 *
+	 * @param arary     $data        data provider
+	 * @param string    $object      host, template, trigger or prototype
+	 * @param element   $form        object configuration form
+	 * @param string    $action      create or update object
+	 * @param string    $sql         selected table from db
+	 * @param string    $old_hash    db hash before changes
+	 */
+	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$title = ($action === 'add') ? 'Cannot add '.$object : 'Cannot update '.$object;
 
-				$this->assertEquals(1, CDBHelper::getCount($success_sql));
-				// Check the results in form.
-				$this->checkTagFields($data, $object, $form);
-				break;
+			switch ($object) {
+				case 'host':
+				case 'template':
+					$error_details = $data['error_details'];
+					break;
 
-			case TEST_BAD:
-				switch ($object) {
-					case 'host':
-					case 'template':
-						$error_details = $data['error_details'];
-						break;
+				case 'trigger':
+				case 'trigger prototype':
+					$error_details = $data['trigger_error_details'];
+					break;
 
-					case 'trigger':
-					case 'trigger prototype':
-						$error_details = $data['trigger_error_details'];
-						break;
+				case 'host prototype':
+					$error_details = $data['host_prototype_error_details'];
+					break;
+			}
 
-					case 'host prototype':
-						$error_details = $data['host_prototype_error_details'];
-						break;
-				}
+			$this->assertMessage(TEST_BAD, $title, $error_details);
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		}
+		else {
+			$title = ($action === 'add') ? ucfirst($object).' added' : ucfirst($object).' updated';
+			$this->assertMessage(TEST_GOOD, $title);
 
-				$this->assertMessage(TEST_BAD, 'Cannot update '.$object, $error_details);
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql));
-				break;
+			$success_sql = ($object === 'trigger' || $object === 'trigger prototype')
+				? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name'])
+				: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
+
+			$this->assertEquals(1, CDBHelper::getCount($success_sql));
+			// Check the results in form.
+			$this->checkTagFields($data, $object, $form);
 		}
 	}
+
 
 	/**
 	 * Test cloning of host, template, trigger or trigger prototype with tags
@@ -506,18 +488,19 @@ class testFormTags extends CWebTest {
 		foreach ($expected as &$tag) {
 			unset($tag['action'], $tag['index']);
 
+			if (CTestArrayHelper::get($data, 'trim', false) === false) {
+				continue;
+			}
+
 			// Remove trailing spaces from tag and value.
-			if (strstr($data['name'], 'With trailing spaces') ||
-						CTestArrayHelper::get($data, 'case_name') === 'With trailing spaces') {
-				foreach ($expected as $i => &$options) {
-					foreach (['tag', 'value'] as $parameter) {
-						if (array_key_exists($parameter, $options)) {
-							$options[$parameter] = trim($options[$parameter]);
-						}
+			foreach ($expected as $i => &$options) {
+				foreach (['tag', 'value'] as $parameter) {
+					if (array_key_exists($parameter, $options)) {
+						$options[$parameter] = trim($options[$parameter]);
 					}
 				}
-				unset($options);
 			}
+			unset($options);
 		}
 		unset($tag);
 
