@@ -23,24 +23,30 @@
  * @var CView $this
  */
 
-require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
+$this->addJsFile('multiselect.js');
+$this->addJsFile('textareaflexible.js');
+$this->addJsFile('popup.condition.common.js');
+$this->includeJsFile('configuration.correlation.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $data['form']);
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', 'correlation.condition.add')
+		->getUrl()
+	)
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-if ($data['correlationid']) {
+if ($data['correlationid'] != 0) {
 	$form->addVar('correlationid', $data['correlationid']);
 }
 
-$correlation_tab = (new CFormList())
+$form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['correlation']['name']))
+		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -54,10 +60,8 @@ $condition_table = (new CTable(_('No conditions defined.')))
 
 $i = 0;
 
-if ($data['correlation']['filter']['conditions']) {
-	$correlation_condition_string_values = corrConditionValueToString([$data['correlation']]);
-
-	foreach ($data['correlation']['filter']['conditions'] as $j => $condition) {
+if ($data['conditions']) {
+	foreach ($data['conditions'] as $condition) {
 		// For some types operators are optional. Set the default "=" if operator is not set.
 		if (!array_key_exists('operator', $condition)) {
 			$condition['operator'] = CONDITION_OPERATOR_EQUAL;
@@ -76,7 +80,7 @@ if ($data['correlation']['filter']['conditions']) {
 
 		$condition_table->addRow([
 				$labelSpan,
-				(new CCol(getcorrConditionDescription($condition, $correlation_condition_string_values[0][$j])))
+				(new CCol(getCorrConditionDescription($condition, $data['group_names'])))
 					->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
@@ -101,9 +105,9 @@ $condition_table->addRow([
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 
-$correlation_tab
+$form_list
 	->addRow(_('Type of calculation'), [
-		new CComboBox('evaltype', $data['correlation']['filter']['evaltype'], 'processTypeOfCalculation()', [
+		new CComboBox('evaltype', $data['evaltype'], 'processTypeOfCalculation()', [
 			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 			CONDITION_EVAL_TYPE_AND => _('And'),
 			CONDITION_EVAL_TYPE_OR => _('Or'),
@@ -111,7 +115,7 @@ $correlation_tab
 		]),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('condition_label'),
-		(new CTextBox('formula', $data['correlation']['filter']['formula']))
+		(new CTextBox('formula', $data['formula']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('formula')
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
@@ -124,58 +128,58 @@ $correlation_tab
 			->setAriaRequired()
 	);
 
-$correlation_tab
+$form_list
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['correlation']['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
+	->addRow(
+		_('Operations'),
+		(new CList())
+			->addItem(
+				(new CCheckBox('op_close_old'))
+					->setChecked($data['op_close_old'])
+					->setId('operation_0_type')
+					->setLabel(_('Close old events'))
+			)
+			->addItem(
+				(new CCheckBox('op_close_new'))
+					->setChecked($data['op_close_new'])
+					->setId('operation_1_type')
+					->setLabel(_('Close new event'))
+			)
+			->addClass(ZBX_STYLE_CHECKBOX_LIST)
+	)
+	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())))
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', ZBX_CORRELATION_ENABLED))
-			->setChecked($data['correlation']['status'] == ZBX_CORRELATION_ENABLED)
+			->setChecked($data['status'] == ZBX_CORRELATION_ENABLED)
+			->setUncheckedValue(ZBX_CORRELATION_DISABLED)
 	);
 
-// Operations tab.
-$operation_tab = (new CFormList())
-	->addRow(
-		_('Close old events'),
-		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
-			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
-			->setId('operation_0_type')
-	)
-	->addRow(
-		_('Close new event'),
-		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
-			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
-			->setId('operation_1_type')
-	)
-	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())));
-
 // Append tabs to form.
-$correlation_tabs = (new CTabView())
-	->addTab('correlationTab', _('Correlation'), $correlation_tab)
-	->addTab('operationTab', _('Operations'), $operation_tab);
-
-if (!hasRequest('form_refresh')) {
-	$correlation_tabs->setSelected(0);
-}
+$correlation_tabs = (new CTabView())->addTab('correlationTab', _('Correlation'), $form_list);
 
 // Append buttons to form.
-if ($data['correlationid']) {
-	$correlation_tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')), [
-			new CButton('clone', _('Clone')),
-			new CButtonDelete(
-				_('Delete current correlation?'),
-				url_param('form').url_param('correlationid')
-			),
-			new CButtonCancel()
-		]
-	));
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'correlation.list')
+	->setArgument('page', CPagerHelper::loadPage('correlation.list', null))
+))->setId('cancel');
+
+if ($data['correlationid'] == 0) {
+	$add_button = (new CSubmitButton(_('Add'), 'action', 'correlation.create'))->setId('add');
+	$correlation_tabs->setFooter(makeFormFooter($add_button, [$cancel_button]));
 }
 else {
-	$correlation_tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
-	));
+	$update_button = (new CSubmitButton(_('Update'), 'action', 'correlation.update'))->setId('update');
+	$clone_button = (new CSimpleButton(_('Clone')))->setId('clone');
+	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'correlation.delete')
+			->setArgument('correlationids', (array) $data['correlationid'])
+			->setArgumentSID(),
+		_('Delete current correlation?')
+	))->setId('delete');
+
+	$correlation_tabs->setFooter(makeFormFooter($update_button, [$clone_button, $delete_button, $cancel_button]));
 }
 
 $form->addItem($correlation_tabs);

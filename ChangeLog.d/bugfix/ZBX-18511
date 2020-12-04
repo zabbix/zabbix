@@ -1,0 +1,1 @@
+..F....... [ZBX-18511] fixed error for non logged in user trying to access graphs page with time range arguments (gcalenko)

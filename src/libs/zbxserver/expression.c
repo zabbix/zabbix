@@ -1201,9 +1201,9 @@ static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -1331,9 +1331,9 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 			return ret;
 	}
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -1787,13 +1787,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED == DBis_null(row[0]))
-		{
-			zbx_free(*replace_to);
-		}
-		else
-			*replace_to = zbx_strdup(*replace_to, row[0]);
-
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);

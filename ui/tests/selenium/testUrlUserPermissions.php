@@ -673,7 +673,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'queue.php',
+				'url' => 'zabbix.php?action=queue.overview',
 				'title' =>	'Queue [refreshed every 30 sec.]',
 				'users' => [
 					'guest' => false,
