@@ -65,7 +65,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 			'massupdate_app_action' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'preprocessing_test_type' => 'int32',
 			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
-			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM])
 		];
 
 		$ret = $this->validateInput($fields);

@@ -45,7 +45,7 @@ class CControllerPopupMassupdateTemplate extends CController {
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
 			'macros_remove' => 'in 0,1',
-			'macros_remove_all' => 'in 0,1',
+			'macros_remove_all' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
