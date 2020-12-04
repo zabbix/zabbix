@@ -2143,6 +2143,14 @@ Changes for 4.0.28rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
+........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
+.......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)
+.......PS. [ZBX-18662] improved pollers, unreachable pollers, Java pollers and pingers to use less memory (vso)
+........S. [ZBX-18423] fixed inconsistent macro expansion with Oracle DB compared with other databases (viktors)
+A......... [ZBX-18219] fixed custom multiplier preprocessing step validation to accept a string with macros (agriscenko)
+..F....... [ZBX-18422] fixed "server is not running" warning message width (gcalenko)
+..F....... [ZBX-18688] fixed schema name didnt show when available only postgresql (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.27
