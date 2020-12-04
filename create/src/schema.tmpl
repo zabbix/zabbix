@@ -314,7 +314,7 @@ FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
-FIELD		|valumapname	|t_varchar(64)	|''	|NOT NULL	|0			|-|valuemap	|name
+FIELD		|valuemap	|t_varchar(64)	|''	|NOT NULL	|0			|-|valuemap	|name
 FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -1873,8 +1873,8 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0		|1|hosts
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 UNIQUE		|1		|hostid,name
 
-TABLE|valuemap_field|valuemap_fieldid|ZBX_TEMPLATE
-FIELD		|valuemap_fieldid	|t_id		|	|NOT NULL	|0
+TABLE|valuemap_mapping|valuemap_mappingid|ZBX_TEMPLATE
+FIELD		|valuemap_mappingid	|t_id		|	|NOT NULL	|0
 FIELD		|valuemapid		|t_id		|	|NOT NULL	|0			|1|valuemap
 FIELD		|value			|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|newvalue		|t_varchar(64)	|''	|NOT NULL	|0
