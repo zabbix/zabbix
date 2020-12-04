@@ -11,8 +11,6 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/godror/godror v0.19.4
-	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
-	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.8.2-0.20200910143026-040df1ccef85
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mediocregopher/radix/v3 v3.5.0

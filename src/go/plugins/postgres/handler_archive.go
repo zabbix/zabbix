@@ -22,22 +22,14 @@ package postgres
 import (
 	"context"
 	"errors"
-
 	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresSizeArchive = "pgsql.archive"
-)
-
 // archiveHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		archiveCountJSON, archiveSizeJSON string
-		err                               error
-		row                               pgx.Row
-	)
+func archiveHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var archiveCountJSON, archiveSizeJSON string
 
 	queryArchiveCount := `SELECT row_to_json(T)
 							FROM (
@@ -56,7 +48,7 @@ func (p *Plugin) archiveHandler(ctx context.Context, conn PostgresClient, key st
 										 ) ready
 								) T;`
 
-	row, err = conn.QueryRow(ctx, queryArchiveCount)
+	row, err := conn.QueryRow(ctx, queryArchiveCount)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

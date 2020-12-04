@@ -21,7 +21,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -30,38 +29,24 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresCustom = "pgsql.custom.query"
-)
-
 // customQueryHandler executes custom user queries from *.sql files.
-func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		err  error
-		rows *sql.Rows
-		data []string
-	)
-	// for now we are expecting at least one parameter
-	if len(params) == 0 {
-		return nil, errors.New("the key requires custom query name as fourth parameter")
-	}
+func customQueryHandler(ctx context.Context, conn PostgresClient,
+	_ string, params map[string]string, extraParams ...string) (interface{}, error) {
+	queryName := params["QueryName"]
 
-	if len(params[0]) == 0 {
-		return nil, errors.New("expected custom query name as fourth parameter for the key, got empty string")
-	}
-
-	queryName := params[0]
-	queryArgs := make([]interface{}, len(params[1:]))
-
-	for i, v := range params[1:] {
+	queryArgs := make([]interface{}, len(extraParams))
+	for i, v := range extraParams {
 		queryArgs[i] = v
 	}
 
-	rows, err = conn.QueryByName(ctx, queryName, queryArgs...)
+	rows, err := conn.QueryByName(ctx, queryName, queryArgs...)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 	defer rows.Close()
+
+	// JSON marshaling
+	var data []string
 
 	columns, err := rows.Columns()
 	if err != nil {
@@ -94,12 +79,11 @@ func (p *Plugin) customQueryHandler(ctx context.Context, conn PostgresClient, ke
 		jsonRes, _ := json.Marshal(results)
 		data = append(data, strings.TrimSpace(string(jsonRes)))
 	}
+
 	// Any errors encountered by rows.Next or rows.Scan will be returned here
 	if rows.Err() != nil {
 		return nil, err
 	}
 
-	res := "[" + strings.Join(data, ",") + "]"
-
-	return res, nil
+	return "[" + strings.Join(data, ",") + "]", nil
 }

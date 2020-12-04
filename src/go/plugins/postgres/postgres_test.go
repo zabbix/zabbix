@@ -31,6 +31,8 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
+var testParamDatabase = map[string]string{"Database": "postgres"}
+
 // TestMain does the before and after setup
 func TestMain(m *testing.M) {
 	var code int
@@ -38,7 +40,7 @@ func TestMain(m *testing.M) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	log.Infof("[TestMain] Start connecting to PostgreSQL...")
-	if err := сreateConnection(); err != nil {
+	if err := createConnection(); err != nil {
 		log.Infof("failed to create connection to PostgreSQL for tests")
 		os.Exit(code)
 	}
@@ -54,6 +56,7 @@ func TestMain(m *testing.M) {
 	log.Infof("[TestMain] Cleaning up...")
 	os.Exit(code)
 }
+
 func TestPlugin_Start(t *testing.T) {
 	t.Run("Connection manager must be initialized", func(t *testing.T) {
 		impl.Start()
@@ -64,17 +67,17 @@ func TestPlugin_Start(t *testing.T) {
 }
 
 func TestPlugin_Export(t *testing.T) {
+	pgAddr, pgUser, pgPwd, pgDb := getEnv()
+
 	type args struct {
 		key    string
 		params []string
 		ctx    plugin.ContextProvider
 	}
 
-	var pingOK int64 = 1
-
 	//impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
 	impl.connMgr.queryStorage = yarn.NewFromMap(map[string]string{
-		"TestQuery.sql": "SELECT 1::text AS res",
+		"TestQuery.sql": "SELECT $1::text AS res",
 	})
 
 	tests := []struct {
@@ -87,36 +90,29 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			"Check PG Ping",
 			&impl,
-			args{keyPostgresPing, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
-			pingOK,
+			args{keyPing, []string{pgAddr, pgUser, pgPwd}, nil},
+			pingOk,
 			false,
-		},
-		{
-			"Unknown metric",
-			&impl,
-			args{"unknown.metric", nil, nil},
-			nil,
-			true,
 		},
 		{
 			"Too many parameters",
 			&impl,
-			args{keyPostgresPing, []string{"param1", "param2", "param3", "param4", "param5"}, nil},
+			args{keyPing, []string{"param1", "param2", "param3", "param4", "param5"}, nil},
 			nil,
 			true,
 		},
 		{
 			"Check wal handler",
 			&impl,
-			args{keyPostgresWal, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
+			args{keyWal, []string{pgAddr, pgUser, pgPwd}, nil},
 			nil,
 			false,
 		},
 		{
 			"Check custom queries handler. Should return 1 as text",
 			&impl,
-			args{keyPostgresCustom, []string{"tcp://localhost:5432", "postgres", "postgres", "postgres", "TestQuery"}, nil},
-			"[{\"res\":\"1\"}]",
+			args{keyCustomQuery, []string{pgAddr, pgUser, pgPwd, pgDb, "TestQuery", "echo"}, nil},
+			"[{\"res\":\"echo\"}]",
 			false,
 		},
 	}
@@ -127,10 +123,10 @@ func TestPlugin_Export(t *testing.T) {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotResult, tt.wantResult) && tt.args.key != keyPostgresWal {
+			if !reflect.DeepEqual(gotResult, tt.wantResult) && tt.args.key != keyWal {
 				t.Errorf("Plugin.Export() = %v, want %v", gotResult, tt.wantResult)
 			}
-			if tt.args.key == keyPostgresWal && len(gotResult.(string)) == 0 {
+			if tt.args.key == keyWal && len(gotResult.(string)) == 0 {
 				t.Errorf("Plugin.Export() result for keyPostgresWal length is 0")
 			}
 		})

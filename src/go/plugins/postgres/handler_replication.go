@@ -28,29 +28,19 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresReplicationCount                          = "pgsql.replication.count"
-	keyPostgresReplicationStatus                         = "pgsql.replication.status"
-	keyPostgresReplicationLagSec                         = "pgsql.replication.lag.sec"
-	keyPostgresReplicationLagB                           = "pgsql.replication.lag.b"
-	keyPostgresReplicationRecoveryRole                   = "pgsql.replication.recovery_role"
-	keyPostgresReplicationMasterDiscoveryApplicationName = "pgsql.replication.master.discovery.application_name"
-)
-
 // replicationHandler gets info about recovery state if all is OK or nil otherwise.
-func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
+func replicationHandler(ctx context.Context, conn PostgresClient,
+	key string, _ map[string]string, _ ...string) (interface{}, error) {
 	var (
 		replicationResult   int64
 		status              int
 		query, stringResult string
 		inRecovery          bool
-		err                 error
-		row                 pgx.Row
 	)
 
 	switch key {
-	case keyPostgresReplicationStatus:
-		row, err = conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
+	case keyReplicationStatus:
+		row, err := conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
@@ -80,14 +70,14 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 
 		return strconv.Itoa(status), nil
 
-	case keyPostgresReplicationLagSec:
+	case keyReplicationLagSec:
 		query = `SELECT
   					CASE
     					WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
 						ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
   					END as lag`
-	case keyPostgresReplicationLagB:
-		row, err = conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
+	case keyReplicationLagB:
+		row, err := conn.QueryRow(ctx, `SELECT pg_is_in_recovery()`)
 		if err != nil {
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
@@ -124,13 +114,13 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 
 		return replicationResult, nil
 
-	case keyPostgresReplicationRecoveryRole:
+	case keyReplicationRecoveryRole:
 		query = `SELECT pg_is_in_recovery()::int`
 
-	case keyPostgresReplicationCount:
+	case keyReplicationCount:
 		query = `SELECT count(*) FROM pg_stat_replication`
 
-	case keyPostgresReplicationMasterDiscoveryApplicationName:
+	case keyReplicationMasterDiscoveryAppName:
 		query = `SELECT '{"data":'|| coalesce(json_agg(T), '[]'::json)::text || '}'
 				   FROM (
 						SELECT
@@ -139,7 +129,7 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
         					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), sent_lsn) AS master_replication_lag
 						FROM pg_stat_replication
 					) T`
-		row, err = conn.QueryRow(ctx, query)
+		row, err := conn.QueryRow(ctx, query)
 
 		if err != nil {
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
@@ -157,7 +147,7 @@ func (p *Plugin) replicationHandler(ctx context.Context, conn PostgresClient, ke
 		return stringResult, nil
 	}
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)

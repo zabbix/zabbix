@@ -27,18 +27,11 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresBgwriter = "pgsql.bgwriter"
-)
-
 // bgwriterHandler executes select  with statistics from pg_stat_bgwriter
 // and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		bgwriterJSON string
-		err          error
-		row          pgx.Row
-	)
+func bgwriterHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var bgwriterJSON string
 
 	query := `
   SELECT row_to_json (T)
@@ -57,7 +50,7 @@ func (p *Plugin) bgwriterHandler(ctx context.Context, conn PostgresClient, key s
           FROM pg_catalog.pg_stat_bgwriter
 		  ) T ;`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

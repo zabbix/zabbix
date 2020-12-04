@@ -1,5 +1,3 @@
-// +build postgres_tests
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -23,46 +21,33 @@ package postgres
 
 import (
 	"context"
-	"fmt"
-	"testing"
+	"errors"
+
+	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
-func TestPlugin_oldestHandler(t *testing.T) {
+// oldestXIDHandler gets age of the oldest xid if all is OK or nil otherwise.
+func oldestXIDHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var resultXID int64
 
-	// create pool or aquare conn from old pool for test
-	sharedPool, err := getConnPool(t)
+	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
+				FROM pg_catalog.pg_stat_activity`
+
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		t.Fatal(err)
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	type args struct {
-		conn   *PostgresConn
-		params []string
-		ctx    context.Context
-	}
-	tests := []struct {
-		name    string
-		p       *Plugin
-		args    args
-		wantErr bool
-	}{
-		{
-			fmt.Sprintf("oldestHandler() should return ptr to Pool for oldestHandler()"),
-			&impl,
-			args{conn: sharedPool, ctx: context.Background()},
+	err = row.Scan(&resultXID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+		}
 
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.p.oldestHandler(tt.args.ctx, tt.args.conn, keyPostgresOldestXid, tt.args.params)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.oldestHandler() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-		})
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
+	return resultXID, nil
 }

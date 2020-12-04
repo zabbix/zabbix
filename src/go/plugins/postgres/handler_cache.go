@@ -27,21 +27,14 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresCache = "pgsql.cache.hit"
-)
-
 // cacheHandler finds cache hit percent and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) cacheHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		cache float64
-		err   error
-		row   pgx.Row
-	)
+func cacheHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var cache float64
 
 	query := `SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2) FROM pg_catalog.pg_stat_database;`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

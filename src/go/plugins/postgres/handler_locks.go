@@ -23,21 +23,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v4"
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresLocks = "pgsql.locks"
-)
-
 // locksHandler executes select from pg_stat_database command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) locksHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		locksJSON string
-		err       error
-		row       pgx.Row
-	)
+func locksHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var locksJSON string
 
 	query := `
 WITH T AS
@@ -87,7 +79,7 @@ FROM
 	FROM T
 	GROUP BY dbname) T2`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

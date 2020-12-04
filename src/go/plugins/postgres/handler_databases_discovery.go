@@ -27,24 +27,17 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresDiscoveryDatabases = "pgsql.db.discovery"
-)
-
 // databasesDiscoveryHandler gets names of all databases and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesDiscoveryHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		databasesJSON string
-		err           error
-		row           pgx.Row
-	)
+func databasesDiscoveryHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var databasesJSON string
 
 	query := `SELECT json_build_object ('data',json_agg(json_build_object('{#DBNAME}',d.datname)))
 				FROM pg_database d
 			   WHERE NOT datistemplate
 				 AND datallowconn;`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

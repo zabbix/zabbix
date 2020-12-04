@@ -27,17 +27,10 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresAutovacuum = "pgsql.autovacuum.count"
-)
-
 // autovacuumHandler returns count of autovacuum workers if all is OK or nil otherwise.
-func (p *Plugin) autovacuumHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		countAutovacuumWorkers int64
-		err                    error
-		row                    pgx.Row
-	)
+func autovacuumHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var countAutovacuumWorkers int64
 
 	query := `SELECT count(*)
 				FROM pg_catalog.pg_stat_activity
@@ -45,7 +38,7 @@ func (p *Plugin) autovacuumHandler(ctx context.Context, conn PostgresClient, key
 				 AND state <> 'idle'
 				 AND pid <> pg_catalog.pg_backend_pid()`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

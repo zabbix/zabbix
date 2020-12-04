@@ -1,4 +1,4 @@
-/*
+/* /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
 **
@@ -20,13 +20,36 @@
 package postgres
 
 import (
+	"context"
 	"errors"
+
+	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
-func validateDatabase(database string) (err error) {
-	if len(database) < 1 || len(database) > 63 || database == "" {
-		return errors.New("size name of database must be between 1 and 63 bytes")
+// databaseAgeHandler gets age of specific database respectively or nil otherwise.
+func databaseAgeHandler(ctx context.Context, conn PostgresClient,
+	_ string, params map[string]string, _ ...string) (interface{}, error) {
+	var countAge int64
+
+	query := `SELECT age(datfrozenxid)
+		FROM pg_catalog.pg_database
+   		WHERE datistemplate = false
+			 AND datname = $1;`
+	row, err := conn.QueryRow(ctx, query, params["Database"])
+
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return
+	err = row.Scan(&countAge)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+		}
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return countAge, nil
 }

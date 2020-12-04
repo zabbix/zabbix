@@ -27,21 +27,14 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresUptime = "pgsql.uptime"
-)
-
 // uptimeHandler finds difference btw current time and
 // postmaster start time and returns int64 if all is OK or nil otherwise.
-func (p *Plugin) uptimeHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		uptime float64
-		err    error
-		row    pgx.Row
-	)
+func uptimeHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var uptime float64
 
 	query := `SELECT date_part('epoch', now() - pg_postmaster_start_time());`
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)

@@ -29,17 +29,18 @@ import (
 )
 
 func TestPlugin_pingHandler(t *testing.T) {
-	var pingOK int64 = 1
-	// create pool or aquare conn from old pool for test
-	sharedPool, err := getConnPool(t)
+	// create pool or acquire conn from old pool for test
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *PostgresConn
-		params []string
-		ctx    context.Context
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -49,18 +50,16 @@ func TestPlugin_pingHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("pingHandler should return %d if connection is ok", postgresPingOk),
+			fmt.Sprintf("pingHandler should return %d if connection is ok", pingOk),
 			&impl,
-			args{conn: sharedPool, ctx: context.Background()},
-
-			pingOK,
+			args{context.Background(), sharedPool, keyPing, nil, []string{}},
+			pingOk,
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.pingHandler(tt.args.ctx,
-				tt.args.conn, keyPostgresPing, tt.args.params)
+			got, err := pingHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.pingHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

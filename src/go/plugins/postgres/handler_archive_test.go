@@ -28,15 +28,17 @@ import (
 )
 
 func TestPlugin_archiveHandler(t *testing.T) {
-	sharedPool, err := getConnPool(t)
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *PostgresConn
-		params []string
-		ctx    context.Context
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -47,14 +49,13 @@ func TestPlugin_archiveHandler(t *testing.T) {
 		{
 			fmt.Sprintf("archiveHandler should return json with data if OK "),
 			&impl,
-			args{conn: sharedPool, ctx: context.Background()},
+			args{context.Background(), sharedPool, keyArchiveSize, nil, []string{}},
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			got, err := tt.p.archiveHandler(tt.args.ctx, tt.args.conn, keyPostgresSizeArchive, tt.args.params)
+			got, err := archiveHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.archiveHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

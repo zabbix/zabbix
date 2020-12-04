@@ -28,17 +28,18 @@ import (
 )
 
 func TestPlugin_replicationHandler(t *testing.T) {
-	// create pool or aquare conn from old pool
-	sharedPool, err := getConnPool(t)
+	// create pool or acquire conn from old pool
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *PostgresConn
-		key    string
-		params []string
-		ctx    context.Context
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -49,50 +50,50 @@ func TestPlugin_replicationHandler(t *testing.T) {
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.count"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.replication.count", ctx: context.Background()},
+			args{context.Background(), sharedPool, keyReplicationCount, nil, []string{}},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.status"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.replication.status", ctx: context.Background()},
+			args{context.Background(), sharedPool, keyReplicationStatus, nil, []string{}},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.lag.sec"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.replication.lag.sec", ctx: context.Background()},
+			args{context.Background(), sharedPool, keyReplicationLagSec, nil, []string{}},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.lag.b"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.replication.lag.b", ctx: context.Background()},
+			args{context.Background(), sharedPool, keyReplicationLagB, nil, []string{}},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.recovery_role"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.replication.recovery_role", ctx: context.Background()},
+			args{context.Background(), sharedPool, keyReplicationRecoveryRole, nil, []string{}},
 			false,
 		},
 		{
 			fmt.Sprintf("replicationHandler should return ptr to Pool for replication.master.discovery.application_name"),
 			&impl,
-			args{conn: sharedPool, key: "pgsql.replication.master.discovery.application_name", ctx: context.Background()},
+			args{context.Background(), sharedPool, keyReplicationMasterDiscoveryAppName, nil, []string{}},
 			false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.replicationHandler(tt.args.ctx, tt.args.conn, tt.args.key, []string{})
+			got, err := replicationHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.replicationHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.wantErr == false {
-				if tt.args.key == "pgsql.replication.status" || tt.args.key == "pgsql.replication.master.discovery.application_name" {
+				if tt.args.key == keyReplicationStatus || tt.args.key == keyReplicationMasterDiscoveryAppName {
 					if len(got.(string)) == 0 {
 						t.Errorf("Plugin.replicationTransactions() at DeepEqual error = %v, wantErr %v", err, tt.wantErr)
 						return

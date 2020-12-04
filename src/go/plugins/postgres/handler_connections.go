@@ -27,17 +27,10 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresConnections = "pgsql.connections"
-)
-
 // connectionsHandler executes select from pg_stat_activity command and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		connectionsJSON string
-		err             error
-		row             pgx.Row
-	)
+func connectionsHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var connectionsJSON string
 
 	query := `SELECT row_to_json(T)
 	FROM (
@@ -54,7 +47,7 @@ func (p *Plugin) connectionsHandler(ctx context.Context, conn PostgresClient, ke
 			(SELECT count(*) FROM pg_prepared_xacts) AS prepared
 		FROM pg_stat_activity WHERE datid is not NULL) T;`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

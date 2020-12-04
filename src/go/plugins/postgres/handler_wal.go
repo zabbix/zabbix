@@ -27,17 +27,10 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresWal = "pgsql.wal.stat"
-)
-
 // walHandler executes select from directory which contains wal files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) walHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		walJSON string
-		err     error
-		row     pgx.Row
-	)
+func walHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var walJSON string
 
 	query := `SELECT row_to_json(T)
 			    FROM (
@@ -47,7 +40,7 @@ func (p *Plugin) walHandler(ctx context.Context, conn PostgresClient, key string
 					FROM pg_ls_waldir() AS COUNT
 					) T;`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

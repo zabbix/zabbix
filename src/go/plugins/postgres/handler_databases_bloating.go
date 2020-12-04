@@ -27,24 +27,17 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresDatabasesBloating = "pgsql.db.bloating_tables"
-)
-
 // databasesBloatingHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) databasesBloatingHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		countBloating int64
-		err           error
-		row           pgx.Row
-	)
+func databasesBloatingHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var countBloating int64
 
 	query := `SELECT count(*)
 				FROM pg_catalog.pg_stat_all_tables
 	   		   WHERE (n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2
 		 		 AND (n_live_tup+n_dead_tup) > 50;`
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

@@ -1,4 +1,4 @@
-/*
+/* /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
 **
@@ -27,27 +27,22 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresOldestXid = "pgsql.oldest.xid"
-)
+// databaseSizeHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
+func databaseSizeHandler(ctx context.Context, conn PostgresClient,
+	_ string, params map[string]string, _ ...string) (interface{}, error) {
+	var countSize int64
 
-// oldestHandler gets age of the oldest xid if all is OK or nil otherwise.
-func (p *Plugin) oldestHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		resultXID int64
-		err       error
-		row       pgx.Row
-	)
+	query := `SELECT pg_database_size(datname::text)
+		FROM pg_catalog.pg_database
+   		WHERE datistemplate = false
+			 AND datname = $1;`
 
-	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
-				FROM pg_catalog.pg_stat_activity`
-
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query, params["Database"])
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	err = row.Scan(&resultXID)
+	err = row.Scan(&countSize)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
@@ -56,5 +51,5 @@ func (p *Plugin) oldestHandler(ctx context.Context, conn PostgresClient, key str
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return resultXID, nil
+	return countSize, nil
 }

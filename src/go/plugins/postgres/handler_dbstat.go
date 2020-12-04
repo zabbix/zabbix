@@ -28,23 +28,16 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	PGVersionWithChecksum = 120000
-	keyPostgresStatSum    = "pgsql.dbstat.sum"
-	keyPostgresStat       = "pgsql.dbstat"
-)
+const pgVersionWithChecksum = 120000
 
 // dbStatHandler executes select from pg_catalog.pg_stat_database
 // command for each database and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key string, params []string) (interface{}, error) {
-	var (
-		statJSON, query string
-		err             error
-		row             pgx.Row
-	)
+func dbStatHandler(ctx context.Context, conn PostgresClient,
+	key string, _ map[string]string, _ ...string) (interface{}, error) {
+	var statJSON, query string
 
 	switch key {
-	case keyPostgresStatSum:
+	case keyDBStatSum:
 		query = `
   SELECT row_to_json (T)
     FROM  (
@@ -68,13 +61,13 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
       , sum(blk_write_time) as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.PostgresVersion() >= PGVersionWithChecksum {
+		if conn.PostgresVersion() >= pgVersionWithChecksum {
 			query = fmt.Sprintf(query, "sum(COALESCE(checksum_failures, 0))")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
 
-	case keyPostgresStat:
+	case keyDBStat:
 		query = `
   SELECT json_object_agg(coalesce (datname,'null'), row_to_json(T))
     FROM  (
@@ -99,14 +92,14 @@ func (p *Plugin) dbStatHandler(ctx context.Context, conn PostgresClient, key str
       , blk_write_time as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if conn.PostgresVersion() >= PGVersionWithChecksum {
+		if conn.PostgresVersion() >= pgVersionWithChecksum {
 			query = fmt.Sprintf(query, "COALESCE(checksum_failures, 0)")
 		} else {
 			query = fmt.Sprintf(query, "null")
 		}
 	}
 
-	row, err = conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
