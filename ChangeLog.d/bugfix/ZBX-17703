@@ -1,0 +1,1 @@
+........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
