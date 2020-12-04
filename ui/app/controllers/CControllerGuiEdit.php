@@ -21,14 +21,23 @@
 
 class CControllerGuiEdit extends CController {
 
+	/**
+	 * @var array
+	 */
+	protected $timezones;
+
 	protected function init() {
 		$this->disableSIDValidation();
+
+		$this->timezones = [
+			ZBX_DEFAULT_TIMEZONE => CDateTimeZoneHelper::getSystemDateTimeZone()
+		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
 	}
 
 	protected function checkInput() {
 		$fields = [
 			'default_lang' =>				'db config.default_lang',
-			'default_timezone' =>			'db config.default_timezone',
+			'default_timezone' =>			'db config.default_timezone|in '.implode(',', array_keys($this->timezones)),
 			'default_theme' =>				'db config.default_theme',
 			'search_limit' =>				'db config.search_limit',
 			'max_overview_table_size' =>	'db config.max_overview_table_size',
@@ -60,6 +69,7 @@ class CControllerGuiEdit extends CController {
 			'default_timezone' => $this->getInput('default_timezone', CSettingsHelper::get(
 				CSettingsHelper::DEFAULT_TIMEZONE
 			)),
+			'timezones' => $this->timezones,
 			'default_theme' => $this->getInput('default_theme', CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME)),
 			'search_limit' => $this->getInput('search_limit', CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)),
 			'max_overview_table_size' => $this->getInput('max_overview_table_size', CSettingsHelper::get(

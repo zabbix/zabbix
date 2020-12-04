@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-20 20:01+0200\n"
+"POT-Creation-Date: 2020-11-27 19:56+0200\n"
 "PO-Revision-Date: 2019-06-19 11:23+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -209,7 +209,7 @@ msgid_plural "%1$s retries left"
 msgstr[0] "%1$s tentava faltando"
 msgstr[1] "%1$s tentavas faltando"
 
-#: app/views/administration.user.edit.php:499
+#: app/views/administration.user.edit.php:504
 #: include/classes/widgets/CWidgetConfig.php:213
 #: include/classes/widgets/CWidgetConfig.php:214 jsLoader.php:313
 #: jsLoader.php:314
@@ -410,22 +410,22 @@ msgstr "Acesso negado"
 msgid "Access denied!"
 msgstr "Acesso negado!"
 
-#: app/views/administration.user.edit.php:437
+#: app/views/administration.user.edit.php:442
 #: app/views/administration.userrole.edit.php:181
 msgid "Access to API"
 msgstr ""
 
-#: app/views/administration.user.edit.php:392
+#: app/views/administration.user.edit.php:397
 #: app/views/administration.userrole.edit.php:78
 msgid "Access to UI elements"
 msgstr ""
 
-#: app/views/administration.user.edit.php:464
+#: app/views/administration.user.edit.php:469
 #: app/views/administration.userrole.edit.php:235
 msgid "Access to actions"
 msgstr ""
 
-#: app/views/administration.user.edit.php:411
+#: app/views/administration.user.edit.php:416
 #: app/views/administration.userrole.edit.php:130
 msgid "Access to modules"
 msgstr ""
@@ -471,7 +471,7 @@ msgstr "Eventos confirmados RESOLVIDOS"
 #: app/views/administration.mediatype.edit.php:151
 #: app/views/administration.mediatype.list.php:84
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:235
+#: app/views/administration.user.edit.php:240
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.share.edit.php:29 app/views/dashboard.share.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
@@ -657,8 +657,8 @@ msgstr "Ativo até"
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:132
-#: app/views/administration.user.edit.php:308
-#: app/views/administration.user.edit.php:598
+#: app/views/administration.user.edit.php:313
+#: app/views/administration.user.edit.php:603
 #: app/views/administration.usergroup.edit.php:144
 #: app/views/administration.usergroup.edit.php:195
 #: app/views/administration.usergroup.edit.php:234
@@ -964,8 +964,8 @@ msgid "All dashboards"
 msgstr "Todos os dashboards"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:367
-#: app/views/administration.user.edit.php:373
+#: app/views/administration.user.edit.php:372
+#: app/views/administration.user.edit.php:378
 msgid "All groups"
 msgstr "Todos os grupos"
 
@@ -1027,11 +1027,11 @@ msgstr "Permitir fechamento manual"
 msgid "Allowed hosts"
 msgstr "Hosts permitidos"
 
-#: app/views/administration.user.edit.php:457
+#: app/views/administration.user.edit.php:462
 msgid "Allowed methods"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:654
+#: include/classes/setup/CSetupWizard.php:656
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativamente, você pode instalar manualmente:"
 
@@ -1419,7 +1419,7 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "Auto"
 
-#: app/views/administration.user.edit.php:196
+#: app/views/administration.user.edit.php:201
 msgid "Auto-login"
 msgstr "Login automático"
 
@@ -1427,7 +1427,7 @@ msgstr "Login automático"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Não é possível habilitar as opções de login automático e logout automático ao mesmo tempo."
 
-#: app/views/administration.user.edit.php:201
+#: app/views/administration.user.edit.php:206
 msgid "Auto-logout"
 msgstr "Logout automático"
 
@@ -1492,7 +1492,7 @@ msgid "Axes"
 msgstr "Eixos"
 
 #: include/classes/setup/CSetupWizard.php:148
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 msgid "Back"
 msgstr "Retornar"
 
@@ -1584,7 +1584,7 @@ msgstr "Tipo da borda"
 msgid "Border width"
 msgstr "Largura da borda"
 
-#: app/controllers/CControllerUserUpdateGeneral.php:93
+#: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr ""
 
@@ -1704,8 +1704,8 @@ msgstr "Não pode ser removido"
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:126
-#: app/views/administration.user.edit.php:577
-#: app/views/administration.user.edit.php:608
+#: app/views/administration.user.edit.php:582
+#: app/views/administration.user.edit.php:613
 #: app/views/administration.usergroup.edit.php:214
 #: app/views/administration.userrole.edit.php:272
 #: app/views/administration.valuemap.edit.php:92
@@ -1904,8 +1904,8 @@ msgstr "Tigger não foi adicionada"
 msgid "Cannot add trigger prototype"
 msgstr "Protótipo de trigger não adicionado"
 
-#: app/controllers/CControllerUserCreate.php:65
-#: app/controllers/CControllerUserCreate.php:121
+#: app/controllers/CControllerUserCreate.php:63
+#: app/controllers/CControllerUserCreate.php:119
 msgid "Cannot add user"
 msgstr "Usuário não foi incluído"
 
@@ -2048,7 +2048,7 @@ msgstr "Não foi possível criar a nova aplicação, o cenário web já possui u
 msgid "Cannot create template."
 msgstr "Não foi possível criar o template."
 
-#: include/classes/setup/CSetupWizard.php:652
+#: include/classes/setup/CSetupWizard.php:654
 msgid "Cannot create the configuration file."
 msgstr "Não foi possível criar o arquivo de configuração."
 
@@ -2947,8 +2947,8 @@ msgstr "Não foi possível atualizar a autenticação"
 
 #: app/controllers/CControllerAutoregUpdate.php:41
 #: app/controllers/CControllerAutoregUpdate.php:73
-#: app/controllers/CControllerGuiUpdate.php:51
-#: app/controllers/CControllerGuiUpdate.php:99
+#: app/controllers/CControllerGuiUpdate.php:53
+#: app/controllers/CControllerGuiUpdate.php:101
 #: app/controllers/CControllerHousekeepingUpdate.php:67
 #: app/controllers/CControllerHousekeepingUpdate.php:140
 #: app/controllers/CControllerMiscConfigUpdate.php:57
@@ -3156,10 +3156,10 @@ msgstr "Não foi possível atualizar o protótipo de trigger \"%1$s\": %2$s."
 msgid "Cannot update trigger prototypes"
 msgstr "Não foi possível atualizar os protótipos de trigger"
 
-#: app/controllers/CControllerUserProfileUpdate.php:65
-#: app/controllers/CControllerUserProfileUpdate.php:125
-#: app/controllers/CControllerUserUpdate.php:69
-#: app/controllers/CControllerUserUpdate.php:133
+#: app/controllers/CControllerUserProfileUpdate.php:63
+#: app/controllers/CControllerUserProfileUpdate.php:123
+#: app/controllers/CControllerUserUpdate.php:67
+#: app/controllers/CControllerUserUpdate.php:131
 msgid "Cannot update user"
 msgstr "Usuário não foi atualizado"
 
@@ -3678,12 +3678,12 @@ msgstr "Configuração"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Configuração de estatísticas de cache. Cache - buffer (modos: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:672
+#: include/classes/setup/CSetupWizard.php:674
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "O arquivo de configuração \"%1$s\" foi criado."
 
-#: app/controllers/CControllerGuiEdit.php:86
+#: app/controllers/CControllerGuiEdit.php:96
 msgid "Configuration of GUI"
 msgstr "Configuração da GUI"
 
@@ -3826,7 +3826,7 @@ msgstr "Configuração de grupos de usuários"
 msgid "Configuration of user roles"
 msgstr ""
 
-#: app/controllers/CControllerUserEdit.php:209
+#: app/controllers/CControllerUserEdit.php:208
 #: app/controllers/CControllerUserList.php:170
 msgid "Configuration of users"
 msgstr "Configuração de usuários"
@@ -3841,7 +3841,7 @@ msgid "Configuration of web monitoring"
 msgstr "Configuração da monitoração web"
 
 #: app/controllers/CControllerAutoregUpdate.php:69
-#: app/controllers/CControllerGuiUpdate.php:95
+#: app/controllers/CControllerGuiUpdate.php:97
 #: app/controllers/CControllerHousekeepingUpdate.php:136
 #: app/controllers/CControllerMiscConfigUpdate.php:115
 #: app/controllers/CControllerTrigDisplayUpdate.php:108
@@ -3857,7 +3857,7 @@ msgstr "Configura a conexão com o DB"
 msgid "Confirmation text"
 msgstr "Mensagem de confirmação"
 
-#: include/classes/setup/CSetupWizard.php:670
+#: include/classes/setup/CSetupWizard.php:672
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Parabéns! Você instalou com sucesso a interface web do Zabbix."
 
@@ -4591,15 +4591,15 @@ msgid "Data storage period"
 msgstr "Périodo de retenção de dados"
 
 #: include/classes/setup/CSetupWizard.php:380
-#: include/classes/setup/CSetupWizard.php:519
-#: include/classes/setup/CSetupWizard.php:712
+#: include/classes/setup/CSetupWizard.php:521
+#: include/classes/setup/CSetupWizard.php:714
 msgid "Database TLS CA file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
 #: include/classes/setup/CSetupWizard.php:392
-#: include/classes/setup/CSetupWizard.php:525
-#: include/classes/setup/CSetupWizard.php:720
+#: include/classes/setup/CSetupWizard.php:527
+#: include/classes/setup/CSetupWizard.php:722
 msgid "Database TLS certificate file"
 msgstr ""
 
@@ -4608,18 +4608,18 @@ msgid "Database TLS certificate files must be read-only"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:404
-#: include/classes/setup/CSetupWizard.php:533
+#: include/classes/setup/CSetupWizard.php:535
 msgid "Database TLS cipher list"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:362
-#: include/classes/setup/CSetupWizard.php:515
+#: include/classes/setup/CSetupWizard.php:517
 msgid "Database TLS encryption"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:386
-#: include/classes/setup/CSetupWizard.php:522
-#: include/classes/setup/CSetupWizard.php:716
+#: include/classes/setup/CSetupWizard.php:524
+#: include/classes/setup/CSetupWizard.php:718
 msgid "Database TLS key file"
 msgstr ""
 
@@ -4632,7 +4632,7 @@ msgid "Database host"
 msgstr "Host do banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:398
-#: include/classes/setup/CSetupWizard.php:528
+#: include/classes/setup/CSetupWizard.php:530
 msgid "Database host verification"
 msgstr ""
 
@@ -4641,34 +4641,34 @@ msgid "Database monitor"
 msgstr "Monitoração de banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:306
-#: include/classes/setup/CSetupWizard.php:495 setup.php:45
+#: include/classes/setup/CSetupWizard.php:497 setup.php:45
 msgid "Database name"
 msgstr "Nome do banco de dados"
 
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:499
 msgid "Database password"
 msgstr "Senha do banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:298
-#: include/classes/setup/CSetupWizard.php:494 setup.php:44
+#: include/classes/setup/CSetupWizard.php:496 setup.php:44
 msgid "Database port"
 msgstr "Porta do banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:311
-#: include/classes/setup/CSetupWizard.php:499
+#: include/classes/setup/CSetupWizard.php:501
 msgid "Database schema"
 msgstr "Esquema do banco de dados"
 
-#: include/classes/setup/CSetupWizard.php:493
+#: include/classes/setup/CSetupWizard.php:495
 msgid "Database server"
 msgstr "Servidor de banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:289
-#: include/classes/setup/CSetupWizard.php:480
+#: include/classes/setup/CSetupWizard.php:482
 msgid "Database type"
 msgstr "Tipo de banco de dados"
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:498
 msgid "Database user"
 msgstr "Usuário do banco de dados"
 
@@ -4768,7 +4768,7 @@ msgstr "Atraso padrão"
 msgid "Default host inventory mode"
 msgstr "Modo padrão do inventário em novos hosts"
 
-#: app/views/administration.gui.edit.php:68
+#: app/views/administration.gui.edit.php:67
 #: include/classes/setup/CSetupWizard.php:220
 msgid "Default language"
 msgstr ""
@@ -4785,13 +4785,13 @@ msgstr "Tipo de mídia padrão"
 msgid "Default operation step duration"
 msgstr "Duração padrão do passo da operação"
 
-#: app/views/administration.gui.edit.php:78
-#: include/classes/setup/CSetupWizard.php:465
+#: app/views/administration.gui.edit.php:79
+#: include/classes/setup/CSetupWizard.php:467
 msgid "Default theme"
 msgstr "Tema padrão"
 
-#: app/views/administration.gui.edit.php:73
-#: include/classes/setup/CSetupWizard.php:460
+#: app/views/administration.gui.edit.php:72
+#: include/classes/setup/CSetupWizard.php:461
 msgid "Default time zone"
 msgstr ""
 
@@ -4818,7 +4818,7 @@ msgstr "Atrasado por"
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:142
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:586
+#: app/views/administration.user.edit.php:591
 #: app/views/administration.usergroup.edit.php:223
 #: app/views/administration.usergroup.list.php:236
 #: app/views/administration.user.list.php:244
@@ -5097,7 +5097,7 @@ msgstr "Excluir o protótipos de trigger selecionados?"
 msgid "Delete selected triggers?"
 msgstr "Excluir triggers selecionadas?"
 
-#: app/views/administration.user.edit.php:588
+#: app/views/administration.user.edit.php:593
 msgid "Delete selected user?"
 msgstr "Excluir usuários selecionados?"
 
@@ -5168,7 +5168,7 @@ msgstr "Excluído: Template \"%1$s\"."
 msgid "Delimiter"
 msgstr "Delimitador"
 
-#: app/views/administration.user.edit.php:457
+#: app/views/administration.user.edit.php:462
 msgid "Denied methods"
 msgstr ""
 
@@ -5381,8 +5381,8 @@ msgstr "Desativar os cenários web selecionados?"
 #: app/views/administration.miscconfig.edit.php:54
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:245
-#: app/views/administration.user.edit.php:438
+#: app/views/administration.user.edit.php:250
+#: app/views/administration.user.edit.php:443
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5705,7 +5705,7 @@ msgstr "Fora"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:656
+#: include/classes/setup/CSetupWizard.php:658
 msgid "Download the configuration file"
 msgstr "Receber a configuração"
 
@@ -5851,7 +5851,7 @@ msgstr "Cada URL deverá possuir um nome único. Certifique-se que existe um nom
 msgid "Each item"
 msgstr ""
 
-#: app/views/administration.user.edit.php:293
+#: app/views/administration.user.edit.php:298
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:261
 #: include/views/configuration.action.edit.php:282
@@ -6176,8 +6176,8 @@ msgstr "Ativar traps"
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:239
-#: app/views/administration.user.edit.php:438
+#: app/views/administration.user.edit.php:244
+#: app/views/administration.user.edit.php:443
 #: app/views/administration.usergroup.edit.php:80
 #: app/views/administration.usergroup.edit.php:92
 #: app/views/administration.usergroup.edit.php:93
@@ -6612,7 +6612,7 @@ msgstr "O campo \"%1$s\" não pode ser definido como NULO."
 #: app/controllers/CControllerDashboardPropertiesCheck.php:38
 #: app/controllers/CControllerDashboardPropertiesEdit.php:38
 #: app/controllers/CControllerPopupTriggerWizard.php:236
-#: app/controllers/CControllerUserUpdateGeneral.php:113
+#: app/controllers/CControllerUserUpdateGeneral.php:126
 #: include/classes/api/services/CAction.php:1692
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:325
@@ -6904,7 +6904,7 @@ msgstr "De"
 msgid "Frontend access"
 msgstr "Acesso à interface web"
 
-#: app/views/administration.user.edit.php:487
+#: app/views/administration.user.edit.php:492
 msgid "Frontend messaging"
 msgstr "Ativar mensagens globais"
 
@@ -6938,8 +6938,8 @@ msgstr "GMT%1$s"
 msgid "GSM modem"
 msgstr "Modem GSM"
 
-#: app/views/administration.gui.edit.php:29
-#: app/views/administration.gui.edit.php:133 include/html.inc.php:893
+#: app/views/administration.gui.edit.php:30
+#: app/views/administration.gui.edit.php:134 include/html.inc.php:893
 msgid "GUI"
 msgstr "GUI"
 
@@ -6948,7 +6948,7 @@ msgid "GUI access disabled."
 msgstr "Acesso à GUI desativado."
 
 #: include/classes/setup/CSetupWizard.php:61
-#: include/classes/setup/CSetupWizard.php:470
+#: include/classes/setup/CSetupWizard.php:472
 msgid "GUI settings"
 msgstr ""
 
@@ -7712,7 +7712,7 @@ msgstr[1] "Hosts ativados"
 #: app/partials/popup.operations.php:181
 #: app/views/administration.script.edit.php:92
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:364
+#: app/views/administration.user.edit.php:369
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
@@ -8789,9 +8789,9 @@ msgstr "O nome ou o valor do campo \"%1$s\" é inválido para a cláusula \"wher
 msgid "Incorrect fields for sysmap."
 msgstr "Campos inválidos para o mapa do sistema."
 
-#: include/classes/setup/CSetupWizard.php:712
-#: include/classes/setup/CSetupWizard.php:716
-#: include/classes/setup/CSetupWizard.php:720
+#: include/classes/setup/CSetupWizard.php:714
+#: include/classes/setup/CSetupWizard.php:718
+#: include/classes/setup/CSetupWizard.php:722
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
 msgstr ""
@@ -9311,7 +9311,7 @@ msgstr ""
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
-#: app/controllers/CControllerUserUpdateGeneral.php:98 correlation.php:225
+#: app/controllers/CControllerUserUpdateGeneral.php:111 correlation.php:225
 #: correlation.php:235 correlation.php:241 correlation.php:261
 #: correlation.php:265 correlation.php:278
 #: include/classes/api/services/CAction.php:1724
@@ -9637,11 +9637,11 @@ msgid "Insert expression"
 msgstr "Insira a expressão"
 
 #: include/classes/setup/CSetupWizard.php:69
-#: include/classes/setup/CSetupWizard.php:677
+#: include/classes/setup/CSetupWizard.php:679
 msgid "Install"
 msgstr "Instalação"
 
-#: setup.php:171
+#: setup.php:172
 msgid "Installation"
 msgstr "Instalação"
 
@@ -10610,7 +10610,7 @@ msgstr "Texto"
 msgid "Label location"
 msgstr "Localização do texto"
 
-#: app/views/administration.user.edit.php:188
+#: app/views/administration.user.edit.php:193
 msgid "Language"
 msgstr "Idioma"
 
@@ -10790,11 +10790,11 @@ msgstr "Remover espaços à esquerda"
 msgid "Legend"
 msgstr "Legenda"
 
-#: setup.php:194
+#: setup.php:195
 msgid "Licensed under"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:81
+#: app/views/administration.gui.edit.php:82
 msgid "Limit for search and filter results"
 msgstr "Limite de busca/filtro de elementos"
 
@@ -11414,19 +11414,19 @@ msgstr "Max"
 msgid "Max columns"
 msgstr "Máximo de colunas"
 
-#: app/views/administration.gui.edit.php:93
+#: app/views/administration.gui.edit.php:94
 msgid "Max count of elements to show inside table cell"
 msgstr "Máximo de elementos mostrados dentro de uma célula de tabela"
 
-#: app/views/administration.gui.edit.php:114
+#: app/views/administration.gui.edit.php:115
 msgid "Max history display period"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:87
+#: app/views/administration.gui.edit.php:88
 msgid "Max number of columns and rows in overview tables"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:126
+#: app/views/administration.gui.edit.php:127
 msgid "Max period"
 msgstr ""
 
@@ -11465,8 +11465,8 @@ msgid "May"
 msgstr "Maio"
 
 #: app/controllers/CControllerPopupMedia.php:167
-#: app/views/administration.user.edit.php:305
-#: app/views/administration.user.edit.php:320 app/views/popup.media.php:65
+#: app/views/administration.user.edit.php:310
+#: app/views/administration.user.edit.php:325 app/views/popup.media.php:65
 msgid "Media"
 msgstr "Mídia"
 
@@ -11596,8 +11596,8 @@ msgstr ""
 msgid "Message templates"
 msgstr ""
 
-#: app/views/administration.user.edit.php:492
-#: app/views/administration.user.edit.php:500
+#: app/views/administration.user.edit.php:497
+#: app/views/administration.user.edit.php:505
 msgid "Message timeout"
 msgstr "Enquanto a mensagem estiver visível"
 
@@ -11615,7 +11615,7 @@ msgstr "Mensagem/Comando"
 msgid "Messages"
 msgstr "Mensagens"
 
-#: app/views/administration.user.edit.php:572
+#: app/views/administration.user.edit.php:577
 msgid "Messaging"
 msgstr "Mensagens"
 
@@ -12196,7 +12196,7 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:142
 #: include/classes/setup/CSetupWizard.php:421
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 msgid "Next step"
 msgstr "Próximo passo"
 
@@ -12390,7 +12390,7 @@ msgstr "Sem detalhes"
 msgid "No discovery rule IDs given."
 msgstr "Não foram informados os IDs de regra de descoberta."
 
-#: app/views/administration.user.edit.php:414
+#: app/views/administration.user.edit.php:419
 #: app/views/administration.userrole.edit.php:163
 msgid "No enabled modules found."
 msgstr ""
@@ -12572,7 +12572,7 @@ msgstr ""
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:56
 #: app/controllers/CControllerPopupMediatypeTestSend.php:73
 #: app/controllers/CControllerPopupScriptExec.php:103
-#: app/controllers/CControllerUserUpdateGeneral.php:121
+#: app/controllers/CControllerUserUpdateGeneral.php:134
 #: app/controllers/CControllerWidgetClockView.php:111
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:303
@@ -13205,7 +13205,7 @@ msgstr "Ativo"
 msgid "On status change triggers blink for"
 msgstr "Ao mudar o status da trigger piscar por"
 
-#: app/views/administration.user.edit.php:498
+#: app/views/administration.user.edit.php:503
 msgid "Once"
 msgstr "Uma vez"
 
@@ -13907,7 +13907,7 @@ msgstr "Erro de análise"
 msgid "Passive"
 msgstr "Passivo"
 
-#: app/controllers/CControllerUserUpdateGeneral.php:98
+#: app/controllers/CControllerUserUpdateGeneral.php:111
 #: app/partials/popup.operations.php:245 app/partials/popup.operations.php:289
 #: app/views/administration.mediatype.edit.php:200
 #: app/views/administration.user.edit.php:113
@@ -14014,9 +14014,9 @@ msgid "Periods"
 msgstr "Períodos"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:364
-#: app/views/administration.user.edit.php:384
-#: app/views/administration.user.edit.php:481
+#: app/views/administration.user.edit.php:369
+#: app/views/administration.user.edit.php:389
+#: app/views/administration.user.edit.php:486
 #: app/views/administration.usergroup.edit.php:106
 #: app/views/administration.usergroup.edit.php:157
 #: app/views/administration.usergroup.edit.php:208
@@ -14030,7 +14030,7 @@ msgstr "Períodos"
 msgid "Permissions"
 msgstr "Permissões"
 
-#: app/views/administration.user.edit.php:389
+#: app/views/administration.user.edit.php:394
 msgid "Permissions can be assigned for user groups only."
 msgstr "Permissões devem ser definidas para grupos de usuários apenas."
 
@@ -14052,16 +14052,16 @@ msgstr "Informar algorítimo"
 msgid "Plain text"
 msgstr "Texto puro"
 
-#: app/views/administration.user.edit.php:516
-#: app/views/administration.user.edit.php:548
+#: app/views/administration.user.edit.php:521
+#: app/views/administration.user.edit.php:553
 msgid "Play"
 msgstr "Executar"
 
-#: app/views/administration.user.edit.php:496
+#: app/views/administration.user.edit.php:501
 msgid "Play sound"
 msgstr "Executar som"
 
-#: include/classes/setup/CSetupWizard.php:552
+#: include/classes/setup/CSetupWizard.php:554
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "Por favor verifique os parâmetros de configuração. Se tudo estiver correto pressione o botão \"%1$s\", ou pressione o botão \"%2$s\" para modificar parâmetros de configuração."
@@ -14075,7 +14075,7 @@ msgstr ""
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "Por favor crie o banco de dados manualmente e informe os parâmetros de conexão para a base. Pressione o botão \"%1$s\" quando estiver pronto."
 
-#: include/classes/setup/CSetupWizard.php:860
+#: include/classes/setup/CSetupWizard.php:862
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr ""
 
@@ -14154,7 +14154,7 @@ msgid "Post type"
 msgstr "Tipo do post"
 
 #: include/classes/setup/CSetupWizard.php:65
-#: include/classes/setup/CSetupWizard.php:550
+#: include/classes/setup/CSetupWizard.php:552
 msgid "Pre-installation summary"
 msgstr "Sumário da pré-instalação"
 
@@ -14646,7 +14646,7 @@ msgstr "Recipiente (descendente)"
 msgid "Recipients"
 msgstr ""
 
-#: app/views/administration.user.edit.php:510
+#: app/views/administration.user.edit.php:515
 #: include/classes/screens/CScreenProblem.php:1086
 #: include/views/configuration.item.list.php:175
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14686,7 +14686,7 @@ msgstr "Hora da recuperação"
 msgid "Rectangle"
 msgstr "Retângulo"
 
-#: app/views/administration.user.edit.php:211
+#: app/views/administration.user.edit.php:216
 msgid "Refresh"
 msgstr "Atualizar"
 
@@ -14781,7 +14781,7 @@ msgstr "Comando remoto"
 #: app/views/administration.mediatype.edit.php:165
 #: app/views/administration.mediatype.edit.php:184
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:296
+#: app/views/administration.user.edit.php:301
 #: app/views/administration.valuemap.edit.php:65
 #: app/views/js/administration.iconmap.edit.js.php:52
 #: app/views/js/administration.macros.edit.js.php:45
@@ -15048,7 +15048,7 @@ msgstr "Restaurar todos os campos aos seus valores originais?"
 msgid "Reset confirmation"
 msgstr "Confirmação de restauração"
 
-#: app/views/administration.gui.edit.php:136
+#: app/views/administration.gui.edit.php:137
 #: app/views/administration.housekeeping.edit.php:191
 #: app/views/administration.miscconfig.edit.php:177
 #: app/views/administration.trigdisplay.edit.php:168
@@ -15248,8 +15248,8 @@ msgstr "Direita Y"
 msgid "Right trim"
 msgstr "Remover espaços à direita"
 
-#: app/views/administration.user.edit.php:344
-#: app/views/administration.user.edit.php:354
+#: app/views/administration.user.edit.php:349
+#: app/views/administration.user.edit.php:359
 msgid "Role"
 msgstr ""
 
@@ -15274,7 +15274,7 @@ msgstr "Sobrepor linha"
 msgid "Rows"
 msgstr "Linhas"
 
-#: app/views/administration.user.edit.php:216
+#: app/views/administration.user.edit.php:221
 msgid "Rows per page"
 msgstr "Registros por página"
 
@@ -15579,7 +15579,7 @@ msgstr ""
 msgid "Save changes"
 msgstr "Salvar alterações"
 
-#: include/classes/setup/CSetupWizard.php:657
+#: include/classes/setup/CSetupWizard.php:659
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Salvar como \"%1$s\""
@@ -15928,7 +15928,7 @@ msgstr "Enviar mensagem para os usuários"
 msgid "Send only to"
 msgstr "Enviar apenas para"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:68
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:68
 #: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "Enviar para"
@@ -16308,7 +16308,7 @@ msgstr ""
 #: app/partials/common.filter.trigger.php:168
 #: app/partials/monitoring.host.filter.php:133
 #: app/partials/monitoring.problem.filter.php:247
-#: app/views/administration.user.edit.php:566
+#: app/views/administration.user.edit.php:571
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:102
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:154
@@ -16324,7 +16324,7 @@ msgstr "Exibir incidentes suprimidos"
 msgid "Show tags"
 msgstr "Exibir etiquetas"
 
-#: app/views/administration.gui.edit.php:108
+#: app/views/administration.gui.edit.php:109
 msgid "Show technical errors"
 msgstr ""
 
@@ -16360,7 +16360,7 @@ msgstr "Exibir mapas indisponíveis"
 msgid "Show value"
 msgstr "Mostrar valor"
 
-#: app/views/administration.gui.edit.php:98
+#: app/views/administration.gui.edit.php:99
 msgid "Show warning if Zabbix server is down"
 msgstr "Exibir um alerta se o servidor Zabbix estiver fora do ar"
 
@@ -16797,8 +16797,8 @@ msgstr "Já existe um passo com o nome \"%1$s\"."
 msgid "Steps"
 msgstr "Passos"
 
-#: app/views/administration.user.edit.php:521
-#: app/views/administration.user.edit.php:553
+#: app/views/administration.user.edit.php:526
+#: app/views/administration.user.edit.php:558
 msgid "Stop"
 msgstr "Parar"
 
@@ -16823,8 +16823,8 @@ msgstr ""
 msgid "Store credentials in"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:485
-#: include/classes/setup/CSetupWizard.php:486
+#: include/classes/setup/CSetupWizard.php:487
+#: include/classes/setup/CSetupWizard.php:488
 msgid "Stored in HashiCorp Vault secret"
 msgstr ""
 
@@ -16937,8 +16937,7 @@ msgstr "Sueco (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "A mudança do método de autenticação irá invalidar todas as sessões, exceto esta! Continuar?"
 
-#: app/views/administration.gui.edit.php:75
-#: include/classes/setup/CSetupWizard.php:462
+#: include/classes/helpers/CDateTimeZoneHelper.php:97
 msgid "System"
 msgstr ""
 
@@ -16948,8 +16947,9 @@ msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "Tempo desde a carga do sistema. Retorna: timestamp UNIX (número inteiro)"
 
 #: app/views/administration.user.edit.php:138
-#: app/views/administration.user.edit.php:139
-#: app/views/administration.user.edit.php:140 include/users.inc.php:81
+#: app/views/administration.user.edit.php:140
+#: include/classes/helpers/CDateTimeZoneHelper.php:74
+#: include/classes/helpers/CDateTimeZoneHelper.php:80 include/users.inc.php:81
 msgid "System default"
 msgstr "Padrão do sistema"
 
@@ -17457,7 +17457,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "A aplicação do cenário web pertence à um host diferente do que o do cenário web."
 
-#: app/views/administration.user.edit.php:190
+#: app/views/administration.user.edit.php:195
 msgid "Theme"
 msgstr "Tema"
 
@@ -17571,7 +17571,7 @@ msgstr "Hora de um processo ou grupo de processos Zabbix em particular (identifi
 msgid "Time elapsed:"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:120
+#: app/views/administration.gui.edit.php:121
 msgid "Time filter default period"
 msgstr ""
 
@@ -17605,7 +17605,7 @@ msgstr "Tipo de horário"
 msgid "Time units in period shift must be greater or equal to period time unit."
 msgstr ""
 
-#: app/views/administration.user.edit.php:189
+#: app/views/administration.user.edit.php:194
 msgid "Time zone"
 msgstr ""
 
@@ -17953,7 +17953,7 @@ msgstr "Protótipos de trigger atualizados"
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr "A expressão de recuperação da trigger precisa possuir ao menos uma referência ao conjunto \"host:chave\"."
 
-#: app/views/administration.user.edit.php:565 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:570 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "Severidade da trigger"
 
@@ -18040,7 +18040,7 @@ msgstr "Dois elementos do mapa devem ser serlecionados"
 #: app/views/administration.mediatype.list.php:80
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:235
+#: app/views/administration.user.edit.php:240
 #: app/views/dashboard.share.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -18158,7 +18158,7 @@ msgstr "DESCONHECIDO"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:221
+#: app/views/administration.user.edit.php:226
 msgid "URL (after login)"
 msgstr "URL (após se autenticar)"
 
@@ -18481,7 +18481,7 @@ msgstr "Ligado"
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:266
 #: app/views/administration.autoreg.edit.php:90
-#: app/views/administration.gui.edit.php:135
+#: app/views/administration.gui.edit.php:136
 #: app/views/administration.housekeeping.edit.php:190
 #: app/views/administration.iconmap.edit.php:132
 #: app/views/administration.image.edit.php:77
@@ -18493,8 +18493,8 @@ msgstr "Ligado"
 #: app/views/administration.regex.edit.php:141
 #: app/views/administration.script.edit.php:140
 #: app/views/administration.trigdisplay.edit.php:167
-#: app/views/administration.user.edit.php:584
-#: app/views/administration.user.edit.php:607
+#: app/views/administration.user.edit.php:589
+#: app/views/administration.user.edit.php:612
 #: app/views/administration.usergroup.edit.php:221
 #: app/views/administration.userrole.edit.php:298
 #: app/views/administration.valuemap.edit.php:110
@@ -18615,7 +18615,7 @@ msgstr "Usar requisições em lote"
 msgid "Use custom event status colours"
 msgstr "Utilizar cor customizada de evento"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:84
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "Usar se severidade"
 
@@ -18633,7 +18633,7 @@ msgstr "Utilizado em itens"
 
 #: app/controllers/CControllerAuditLogList.php:184
 #: app/partials/popup.operations.php:103
-#: app/views/administration.user.edit.php:225
+#: app/views/administration.user.edit.php:230
 #: app/views/reports.auditlog.list.php:87 httpconf.php:66
 #: include/actions.inc.php:1700 include/actions.inc.php:1753
 #: include/actions.inc.php:1967 include/classes/setup/CSetupWizard.php:350
@@ -18676,7 +18676,7 @@ msgstr "O usuário \"%1$s\" é utilizado na ação \"%2$s\"."
 msgid "User action"
 msgstr "Ação do usuário"
 
-#: app/controllers/CControllerUserCreate.php:114
+#: app/controllers/CControllerUserCreate.php:112
 msgid "User added"
 msgstr "Usuário incluído"
 
@@ -18689,7 +18689,7 @@ msgstr "Mensagem do agente de usuário"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Um usuário não pode se adicionar em um grupo desativado ou em um grupo com acesso à interface web desativado."
 
-#: app/views/administration.user.edit.php:347
+#: app/views/administration.user.edit.php:352
 #: include/classes/api/services/CUser.php:850
 msgid "User cannot change own role."
 msgstr ""
@@ -18822,7 +18822,7 @@ msgstr "Nome do usuário"
 msgid "User password"
 msgstr "Senha do usuário"
 
-#: app/controllers/CControllerUserProfileEdit.php:138
+#: app/controllers/CControllerUserProfileEdit.php:137
 #: app/views/administration.user.edit.php:38
 msgid "User profile"
 msgstr "Dados personalizados do usuário"
@@ -18886,7 +18886,7 @@ msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s no mapa \"%2$s
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s na tela \"%2$s\"."
 
-#: app/views/administration.user.edit.php:358
+#: app/views/administration.user.edit.php:363
 #: app/views/administration.userrole.edit.php:55
 #: app/views/administration.userrole.edit.php:70
 msgid "User type"
@@ -18898,8 +18898,8 @@ msgid_plural "Users unblocked"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/controllers/CControllerUserProfileUpdate.php:120
-#: app/controllers/CControllerUserUpdate.php:126
+#: app/controllers/CControllerUserProfileUpdate.php:118
+#: app/controllers/CControllerUserUpdate.php:124
 msgid "User updated"
 msgstr "Usuário atualizado"
 
@@ -18930,8 +18930,8 @@ msgstr "Usuário"
 msgid "Username and password"
 msgstr "Usuário e senha"
 
-#: include/classes/setup/CSetupWizard.php:585
-#: include/classes/setup/CSetupWizard.php:878
+#: include/classes/setup/CSetupWizard.php:587
+#: include/classes/setup/CSetupWizard.php:880
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
 msgstr ""
 
@@ -19370,17 +19370,17 @@ msgid "Various information about specific process(es). Returns float"
 msgstr "Várias informações sobre processo(s) específico(s). Retorna ponto flutuante"
 
 #: include/classes/setup/CSetupWizard.php:327
-#: include/classes/setup/CSetupWizard.php:504
+#: include/classes/setup/CSetupWizard.php:506
 msgid "Vault API endpoint"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:342
-#: include/classes/setup/CSetupWizard.php:510
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Vault authentication token"
 msgstr ""
 
 #: include/classes/core/ZBase.php:228
-#: include/classes/setup/CSetupWizard.php:874 include/config.inc.php:53
+#: include/classes/setup/CSetupWizard.php:876 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr ""
 
@@ -19389,7 +19389,7 @@ msgid "Vault secret"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:509
 msgid "Vault secret path"
 msgstr ""
 
@@ -19591,7 +19591,7 @@ msgstr "Bem vindo"
 msgid "Welcome to"
 msgstr "Bem vindo a"
 
-#: app/views/administration.user.edit.php:235 app/views/popup.media.php:79
+#: app/views/administration.user.edit.php:240 app/views/popup.media.php:79
 msgid "When active"
 msgstr "Ativo quando"
 
@@ -19665,7 +19665,7 @@ msgstr "Sem triggers"
 msgid "Wizard"
 msgstr "Assistente"
 
-#: app/views/administration.gui.edit.php:103
+#: app/views/administration.gui.edit.php:104
 msgid "Working time"
 msgstr "Horário comercial"
 
@@ -19912,8 +19912,8 @@ msgstr "Ontem"
 msgid "You are logged in as \"%1$s\"."
 msgstr "Você está autenticado como \"%1$s\"."
 
-#: app/views/administration.gui.edit.php:62
-#: app/views/administration.user.edit.php:175
+#: app/views/administration.gui.edit.php:63
+#: app/views/administration.user.edit.php:178
 #: include/classes/setup/CSetupWizard.php:216
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Não é possível selecionar alguns idiomas, o suporte aos idiomas adicionais necessita da instalação do pacote \"locale\" em seu servidor web."
@@ -20036,7 +20036,7 @@ msgstr "Formulário de login do Zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:878
-#: include/classes/setup/CSetupWizard.php:541
+#: include/classes/setup/CSetupWizard.php:543
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
 
@@ -20066,11 +20066,11 @@ msgstr "O servidor Zabbix não está rodando: a informação apresentada pode n�
 msgid "Zabbix server is running"
 msgstr "Zabbix está rodando"
 
-#: include/classes/setup/CSetupWizard.php:545
+#: include/classes/setup/CSetupWizard.php:547
 msgid "Zabbix server name"
 msgstr "Nome do servidor Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:542
+#: include/classes/setup/CSetupWizard.php:544
 msgid "Zabbix server port"
 msgstr "Porta do servidor Zabbix"
 
@@ -20380,7 +20380,7 @@ msgstr "não pode ser modificado"
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:47
-#: app/controllers/CControllerUserUpdateGeneral.php:98 correlation.php:225
+#: app/controllers/CControllerUserUpdateGeneral.php:111 correlation.php:225
 #: correlation.php:235 correlation.php:241 correlation.php:261
 #: correlation.php:265 correlation.php:278
 #: include/classes/api/services/CAction.php:1898
@@ -20560,7 +20560,7 @@ msgid "days"
 msgstr "dias"
 
 #: app/controllers/CControllerMapView.php:123
-#: include/classes/setup/CSetupWizard.php:482
+#: include/classes/setup/CSetupWizard.php:484
 #: include/classes/widgets/CWidgetHelper.php:63
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -20753,7 +20753,7 @@ msgid "in"
 msgstr "em"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:374
+#: app/views/administration.user.edit.php:379
 msgid "including subgroups"
 msgstr "incluindo subgrupos"
 
@@ -21117,7 +21117,7 @@ msgstr "número"
 msgid "of"
 msgstr "de"
 
-#: app/views/administration.user.edit.php:270
+#: app/views/administration.user.edit.php:275
 #: include/classes/setup/CFrontendSetup.php:238
 #: include/classes/setup/CFrontendSetup.php:291
 #: include/classes/setup/CFrontendSetup.php:308
@@ -21140,7 +21140,7 @@ msgstr "de"
 msgid "off"
 msgstr "off"
 
-#: app/views/administration.user.edit.php:270
+#: app/views/administration.user.edit.php:275
 #: app/views/monitoring.host.dashboard.view.php:51
 #: include/classes/setup/CFrontendSetup.php:291
 #: include/classes/setup/CFrontendSetup.php:308

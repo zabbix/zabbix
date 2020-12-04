@@ -116,28 +116,52 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 	if (2 == nparam)
 	{
-		char		*period = params[1], *error = NULL;
-		int		period_num;
-		zbx_time_unit_t	base;
-		size_t		len;
+		char	*p = params[1];
+		size_t	len;
 
-		/* second parameter must start with a negative sign, contain a value and end with a time unit */
-		if ('-' != period[0] || 2 >= strlen(period))
+		while ('\0' != *p)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "invalid second parameter \"%s\"", params[1]);
-			return FAIL;
+			zbx_time_unit_t	unit;
+
+			if ('/' == *p)
+			{
+				if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unexpected character starting with \"%s\"", p);
+					return FAIL;
+				}
+
+				zbx_tm_round_down(&local_time, unit);
+
+				p++;
+			}
+			else if ('+' == *p || '-' == *p)
+			{
+				int	num;
+				char	op, *error = NULL;
+
+				op = *(p++);
+
+				if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, &error))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "failed to parse time period: %s", error);
+					zbx_free(error);
+					return FAIL;
+				}
+
+				if ('+' == op)
+					zbx_tm_add(&local_time, num, unit);
+				else
+					zbx_tm_sub(&local_time, num, unit);
+
+				p += len;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "unexpected character starting with \"%s\"", p);
+				return FAIL;
+			}
 		}
-
-		if (FAIL == zbx_tm_parse_period(++period, &len, &period_num, &base, &error) || '\0' != period[len])
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse second parameter \"%s\": %s", params[1],
-					ZBX_NULL2STR(error));
-
-			zbx_free(error);
-			return FAIL;
-		}
-
-		zbx_tm_sub(&local_time, period_num, base);
 	}
 
 	buf = zbx_malloc(NULL, MAX_STRING_LEN);

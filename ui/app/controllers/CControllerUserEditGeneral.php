@@ -31,8 +31,17 @@ abstract class CControllerUserEditGeneral extends CController {
 	 */
 	protected $user = [];
 
+	/**
+	 * @var array
+	 */
+	protected $timezones = [];
+
 	protected function init() {
 		$this->disableSIDValidation();
+
+		$this->timezones = [
+			TIMEZONE_DEFAULT => CDateTimeZoneHelper::getDefaultDateTimeZone()
+		] + (new CDateTimeZoneHelper())->getAllDateTimeZones();
 	}
 
 	/**

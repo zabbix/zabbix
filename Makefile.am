@@ -168,7 +168,8 @@ tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml"
 
 tests: tests_build
-	tests/tests_run.pl
+	cd tests && \
+	./tests_run.pl
 endif
 
 .PHONY: test tests

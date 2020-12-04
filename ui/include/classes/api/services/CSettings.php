@@ -26,7 +26,6 @@ class CSettings extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'getglobal' => [],
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
@@ -53,7 +52,7 @@ class CSettings extends CApiService {
 		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout', 'session_key'
+		'item_test_timeout'
 	];
 
 	/**
@@ -97,7 +96,13 @@ class CSettings extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function getGlobal(array $options): array {
+	public function getGlobal(array $options, $api_call = true): array {
+		if ($api_call) {
+			return self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect method "%1$s.%2$s".', 'settings', 'getglobal')
+			);
+		}
+
 		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
 			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
 			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
@@ -144,8 +149,7 @@ class CSettings extends CApiService {
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
 			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
 			'default_timezone', 'login_block', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_exceptions',
-			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout',
-			'session_key'
+			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $settings) && $settings[$field_name] !== $db_settings[$field_name]) {
@@ -233,7 +237,7 @@ class CSettings extends CApiService {
 			'alert_usrgrpid' =>					['type' => API_ID, 'flags' => API_ALLOW_NULL],
 			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
 			'default_lang' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(getLocales()))],
-			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', DateTimeZone::listIdentifiers())],
+			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()))],
 			'login_attempts' =>					['type' => API_INT32, 'in' => '1:32'],
 			'login_block' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [30, SEC_PER_HOUR])],
 			'validate_uri_schemes' =>			['type' => API_INT32, 'in' => '0,1'],
@@ -246,8 +250,7 @@ class CSettings extends CApiService {
 			'socket_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
 			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'session_key' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'session_key')]
+			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300']
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
