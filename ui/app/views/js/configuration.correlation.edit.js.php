@@ -70,8 +70,9 @@
 		jQuery('#clone').click(function() {
 			jQuery('#correlationid, #delete, #clone').remove();
 			jQuery('#update')
-				.text(<?= json_encode(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'});
+				.text(t('Add'))
+				.val('correlation.create')
+				.attr({id: 'add'});
 
 			// Remove operations IDs.
 			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
@@ -86,5 +87,8 @@
 		});
 
 		processTypeOfCalculation();
+
+		const $form = $(document.forms['correlation.edit']);
+		$form.on('submit', () => $form.trimValues(['#name', '#description']));
 	});
 </script>
