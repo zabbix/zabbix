@@ -23,18 +23,24 @@
  * @var CView $this
  */
 
+if ($data['uncheck']) {
+	uncheckTableRows('correlation');
+}
+
 $widget = (new CWidget())
 	->setTitle(_('Event correlation'))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(new CSubmit('form', _('Create correlation')))
+				->addItem(new CRedirectButton(_('Create correlation'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'correlation.edit'))
+				)
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter(new CUrl('correlation.php')))
+	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'correlation.list')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -51,6 +57,7 @@ $widget = (new CWidget())
 					->setModern(true)
 			)
 		])
+		->addVar('action', 'correlation.list')
 	);
 
 $form = (new CForm())->setName('correlation_form');
@@ -59,33 +66,33 @@ $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))
-				->onClick("checkAll('".$form->getName()."', 'all_items', 'g_correlationid');")
+				->onClick("checkAll('".$form->getName()."', 'all_items', 'correlationids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'correlation.php'),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'correlation.list')
+			->getUrl()
+		),
 		_('Conditions'),
 		_('Operations'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], 'correlation.php')
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'correlation.list')
+			->getUrl()
+		)
 	]);
 
 if ($data['correlations']) {
-	/*
-	 * If condition type is "New event host group", then to avoid performance drops, call this function first in order
-	 * to read all host groups before each iteration.
-	 */
-	$correlation_condition_string_values = corrConditionValueToString($data['correlations']);
-
-	foreach ($data['correlations'] as $i => $correlation) {
+	foreach ($data['correlations'] as $correlation) {
 		$conditions = [];
 		$operations = [];
 
 		order_result($correlation['filter']['conditions'], 'type', ZBX_SORT_DOWN);
 
-		foreach ($correlation['filter']['conditions'] as $j => $condition) {
+		foreach ($correlation['filter']['conditions'] as $condition) {
 			if (!array_key_exists('operator', $condition)) {
 				$condition['operator'] = CONDITION_OPERATOR_EQUAL;
 			}
 
-			$conditions[] = getCorrConditionDescription($condition, $correlation_condition_string_values[$i][$j]);
+			$conditions[] = getCorrConditionDescription($condition, $data['group_names']);
 			$conditions[] = BR();
 		}
 
@@ -97,25 +104,34 @@ if ($data['correlations']) {
 		}
 
 		if ($correlation['status'] == ZBX_CORRELATION_DISABLED) {
-			$status = (new CLink(_('Disabled'),
-				'correlation.php?action=correlation.massenable&g_correlationid[]='.$correlation['correlationid'])
-			)
+			$status = (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
+				->setArgument('correlationids', (array) $correlation['correlationid'])
+				->setArgument('action', 'correlation.enable')
+				->setArgumentSID()
+				->getUrl()
+			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addSID();
 		}
 		else {
-			$status = (new CLink(_('Enabled'),
-				'correlation.php?action=correlation.massdisable&g_correlationid[]='.$correlation['correlationid'])
-			)
+			$status = (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
+				->setArgument('correlationids', (array) $correlation['correlationid'])
+				->setArgument('action', 'correlation.disable')
+				->setArgumentSID()
+				->getUrl()
+			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 				->addSID();
 		}
 
 		$table->addRow([
-			new CCheckBox('g_correlationid['.$correlation['correlationid'].']', $correlation['correlationid']),
-			new CLink($correlation['name'], 'correlation.php?form=update&correlationid='.$correlation['correlationid']),
+			new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
+			new CLink($correlation['name'], (new CUrl('zabbix.php'))
+				->setArgument('correlationid', $correlation['correlationid'])
+				->setArgument('action', 'correlation.edit')
+			),
 			$conditions,
 			$operations,
 			$status
@@ -126,11 +142,11 @@ if ($data['correlations']) {
 $form->addItem([
 	$table,
 	$data['paging'],
-	new CActionButtonList('action', 'g_correlationid', [
-		'correlation.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?')],
-		'correlation.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?')],
-		'correlation.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?')]
-	])
+	new CActionButtonList('action', 'correlationids', [
+		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?')],
+		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?')],
+		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?')]
+	], 'correlation')
 ]);
 
 $widget->addItem($form);

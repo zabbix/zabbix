@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T10:21:53Z'
+  version: '5.4'
+  date: '2020-11-24T11:02:45Z'
   groups:
     -
       name: Templates/Modules
@@ -1058,9 +1058,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      return (value=='9223372036854775807' ? 0 : value)
-                      
+                    - 'return (value==''9223372036854775807'' ? 0 : value)'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1357,6 +1355,69 @@ zabbix_export:
                   priority: WARNING
                   description: 'The disk appears to be under heavy load'
                   manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                      expression: '{Windows physical disks by Zabbix agent active:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
+                    -
+                      name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
+                      expression: '{Windows physical disks by Zabbix agent active:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+            -
+              name: '{#DEVNAME}: Average disk read queue length'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]'
+              history: 7d
+              value_type: FLOAT
+              description: 'Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.'
+              application_prototypes:
+                -
+                  name: 'Disk {#DEVNAME}'
+            -
+              name: '{#DEVNAME}: Disk read request avg waiting time'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.'
+              application_prototypes:
+                -
+                  name: 'Disk {#DEVNAME}'
+              trigger_prototypes:
+                -
+                  expression: '{min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
+                  name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                  priority: WARNING
+                  description: 'This trigger might indicate disk {#DEVNAME} saturation.'
+                  manual_close: 'YES'
+            -
+              name: '{#DEVNAME}: Disk write request avg waiting time'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.'
+              application_prototypes:
+                -
+                  name: 'Disk {#DEVNAME}'
+              trigger_prototypes:
+                -
+                  expression: '{min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}'
+                  name: '{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
+                  priority: WARNING
+                  description: 'This trigger might indicate disk {#DEVNAME} saturation.'
+                  manual_close: 'YES'
+            -
+              name: '{#DEVNAME}: Average disk write queue length'
+              type: ZABBIX_ACTIVE
+              key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60]'
+              history: 7d
+              value_type: FLOAT
+              description: 'Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.'
+              application_prototypes:
+                -
+                  name: 'Disk {#DEVNAME}'
             -
               name: '{#DEVNAME}: Disk average queue size (avgqu-sz)'
               type: ZABBIX_ACTIVE
@@ -1390,6 +1451,35 @@ zabbix_export:
                 -
                   name: 'Disk {#DEVNAME}'
           graph_prototypes:
+            -
+              name: '{#DEVNAME}: Disk average queue length'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Windows physical disks by Zabbix agent active'
+                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Windows physical disks by Zabbix agent active'
+                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60]'
+            -
+              name: '{#DEVNAME}: Disk average waiting time'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Windows physical disks by Zabbix agent active'
+                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Windows physical disks by Zabbix agent active'
+                    key: 'perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]'
             -
               name: '{#DEVNAME}: Disk read/write rates'
               graph_items:
@@ -1437,9 +1527,17 @@ zabbix_export:
           value: _Total
           description: 'This macro is used in physical disks discovery. Can be overridden on the host or linked template level.'
         -
+          macro: '{$VFS.DEV.READ.AWAIT.WARN}'
+          value: '0.02'
+          description: 'Disk read average response time (in s) before the trigger would fire.'
+        -
           macro: '{$VFS.DEV.UTIL.MAX.WARN}'
           value: '95'
           description: 'The warning threshold of disk time utilization in percent.'
+        -
+          macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
+          value: '0.02'
+          description: 'Disk write average response time (in s) before the trigger would fire.'
     -
       template: 'Windows services by Zabbix agent active'
       name: 'Windows services by Zabbix agent active'
