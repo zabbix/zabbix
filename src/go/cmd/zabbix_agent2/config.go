@@ -21,15 +21,17 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/zbxcmd"
 )
 
 func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions) error {
-	const hostNameLen = 128
+	var maxLen int
 	var err error
 
 	if len(options.Hostname) == 0 {
@@ -52,11 +54,19 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 		if len(options.Hostname) == 0 {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", hostnameItem)
 		}
-		if len(options.Hostname) > hostNameLen {
-			options.Hostname = options.Hostname[:hostNameLen]
-			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, hostNameLen)
+		hosts := agent.ExtractHostnames(options.Hostname)
+		options.Hostname = strings.Join(hosts, ",")
+		if len(hosts) > 1 {
+			maxLen = zbxcmd.MaxExecuteOutputLenB
+		} else {
+			maxLen = agent.HostNameLen
 		}
-		if err = agent.CheckHostname(options.Hostname); err != nil {
+		if len(options.Hostname) > maxLen {
+			options.Hostname = options.Hostname[:maxLen]
+			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, maxLen)
+		}
+
+		if err = agent.CheckHostnameParameter(options.Hostname); err != nil {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
 		}
 	} else {

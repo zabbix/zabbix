@@ -24,6 +24,13 @@
  */
 class CMap extends CMapElement {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_EDIT_MAPS]
+	];
+
 	protected $tableName = 'sysmaps';
 	protected $tableAlias = 's';
 	protected $sortColumns = ['name', 'width', 'height'];
@@ -1888,7 +1895,7 @@ class CMap extends CMapElement {
 		foreach ($maps as $index => $map) {
 			$update_maps[] = [
 				'values' => $map,
-				'where' => ['sysmapid' => $map['sysmapid']],
+				'where' => ['sysmapid' => $map['sysmapid']]
 			];
 
 			$db_map = $db_maps[$map['sysmapid']];

@@ -1,0 +1,232 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-19T10:58:50Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'TP-LINK SNMP'
+      name: 'TP-LINK SNMP'
+      description: |
+        Template Net TP-LINK
+        
+        MIBs used:
+        TPLINK-SYSINFO-MIB
+        TPLINK-SYSMONITOR-MIB
+        
+        Known Issues:
+        
+          Description: Default sysLocation, sysName and sysContact is not filled with proper data. Real hostname and location can be found only in private branch (TPLINK-SYSINFO-MIB). Please check whether this problem exists in the latest firmware: https://www.tp-link.com/en/support/download/t2600g-28ts/#Firmware
+          Version: 2.0.0 Build 20170628 Rel.55184 (Beta)
+          Device: T2600G-28TS 2.0
+        
+          Description: The Serial number of the product (tpSysInfoSerialNum) is missing in HW versions prior to V2_170323
+          Version: Prior to version V2_170323
+          Device: T2600G-28TS 2.0
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces Simple SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Inventory
+        -
+          name: Memory
+      items:
+        -
+          name: 'Firmware version'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11863.6.1.1.6.0
+          key: system.hw.firmware
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: TPLINK-SYSINFO-MIB
+            The software version of the product.
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Firmware has changed'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11863.6.1.1.5.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: TPLINK-SYSINFO-MIB
+            The hardware version of the product.
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11863.6.1.1.8.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: TPLINK-SYSINFO-MIB
+            The Serial number of the product.
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Hardware version(revision)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.11863.6.1.1.5.0
+          key: system.hw.version
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: TPLINK-SYSINFO-MIB
+            The hardware version of the product.
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+      discovery_rules:
+        -
+          name: 'CPU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.1.1.1.1]'
+          key: cpu.discovery
+          delay: 1h
+          description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.'
+          item_prototypes:
+            -
+              name: '#{#SNMPVALUE}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11863.6.4.1.1.1.1.3.{#SNMPINDEX}'
+              key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: TPLINK-SYSMONITOR-MIB
+                Displays the CPU utilization in 1 minute.
+                Reference: http://www.tp-link.com/faq-1330.html
+              applications:
+                -
+                  name: CPU
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  name: '#{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+          graph_prototypes:
+            -
+              name: '#{#SNMPVALUE}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'TP-LINK SNMP'
+                    key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
+        -
+          name: 'Memory Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.2.1.1.1]'
+          key: memory.discovery
+          delay: 1h
+          description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.'
+          item_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Memory utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.11863.6.4.1.2.1.1.2.{#SNMPINDEX}'
+              key: 'vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: TPLINK-SYSMONITOR-MIB
+                Displays the memory utilization.
+                Reference: http://www.tp-link.com/faq-1330.html
+              applications:
+                -
+                  name: Memory
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  name: '#{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+          graph_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'TP-LINK SNMP'
+                    key: 'vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'

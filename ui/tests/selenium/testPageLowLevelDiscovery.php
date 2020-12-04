@@ -109,16 +109,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertRowCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$start_contents = $this->getTableData();
 
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
 
-		// Check that filtered count mathces expected.
+		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertRowCount(1);
+		$this->assertTableStats(1);
 
 		// Checking that filtered discovery rule matches expected.
 		$this->assertEquals(['Discovery rule 3'], $this->getTableData());
@@ -126,7 +126,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
-		$this->assertRowCount($table->getRows()->count());
+		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, $this->getTableData());
 	}
 
@@ -274,9 +274,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Virtualization'
+						'Host groups' => 'Templates/Server hardware'
 					],
-					'rows' => 8
+					'rows' => 39
 				]
 			],
 			[
@@ -309,7 +309,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'testFormDiscoveryRule2',
+						'Name' => 'testFormDiscoveryRule2'
 					],
 					'expected' => [
 						'testFormDiscoveryRule2'
@@ -319,7 +319,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Update interval' => '0',
+						'Update interval' => '0'
 					],
 					'expected' => [
 						'Test discovery rule',
@@ -402,9 +402,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Block devices discovery',
-						'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
-						'Template Module Linux network interfaces by Zabbix agent: Network interface discovery'
+						'Linux block devices by Zabbix agent: Block devices discovery',
+						'Linux filesystems by Zabbix agent: Mounted filesystem discovery',
+						'Linux network interfaces by Zabbix agent: Network interface discovery'
 					]
 				]
 			],
@@ -415,7 +415,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Block devices discovery'
+						'Linux block devices by Zabbix agent: Block devices discovery'
 					]
 				]
 			],

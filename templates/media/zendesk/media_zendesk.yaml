@@ -1,0 +1,460 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:53Z'
+  media_types:
+    -
+      name: Zendesk
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGS}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: severity_average
+          value: normal
+        -
+          name: severity_default
+          value: '-'
+        -
+          name: severity_disaster
+          value: urgent
+        -
+          name: severity_high
+          value: high
+        -
+          name: severity_information
+          value: low
+        -
+          name: severity_not_classified
+          value: low
+        -
+          name: severity_warning
+          value: normal
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: zbxurl
+          value: '{$ZABBIX.URL}'
+        -
+          name: zendesk_issue_key
+          value: '{EVENT.TAGS.__zbx_zdk_issuekey}'
+        -
+          name: zendesk_token
+          value: '<put your {enduser_email_address}/token:{api_token}>'
+        -
+          name: zendesk_type
+          value: incident
+        -
+          name: zendesk_url
+          value: '<put your Zendesk URL>'
+      script: |
+        var Zendesk = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                Zendesk.params = params;
+                if (typeof Zendesk.params.url === 'string') {
+                    if (!Zendesk.params.url.endsWith('/')) {
+                        Zendesk.params.url += '/';
+                    }
+                    Zendesk.params.url += 'api/v2/';
+                }
+            },
+        
+            addCustomFields: function (data, fields) {
+                if (typeof fields === 'object' && Object.keys(fields).length) {
+                    var schema = Zendesk.getSchema(),
+                        arr = [],
+                        i,
+                        n;
+        
+                    if (schema) {
+                        Object.keys(fields)
+                            .forEach(function(field) {
+                                for (i = 0, n = schema.ticket_fields.length; i < n; i++) {
+                                    if (schema.ticket_fields[i].id == field
+                                        && ['text', 'integer', 'date'].indexOf(schema.ticket_fields[i].type) !== -1){
+        
+                                        switch (schema.ticket_fields[i].type) {
+                                            case 'integer':
+                                                fields[field] = parseInt(fields[field]);
+                                                break;
+                                            case 'date':
+                                                if (fields[field].match(/^\d{4}[.-]\d{2}[.-]\d{2}$/) !== null) {
+                                                    fields[field] = fields[field].replace(/\./g, '-');
+                                                }
+                                                else {
+                                                    fields[field] = '';
+                                                }
+                                                break;
+                                        }
+        
+                                        arr.push({id: field, value: fields[field]});
+                                        break;
+                                    }
+                                }
+                            });
+        
+                        if (arr.length) {
+                            data.ticket['custom_fields'] = arr;
+                        }
+                    }
+                    else {
+                        Zabbix.log(4, '[Zendesk Webhook] Failed to retrieve field schema.');
+                    }
+                }
+        
+                return data;
+            },
+        
+            request: function (method, query, data) {
+                ['url', 'token', 'type'].forEach(function (field) {
+                    if (typeof Zendesk.params !== 'object' || typeof Zendesk.params[field] === 'undefined') {
+                        throw 'Required Zendesk param is not set: ' + field + '\n' + Zendesk.params[field];
+                    }
+                });
+        
+                var response,
+                    url = Zendesk.params.url + query,
+                    request = new HttpRequest();
+        
+                if (typeof Zendesk.HTTPProxy === 'string' && Zendesk.HTTPProxy.trim() !== '') {
+                    request.setProxy(Zendesk.HTTPProxy);
+                }
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Basic ' + btoa(Zendesk.params.token));
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[Zendesk Webhook] Sending request: ' + url + ((typeof data === 'string') ? (' ' + data) : ''));
+        
+                switch (method) {
+                    case 'get':
+                        response = request.get(url, data);
+                        break;
+        
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[Zendesk Webhook] Received response with status code ' + request.getStatus() + '. ' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[Zendesk Webhook] Failed to parse response received from Zendesk.');
+                    }
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response !== null && typeof response.error !== 'undefined'
+                        && Object.keys(response.error).length > 0) {
+                        message += ': ' + JSON.stringify(response.error);
+                    }
+                    else if (response !== null && typeof response.description !== 'undefined'
+                        && Object.keys(response.description).length > 0) {
+                        message += ': ' + JSON.stringify(response.description);
+                    }
+                    else {
+                        message += '. ' + response;
+                    }
+                    throw message + '. Check debug log for more information.';
+                }
+        
+                return {
+                    status: request.getStatus(),
+                    response: response
+                };
+            },
+        
+            getSchema: function() {
+                var result = Zendesk.request('get', 'ticket_fields.json');
+        
+                return result.response;
+            },
+        
+            createIssue: function(data, fields) {
+                var result = Zendesk.request('post', 'tickets.json', Zendesk.addCustomFields(data, fields));
+        
+                if (typeof result.response !== 'object' || typeof result.response.ticket.id === 'undefined'
+                    || result.status != 201) {
+                    throw 'Cannot create Zendesk issue. Check debug log for more information.';
+                }
+        
+                return result.response.ticket.id;
+            },
+        
+            updateIssue: function(data, fields) {
+                Zendesk.request('put', 'tickets/' + Zendesk.params.issue_key + '.json', Zendesk.addCustomFields(data, fields));
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                fields = {},
+                zendesk = {},
+                update = {},
+                data = {},
+                result = {tags: {}},
+                required_params = [
+                    'alert_subject',
+                    'alert_message',
+                    'event_id',
+                    'event_source',
+                    'event_value',
+                    'event_update_status'
+                ],
+                severities = [
+                    {name: 'not_classified', color: '#97AAB3'},
+                    {name: 'information', color: '#7499FF'},
+                    {name: 'warning', color: '#FFC859'},
+                    {name: 'average', color: '#FFA059'},
+                    {name: 'high', color: '#E97659'},
+                    {name: 'disaster', color: '#E45959'},
+                    {name: 'resolved', color: '#009900'},
+                    {name: 'default', color: '#000000'}
+                ],
+                priority;
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('zendesk_')) {
+                        zendesk[key.substring(8)] = params[key];
+                    }
+                    else if (key.startsWith('customfield_')) {
+                        fields[key.substring(12)] = params[key];
+                    }
+                    else if (key.startsWith('event_update_')) {
+                        update[key.substring(13)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+                        throw 'Parameter ' + key + ' cannot be empty.';
+                    }
+                });
+        
+            // Possible values: question, incident, problems, task
+            if (['question', 'incident', 'problem', 'task'].indexOf(params.zendesk_type) === -1) {
+                throw 'Incorrect "zendesk_type" parameter given: ' + params.zendesk_type +
+                    '\nMust be one of question, incident, problem, task.';
+            }
+        
+            // Possible values: 0 - Trigger, 1 - Discovery, 2 - Autoregistration, 3 - Internal.
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            // Possible values: 1 for problem, 0 for recovering
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            // Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.
+            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            // Zendesk_issue_key must be a positive integer if an update action is being performed.
+            if (params.event_source === '0' && ((params.event_value === '1' && params.event_update_status === '1')
+                || (params.event_value === '0' && (params.event_update_status === '0' || params.event_update_status === '1')))
+                && (isNaN(parseInt(params.zendesk_issue_key)) || parseInt(params.zendesk_issue_key) < 1 )) {
+                throw 'Incorrect "zendesk_issue_key" parameter given: ' + params.zendesk_issue_key +
+                    '\nMust be positive integer.';
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '7';
+            }
+        
+            if (params.event_value === '0') {
+                params.event_nseverity = '6';
+            }
+        
+            priority = params['severity_' + severities[params.event_nseverity].name] || severities[7].name;
+        
+            Zendesk.setParams(zendesk);
+            Zendesk.HTTPProxy = params.HTTPProxy;
+        
+            // Create issue for non trigger-based events.
+            if (params.event_source !== '0' && params.event_value !== '0') {
+                data = {
+                    ticket: {
+                        external_id: params.event_id,
+                        type: Zendesk.params.type,
+                        status: 'new',
+                        subject: params.alert_subject,
+                        comment: {
+                            body: params.alert_message,
+                            public: 'false'
+                        },
+                        priority: priority,
+                        tags: params.event_tags
+                    }
+                };
+        
+                Zendesk.createIssue(data, fields);
+            }
+            // Create issue for trigger-based events.
+            else if (params.event_value === '1' && update.status === '0') {
+                data = {
+                    ticket: {
+                        external_id: params.event_id,
+                        type: Zendesk.params.type,
+                        status: 'new',
+                        subject: params.alert_subject,
+                        comment: {
+                            body: params.zbxurl + (params.zbxurl.endsWith('/') ? '' : '/') + 'tr_events.php?triggerid=' +
+                                params.trigger_id + '&eventid=' + params.event_id + '\n' + params.alert_message,
+                            public: 'false'
+                        },
+                        priority: priority,
+                        tags: params.event_tags
+                    }
+                };
+                var key = Zendesk.createIssue(data, fields);
+        
+                result.tags.__zbx_zdk_issuekey = key;
+                result.tags.__zbx_zdk_issuelink = params.zendesk_url +
+                    (params.zendesk_url.endsWith('/') ? '' : '/') + 'agent/tickets/' + key;
+            }
+            // Update created issue for trigger-based event.
+            else {
+                data = {
+                    ticket: {
+                        type: Zendesk.params.type,
+                        subject: params.alert_subject,
+                        comment: {
+                            body: params.alert_message,
+                            public: 'false'
+                        }
+                    }
+                };
+        
+                Zendesk.updateIssue(data, fields);
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[Zendesk Webhook] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_zdk_issuelink}'
+      event_menu_name: 'Zendesk: {EVENT.TAGS.__zbx_zdk_issuekey}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '{EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '{EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '{EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        -
+          event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: 'Internal problem: {EVENT.NAME}'
+          message: |
+            Internal problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}

@@ -26,8 +26,10 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
+$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
+
 $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
 );
 
 $form->addItem($form_list);
@@ -285,13 +287,13 @@ $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields
 
 // Create CTabView.
 $form_tabs = (new CTabView())
-	->addTab('data_set',  _('Data set'), $tab_data_set)
-	->addTab('displaying_options',  _('Displaying options'), $tab_displaying_opt)
-	->addTab('time_period',  _('Time period'), $tab_time_period)
+	->addTab('data_set',  _('Data set'), $tab_data_set, TAB_INDICATOR_GRAPH_DATASET)
+	->addTab('displaying_options',  _('Displaying options'), $tab_displaying_opt, TAB_INDICATOR_GRAPH_OPTIONS)
+	->addTab('time_period',  _('Time period'), $tab_time_period, TAB_INDICATOR_GRAPH_TIME)
 	->addTab('axes',  _('Axes'), $tab_axes)
-	->addTab('legendtab',  _('Legend'), $tab_legend)
-	->addTab('problems',  _('Problems'), $tab_problems)
-	->addTab('overrides',  _('Overrides'), $tab_overrides)
+	->addTab('legendtab',  _('Legend'), $tab_legend, TAB_INDICATOR_GRAPH_LEGEND)
+	->addTab('problems',  _('Problems'), $tab_problems, TAB_INDICATOR_GRAPH_PROBLEMS)
+	->addTab('overrides',  _('Overrides'), $tab_overrides, TAB_INDICATOR_GRAPH_OVERRIDES)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
 	->onTabChange('jQuery.colorpicker("hide");jQuery(window).trigger("resize");')
 	->setSelected(0);

@@ -1,0 +1,761 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:48Z'
+  media_types:
+    -
+      name: Mattermost
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: bot_token
+          value: '<YOUR BOT TOKEN>'
+        -
+          name: discovery_host_dns
+          value: '{DISCOVERY.DEVICE.DNS}'
+        -
+          name: discovery_host_ip
+          value: '{DISCOVERY.DEVICE.IPADDRESS}'
+        -
+          name: event_date
+          value: '{EVENT.DATE}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_opdata
+          value: '{EVENT.OPDATA}'
+        -
+          name: event_recovery_date
+          value: '{EVENT.RECOVERY.DATE}'
+        -
+          name: event_recovery_time
+          value: '{EVENT.RECOVERY.TIME}'
+        -
+          name: event_severity
+          value: '{EVENT.SEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGS}'
+        -
+          name: event_time
+          value: '{EVENT.TIME}'
+        -
+          name: event_update_date
+          value: '{EVENT.UPDATE.DATE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_update_time
+          value: '{EVENT.UPDATE.TIME}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: host_ip
+          value: '{HOST.IP}'
+        -
+          name: host_name
+          value: '{HOST.HOST}'
+        -
+          name: mattermost_url
+          value: '<YOUR MATTERMOST URL>'
+        -
+          name: send_mode
+          value: alarm
+        -
+          name: send_to
+          value: '{ALERT.SENDTO}'
+        -
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      attempts: '1'
+      script: |
+        var SEVERITY_COLORS = [
+            '#97AAB3', '#7499FF', '#FFC859',
+            '#FFA059', '#E97659', '#E45959'
+        ];
+        
+        var RESOLVE_COLOR = '#009900';
+        
+        var SEND_MODE_HANDLERS = {
+            alarm: handlerAlarm,
+            event: handlerEvent
+        };
+        
+        if (!String.prototype.format) {
+            String.prototype.format = function() {
+                var args = arguments;
+        
+                return this.replace(/{(\d+)}/g, function(match, number) {
+                    return number in args
+                        ? args[number]
+                        : match
+                    ;
+                });
+            };
+        }
+        
+        function isEventProblem(params) {
+            return params.event_value == 1
+                && params.event_update_status == 0
+            ;
+        }
+        
+        function isEventUpdate(params) {
+            return params.event_value == 1
+                && params.event_update_status == 1
+            ;
+        }
+        
+        function isEventResolve(params) {
+            return params.event_value == 0;
+        }
+        
+        function getPermalink(mattermost_url, team_name, postid) {
+            return '{0}/{1}/pl/{2}'.format(
+                mattermost_url.replace(/\/+$/, ''),
+                team_name,
+                postid
+            );
+        }
+        
+        function getChannel(send_to) {
+            switch (true) {
+                case /.+\/#.+/.test(send_to):
+                    return getChannelByName(send_to);
+        
+                case /@.+/.test(send_to):
+                    return getDirectChannel(send_to);
+        
+                default:
+                    return getChannelByID(send_to);
+            }
+        }
+        
+        function getChannelByName(send_to) {
+            var team_chan = send_to
+                .trim()
+                .split('/#');
+        
+            var resp = JSON.parse(req.get(
+                Mattermost.channel_byname.format(team_chan[0], team_chan[1]),
+                JSON.stringify(fields)
+            )
+            );
+        
+            if (req.getStatus() != 200) {
+                throw '[{0}] {1}'.format(resp.status_code, resp.message);
+            }
+        
+            return resp;
+        }
+        
+        function getDirectChannel(send_to) {
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+                arguments.callee.name,
+                JSON.stringify(arguments)
+            ));
+        
+            var teamUser = send_to
+                    .trim()
+                    .split('/@'),
+                bot = getBotUser(),
+                user = getUserByName(teamUser[1]);
+        
+            var resp = JSON.parse(req.post(
+                Mattermost.direct_channel,
+                JSON.stringify([bot.id, user.id])
+            )
+            );
+        
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+                arguments.callee.name,
+                JSON.stringify(resp)
+            ));
+        
+            if (req.getStatus() != 201) {
+                throw '[{0}] {1}'.format(resp.status_code, resp.message);
+            }
+        
+            resp.team_name = teamUser[0];
+        
+            return resp;
+        }
+        
+        function getChannelByID(channelID) {
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+                arguments.callee.name,
+                JSON.stringify(arguments)
+            ));
+        
+            var resp = JSON.parse(req.get(
+                Mattermost.get_channel.format(channelID),
+                JSON.stringify(fields)
+            )
+            );
+        
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+                arguments.callee.name,
+                JSON.stringify(resp)
+            ));
+        
+            if (req.getStatus() != 200) {
+                throw '[{0}] {1}'.format(resp.status_code, resp.message);
+            }
+        
+            return resp;
+        }
+        
+        function getBotUser() {
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+                arguments.callee.name,
+                JSON.stringify(arguments)
+            ));
+        
+            var resp = JSON.parse(req.get(
+                Mattermost.bot_user,
+                JSON.stringify(fields)
+            )
+            );
+        
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+                arguments.callee.name,
+                JSON.stringify(resp)
+            ));
+        
+            if (req.getStatus() != 200) {
+                throw '[{0}] {1}'.format(resp.status_code, resp.message);
+            }
+        
+            return resp;
+        }
+        
+        function getUserByName(userName) {
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+                arguments.callee.name,
+                JSON.stringify(arguments)
+            ));
+        
+            var resp = JSON.parse(req.get(
+                Mattermost.user_byname.format(userName),
+                JSON.stringify(fields)
+            )
+            );
+        
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+                arguments.callee.name,
+                JSON.stringify(resp)
+            ));
+        
+            if (req.getStatus() != 200) {
+                throw '[{0}] {1}'.format(resp.status_code, resp.message);
+            }
+        
+            return resp;
+        }
+        
+        function getTeamByID(teamID) {
+            Zabbix.log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(
+                arguments.callee.name,
+                JSON.stringify(arguments)
+            ));
+        
+            var resp = JSON.parse(req.get(
+                Mattermost.get_team.format(teamID),
+                JSON.stringify(fields)
+            )
+            );
+        
+            Zabbix.log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(
+                arguments.callee.name,
+                JSON.stringify(resp)
+            ));
+        
+            if (req.getStatus() != 200) {
+                throw '[{0}] {1}'.format(resp.status_code, resp.message);
+            }
+        
+            return resp;
+        }
+        
+        function createProblemURL(zabbix_url, triggerid, eventid, event_source) {
+            var problem_url = '';
+            if (event_source === '0') {
+                problem_url = '{0}/tr_events.php?triggerid={1}&eventid={2}'
+                    .format(
+                        zabbix_url,
+                        triggerid,
+                        eventid
+                    );
+            }
+            else {
+                problem_url = zabbix_url;
+            }
+        
+            return problem_url;
+        }
+        
+        function getTagValue(event_tags, key) {
+            var pattern = new RegExp('(' + key + ':.+)');
+            var tagValue = event_tags
+                .split(',')
+                .filter(function (v) {
+                    return v.match(pattern);
+                })
+                .map(function (v) {
+                    return v.split(':')[1];
+                })[0]
+                || 0;
+        
+            return tagValue;
+        }
+        
+        function handlerAlarm(req, params) {
+            var channel = getChannel(params.send_to);
+            var fields = {
+                channel_id: channel.id,
+                props: {}
+            };
+        
+            if (isEventProblem(params)) {
+                var team_name = channel.team_name
+                    ? channel.team_name
+                    : getTeamByID(channel.team_id).name;
+        
+                fields.props.attachments = [
+                    createMessage(
+                        SEVERITY_COLORS[params.event_nseverity] || 0,
+                        params.event_date,
+                        params.event_time,
+                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
+                    )
+                ];
+        
+                var resp = JSON.parse(req.post(
+                    Mattermost.post_message,
+                    JSON.stringify(fields)
+                )
+                );
+        
+                if (req.getStatus() != 201) {
+                    throw '[{0}] {1}'.format(resp.status_code, resp.message);
+                }
+        
+                result.tags.__mattermost_post_id = resp.id;
+                result.tags.__mattermost_channel_id = channel.id;
+                result.tags.__mattermost_channel_name = channel.name;
+                result.tags.__mattermost_message_link = getPermalink(
+                    params.mattermost_url,
+                    team_name,
+                    resp.id
+                );
+        
+            }
+            else if (isEventUpdate(params)) {
+                fields.root_id = getTagValue(params.event_tags, 'mattermost_post_id');
+        
+                if (params.event_source === '0') {}
+                fields.props.attachments = [
+                    createMessage(
+                        SEVERITY_COLORS[params.event_nseverity] || 0,
+                        params.event_update_date,
+                        params.event_update_time,
+                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source),
+                        true
+                    )
+                ];
+        
+                resp = JSON.parse(req.post(
+                    Mattermost.post_message, JSON.stringify(fields)
+                )
+                );
+        
+                if (req.getStatus() != 201) {
+                    throw '[{0}] {1}'.format(resp.status_code, resp.message);
+                }
+        
+            }
+            else if (isEventResolve(params)) {
+                fields.channel_id = getTagValue(params.event_tags, 'mattermost_channel_id');
+                fields.id = getTagValue(params.event_tags, 'mattermost_post_id');
+                fields.props.attachments = [
+                    createMessage(
+                        RESOLVE_COLOR,
+                        params.event_date,
+                        params.event_time,
+                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
+                    )
+                ];
+        
+                var post_id = getTagValue(params.event_tags, 'mattermost_post_id');
+        
+                resp = JSON.parse(req.put(
+                    Mattermost.chat_update.format(post_id),
+                    JSON.stringify(fields)
+                )
+                );
+        
+                if (req.getStatus() != 200) {
+                    throw '[{0}] {1}'.format(resp.status_code, resp.message);
+                }
+            }
+        }
+        
+        function handlerEvent(req, params) {
+            var channel = getChannel(params.send_to);
+            var fields = {
+                channel_id: channel.id,
+                props: {}
+            };
+        
+            if (isEventProblem(params)) {
+                var team_name = channel.team_name
+                    ? channel.team_name
+                    : getTeamByID(channel.team_id).name;
+        
+                fields.props.attachments = [
+                    createMessage(
+                        SEVERITY_COLORS[params.event_nseverity] || 0,
+                        params.event_date,
+                        params.event_time,
+                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
+                    )
+                ];
+        
+                var resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
+        
+                if (req.getStatus() != 201) {
+                    throw '[{0}] {1}'.format(resp.status_code, resp.message);
+                }
+        
+                result.tags.__mattermost_channel_name = channel.name;
+                result.tags.__mattermost_message_link = getPermalink(
+                    params.mattermost_url,
+                    team_name,
+                    resp.id
+                );
+        
+            }
+            else if (isEventUpdate(params)) {
+                fields.props.attachments = [
+                    createMessage(
+                        SEVERITY_COLORS[params.event_nseverity] || 0,
+                        params.event_update_date,
+                        params.event_update_time,
+                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source),
+                        false
+                    )
+                ];
+        
+                resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
+        
+                if (req.getStatus() != 201) {
+                    throw '[{0}] {1}'.format(resp.status_code, resp.message);
+                }
+        
+            }
+            else if (isEventResolve(params)) {
+                fields.props.attachments = [
+                    createMessage(
+                        RESOLVE_COLOR,
+                        params.event_recovery_date,
+                        params.event_recovery_time,
+                        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source)
+                    )
+                ];
+        
+                resp = JSON.parse(req.post(Mattermost.post_message, JSON.stringify(fields)));
+        
+                if (req.getStatus() != 201) {
+                    throw '[{0}] {1}'.format(resp.status_code, resp.message);
+                }
+            }
+        }
+        
+        function createMessage(
+            event_severity_color,
+            event_date,
+            event_time,
+            problem_url,
+            isShort
+        ) {
+            var message = {
+                fallbac: params.alert_subject,
+                title: params.alert_subject,
+                color: event_severity_color,
+                title_link: problem_url,
+                footer: problem_url,
+        
+                fields: [
+                    {
+                        title: 'Host',
+                        value: '{0} [{1}]'.format(params.host_name, params.host_ip),
+                        short: true
+                    },
+                    {
+                        title: 'Event time',
+                        value: '{0} {1}'.format(event_date, event_time),
+                        short: true
+                    }
+                ],
+            };
+        
+            
+            if (params.event_source === '0') {
+                message.fields.push(
+                    {
+                        title: 'Severity',
+                        value: params.event_severity,
+                        short: true
+                    },
+                    {
+                        title: 'Opdata',
+                        value: params.event_opdata,
+                        short: true
+                    }
+                );
+            }
+        
+            if (!isShort && params.event_source === '0') {
+                message.fields.push(
+                    {
+                        title: 'Event tags',
+                        value: '`{0}`'.format(params.event_tags.replace(/__.+?:(.+?,|.+)/g, '') || 'None'),
+                        short: true
+                    },
+                    {
+                        title: 'Trigger description',
+                        value: params.trigger_description,
+                        short: true
+                    }
+                );
+            }
+        
+            if (params.event_source !== '0' || params.event_update_status === '1') {
+                message.fields.push(
+                    {
+                        title: 'Details',
+                        value: params.alert_message,
+                        short: false
+                    }
+                );
+            }
+        
+            return message;
+        }
+        
+        function validateParams(params) {
+            if (typeof params.bot_token !== 'string' || params.bot_token.trim() === '') {
+                throw 'Field "bot_token" cannot be empty';
+            }
+        
+            if (isNaN(params.event_id)) {
+                throw 'Field "event_id" is not a number';
+            }
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+        
+            if (params.event_source !== '0') {
+                params.event_nseverity = '0';
+                params.event_severity = 'Not classified';
+                params.event_update_status = '0';
+                params.send_mode = 'event';
+            }
+        
+            if (params.event_source === '1' || params.event_source === '2') {
+                params.event_value = '1';
+            }
+        
+            if (params.event_source === '1') {
+                params.host_name = params.discovery_host_dns;
+                params.host_ip = params.discovery_host_ip;
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                throw 'Incorrect "event_nseverity" parameter given: ' + params.event_nseverity + '\nMust be 0-5.';
+            }
+        
+            if (typeof params.event_severity !== 'string' || params.event_severity.trim() === '') {
+                throw 'Field "event_severity" cannot be empty';
+            }
+        
+            if (params.event_update_status !== '0' && params.event_update_status !== '1') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_value !== '0' && params.event_value !== '1') {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            if (typeof params.host_ip !== 'string' || params.host_ip.trim() === '') {
+                throw 'Field "host_ip" cannot be empty';
+            }
+        
+            if (typeof params.host_name !== 'string' || params.host_name.trim() === '') {
+                throw 'Field "host_name" cannot be empty';
+            }
+        
+            if (typeof params.mattermost_url !== 'string' || params.mattermost_url.trim() === '') {
+                throw 'Field "mattermost_url" cannot be empty';
+            }
+        
+            if (!/^(http|https):\/\/.+/.test(params.mattermost_url)) {
+                throw 'Field "mattermost_url" must contain a schema';
+            }
+        
+            if (['alarm', 'event'].indexOf(params.send_mode) === -1) {
+                throw 'Incorrect "send_mode" parameter given: ' + params.send_mode + '\nMust be "alarm" or "event".';
+            }
+        
+            if (typeof params.send_to !== 'string' || params.send_to.trim() === '') {
+                throw 'Field "send_to" cannot be empty';
+            }
+        
+            if (isNaN(params.trigger_id) && params.event_source === '0') {
+                throw 'field "trigger_id" is not a number';
+            }
+        
+            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '') {
+                throw 'Field "zabbix_url" cannot be empty';
+            }
+        
+            if (!/^(http|https):\/\/.+/.test(params.zabbix_url)) {
+                throw 'Field "zabbix_url" must contain a schema';
+            }
+        
+        }
+        
+        try {
+            var params = JSON.parse(value);
+        
+            validateParams(params);
+        
+            var req = new HttpRequest(),
+                fields = {},
+                result = {tags: {}};
+        
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+                req.setProxy(params.HTTPProxy);
+            }
+        
+            req.addHeader('Content-Type: application/json; charset=utf-8');
+            req.addHeader('Authorization: Bearer ' + params.bot_token);
+        
+            params.mattermost_url = params.mattermost_url.replace(/\/+$/, '');
+            params.zabbix_url = params.zabbix_url.replace(/\/+$/, '');
+        
+            var APIEndpoint = params.mattermost_url + '/api/v4/';
+        
+            var Mattermost = {
+                post_message: APIEndpoint + 'posts',
+                get_channel: APIEndpoint + 'channels/{0}',
+                get_team: APIEndpoint + 'teams/{0}',
+                chat_update: APIEndpoint + 'posts/{0}',
+                direct_channel: APIEndpoint + 'channels/direct',
+                channel_byname: APIEndpoint + 'teams/name/{0}/channels/name/{1}',
+                user_byname: APIEndpoint + 'users/username/{0}',
+                bot_user: APIEndpoint + 'users/me'
+        
+            };
+        
+            params.send_mode = params.send_mode.toLowerCase();
+            params.send_mode = params.send_mode in SEND_MODE_HANDLERS
+                ? params.send_mode
+                : 'alarm';
+        
+            SEND_MODE_HANDLERS[params.send_mode](req, params);
+        
+            if (params.event_source === '0') {
+                return JSON.stringify(result);
+            }
+            else {
+                return 'OK';
+            }
+        }
+        catch (error) {
+            Zabbix.log(4, '[ Mattermost Webhook ] Mattermost notification failed: ' + error);
+            throw 'Mattermost notification failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__mattermost_message_link}'
+      event_menu_name: 'Open in Mattermost: {EVENT.TAGS.__mattermost_channel_name}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

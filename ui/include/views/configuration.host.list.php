@@ -35,7 +35,9 @@ $widget = (new CWidget())
 			))
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'host']).', null), null, this);'
+					)
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -300,7 +302,8 @@ foreach ($data['hosts'] as $host) {
 			break;
 		}
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		if (array_key_exists($template['templateid'], $data['writable_templates'])
+				&& $data['allowed_ui_conf_templates']) {
 			$caption = [
 				(new CLink(CHtml::encode($template['name']),
 					(new CUrl('templates.php'))
@@ -324,7 +327,8 @@ foreach ($data['hosts'] as $host) {
 			$caption[] = ' (';
 
 			foreach ($parent_templates as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])) {
+				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
+						&& $data['allowed_ui_conf_templates']) {
 					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')
@@ -484,7 +488,12 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			'host.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.host' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 		]
 	)

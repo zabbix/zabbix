@@ -24,6 +24,7 @@
  */
 
 $this->includeJsFile('administration.proxy.edit.js.php');
+$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
@@ -34,7 +35,7 @@ if ($data['form_refresh'] == 0) {
 }
 
 $proxyForm = (new CForm())
-	->setId('proxyForm')
+	->setId('proxy-form')
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
@@ -111,6 +112,7 @@ $encryption_form_list = (new CFormList('encryption'))
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableAutocomplete()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -120,7 +122,7 @@ $encryption_form_list = (new CFormList('encryption'))
 	);
 
 $tabs->addTab('proxyTab', _('Proxy'), $proxy_form_list);
-$tabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+$tabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

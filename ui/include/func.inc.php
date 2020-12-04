@@ -535,7 +535,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		foreach ([
 			'days' => SEC_PER_DAY,
 			'hours' => SEC_PER_HOUR,
-			'minutes' => SEC_PER_MIN,
+			'minutes' => SEC_PER_MIN
 		] as $part => $sec_per_part) {
 			$v = floor($value_abs_int / $sec_per_part);
 			if ($v > 0) {
@@ -585,8 +585,8 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$result = [];
 
-	foreach (array_filter($parts) as $unit => $value) {
-		$result[] = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
+	foreach (array_filter($parts) as $part_unit => $part_value) {
+		$result[] = formatFloat($part_value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
@@ -1322,7 +1322,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @param string   $number     Valid number in decimal or scientific notation.
  * @param int|null $precision  Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
  * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
- * @param bool     $exact      Display exaclty this number of decimals instead of first non-zeros.
+ * @param bool     $exact      Display exactly this number of decimals instead of first non-zeros.
  *
  * Note: $decimals must be less than $precision.
  *
@@ -1521,8 +1521,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				$data['buttons'][] = (new CButton('login', _('Login')))
 					->onClick('javascript: document.location = "index.php?request='.$url.'";');
 			}
-			$data['buttons'][] = (new CButton('back', _('Go to dashboard')))
-				->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"');
+
+			$data['buttons'][] = (new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+				->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"');
 		}
 		// if the user is not logged in - offer to login
 		else {
@@ -1646,7 +1647,7 @@ function filter_messages(): array {
 	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$messages = CMessageHelper::getMessages();
-		CMessageHelper::clear();
+		CMessageHelper::clear(false);
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
@@ -1803,7 +1804,11 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages of the current request.
 
 	if ($options['with_current_messages']) {
-		show_messages();
+		show_messages(
+			CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+			CMessageHelper::getTitle(),
+			CMessageHelper::getTitle()
+		);
 
 		$messages_current = $ZBX_MESSAGES_PREPARED;
 		$restore_messages = [];
@@ -1832,7 +1837,11 @@ function get_prepared_messages(array $options = []): ?string {
 			$failed_attempts
 		));
 
-		show_messages();
+		show_messages(
+			false, // Failed login can be only error message.
+			CMessageHelper::getTitle(),
+			CMessageHelper::getTitle()
+		);
 
 		CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 	}
@@ -1900,19 +1909,6 @@ function error($msgs, string $src = ''): void {
 
 	foreach ($msgs as $msg) {
 		CMessageHelper::addError($msg, $src);
-	}
-}
-
-/**
- * Add multiple errors under single header.
- *
- * @param array  $data
- * @param string $data['header']  common header for all error messages
- * @param array  $data['msgs']    array of error messages
- */
-function error_group($data) {
-	foreach (zbx_toArray($data['msgs']) as $msg) {
-		error($data['header'] . ' ' . $msg);
 	}
 }
 
@@ -2444,6 +2440,31 @@ function getTimeSelectorPeriod(array $options) {
 	$options['to_ts'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
 	return $options;
+}
+
+/**
+ * Get array of action statuses available for defined time range. For incorrect "from" or "to" all actions will be set
+ * to false.
+ *
+ * @param string $from      Relative or absolute time, cannot be null.
+ * @param string $to        Relative or absolute time, cannot be null.
+ *
+ * @return array
+ */
+function getTimeselectorActions($from, $to): array {
+	$ts_now = time();
+	$parser = new CRangeTimeParser();
+	$ts_from = ($parser->parse($from) !== CParser::PARSE_FAIL) ? $parser->getDateTime(true)->getTimestamp() : null;
+	$ts_to = ($parser->parse($to) !== CParser::PARSE_FAIL) ? $parser->getDateTime(false)->getTimestamp() : null;
+	$valid = ($ts_from !== null && $ts_to !== null);
+	$parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+	$max_period = 1 + $ts_now - $parser->getDateTime(true)->getTimestamp();
+
+	return [
+		'can_zoomout' => ($valid && ($ts_to - $ts_from + 1 < $max_period)),
+		'can_decrement' => ($valid && ($ts_from > 0)),
+		'can_increment' => ($valid && ($ts_to < $ts_now - ZBX_MIN_PERIOD))
+	];
 }
 
 /**

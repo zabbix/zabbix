@@ -32,8 +32,9 @@ import (
 	"zabbix.com/pkg/log"
 )
 
-func Execute(s string, timeout time.Duration) (string, error) {
+func Execute(s string, timeout time.Duration, path string) (string, error) {
 	cmd := exec.Command("sh", "-c", s)
+	cmd.Dir = path
 
 	var b bytes.Buffer
 	cmd.Stdout = &b
@@ -60,8 +61,8 @@ func Execute(s string, timeout time.Duration) (string, error) {
 		return "", fmt.Errorf("Timeout while executing a shell script.")
 	}
 
-	if maxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
+	if MaxExecuteOutputLenB <= len(b.String()) {
+		return "", fmt.Errorf("Command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
 	}
 
 	return strings.TrimRight(b.String(), " \t\r\n"), nil

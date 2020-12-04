@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Template OS Linux by Zabbix agent';
+	public $templateName = 'Linux by Zabbix agent';
 
 	use FilterTrait;
 	use TableTrait;
@@ -44,7 +44,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = ['', 'Name', 'Hosts', 'Applications', 'Items', 'Triggers', 'Graphs',
-				'Screens', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
+				'Dashboards', 'Discovery', 'Web', 'Linked templates', 'Linked to templates', 'Tags'];
 		$this->assertSame($headers, $table->getHeadersText());
 
 		foreach (['Export', 'Mass update', 'Delete', 'Delete and clear'] as $button) {
@@ -120,12 +120,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Linked templates')->fill([
-				'values' => 'Template Module ICMP Ping',
+				'values' => 'ICMP Ping',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMP']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Generic SNMP']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
@@ -183,7 +183,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template',
@@ -196,7 +196,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template'
@@ -207,7 +207,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Contains'],
+						['name' => 'action', 'operator' => 'Contains']
 					],
 					'expected_templates' => [
 						'Form test template',
@@ -220,7 +220,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Equals'],
+						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
 			]
@@ -259,7 +259,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->login()->open('templates.php?groupid=0');
 		// Reset Templates filter from possible previous scenario.
 		$this->resetFilter();
-		// Click on Hosts link in Temlate row.
+		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
 		// Check that Hosts page is opened.
@@ -269,7 +269,7 @@ class testPageTemplates extends CLegacyWebTest {
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
-		$this->assertRowCount(count($hosts));
+		$this->assertTableStats(count($hosts));
 		// Reset Hosts filter after scenario.
 		$this->resetFilter();
 	}

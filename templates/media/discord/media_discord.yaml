@@ -1,0 +1,345 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:47Z'
+  media_types:
+    -
+      name: Discord
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: discord_endpoint
+          value: '{ALERT.SENDTO}'
+        -
+          name: event_date
+          value: '{EVENT.DATE}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_name
+          value: '{EVENT.NAME}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_opdata
+          value: '{EVENT.OPDATA}'
+        -
+          name: event_recovery_date
+          value: '{EVENT.RECOVERY.DATE}'
+        -
+          name: event_recovery_time
+          value: '{EVENT.RECOVERY.TIME}'
+        -
+          name: event_severity
+          value: '{EVENT.SEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGS}'
+        -
+          name: event_time
+          value: '{EVENT.TIME}'
+        -
+          name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
+        -
+          name: event_update_date
+          value: '{EVENT.UPDATE.DATE}'
+        -
+          name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_update_time
+          value: '{EVENT.UPDATE.TIME}'
+        -
+          name: event_update_user
+          value: '{USER.FULLNAME}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: host_ip
+          value: '{HOST.IP}'
+        -
+          name: host_name
+          value: '{HOST.NAME}'
+        -
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: use_default_message
+          value: 'false'
+        -
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      script: |
+        var SEVERITY_COLORS = [
+            '#97AAB3', // Not classified.
+            '#7499FF', // Information.
+            '#FFC859', // Warning.
+            '#FFA059', // Average.
+            '#E97659', // High.
+            '#E45959', // Disaster.
+            '#009900'  // Resolved.
+        ];
+        
+        function stringTruncate(str, len) {
+            return str.length > len ? str.substring(0, len - 3) + '...' : str;
+        }
+        
+        try {
+            Zabbix.log(4, '[ Discord Webhook ] Executed with params: ' + value);
+        
+            var params = JSON.parse(value);
+        
+            if (!params.discord_endpoint) {
+                throw 'Cannot get discord_endpoint';
+            }
+            else {
+                params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v7/') + '?wait=True';
+            }
+        
+            params.zabbix_url = (params.zabbix_url.endsWith('/'))
+                ? params.zabbix_url.slice(0, -1) : params.zabbix_url;
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+        
+            // Set params to true for non trigger-based events.
+            if (params.event_source !== '0') {
+                params.use_default_message = 'true';
+                params.event_nseverity = '0';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: "' + params.event_update_status + '".\nMust be 0 or 1.';
+            }
+        
+            if (params.event_value == 0) {
+                params.event_nseverity = '6';
+            }
+        
+            if (!SEVERITY_COLORS[params.event_nseverity]) {
+                throw 'Incorrect "event_nseverity" parameter given: ' + params.event_nseverity + '\nMust be 0-5.';
+            }
+        
+            var color = parseInt(SEVERITY_COLORS[params.event_nseverity].replace('#', ''), 16),
+                fields = [],
+                body = {
+                    embeds: [
+                        {
+                            color: color || 0,
+                            url: (params.event_source === '0')
+                                ? params.zabbix_url + '/tr_events.php?triggerid=' + params.trigger_id +
+                                    '&eventid=' + params.event_id
+                                : params.zabbix_url
+                        }
+                    ]
+                };
+        
+            // Default message from {ALERT.MESSAGE}.
+            if (params.use_default_message.toLowerCase() == 'true') {
+                body.embeds[0].title = stringTruncate(params.alert_subject, 256);
+                body.embeds[0].description = stringTruncate(params.alert_message, 2048);
+            }
+            else {
+                fields.push(
+                    {
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
+                    }
+                );
+        
+                // Resolved message.
+                if (params.event_value == 0 && params.event_update_status == 0) {
+                    body.embeds[0].title = stringTruncate('OK: ' + params.event_name, 256);
+                    fields.push(
+                        {
+                            name: 'Recovery time',
+                            value: params.event_recovery_time + ' ' + params.event_recovery_date,
+                            inline: 'True'
+                        }
+                    );
+                }
+        
+                // Problem message.
+                else if (params.event_value == 1 && params.event_update_status == 0) {
+                    body.embeds[0].title = stringTruncate('PROBLEM: ' + params.event_name, 256);
+                    fields.push(
+                        {
+                            name: 'Event time',
+                            value: params.event_time + ' ' + params.event_date,
+                            inline: 'True'
+                        }
+                    );
+                }
+        
+                // Update message.
+                else if (params.event_update_status == 1) {
+                    body.embeds[0].title = stringTruncate('UPDATE: ' + params.event_name, 256);
+                    body.embeds[0].description = params.event_update_user + ' ' + params.event_update_action + '.';
+        
+                    if (params.event_update_message) {
+                        body.embeds[0].description += ' Comment:\n>>> ' + params.event_update_message;
+                    }
+        
+                    body.embeds[0].description = stringTruncate(body.embeds[0].description, 2048);
+        
+                    fields.push(
+                        {
+                            name: 'Event update time',
+                            value: params.event_update_time + ' ' + params.event_update_date,
+                            inline: 'True'
+                        }
+                    );
+                }
+        
+                fields.push(
+                    {
+                        name: 'Severity',
+                        value: params.event_severity,
+                        inline: 'True'
+                    }
+                );
+        
+                if (params.event_opdata) {
+                    fields.push(
+                        {
+                            name: 'Operational data',
+                            value: stringTruncate(params.event_opdata, 1024),
+                            inline: 'True'
+                        }
+                    );
+                }
+        
+                if (params.event_value == 1 && params.event_update_status == 0 && params.trigger_description) {
+                    fields.push(
+                        {
+                            name: 'Trigger description',
+                            value: stringTruncate(params.trigger_description, 1024)
+                        }
+                    );
+                }
+        
+                body.embeds[0].footer = {
+                    text: 'Event ID: ' + params.event_id
+                };
+        
+                if (params.event_tags) {
+                    body.embeds[0].footer.text += '\nEvent tags: ' + params.event_tags;
+                }
+                body.embeds[0].footer.text = stringTruncate(body.embeds[0].footer.text, 2048);
+            }
+        
+            if (fields.length > 0) {
+                body.embeds[0].fields = fields;
+            }
+        
+            var req = new HttpRequest();
+        
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+                req.setProxy(params.HTTPProxy);
+            }
+        
+            req.addHeader('Content-Type: application/json');
+        
+            var resp = req.post(params.discord_endpoint, JSON.stringify(body)),
+                data = JSON.parse(resp);
+        
+            Zabbix.log(4, '[ Discord Webhook ] JSON: ' + JSON.stringify(body));
+            Zabbix.log(4, '[ Discord Webhook ] Response: ' + resp);
+        
+            if (data.id) {
+                return resp;
+            }
+            else {
+                var message = ((typeof data.message === 'string') ? data.message : 'Unknown error');
+        
+                Zabbix.log(3, '[ Discord Webhook ] FAILED with response: ' + resp);
+                throw message + '. For more details check zabbix server log.';
+            }
+        }
+        catch (error) {
+            Zabbix.log(3, '[ Discord Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

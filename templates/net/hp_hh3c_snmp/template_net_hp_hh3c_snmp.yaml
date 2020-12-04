@@ -1,0 +1,488 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-23T09:06:48Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'HP Comware HH3C SNMP'
+      name: 'HP Comware HH3C SNMP'
+      description: |
+        Template Net HP Comware (HH3C)
+        
+        MIBs used:
+        ENTITY-MIB
+        HH3C-ENTITY-EXT-MIB
+        
+        Known Issues:
+        
+          Description: No temperature sensors. All entities of them return 0 for HH3C-ENTITY-EXT-MIB::hh3cEntityExtTemperature
+          Version: 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010-2016 Hewlett Packard Enterprise Development LP
+          Device: HP 1910-48
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: Memory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      discovery_rules:
+        -
+          name: 'Entity Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: entity.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '3'
+                formulaid: A
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Firmware version'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.9.{#SNMPINDEX}'
+              key: 'system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#ENT_NAME}: Firmware has changed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Firmware version has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              name: '{#ENT_NAME}: Hardware model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
+              key: 'system.hw.model[entPhysicalDescr.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: '{#ENT_NAME}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+            -
+              name: '{#ENT_NAME}: Hardware version(revision)'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'system.hw.version[entPhysicalHardwareRev.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+            -
+              name: '{#ENT_NAME}: Operating system'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.10.{#SNMPINDEX}'
+              key: 'system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#ENT_NAME}: Operating system description has changed'
+                  priority: INFO
+                  description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+                  manual_close: 'YES'
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_DESCR},1.3.6.1.2.1.47.1.1.1.1.2]'
+          key: fan.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '7'
+                formulaid: A
+          description: 'Discovering all entities of PhysicalClass - 7: fan(7)'
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.19.{#SNMPINDEX}'
+              key: 'sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: HH3C-ENTITY-EXT-MIB
+                Indicate the error state of this entity object.
+                fanError(41) means that the fan stops working.
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS:"fanError"},eq)}=1 or {count(#1,{$FAN_CRIT_STATUS:"hardwareFaulty"},eq)}=1'
+                  name: '{#ENT_NAME}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+        -
+          name: 'Module Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.2,{#MODULE_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: module.discovery
+          delay: 1h
+          filter:
+            evaltype: OR
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '^(MODULE|Module) (LEVEL|level)1$'
+                formulaid: A
+              -
+                macro: '{#SNMPVALUE}'
+                value: '(Fabric|FABRIC) (.+) (Module|MODULE)'
+                formulaid: B
+          description: 'Filter limits results to ''Module level1'' or Fabric Modules'
+          item_prototypes:
+            -
+              name: '{#MODULE_NAME}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.6.{#SNMPINDEX}'
+              key: 'system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: HH3C-ENTITY-EXT-MIB
+                The CPU usage for this entity. Generally, the CPU usage
+                will calculate the overall CPU usage on the entity, and it
+                is not sensible with the number of CPU on the entity
+              applications:
+                -
+                  name: CPU
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+                  name: '{#MODULE_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+            -
+              name: '{#MODULE_NAME}: Memory utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: HH3C-ENTITY-EXT-MIB
+                The memory usage for the entity. This object indicates what
+                percent of memory are used.
+              applications:
+                -
+                  name: Memory
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+                  name: '{#MODULE_NAME}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+          graph_prototypes:
+            -
+              name: '{#MODULE_NAME}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'HP Comware HH3C SNMP'
+                    key: 'system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}]'
+            -
+              name: '{#MODULE_NAME}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'HP Comware HH3C SNMP'
+                    key: 'vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}]'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_DESCR},1.3.6.1.2.1.47.1.1.1.1.2]'
+          key: psu.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '6'
+                formulaid: A
+          description: 'Discovering all entities of PhysicalClass - 6: powerSupply(6)'
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.19.{#SNMPINDEX}'
+              key: 'sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: HH3C-ENTITY-EXT-MIB
+                Indicate the error state of this entity object.
+                psuError(51) means that the Power Supply Unit is in the state of fault.
+                rpsError(61) means the Redundant Power Supply is in the state of fault.
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS:"psuError"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"rpsError"},eq)}=1 or {count(#1,{$PSU_CRIT_STATUS:"hardwareFaulty"},eq)}=1'
+                  name: '{#ENT_NAME}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.2,{#MODULE_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: temp.discovery
+          delay: 1h
+          filter:
+            evaltype: OR
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '^(MODULE|Module) (LEVEL|level)1$'
+                formulaid: A
+              -
+                macro: '{#SNMPVALUE}'
+                value: '(Fabric|FABRIC) (.+) (Module|MODULE)'
+                formulaid: B
+              -
+                macro: '{#SNMPVALUE}'
+                value: '(T|t)emperature.*(s|S)ensor'
+                formulaid: C
+          description: 'Discovering modules temperature (same filter as in Module Discovery) plus and temperature sensors'
+          item_prototypes:
+            -
+              name: '{#SNMPVALUE}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.25506.2.6.1.1.1.1.12.{#SNMPINDEX}'
+              key: 'sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: HH3C-ENTITY-EXT-MIB
+                The temperature for the {#SNMPVALUE}.
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}>{$TEMP_CRIT:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:""}-3'
+                  name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                -
+                  expression: '{avg(5m)}>{$TEMP_WARN:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{max(5m)}<{$TEMP_WARN:""}-3'
+                  name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                      expression: '{HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}'
+                      recovery_expression: '{HP Comware HH3C SNMP:sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$FAN_CRIT_STATUS:"fanError"}'
+          value: '41'
+        -
+          macro: '{$FAN_CRIT_STATUS:"hardwareFaulty"}'
+          value: '91'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$PSU_CRIT_STATUS:"hardwareFaulty"}'
+          value: '91'
+        -
+          macro: '{$PSU_CRIT_STATUS:"psuError"}'
+          value: '51'
+        -
+          macro: '{$PSU_CRIT_STATUS:"rpsError"}'
+          value: '61'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+  value_maps:
+    -
+      name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: notSupported
+        -
+          value: '2'
+          newvalue: normal
+        -
+          value: '3'
+          newvalue: postFailure
+        -
+          value: '4'
+          newvalue: entityAbsent
+        -
+          value: '11'
+          newvalue: poeError
+        -
+          value: '21'
+          newvalue: stackError
+        -
+          value: '22'
+          newvalue: stackPortBlocked
+        -
+          value: '23'
+          newvalue: stackPortFailed
+        -
+          value: '31'
+          newvalue: sfpRecvError
+        -
+          value: '32'
+          newvalue: sfpSendError
+        -
+          value: '33'
+          newvalue: sfpBothError
+        -
+          value: '41'
+          newvalue: fanError
+        -
+          value: '51'
+          newvalue: psuError
+        -
+          value: '61'
+          newvalue: rpsError
+        -
+          value: '71'
+          newvalue: moduleFaulty
+        -
+          value: '81'
+          newvalue: sensorError
+        -
+          value: '91'
+          newvalue: hardwareFaulty

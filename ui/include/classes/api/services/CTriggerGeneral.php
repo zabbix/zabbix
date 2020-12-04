@@ -119,7 +119,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerids = [];
 
 		$output = ['url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag',
-			'manual_close', 'opdata'
+			'manual_close', 'opdata', 'event_name'
 		];
 		if ($this instanceof CTriggerPrototype) {
 			$output[] = 'discover';
@@ -317,7 +317,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	private function getHostTriggersByTemplateId(array $tpl_triggerids, array $hostids = null) {
 		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
-			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.templateid,i.hostid';
+			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.templateid,'.
+			't.event_name,i.hostid';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
@@ -372,7 +373,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$recovery_expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
 
 		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
-			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,i.hostid,h.host';
+			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.event_name,i.hostid,'.
+			'h.host';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
@@ -822,6 +824,8 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
+		$eventname_validator = new CEventNameValidator();
+
 		switch (get_class($this)) {
 			case 'CTrigger':
 				$error_duplicate = _('Duplicate trigger with name "%1$s".');
@@ -864,6 +868,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if (array_key_exists('url', $trigger) && $trigger['url'] && !CHtmlUrlValidator::validate($trigger['url'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+			}
+
+			if (array_key_exists('event_name', $trigger) && !$eventname_validator->validate($trigger['event_name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'event_name', $eventname_validator->getError())
+				);
 			}
 
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
@@ -989,11 +999,13 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException if validation failed.
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
+		$db_triggers = [];
 		if (!$triggers) {
 			return;
 		}
 
 		$class = get_class($this);
+		$eventname_validator = new CEventNameValidator();
 
 		switch ($class) {
 			case 'CTrigger':
@@ -1038,7 +1050,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
 				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata', 'discover'
+				'manual_close', 'opdata', 'discover', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1089,6 +1101,13 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_update, $description);
 			if ($_db_trigger['templateid'] != 0) {
 				$this->checkNoParameters($trigger, $read_only_fields_tmpl, $error_cannot_update_tmpl, $description);
+			}
+
+			if (array_key_exists('event_name', $trigger) && $_db_trigger['event_name'] !== $trigger['event_name']
+					&& !$eventname_validator->validate($trigger['event_name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'event_name', $eventname_validator->getError())
+				);
 			}
 
 			if ($class === 'CTrigger') {
@@ -1397,6 +1416,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($trigger['description'] !== $db_trigger['description']) {
 				$upd_trigger['values']['description'] = $trigger['description'];
+			}
+			if (array_key_exists('event_name', $trigger) && $trigger['event_name'] !== $db_trigger['event_name']) {
+				$upd_trigger['values']['event_name'] = $trigger['event_name'];
 			}
 			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== $db_trigger['opdata']) {
 				$upd_trigger['values']['opdata'] = $trigger['opdata'];
@@ -1994,7 +2016,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-			'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name'
 		];
 		if ($this instanceof CTriggerPrototype) {
 			$output[] = 'discover';

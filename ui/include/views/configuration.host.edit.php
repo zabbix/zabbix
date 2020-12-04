@@ -37,7 +37,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
-	->setId('hostsForm')
+	->setId('hosts-form')
 	->setName('hostsForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->disablePasswordAutofill()
@@ -148,13 +148,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 }
 // Interfaces for discovered hosts.
 else {
-	$existingInterfaceTypes = [];
-	foreach ($data['interfaces'] as $interface) {
-		$existingInterfaceTypes[$interface['type']] = true;
-	}
 	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfaceManager.render();');
-	zbx_add_post_js('HostInterfaceManager.disableEdit();');
+	zbx_add_post_js('HostInterfaceManager.makeReadonly();');
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 
@@ -468,13 +464,15 @@ $tmplList = new CFormList();
 // Templates for discovered hosts.
 if ($data['readonly']) {
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setHeader([_('Name')])
 		->addStyle('width: 100%;');
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				(new CUrl('templates.php'))
 					->setArgument('form','update')
@@ -499,13 +497,15 @@ else {
 	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				'templates.php?form=update&templateid='.$template['templateid']
 			))->setTarget('_blank');
@@ -568,7 +568,7 @@ else {
 		);
 }
 
-$divTabs->addTab('templateTab', _('Templates'), $tmplList);
+$divTabs->addTab('templateTab', _('Templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
 
 /*
  * IPMI
@@ -597,19 +597,22 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 		->addRow(_('Username'),
 			(new CTextBox('ipmi_username', $data['ipmi_username'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->disableAutocomplete()
 		)
 		->addRow(_('Password'),
 			(new CTextBox('ipmi_password', $data['ipmi_password'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->disableAutocomplete()
 		)
 );
 
 // tags
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-	'source' => 'host',
-	'tags' => $data['tags'],
-	'readonly' => $data['readonly']
-]));
+		'source' => 'host',
+		'tags' => $data['tags'],
+		'readonly' => false
+	]), TAB_INDICATOR_TAGS
+);
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
@@ -623,7 +626,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 		->addRow(null, new CPartial($tmpl, [
 			'macros' => $data['macros'],
 			'readonly' => $data['readonly']
-		]), 'macros_container')
+		]), 'macros_container'),
+	TAB_INDICATOR_MACROS
 );
 
 $inventoryFormList = new CFormList('inventorylist');
@@ -690,7 +694,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
 
-$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList, TAB_INDICATOR_INVENTORY);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
@@ -729,6 +733,7 @@ $encryption_form_list = (new CFormList('encryption'))
 		(new CTextBox('tls_psk', $data['tls_psk'], $data['readonly'], 512))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
+			->disableAutocomplete()
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['readonly'], 1024))
@@ -739,7 +744,7 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
 
-$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
 
 /*
  * footer

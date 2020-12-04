@@ -34,4 +34,10 @@ class CTextBox extends CInput {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
 	}
+
+	public function setAdaptiveWidth($value) {
+		$this->addStyle('max-width: '.$value.'px;');
+		$this->addStyle('width: 100%;');
+		return $this;
+	}
 }

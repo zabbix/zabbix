@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmaps.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'class.tab-indicators.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -110,10 +110,16 @@ else {
 	$sysmap = [];
 }
 
+$allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$map = [
 		'name' => getRequest('name'),
 		'width' => getRequest('width'),
@@ -224,7 +230,12 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
+elseif ((hasRequest('delete') && hasRequest('sysmapid'))
+		|| (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$sysmapIds = getRequest('maps', []);
 
 	if (hasRequest('sysmapid')) {
@@ -263,6 +274,10 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action'
  * Display
  */
 if (hasRequest('form')) {
+	if (!$allowed_edit) {
+		access_deny(ACCESS_DENY_PAGE);
+	}
+
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = $current_userid;
 	$user_groupids = [];
@@ -395,7 +410,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'profileIdx' => 'web.sysmapconf.filter',
-		'active_tab' => CProfile::get('web.sysmapconf.filter.active', 1)
+		'active_tab' => CProfile::get('web.sysmapconf.filter.active', 1),
+		'allowed_edit' => $allowed_edit
 	];
 
 	// get maps

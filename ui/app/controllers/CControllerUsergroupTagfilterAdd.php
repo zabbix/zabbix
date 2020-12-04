@@ -60,7 +60,7 @@ class CControllerUsergroupTagfilterAdd extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS);
 	}
 
 	protected function doAction() {
@@ -81,7 +81,7 @@ class CControllerUsergroupTagfilterAdd extends CController {
 			$tag_filters[] = [
 				'groupid' => $groupid,
 				'tag' => $new_tag_filter['tag'],
-				'value' => $new_tag_filter['value'],
+				'value' => $new_tag_filter['value']
 			];
 		}
 

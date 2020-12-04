@@ -1,0 +1,5 @@
+{
+	"require": {
+		"symfony/yaml": "v5.1.3"
+	}
+}

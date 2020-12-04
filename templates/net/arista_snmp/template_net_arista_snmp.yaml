@@ -1,0 +1,661 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-22T16:58:30Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'Arista SNMP'
+      name: 'Arista SNMP'
+      description: |
+        Template Net Arista
+        
+        MIBs used:
+        ENTITY-SENSORS-MIB
+        ENTITY-STATE-MIB
+        ENTITY-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'EtherLike-MIB SNMP'
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'HOST-RESOURCES-MIB SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+        -
+          name: Voltage
+        -
+          name: 'Zabbix raw items'
+      items:
+        -
+          name: 'Get sensors'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3,{#THRESHOLD_LO_WARN},1.3.6.1.4.1.30065.3.12.1.1.1.1,{#THRESHOLD_LO_CRIT},1.3.6.1.4.1.30065.3.12.1.1.1.2,{#THRESHOLD_HI_WARN},1.3.6.1.4.1.30065.3.12.1.1.1.3,{#THRESHOLD_HI_CRIT},1.3.6.1.4.1.30065.3.12.1.1.1.4]'
+          key: sensors.get
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Gets sensors with type, description, and thresholds.'
+          applications:
+            -
+              name: 'Zabbix raw items'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  try {
+                      var data = JSON.parse(value);
+                  }
+                  catch (error) {
+                      throw 'Failed to parse JSON of Arista sensor discovery.';
+                  }
+                  var fields = ['{#SNMPINDEX}','{#SENSOR_TYPE}','{#SENSOR_INFO}','{#SENSOR_PRECISION}','{#THRESHOLD_LO_WARN}','{#THRESHOLD_LO_CRIT}','{#THRESHOLD_HI_WARN}','{#THRESHOLD_HI_CRIT}'];
+                  data.forEach(function (element) {
+                      fields.forEach(function (field) {
+                          element[field] = element[field] || '';
+                      });
+                  });
+                  return JSON.stringify(data);
+      discovery_rules:
+        -
+          name: 'Entity discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: entity.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '3'
+                formulaid: A
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Hardware model name'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}'
+              key: 'system.hw.model[entPhysicalModelName.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+            -
+              name: '{#ENT_NAME}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              applications:
+                -
+                  name: Inventory
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+        -
+          name: 'Fan discovery'
+          type: DEPENDENT
+          key: fan.discovery
+          delay: '0'
+          filter:
+            evaltype: OR
+            conditions:
+              -
+                macro: '{#SENSOR_TYPE}'
+                value: '10'
+                formulaid: A
+          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter'
+          item_prototypes:
+            -
+              name: '{#SENSOR_INFO}: Fan speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
+              key: 'sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}]'
+              units: rpm
+              description: |
+                MIB: ENTITY-SENSORS-MIB
+                The most recent measurement obtained by the agent for this sensor.
+                To correctly interpret the value of this object, the associated entPhySensorType,
+                entPhySensorScale, and entPhySensorPrecision objects must also be examined.
+              applications:
+                -
+                  name: Fans
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
+                  name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses fan sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Fan is in critical state'
+                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                -
+                  expression: '{min(5m)} > {#THRESHOLD_HI_WARN}'
+                  name: '{#SENSOR_INFO}: Fan speed is above the warning threshold of {#THRESHOLD_HI_WARN}rpm for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses fan sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Fan is in critical state'
+                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                    -
+                      name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
+                      expression: '{Arista SNMP:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}'
+                -
+                  expression: '{max(5m)} < {#THRESHOLD_LO_CRIT}'
+                  name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses fan sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Fan is in critical state'
+                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                -
+                  expression: '{max(5m)} < {#THRESHOLD_LO_WARN}'
+                  name: '{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses fan sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Fan is in critical state'
+                      expression: '{Arista SNMP:sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                    -
+                      name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
+                      expression: '{Arista SNMP:sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}'
+            -
+              name: '{#SENSOR_INFO}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}'
+              key: 'sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: ENTITY-SENSORS-MIB
+                The operational status of the sensor {#SENSOR_INFO}
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+                  name: '{#SENSOR_INFO}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+          master_item:
+            key: sensors.get
+          overrides:
+            -
+              name: 'trigger THRESHOLD_HI_CRIT'
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Fan speed is above the critical threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_HI_WARN'
+              step: '3'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_WARN}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Fan speed is above the warning threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_LO_CRIT'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_LO_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Fan speed is below the critical threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_LO_WARN'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_LO_WARN}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Fan speed is below the warning threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+        -
+          name: 'PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: psu.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#ENT_CLASS}'
+                value: '6'
+                formulaid: A
+          item_prototypes:
+            -
+              name: '{#ENT_NAME}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.131.1.1.1.3.{#SNMPINDEX}'
+              key: 'sensor.psu.status[entStateOper.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: 'MIB: ENTITY-STATE-MIB'
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'ENTITY-STATE-MIB::EntityOperState'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+                  name: '{#ENT_NAME}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+        -
+          name: 'Temperature discovery'
+          type: DEPENDENT
+          key: temp.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#SENSOR_TYPE}'
+                value: '8'
+                formulaid: B
+              -
+                macro: '{#SENSOR_PRECISION}'
+                value: '1'
+                formulaid: A
+          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with celsius filter'
+          item_prototypes:
+            -
+              name: '{#SENSOR_INFO}: Temperature status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}'
+              key: 'sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: ENTITY-SENSORS-MIB
+                The operational status of the sensor {#SENSOR_INFO}
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+            -
+              name: '{#SENSOR_INFO}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: ENTITY-SENSORS-MIB
+                The most recent measurement obtained by the agent for this sensor.
+                To correctly interpret the value of this object, the associated entPhySensorType,
+                entPhySensorScale, and entPhySensorPrecision objects must also be examined.
+              applications:
+                -
+                  name: Temperature
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.1'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
+                  name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values defined in the device.'
+                -
+                  expression: '{min(5m)} > {#THRESHOLD_HI_WARN}'
+                  name: '{#SENSOR_INFO}: Temperature is above the warning threshold of {#THRESHOLD_HI_WARN}°C for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
+                      expression: '{Arista SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}'
+                -
+                  expression: '{max(5m)} < {#THRESHOLD_LO_CRIT}'
+                  name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature sensor values defined in the device.'
+                -
+                  expression: '{max(5m)} < {#THRESHOLD_LO_WARN}'
+                  name: '{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses temperature sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
+                      expression: '{Arista SNMP:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}'
+          master_item:
+            key: sensors.get
+          overrides:
+            -
+              name: 'trigger THRESHOLD_HI_CRIT'
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Temperature is above the critical threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_HI_WARN'
+              step: '3'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_WARN}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Temperature is above the warning threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_LO_CRIT'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_LO_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Temperature is below the critical threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_LO_WARN'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_LO_WARN}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Temperature is below the warning threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+        -
+          name: 'Voltage discovery'
+          type: DEPENDENT
+          key: voltage.discovery
+          delay: '0'
+          filter:
+            evaltype: OR
+            conditions:
+              -
+                macro: '{#SENSOR_TYPE}'
+                value: 3|4
+                formulaid: A
+          description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with volts filter'
+          item_prototypes:
+            -
+              name: '{#SENSOR_INFO}: Voltage'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
+              key: 'sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: ENTITY-SENSORS-MIB
+                The most recent measurement obtained by the agent for this sensor.
+                To correctly interpret the value of this object, the associated entPhySensorType,
+                entPhySensorScale, and entPhySensorPrecision objects must also be examined.
+              applications:
+                -
+                  name: Voltage
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {#THRESHOLD_HI_CRIT}'
+                  name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses voltage sensor values defined in the device.'
+                -
+                  expression: '{min(5m)} > {#THRESHOLD_HI_WARN}'
+                  name: '{#SENSOR_INFO}: Voltage is above the warning threshold of {#THRESHOLD_HI_WARN}V for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses voltage sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
+                      expression: '{Arista SNMP:sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}].min(5m)} > {#THRESHOLD_HI_CRIT}'
+                -
+                  expression: '{max(5m)} < {#THRESHOLD_LO_CRIT}'
+                  name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses voltage sensor values defined in the device.'
+                -
+                  expression: '{max(5m)} < {#THRESHOLD_LO_WARN}'
+                  name: '{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'This trigger uses voltage sensor values defined in the device.'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
+                      expression: '{Arista SNMP:sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}].max(5m)} < {#THRESHOLD_LO_CRIT}'
+          master_item:
+            key: sensors.get
+          overrides:
+            -
+              name: 'trigger THRESHOLD_HI_CRIT'
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Voltage is above the critical threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_HI_WARN'
+              step: '3'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_WARN}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Voltage is above the warning threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_LO_CRIT'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_LO_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Voltage is below the critical threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_LO_WARN'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_LO_WARN}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Voltage is below the warning threshold'
+                  status: ENABLED
+                  discover: NO_DISCOVER
+      macros:
+        -
+          macro: '{$FAN_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$MEMORY.NAME.NOT_MATCHES}'
+          value: (Buffer|Cache)
+          description: 'Filter is overriden to ignore RAM(Cache) and RAM(Buffers) memory objects.'
+        -
+          macro: '{$PSU_CRIT_STATUS}'
+          value: '2'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+          value: '95'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.WARN}'
+          value: '90'
+  value_maps:
+    -
+      name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+      mappings:
+        -
+          value: '1'
+          newvalue: ok
+        -
+          value: '2'
+          newvalue: unavailable
+        -
+          value: '3'
+          newvalue: nonoperational
+    -
+      name: 'ENTITY-STATE-MIB::EntityOperState'
+      mappings:
+        -
+          value: '1'
+          newvalue: unknown
+        -
+          value: '2'
+          newvalue: disabled
+        -
+          value: '3'
+          newvalue: enabled
+        -
+          value: '4'
+          newvalue: testing

@@ -168,6 +168,7 @@ typedef struct
 	char			*datacenter_name;
 	char			*parent_name;
 	char			*parent_type;
+	char			*ip;
 	char			**props;
 	zbx_vector_str_t	ds_names;
 	zbx_vector_ptr_t	vms;
@@ -196,7 +197,8 @@ typedef struct
 {
 	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
 	unsigned char	skip_old;	/* skip old event log records */
-
+	unsigned char	oom;		/* no enough memory to store new events */
+	zbx_uint64_t	req_sz;		/* memory size required to store events */
 }
 zbx_vmware_eventlog_state_t;
 
@@ -246,6 +248,10 @@ typedef struct
 	/* the vmware service instance version */
 	char				*version;
 
+	/* the vmware service instance version numeric */
+	unsigned short			major_version;
+	unsigned short			minor_version;
+
 	/* the vmware service instance fullname */
 	char				*fullname;
 
@@ -271,6 +277,7 @@ typedef struct
 {
 	zbx_vector_ptr_t	services;
 	zbx_hashset_t		strpool;
+	zbx_uint64_t		strpool_sz;
 }
 zbx_vmware_t;
 
@@ -339,8 +346,12 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_VMPROP_STORAGE_UNSHARED		13
 #define ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED		14
 #define ZBX_VMWARE_VMPROP_UPTIME			15
+#define ZBX_VMWARE_VMPROP_IPADDRESS			16
+#define ZBX_VMWARE_VMPROP_GUESTHOSTNAME			17
+#define ZBX_VMWARE_VMPROP_GUESTFAMILY			18
+#define ZBX_VMWARE_VMPROP_GUESTFULLNAME			19
 
-#define ZBX_VMWARE_VMPROPS_NUM				16
+#define ZBX_VMWARE_VMPROPS_NUM				20
 
 /* vmware service types */
 #define ZBX_VMWARE_TYPE_UNKNOWN	0

@@ -27,7 +27,6 @@ class CBaseComponent {
 	/**
 	 * CSS Classes.
 	 */
-
 	addClass(class_name) {
 		this._target.classList.add(class_name);
 		return this;

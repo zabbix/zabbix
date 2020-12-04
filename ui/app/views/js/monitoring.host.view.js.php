@@ -22,45 +22,70 @@
 /**
  * @var CView $this
  */
+
 ?>
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('filter_tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('filter_tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
-
-		$('#filter_maintenance_status').on('change', function() {
-			$('#filter_show_suppressed').prop('disabled', !this.checked);
-		});
-
 		function hostPage() {
+			let filter_options = <?= json_encode($data['filter_options']) ?>;
+
 			this.refresh_url = '<?= $data['refresh_url'] ?>';
 			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
+			this.deferred = null;
+
+			if (filter_options) {
+				this.refresh_counters = this.createCountersRefresh(1);
+				this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
+				this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
+					let url = new Curl('', false);
+
+					url.setArgument('action', 'host.view.refresh');
+					this.refresh_url = url.getUrl();
+					this.unscheduleRefresh();
+					this.refresh();
+
+					var filter_item = this.filter._active_item;
+
+					if (this.filter._active_item.hasCounter()) {
+						$.post('zabbix.php', {
+							action: 'host.view.refresh',
+							filter_counters: 1,
+							counter_index: filter_item._index
+						}).done((json) => {
+							if (json.filter_counters) {
+								filter_item.updateCounter(json.filter_counters.pop());
+							}
+						});
+					}
+				});
+			}
 		}
 
 		hostPage.prototype = {
+			createCountersRefresh: function(timeout) {
+				if (this.refresh_counters) {
+					clearTimeout(this.refresh_counters);
+					this.refresh_counters = null;
+				}
+
+				return setTimeout(() => this.getFiltersCounters(), timeout);
+			},
+			getFiltersCounters: function() {
+				return $.post('zabbix.php', {
+						action: 'host.view.refresh',
+						filter_counters: 1
+					}).done((json) => {
+						if (json.filter_counters) {
+							this.filter.updateCounters(json.filter_counters);
+						}
+					}).always(() => {
+						if (this.refresh_interval > 0) {
+							this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
+						}
+					});
+			},
 			getCurrentForm: function() {
 				return $('form[name=host_view]');
 			},
@@ -73,9 +98,9 @@
 			refresh: function() {
 				this.setLoading();
 
-				var deferred = $.getJSON(this.refresh_url);
+				this.deferred = $.getJSON(this.refresh_url);
 
-				return this.bindDataEvents(deferred);
+				return this.bindDataEvents(this.deferred);
 			},
 			setLoading: function() {
 				this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
@@ -128,34 +153,37 @@
 			},
 			onDataAlways: function() {
 				if (this.running) {
+					this.deferred = null;
 					this.scheduleRefresh();
 				}
 			},
 			scheduleRefresh: function() {
 				this.unscheduleRefresh();
-				this.timeout = setTimeout((function() {
-					this.timeout = null;
-					this.refresh();
-				}).bind(this), this.refresh_interval);
+
+				if (this.refresh_interval > 0) {
+					this.timeout = setTimeout((function() {
+						this.timeout = null;
+						this.refresh();
+					}).bind(this), this.refresh_interval);
+				}
 			},
 			unscheduleRefresh: function() {
 				if (this.timeout !== null) {
 					clearTimeout(this.timeout);
 					this.timeout = null;
 				}
-			},
-			start: function() {
-				if (this.refresh_interval != 0) {
-					this.running = true;
-					this.scheduleRefresh();
+
+				if (this.deferred) {
+					this.deferred.abort();
 				}
 			},
-			stop: function() {
-				this.running = false;
-				this.unscheduleRefresh();
+			start: function() {
+				this.running = true;
+				this.refresh();
 			}
 		};
 
 		window.host_page = new hostPage();
+		window.host_page.start();
 	});
 </script>

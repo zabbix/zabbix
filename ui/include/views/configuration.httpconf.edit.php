@@ -32,8 +32,8 @@ if (!empty($this->data['hostid'])) {
 
 // create form
 $http_form = (new CForm())
+	->setId('http-form')
 	->setName('httpForm')
-	->setId('httpForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
@@ -113,7 +113,9 @@ $http_form_list
 	->addRow(_('HTTP proxy'),
 		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'));
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete()
+	);
 
 $http_form_list->addRow(_('Variables'), (new CDiv(
 	(new CTable())
@@ -165,10 +167,14 @@ $http_authentication_form_list->addRow(_('HTTP authentication'),
 
 $http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
@@ -185,6 +191,7 @@ $http_authentication_form_list
 	->addRow(_('SSL key password'),
 		(new CTextBox('ssl_key_password', $this->data['ssl_key_password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	);
 
 /*
@@ -230,8 +237,8 @@ $http_step_form_list->addRow((new CLabel(_('Steps'), $steps_table->getId()))->se
 // append tabs to form
 $http_tab = (new CTabView())
 	->addTab('scenarioTab', _('Scenario'), $http_form_list)
-	->addTab('stepTab', _('Steps'), $http_step_form_list)
-	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list);
+	->addTab('stepTab', _('Steps'), $http_step_form_list, TAB_INDICATOR_STEPS)
+	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list, TAB_INDICATOR_HTTP_AUTH);
 if (!$this->data['form_refresh']) {
 	$http_tab->setSelected(0);
 }

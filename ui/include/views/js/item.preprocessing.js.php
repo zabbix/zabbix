@@ -182,7 +182,7 @@
 						label_after: '}',
 						grow: 'auto',
 						rows: 0,
-						maxlength: <?= (int) $data['preprocessing_script_maxlength'] ?>
+						maxlength: <?= (int) DB::getFieldLength('item_preproc', 'params') ?>
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
@@ -226,8 +226,40 @@
 			}
 		}
 
-		var $preprocessing = $('#preprocessing'),
-			step_index = $preprocessing.find('li.sortable').length;
+		/**
+		 * Allow only one option with value "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED" to be enabled.
+		 */
+		function updateTypeOptionsAvailability() {
+			const type_selects = $('[name^="preprocessing["][name$="[type]"] option[value="<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>"]');
+
+			if (type_selects.filter(':selected').length) {
+				type_selects
+					.not(':selected')
+					.prop('disabled', true);
+			}
+			else {
+				type_selects.prop('disabled', false);
+			}
+		}
+
+		var $preprocessing = $('#preprocessing');
+
+		if ($preprocessing.length === 0) {
+			const prep_elem = document.querySelector('#preprocessing_div');
+
+			if (!prep_elem) {
+				return false;
+			}
+
+			let obj = prep_elem;
+			if (prep_elem.tagName === 'SPAN') {
+				obj = prep_elem.originalObject;
+			}
+
+			$preprocessing = $(obj.querySelector('#preprocessing'));
+		}
+
+		var step_index = $preprocessing.find('li.sortable').length;
 
 		$preprocessing.sortable({
 			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
@@ -257,14 +289,17 @@
 					$('#preproc_test_all').show();
 					$preprocessing
 						.sortable('disable')
-						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
+						.addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 				else if (sortable_count > 1) {
 					$preprocessing
 						.sortable('enable')
-						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
+						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
+						.removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				updateTypeOptionsAvailability();
 				step_index++;
 			})
 			.on('click', '#preproc_test_all', function() {
@@ -297,6 +332,8 @@
 						.sortable('disable')
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
+
+				updateTypeOptionsAvailability();
 			})
 			.on('change', 'select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
@@ -318,12 +355,24 @@
 							.prop('checked', false)
 							.prop('disabled', true)
 							.trigger('change');
+						$row.find('[name*="[test]"]').prop('disabled', false);
+						break;
+
+					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
+						$on_fail
+							.prop('checked', true)
+							.prop('disabled', true)
+							.trigger('change');
+						$row.find('[name*="[test]"]').prop('disabled', true);
 						break;
 
 					default:
 						$on_fail.prop('disabled', false);
+						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
+
+				updateTypeOptionsAvailability();
 			})
 			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());

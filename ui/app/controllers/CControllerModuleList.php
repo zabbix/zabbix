@@ -49,7 +49,7 @@ class CControllerModuleList extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction() {
@@ -115,7 +115,7 @@ class CControllerModuleList extends CController {
 			'modules' => $modules,
 			'paging' => $paging,
 			'filter_profile' => 'web.modules.filter',
-			'filter_active_tab' => CProfile::get('web.modules.filter.active', 1),
+			'filter_active_tab' => CProfile::get('web.modules.filter.active', 1)
 		];
 
 		$response = new CControllerResponseData($data);

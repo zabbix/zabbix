@@ -68,7 +68,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldm
 
 foreach ($data['items'] as $item) {
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
@@ -137,7 +139,8 @@ foreach ($data['items'] as $item) {
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
-			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
+			|| $item['type'] == ITEM_TYPE_DEPENDENT
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -155,9 +158,10 @@ foreach ($data['items'] as $item) {
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('group_itemid[]', $item['itemid'])
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('visible[discover]', '1')
-				->setArgument('massupdate', 'discover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('action', $nodiscover
+					? 'itemprototype.massdiscover.enable'
+					: 'itemprototype.massdiscover.disable'
+				)
 				->setArgumentSID()
 				->getUrl()
 		))
@@ -192,7 +196,12 @@ $itemForm->addItem([
 			'itemprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create items from selected prototypes as disabled?')
 			],
-			'itemprototype.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.itemprototype' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.itemprototype');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?')
 			]

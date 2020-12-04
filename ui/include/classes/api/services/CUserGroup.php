@@ -24,6 +24,13 @@
  */
 class CUserGroup extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+	];
+
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['usrgrpid', 'name'];
@@ -653,7 +660,7 @@ class CUserGroup extends CApiService {
 				if ($db_right['permission'] != $rights[$db_right['groupid']][$db_right['id']]) {
 					$upd_rights[] = [
 						'values' => ['permission' => $rights[$db_right['groupid']][$db_right['id']]],
-						'where' => ['rightid' => $db_right['rightid']],
+						'where' => ['rightid' => $db_right['rightid']]
 					];
 				}
 				unset($rights[$db_right['groupid']][$db_right['id']]);

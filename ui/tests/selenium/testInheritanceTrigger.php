@@ -131,7 +131,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		$template_tags = [
 			['name'=>'template', 'value'=>'template'],
-			['name'=>'test', 'value'=>'inheritance'],
+			['name'=>'test', 'value'=>'inheritance']
 		];
 		$template_tags_count = count($template_tags);
 
@@ -153,7 +153,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		$templated_trigger_tags = [
 			['name'=>'tag1', 'value'=>'trigger'],
-			['name'=>'tag2', 'value'=>'templated'],
+			['name'=>'tag2', 'value'=>'templated']
 		];
 		$templated_trigger_tags_count = count($templated_trigger_tags);
 
@@ -181,7 +181,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$this->checkTags($triggers_tags_slice_1, $templated_trigger_tags);
 
 		// Click on inherited and trigger tags radio.
-		$form->getFieldById('show_inherited_tags')->fill('Inherited and trigger tags');
+		$form->getField('id:show_inherited_tags')->fill('Inherited and trigger tags');
 
 		$triggers_tags_slice_2 = $trigger_tags_table->getRows()->slice(0, -($template_tags_count+1)); // Remove templated tags and Add button from cycle.
 		$template_tags_slice = $trigger_tags_table->getRows()->slice($templated_trigger_tags_count, -1); // Remove trigger tags and Add button from cycle.

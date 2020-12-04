@@ -1,0 +1,195 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:51Z'
+  media_types:
+    -
+      name: SIGNL4
+      type: WEBHOOK
+      parameters:
+        -
+          name: Event_Ack_Status
+          value: '{EVENT.ACK.STATUS}'
+        -
+          name: Event_Date_Time
+          value: '{EVENT.DATE} {EVENT.TIME}'
+        -
+          name: Event_ID
+          value: '{EVENT.ID}'
+        -
+          name: Event_Update_Action
+          value: '{EVENT.UPDATE.ACTION}'
+        -
+          name: Event_Update_Status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: Hostname
+          value: '{HOST.NAME}'
+        -
+          name: Host_IP
+          value: '{HOST.IP}'
+        -
+          name: Message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: Severity
+          value: '{EVENT.SEVERITY}'
+        -
+          name: Subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: teamsecret
+          value: '{ALERT.SENDTO}'
+        -
+          name: Trigger_ID
+          value: '{TRIGGER.ID}'
+        -
+          name: Trigger_Status
+          value: '{TRIGGER.STATUS}'
+        -
+          name: User
+          value: '{USER.FULLNAME}'
+        -
+          name: Zabbix_URL
+          value: '{$ZABBIX.URL}'
+      script: |
+        // SIGNL4 Webhook
+        try {
+            var response,
+                payload,
+                params = JSON.parse(value),
+                endpoint = 'https://connect.signl4.com/webhook/',
+                request = new HttpRequest();
+        
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+                request.setProxy(params.HTTPProxy);
+            }
+        
+            if (typeof params.teamsecret === 'string' && params.teamsecret.trim() !== '') {
+                endpoint += params.teamsecret;
+                delete params.teamsecret;
+            }
+            else {
+                throw 'The team secret of your SIGNL4 team cannot be empty.';
+            }
+        
+            if (typeof params.Severity === 'string' && params.Severity === '{EVENT.SEVERITY}') {
+                params.Severity = 'Not classified';
+            }
+        
+        	if (typeof params.User === 'string' && params.User === '{USER.FULLNAME}') {
+                params.User = '';
+            }
+        
+        	if (typeof params.Event_Update_Action === 'string' && params.Event_Update_Action === '{EVENT.UPDATE.ACTION}') {
+                params.Event_Update_Action = '';
+            }
+        
+        	// Assemble X-S4-ExternalID for two-way integration
+        	// Format: "ZabbixEventID: 222 ZabbixURL: https://your-zabbix-server/zabbix/"
+        	params['X-S4-ExternalID'] = 'ZabbixEventID: ' + params.Event_ID;
+        	if (typeof params.Zabbix_URL === 'string' && params.Zabbix_URL.indexOf('http') == 0) {
+        		// Make sure the URL ends with '/'
+        		if (params.Zabbix_URL.charAt(params.Zabbix_URL.length - 1) != '/') {
+        			params.Zabbix_URL = params.Zabbix_URL + '/';
+        		}
+        
+        		params['X-S4-ExternalID'] = params['X-S4-ExternalID'] + ' ZabbixURL: ' +  params.Zabbix_URL;
+        
+        		// Add Link parameter
+        		params['Link'] = params.Zabbix_URL + "tr_events.php?triggerid="+params.Trigger_ID + "&eventid=" + params.Event_ID;
+        	}
+        
+        	// Check if this is a new problem or a recovery
+        	if (params.Trigger_Status == 'OK') {
+        		params['X-S4-Status'] = 'resolved';
+        	}
+        	else {
+        		params['X-S4-Status'] = 'new';
+        	}
+        
+            payload = JSON.stringify(params);
+            Zabbix.log(4, '[ SIGNL4 Webhook ] Sending request: ' + payload);
+        
+            request.addHeader('Content-Type: application/json');
+            response = request.post(endpoint, 'payload=' + payload);
+        
+            Zabbix.log(4, '[ SIGNL4 Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response
+            );
+        
+            if (request.getStatus() !== 201) {
+                throw 'Request failed with status code ' + request.getStatus() +
+                        '. Check debug log for more information.';
+            }
+        
+            return 'OK';
+        }
+        catch (error) {
+            Zabbix.log(4, '[ SIGNL4 Webhook ] ERROR: ' + error);
+        
+            throw 'Sending failed: ' + error;
+        }
+      description: |
+        SIGNL4 is a mobile alert notification app for powerful alerting, alert management and mobile assignment of work items. It offers alerting via app push, SMS and voice calls including escalations, tracking, and duty scheduling.
+        
+        Get the app at https://www.signl4.com.
+        
+        Find out more including an integration video here: https://www.signl4.com/blog/portfolio_item/zabbix-mobile-alert-notification-duty-schedule-escalation/
+        
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved: {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

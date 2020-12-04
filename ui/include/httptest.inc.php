@@ -27,7 +27,8 @@ function httptest_authentications($type = null) {
 		HTTPTEST_AUTH_NONE => _('None'),
 		HTTPTEST_AUTH_BASIC => _('Basic'),
 		HTTPTEST_AUTH_NTLM => _('NTLM'),
-		HTTPTEST_AUTH_KERBEROS => _('Kerberos')
+		HTTPTEST_AUTH_KERBEROS => _('Kerberos'),
+		HTTPTEST_AUTH_DIGEST => _('Digest')
 	];
 
 	if (is_null($type)) {
@@ -228,10 +229,11 @@ function getHttpTestParentTemplates(array $httptests) {
  *
  * @param string $httptestid
  * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeHttpTestTemplatePrefix($httptestid, array $parent_templates) {
+function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $provide_links) {
 	if (!array_key_exists($httptestid, $parent_templates['links'])) {
 		return null;
 	}
@@ -242,7 +244,7 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates) {
 
 	$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
 
-	if ($template['permission'] == PERM_READ_WRITE) {
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$name = (new CLink(CHtml::encode($template['name']),
 			(new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
@@ -261,16 +263,17 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates) {
  *
  * @param string $httptestid
  * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeHttpTestTemplatesHtml($httptestid, array $parent_templates) {
+function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($httptestid, $parent_templates['links'])) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
 
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink(CHtml::encode($template['name']),
 				(new CUrl('httpconf.php'))
 					->setArgument('form', 'update')

@@ -21,7 +21,14 @@
 
 class CApiService {
 
+	/**
+	 * Authorized user data.
+	 *
+	 * @var array
+	 */
 	public static $userData;
+
+	public const ACCESS_RULES = [];
 
 	/**
 	 * The name of the table.
@@ -417,7 +424,7 @@ class CApiService {
 	 *
 	 * @return string
 	 */
-	private static function dbDistinct(array $sql_parts) {
+	protected static function dbDistinct(array $sql_parts) {
 		$count = count($sql_parts['from']);
 
 		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
@@ -1156,5 +1163,18 @@ class CApiService {
 		CAudit::addBulk(self::$userData['userid'], self::$userData['userip'], $action, $resourcetype, $objects,
 			$objects_old
 		);
+	}
+
+	/**
+	 * Check access to specific access rule.
+	 *
+	 * @static
+	 *
+	 * @param string $rule_name  Rule name.
+	 *
+	 * @return bool  Returns true if user has access to specified rule, and false otherwise.
+	 */
+	protected static function checkAccess(string $rule_name): bool {
+		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));
 	}
 }

@@ -63,7 +63,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 				'value' => $val['name']
 			];
 
-			// Add default values to avoid check of key existance.
+			// Add default values to avoid check of key existence.
 			$val = array_merge([
 				'order' => 1,
 				'parent' => 0,

@@ -37,6 +37,11 @@ class CCheckBoxList extends CList {
 	protected $enabled = true;
 
 	/**
+	 * Checkboxes id unique suffix.
+	 */
+	protected $uniqid = '';
+
+	/**
 	 * @param string $name
 	 */
 	public function __construct($name) {
@@ -45,6 +50,17 @@ class CCheckBoxList extends CList {
 		$this->addClass(ZBX_STYLE_CHECKBOX_LIST);
 		$this->name = $name;
 		$this->values = [];
+	}
+
+	/**
+	 * Set unique ID, is used as suffix for generated check-box IDs.
+	 *
+	 * @param string $uniqid  Unique id string.
+	 */
+	public function setUniqid(string $uniqid) {
+		$this->uniqid = $uniqid;
+
+		return $this;
 	}
 
 	/**
@@ -110,13 +126,16 @@ class CCheckBoxList extends CList {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
+		$uniqid = ($this->uniqid === '') ? '' : '_'.$this->uniqid;
+
 		foreach ($this->values as $value) {
-			parent::addItem(
-				(new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
-					->setLabel($value['name'])
-					->setChecked($value['checked'])
-					->setEnabled($this->enabled)
-			);
+			$checkbox = (new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
+				->setLabel($value['name'])
+				->setChecked($value['checked'])
+				->setEnabled($this->enabled);
+			$checkbox->setId($checkbox->getId().$uniqid);
+
+			parent::addItem($checkbox);
 		}
 
 		return parent::toString($destroy);

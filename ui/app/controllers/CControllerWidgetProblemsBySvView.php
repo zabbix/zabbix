@@ -67,7 +67,8 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'allowed' => $data['allowed']
 		]));
 	}
 }

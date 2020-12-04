@@ -256,7 +256,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
 						'Default login form' => 'HTTP login form',
-						'Remove domain name' => 'local.com',
+						'Remove domain name' => 'local.com'
 					],
 					'pages' => [
 						[
@@ -418,7 +418,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					'pages' => [
 						[
 							'page' => 'index_http.php',
-							'error' => 'You are not logged in',
+							'error' => 'You are not logged in'
 						]
 					],
 					'db_check'  => [
@@ -538,7 +538,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 			// Check user data in DB after login.
 			$session_cookie = $this->webDriver->manage()->getCookieNamed(ZBX_SESSION_NAME);
-			$session_cookie = unserialize(base64_decode($session_cookie['value']));
+			$session_cookie = json_decode(base64_decode(urldecode($session_cookie['value'])), true);
 			$session = $session_cookie['sessionid'];
 
 			$user_data = CDBHelper::getRow(

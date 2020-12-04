@@ -39,13 +39,13 @@ class testTimezone extends CWebTest {
 	 * Change zabbix timezone from GUI and check that system time displayed correctly according to timezone.
 	 */
 	public function testTimezone_Gui() {
-		$this->userLogin('Admin', 'zabbix');
-		$this->setTimezone('Europe/Riga', 'gui');
+		$this->page->userLogin('Admin', 'zabbix');
+		$this->setTimezone('System: (UTC+02:00) Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$etc_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 
 		// UTC -3 hours.
-		$this->setTimezone('UTC', 'gui');
+		$this->setTimezone('(UTC+00:00) UTC', 'gui');
 		date_modify($etc_time,'-3 hours');
 
 		// Return to problem page and check time.
@@ -58,25 +58,29 @@ class testTimezone extends CWebTest {
 		return [
 			[
 				[
-					'user_timezone' => 'UTC',
+					'user_timezone' => '(UTC+00:00) UTC',
+					'timezone_db' => 'UTC',
 					'time_diff' => '-3 hours'
 				]
 			],
 			[
 				[
-					'user_timezone' => 'System default',
+					'user_timezone' => 'System default: (UTC+02:00) Europe/Riga',
+					'timezone_db' => 'default',
 					'time_diff' => '+0 hours'
 				]
 			],
 			[
 				[
-					'user_timezone' => 'America/Inuvik',
+					'user_timezone' => '(UTC-07:00) America/Inuvik',
+					'timezone_db' => 'America/Inuvik',
 					'time_diff' => '-9 hours'
 				]
 			],
 			[
 				[
-					'user_timezone' => 'Asia/Magadan',
+					'user_timezone' => '(UTC+11:00) Asia/Magadan',
+					'timezone_db' => 'Asia/Magadan',
 					'time_diff' => '+8 hours'
 				]
 			]
@@ -91,14 +95,14 @@ class testTimezone extends CWebTest {
 	 */
 	public function testTimezone_UserSettings($data) {
 		// Set system timezone.
-		$this->userLogin('Admin', 'zabbix');
-		$this->setTimezone('Europe/Riga', 'gui');
+		$this->page->userLogin('Admin', 'zabbix');
+		$this->setTimezone('System: (UTC+02:00) Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->page->logout();
 
 		// User timezone change.
-		$this->userLogin('test-timezone', 'zabbix');
+		$this->page->userLogin('test-timezone', 'zabbix');
 		$this->setTimezone($data['user_timezone'], 'userprofile');
 		date_modify($system_time, $data['time_diff']);
 
@@ -106,9 +110,8 @@ class testTimezone extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view');
 		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->assertEquals($system_time, $user_time);
-		$timezone_db = ($data['user_timezone'] == 'System default') ? 'default' : $data['user_timezone'];
-		$this->assertEquals($timezone_db, CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.zbx_dbstr('test-timezone')));
-		$this->assertEquals('Europe/Riga', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
+		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.zbx_dbstr('test-timezone')));
+		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
 		$this->page->logout();
 	}
 
@@ -123,9 +126,10 @@ class testTimezone extends CWebTest {
 						],
 						'Password' => 'test',
 						'Password (once again)' => 'test',
-						'Time zone' => 'UTC'
+						'Time zone' => '(UTC+00:00) UTC'
 					],
-					'time_diff' => '-3 hours'
+					'time_diff' => '-3 hours',
+					'timezone_db' => 'UTC'
 				]
 			],
 			[
@@ -137,9 +141,10 @@ class testTimezone extends CWebTest {
 						],
 						'Password' => 'test',
 						'Password (once again)' => 'test',
-						'Time zone' => 'System default'
+						'Time zone' => 'System default: (UTC+02:00) Europe/Riga'
 					],
-					'time_diff' => '+0 hours'
+					'time_diff' => '+0 hours',
+					'timezone_db' => 'default'
 				]
 			],
 			[
@@ -151,9 +156,10 @@ class testTimezone extends CWebTest {
 						],
 						'Password' => 'test',
 						'Password (once again)' => 'test',
-						'Time zone' => 'America/Inuvik'
+						'Time zone' => '(UTC-07:00) America/Inuvik'
 					],
-					'time_diff' => '-9 hours'
+					'time_diff' => '-9 hours',
+					'timezone_db' => 'America/Inuvik'
 				]
 			],
 			[
@@ -165,9 +171,10 @@ class testTimezone extends CWebTest {
 						],
 						'Password' => 'test',
 						'Password (once again)' => 'test',
-						'Time zone' => 'Asia/Magadan'
+						'Time zone' => '(UTC+11:00) Asia/Magadan'
 					],
-					'time_diff' => '+8 hours'
+					'time_diff' => '+8 hours',
+					'timezone_db' => 'Asia/Magadan'
 				]
 			]
 		];
@@ -180,19 +187,19 @@ class testTimezone extends CWebTest {
 	 * to choosed timezone.
 	 */
 	public function testTimezone_CreateUsers($data) {
-		$this->userLogin('Admin', 'zabbix');
-		$this->setTimezone('Europe/Riga', 'gui');
+		$this->page->userLogin('Admin', 'zabbix');
+		$this->setTimezone('System: (UTC+02:00) Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Permissions');
-		$form->fill(['User type' => 'Zabbix Super Admin']);
+		$form->fill(['Role' => 'Super admin role']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
-		$this->userLogin($data['fields']['Alias'], $data['fields']['Password']);
+		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
 		$this->page->open('zabbix.php?action=problem.view');
 
 		// Expected time after timezone change.
@@ -202,10 +209,9 @@ class testTimezone extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view');
 		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->assertEquals($system_time, $user_time);
-		$timezone_db = ($data['fields']['Time zone'] == 'System default') ? 'default' : $data['fields']['Time zone'];
-		$this->assertEquals($timezone_db, CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.
+		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.
 				zbx_dbstr($data['fields']['Alias'])));
-		$this->assertEquals('Europe/Riga', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
+		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
 		$this->page->logout();
 	}
 
@@ -242,19 +248,5 @@ class testTimezone extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $message);
-	}
-
-	/**
-	 * Allows to login with user credentials.
-	 *
-	 * @param string $alias     Username on login screen
-	 * @param string $password  Password on login screen
-	 */
-	private function userLogin($alias, $password) {
-		$this->page->open('index.php');
-		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
-		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
-		$this->page->waitUntilReady();
 	}
 }

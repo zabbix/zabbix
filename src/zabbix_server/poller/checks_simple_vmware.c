@@ -742,6 +742,11 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 		service->eventlog.last_key = request->lastlogsize;
 		service->eventlog.skip_old = skip_old;
 	}
+	else if (0 != service->eventlog.oom)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Not enough shared memory to store VMware events."));
+		goto unlock;
+	}
 	else if (request->lastlogsize < service->eventlog.last_key)
 	{
 		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
@@ -946,6 +951,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#HV.UUID}", hv->uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NAME}", name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#HV.IP}", NULL != hv->ip ? hv->ip : "", ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 				NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
@@ -2442,6 +2448,18 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 					NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.IP}", NULL != vm->props[ZBX_VMWARE_VMPROP_IPADDRESS] ?
+					vm->props[ZBX_VMWARE_VMPROP_IPADDRESS] : "", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.DNS}",
+					NULL != vm->props[ZBX_VMWARE_VMPROP_GUESTHOSTNAME] ?
+					vm->props[ZBX_VMWARE_VMPROP_GUESTHOSTNAME] : "", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.GUESTFAMILY}",
+					NULL != vm->props[ZBX_VMWARE_VMPROP_GUESTFAMILY] ?
+					vm->props[ZBX_VMWARE_VMPROP_GUESTFAMILY] : "", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.GUESTFULLNAME}",
+					NULL != vm->props[ZBX_VMWARE_VMPROP_GUESTFULLNAME] ?
+					vm->props[ZBX_VMWARE_VMPROP_GUESTFULLNAME] : "", ZBX_JSON_TYPE_STRING);
+
 			zbx_json_close(&json_data);
 		}
 	}

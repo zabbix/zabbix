@@ -103,6 +103,12 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
 
+
+char	*CONFIG_SOURCE_IP 		= NULL;
+char	*CONFIG_SSL_CA_LOCATION		= NULL;
+char	*CONFIG_SSL_CERT_LOCATION	= NULL;
+char	*CONFIG_SSL_KEY_LOCATION	= NULL;
+
 static char	*read_file(const char *filename, char **error)
 {
 	char	buffer[4096];

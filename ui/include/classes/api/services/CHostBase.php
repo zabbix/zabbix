@@ -21,6 +21,13 @@
 
 abstract class CHostBase extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
@@ -214,14 +221,14 @@ abstract class CHostBase extends CApiService {
 			$hosts = API::Host()->get([
 				'hostids' => $targetids,
 				'output' => ['hostid', 'host'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 		}
 		else{
 			$hosts = API::Host()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 		}
 
@@ -229,7 +236,7 @@ abstract class CHostBase extends CApiService {
 			$templates = API::Template()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 
 			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));

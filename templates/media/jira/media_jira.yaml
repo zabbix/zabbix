@@ -1,0 +1,454 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:48Z'
+  media_types:
+    -
+      name: Jira
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_recovery_value
+          value: '{EVENT.RECOVERY.VALUE}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags_json
+          value: '{EVENT.TAGSJSON}'
+        -
+          name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
+        -
+          name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_update_user
+          value: '{USER.FULLNAME}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: jira_issue_key
+          value: '{EVENT.TAGS.__zbx_jira_issuekey}'
+        -
+          name: jira_issue_type
+          value: '<PLACE ISSUETYPE NAME>'
+        -
+          name: jira_password
+          value: '<PLACE PASSWORD OR TOKEN>'
+        -
+          name: jira_project_key
+          value: '<PLACE PROJECT KEY>'
+        -
+          name: jira_url
+          value: '<PLACE YOUR JIRA URL>'
+        -
+          name: jira_user
+          value: '<PLACE LOGIN>'
+        -
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+      script: |
+        var Jira = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                Jira.params = params;
+                if (typeof Jira.params.url === 'string') {
+                    if (!Jira.params.url.endsWith('/')) {
+                        Jira.params.url += '/';
+                    }
+        
+                    Jira.params.url += 'rest/api/latest/';
+                }
+            },
+        
+            setProxy: function (HTTPProxy) {
+                Jira.HTTPProxy = HTTPProxy;
+            },
+        
+            setTags: function(event_tags_json) {
+                if (typeof event_tags_json !== 'undefined' && event_tags_json !== ''
+                    && event_tags_json !== '{EVENT.TAGSJSON}') {
+                    try {
+                        var tags = JSON.parse(event_tags_json),
+                            label;
+        
+                        Jira.labels = [];
+        
+                        tags.forEach(function (tag) {
+                            if (typeof tag.tag !== 'undefined' && typeof tag.value !== 'undefined'
+                                && !tag.tag.startsWith('__zbx')) {
+                                label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');
+                                if (label.length < 256) {
+                                    Jira.labels.push(label);
+                                }
+                            }
+                        });
+                    }
+                    catch (error) {
+                        // Code is not missing here.
+                    }
+                }
+            },
+        
+            escapeMarkup: function (str) {
+                var length = str.length,
+                    result = '',
+                    markup = ['{', '|', '}', '~', '_', '\\', '[', ']', '^', '<', '>', '?', '!', '#', '+', '*', '&'];
+        
+                for (var i = 0; i < length; i++) {
+                    var char = str[i];
+        
+                    result += (markup.indexOf(char) !== -1) ? ('&#' + str[i].charCodeAt() + ';') : char;
+                }
+        
+                return result;
+            },
+        
+            addCustomFields: function (data, fields) {
+                if (typeof fields === 'object' && Object.keys(fields).length) {
+                    var schema = Jira.getSchema(),
+                        path = ['projects', 0, 'issuetypes', 0, 'fields'],
+                        field;
+        
+                    while ((field = path.shift()) !== undefined) {
+                        schema = schema[field];
+                        if (typeof schema === 'undefined') {
+                            schema = null;
+                            break;
+                        }
+                    }
+        
+                    if (schema) {
+                        Object.keys(fields)
+                            .forEach(function(field) {
+                                if (typeof schema[field] === 'object' && typeof schema[field].schema === 'object') {
+                                    switch (schema[field].schema.type) {
+                                        case 'number':
+                                            data.fields[field] = parseInt(fields[field]);
+                                            break;
+        
+                                        case 'datetime':
+                                            if (fields[field].match(/\d+[.-]\d+[.-]\d+T\d+:\d+:\d+/) !== null) {
+                                                data.fields[field] = fields[field].replace(/\./g, '-');
+                                            }
+                                            break;
+        
+                                        case 'option':
+                                            data.fields[field] = {value: fields[field]};
+                                            break;
+        
+                                        case 'array':
+                                            if (schema[field].schema.items === 'option') {
+                                                data.fields[field] = [{value: fields[field]}];
+                                            }
+                                            else {
+                                                data.fields[field] = [fields[field]];
+                                            }
+                                            break;
+        
+                                        default:
+                                            data.fields[field] = fields[field];
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        Zabbix.log(4, '[ Jira Webhook ] Failed to retrieve field schema.');
+                    }
+                }
+        
+                return data;
+            },
+        
+            request: function (method, query, data) {
+                ['url', 'user', 'password', 'project_key', 'issue_type'].forEach(function (field) {
+                    if (typeof Jira.params !== 'object' || typeof Jira.params[field] === 'undefined'
+                        || Jira.params[field] === '' ) {
+                        throw 'Required Jira param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    url = Jira.params.url + query,
+                    request = new HttpRequest();
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Basic ' + btoa(Jira.params.user + ':' + Jira.params.password));
+        
+                if (typeof Jira.HTTPProxy !== 'undefined' && Jira.HTTPProxy !== '') {
+                    request.setProxy(Jira.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ Jira Webhook ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
+        
+                switch (method) {
+                    case 'get':
+                        response = request.get(url, data);
+                        break;
+        
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ Jira Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ Jira Webhook ] Failed to parse response received from Jira');
+                        response = null;
+                    }
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response !== null && typeof response.errors !== 'undefined'
+                        && Object.keys(response.errors).length > 0) {
+                        message += ': ' + JSON.stringify(response.errors);
+                    }
+                    else if (response !== null && typeof response.errorMessages !== 'undefined'
+                        && Object.keys(response.errorMessages).length > 0) {
+                        message += ': ' + JSON.stringify(response.errorMessages);
+                    }
+        
+                    throw message + ' Check debug log for more information.';
+                }
+        
+                return {
+                    status: request.getStatus(),
+                    response: response
+                };
+            },
+        
+            getSchema: function() {
+                var result = Jira.request('get', 'issue/createmeta?expand=projects.issuetypes.fields&projectKeys=' +
+                    encodeURIComponent(Jira.params.project_key) + '&issuetypeNames=' +
+                    encodeURIComponent(Jira.params.issue_type));
+        
+                return result.response;
+            },
+        
+            createIssue: function(summary, description, fields) {
+                var data = {
+                    fields: {
+                        project: {
+                            key: Jira.params.project_key
+                        },
+                        issuetype: {
+                            name: Jira.params.issue_type
+                        },
+                        summary: summary,
+                        description: description
+                    }
+                };
+        
+                if (Jira.labels && Jira.labels.length > 0) {
+                    data.fields.labels = Jira.labels;
+                }
+                var result = Jira.request('post', 'issue', Jira.addCustomFields(data, fields));
+        
+                if (typeof result.response !== 'object' || typeof result.response.key === 'undefined') {
+                    throw 'Cannot create Jira issue. Check debug log for more information.';
+                }
+        
+                return result.response.key;
+            },
+        
+            updateIssue: function(summary, fields, update) {
+                var data = {fields: {}};
+        
+                if (summary) {
+                    data.fields.summary = summary;
+                }
+        
+                Jira.request('put', 'issue/' + encodeURIComponent(Jira.params.issue_key), Jira.addCustomFields(data, fields));
+                Jira.commentIssue(update);
+            },
+        
+            commentIssue: function(update) {
+                var data = {};
+        
+                if (typeof update === 'string') {
+                    data.body = update;
+                    Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);
+                }
+                else if (update.status === '1') {
+                    data.body = update.user + ' ' + update.action + '.';
+        
+                    if (update.message) {
+                        data.body += '\nMessage: {quote}' + Jira.escapeMarkup(update.message) + '{quote}';
+                    }
+        
+                    Jira.request('post', 'issue/' + encodeURIComponent(Jira.params.issue_key) + '/comment', data);
+                }
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                fields = {},
+                jira = {},
+                update = {},
+                result = {tags: {}},
+                required_params = ['alert_subject', 'summary', 'event_recovery_value', 'event_source', 'event_value'];
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('jira_')) {
+                        jira[key.substring(5)] = params[key];
+                    }
+                    else if (key.startsWith('customfield_')) {
+                        fields[key] = params[key];
+                    }
+                    else if (key.startsWith('event_update_')) {
+                        update[key.substring(13)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
+                        throw 'Parameter "' + key + '" can\'t be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_recovery_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            Jira.setParams(jira);
+            Jira.setProxy(params.HTTPProxy);
+            Jira.setTags(params.event_tags_json);
+        
+            // Create issue for non trigger-based events.
+            if (params.event_source !== '0' && params.event_recovery_value !== '0') {
+                Jira.createIssue(params.alert_subject, params.alert_message);
+            }
+            // Create issue for trigger-based events.
+            else if (params.event_value === '1' && update.status === '0' && !jira.issue_key.startsWith(jira.project_key)) {
+                var key = Jira.createIssue(params.alert_subject,
+                    (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);
+        
+        
+                result.tags.__zbx_jira_issuekey = key;
+                result.tags.__zbx_jira_issuelink = params.jira_url +
+                    (params.jira_url.endsWith('/') ? '' : '/') + 'browse/' + key;
+            }
+            // Update created issue for trigger-based event.
+            else {
+                if (!jira.issue_key.startsWith(jira.project_key)) {
+                    throw 'Incorrect Issue key given: ' + jira.issue_key;
+                }
+                Jira.updateIssue(params.alert_subject, fields,
+                    ((params.event_value === '0' && !Object.keys(fields).length)
+                        ? params.alert_message : update));
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[ Jira Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_jira_issuelink}'
+      event_menu_name: 'Jira: {EVENT.TAGS.__zbx_jira_issuekey}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

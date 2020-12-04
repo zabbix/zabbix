@@ -31,6 +31,7 @@ $triggersWidget = (new CWidget())
 
 // create form
 $triggersForm = (new CForm())
+	->setId('triggers-prototype-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -67,6 +68,13 @@ $triggersFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(
+		(new CLabel(_('Event name'), 'event_name')),
+		(new CTextAreaFlexible('event_name', $data['event_name']))
+			->setReadonly($data['limited'])
+			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),
@@ -537,17 +545,19 @@ $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
 
 // tags
 $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-	'source' => 'trigger_prototype',
-	'tags' => $data['tags'],
-	'show_inherited_tags' => $data['show_inherited_tags'],
-	'readonly' => false
-]));
+		'source' => 'trigger_prototype',
+		'tags' => $data['tags'],
+		'show_inherited_tags' => $data['show_inherited_tags'],
+		'readonly' => false
+	]), TAB_INDICATOR_TAGS
+);
 
 /*
  * Dependencies tab
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
+	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
@@ -616,7 +626,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
-$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
+$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
 // append buttons to form
 if (!empty($data['triggerid'])) {

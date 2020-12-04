@@ -169,4 +169,13 @@ class CPartial {
 			array_unshift(self::$directories, $directory);
 		}
 	}
+
+	/**
+	 * Get partial file name.
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return $this->name;
+	}
 }

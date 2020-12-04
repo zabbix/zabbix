@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Configuration of services');
 $page['file'] = 'services.php';
-$page['scripts'] = ['class.calendar.js', 'multiselect.js'];
+$page['scripts'] = ['class.calendar.js', 'multiselect.js', 'class.tab-indicators.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -273,7 +273,7 @@ if (hasRequest('form')) {
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
 				'selectTrigger' => ['description'],
 				'output' => ['name', 'triggerid'],
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 
 			foreach ($service['dependencies'] as $dependency) {
@@ -283,7 +283,7 @@ if (hasRequest('form')) {
 					'triggerid' => $child_service['triggerid'],
 					'trigger' => ($child_service['triggerid'] == 0) ? '' : $child_service['trigger']['description'],
 					'serviceid' => $dependency['servicedownid'],
-					'soft' => $dependency['soft'],
+					'soft' => $dependency['soft']
 				];
 			}
 

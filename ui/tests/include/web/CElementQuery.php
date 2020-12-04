@@ -22,13 +22,16 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CElement.php';
 require_once dirname(__FILE__).'/CElementCollection.php';
+require_once dirname(__FILE__).'/CElementFilter.php';
 require_once dirname(__FILE__).'/elements/CNullElement.php';
 require_once dirname(__FILE__).'/elements/CFormElement.php';
+require_once dirname(__FILE__).'/elements/CCheckboxFormElement.php';
 require_once dirname(__FILE__).'/elements/CTableElement.php';
 require_once dirname(__FILE__).'/elements/CTableRowElement.php';
 require_once dirname(__FILE__).'/elements/CWidgetElement.php';
 require_once dirname(__FILE__).'/elements/CDashboardElement.php';
 require_once dirname(__FILE__).'/elements/CDropdownElement.php';
+require_once dirname(__FILE__).'/elements/CZDropdownElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxElement.php';
 require_once dirname(__FILE__).'/elements/COverlayDialogElement.php';
 require_once dirname(__FILE__).'/elements/CMessageElement.php';
@@ -42,6 +45,7 @@ require_once dirname(__FILE__).'/elements/CCompositeInputElement.php';
 require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
 require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 require_once dirname(__FILE__).'/elements/CInputGroupElement.php';
+require_once dirname(__FILE__).'/elements/CHostInterfaceElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -69,21 +73,6 @@ class CElementQuery implements IWaitable {
 	 * Wait iteration step duration.
 	 */
 	const WAIT_ITERATION = 50;
-
-	/**
-	 * Possible wait conditions.
-	 */
-	const PRESENT = 'present';
-	const TEXT_PRESENT = 'text_present';
-	const ATTRIBUTES_PRESENT = 'attributes_present';
-	const VISIBLE = 'visible';
-	const CLICKABLE = 'clickable';
-	const READY = 'ready';
-	const NOT_PRESENT = 'not present';
-	const TEXT_NOT_PRESENT = 'text not present';
-	const ATTRIBUTES_NOT_PRESENT = 'attributes_not_present';
-	const NOT_VISIBLE = 'not visible';
-	const NOT_CLICKABLE = 'not clickable';
 
 	/**
 	 * Element selector.
@@ -159,7 +148,7 @@ class CElementQuery implements IWaitable {
 			if (!is_array($type)) {
 				$parts = explode(':', $type, 2);
 				if (count($parts) !== 2) {
-					throw new Exception('Element selector "'.$selector.'" is not well formatted.');
+					throw new Exception('Element selector "'.$type.'" is not well formatted.');
 				}
 
 				list($type, $locator) = $parts;
@@ -274,7 +263,7 @@ class CElementQuery implements IWaitable {
 	public function query($type, $locator = null) {
 		$prefix = CXPathHelper::fromWebDriverBy($this->by);
 		$suffix = CXPathHelper::fromSelector($type, $locator);
-		$this->by = static::getSelector('xpath', './'.$prefix.'/'.$suffix);
+		$this->by = static::getSelector('xpath', './/'.$prefix.'//'.$suffix);
 
 		return $this;
 	}
@@ -286,35 +275,6 @@ class CElementQuery implements IWaitable {
 	 */
 	public static function wait() {
 		return static::getDriver()->wait(20, self::WAIT_ITERATION);
-	}
-
-	/**
-	 * Get element condition callable name.
-	 *
-	 * @param string $condition    condition name
-	 *
-	 * @return array
-	 */
-	public static function getConditionCallable($condition) {
-		$conditions = [
-			static::READY => 'getReadyCondition',
-			static::PRESENT => 'getPresentCondition',
-			static::NOT_PRESENT => 'getNotPresentCondition',
-			static::TEXT_PRESENT => 'getTextPresentCondition',
-			static::TEXT_NOT_PRESENT => 'getTextNotPresentCondition',
-			static::ATTRIBUTES_PRESENT => 'getAttributesPresentCondition',
-			static::ATTRIBUTES_NOT_PRESENT => 'getAttributesNotPresentCondition',
-			static::VISIBLE => 'getVisibleCondition',
-			static::NOT_VISIBLE => 'getNotVisibleCondition',
-			static::CLICKABLE => 'getClickableCondition',
-			static::NOT_CLICKABLE => 'getNotClickableCondition'
-		];
-
-		if (!array_key_exists($condition, $conditions)) {
-			throw new Exception('Cannot get element condition callable by name "'.$condition.'"!');
-		}
-
-		return $conditions[$condition];
 	}
 
 	/**
@@ -330,7 +290,7 @@ class CElementQuery implements IWaitable {
 			$selector = ' located by '.$selector;
 		}
 
-		$callable = call_user_func_array([$target, self::getConditionCallable($condition)], $params);
+		$callable = call_user_func_array([$target, CElementFilter::getConditionCallable($condition)], $params);
 		self::wait()->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 
@@ -492,6 +452,17 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getSelectedCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->one(false)->isSelected();
+		};
+	}
+
+	/**
 	 * Check that the corresponding element exists.
 	 *
 	 * @return boolean
@@ -517,6 +488,7 @@ class CElementQuery implements IWaitable {
 				'/textarea[@name]'
 			],
 			'CDropdownElement'			=> '/select[@name]',
+			'CZDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
 				'/div[contains(@class, "multiselect-control")]',
@@ -524,6 +496,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
+				'/ul/li/ul[contains(@class, "radio-list-control")]',
 				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
 			],
 			'CCheckboxListElement'		=> [

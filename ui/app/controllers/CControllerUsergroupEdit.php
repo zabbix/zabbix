@@ -58,7 +58,7 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)) {
 			return false;
 		}
 
@@ -156,7 +156,7 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
-	 * Returs all needed host groups formatted for multiselector.
+	 * Returns all needed host groups formatted for multiselector.
 	 *
 	 * @param array $groupids
 	 *
@@ -178,7 +178,7 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
-	 * Returs all needed user formatted for multiselector.
+	 * Returns all needed user formatted for multiselector.
 	 *
 	 * @return array
 	 */

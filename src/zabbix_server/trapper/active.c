@@ -142,7 +142,15 @@ out:
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
+ * Parameters: sock          - [IN] open socket of server-agent connection    *
+ *             host          - [IN] host name                                 *
+ *             ip            - [IN] IP address of the host                    *
+ *             port          - [IN] port of the host                          *
+ *             host_metadata - [IN] host metadata                             *
+ *             flag          - [IN] flag describing interface type            *
+ *             interface     - [IN] interface value if flag is not default    *
+ *             hostid        - [OUT] host ID                                  *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -150,19 +158,19 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: NB! adds host to the database if it does not exist or if it      *
- *           exists but metadata has changed                                  *
+ *           exists but metadata, interface, interface type or port has       *
+ *           changed                                                          *
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
 		char *error)
 {
-	char		*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-	unsigned short	old_port_v;
-	int		tls_offset = 0;
+	char			*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
+	DB_RESULT		result;
+	DB_ROW			row;
+	unsigned short		old_port_v;
+	int			tls_offset = 0, ret = FAIL;
 	zbx_conn_flags_t	old_flag_v;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
@@ -273,7 +281,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
 		old_flag_v = (zbx_conn_flags_t)(SUCCEED == DBis_null(old_flag)) ? ZBX_CONN_DEFAULT : atoi(old_flag);
 		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata) ||
+		if (SUCCEED == DBis_null(old_flag) || 0 != strcmp(old_metadata, host_metadata) ||
 				(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
 				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
 				(old_flag_v != flag))
@@ -380,16 +388,12 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM		*dc_items;
-		int		*errcodes, now;
-		zbx_config_t	cfg;
+		int		*errcodes;
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
-
-		now = time(NULL);
 
 		for (i = 0; i < itemids.values_num; i++)
 		{
@@ -408,23 +412,12 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
-			{
-				if (0 == cfg.refresh_unsupported)
-					continue;
-
-				if (dc_items[i].lastclock + cfg.refresh_unsupported > now)
-					continue;
-			}
-
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%d:" ZBX_FS_UI64 "\n",
 					dc_items[i].key_orig, delay, dc_items[i].lastlogsize);
 		}
-
-		zbx_config_clean(&cfg);
 
 		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 
@@ -552,7 +545,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
-	zbx_config_t		cfg;
 
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
@@ -625,7 +617,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 	get_list_of_active_checks(hostid, &itemids);
 
@@ -636,14 +627,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM		*dc_items;
-		int		*errcodes, now, delay;
+		int		*errcodes, delay;
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-
-		now = time(NULL);
 
 		for (i = 0; i < itemids.values_num; i++)
 		{
@@ -659,15 +648,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
-
-			if (ZBX_COMPONENT_VERSION(4,4) > version && ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
-			{
-				if (0 == cfg.refresh_unsupported)
-					continue;
-
-				if (dc_items[i].lastclock + cfg.refresh_unsupported > now)
-					continue;
-			}
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
@@ -715,10 +695,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zbx_json_close(&json);
 
-	if (ZBX_COMPONENT_VERSION(4,4) <= version)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, cfg.refresh_unsupported);
+	if (ZBX_COMPONENT_VERSION(4,4) == version || ZBX_COMPONENT_VERSION(5,0) == version)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
 
-	zbx_config_clean(&cfg);
 	zbx_vector_uint64_destroy(&itemids);
 
 	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);

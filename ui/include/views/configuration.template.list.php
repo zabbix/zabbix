@@ -130,7 +130,10 @@ $widget = (new CWidget())
 				)
 			)
 			->addItem(
-				(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
+				(new CButton('form', _('Import')))
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'template']).', null), null, this);'
+					)
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -152,7 +155,7 @@ $table = (new CTableInfo())
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
-		_('Screens'),
+		_('Dashboards'),
 		_('Discovery'),
 		_('Web'),
 		_('Linked templates'),
@@ -227,11 +230,13 @@ foreach ($data['templates'] as $template) {
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Hosts'),
-				(new CUrl('hosts.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_templates', [$template['templateid']])
-			),
+			$data['allowed_ui_conf_hosts']
+				? new CLink(_('Hosts'),
+					(new CUrl('hosts.php'))
+						->setArgument('filter_set', '1')
+						->setArgument('filter_templates', [$template['templateid']])
+				)
+				: _('Hosts'),
 			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
 		],
 		[
@@ -268,8 +273,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['graphs'])
 		],
 		[
-			new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
-			CViewHelper::showNum($template['screens'])
+			new CLink(_('Dashboards'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'template.dashboard.list')
+					->setArgument('templateid', $template['templateid'])),
+			CViewHelper::showNum($template['dashboards'])
 		],
 		[
 			new CLink(_('Discovery'),
@@ -305,7 +313,12 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			'template.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.template' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.template');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],
 			'template.massdeleteclear' => ['name' => _('Delete and clear'),
 				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')

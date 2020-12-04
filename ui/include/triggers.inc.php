@@ -348,7 +348,8 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+			'event_name'
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => ['tag', 'value'],
@@ -424,6 +425,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 			// The dependencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
+				'event_name' => $srcTrigger['event_name'],
 				'opdata' => $srcTrigger['opdata'],
 				'expression' => $srcTrigger['expression'],
 				'url' => $srcTrigger['url'],
@@ -591,7 +593,7 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 
 	$function_macro_parser = new CFunctionMacroParser();
 	$user_macro_parser = new CUserMacroParser();
-	$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+	$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
 	$lld_macro_parser = new CLLDMacroParser();
 	$lld_macro_function_parser = new CLLDMacroFunctionParser();
 
@@ -754,7 +756,9 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	] + $host_options;
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments',
+			'manual_close'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectDependencies' => ['triggerid'],
 		'monitored' => true,
@@ -959,8 +963,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 /**
  * Creates and returns a trigger status cell for the trigger overview table.
  *
- * @param array  $trigger
- * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
+ * @param array $trigger
+ * @param array $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  *
  * @return CCol
  */
@@ -1928,7 +1932,13 @@ function get_item_function_info($expr) {
 		'strlen' => $rules['string_as_uint'],
 		'sum' => $rules['numeric'],
 		'time' => $rules['time'],
-		'timeleft' => $rules['numeric_as_float']
+		'timeleft' => $rules['numeric_as_float'],
+		'trendavg' => $rules['numeric'],
+		'trendcount' => $rules['numeric'],
+		'trenddelta' => $rules['numeric'],
+		'trendmax' => $rules['numeric'],
+		'trendmin' => $rules['numeric'],
+		'trendsum' => $rules['numeric']
 	];
 
 	$expr_data = new CTriggerExpression();
@@ -2351,10 +2361,11 @@ function getTriggerParentTemplates(array $triggers, $flag) {
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array|null
  */
-function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	if (!array_key_exists($triggerid, $parent_templates['links'])) {
 		return null;
 	}
@@ -2373,7 +2384,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 	$list = [];
 
 	foreach ($templates as $template) {
-		if ($template['permission'] == PERM_READ_WRITE) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
@@ -2407,10 +2418,11 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
  * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
+function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bool $provide_links) {
 	$list = [];
 
 	while (array_key_exists($triggerid, $parent_templates['links'])) {
@@ -2429,7 +2441,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
 		}
 
 		foreach ($templates as $template) {
-			if ($template['permission'] == PERM_READ_WRITE) {
+			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$url = (new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')

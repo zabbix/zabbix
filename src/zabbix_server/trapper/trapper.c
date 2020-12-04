@@ -1350,7 +1350,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	if (1 == process_num && 0 == CONFIG_CONFSYNCER_FORKS)
 	{
 		zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-		DCsync_configuration(ZBX_DBSYNC_INIT);
+		DCsync_configuration(ZBX_DBSYNC_INIT, NULL);
 	}
 
 	zbx_set_sigusr_handler(zbx_trapper_sigusr_handler);
@@ -1360,7 +1360,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 #ifdef HAVE_NETSNMP
 		if (1 == snmp_cache_reload_requested)
 		{
-			zbx_clear_cache_snmp();
+			zbx_clear_cache_snmp(process_type, process_num);
 			snmp_cache_reload_requested = 0;
 		}
 #endif

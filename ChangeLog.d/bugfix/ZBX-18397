@@ -1,0 +1,1 @@
+A.F....... [ZBX-18397] fixed global macros clearing value on type change from secret to text when value is set and is the same as before (Ivo)

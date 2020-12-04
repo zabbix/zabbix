@@ -25,6 +25,7 @@
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"
+#include "console.h"
 
 #include "duktape.h"
 
@@ -205,6 +206,9 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 	/* initialize Zabbix object */
 	zbx_es_init_zabbix(es, error);
 
+	/* initialize console object */
+	zbx_es_init_console(es, error);
+
 	/* remove Duktape object */
 	duk_push_global_object(es->env->ctx);
 	duk_del_prop_string(es->env->ctx, -1, "Duktape");
@@ -222,7 +226,7 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		return FAIL;
 	}
 
-	/* initialize CurlHttpRequest prototype */
+	/* initialize HttpRequest and CurlHttpRequest prototypes */
 	if (FAIL == zbx_es_init_httprequest(es, error))
 		goto out;
 

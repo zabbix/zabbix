@@ -1,0 +1,452 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-10-23T09:10:45Z'
+  groups:
+    -
+      name: 'Templates/Network devices'
+  templates:
+    -
+      template: 'Netgear Fastpath SNMP'
+      name: 'Netgear Fastpath SNMP'
+      description: |
+        Template Net Netgear Fastpath
+        
+        MIBs used:
+        FASTPATH-SWITCHING-MIB
+        FASTPATH-BOXSERVICES-PRIVATE-MIB
+        
+        Template tooling version used: 0.38
+      templates:
+        -
+          name: 'Generic SNMP'
+        -
+          name: 'Interfaces SNMP'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      applications:
+        -
+          name: CPU
+        -
+          name: Fans
+        -
+          name: Inventory
+        -
+          name: Memory
+        -
+          name: 'Power supply'
+        -
+          name: Temperature
+      items:
+        -
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.10.1.1.4.9.0
+          key: 'system.cpu.util[agentSwitchCpuProcessTotalUtilization.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FASTPATH-SWITCHING-MIB
+            CPU utilization in %
+          applications:
+            -
+              name: CPU
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - '60 Secs \( ([0-9\.]+)%\).+300 Secs'
+                - \1
+          triggers:
+            -
+              expression: '{min(5m)}>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+        -
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.3.0
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: FASTPATH-SWITCHING-MIB'
+          inventory_link: MODEL
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+        -
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.4.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: FASTPATH-SWITCHING-MIB
+            Serial number of the switch
+          inventory_link: SERIALNO_A
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+        -
+          name: 'Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.10.0
+          key: 'system.sw.os[agentInventoryOperatingSystem.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: FASTPATH-SWITCHING-MIB
+            Operating System running on this unit
+          inventory_link: OS
+          applications:
+            -
+              name: Inventory
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+        -
+          name: 'Available memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.10.1.1.5.1.0
+          key: 'vm.memory.available[agentSwitchCpuProcessMemFree.0]'
+          history: 7d
+          units: B
+          description: |
+            MIB: FASTPATH-SWITCHING-MIB
+            The total memory freed for utilization.
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.4526.10.1.1.5.2.0
+          key: 'vm.memory.total[agentSwitchCpuProcessMemAvailable.0]'
+          history: 7d
+          units: B
+          description: |
+            MIB: FASTPATH-SWITCHING-MIB
+            The total Memory allocated for the tasks
+          applications:
+            -
+              name: Memory
+        -
+          name: 'Memory utilization'
+          type: CALCULATED
+          key: 'vm.memory.util[memoryUsedPercentage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: '(last("vm.memory.total[agentSwitchCpuProcessMemAvailable.0]")-last("vm.memory.available[agentSwitchCpuProcessMemFree.0]"))/last("vm.memory.total[agentSwitchCpuProcessMemAvailable.0]")*100'
+          description: 'Memory utilization in %'
+          applications:
+            -
+              name: Memory
+          triggers:
+            -
+              expression: '{min(5m)}>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+      discovery_rules:
+        -
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.4526.10.43.1.6.1.1]'
+          key: fan.discovery
+          delay: 1h
+          description: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::1.3.6.1.4.1.4526.10.43.1.6.1.1'
+          item_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.4526.10.43.1.6.1.3.{#SNMPINDEX}'
+              key: 'sensor.fan.status[boxServicesFanItemState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: FASTPATH-BOXSERVICES-PRIVATE-MIB
+                The status of fan
+              applications:
+                -
+                  name: Fans
+              valuemap:
+                name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1'
+                  name: '#{#SNMPVALUE}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+        -
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.4526.10.43.1.7.1.1]'
+          key: psu.discovery
+          delay: 1h
+          description: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyIndex'
+          item_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.4526.10.43.1.7.1.3.{#SNMPINDEX}'
+              key: 'sensor.psu.status[boxServicesPowSupplyItemState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: FASTPATH-BOXSERVICES-PRIVATE-MIB
+                The status of power supply
+              applications:
+                -
+                  name: 'Power supply'
+              valuemap:
+                name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState'
+              trigger_prototypes:
+                -
+                  expression: '{count(#1,{$PSU_CRIT_STATUS:"failed"},eq)}=1'
+                  name: '#{#SNMPVALUE}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+        -
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.4526.10.43.1.8.1.1]'
+          key: temp.discovery
+          delay: 1h
+          description: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsTable'
+          item_prototypes:
+            -
+              name: '#{#SNMPVALUE}: Temperature status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.4526.10.43.1.8.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: FASTPATH-BOXSERVICES-PRIVATE-MIB
+                The state of temperature sensor
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState'
+            -
+              name: '#{#SNMPVALUE}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.4526.10.43.1.8.1.5.{#SNMPINDEX}'
+              key: 'sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: FASTPATH-BOXSERVICES-PRIVATE-MIB
+                The temperature value reported by sensor
+              applications:
+                -
+                  name: Temperature
+              trigger_prototypes:
+                -
+                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:""}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:""}+3'
+                  name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:""}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+          trigger_prototypes:
+            -
+              expression: |
+                {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                or
+                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+              name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+            -
+              expression: |
+                {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_WARN:""}
+                or
+                {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_WARN_STATUS}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_WARN:""}-3'
+              name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:""}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              dependencies:
+                -
+                  name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:""}'
+                  expression: |
+                    {Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:""}
+                    or
+                    {Netgear Fastpath SNMP:sensor.temp.status[boxServicesTempSensorState.{#SNMPINDEX}].last()}={$TEMP_CRIT_STATUS}
+                  recovery_expression: '{Netgear Fastpath SNMP:sensor.temp.value[boxServicesTempSensorTemperature.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:""}-3'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$FAN_CRIT_STATUS:"failed"}'
+          value: '2'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$PSU_CRIT_STATUS:"failed"}'
+          value: '2'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN_STATUS}'
+          value: '2'
+  graphs:
+    -
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Netgear Fastpath SNMP'
+            key: 'system.cpu.util[agentSwitchCpuProcessTotalUtilization.0]'
+    -
+      name: 'Memory usage'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'Netgear Fastpath SNMP'
+            key: 'vm.memory.total[agentSwitchCpuProcessMemAvailable.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Netgear Fastpath SNMP'
+            key: 'vm.memory.available[agentSwitchCpuProcessMemFree.0]'
+    -
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Netgear Fastpath SNMP'
+            key: 'vm.memory.util[memoryUsedPercentage.0]'
+  value_maps:
+    -
+      name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState'
+      mappings:
+        -
+          value: '1'
+          newvalue: operational
+        -
+          value: '2'
+          newvalue: failed
+        -
+          value: '3'
+          newvalue: powering
+        -
+          value: '4'
+          newvalue: notpowering
+        -
+          value: '5'
+          newvalue: notpresent
+    -
+      name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState'
+      mappings:
+        -
+          value: '1'
+          newvalue: operational
+        -
+          value: '2'
+          newvalue: failed
+        -
+          value: '3'
+          newvalue: powering
+        -
+          value: '4'
+          newvalue: notpowering
+        -
+          value: '5'
+          newvalue: notpresent
+    -
+      name: 'FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState'
+      mappings:
+        -
+          value: '1'
+          newvalue: normal
+        -
+          value: '2'
+          newvalue: warning
+        -
+          value: '3'
+          newvalue: critical
+        -
+          value: '4'
+          newvalue: shutdown
+        -
+          value: '5'
+          newvalue: notpresent
+        -
+          value: '6'
+          newvalue: notoperational

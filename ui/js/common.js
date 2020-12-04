@@ -18,6 +18,21 @@
 **/
 
 
+const KEY_ARROW_DOWN = 40;
+const KEY_ARROW_LEFT = 37;
+const KEY_ARROW_RIGHT = 39;
+const KEY_ARROW_UP = 38;
+const KEY_BACKSPACE = 8;
+const KEY_DELETE = 46;
+const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
+const KEY_TAB = 9;
+const KEY_PAGE_UP = 33;
+const KEY_PAGE_DOWN = 34;
+const KEY_END = 35;
+const KEY_HOME = 36;
+const KEY_SPACE = 32;
+
 /**
  * jQuery based publish/subscribe handler.
  *
@@ -330,6 +345,10 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
 				'popup.mediatype.message'
 			],
+			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
+				'popup.massupdate.triggerprototype'
+			],
+			preprocessing_popup_actions = ['popup.massupdate.item', 'popup.massupdate.itemprototype'],
 			dialogue_class = '';
 
 		if (wide_popup_actions.indexOf(action) !== -1) {
@@ -337,6 +356,12 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 		}
 		else if (medium_popup_actions.indexOf(action) !== -1) {
 			dialogue_class = ' modal-popup-medium';
+		}
+		else if (static_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-static';
+		}
+		else if (preprocessing_popup_actions.indexOf(action) !== -1) {
+			dialogue_class = ' modal-popup-preprocessing';
 		}
 
 		overlay = overlayDialogue({
@@ -963,4 +988,24 @@ function getFirstMultiselectValue(host_field_id, hostgroup_field_id) {
 	}
 
 	return ret;
+}
+
+function openMassupdatePopup(elem, popup_name) {
+	const data = {};
+	const form = elem.closest('form');
+
+	data['ids'] = [...form.querySelectorAll('input:checked')].map((input) => input.value);
+
+	switch (popup_name) {
+		case 'popup.massupdate.item':
+			data['hostid'] = form.querySelector('#hostid').value;
+			break;
+		case 'popup.massupdate.itemprototype':
+		case 'popup.massupdate.triggerprototype':
+			data['parent_discoveryid'] = form.querySelector('#parent_discoveryid').value;
+			data['prototype'] = 1;
+			break;
+	}
+
+	return PopUp(popup_name, data, null, this);
 }

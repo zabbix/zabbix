@@ -24,6 +24,13 @@
  */
 class CMaintenance extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_EDIT_MAINTENANCE],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_EDIT_MAINTENANCE],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN, 'action' => CRoleHelper::ACTIONS_EDIT_MAINTENANCE]
+	];
+
 	protected $tableName = 'maintenances';
 	protected $tableAlias = 'm';
 	protected $sortColumns = ['maintenanceid', 'name', 'maintenance_type', 'active_till', 'active_since'];

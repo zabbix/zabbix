@@ -61,6 +61,7 @@
 #include "taskmanager/taskmanager.h"
 #include "preprocessor/preproc_manager.h"
 #include "preprocessor/preproc_worker.h"
+#include "availability/avail_manager.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
 #include "events.h"
@@ -71,6 +72,9 @@
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "export.h"
+#include "zbxvault.h"
+#include "zbxdiag.h"
+#include "zbxtrends.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -105,6 +109,11 @@ const char	*help_message[] = {
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
 	"                                 target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
+	"      " ZBX_SECRETS_RELOAD "             Reload secrets from Vault",
+	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
+	"                                 section (historycache, preprocessing, alerting,",
+	"                                 lld, valuecache, locks) or everything if section is",
+	"                                 not specified",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -116,7 +125,7 @@ const char	*help_message[] = {
 	"                                 preprocessing worker, proxy poller,",
 	"                                 self-monitoring, snmp trapper, task manager,",
 	"                                 timer, trapper, unreachable poller,",
-	"                                 vmware collector)",
+	"                                 vmware collector, history poller, availability manager)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier, up to 65535. For larger",
 	"                                 values specify target as \"process-type,N\"",
@@ -189,6 +198,8 @@ int	CONFIG_PREPROCESSOR_FORKS	= 3;
 int	CONFIG_LLDMANAGER_FORKS		= 1;
 int	CONFIG_LLDWORKER_FORKS		= 2;
 int	CONFIG_ALERTDB_FORKS		= 1;
+int	CONFIG_HISTORYPOLLER_FORKS	= 5;
+int	CONFIG_AVAILMAN_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -212,6 +223,7 @@ zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE		= ZBX_GIBIBYTE;
@@ -230,6 +242,9 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULTURL		= NULL;
+char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -306,6 +321,8 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
+
+volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -449,6 +466,16 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_ALERTSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_ALERTDB_FORKS;
 	}
+	else if (local_server_num <= (server_count += CONFIG_HISTORYPOLLER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HISTORYPOLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_HISTORYPOLLER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_AVAILMAN_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_AVAILMAN;
+		*local_process_num = local_server_num - server_count + CONFIG_AVAILMAN_FORKS;
+	}
 	else
 		return FAIL;
 
@@ -517,6 +544,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_VAULTURL)
+		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
 }
 
 /******************************************************************************
@@ -553,6 +583,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
+	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_TREND_FUNC_CACHE_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"TrendFunctionCacheSize\" configuration parameter must be either 0"
+				" or greater than 128KB");
+		err = 1;
+	}
+
 	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
@@ -576,6 +613,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
+
 #endif
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
@@ -673,6 +713,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"TrendFunctionCacheSize",	&CONFIG_TREND_FUNC_CACHE_SIZE,		TYPE_UINT64,
+			PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&CONFIG_VALUE_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
@@ -726,6 +768,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"DBUser",			&CONFIG_DBUSER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -817,6 +865,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			100},
 		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
+		{"StartHistoryPollers",		&CONFIG_HISTORYPOLLER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
 		{NULL}
 	};
 
@@ -949,6 +999,24 @@ int	main(int argc, char **argv)
 	}
 
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+}
+
+static void	zbx_main_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_DIAGINFO == ZBX_RTC_GET_MSG(flags))
+	{
+		int	scope = ZBX_RTC_GET_SCOPE(flags);
+
+		if (ZBX_DIAGINFO_ALL == scope)
+		{
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
+					(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
+					(1 << ZBX_DIAGINFO_ALERTING) | (1 << ZBX_DIAGINFO_LOCKS);
+		}
+		else
+			zbx_diaginfo_scope = 1 << scope;
+	}
+
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1104,9 +1172,30 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != zbx_tfc_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (FAIL == zbx_export_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_token_from_env(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_init_db_credentials(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1146,7 +1235,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
-			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS;
+			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS +
+			CONFIG_HISTORYPOLLER_FORKS + CONFIG_AVAILMAN_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
@@ -1286,6 +1376,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_ALERTSYNCER:
 				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
+			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
+				poller_type = ZBX_POLLER_TYPE_HISTORY;
+				thread_args.args = &poller_type;
+				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_AVAILMAN:
+				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
+				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				break;
 		}
 	}
 
@@ -1295,12 +1394,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_problems_export_init("main-process", 0);
 	}
 
+	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
+
 	while (-1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			break;
+		}
+
+		/* check if the wait was interrupted because of diaginfo remote command */
+		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
+		{
+			zbx_diag_log_info(zbx_diaginfo_scope);
+			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
 	}
 

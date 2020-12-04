@@ -30,6 +30,11 @@ if (hasRequest('conditions')) {
 	$counter = key($conditions) + 1;
 }
 
+$interface_ids_by_types = [];
+foreach ($data['interfaces'] as $interface) {
+	$interface_ids_by_types[$interface['type']][] = $interface['interfaceid'];
+}
+
 include dirname(__FILE__).'/common.item.edit.js.php';
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
@@ -132,6 +137,9 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 						updateExpression();
 					}
+
+					// Change value attribute to trigger MutationObserver event for tab indicator.
+					$(this).attr('value', $(this).val());
 				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).length > 1);

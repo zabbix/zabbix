@@ -1,0 +1,573 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+#include "common.h"
+#include "zbxalgo.h"
+#include "log.h"
+#include "zbxtrends.h"
+#include "mutexs.h"
+#include "memalloc.h"
+#include "trends.h"
+
+extern zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;		/* the itemid */
+	int			start;		/* the period start time */
+	int			end;		/* the period end time */
+	zbx_trend_function_t	function;	/* the trends function */
+	zbx_trend_state_t	state;		/* the cached value state */
+	double			value;		/* the cached value */
+	zbx_uint32_t		prev;		/* index of the previous LRU list or unused entry */
+	zbx_uint32_t		next;		/* index of the next LRU list or unused entry */
+	zbx_uint32_t		prev_value;	/* index of the previous value list */
+	zbx_uint32_t		next_value;	/* index of the next value list */
+}
+zbx_tfc_data_t;
+
+typedef struct
+{
+	char		header[ZBX_HASHSET_ENTRY_OFFSET];
+	zbx_tfc_data_t	data;
+}
+zbx_tfc_slot_t;
+
+typedef struct
+{
+	zbx_hashset_t	index;
+	zbx_tfc_slot_t	*slots;
+	zbx_uint32_t	slots_num;
+	zbx_uint32_t	free_slot;
+	zbx_uint32_t	free_head;
+	zbx_uint32_t	lru_head;
+	zbx_uint32_t	lru_tail;
+	zbx_uint64_t	hits;
+	zbx_uint64_t	misses;
+	zbx_uint64_t	items_num;
+}
+zbx_tfc_t;
+
+static zbx_tfc_t	*cache = NULL;
+
+/*
+ * The shared memory is split in three parts:
+ *   1) header, containing cache information
+ *   2) indexing hashset slots pointer array, allocated during cache initialization
+ *   3) slots array, allocated during cache initialization and used for hashset entry allocations
+ */
+static zbx_mem_info_t	*tfc_mem = NULL;
+
+static zbx_mutex_t	tfc_lock = ZBX_MUTEX_NULL;
+
+ZBX_MEM_FUNC_IMPL(__tfc, tfc_mem)
+
+#define LOCK_CACHE	zbx_mutex_lock(tfc_lock)
+#define UNLOCK_CACHE	zbx_mutex_unlock(tfc_lock)
+
+static void	tfc_free_slot(zbx_tfc_slot_t *slot)
+{
+	zbx_uint32_t	index = slot - cache->slots;
+
+	slot->data.next = cache->free_head;
+	slot->data.prev = UINT32_MAX;
+	cache->free_head = index;
+}
+
+static zbx_tfc_slot_t	*tfc_alloc_slot()
+{
+	zbx_uint32_t	index;
+
+	if (cache->free_slot != cache->slots_num)
+		tfc_free_slot(&cache->slots[cache->free_slot++]);
+
+	if (UINT32_MAX == cache->free_head)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	index = cache->free_head;
+	cache->free_head = cache->slots[index].data.next;
+
+	return &cache->slots[index];
+}
+
+static zbx_uint32_t	tfc_data_slot_index(zbx_tfc_data_t *data)
+{
+	return (zbx_tfc_slot_t *)((char *)data - ZBX_HASHSET_ENTRY_OFFSET) - cache->slots;
+}
+
+static zbx_hash_t	tfc_hash_func(const void *v)
+{
+	const zbx_tfc_data_t	*d = (const zbx_tfc_data_t *)v;
+	zbx_hash_t		hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&d->itemid);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&d->start, sizeof(d->start), hash);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&d->end, sizeof(d->end), hash);
+
+	return ZBX_DEFAULT_UINT64_HASH_ALGO(&d->function, sizeof(d->function), hash);
+}
+
+static int	tfc_compare_func(const void *v1, const void *v2)
+{
+	const zbx_tfc_data_t	*d1 = (const zbx_tfc_data_t *)v1;
+	const zbx_tfc_data_t	*d2 = (const zbx_tfc_data_t *)v2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(d1->itemid, d2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(d1->start, d2->start);
+	ZBX_RETURN_IF_NOT_EQUAL(d1->end, d2->end);
+
+	return d1->function - d2->function;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_malloc_func                                                  *
+ *                                                                            *
+ * Purpose: allocate memory for indexing hashset                              *
+ *                                                                            *
+ * Comments: There are two kinds of allocations that should be done:          *
+ *             1) initial allocation of hashset slots array                   *
+ *             2) allocations of hashset entries                              *
+ *           The initial hashset size is chosen large enough to hold all      *
+ *           entries without reallocation. So there should be no other        *
+ *           allocations done.                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	*tfc_malloc_func(void *old, size_t size)
+{
+	static int	alloc_num = 0;
+
+	if (sizeof(zbx_tfc_slot_t) == size)
+		return tfc_alloc_slot();
+
+	if (0 == alloc_num++)
+		return __tfc_mem_malloc_func(old, size);
+
+	return NULL;
+}
+
+static void	*tfc_realloc_func(void *old, size_t size)
+{
+	ZBX_UNUSED(old);
+	ZBX_UNUSED(size);
+
+	return NULL;
+}
+
+static void	tfc_free_func(void *ptr)
+{
+	if (ptr >= (void *)cache->slots && ptr < (void *)(cache->slots + cache->slots_num))
+		return tfc_free_slot(ptr);
+
+	return __tfc_mem_free_func(ptr);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_lru_append                                                   *
+ *                                                                            *
+ * Purpose: append data to the tail of least recently used slot list          *
+ *                                                                            *
+ ******************************************************************************/
+static void	tfc_lru_append(zbx_tfc_data_t *data)
+{
+	zbx_uint32_t	index;
+
+	index = tfc_data_slot_index(data);
+
+	data->prev = cache->lru_tail;
+	data->next = UINT32_MAX;
+
+	if (UINT32_MAX != data->prev)
+		cache->slots[data->prev].data.next = index;
+	else
+		cache->lru_head = index;
+
+	cache->lru_tail = index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_lru_remove                                                   *
+ *                                                                            *
+ * Purpose: remove data from least recently used slot list                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	tfc_lru_remove(zbx_tfc_data_t *data)
+{
+	if (UINT32_MAX != data->prev)
+		cache->slots[data->prev].data.next = data->next;
+	else
+		cache->lru_head = data->next;
+
+	if (UINT32_MAX != data->next)
+		cache->slots[data->next].data.prev = data->prev;
+	else
+		cache->lru_tail = data->prev;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_value_append                                                 *
+ *                                                                            *
+ * Purpose: append data to the tail of same item value list                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	tfc_value_append(zbx_tfc_data_t *root, zbx_tfc_data_t *data)
+{
+	zbx_uint32_t	index, root_index;
+
+	if (root->prev_value == (index = tfc_data_slot_index(data)))
+		return;
+
+	root_index = tfc_data_slot_index(root);
+
+	data->next_value = root_index;
+	data->prev_value = root->prev_value;
+
+	root->prev_value = index;
+	cache->slots[data->prev_value].data.next_value = index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_value_remove                                                 *
+ *                                                                            *
+ * Purpose: remove data from same item value list                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	tfc_value_remove(zbx_tfc_data_t *data)
+{
+	cache->slots[data->prev_value].data.next_value = data->next_value;
+	cache->slots[data->next_value].data.prev_value = data->prev_value;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_free_data                                                    *
+ *                                                                            *
+ * Purpose: frees slot used to store trends function data                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	tfc_free_data(zbx_tfc_data_t *data)
+{
+	tfc_lru_remove(data);
+	tfc_value_remove(data);
+
+	if (data->prev_value == data->next_value)
+	{
+		zbx_hashset_remove_direct(&cache->index, &cache->slots[data->prev_value].data);
+		cache->items_num--;
+	}
+
+	zbx_hashset_remove_direct(&cache->index, data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_reserve_slot                                                 *
+ *                                                                            *
+ * Purpose: ensure there is a free slot available                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	tfc_reserve_slot()
+{
+	if (UINT32_MAX == cache->free_head && cache->slots_num == cache->free_slot)
+	{
+		if (UINT32_MAX == cache->lru_head)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(1);
+		}
+
+		tfc_free_data(&cache->slots[cache->lru_head].data);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tfc_index_add                                                    *
+ *                                                                            *
+ * Purpose: indexes data by adding it to the index hashset                    *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
+{
+	zbx_tfc_data_t	*data;
+
+	if (NULL == (data = (zbx_tfc_data_t *)zbx_hashset_insert(&cache->index, data_local, sizeof(zbx_tfc_data_t))))
+	{
+		cache->slots_num = cache->index.num_data;
+		tfc_reserve_slot();
+
+		if (NULL == (data = (zbx_tfc_data_t *)zbx_hashset_insert(&cache->index, data_local,
+				sizeof(zbx_tfc_data_t))))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tfc_init                                                     *
+ *                                                                            *
+ * Purpose: initialize trend function cache                                   *
+ *                                                                            *
+ * Parameters: error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the cache was initialized successfully             *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tfc_init(char **error)
+{
+	zbx_uint64_t	size_reserved;
+	int		ret = FAIL;
+
+	if (0 == CONFIG_TREND_FUNC_CACHE_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): trends function cache disabled", __func__);
+		return SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_mutex_create(&tfc_lock, ZBX_MUTEX_TREND_FUNC, error))
+		goto out;
+
+	size_reserved = zbx_mem_required_size(1, "trend function cache size", "TrendFunctionCacheSize");
+
+	if (SUCCEED != zbx_mem_create(&tfc_mem, CONFIG_TREND_FUNC_CACHE_SIZE, "trend function cache size",
+			"TrendFunctionCacheSize", 1, error))
+	{
+		goto out;
+	}
+
+	cache =  (zbx_tfc_t *)__tfc_mem_realloc_func(NULL, sizeof(zbx_tfc_t));
+
+	/* (8 + 8) * 3 - overhead for 3 allocations */
+	CONFIG_TREND_FUNC_CACHE_SIZE -= size_reserved + sizeof(zbx_tfc_t) + (8 + 8) * 3;
+
+	/* 5/4 - reversing critical load factor which is accounted for when inserting new hashset entry */
+	/* but ignored when creating hashset with the specified size                                    */
+	cache->slots_num = CONFIG_TREND_FUNC_CACHE_SIZE / (16 * 5 / 4 + sizeof(zbx_tfc_slot_t));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): slots:%u", __func__, cache->slots_num);
+
+	zbx_hashset_create_ext(&cache->index, cache->slots_num, tfc_hash_func, tfc_compare_func,
+			NULL, tfc_malloc_func, tfc_realloc_func, tfc_free_func);
+
+	cache->lru_head = UINT32_MAX;
+	cache->lru_tail = UINT32_MAX;
+
+	cache->slots = (zbx_tfc_slot_t *)__tfc_mem_malloc_func(NULL, sizeof(zbx_tfc_slot_t) * cache->slots_num);
+	cache->free_head = UINT32_MAX;
+	cache->free_slot = 0;
+
+	cache->hits = 0;
+	cache->misses = 0;
+	cache->items_num = 0;
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(*error));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tfc_get_value                                                *
+ *                                                                            *
+ * Purpose: get value and state from trend function cache                     *
+ *                                                                            *
+ * Parameters: itemid   - [IN] the itemid                                     *
+ *             start    - [IN] the period start time (including)              *
+ *             end      - [IN] the period end time (including)                *
+ *             function - [IN] the trend function                             *
+ *             value    - [OUT] the cached value                              *
+ *             state    - [OUT] the cached state                              *
+ *                                                                            *
+ * Return value: SUCCEED - the value/state was retrieved successfully         *
+ *               FAIL - no cached item value of the function over the range   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double *value,
+		zbx_trend_state_t *state)
+{
+	zbx_tfc_data_t	*data, data_local;
+
+	if (NULL == cache)
+		return FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " period:%d-%d", __func__, itemid, start, end);
+
+	data_local.itemid = itemid;
+	data_local.start = start;
+	data_local.end = end;
+	data_local.function = function;
+
+	LOCK_CACHE;
+
+	if (NULL != (data = (zbx_tfc_data_t *)zbx_hashset_search(&cache->index, &data_local)))
+	{
+		tfc_lru_remove(data);
+		tfc_lru_append(data);
+
+		*value = data->value;
+		*state = data->state;
+
+		cache->hits++;
+	}
+	else
+		cache->misses++;
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:%p", __func__, data);
+
+	return NULL != data ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tfc_put_value                                                *
+ *                                                                            *
+ * Purpose: put value and state from trend function cache                     *
+ *                                                                            *
+ * Parameters: itemid   - [IN] the itemid                                     *
+ *             start    - [IN] the period start time (including)              *
+ *             end      - [IN] the period end time (including)                *
+ *             function - [IN] the trend function                             *
+ *             value    - [IN] the value to cache                             *
+ *             state    - [IN] the state to cache                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double value,
+		zbx_trend_state_t state)
+{
+	zbx_tfc_data_t	*data, data_local, *root;
+
+	if (NULL == cache)
+		return;
+
+	data_local.itemid = itemid;
+	data_local.start = 0;
+	data_local.end = 0;
+	data_local.function = ZBX_TREND_FUNCTION_UNKNOWN;
+
+	LOCK_CACHE;
+
+	tfc_reserve_slot();
+
+	if (NULL == (root = (zbx_tfc_data_t *)zbx_hashset_search(&cache->index, &data_local)))
+	{
+		root = tfc_index_add(&data_local);
+		root->prev_value = tfc_data_slot_index(root);
+		root->next_value = root->prev_value;
+		cache->items_num++;
+		tfc_reserve_slot();
+	}
+
+	data_local.start = start;
+	data_local.end = end;
+	data_local.function = function;
+	data_local.state = ZBX_TREND_STATE_UNKNOWN;
+	data = tfc_index_add(&data_local);
+
+	if (ZBX_TREND_STATE_UNKNOWN == data->state)
+	{
+		/* new slot was allocated, link it */
+		tfc_lru_append(data);
+		tfc_value_append(root, data);
+	}
+
+	data->value = value;
+	data->state = state;
+
+	UNLOCK_CACHE;
+}
+
+void	zbx_tfc_invalidate_trends(ZBX_DC_TREND *trends, int trends_num)
+{
+	zbx_tfc_data_t	*root, *data, data_local;
+	int		i, next;
+
+	if (NULL == cache)
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __func__, trends_num);
+
+	data_local.start = 0;
+	data_local.end = 0;
+	data_local.function = ZBX_TREND_FUNCTION_UNKNOWN;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < trends_num; i++)
+	{
+		data_local.itemid = trends[i].itemid;
+
+		if (NULL == (root = (zbx_tfc_data_t *)zbx_hashset_search(&cache->index, &data_local)))
+			continue;
+
+		for (data = &cache->slots[root->next_value].data; data != root; data = &cache->slots[next].data)
+		{
+			next = data->next_value;
+
+			if (trends[i].clock < data->start || trends[i].clock > data->end)
+				continue;
+
+			tfc_free_data(data);
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error)
+{
+	if (NULL == cache)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(*error, "Trends function cache is disabled.");
+
+		return FAIL;
+	}
+
+	LOCK_CACHE;
+
+	stats->hits = cache->hits;
+	stats->misses = cache->misses;
+	stats->items_num = cache->items_num;
+	stats->requests_num = cache->index.num_data - cache->items_num;
+
+	UNLOCK_CACHE;
+
+	return SUCCEED;
+}

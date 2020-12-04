@@ -24,6 +24,10 @@
  */
 class CTrend extends CApiService {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+	];
+
 	public function __construct() {
 		// the parent::__construct() method should not be called.
 	}
@@ -203,7 +207,7 @@ class CTrend extends CApiService {
 							'date_histogram' => [
 								'field' => 'clock',
 								'interval' => '1h',
-								'min_doc_count' => 1,
+								'min_doc_count' => 1
 							],
 							'aggs' => [
 								'max_value' => [

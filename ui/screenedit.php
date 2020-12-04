@@ -33,6 +33,10 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
 $knownResourceTypes = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
@@ -63,7 +67,6 @@ $fields = [
 	'caption' =>		[T_ZBX_STR, O_OPT, null,	null,			null],
 	'resourceid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,			null,
 		hasRequest('add') || hasRequest('update') ? getResourceNameByType(getRequest('resourcetype')) : null],
-	'templateid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')],
 	'max_columns' =>	[T_ZBX_INT, O_OPT, null,
@@ -112,10 +115,7 @@ $options = [
 ];
 $screens = API::Screen()->get($options);
 if (empty($screens)) {
-	$screens = API::TemplateScreen()->get($options);
-	if (empty($screens)) {
-		access_deny();
-	}
+	access_deny();
 }
 $screen = reset($screens);
 
@@ -271,10 +271,7 @@ $data = [
 // Getting updated screen, so we won't have to refresh the page to see changes.
 $data['screen'] = API::Screen()->get($options);
 if (empty($data['screen'])) {
-	$data['screen'] = API::TemplateScreen()->get($options);
-	if (empty($data['screen'])) {
-		access_deny();
-	}
+	access_deny();
 }
 $data['screen'] = reset($data['screen']);
 

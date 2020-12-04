@@ -1,0 +1,398 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:49Z'
+  media_types:
+    -
+      name: OTRS
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: otrs_auth_password
+          value: '<PUT YOUR USER PASSWORD>'
+        -
+          name: otrs_auth_user
+          value: '<PUT YOUR USER NAME>'
+        -
+          name: otrs_customer
+          value: '<PUT YOUR CUSTOMER EMAIL>'
+        -
+          name: otrs_default_priority_id
+          value: '3'
+        -
+          name: otrs_queue
+          value: '<PUT YOUR QUEUE NAME>'
+        -
+          name: otrs_ticket_id
+          value: '{EVENT.TAGS.__zbx_otrs_ticket_id}'
+        -
+          name: otrs_ticket_state
+          value: new
+        -
+          name: otrs_time_unit
+          value: '0'
+        -
+          name: otrs_url
+          value: '<PUT YOUR OTRS URL>'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      script: |
+        var OTRS = {
+            params: {},
+            entrypoint: 'nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket',
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                OTRS.params = params;
+                if (typeof OTRS.params.url === 'string') {
+                    if (!OTRS.params.url.endsWith('/')) {
+                        OTRS.params.url += '/';
+                    }
+                }
+            },
+        
+            addDynamicFields: function (data, fields) {
+                if (typeof fields === 'object' && Object.keys(fields).length) {
+                    data.DynamicField = [];
+        
+                    Object.keys(fields)
+                        .forEach(function(field) {
+                            if (field !== undefined) {
+                                if (fields[field].match(/^\d{4}[.-]\d{2}[.-]\d{2}$/)) {
+                                    fields[field] = fields[field].replace(/\./g, '-');
+                                }
+        
+                                data.DynamicField.push({Name: field, Value: fields[field]});
+                            }
+                        });
+                }
+        
+                return data;
+            },
+        
+            request: function (method, query, data) {
+                ['url', 'auth_user', 'auth_password', 'queue',
+                    'customer', 'ticket_state', 'default_priority_id', 'time_unit'].forEach(function (field) {
+                    if (typeof OTRS.params !== 'object' || typeof OTRS.params[field] === 'undefined'
+                        || OTRS.params[field] === '' ) {
+                        throw 'Required param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    request = new HttpRequest(),
+                    url = OTRS.params.url + query +
+                        '?UserLogin=' + encodeURIComponent(OTRS.params.auth_user) +
+                        '&Password=' + encodeURIComponent(OTRS.params.auth_password);
+        
+                if (typeof OTRS.HTTPProxy !== 'undefined' && OTRS.HTTPProxy.trim() !== '') {
+                    request.setProxy(OTRS.HTTPProxy);
+                }
+        
+                request.addHeader('Content-Type: application/json');
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ OTRS Webhook ] Sending request: ' +
+                    url + ((typeof data === 'string') ? (' ' + data) : ''));
+        
+                switch (method) {
+                    case 'get':
+                        response = request.get(url, data);
+                        break;
+        
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ OTRS Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    message += ': ' + response;
+                    throw message + ' Check debug log for more information.';
+                }
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ OTRS Webhook ] Failed to parse response received from OTRS');
+                        response = null;
+                    }
+                }
+        
+                if (typeof response.Error !== 'undefined'
+                    && Object.keys(response.Error).length > 0) {
+                    message = 'Request failed: ' + JSON.stringify(response.Error);
+                }
+        
+        
+                return {
+                    status: request.getStatus(),
+                    response: response
+                };
+            },
+        
+            createTicket: function(subject, message, priority, fields) {
+                var result,
+                    data = {
+                        Ticket: {
+                            Title: subject,
+                            Queue: OTRS.params.queue,
+                            State: OTRS.params.ticket_state,
+                            PriorityID: priority || OTRS.params.default_priority_id,
+                            CustomerUser: OTRS.params.customer
+                        },
+                        Article: {
+                            Subject: subject,
+                            Body: message,
+                            TimeUnit: OTRS.params.time_unit,
+                            ContentType: 'text/plain; charset=utf8'
+                        }
+                    };
+        
+                result = OTRS.request('post', OTRS.entrypoint, OTRS.addDynamicFields(data, fields));
+        
+                if (typeof result.response !== 'object'
+                    || typeof result.response.TicketID === 'undefined'
+                    || result.status != 200) {
+                    throw 'Cannot create OTRS ticket. Check debug log for more information.';
+                }
+        
+                return result.response.TicketID;
+            },
+        
+            updateTicket: function(subject, message) {
+                var result,
+                    data = {
+                        Article: {
+                            Subject: subject,
+                            Body: message || '',
+                            TimeUnit: OTRS.params.time_unit,
+                            ContentType: 'text/plain; charset=utf8'
+                        }
+                    };
+        
+                result = OTRS.request('put', OTRS.entrypoint + '/' + encodeURIComponent(OTRS.params.ticket_id), data);
+        
+                if (typeof result.response !== 'object'
+                    || typeof result.response.TicketID === 'undefined'
+                    || result.status != 200) {
+                    throw 'Cannot update OTRS ticket. Check debug log for more information.';
+                }
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                params_otrs = {},
+                params_fields = {},
+                params_update = {},
+                result = {tags: {}},
+                required_params = [
+                    'alert_subject', 'event_source',
+                    'event_value',  'event_update_status'
+                ],
+                severities = [
+                    {name: 'not_classified', color: '#97AAB3'},
+                    {name: 'information', color: '#7499FF'},
+                    {name: 'warning', color: '#FFC859'},
+                    {name: 'average', color: '#FFA059'},
+                    {name: 'high', color: '#E97659'},
+                    {name: 'disaster', color: '#E45959'},
+                    {name: 'resolved', color: '#009900'},
+                    {name: null, color: '#000000'}
+                ],
+                priority;
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('otrs_')) {
+                        params_otrs[key.substring(5)] = params[key];
+                    }
+                    else if (key.startsWith('dynamicfield_')) {
+                        params_fields[key.substring(13)] = params[key];
+                    }
+                    else if (key.startsWith('event_update_')) {
+                        params_update[key.substring(13)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
+                        throw 'Parameter "' + key + '" cannot be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            if (params.event_source === '0'
+                && ((params.event_value === '1' && params.event_update_status === '1')
+                    || (params.event_value === '0'
+                        && (params.event_update_status === '0' || params.event_update_status === '1')))
+                && (isNaN(parseInt(params.otrs_ticket_id)) || parseInt(params.otrs_ticket_id) < 1 )) {
+                throw 'Incorrect "otrs_ticket_id" parameter given: ' + params.otrs_ticket_id +
+                    '\nMust be positive integer.';
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '7';
+            }
+        
+            if (params.event_value === '0') {
+                params.event_nseverity = '6';
+            }
+        
+            priority = params['severity_' + severities[params.event_nseverity].name];
+            priority = priority && priority.trim() || severities[7].name;
+        
+            OTRS.setParams(params_otrs);
+            OTRS.HTTPProxy = params.HTTPProxy;
+        
+            // Create ticket for non trigger-based events.
+            if (params.event_source !== '0'
+                && params.event_value !== '0') {
+                OTRS.createTicket(params.alert_subject, params.alert_message, priority);
+            }
+            // Create ticket for trigger-based events.
+            else if (params.event_value === '1' && params_update.status === '0') {
+                var ticket_id = OTRS.createTicket(params.alert_subject,
+                    params.alert_subject + '\n' + params.alert_message + '\n' +
+                    params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') +
+                    'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id + '\n',
+                    priority,
+                    params_fields);
+        
+                result.tags.__zbx_otrs_ticket_id = ticket_id;
+                result.tags.__zbx_otrs_ticketlink = params.otrs_url +
+                    (params.otrs_url.endsWith('/') ? '' : '/') + 'index.pl?Action=AgentTicketZoom;TicketID=' + ticket_id;
+            }
+            // Update created ticket for trigger-based event.
+            else {
+                OTRS.updateTicket(params.alert_subject, params.alert_message);
+            }
+        
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(3, '[ OTRS Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_otrs_ticketlink}'
+      event_menu_name: 'OTRS: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved: {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

@@ -323,7 +323,7 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM', 'Kerberos']);
+		$this->zbxTestDropdownHasOptions('authentication', ['None', 'Basic', 'NTLM', 'Kerberos', 'Digest']);
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelect('authentication', $data['authentication']);
@@ -982,7 +982,7 @@ class testFormWeb extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Headers -empty value',
 					'headers' => [
-						['name' => 'test'],
+						['name' => 'test']
 					],
 					'add_step' => [
 						['step' => 'Headers -empty value']
@@ -999,7 +999,7 @@ class testFormWeb extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Headers -empty name',
 					'headers' => [
-						['value' => 'test'],
+						['value' => 'test']
 					],
 					'add_step' => [
 						['step' => 'Headers -empty name']

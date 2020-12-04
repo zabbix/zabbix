@@ -1,0 +1,389 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:52Z'
+  media_types:
+    -
+      name: 'SolarWinds Service Desk'
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_recovery_value
+          value: '{EVENT.RECOVERY.VALUE}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: priority_average
+          value: Medium
+        -
+          name: priority_default
+          value: Low
+        -
+          name: priority_disaster
+          value: Critical
+        -
+          name: priority_high
+          value: High
+        -
+          name: samanage_incident_id
+          value: '{EVENT.TAGS.__zbx_solarwinds_inc_id}'
+        -
+          name: samanage_token
+          value: '<PUT YOUR TOKEN HERE>'
+        -
+          name: samanage_url
+          value: '<PUT YOUR INSTANCE URL HERE>'
+      script: |
+        var SolarWinds = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+        
+                SolarWinds.params = params;
+                SolarWinds.params.endpoint = 'https://api.samanage.com/';
+            },
+        
+            setProxy: function (HTTPProxy) {
+                SolarWinds.HTTPProxy = HTTPProxy;
+            },
+        
+            addCustomFields: function (data, fields) {
+                if (typeof data.incident === 'object' && typeof fields === 'object' && Object.keys(fields).length) {
+                    if (typeof fields.sw_fields === 'object' && Object.keys(fields.sw_fields).length) {
+                        Object.keys(fields.sw_fields)
+                            .forEach(function(field) {
+                                try {
+                                    data.incident[field] = JSON.parse(fields.sw_fields[field]);
+                                }
+                                catch (error) {
+                                    data.incident[field] = fields.sw_fields[field];
+                                }
+                            });
+                    }
+        
+                    if (typeof fields.sw_customfields === 'object' && Object.keys(fields.sw_customfields).length) {
+                        data.incident.custom_fields_values = {custom_fields_value: []};
+                        Object.keys(fields.sw_customfields)
+                            .forEach(function(field) {
+                                data.incident.custom_fields_values.custom_fields_value.push({
+                                    name: field,
+                                    value: fields.sw_customfields[field]
+                                });
+                            });
+                    }
+                }
+        
+                return data;
+            },
+        
+            request: function (method, query, data) {
+                ['token'].forEach(function (field) {
+                    if (typeof SolarWinds.params !== 'object' || typeof SolarWinds.params[field] === 'undefined'
+                        || SolarWinds.params[field] === '' ) {
+                        throw 'Required SolarWinds param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    url = SolarWinds.params.endpoint + query,
+                    request = new HttpRequest();
+        
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('X-Samanage-Authorization: Bearer ' + SolarWinds.params.token);
+                request.addHeader('Accept: application/vnd.samanage.v2.1+json');
+        
+                if (typeof SolarWinds.HTTPProxy !== 'undefined' && SolarWinds.HTTPProxy !== '') {
+                    request.setProxy(SolarWinds.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ SolarWinds SD Webhook ] Sending request: ' + url + ((typeof data === 'string')
+                    ? ('\n' + data)
+                    : ''));
+        
+                switch (method) {
+                    case 'get':
+                        response = request.get(url, data);
+                        break;
+        
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'put':
+                        response = request.put(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ SolarWinds SD Webhook ] Received response with status code ' + request.getStatus() +
+                    '\n' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ SolarWinds SD Webhook ] Failed to parse response received from SolarWinds');
+                        response = null;
+                    }
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response !== null && typeof response.error !== 'undefined'
+                        && Object.keys(response.error).length > 0) {
+                        message += ': ' + JSON.stringify(response.error);
+                    }
+                    else if (response !== null && typeof response === 'object'
+                        && Object.keys(response).length > 0) {
+                        Object.keys(response)
+                            .forEach(function(field) {
+                                message += '\n' + field + ': ' + response[field][0];
+                            });
+                    }
+        
+                    throw message + ' Check debug log for more information.';
+                }
+        
+                return {
+                    status: request.getStatus(),
+                    response: response
+                };
+            },
+        
+            createIncident: function(name, description, fields) {
+                var data = {
+                    incident: {
+                        name: name,
+                        description: description,
+                        priority: SolarWinds.params.priority
+                    }
+                };
+        
+                var result = SolarWinds.request('post', 'incidents.json', SolarWinds.addCustomFields(data, fields));
+        
+                if (typeof result.response !== 'object' || typeof result.response.id === 'undefined') {
+                    throw 'Cannot create SolarWinds incident. Check debug log for more information.';
+                }
+        
+                return result.response.id;
+            },
+        
+            updateIncident: function(name, fields, message) {
+                var data = {
+                    incident: {
+                        name: name,
+                        priority: SolarWinds.params.priority
+                    }
+                };
+        
+                SolarWinds.request(
+                    'put',
+                    'incidents/' + SolarWinds.params.incident_id + '.json',
+                    SolarWinds.addCustomFields(data, fields));
+        
+                SolarWinds.commenIncident(message);
+            },
+        
+            commenIncident: function(message) {
+                var data = {
+                    comment: {
+                        body: message
+                    }
+                };
+        
+                SolarWinds.request('post', 'incidents/' + SolarWinds.params.incident_id + '/comments.json', data);
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                fields = {},
+                samanage = {},
+                result = {tags: {}},
+                required_params = ['alert_subject', 'event_recovery_value', 'event_source', 'event_value', 'priority_default'],
+                severities = [
+                    {name: 'not_classified'},
+                    {name: 'information'},
+                    {name: 'warning'},
+                    {name: 'average'},
+                    {name: 'high'},
+                    {name: 'disaster'},
+                    {name: 'resolved'},
+                    {name: 'default'}
+                ];
+        
+            fields.sw_fields = {};
+            fields.sw_customfields = {};
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('samanage_')) {
+                        samanage[key.substring(9)] = params[key];
+                    }
+                    else if (key.startsWith('sw_field_')) {
+                        fields.sw_fields[key.substring(9)] = params[key];
+                    }
+                    else if (key.startsWith('sw_customfield_')) {
+                        fields.sw_customfields[key.substring(15)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
+                        throw 'Parameter "' + key + '" can\'t be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_recovery_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '7';
+            }
+        
+            if (params.event_value === '0') {
+                params.event_nseverity = '6';
+            }
+        
+            samanage.priority = params['priority_' + severities[params.event_nseverity].name] || params.priority_default;
+        
+            SolarWinds.setParams(samanage);
+            SolarWinds.setProxy(params.HTTPProxy);
+        
+            // Create incident for non trigger-based events.
+            if (params.event_source !== '0' && params.event_recovery_value !== '0') {
+                SolarWinds.createIncident(params.alert_subject, params.alert_message);
+            }
+            // Create incident for trigger-based events.
+            else if (params.event_value === '1' && params.event_update_status === '0'
+                    && samanage.incident_id === '{EVENT.TAGS.__zbx_solarwinds_inc_id}') {
+                var key = SolarWinds.createIncident(params.alert_subject, params.alert_message, fields);
+        
+        
+                result.tags.__zbx_solarwinds_inc_id = key;
+                result.tags.__zbx_solarwinds_inc_link = params.samanage_url +
+                    (params.samanage_url.endsWith('/') ? '' : '/') + 'incidents/' + key;
+            }
+            // Update created incident for trigger-based event.
+            else {
+                if (samanage.incident_id === '{EVENT.TAGS.__zbx_solarwinds_inc_id}' || samanage.incident_id === '') {
+                    throw 'Incorrect incident key given: ' + samanage.incident_id;
+                }
+                if (!params.alert_message) {
+                    throw 'Parameter "alert_message" can\'t be empty.';
+                }
+                SolarWinds.updateIncident(params.alert_subject, fields, params.alert_message);
+            }
+        
+            if (params.event_source === '0') {
+                return JSON.stringify(result);
+            }
+            else {
+                return 'OK';
+            }
+        }
+        catch (error) {
+            Zabbix.log(3, '[ SolarWinds SD Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_solarwinds_inc_link}'
+      event_menu_name: 'SolarWinds incident ID: {EVENT.TAGS.__zbx_solarwinds_inc_id}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            
+            Trigger description: {TRIGGER.DESCRIPTION}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

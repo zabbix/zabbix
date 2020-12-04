@@ -1,0 +1,245 @@
+zabbix_export:
+  version: '5.4'
+  date: '2020-10-16T09:33:47Z'
+  media_types:
+    -
+      name: iLert
+      type: WEBHOOK
+      parameters:
+        -
+          name: .ILERT.ALERT.SOURCE.KEY
+          value: '{ALERT.SENDTO}'
+        -
+          name: .ILERT.INCIDENT.SUMMARY
+          value: ''
+        -
+          name: ALERT.MESSAGE
+          value: '{ALERT.MESSAGE}'
+        -
+          name: ALERT.SUBJECT
+          value: '{ALERT.SUBJECT}'
+        -
+          name: EVENT.ACK.STATUS
+          value: '{EVENT.ACK.STATUS}'
+        -
+          name: EVENT.DATE
+          value: '{EVENT.DATE}'
+        -
+          name: EVENT.ID
+          value: '{EVENT.ID}'
+        -
+          name: EVENT.NAME
+          value: '{EVENT.NAME}'
+        -
+          name: EVENT.NSEVERITY
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: EVENT.OPDATA
+          value: '{EVENT.OPDATA}'
+        -
+          name: EVENT.RECOVERY.DATE
+          value: '{EVENT.RECOVERY.DATE}'
+        -
+          name: EVENT.RECOVERY.TIME
+          value: '{EVENT.RECOVERY.TIME}'
+        -
+          name: EVENT.RECOVERY.VALUE
+          value: '{EVENT.RECOVERY.VALUE}'
+        -
+          name: EVENT.SEVERITY
+          value: '{EVENT.SEVERITY}'
+        -
+          name: EVENT.TAGS
+          value: '{EVENT.TAGS}'
+        -
+          name: EVENT.TIME
+          value: '{EVENT.TIME}'
+        -
+          name: EVENT.UPDATE.ACTION
+          value: '{EVENT.UPDATE.ACTION}'
+        -
+          name: EVENT.UPDATE.DATE
+          value: '{EVENT.UPDATE.DATE}'
+        -
+          name: EVENT.UPDATE.MESSAGE
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: EVENT.UPDATE.STATUS
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: EVENT.UPDATE.TIME
+          value: '{EVENT.UPDATE.TIME}'
+        -
+          name: EVENT.VALUE
+          value: '{EVENT.VALUE}'
+        -
+          name: HOST.HOST
+          value: '{HOST.HOST}'
+        -
+          name: HOST.IP
+          value: '{HOST.IP}'
+        -
+          name: HOST.NAME
+          value: '{HOST.NAME}'
+        -
+          name: ITEM.ID1
+          value: '{ITEM.ID1}'
+        -
+          name: ITEM.ID2
+          value: '{ITEM.ID2}'
+        -
+          name: ITEM.ID3
+          value: '{ITEM.ID3}'
+        -
+          name: ITEM.ID4
+          value: '{ITEM.ID4}'
+        -
+          name: ITEM.ID5
+          value: '{ITEM.ID5}'
+        -
+          name: ITEM.NAME1
+          value: '{ITEM.NAME1}'
+        -
+          name: ITEM.NAME2
+          value: '{ITEM.NAME2}'
+        -
+          name: ITEM.NAME3
+          value: '{ITEM.NAME3}'
+        -
+          name: ITEM.NAME4
+          value: '{ITEM.NAME4}'
+        -
+          name: ITEM.NAME5
+          value: '{ITEM.NAME5}'
+        -
+          name: TRIGGER.DESCRIPTION
+          value: '{TRIGGER.DESCRIPTION}'
+        -
+          name: TRIGGER.ID
+          value: '{TRIGGER.ID}'
+        -
+          name: TRIGGER.NAME
+          value: '{TRIGGER.NAME}'
+        -
+          name: TRIGGER.SEVERITY
+          value: '{TRIGGER.SEVERITY}'
+        -
+          name: TRIGGER.STATUS
+          value: '{TRIGGER.STATUS}'
+        -
+          name: TRIGGER.URL
+          value: '{TRIGGER.URL}'
+        -
+          name: TRIGGER.VALUE
+          value: '{TRIGGER.VALUE}'
+        -
+          name: USER.FULLNAME
+          value: '{USER.FULLNAME}'
+        -
+          name: ZABBIX.URL
+          value: '{$ZABBIX.URL}'
+      script: |
+        try {
+            var result = { tags: {} },
+                params = JSON.parse(value),
+                req = new HttpRequest(),
+                resp = '';
+        
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+                req.setProxy(params.HTTPProxy);
+            }
+            var alertSourceKey = params['.ILERT.ALERT.SOURCE.KEY'];
+            if (!alertSourceKey || (typeof alertSourceKey === 'string' && alertSourceKey.trim() === '')) {
+                throw 'incorrect value for variable "ILERT.ALERT.SOURCE.KEY". The value must be a non-empty string.';
+            }
+            delete params['.ILERT.ALERT.SOURCE.KEY'];
+            
+            var ilertApiBaseURL = "https://api.ilert.com";
+            var reqURL = encodeURI(ilertApiBaseURL + "/api/v1/events/zabbix-mt/" + alertSourceKey)
+        
+            var incidentKey = "zabbix-" + params['EVENT.ID'];
+            var incidentViewURL = ilertApiBaseURL + "/api/v1/incidents/resolve-ik/" + alertSourceKey + "/" + incidentKey;
+        
+            req.addHeader('Accept: application/json');
+            req.addHeader('Content-Type: application/json');
+        
+            Zabbix.log(4, '[iLert Webhook] Sending request:' + JSON.stringify(params));
+            resp = req.post(reqURL, JSON.stringify(params));
+            Zabbix.log(4, '[iLert Webhook] Receiving response:' + resp);
+        
+            try {
+                resp = JSON.parse(resp);
+            }
+            catch (error) {
+                throw 'incorrect response. iLert returned a non-JSON object.';
+            }
+        
+            if (req.getStatus() == 200) {
+                result.tags.__ilert_incident_url = incidentViewURL;
+                return JSON.stringify(result);
+            }
+        
+            if (req.getStatus() == 400 && typeof resp === 'object' && typeof resp.code === 'string') {
+                if (resp.code === 'NO_OPEN_INCIDENT_WITH_KEY') {
+                  return JSON.stringify(result);
+                }
+                if (resp.code === 'INCIDENT_ALREADY_ACCEPTED') {
+                  result.tags.__ilert_incident_url = incidentViewURL;
+                  return JSON.stringify(result);
+                }
+            }
+        
+            if (typeof resp === 'object' && typeof resp.message === 'string') {
+                throw resp.message;
+            }
+            else {
+                throw 'Unknown error.';
+            }
+        }
+        catch (error) {
+            Zabbix.log(3, '[iLert Webhook] Notification failed : ' + error);
+            throw 'iLert notification failed : ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__ilert_incident_url}'
+      event_menu_name: 'iLert incident'
+      description: |
+        Please refer to https://docs.ilert.com/integrations/zabbix/native 
+          
+        Set global macro {$ZABBIX.URL} with your Zabbix server URL.
+        Add a dedicated user with the media type "iLert". You can also rewrite the incident summary via ".ILERT.INCIDENT.SUMMARY" parameter or leave it empty to use the standard pattern.
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}

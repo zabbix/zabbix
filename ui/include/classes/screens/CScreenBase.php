@@ -51,13 +51,6 @@ class CScreenBase {
 	public $resourcetype;
 
 	/**
-	 * Is templated screen
-	 *
-	 * @var bool
-	 */
-	public $isTemplatedScreen;
-
-	/**
 	 * Screen id
 	 *
 	 * @var int
@@ -146,7 +139,6 @@ class CScreenBase {
 	 * @param int		$options['mode']
 	 * @param int		$options['timestamp']
 	 * @param int		$options['resourcetype']
-	 * @param bool		$options['isTemplatedScreen']
 	 * @param int		$options['screenid']
 	 * @param array		$options['screenitem']
 	 * @param string	$options['action']
@@ -165,7 +157,6 @@ class CScreenBase {
 			'mode'				=> SCREEN_MODE_SLIDESHOW,
 			'timestamp'			=> time(),
 			'resourcetype'		=> null,
-			'isTemplatedScreen'	=> false,
 			'screenid'			=> null,
 			'action'			=> null,
 			'groupid'			=> null,
@@ -191,7 +182,6 @@ class CScreenBase {
 		switch ($this->resourcetype) {
 			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
 				$this->required_parameters += [
-					'isTemplatedScreen'	=> false,
 					'screenid'			=> false,
 					'action'			=> false,
 					'groupid'			=> false,
@@ -206,7 +196,6 @@ class CScreenBase {
 
 			case SCREEN_RESOURCE_DISCOVERY:
 				$this->required_parameters += [
-					'isTemplatedScreen'	=> false,
 					'screenid'			=> false,
 					'action'			=> false,
 					'groupid'			=> false,
@@ -221,7 +210,6 @@ class CScreenBase {
 
 			case SCREEN_RESOURCE_HTTPTEST:
 				$this->required_parameters += [
-					'isTemplatedScreen'	=> false,
 					'screenid'			=> false,
 					'action'			=> false,
 					'groupid'			=> true,
@@ -236,7 +224,6 @@ class CScreenBase {
 
 			case SCREEN_RESOURCE_PROBLEM:
 				$this->required_parameters += [
-					'isTemplatedScreen'	=> false,
 					'screenid'			=> false,
 					'action'			=> false,
 					'groupid'			=> false,
@@ -251,7 +238,6 @@ class CScreenBase {
 
 			case SCREEN_RESOURCE_HISTORY:
 				$this->required_parameters += [
-					'isTemplatedScreen'	=> true,
 					'screenid'			=> true,
 					'action'			=> true,
 					'groupid'			=> false,
@@ -266,7 +252,6 @@ class CScreenBase {
 
 			default:
 				$this->required_parameters += [
-					'isTemplatedScreen'	=> true,
 					'screenid'			=> true,
 					'action'			=> true,
 					'groupid'			=> true,
@@ -290,19 +275,10 @@ class CScreenBase {
 				'max_columns'
 			];
 
-			if ($this->hostid != 0) {
-				$this->screenitem = API::TemplateScreenItem()->get([
-					'output' => $screenitem_output,
-					'screenitemids' => $options['screenitemid'],
-					'hostids' => $this->hostid
-				]);
-			}
-			else {
-				$this->screenitem = API::ScreenItem()->get([
-					'output' => $screenitem_output,
-					'screenitemids' => $options['screenitemid']
-				]);
-			}
+			$this->screenitem = API::ScreenItem()->get([
+				'output' => $screenitem_output,
+				'screenitemids' => $options['screenitemid']
+			]);
 
 			if ($this->screenitem) {
 				$this->screenitem = reset($this->screenitem);
@@ -416,7 +392,7 @@ class CScreenBase {
 		$parameters = $this->parameters;
 
 		// unset redundant parameters
-		unset($parameters['isTemplatedScreen'], $parameters['action'], $parameters['dataId']);
+		unset($parameters['action'], $parameters['dataId']);
 
 		foreach ($parameters as $pname => $default_value) {
 			if ($this->required_parameters[$pname]) {

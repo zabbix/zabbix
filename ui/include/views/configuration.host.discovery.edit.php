@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	));
 
 $form = (new CForm())
+	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -89,7 +90,7 @@ $form_list
 		'url_row'
 	);
 
-// Append ITEM_TYPE_HTTPAGENT Query fields to form list.
+// Prepare ITEM_TYPE_HTTPAGENT query fields.
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
@@ -104,7 +105,59 @@ elseif (!$data['limited']) {
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
 $query_fields->items = [json_encode($query_fields_data)];
 
+// Prepare ITEM_TYPE_SCRIPT parameters.
+$parameters_data = [];
+
+// Prepare ITEM_TYPE_SCRIPT parameters.
+$parameters_data = [];
+if ($data['parameters']) {
+	$parameters_data = $data['parameters'];
+}
+elseif (!$data['limited']) {
+	$parameters_data[] = ['name' => '', 'value' => ''];
+}
+
+$parameters_table = (new CTable())
+	->setId('parameters_table')
+	->setHeader([
+		(new CColHeader(_('Name')))->setWidth('50%'),
+		(new CColHeader(_('Value')))->setWidth('50%'),
+		_('Action')
+	])
+	->setAttribute('style', 'width: 100%;');
+
+if ($parameters_data) {
+	foreach ($parameters_data as $parameter) {
+		$parameters_table->addRow([
+			(new CTextBox('parameters[name][]', $parameter['name'], $data['limited'],
+				DB::getFieldLength('item_parameter', 'name'))
+			)
+				->setAttribute('style', 'width: 100%;')
+				->removeId(),
+			(new CTextBox('parameters[value][]', $parameter['value'], $data['limited'],
+				DB::getFieldLength('item_parameter', 'value'))
+			)
+				->setAttribute('style', 'width: 100%;')
+				->removeId(),
+			(new CButton('', _('Remove')))
+				->removeId()
+				->onClick('jQuery(this).closest("tr").remove()')
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$data['limited'])
+		]);
+	}
+}
+
+$parameters_table->addRow([
+	(new CButton('parameter_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+		->setEnabled(!$data['limited'])
+]);
+
 $form_list
+	// Append ITEM_TYPE_HTTPAGENT Query fields to form list.
 	->addRow(
 		new CLabel(_('Query fields'), 'query_fields_pairs'),
 		(new CDiv([
@@ -144,6 +197,48 @@ $form_list
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
 		'query_fields_row'
 	)
+	// Append ITEM_TYPE_SCRIPT parameters to form list.
+	->addItem(
+		(new CTag('script', true))
+			->setId('parameters_table_row')
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->addItem(
+				(new CRow([
+					(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('item_parameter', 'name')))
+						->setAttribute('style', 'width: 100%;')
+						->removeId(),
+					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
+						->setAttribute('style', 'width: 100%;')
+						->removeId(),
+					(new CButton('', _('Remove')))
+						->removeId()
+						->onClick('jQuery(this).closest("tr").remove()')
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				]))
+			)
+	)
+	->addRow(
+		new CLabel(_('Parameters'), $parameters_table->getId()),
+		(new CDiv($parameters_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'parameters_row'
+	)
+	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
+		(new CMultilineInput('script', $data['params'], [
+			'title' => _('JavaScript'),
+			'placeholder' => _('script'),
+			'placeholder_textarea' => 'return value',
+			'grow' => 'auto',
+			'rows' => 0,
+			'maxlength' => DB::getFieldLength('items', 'params'),
+			'readonly' => $data['limited']
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'script_row'
+	)
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
 	->addRow(
 		new CLabel(_('Request type'), 'request_method'),
@@ -158,10 +253,12 @@ $form_list
 		],
 		'request_method_row'
 	)
-	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
+	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
 	->addRow(
-		new CLabel(_('Timeout'), 'timeout'),
-		(new CTextBox('timeout', $data['timeout'], $data['limited']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
+		(new CTextBox('timeout', $data['timeout'], $data['limited']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
 		'timeout_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
@@ -267,7 +364,8 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $data['limited'], DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete(),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
@@ -275,12 +373,9 @@ $form_list
 		new CLabel(_('HTTP authentication'), 'http_authtype'),
 		[
 			$data['limited'] ? new CVar('http_authtype', $data['http_authtype']) : null,
-			(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null, [
-				HTTPTEST_AUTH_NONE => _('None'),
-				HTTPTEST_AUTH_BASIC => _('Basic'),
-				HTTPTEST_AUTH_NTLM => _('NTLM'),
-				HTTPTEST_AUTH_KERBEROS => _('Kerberos')
-			]))->setEnabled(!$data['limited'])
+			(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null,
+				httptest_authentications()
+			))->setEnabled(!$data['limited'])
 		],
 		'http_authtype_row'
 	)
@@ -289,7 +384,9 @@ $form_list
 		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $data['limited'],
 			DB::getFieldLength('items', 'username')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_username_row'
 		)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
@@ -297,7 +394,9 @@ $form_list
 		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $data['limited'],
 				DB::getFieldLength('items', 'password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
@@ -336,7 +435,9 @@ $form_list
 		new CLabel(_('SSL key password'), 'ssl_key_password'),
 		(new CTextBox('ssl_key_password', $data['ssl_key_password'], $data['limited'],
 			DB::getFieldLength('items', 'ssl_key_password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'ssl_key_password_row'
 	)
 	// Append master item select to form list.
@@ -374,41 +475,23 @@ $form_list
 	);
 
 // Append interfaces to form list.
+$select_interface = getInterfaceSelect($data['interfaces'])
+	->setId('interface-select')
+	->setValue($data['interfaceid'])
+	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+	->setFocusableElementId('interfaceid')
+	->setAriaRequired();
+
 if ($data['display_interfaces']) {
-	$interfaces_combobox = (new CComboBox('interfaceid', $data['interfaceid']))->setAriaRequired();
-
-	// Set up interface groups sorted by priority.
-	$interface_types = zbx_objectValues($data['interfaces'], 'type');
-	$interface_groups = [];
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		if (in_array($interface_type, $interface_types)) {
-			$interface_groups[$interface_type] = new COptGroup(interfaceType2str($interface_type));
-		}
-	}
-
-	// add interfaces to groups
-	foreach ($data['interfaces'] as $interface) {
-		$option = new CComboItem($interface['interfaceid'],
-			$interface['useip']
-				? $interface['ip'].' : '.$interface['port']
-				: $interface['dns'].' : '.$interface['port'],
-			($interface['interfaceid'] == $data['interfaceid'])
-		);
-		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interface_groups[$interface['type']]->addItem($option);
-	}
-	foreach ($interface_groups as $interface_group) {
-		$interfaces_combobox->addItem($interface_group);
-	}
-
-	$form_list->addRow((new CLabel(_('Host interface'), 'interfaceid'))->setAsteriskMark(),
-		[$interfaces_combobox,
+	$form_list->addRow(
+		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))->setAsteriskMark(),
+		[
+			$select_interface,
 			(new CSpan(_('No interface found')))
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')
 				->setAttribute('style', 'display: none;')
-		], 'interface_row'
-	);
+		], 'interface_row');
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 $form_list
@@ -442,7 +525,9 @@ $form_list
 		'row_jmx_endpoint'
 	)
 	->addRow(_('User name'),
-		(new CTextBox('username', $data['username'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('username', $data['username'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_username'
 	)
 	->addRow(
@@ -460,7 +545,9 @@ $form_list
 		'row_privatekey'
 	)
 	->addRow(_('Password'),
-		(new CTextBox('password', $data['password'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('password', $data['password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_password'
 	)
 	->addRow(
@@ -764,11 +851,12 @@ $tab = (new CTabView())
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
-			)
+			),
+		TAB_INDICATOR_PREPROCESSING
 	)
-	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
-	->addTab('macroTab', _('Filters'), $conditionFormList)
-	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
+	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list, TAB_INDICATOR_LLD_MACROS)
+	->addTab('macroTab', _('Filters'), $conditionFormList, TAB_INDICATOR_FILTERS)
+	->addTab('overridesTab', _('Overrides'), $overrides_form_list, TAB_INDICATOR_OVERRIDES);
 
 if (!hasRequest('form_refresh')) {
 	$tab->setSelected(0);

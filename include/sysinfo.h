@@ -213,6 +213,7 @@ void	free_key_access_rules(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
+void	set_user_parameter_dir(const char *path);
 int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)(void));
 void	test_parameters(void);

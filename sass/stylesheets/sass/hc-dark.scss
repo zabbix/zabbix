@@ -204,6 +204,10 @@ $ok-ack-fg-color: #00ff00;
 // Multiselect
 $multiselect-selected-bg-color: #222222;
 
+// Dashboard list table.
+$dashboard-shared-bg-color: #e0e0e0;
+$dashboard-my-bg-color: #e0e0e0;
+
 // Important! @import string should come after variables.
 @import 'screen.scss';
 
@@ -1433,4 +1437,25 @@ td.inactive-bg {
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
+}
+
+// Tabfilter
+
+.filter-container.tabfilter-container {
+
+	.selected.expanded .icon-home::before {
+		// white icon
+		background: url($sprite-path) no-repeat -433px -510px;
+	}
+
+	.icon-home::before {
+		// black icon
+		background: url($sprite-path) no-repeat -281px -510px;
+	}
+
+	.tabfilter-item-label {
+		&.focused {
+			box-shadow: 0 0 0 2px $blue;
+		}
+	}
 }

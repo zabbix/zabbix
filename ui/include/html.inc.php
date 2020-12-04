@@ -199,7 +199,7 @@ function get_icon($type, $params = []) {
 function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
-			'hostid', 'status', 'proxy_hostid', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
+			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
 			'jmx_available', 'ipmi_available', 'error', 'snmp_error', 'jmx_error', 'ipmi_error'
 		],
 		'selectHostDiscovery' => ['ts_delete'],
@@ -229,7 +229,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$options['selectItems'] = API_OUTPUT_COUNT;
 			$options['selectTriggers'] = API_OUTPUT_COUNT;
 			$options['selectGraphs'] = API_OUTPUT_COUNT;
-			$options['selectScreens'] = API_OUTPUT_COUNT;
+			$options['selectDashboards'] = API_OUTPUT_COUNT;
 			$options['selectDiscoveries'] = API_OUTPUT_COUNT;
 			$options['selectHttpTests'] = API_OUTPUT_COUNT;
 		}
@@ -293,19 +293,6 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem($breadcrumbs);
 	}
 	else {
-		$proxy_name = '';
-
-		if ($db_host['proxy_hostid'] != 0) {
-			$db_proxies = API::Proxy()->get([
-				'output' => ['host'],
-				'proxyids' => [$db_host['proxy_hostid']]
-			]);
-
-			$proxy_name = CHtml::encode($db_proxies[0]['host']).NAME_DELIMITER;
-		}
-
-		$name = $proxy_name.CHtml::encode($db_host['name']);
-
 		switch ($db_host['status']) {
 			case HOST_STATUS_MONITORED:
 				if ($db_host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -323,7 +310,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid']));
+		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
+			'hosts.php?form=update&hostid='.$db_host['hostid']
+		));
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
@@ -408,16 +397,20 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 		$content_menu->addItem($graphs);
 
-		// screens
+		// Dashboards
 		if ($is_template) {
-			$screens = new CSpan([
-				new CLink(_('Screens'), 'screenconf.php?templateid='.$db_host['hostid']),
-				CViewHelper::showNum($db_host['screens'])
+			$dashboards = new CSpan([
+				new CLink(_('Dashboards'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'template.dashboard.list')
+						->setArgument('templateid', $db_host['hostid'])
+				),
+				CViewHelper::showNum($db_host['dashboards'])
 			]);
-			if ($current_element == 'screens') {
-				$screens->addClass(ZBX_STYLE_SELECTED);
+			if ($current_element == 'dashboards') {
+				$dashboards->addClass(ZBX_STYLE_SELECTED);
 			}
-			$content_menu->addItem($screens);
+			$content_menu->addItem($dashboards);
 		}
 
 		// discovery rules
@@ -614,7 +607,7 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 function getHostAvailabilityTable($host) {
 	$container = (new CDiv())->addClass(ZBX_STYLE_STATUS_CONTAINER);
 
-	foreach (['zbx' => '', 'snmp' => 'snmp_', 'jmx' => 'jmx_', 'ipmi' => 'ipmi_'] as $type => $prefix) {
+	foreach (['ZBX' => '', 'SNMP' => 'snmp_', 'JMX' => 'jmx_', 'IPMI' => 'ipmi_'] as $type => $prefix) {
 		switch ($host[$prefix.'available']) {
 			case HOST_AVAILABLE_TRUE:
 				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);

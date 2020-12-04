@@ -19,14 +19,20 @@
 **/
 
 
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Class for converting YAML data stream to PHP array.
  */
 class CYamlImportReader extends CImportReader {
 
 	/**
-	 * Convert YAML data stream to PHP array. Suppress PHP notices when executing yaml_parse() with custom
-	 * error handler. Display only first error since that is where the syntax in file is incorrect.
+	 * Convert YAML data stream to PHP array.
+	 * Known issues:
+	 *   - Error messages coming from Symfony YAML are not translatable;
+	 *   - Symfony parser incorrectly interprets YAML as JSON;
+	 *   - Symfony parser recognizes patterns (like dates) in unquoted strings which are not supported by Zabbix;
+	 *   - Symfony parser support only one YAML document per file.
 	 *
 	 * @param string $string
 	 *
@@ -35,31 +41,40 @@ class CYamlImportReader extends CImportReader {
 	 * @return array
 	 */
 	public function read($string): array {
-		$error = '';
+		try {
+			$data = Yaml::parse($string);
+		}
+		catch (Exception $exception) {
+			throw new ErrorException($exception->getMessage());
+		}
 
-		set_error_handler(function ($errno, $errstr) use (&$error) {
-			if ($error === '' && $errstr !== '') {
-				$error = str_replace('yaml_parse(): ', '', $errstr);
+		if ($data === null) {
+			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('File is empty')));
+		}
+		elseif (!is_array($data)) {
+			throw new ErrorException(_s('Cannot read YAML: %1$s.', _('Invalid YAML file contents')));
+		}
+
+		return self::trimEmptyLine($data);
+	}
+
+	/**
+	 * Removes trailing empty line from multiline strings.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	private static function trimEmptyLine(array $data): array {
+		foreach ($data as &$value) {
+			if (is_array($value)) {
+				$value = self::trimEmptyLine($value);
 			}
-		});
-
-		$data = yaml_parse($string);
-
-		restore_error_handler();
-
-		/*
-		 * Unfortunately yaml_parse() not always returns FALSE. If file is empty, it returns NULL and if file contains
-		 * gibberish and not a "zabbix_export" array, $data contains same input string, but Import Validator expects
-		 * $data to be an array. Create a custom error message for these cases.
-		 */
-		if (!is_array($data) && $data !== false) {
-			$data = false;
-			$error = _('Invalid file content');
+			else if (is_string($value) && $value !== '' && $value[strlen($value) - 1] === "\n") {
+				$value = substr($value, 0, -1);
+			}
 		}
-
-		if ($data === false) {
-			throw new ErrorException(_s('Cannot read YAML: %1$s.', $error));
-		}
+		unset($value);
 
 		return $data;
 	}

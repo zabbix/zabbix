@@ -101,7 +101,9 @@ foreach ($data['applications'] as $application) {
 
 	// Inherited app, display the template list.
 	if ($application['templateids']) {
-		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates']);
+		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates'],
+			$data['allowed_ui_conf_templates']
+		);
 		$name[] = $application['name'];
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {

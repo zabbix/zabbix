@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for Macros tests.
@@ -31,6 +32,15 @@ abstract class testFormMacros extends CWebTest {
 	use MacrosTrait;
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
@@ -52,7 +62,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=create'
 		);
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->fill([ucfirst($host_type).' name' => $data['Name']]);
 
 		if ($is_prototype) {
@@ -103,7 +113,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->removeMacros();
 		$form->submit();
@@ -129,7 +139,7 @@ abstract class testFormMacros extends CWebTest {
 	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 
 			$name = 'Host prototype with edited global {#MACRO}';
 			$form->fill([ucfirst($host_type).' name' => $name]);
@@ -218,7 +228,7 @@ abstract class testFormMacros extends CWebTest {
 			$old_hash = $this->getHash();
 		}
 
-		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->fillMacros($data['macros']);
 		$form->submit();
@@ -261,7 +271,7 @@ abstract class testFormMacros extends CWebTest {
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
-		$form = $this->query('id:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
@@ -420,7 +430,7 @@ abstract class testFormMacros extends CWebTest {
 
 		// Switch to tab with inherited and instance macros and verify that the value is secret but is still accessible.
 		$this->checkInheritedTab($data['macro_fields'], true);
-		// Check that macro value is hidden but is still accessible after swithing back to instance macros list.
+		// Check that macro value is hidden but is still accessible after switching back to instance macros list.
 		$value_field = $this->getValueField($data['macro_fields']['macro']);
 		$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 
@@ -581,6 +591,39 @@ abstract class testFormMacros extends CWebTest {
 		$this->query('class:is-loading')->waitUntilNotPresent();
 	}
 
+	public function createVaultMacros($data, $url, $source) {
+		$this->openMacrosTab($url, $source, true);
+		$this->fillMacros([$data['macro_fields']]);
+		$this->query('button:Update')->one()->click();
+		if ($data['expected'] == TEST_BAD) {
+			$this->assertMessage($data['expected'], $data['title'], $data['message']);
+		}
+		else {
+			$this->assertMessage($data['expected'], $data['title']);
+			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
+			$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], ZBX_MACRO_TYPE_VAULT],
+					array_values(CDBHelper::getRow($sql)));
+			$this->openMacrosTab($url, $source);
+			$value_field = $this->getValueField($data['macro_fields']['macro']);
+			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
+		}
+	}
+
+	public function updateVaultMacros($data, $url, $source) {
+		$this->openMacrosTab($url, $source, true);
+		$this->fillMacros([$data]);
+		$this->query('button:Update')->one()->click();
+		$this->openMacrosTab($url, $source);
+		$result = [];
+		foreach (['macro', 'value', 'description'] as $field) {
+			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['index'].'_'.$field.'"]')->one()->getText();
+		}
+		$this->assertEquals([$data['macro'], $data['value']['text'], $data['description']], $result);
+		array_push($result, ZBX_MACRO_TYPE_VAULT);
+		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['macro']);
+		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
+	}
+
 	/**
 	 * Function opens Macros tab in corresponding instance configuration form.
 	 *
@@ -593,6 +636,6 @@ abstract class testFormMacros extends CWebTest {
 			$this->page->login();
 		}
 		$this->page->open($url)->waitUntilReady();
-		$this->query('id:'.$source.'Form')->asForm()->one()->selectTab('Macros');
+		$this->query('id:'.$source.'-form')->asForm()->one()->selectTab('Macros');
 	}
 }

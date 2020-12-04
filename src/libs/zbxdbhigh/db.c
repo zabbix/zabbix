@@ -429,6 +429,22 @@ int	DBexecute_once(const char *fmt, ...)
 	return rc;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBis_null                                                        *
+ *                                                                            *
+ * Purpose: check if numeric field value is null                              *
+ *                                                                            *
+ * Parameters: field - [IN] field value to be checked                         *
+ *                                                                            *
+ * Return value: SUCCEED - field value is null                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: ATTENTION! This function should only be used with numeric fields *
+ *           since on Oracle empty string is returned instead of NULL and it  *
+ *           is not possible to differentiate empty string from NULL string   *
+ *                                                                            *
+ ******************************************************************************/
 int	DBis_null(const char *field)
 {
 	return zbx_db_is_null(field);
@@ -1313,7 +1329,8 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 	if (NULL == recipient_userid || *userid == *recipient_userid)
 		goto out;
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64, *recipient_userid);
+	result = DBselect("select r.type from users u,role r where u.roleid=r.roleid and"
+			" userid=" ZBX_FS_UI64, *recipient_userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		user_type = atoi(row[0]);
@@ -1572,7 +1589,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata,a.listen_ip,a.listen_dns,"
-					"a.listen_port,a.flags"
+					"a.listen_port,a.flags,a.autoreg_hostid"
 				" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
@@ -1594,7 +1611,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
 				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
 
-				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
+				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[8]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 						autoreg_host->flag != atoi(row[7]))
 				{
@@ -1776,7 +1793,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 		ts.sec = autoreg_host->now;
 		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
 	}
 
 	zbx_process_events(NULL, NULL);
@@ -3341,7 +3358,7 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
  *             ha           [IN] the host availability data                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
+static int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha)
 {
 	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
@@ -3395,6 +3412,55 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_update_host_availabilities                                *
+ *                                                                            *
+ * Purpose: sync host availabilities updates into database                    *
+ *                                                                            *
+ * Parameters: host_availabilities [IN] the host availability data            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities)
+{
+	int	txn_error;
+	char	*sql = NULL;
+	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
+	int	i;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	do
+	{
+		size_t	sql_offset = 0;
+
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < host_availabilities->values_num; i++)
+		{
+			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
+					(zbx_host_availability_t *)host_availabilities->values[i]))
+			{
+				continue;
+			}
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+
+		txn_error = DBcommit();
+	}
+	while (ZBX_DB_DOWN == txn_error);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_user_by_active_session                                     *
  *                                                                            *
  * Purpose: validate that session is active and get associated user data      *
@@ -3418,11 +3484,12 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.type"
-				" from sessions s,users u"
+			"select u.userid,u.roleid,r.type"
+				" from sessions s,users u,role r"
 			" where s.userid=u.userid"
 				" and s.sessionid='%s'"
-				" and s.status=%d",
+				" and s.status=%d"
+				" and u.roleid=r.roleid",
 			sessionid_esc, ZBX_SESSION_ACTIVE)))
 	{
 		goto out;
@@ -3432,7 +3499,8 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 		goto out;
 
 	ZBX_STR2UINT64(user->userid, row[0]);
-	user->type = atoi(row[1]);
+	ZBX_STR2UINT64(user->roleid, row[1]);
+	user->type = atoi(row[2]);
 
 	ret = SUCCEED;
 out:

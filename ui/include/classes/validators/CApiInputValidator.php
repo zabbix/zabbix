@@ -171,6 +171,15 @@ class CApiInputValidator {
 
 			case API_URL:
 				return self::validateUrl($rule, $data, $path, $error);
+
+			case API_IP:
+				return self::validateIp($rule, $data, $path, $error);
+
+			case API_DNS:
+				return self::validateDns($rule, $data, $path, $error);
+
+			case API_PORT:
+				return self::validatePort($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -219,6 +228,9 @@ class CApiInputValidator {
 			case API_HTTP_POST:
 			case API_VARIABLE_NAME:
 			case API_URL:
+			case API_IP:
+			case API_DNS:
+			case API_PORT:
 				return true;
 
 			case API_OBJECT:
@@ -1796,6 +1808,153 @@ class CApiInputValidator {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * IP address validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateIp($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$ip_parser = new CIPParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'macros' => ($flags & API_ALLOW_MACRO)
+		]);
+
+		if ($ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP address is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * DNS name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateDns($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$dns_parser = new CDnsParser([
+			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'macros' => ($flags & API_ALLOW_MACRO)
+		]);
+
+		if ($dns_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a DNS name is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Port number validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePort($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (!is_int($data) && !is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		$data = (string) $data;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$user_macro_parser = new CUserMacroParser();
+
+			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$lld_macro_parser = new CLLDMacroParser();
+
+			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
+			return false;
+		}
+
+		$data = (string) $data;
 
 		return true;
 	}

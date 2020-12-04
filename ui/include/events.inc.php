@@ -134,19 +134,42 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 
 /**
  *
- * @param array  $event                   An array of event data.
- * @param string $event['eventid']        Event ID.
- * @param string $event['objectid']       Object ID.
- * @param string $event['correlationid']  OK Event correlation ID.
- * @param string $event['userid']         User ID who generated the OK event.
- * @param string $event['name']           Event name.
- * @param string $event['acknowledged']   State of acknowledgement.
- * @param CCOl   $event['opdata']         Operational data with expanded macros.
- * @param string $event['comments']       Trigger description with expanded macros.
+ * @param array  $event                              An array of event data.
+ * @param string $event['eventid']                   Event ID.
+ * @param string $event['r_eventid']                 OK event ID.
+ * @param string $event['objectid']                  Object ID.
+ * @param string $event['correlationid']             OK Event correlation ID.
+ * @param string $event['userid']                    User ID who generated the OK event.
+ * @param string $event['name']                      Event name.
+ * @param string $event['acknowledged']              State of acknowledgement.
+ * @param array  $event['acknowledges']              List of problem updates.
+ * @param string $event['acknowledges'][]['action']  Action performed in update.
+ * @param CCOl   $event['opdata']                    Operational data with expanded macros.
+ * @param string $event['comments']                  Trigger description with expanded macros.
+ * @param array  $allowed                            An array of user role rules.
+ * @param bool   $allowed['ui_correlation']          Whether user is allowed to visit event correlation page.
+ * @param bool   $allowed['add_comments']            Whether user is allowed to add problems comments.
+ * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
+ * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
+ * @param bool   $allowed['close']                   Whether user is allowed to close problems.
  *
  * @return CTableInfo
  */
-function make_event_details(array $event) {
+function make_event_details(array $event, array $allowed) {
+	$can_be_closed = $allowed['close'];
+
+	if ($event['r_eventid'] != 0) {
+		$can_be_closed = false;
+	}
+	else {
+		foreach ($event['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+				$can_be_closed = false;
+				break;
+			}
+		}
+	}
+
 	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
@@ -168,10 +191,14 @@ function make_event_details(array $event) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			(new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
+			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed)
+				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
+				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+				)
 		]);
 
 	if ($event['r_eventid'] != 0) {
@@ -182,9 +209,10 @@ function make_event_details(array $event) {
 			]);
 
 			if ($correlations) {
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				if ($allowed['ui_correlation']) {
 					$correlation_name = (new CLink($correlations[0]['name'],
-						(new CUrl('correlation.php'))
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'correlation.edit')
 							->setArgument('correlationid', $correlations[0]['correlationid'])
 							->getUrl()
 					))->addClass(ZBX_STYLE_LINK_ALT);
@@ -235,7 +263,20 @@ function make_event_details(array $event) {
 	return $table;
 }
 
-function make_small_eventlist(array $startEvent) {
+/**
+ *
+ * @param array  $startEvent                  An array of event data.
+ * @param string $startEvent['eventid']       Event ID.
+ * @param string $startEvent['objectid']      Object ID.
+ * @param array  $allowed                     An array of user role rules.
+ * @param bool   $allowed['add_comments']     Whether user is allowed to add problems comments.
+ * @param bool   $allowed['change_severity']  Whether user is allowed to change problems severity.
+ * @param bool   $allowed['acknowledge']      Whether user is allowed to acknowledge problems.
+ * @param bool   $allowed['close']            Whether user is allowed to close problems.
+ *
+ * @return CTableInfo
+ */
+function make_small_eventlist(array $startEvent, array $allowed) {
 	$table = (new CTableInfo())
 		->setHeader([
 			_('Time'),
@@ -314,12 +355,21 @@ function make_small_eventlist(array $startEvent) {
 			? zbx_date2age($event['clock'], $event['r_clock'])
 			: zbx_date2age($event['clock']);
 
-		if ($event['r_eventid'] == 0) {
+		$can_be_closed = $allowed['close'];
+
+		if ($event['r_eventid'] != 0) {
+			$value = TRIGGER_VALUE_FALSE;
+			$value_str = _('RESOLVED');
+			$value_clock = $event['r_clock'];
+			$can_be_closed = false;
+		}
+		else {
 			$in_closing = false;
 
 			foreach ($event['acknowledges'] as $acknowledge) {
 				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 					$in_closing = true;
+					$can_be_closed = false;
 					break;
 				}
 			}
@@ -327,11 +377,6 @@ function make_small_eventlist(array $startEvent) {
 			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 			$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 			$value_clock = $in_closing ? time() : $event['clock'];
-		}
-		else {
-			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
-			$value_clock = $event['r_clock'];
 		}
 
 		$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
@@ -344,10 +389,15 @@ function make_small_eventlist(array $startEvent) {
 		addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
 		// Create acknowledge link.
-		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);');
+		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+				|| $can_be_closed)
+			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
+			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+			);
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -372,30 +422,36 @@ function make_small_eventlist(array $startEvent) {
 /**
  * Create table with trigger description and events.
  *
- * @param array  $trigger                    An array of trigger data.
- * @param string $trigger['triggerid']       Trigger ID to select events.
- * @param string $trigger['comments']        Trigger description.
- * @param string $trigger['url']             Trigger URL.
+ * @param array  $trigger                     An array of trigger data.
+ * @param string $trigger['triggerid']        Trigger ID to select events.
+ * @param string $trigger['comments']         Trigger description.
+ * @param string $trigger['url']              Trigger URL.
  * @param string $eventid_till
- * @param bool   $show_timeline              Show time line flag.
- * @param int    $show_tags                  Show tags flag. Possible values:
- *                                             - PROBLEMS_SHOW_TAGS_NONE;
- *                                             - PROBLEMS_SHOW_TAGS_1;
- *                                             - PROBLEMS_SHOW_TAGS_2;
- *                                             - PROBLEMS_SHOW_TAGS_3 (default).
- * @param array  $filter_tags                An array of tag filtering data.
- * @param string $filter_tags[]['tag']       Tag name.
- * @param int    $filter_tags[]['operator']  Tag operator.
- * @param string $filter_tags[]['value']     Tag value.
- * @param int    $tag_name_format            Tag name format. Possible values:
- *                                             - PROBLEMS_TAG_NAME_FULL (default);
- *                                             - PROBLEMS_TAG_NAME_SHORTENED;
- *                                             - PROBLEMS_TAG_NAME_NONE.
- * @param string $tag_priority               A list of comma-separated tag names.
+ * @param array  $allowed                     An array of user role rules.
+ * @param bool   $allowed['ui_problems']      Whether user is allowed to visit problems page.
+ * @param bool   $allowed['add_comments']     Whether user is allowed to add problems comments.
+ * @param bool   $allowed['change_severity']  Whether user is allowed to change problems severity.
+ * @param bool   $allowed['acknowledge']      Whether user is allowed to acknowledge problems.
+ * @param bool   $allowed['close']            Whether user is allowed to close problems.
+ * @param bool   $show_timeline               Show time line flag.
+ * @param int    $show_tags                   Show tags flag. Possible values:
+ *                                              - PROBLEMS_SHOW_TAGS_NONE;
+ *                                              - PROBLEMS_SHOW_TAGS_1;
+ *                                              - PROBLEMS_SHOW_TAGS_2;
+ *                                              - PROBLEMS_SHOW_TAGS_3 (default).
+ * @param array  $filter_tags                 An array of tag filtering data.
+ * @param string $filter_tags[]['tag']        Tag name.
+ * @param int    $filter_tags[]['operator']   Tag operator.
+ * @param string $filter_tags[]['value']      Tag value.
+ * @param int    $tag_name_format             Tag name format. Possible values:
+ *                                              - PROBLEMS_TAG_NAME_FULL (default);
+ *                                              - PROBLEMS_TAG_NAME_SHORTENED;
+ *                                              - PROBLEMS_TAG_NAME_NONE.
+ * @param string $tag_priority                A list of comma-separated tag names.
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $show_tags = PROBLEMS_SHOW_TAGS_3,
+function make_popup_eventlist($trigger, $eventid_till, $allowed, $show_timeline = true, $show_tags = PROBLEMS_SHOW_TAGS_3,
 		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
 	// Show trigger description and URL.
 	$div = new CDiv();
@@ -491,9 +547,11 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 			$tags = makeTags($problems, true, 'eventid', $show_tags, $filter_tags, $tag_name_format, $tag_priority);
 		}
 
-		$url_details = (new CUrl('tr_events.php'))
-			->setArgument('triggerid', '')
-			->setArgument('eventid', '');
+		$url_details = $allowed['ui_problems']
+			? (new CUrl('tr_events.php'))
+				->setArgument('triggerid', '')
+				->setArgument('eventid', '')
+			: null;
 
 		foreach ($problems as $problem) {
 			if (array_key_exists($problem['r_eventid'], $r_events)) {
@@ -507,10 +565,13 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 				$problem['userid'] = 0;
 			}
 
+			$can_be_closed = $allowed['close'];
+
 			if ($problem['r_eventid'] != 0) {
 				$value = TRIGGER_VALUE_FALSE;
 				$value_str = _('RESOLVED');
 				$value_clock = $problem['r_clock'];
+				$can_be_closed = false;
 			}
 			else {
 				$in_closing = false;
@@ -518,6 +579,7 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 				foreach ($problem['acknowledges'] as $acknowledge) {
 					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 						$in_closing = true;
+						$can_be_closed = false;
 						break;
 					}
 				}
@@ -527,19 +589,28 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 				$value_clock = $in_closing ? time() : $problem['clock'];
 			}
 
-			$url_details
-				->setArgument('triggerid', $problem['objectid'])
-				->setArgument('eventid', $problem['eventid']);
-
 			$cell_clock = ($problem['clock'] >= $today)
 				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
-			$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+
+			if ($url_details !== null) {
+				$url_details
+					->setArgument('triggerid', $problem['objectid'])
+					->setArgument('eventid', $problem['eventid']);
+				$cell_clock = new CCol(new CLink($cell_clock, $url_details));
+			}
+			else {
+				$cell_clock = new CCol($cell_clock);
+			}
+
 			if ($problem['r_eventid'] != 0) {
 				$cell_r_clock = ($problem['r_clock'] >= $today)
 					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
 					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
-				$cell_r_clock = (new CCol(new CLink($cell_r_clock, $url_details)))
+				$cell_r_clock = (new CCol(($url_details !== null)
+					? new CLink($cell_r_clock, $url_details)
+					: $cell_r_clock
+				))
 					->addClass(ZBX_STYLE_NOWRAP)
 					->addClass(ZBX_STYLE_RIGHT);
 			}
@@ -576,10 +647,15 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 			}
 
 			// Create acknowledge link.
-			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
-				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
+			$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+					|| $can_be_closed)
+				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
+					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
+					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
+				);
 
 			$table->addRow(array_merge($row, [
 				$cell_r_clock,

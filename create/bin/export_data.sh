@@ -53,9 +53,9 @@ for table in `grep TABLE "$schema" | grep $dbflag | awk -F'|' '{print $2}'`; do
 			ref_field=`echo $line | cut -f9 -d'|' | sed -e 's/ //'`
 			# this strange sort order works fine with MySQL
 			if [ -z "$sortorder" ]; then
-				sortorder="order by $pri_field<$ref_field,$ref_field"
+				sortorder="order by $table.$pri_field<$table.$ref_field,$table.$ref_field"
 			else
-				sortorder="$sortorder,$pri_field<$ref_field,$ref_field"
+				sortorder="$sortorder,$table.$pri_field<$table.$ref_field,$table.$ref_field"
 			fi
 		fi
 	done

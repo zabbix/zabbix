@@ -169,7 +169,8 @@ class CControllerAuthenticationUpdate extends CController {
 					'bind_dn' => $ldap_auth['ldap_bind_dn'],
 					'bind_password' => $ldap_auth['ldap_bind_password'],
 					'search_attribute' => $ldap_auth['ldap_search_attribute']
-				]
+				],
+				'detailed_errors' => true
 			]);
 
 			$login = $ldap_validator->validate([
@@ -226,7 +227,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	protected function checkPermissions() {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION);
 	}
 
 	protected function doAction() {

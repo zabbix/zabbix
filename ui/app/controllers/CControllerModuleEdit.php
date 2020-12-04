@@ -54,7 +54,7 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
 
@@ -91,7 +91,7 @@ class CControllerModuleEdit extends CController {
 					? $this->hasInput('status')
 						? MODULE_STATUS_ENABLED
 						: MODULE_STATUS_DISABLED
-					: $this->module['status'],
+					: $this->module['status']
 			];
 
 			$response = new CControllerResponseData($data);

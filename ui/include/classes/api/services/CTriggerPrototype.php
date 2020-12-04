@@ -24,6 +24,13 @@
  */
 class CTriggerPrototype extends CTriggerGeneral {
 
+	public const ACCESS_RULES = [
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'discover'];
@@ -603,7 +610,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			foreach ($triggerPrototype['dependencies'] as $dependency) {
 				$insert[] = [
 					'triggerid_down' => $triggerPrototype['triggerid'],
-					'triggerid_up' => $dependency['triggerid'],
+					'triggerid_up' => $dependency['triggerid']
 				];
 			}
 		}
@@ -1124,7 +1131,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}

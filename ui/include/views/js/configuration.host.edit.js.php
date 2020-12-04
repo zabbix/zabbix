@@ -26,7 +26,6 @@
 <script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
 <div class="<?= ZBX_STYLE_HOST_INTERFACE_ROW ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>" id="interface_row_#{iface.interfaceid}" data-type="#{iface.type}" data-interfaceid="#{iface.interfaceid}">
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
-	<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 	<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 	<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
@@ -74,7 +73,7 @@
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
-				->addRow((new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'))->setAsteriskMark(),
+				->addRow(new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'),
 					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]),
 					'row_snmp_version_#{iface.interfaceid}'
 				)
@@ -111,7 +110,8 @@
 				)
 				->addRow(new CLabel(_('Authentication passphrase'), 'interfaces[#{iface.interfaceid}][details][authpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][authpassphrase]', '#{iface.details.authpassphrase}', false, DB::getFieldLength('interface_snmp', 'authpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete(),
 					'row_snmpv3_authpassphrase_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Privacy protocol'), 'interfaces[#{iface.interfaceid}][details][privprotocol]'),
@@ -123,7 +123,8 @@
 				)
 				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]', '#{iface.details.privpassphrase}', false, DB::getFieldLength('interface_snmp', 'privpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete(),
 					'row_snmpv3_privpassphrase_#{iface.interfaceid}'
 				)
 				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'),
@@ -166,8 +167,9 @@
 				<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
 			};
 
+			this.allow_empty_message = true;
 			this.$noInterfacesMsg = jQuery('<div class="<?= ZBX_STYLE_GREY ?>"></div>')
-				.text('<?= _('No interfaces are defined for this host.') ?>')
+				.text('<?= _('No interfaces are defined.') ?>')
 				.addClass('<?= ZBX_STYLE_GREY ?>')
 				.css('padding', '5px 0px')
 				.insertAfter(jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER ?>'));
@@ -190,7 +192,13 @@
 
 			Object
 				.entries(new_data)
-				.forEach(([_, value]) => this.interfaces[value.interfaceid] = value);
+				.forEach(([_, value]) => {
+					if (!('interfaceid' in value)) {
+						value.interfaceid = this.generateId();
+					}
+
+					this.interfaces[value.interfaceid] = value;
+				});
 
 			return this;
 		}
@@ -200,6 +208,10 @@
 		 */
 		get data() {
 			return this.interfaces;
+		}
+
+		setAllowEmptyMessage(value) {
+			this.allow_empty_message = value;
 		}
 
 		setSnmpFields(elem, iface) {
@@ -334,8 +346,7 @@
 
 		renderRow(iface) {
 			const container = document.querySelector(this.CONTAINER_IDS[iface.type]);
-			const disabled = (iface.items > 0);
-			const locked = (iface.locked > 0);
+			const disabled = (typeof iface.items !== 'undefined' && iface.items > 0);
 
 			iface.type_name = this.INTERFACE_NAMES[iface.type];
 
@@ -530,41 +541,55 @@
 			}
 			else {
 				jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER ?>').hide();
-				this.$noInterfacesMsg.show();
+				this.$noInterfacesMsg.toggle(this.allow_empty_message);
 			}
 		}
 
-		static disableEdit() {
-			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
-				[...row.querySelectorAll('input')].map((el) => {
-					el.removeAttribute('name');
+		/**
+		 * Converts form field to readonly.
+		 *
+		 * @param {Element} el  Native JavaScript element for form field.
+		 */
+		static setReadonly(el) {
+			const tag_name = el.tagName;
 
-					if (el.matches('[type=text]')) {
+			if (tag_name === 'INPUT') {
+				const type = el.getAttribute('type');
+
+				switch (type) {
+					case 'text':
 						el.readOnly = true;
-					}
-
-					if (el.matches('[type=radio], [type=checkbox]')) {
+						break;
+					case 'radio':
+					case 'checkbox':
+						const {checked, name, value} = el;
 						el.disabled = true;
-					}
+
+						if (checked) {
+							const input = document.createElement('input');
+							input.type = 'hidden';
+							input.name = name;
+							input.value = value;
+
+							el.insertAdjacentElement('beforebegin', input);
+						}
+
+						break;
+				}
+			}
+			else if (tag_name === 'SELECT') {
+				el.setAttribute('readonly', 'readonly');
+				el.setAttribute('tabindex', -1);
+			}
+		}
+
+		static makeReadonly() {
+			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
+				[...row.querySelectorAll('input, select')].map((el) => {
+					this.setReadonly(el);
 				});
 
 				[...row.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')].map((el) => el.remove());
-
-				// Change select to input.
-				[...row.querySelectorAll('select')].map((el) => {
-					const index = el.selectedIndex;
-					const value = el.options[index].text;
-
-					// Create new input[type=text].
-					const input = document.createElement('input');
-					input.type = 'text';
-					input.id = el.id;
-					input.readOnly = true;
-					input.value = value;
-
-					// Replace select with created input.
-					el.replaceWith(input);
-				});
 			});
 
 			return true;
@@ -630,7 +655,7 @@
 		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		jQuery('#hostsForm').submit(function() {
+		jQuery('#hosts-form').submit(function() {
 			var tls_accept = 0x00;
 
 			if (jQuery('#tls_in_none').is(':checked')) {

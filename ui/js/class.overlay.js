@@ -287,6 +287,11 @@ Overlay.prototype.makeButton = function(obj) {
 		});
 
 	$button.on('click', function(e) {
+		if (('confirmation' in obj) && !confirm(obj.confirmation)) {
+			e.preventDefault();
+			return;
+		}
+
 		if (obj.isSubmit && this.$btn_submit) {
 			this.$btn_submit.blur().addClass('is-loading');
 		}
@@ -407,6 +412,11 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'buttons':
 				this.unsetProperty(key);
 				this.$dialogue.$footer.append(this.makeButtons(obj[key]));
+				break;
+
+			case 'footer':
+				this.unsetProperty(key);
+				this.$dialogue.$footer.append(obj[key]);
 				break;
 
 			case 'content':

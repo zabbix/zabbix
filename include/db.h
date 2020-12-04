@@ -85,6 +85,7 @@ struct	_DC_TRIGGER;
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
+#define TRIGGER_EVENT_NAME_LEN		2048
 #define TAG_NAME_LEN			255
 #define TAG_VALUE_LEN			255
 
@@ -174,6 +175,9 @@ struct	_DC_TRIGGER;
 #	define ITEM_POSTS_LEN		65535
 #	define ITEM_HEADERS_LEN		65535
 #endif
+
+#define ITEM_PARAMETER_NAME_LEN		255
+#define ITEM_PARAMETER_VALUE_LEN	2048
 
 #define HISTORY_STR_VALUE_LEN		255
 #define HISTORY_TEXT_VALUE_LEN		65535
@@ -312,6 +316,7 @@ typedef struct
 	char		*comments;
 	char		*correlation_tag;
 	char		*opdata;
+	char		*event_name;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;
@@ -727,11 +732,11 @@ typedef struct
 	zbx_uint64_t			hostid;
 
 	zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
+	int				id;	/* ensure chronological order in case of flapping host availability */
 }
 zbx_host_availability_t;
 
-int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const zbx_host_availability_t *ha);
+void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
 
 typedef struct

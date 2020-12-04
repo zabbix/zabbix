@@ -29,10 +29,14 @@ class CFunctionMacroParser extends CParser {
 	 *
 	 * Supported options:
 	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
+	 *   'host_macro'                   Array of macro to be supported as host name.
 	 *
 	 * @var array
 	 */
-	private $options = ['18_simple_checks' => false];
+	private $options = [
+		'18_simple_checks' => false,
+		'host_macro' => []
+	];
 
 	/**
 	 * Parser for item keys.
@@ -63,13 +67,14 @@ class CFunctionMacroParser extends CParser {
 	 * @param array $options
 	 */
 	public function __construct($options = []) {
-		if (array_key_exists('18_simple_checks', $options)) {
-			$this->options['18_simple_checks'] = $options['18_simple_checks'];
-		}
-
+		$this->options = $options + $this->options;
 		$this->item_key_parser = new CItemKey(['18_simple_checks' => $this->options['18_simple_checks']]);
 		$this->function_parser = new CFunctionParser();
 		$this->host_name_parser = new CHostNameParser();
+
+		if ($this->options['host_macro']) {
+			$this->host_macro_parser = new CSetParser($this->options['host_macro']);
+		}
 	}
 
 	/**
@@ -153,6 +158,12 @@ class CFunctionMacroParser extends CParser {
 	 * @return bool
 	 */
 	protected function parseHost($source, &$pos) {
+		if ($this->options['host_macro'] && $this->host_macro_parser->parse($source, $pos) !== CParser::PARSE_FAIL) {
+			$pos += $this->host_macro_parser->getLength();
+
+			return true;
+		}
+
 		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
 			return false;
 		}
