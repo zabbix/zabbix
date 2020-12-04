@@ -1,8 +1,22 @@
 Changes for 5.0.7rc1
 
 New features:
+.........T [ZBXNEXT-6234] added "Disk read/write request avg waiting time" items in Template Module Windows physical disks (mchudinov)
 
 Bug fixes:
+........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
+...G...... [ZBX-18187] fixed agent2 wmi.get returning the wrong result (arimdjonoks)
+...G...... [ZBX-18543] reworked ceph.osd.discovery metric (vadimipatov)
+........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
+.......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)
+.......PS. [ZBX-18662] improved pollers, unreachable pollers, Java pollers and pingers to use less memory (vso)
+.......PS. [ZBX-18553] increased ssh.run[] item data limit to 512KB for pre-processing, data storage limit still remains at 64KB (viktors)
+........S. [ZBX-18423] fixed inconsistent macro expansion with Oracle DB compared with other databases (viktors)
+.........T [ZBX-18658] changed {$AMI.PORT} macro value to 5038, added handling the "Follows" response and situations with unloaded modules (mchudinov)
+A......... [ZBX-18219] fixed custom multiplier preprocessing step validation to accept a string with macros (agriscenko)
+..F....... [ZBX-18198] fixed tags not being expanded automatically on configuration form open (agriscenko)
+A.F....... [ZBX-18397] fixed global macros clearing value on type change from secret to text when value is set and is the same as before (Ivo)
+A......... [ZBX-18357] fixed dashboard view_mode being reset to default on dashboard update (gcalenko, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.6
