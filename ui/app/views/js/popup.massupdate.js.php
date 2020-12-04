@@ -90,6 +90,11 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tbl_macros'))
 		.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
 		.textareaFlexible();
+
+	$(obj.querySelector('#tbl_macros'))
+		.on('resize', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', () => {
+			$(window).resize();
+		});
 })();
 
 // Tags.
@@ -108,6 +113,9 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tags-table'))
 		.on('click', 'button.element-table-add', () => {
 			$('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+		})
+		.on('resize', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', () => {
+			$(window).resize();
 		});
 })();
 

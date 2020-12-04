@@ -18,6 +18,9 @@
 **/
 
 
+/**
+ * @event resize - Event fired on textarea size change.
+ */
 (function($) {
 	'use strict';
 
@@ -61,6 +64,9 @@
 		$textarea
 			.height(0)
 			.innerHeight($textarea[0].scrollHeight);
+
+		// Fire event.
+		$textarea.trigger('resize');
 
 		$(window).scrollTop(scroll_pos);
 	}
