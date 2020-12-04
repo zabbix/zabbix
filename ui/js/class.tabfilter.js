@@ -678,6 +678,10 @@ class CTabFilter extends CBaseComponent {
 			stop: (_, ui) => {
 				const $item = ui.item;
 
+				/**
+				 * Remove inline style positon, left and top that stay after sortable.
+				 * This styles broken tabs layout.
+				 */
 				if ($item.css('position') === 'relative') {
 					$item.css({
 						'position': '',
