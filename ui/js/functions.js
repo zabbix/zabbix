@@ -289,6 +289,13 @@ function postMessageError(message) {
 	cookie.create('system-message-error', message);
 }
 
+function postMessageDetails(type, messages) {
+	cookie.create('system-message-details', btoa(JSON.stringify({
+		type: type,
+		messages: messages
+	})));
+}
+
 /**
  * Replace placeholders like %<number>$s with arguments.
  * Can be used like usual sprintf but only for %<number>$s placeholders.

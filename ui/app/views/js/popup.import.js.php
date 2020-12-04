@@ -85,7 +85,10 @@ function submitPopup(overlay) {
 			form.querySelector('#import_file').value = '';
 		}
 		else {
-			postMessageOk(response['message']);
+			postMessageOk(response['title']);
+			if ('messages' in response) {
+				postMessageDetails('success', response.messages);
+			}
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location.href;
 		}
