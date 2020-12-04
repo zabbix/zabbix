@@ -1321,22 +1321,6 @@ return [
 			]
 		]
 	],
-	'valuemaps' => [
-		'key' => 'valuemapid',
-		'fields' => [
-			'valuemapid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			]
-		]
-	],
 	'items' => [
 		'key' => 'itemid',
 		'fields' => [
@@ -1437,12 +1421,13 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid'
 			],
-			'valuemapid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'valuemaps',
-				'ref_field' => 'valuemapid'
+			'valuemap' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+				'ref_table' => 'valuemap',
+				'ref_field' => 'name'
 			],
 			'params' => [
 				'null' => false,
@@ -3734,35 +3719,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'items',
 				'ref_field' => 'itemid'
-			]
-		]
-	],
-	'mappings' => [
-		'key' => 'mappingid',
-		'fields' => [
-			'mappingid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'valuemapid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'valuemaps',
-				'ref_field' => 'valuemapid'
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			],
-			'newvalue' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
 			]
 		]
 	],
@@ -8616,6 +8572,58 @@ return [
 				'length' => 20,
 				'ref_table' => 'module',
 				'ref_field' => 'moduleid'
+			]
+		]
+	],
+	'valuemap' => [
+		'key' => 'valuemapid',
+		'fields' => [
+			'valuemapid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
+	'valuemap_mapping' => [
+		'key' => 'valuemap_mappingid',
+		'fields' => [
+			'valuemap_mappingid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'valuemapid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'valuemap',
+				'ref_field' => 'valuemapid'
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			],
+			'newvalue' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
 			]
 		]
 	],
