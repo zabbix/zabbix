@@ -731,7 +731,7 @@ class CLineGraphDraw extends CGraphDraw {
 				[
 					$this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
+					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
 				],
 				3,
 				$this->getColor('White')
@@ -774,7 +774,7 @@ class CLineGraphDraw extends CGraphDraw {
 				[
 					$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 					$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
+					$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
 				],
 				3,
 				$this->getColor('White')

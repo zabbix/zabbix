@@ -42,7 +42,7 @@ $fields = [
 	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
-	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
+	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));

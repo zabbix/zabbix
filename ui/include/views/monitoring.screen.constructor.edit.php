@@ -155,7 +155,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 				] : [
 					'real_hosts' => '1',
 					'with_graphs' => '1'
-				]),
+				])
 			]
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -212,7 +212,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 						'hostid' => $data['screen']['templateid']
 					] : [
 						'real_hosts' => '1'
-					]),
+					])
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -440,7 +440,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'real_hosts' => !array_key_exists('templateid', $data['screen']),
 						'webitems' => true
 					]
-				],
+				]
 			]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(true)

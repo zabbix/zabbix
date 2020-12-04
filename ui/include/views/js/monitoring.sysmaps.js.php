@@ -385,7 +385,7 @@ function createFontSelect(string $name): CSelect {
 						(new CDiv([
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CColor('background_color', '#{color}'))->appendColorPickerJs(false),
+							(new CColor('background_color', '#{color}'))->appendColorPickerJs(false)
 						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 						'shape-background-row'
 					)
@@ -405,7 +405,7 @@ function createFontSelect(string $name): CSelect {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CColor('border_color', '#{color}'))->appendColorPickerJs(false),
+							(new CColor('border_color', '#{color}'))->appendColorPickerJs(false)
 						]))
 							->addClass(ZBX_STYLE_NOWRAP)
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

@@ -35,7 +35,7 @@ class CSimpleButtonTest extends CTagTest {
 			[
 				['</button>'],
 				'<button type="button">&lt;/button&gt;</button>'
-			],
+			]
 		];
 	}
 

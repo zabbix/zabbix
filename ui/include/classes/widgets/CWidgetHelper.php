@@ -1005,7 +1005,7 @@ class CWidgetHelper {
 							],
 							'add_post_js' => false
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					))->addClass(ZBX_STYLE_COLUMN_50),
+					))->addClass(ZBX_STYLE_COLUMN_50)
 				]))
 					->addClass(ZBX_STYLE_COLUMNS)
 					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
@@ -1144,7 +1144,7 @@ class CWidgetHelper {
 									->setModern(true)
 							)
 					))
-						->addClass(ZBX_STYLE_COLUMN_50),
+						->addClass(ZBX_STYLE_COLUMN_50)
 				]))
 					->addClass(ZBX_STYLE_COLUMNS)
 					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)

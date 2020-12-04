@@ -982,7 +982,7 @@ class testFormWeb extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Headers -empty value',
 					'headers' => [
-						['name' => 'test'],
+						['name' => 'test']
 					],
 					'add_step' => [
 						['step' => 'Headers -empty value']
@@ -999,7 +999,7 @@ class testFormWeb extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Headers -empty name',
 					'headers' => [
-						['value' => 'test'],
+						['value' => 'test']
 					],
 					'add_step' => [
 						['step' => 'Headers -empty name']

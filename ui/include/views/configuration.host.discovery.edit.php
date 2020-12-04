@@ -268,7 +268,8 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $data['limited'], DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete(),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
@@ -292,7 +293,9 @@ $form_list
 		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $data['limited'],
 			DB::getFieldLength('items', 'username')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_username_row'
 		)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
@@ -300,7 +303,9 @@ $form_list
 		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $data['limited'],
 				DB::getFieldLength('items', 'password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
@@ -339,7 +344,9 @@ $form_list
 		new CLabel(_('SSL key password'), 'ssl_key_password'),
 		(new CTextBox('ssl_key_password', $data['ssl_key_password'], $data['limited'],
 			DB::getFieldLength('items', 'ssl_key_password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'ssl_key_password_row'
 	)
 	// Append master item select to form list.
@@ -429,7 +436,9 @@ $form_list
 		'row_jmx_endpoint'
 	)
 	->addRow(_('User name'),
-		(new CTextBox('username', $data['username'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('username', $data['username'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_username'
 	)
 	->addRow(
@@ -447,7 +456,9 @@ $form_list
 		'row_privatekey'
 	)
 	->addRow(_('Password'),
-		(new CTextBox('password', $data['password'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('password', $data['password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_password'
 	)
 	->addRow(

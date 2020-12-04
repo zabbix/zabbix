@@ -1456,7 +1456,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
 							->removeId()
-					]))->addClass('step-action'),
+					]))->addClass('step-action')
 				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))

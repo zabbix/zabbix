@@ -409,6 +409,11 @@ Overlay.prototype.setProperties = function(obj) {
 				this.$dialogue.$footer.append(this.makeButtons(obj[key]));
 				break;
 
+			case 'footer':
+				this.unsetProperty(key);
+				this.$dialogue.$footer.append(obj[key]);
+				break;
+
 			case 'content':
 				this.$dialogue.$body.html(obj[key]);
 				if (this.$dialogue.$debug.html().length) {

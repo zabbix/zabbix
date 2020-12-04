@@ -653,7 +653,7 @@ class CUserGroup extends CApiService {
 				if ($db_right['permission'] != $rights[$db_right['groupid']][$db_right['id']]) {
 					$upd_rights[] = [
 						'values' => ['permission' => $rights[$db_right['groupid']][$db_right['id']]],
-						'where' => ['rightid' => $db_right['rightid']],
+						'where' => ['rightid' => $db_right['rightid']]
 					];
 				}
 				unset($rights[$db_right['groupid']][$db_right['id']]);
