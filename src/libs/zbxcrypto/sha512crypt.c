@@ -314,7 +314,7 @@ sha512_process_bytes (const void *buffer, size_t len, struct sha512_ctx *ctx)
 		{
 			sha512_process_block (ctx->buffer, 128, ctx);
 			left_over -= 128;
-			memcpy (ctx->buffer, &ctx->buffer[128], left_over);
+			memmove (ctx->buffer, &ctx->buffer[128], left_over);
 		}
 		ctx->buflen = left_over;
 	}

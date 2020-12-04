@@ -29,7 +29,18 @@
 
 extern int	CONFIG_DOUBLE_PRECISION;
 
-// takes a 64 char token, hashes it with sha-512 and then formats the resulting binary into the printable hex string
+/******************************************************************************
+ *                                                                            *
+ * Function: trapper_parse_preproc_test                                       *
+ *                                                                            *
+ * Purpose: takes a string token, hashes it with sha-512 and then formats the *
+ *          resulting binary into the printable hex string                    *
+ *                                                                            *
+ * Parameters: auth_token         	- [IN] string auth token              *
+ *             hash_res_stringhexes	- [OUT] hashed and formatted auth     *
+ *                                        token                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	format_auth_token_hash(const char *auth_token, char *hash_res_stringhexes)
 {
 	char		hash_res[ZBX_SID_AUTH_TOKEN_LENGTH];
@@ -47,6 +58,20 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 	hash_res_stringhexes[ZBX_SID_AUTH_TOKEN_LENGTH * 2] = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_user                                                         *
+ *                                                                            *
+ * Purpose: authenticate and initialize user data from the supplied json      *
+ *                                                                            *
+ * Parameters: jp         - [IN] the request                                  *
+ *             user       - [OUT] the user data                               *
+ *             result     - [OUT] error logging                               *
+ *                                                                            *
+ * Return value: SUCCEED - managed to find and authenticate user              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	get_user(const struct zbx_json_parse *jp, zbx_user_t *user, char **result)
 {
 	char	buffer[MAX_STRING_LEN];

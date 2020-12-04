@@ -310,7 +310,7 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
  *                                                                            *
  * Purpose: process queue request                                             *
  *                                                                            *
- * Parameters:  sock  - [OUT] the request socket                               *
+ * Parameters:  sock  - [IN] the request socket                               *
  *              jp    - [IN] the request data                                 *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
@@ -468,7 +468,7 @@ out:
  *                                                                            *
  * Purpose: process alert send request that is used to test media types       *
  *                                                                            *
- * Parameters:  sock  - [OUT] the request socket                               *
+ * Parameters:  sock  - [IN] the request socket                               *
  *              jp    - [IN] the request data                                 *
  *                                                                            *
  ******************************************************************************/
@@ -1011,7 +1011,7 @@ out:
  *                                                                            *
  * Purpose: process Zabbix stats request                                      *
  *                                                                            *
- * Parameters: sock  - [OUT] the request socket                                *
+ * Parameters: sock  - [IN] the request socket                                *
  *             jp    - [IN] the request data                                  *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
