@@ -24,6 +24,7 @@
  */
 
 $this->addJsFile('layout.mode.js');
+$this->includeJsFile('report.services.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -34,14 +35,17 @@ $widget = (new CWidget())
 
 $controls = (new CList())
 	->addItem([
-		new CLabel(_('Period'), 'period'),
+		new CLabel(_('Period'), 'label-period'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		new CComboBox('period', $data['period'], 'submit()', [
-			'daily' => _('Daily'),
-			'weekly' => _('Weekly'),
-			'monthly' => _('Monthly'),
-			'yearly' => _('Yearly')
-		])
+		(new CSelect('period'))
+			->setFocusableElementId('label-period')
+			->setValue($data['period'])
+			->addOptions(CSelect::createOptionsFromArray([
+				'daily' => _('Daily'),
+				'weekly' => _('Weekly'),
+				'monthly' => _('Monthly'),
+				'yearly' => _('Yearly')
+			]))
 	]);
 
 if ($data['period'] != 'yearly') {
@@ -50,15 +54,19 @@ if ($data['period'] != 'yearly') {
 		$years[$y] = $y;
 	}
 	$controls->addItem([
-		new CLabel(_('Year'), 'year'),
+		new CLabel(_('Year'), 'label-year'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		new CComboBox('year', $data['year'], 'submit();', $years)
+		(new CSelect('year'))
+			->setFocusableElementId('label-year')
+			->setValue($data['year'])
+			->addOptions(CSelect::createOptionsFromArray($years))
 	]);
 }
 
 $widget->setControls(new CList([
 	(new CForm())
 		->cleanItems()
+		->setName('report.services')
 		->setMethod('get')
 		->addVar('action', 'report.services')
 		->addVar('serviceid', $data['service']['serviceid'])

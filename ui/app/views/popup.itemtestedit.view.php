@@ -105,15 +105,14 @@ if ($data['is_item_testable']) {
 			'host_address_row'
 		)
 		->addRow(
-			new CLabel(_('Proxy'), 'proxy_hostid'),
-			$data['proxies_enabled']
-				? (new CComboBox('proxy_hostid',
-						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
-						[0 => _('(no proxy)')] + $data['proxies']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox(null, _('(no proxy)'), true))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setId('proxy_hostid'), // Automated tests need this.
+			new CLabel(_('Proxy'), 'label-proxy-hostid'),
+			(new CSelect('proxy_hostid'))
+				->setReadonly(!$data['proxies_enabled'])
+				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+				->setFocusableElementId('label-proxy-hostid')
+				->setValue(array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0)
+				->setId('proxy_hostid')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			'proxy_hostid_row'
 		)
 		->addRow(null, null, 'empty_row_1');
