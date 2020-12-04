@@ -1,1 +1,0 @@
-.......PS. [ZBX-18553] increased ssh.run[] item data limit to 512KB for pre-processing, data storage limit still remains at 64KB (viktors)
