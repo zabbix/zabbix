@@ -191,7 +191,6 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  * Purpose: retrieve IP address by host name                                  *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_IPV6
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 {
 	struct addrinfo	hints, *ai = NULL;
@@ -222,26 +221,6 @@ out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
 }
-#else
-void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
-{
-	struct in_addr	*addr;
-	struct hostent  *hst;
-
-	assert(host);
-
-	if (NULL == (hst = gethostbyname(host)))
-	{
-		ip[0] = '\0';
-		return;
-	}
-
-	addr = (struct in_addr *)hst->h_addr_list[0];
-
-	zbx_strlcpy(ip , inet_ntoa(*addr),iplen);
-}
-#endif	/* HAVE_IPV6 */
-
 
 #endif	/* _WINDOWS */
 
