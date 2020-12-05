@@ -34,6 +34,8 @@
 
 extern zbx_mock_config_t	mock_config;
 
+void	mock_config_free_user_macros(void);
+
 static int	config_gmacro_context_compare(const void *d1, const void *d2)
 {
 	const ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
