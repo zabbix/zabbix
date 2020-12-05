@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -23,20 +23,7 @@
  * @var CView $this
  */
 ?>
-
-<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]) ?>
-</script>
-
-<script type="text/javascript">
-	jQuery(function($) {
-		$('#tags-table')
-			.dynamicRows({template: '#tag-row-tmpl'})
-			.on('click', 'button.element-table-add', function() {
-				$('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-			});
-	});
-
+<script>
 	/**
 	 * @see init.js add.popup event
 	 */
@@ -45,15 +32,26 @@
 			return false;
 		}
 
-		if (list.object == 'deptrigger') {
-			for (var i = 0; i < list.values.length; i++) {
-				create_var('triggersForm', 'new_dependency[' + i + ']', list.values[i].triggerid, false);
+		const tmpl = new Template($('#dependency-row-tmpl').html());
+
+
+		for (var i = 0; i < list.values.length; i++) {
+			const value = list.values[i];
+
+			if (document.querySelectorAll(`[data-triggerid="${value.triggerid}"]`).length > 0) {
+				continue;
 			}
 
-			// return to the same form after it has been submitted
-			jQuery('#action').val(<?= json_encode(getRequest('action')) ?>);
-
-			create_var('triggersForm', 'add_dependency', 1, true);
+			document
+				.querySelector('#dependency-table tr:last-child')
+				.insertAdjacentHTML('afterend', tmpl.evaluate({
+					triggerid: value.triggerid,
+					name: value.name,
+					url: ((list.object === 'deptrigger_prototype')
+							? 'trigger_prototypes.php?form=update&parent_discoveryid=<?= $data['parent_discoveryid'] ?>&triggerid='
+							: 'triggers.php?form=update&triggerid=')
+						+ value.triggerid
+				}));
 		}
 	}
 

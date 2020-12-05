@@ -31,7 +31,7 @@ $table = (new CTable())
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
-		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}');
 
 	if ($i == 0) {
@@ -52,7 +52,7 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
-		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 		->setAttribute('placeholder', _('description'));
 
@@ -69,7 +69,9 @@ foreach ($data['macros'] as $i => $macro) {
 		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol($button_cell))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass(ZBX_STYLE_TOP)
 	], 'form_row');
 }
 
@@ -118,7 +120,7 @@ $form_list = (new CFormList('macros-form-list'))
 			->setLabel(_('Macros'))
 			->setChecked(array_key_exists('macros', $data['visible'])),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_macros', (int) $data['macros_visible']))
+			(new CRadioButtonList('mass_update_macros', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
 				->addValue(_('Update'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
@@ -134,5 +136,3 @@ $form_list = (new CFormList('macros-form-list'))
 	);
 
 $form_list->show();
-
-$this->includeJsFile('massupdate.macros.tab.js.php');

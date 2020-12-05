@@ -92,11 +92,11 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	protected static function loadParams(?string $param = null, bool $is_global = false): void {
 		if (!self::$params) {
 			self::$params = $is_global
-				? API::Settings()->getGlobal(['output' => 'extend'])
+				? API::getApiService('settings')->getGlobal(['output' => 'extend'], false)
 				: API::Settings()->get(['output' => 'extend']);
 		}
 		else if (!$is_global && $param && !array_key_exists($param, self::$params)) {
-			self::$params = API::Settings()->get(['output' => 'extend']);
+			self::$params = API::Settings()->get(['output' => 'extend']) + self::$params;
 		}
 
 		if (self::$params === false) {

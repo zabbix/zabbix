@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -23,21 +23,20 @@
  * @var CView $this
  */
 
-require_once dirname(__FILE__).'/js/configuration.template.massupdate.js.php';
-
-$widget = (new CWidget())->setTitle(_('Templates'));
+// Visibility box javascript is already added. It should not be added in popup response.
+define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
+define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
-	->setName('templateForm')
+	->cleanItems()
+	->setId('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('action', 'template.massupdate')
-	->setId('templateForm')
+	->addVar('action', 'popup.massupdate.template')
+	->addVar('update', '1')
+	->addVar('ids', $data['ids'])
+	->addVar('location_url', $data['location_url'])
 	->disablePasswordAutofill();
-
-foreach ($data['templates'] as $templateid) {
-	$form->addVar('templates['.$templateid.']', $templateid);
-}
 
 /*
  * Template tab
@@ -48,10 +47,9 @@ $template_form_list
 	->addRow(
 		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
 			->setLabel(_('Host groups'))
-			->setChecked(array_key_exists('groups', $data['visible']))
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_groups', (int) $data['mass_update_groups']))
+			(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
 				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
@@ -61,7 +59,7 @@ $template_form_list
 				'name' => 'groups[]',
 				'object_name' => 'hostGroup',
 				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-				'data' => $data['groups'],
+				'data' => [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'host_groups',
@@ -75,10 +73,8 @@ $template_form_list
 		]))->setId('groups-div')
 	)
 	->addRow(
-		(new CVisibilityBox('visible[description]', 'description', _('Original')))
-			->setLabel(_('Description'))
-			->setChecked(array_key_exists('description', $data['visible'])),
-		(new CTextArea('description', $data['description']))
+		(new CVisibilityBox('visible[description]', 'description', _('Original')))->setLabel(_('Description')),
+		(new CTextArea('description', ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
@@ -90,7 +86,7 @@ $linked_templates_form_list = new CFormList('linked-templates-form-list');
 
 $new_template_table = (new CTable())
 	->addRow(
-		(new CRadioButtonList('mass_action_tpls', (int) $data['mass_action_tpls']))
+		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
 			->addValue(_('Link'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
@@ -100,7 +96,7 @@ $new_template_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'linked_templates[]',
 			'object_name' => 'templates',
-			'data' => $data['linked_templates'],
+			'data' => [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -117,17 +113,14 @@ $new_template_table = (new CTable())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 			->addItem((new CCheckBox('mass_clear_tpls'))
 				->setLabel(_('Clear when unlinking'))
-				->setChecked($data['mass_clear_tpls'] == 1)
 			)
 	]);
 
 $linked_templates_form_list->addRow(
 	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates'))
-		->setChecked(array_key_exists('linked_templates', $data['visible'])),
+		->setLabel(_('Link templates')),
 	(new CDiv($new_template_table))
 		->setId('linked-templates-div')
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
@@ -136,17 +129,15 @@ $linked_templates_form_list->addRow(
  */
 $tags_form_list = (new CFormList('tags-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
-			->setLabel(_('Tags'))
-			->setChecked(array_key_exists('tags', $data['visible'])),
+		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
-			(new CRadioButtonList('mass_update_tags', (int) $data['mass_update_tags']))
+			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
 				->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
 				->setModern(true)
 				->addStyle('margin-bottom: 10px;'),
-			renderTagTable($data['tags'])
+			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->setId('tags-table')
 		]))->setId('tags-div')
@@ -156,29 +147,43 @@ $tags_form_list = (new CFormList('tags-form-list'))
 $tabs = (new CTabView())
 	->addTab('template_tab', _('Template'), $template_form_list)
 	->addTab('linked_templates_tab', _('Linked templates'), $linked_templates_form_list)
-	->addTab('tags_tab', _('Tags'), $tags_form_list);
+	->addTab('tags_tab', _('Tags'), $tags_form_list)
+	->setSelected(0);
 
 // Macros.
 $tabs->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
-	'visible' => $data['visible'],
-	'macros' => $data['macros'],
-	'macros_checkbox' => $data['macros_checkbox'],
-	'macros_visible' => $data['macros_visible']
+	'visible' => [],
+	'macros' => [['macro' => '', 'type' => ZBX_MACRO_TYPE_TEXT, 'value' => '', 'description' => '']],
+	'macros_checkbox' => [ZBX_ACTION_ADD => 0, ZBX_ACTION_REPLACE => 0, ZBX_ACTION_REMOVE => 0,
+		ZBX_ACTION_REMOVE_ALL => 0
+	]
 ]));
-
-// Reset tabs when opening the form for the first time.
-if (!hasRequest('masssave')) {
-	$tabs->setSelected(0);
-}
-
-// Append buttons to the form.
-$tabs->setFooter(makeFormFooter(
-	new CSubmit('masssave', _('Update')),
-	[new CButtonCancel()]
-));
 
 $form->addItem($tabs);
 
-$widget->addItem($form);
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.macros.js.php')));
 
-$widget->show();
+$output = [
+	'header' => $data['title'],
+	'body' => $form->toString(),
+	'buttons' => [
+		[
+			'title' => _('Update'),
+			'class' => '',
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'return submitPopup(overlay);'
+		]
+	]
+];
+
+$output['script_inline'] = $this->readJsFile('popup.massupdate.js.php');
+$output['script_inline'] .= getPagePostJs();
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

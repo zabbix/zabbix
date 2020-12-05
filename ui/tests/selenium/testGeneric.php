@@ -103,10 +103,9 @@ class testGeneric extends CLegacyWebTest {
 			['zabbix.php?action=auditlog.list',					'Audit log'],
 			['auditacts.php',					'Action log'],
 
-			['queue.php',						'Queue [refreshed every 30 sec.]'],
-			['queue.php?config=0',				'Queue [refreshed every 30 sec.]'],
-			['queue.php?config=1',				'Queue [refreshed every 30 sec.]'],
-			['queue.php?config=2',				'Queue [refreshed every 30 sec.]'],
+			['zabbix.php?action=queue.overview',			'Queue [refreshed every 30 sec.]'],
+			['zabbix.php?action=queue.overview.proxy',		'Queue [refreshed every 30 sec.]'],
+			['zabbix.php?action=queue.details',				'Queue [refreshed every 30 sec.]'],
 
 			['report4.php',					'Notification report'],
 			['report4.php?period=daily',		'Notification report'],
