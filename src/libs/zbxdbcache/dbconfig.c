@@ -8992,7 +8992,7 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 {
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
@@ -9093,25 +9093,31 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			}
 		}
 
+		if (0 == num)
+		{
+			if (ZBX_POLLER_TYPE_NORMAL == poller_type && ITEM_TYPE_SNMP == dc_item->type &&
+					0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
+			{
+				ZBX_DC_SNMPITEM	*snmpitem;
+
+				snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
+
+				if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
+						ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
+				{
+					max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
+				}
+			}
+
+			if (1 < max_items)
+				*items = zbx_malloc(NULL, sizeof(DC_ITEM) * max_items);
+		}
+
 		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&items[num].host, dc_host);
-		DCget_item(&items[num], dc_item);
+		DCget_host(&(*items)[num].host, dc_host);
+		DCget_item(&(*items)[num], dc_item);
 		num++;
-
-		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && ITEM_TYPE_SNMP == dc_item->type &&
-				0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
-		{
-			ZBX_DC_SNMPITEM	*snmpitem;
-
-			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
-
-			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
-					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
-			{
-				max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
-			}
-		}
 	}
 
 	UNLOCK_CACHE;
@@ -11854,7 +11860,6 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 		/* Unless a host was just (re)assigned to a proxy or the proxy has    */
 		/* not updated its status during the maximum proxy heartbeat period.  */
 		/* In this case reset all interfaces to unknown status.               */
-
 		if (0 == interface->reset_availability &&
 				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != host->proxy_hostid)
 		{

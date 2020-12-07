@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "availability.h"
+#include "zbxavailability.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "avail_protocol.h"

@@ -31,113 +31,124 @@ extern unsigned char	program_type;
 
 static int	DBpatch_5030000(void)
 {
-	const ZBX_FIELD	field = {"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	return DBadd_field("interface", &field);
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_5030001(void)
 {
-	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030002(void)
 {
-	const ZBX_FIELD	field = {"errors_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030003(void)
 {
-	const ZBX_FIELD	field = {"disable_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"errors_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030004(void)
 {
-	return DBdrop_field("hosts", "available");
+	const ZBX_FIELD	field = {"disable_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030005(void)
 {
-	return DBdrop_field("hosts", "ipmi_available");
+	return DBdrop_field("hosts", "available");
 }
 
 static int	DBpatch_5030006(void)
 {
-	return DBdrop_field("hosts", "snmp_available");
+	return DBdrop_field("hosts", "ipmi_available");
 }
 
 static int	DBpatch_5030007(void)
 {
-	return DBdrop_field("hosts", "jmx_available");
+	return DBdrop_field("hosts", "snmp_available");
 }
 
 static int	DBpatch_5030008(void)
 {
-	return DBdrop_field("hosts", "disable_until");
+	return DBdrop_field("hosts", "jmx_available");
 }
 
 static int	DBpatch_5030009(void)
 {
-	return DBdrop_field("hosts", "ipmi_disable_until");
+	return DBdrop_field("hosts", "disable_until");
 }
 
 static int	DBpatch_5030010(void)
 {
-	return DBdrop_field("hosts", "snmp_disable_until");
+	return DBdrop_field("hosts", "ipmi_disable_until");
 }
 
 static int	DBpatch_5030011(void)
 {
-	return DBdrop_field("hosts", "jmx_disable_until");
+	return DBdrop_field("hosts", "snmp_disable_until");
 }
 
 static int	DBpatch_5030012(void)
 {
-	return DBdrop_field("hosts", "errors_from");
+	return DBdrop_field("hosts", "jmx_disable_until");
 }
 
 static int	DBpatch_5030013(void)
 {
-	return DBdrop_field("hosts", "ipmi_errors_from");
+	return DBdrop_field("hosts", "errors_from");
 }
 
 static int	DBpatch_5030014(void)
 {
-	return DBdrop_field("hosts", "snmp_errors_from");
+	return DBdrop_field("hosts", "ipmi_errors_from");
 }
 
 static int	DBpatch_5030015(void)
 {
-	return DBdrop_field("hosts", "jmx_errors_from");
+	return DBdrop_field("hosts", "snmp_errors_from");
 }
 
 static int	DBpatch_5030016(void)
 {
-	return DBdrop_field("hosts", "error");
+	return DBdrop_field("hosts", "jmx_errors_from");
 }
 
 static int	DBpatch_5030017(void)
 {
-	return DBdrop_field("hosts", "ipmi_error");
+	return DBdrop_field("hosts", "error");
 }
 
 static int	DBpatch_5030018(void)
 {
-	return DBdrop_field("hosts", "snmp_error");
+	return DBdrop_field("hosts", "ipmi_error");
 }
 
 static int	DBpatch_5030019(void)
 {
-	return DBdrop_field("hosts", "jmx_error");
+	return DBdrop_field("hosts", "snmp_error");
 }
 
 static int	DBpatch_5030020(void)
+{
+	return DBdrop_field("hosts", "jmx_error");
+}
+
+static int	DBpatch_5030021(void)
 {
 	return DBcreate_index("interface", "interface_3", "available", 0);
 }
@@ -168,5 +179,6 @@ DBPATCH_ADD(5030017, 0, 1)
 DBPATCH_ADD(5030018, 0, 1)
 DBPATCH_ADD(5030019, 0, 1)
 DBPATCH_ADD(5030020, 0, 1)
+DBPATCH_ADD(5030021, 0, 1)
 
 DBPATCH_END()

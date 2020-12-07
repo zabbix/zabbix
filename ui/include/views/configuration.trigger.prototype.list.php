@@ -136,10 +136,10 @@ foreach ($this->data['triggers'] as $trigger) {
 			(new CUrl('trigger_prototypes.php'))
 				->setArgument('g_triggerid[]', $triggerid)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', 'triggerprototype.massupdate')
-				->setArgument('visible[discover]', '1')
-				->setArgument('massupdate', 'discover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('action', $nodiscover
+					? 'triggerprototype.discover.enable'
+					: 'triggerprototype.discover.disable'
+				)
 				->setArgumentSID()
 				->getUrl()
 		))
@@ -184,7 +184,12 @@ $triggersForm->addItem([
 			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create triggers from selected prototypes as disabled?')
 			],
-			'triggerprototype.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.triggerprototype' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.triggerprototype');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?')
 			]

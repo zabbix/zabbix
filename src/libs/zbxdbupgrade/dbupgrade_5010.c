@@ -824,7 +824,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 	int			i;
 	zbx_vector_ptr_t	blocks;
 	sciitem_block_t		*block;
-	zbx_vector_char_t	*dimensions, *r_block;
+	zbx_vector_char_t	*dimensions;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -843,7 +843,7 @@ static zbx_vector_char_t	*DBpatch_get_axis_dimensions(zbx_vector_scitem_dim_t *s
 
 	while (0 < blocks.values_num)
 	{
-		zbx_vector_char_t	*block_dimensions, *block_unsized;
+		zbx_vector_char_t	*block_dimensions, *block_unsized, *r_block;
 		int			block_dimensions_sum, block_unsized_count, size_overflow, n;
 
 		zbx_vector_ptr_sort(&blocks, DBpatch_block_compare_func);
@@ -1200,7 +1200,7 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 {
 	uint64_t	new_fieldid;
 	int		i, ret = SUCCEED;
-	char		*name_esc = NULL, *url_esc = NULL;
+	char		*name_esc;
 
 	widget->widgetid = DBget_maxid("widget");
 	widget->dashboardid = dashboardid;
@@ -1223,11 +1223,10 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 
 	for (i = 0; SUCCEED == ret && i < fields->values_num; i++)
 	{
+		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1], *url_esc;
 		zbx_db_widget_field_t	*f;
-		char			s1[ZBX_MAX_UINT64_LEN + 1], s2[ZBX_MAX_UINT64_LEN + 1];
 
 		f = (zbx_db_widget_field_t *)fields->values[i];
-		name_esc = DBdyn_escape_string(f->name);
 		url_esc = DBdyn_escape_string(f->value_str);
 
 		if (0 != f->value_itemid)
@@ -1243,12 +1242,11 @@ static int	DBpatch_add_widget(uint64_t dashboardid, zbx_db_widget_t *widget, zbx
 		if (ZBX_DB_OK > DBexecute("insert into widget_field (widget_fieldid,widgetid,type,name,value_int,"
 				"value_str,value_itemid,value_graphid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,"
 				"'%s',%d,'%s',%s,%s)", new_fieldid++, widget->widgetid,
-				f->type, f->name, f->value_int, f->value_str, s1, s2))
+				f->type, f->name, f->value_int, url_esc, s1, s2))
 		{
 			ret = FAIL;
 		}
 
-		zbx_free(name_esc);
 		zbx_free(url_esc);
 	}
 
@@ -1368,7 +1366,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		offset_idx_x = si->x + si->colspan;
 		if (offset_idx_x > OFFSET_ARRAY_SIZE - 1)
 		{
-			offset_idx_x = OFFSET_ARRAY_SIZE;
+			offset_idx_x = OFFSET_ARRAY_SIZE - 1;
 			zabbix_log(LOG_LEVEL_WARNING, "config error, x screen size overflow for item " ZBX_FS_UI64,
 					si->screenitemid);
 		}
@@ -1376,7 +1374,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		offset_idx_y = si->y + si->rowspan;
 		if (offset_idx_y > OFFSET_ARRAY_SIZE - 1)
 		{
-			offset_idx_y = OFFSET_ARRAY_SIZE;
+			offset_idx_y = OFFSET_ARRAY_SIZE - 1;
 			zabbix_log(LOG_LEVEL_WARNING, "config error, y screen size overflow for item " ZBX_FS_UI64,
 					si->screenitemid);
 		}

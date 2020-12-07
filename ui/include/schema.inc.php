@@ -1221,33 +1221,33 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
-				'default' => '10050',
+				'default' => '10050'
 			],
 			'available' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '0'
 			],
 			'error' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
-				'default' => '',
+				'default' => ''
 			],
 			'errors_from' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '0'
 			],
 			'disable_until' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
-			],
-		],
+				'default' => '0'
+			]
+		]
 	],
 	'valuemaps' => [
 		'key' => 'valuemapid',

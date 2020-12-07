@@ -177,12 +177,15 @@ class CControllerPopupImport extends CController {
 			$output = [];
 
 			if ($result) {
-				$output = ['message' => _('Imported successfully')];
+				$messages = CMessageHelper::getMessages();
+				$output = ['title' => _('Imported successfully')];
+				if (count($messages)) {
+					$output['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				if (($messages = getMessages()) !== null) {
-					$output['errors'] = $messages->toString();
-				}
+				CMessageHelper::setErrorTitle(_('Import failed'));
+				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
 
 			$this->setResponse(

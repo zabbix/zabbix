@@ -20,7 +20,7 @@
 #include "common.h"
 #include "log.h"
 #include "zbxself.h"
-#include "availability.h"
+#include "zbxavailability.h"
 #include "zbxipcservice.h"
 #include "avail_manager.h"
 #include "daemon.h"

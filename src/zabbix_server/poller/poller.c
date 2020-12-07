@@ -46,7 +46,7 @@
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "avail_protocol.h"
-#include "availability.h"
+#include "zbxavailability.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -789,7 +789,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
-	DC_ITEM			items[MAX_POLLER_ITEMS];
+	DC_ITEM			item, *items;
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
 	int			errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
@@ -800,7 +800,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	num = DCconfig_get_poller_items(poller_type, items);
+	items = &item;
+	num = DCconfig_get_poller_items(poller_type, &items);
 
 	if (0 == num)
 	{
@@ -913,6 +914,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		zbx_availability_flush(data, data_offset);
 		zbx_free(data);
 	}
+
+	if (items != &item)
+		zbx_free(items);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 

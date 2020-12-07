@@ -33,7 +33,7 @@
 #include "zbxlld.h"
 #include "events.h"
 #include "zbxvault.h"
-#include "availability.h"
+#include "zbxavailability.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;

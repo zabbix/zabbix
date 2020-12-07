@@ -17,16 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAILABILITY_H
-#define ZABBIX_AVAILABILITY_H
+// Package conf provides .conf file loading and unmarshalling
+package conf
 
-#include "zbxalgo.h"
-#include "db.h"
-
-#define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
-#define ZBX_IPC_AVAILABILITY_REQUEST	1
-
-void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size);
-void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
-
-#endif /* ZABBIX_AVAILABILITY_H */
+// Session is a general structure for storing sessions' configuration.
+type Session struct {
+	URI      string `conf:"name=Uri,optional"`
+	Password string `conf:"optional"`
+	User     string `conf:"optional"`
+}

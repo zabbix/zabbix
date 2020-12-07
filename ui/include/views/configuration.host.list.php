@@ -490,7 +490,12 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			'host.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.host' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 		]
 	)

@@ -498,7 +498,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'correlation.php',
+				'url' => 'zabbix.php?action=correlation.list',
 				'title' =>	'Event correlation rules',
 				'header' => 'Event correlation',
 				'users' => [
@@ -508,7 +508,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'correlation.php?form=Create+correlation',
+				'url' => 'zabbix.php?action=correlation.edit',
 				'title' =>	'Event correlation rules',
 				'users' => [
 					'guest' => false,
@@ -673,7 +673,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'queue.php',
+				'url' => 'zabbix.php?action=queue.overview',
 				'title' =>	'Queue [refreshed every 30 sec.]',
 				'users' => [
 					'guest' => false,
