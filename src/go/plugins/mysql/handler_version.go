@@ -17,29 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package memcached
+package mysql
 
 import (
-	"testing"
+	"context"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
-func Test_zabbixError_Error(t *testing.T) {
-	tests := []struct {
-		name string
-		e    zabbixError
-		want string
-	}{
-		{
-			"ZabbixError stringify",
-			zabbixError{"foobar"},
-			"Foobar.",
-		},
+func versionHandler(ctx context.Context, conn MyClient, params map[string]string, _ ...string) (interface{}, error) {
+	var res string
+
+	row, err := conn.QueryRow(ctx, `SELECT version()`)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Error(); got != tt.want {
-				t.Errorf("zabbixError.Error() = %v, want %v", got, tt.want)
-			}
-		})
+
+	err = row.Scan(&res)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
+	return res, nil
 }

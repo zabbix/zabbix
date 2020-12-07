@@ -90,7 +90,6 @@ serialized to JSON.
 *Params:*  
 type — One of supported stat types: items, sizes, slabs and settings. Empty by default (returns general statistics).  
 
-
 ## Troubleshooting
 The plugin uses Zabbix agent's logs. You can increase debugging level of Zabbix Agent if you need more details about 
 what is happening. 
