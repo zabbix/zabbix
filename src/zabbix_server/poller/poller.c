@@ -143,9 +143,9 @@ static void	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_int
 static int	interface_availability_by_item_type(unsigned char item_type, unsigned char interface_type)
 {
 	if ((ITEM_TYPE_ZABBIX == item_type && INTERFACE_TYPE_AGENT == interface_type) ||
-	(ITEM_TYPE_SNMP == item_type && INTERFACE_TYPE_SNMP == interface_type) ||
-	(ITEM_TYPE_JMX == item_type && INTERFACE_TYPE_JMX == interface_type) ||
-	(ITEM_TYPE_IPMI == item_type && INTERFACE_TYPE_IPMI == interface_type))
+			(ITEM_TYPE_SNMP == item_type && INTERFACE_TYPE_SNMP == interface_type) ||
+			(ITEM_TYPE_JMX == item_type && INTERFACE_TYPE_JMX == interface_type) ||
+			(ITEM_TYPE_IPMI == item_type && INTERFACE_TYPE_IPMI == interface_type))
 		return SUCCEED;
 
 	return FAIL;

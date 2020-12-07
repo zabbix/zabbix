@@ -1446,8 +1446,31 @@ done:
 		}
 		else
 		{
+			int reset_availability = 0;
+
 			if (HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status)
 				host->data_expected_from = now;
+
+			/* reset host status if host status has been changed (e.g., if host has been disabled) */
+			if (status != host->status)
+				reset_availability = 1;
+
+			/* reset host status if host proxy assignment has been changed */
+			if (proxy_hostid != host->proxy_hostid)
+				reset_availability = 1;
+
+			if (0 != reset_availability)
+			{
+				int			i;
+				ZBX_DC_INTERFACE	*interface;
+
+				for (i = 0; i < host->interfaces_v.values_num; i++)
+				{
+					interface = (ZBX_DC_INTERFACE *)host->interfaces_v.values[i];
+					interface->reset_availability = 1;
+				}
+			}
+
 		}
 
 		host->proxy_hostid = proxy_hostid;
@@ -2673,7 +2696,7 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
  *                                                                            *
  * Purpose: update number of items per agent statistics                       *
  *                                                                            *
- * Parameters: interface - [IN] the interface                                 *
+ * Parameters: interface - [IN/OUT] the interface                             *
  * *           type      - [IN] the item type (ITEM_TYPE_*)                   *
  *             num       - [IN] the number of items (+) added, (-) removed    *
  *                                                                            *
@@ -2715,12 +2738,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_INTERFACE	*interface;
+	ZBX_DC_INTERFACE	*interface, *interface_old;
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
 	int			found, update_index, ret, i,  old_nextcheck;
-	zbx_uint64_t		itemid, hostid;
+	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 
 	zbx_vector_ptr_create(&dep_items);
@@ -2787,9 +2810,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		item->hostid = hostid;
 		item->flags = (unsigned char)atoi(row[18]);
-		ZBX_DBROW2UINT64(item->interfaceid, row[19]);
+		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
-		interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
+		interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
+		interface_old = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
 
 		if (SUCCEED != is_time_suffix(row[22], &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -2835,7 +2859,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 				item->data_expected_from = now;
 
 			if (ITEM_STATUS_ACTIVE == item->status)
-				dc_interface_update_agent_stats(interface, item->type, -1);
+				dc_interface_update_agent_stats(interface_old, item->type, -1);
 		}
 
 		if (ITEM_STATUS_ACTIVE == status)
@@ -2844,6 +2868,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item->type = type;
 		item->status = status;
 		item->value_type = value_type;
+		item->interfaceid = interfaceid;
 
 		/* update items_hk index using new data, if not done already */
 
@@ -11829,6 +11854,7 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 		/* Unless a host was just (re)assigned to a proxy or the proxy has    */
 		/* not updated its status during the maximum proxy heartbeat period.  */
 		/* In this case reset all interfaces to unknown status.               */
+
 		if (0 == interface->reset_availability &&
 				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != host->proxy_hostid)
 		{
