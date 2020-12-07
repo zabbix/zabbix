@@ -173,7 +173,7 @@ class CElement extends CBaseElement implements IWaitable {
 			$selector .= '::*';
 		}
 
-		return $this->query($selector);
+		return $this->query($selector)->setReversedOrder();
 	}
 
 	/**
