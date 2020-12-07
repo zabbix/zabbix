@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-21T12:49:04Z'
+  date: '2020-11-26T12:09:34Z'
   groups:
     -
       name: Templates/Applications
@@ -990,7 +990,7 @@ zabbix_export:
               units: '%'
               application_prototypes:
                 -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1007,7 +1007,7 @@ zabbix_export:
               history: 7d
               application_prototypes:
                 -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1030,7 +1030,7 @@ zabbix_export:
               description: 'Time taken to flush an update to disks.'
               application_prototypes:
                 -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1050,7 +1050,7 @@ zabbix_export:
               description: 'Time taken to commit an operation to the journal.'
               application_prototypes:
                 -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1067,7 +1067,7 @@ zabbix_export:
               history: 7d
               application_prototypes:
                 -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1084,7 +1084,7 @@ zabbix_export:
               history: 7d
               application_prototypes:
                 -
-                  name: 'Ceph CRUSH [{#CRUSHRULE}] OSD'
+                  name: 'Ceph {#HOST} OSD [{#CLASS}]'
               preprocessing:
                 -
                   type: JSONPATH
