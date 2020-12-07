@@ -54,7 +54,7 @@ static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
-static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
+static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 extern int		CONFIG_DOUBLE_PRECISION;

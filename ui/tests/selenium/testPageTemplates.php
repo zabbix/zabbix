@@ -183,7 +183,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template',
@@ -196,7 +196,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template'
@@ -207,7 +207,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Contains'],
+						['name' => 'action', 'operator' => 'Contains']
 					],
 					'expected_templates' => [
 						'Form test template',
@@ -220,7 +220,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Equals'],
+						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
 			]
@@ -269,7 +269,7 @@ class testPageTemplates extends CLegacyWebTest {
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
-		$this->assertRowCount(count($hosts));
+		$this->assertTableStats(count($hosts));
 		// Reset Hosts filter after scenario.
 		$this->resetFilter();
 	}

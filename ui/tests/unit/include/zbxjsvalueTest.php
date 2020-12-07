@@ -118,7 +118,7 @@ class CzbxjsvalueTest extends PHPUnit_Framework_TestCase {
 				// 		{"-1":[\'agent_string\',\'another_string\']}
 				[-1 => ['agent_string', 'another_string']],
 				'[[\'agent_string\',\'another_string\']]'
-			],
+			]
 		];
 	}
 

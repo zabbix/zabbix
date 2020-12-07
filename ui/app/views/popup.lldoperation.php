@@ -67,7 +67,7 @@ $operations_popup_form_list = (new CFormList())
 		(new CTextBox('value', $options['value'], $options['templated'],
 				DB::getFieldLength('lld_override_operation', 'value')))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-			->setAttribute('placeholder', _('pattern')),
+			->setAttribute('placeholder', _('pattern'))
 	])
 	->addRow(
 		(new CVisibilityBox('visible[opstatus]', 'opstatus_status', _('Original')))

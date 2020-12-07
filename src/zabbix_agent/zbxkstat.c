@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
 #include "zbxkstat.h"
 #include "mutexs.h"
@@ -196,4 +196,4 @@ out:
 	return ret;
 }
 
-#endif
+#endif /*#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)*/

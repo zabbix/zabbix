@@ -24,7 +24,7 @@ class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
-	public $userRole = 'Super Admin role';
+	public $userRole = 'Super admin role';
 
 	public static function allUsers() {
 		return CDBHelper::getDataProvider('select * from users');
