@@ -44,10 +44,14 @@ type deviceInfo struct {
 }
 
 type deviceParser struct {
-	ModelName    string     `json:"model_name"`
-	SerialNumber string     `json:"serial_number"`
-	Info         deviceInfo `json:"device"`
-	Message      message    `json:"message"`
+	ModelName    string        `json:"model_name"`
+	SerialNumber string        `json:"serial_number"`
+	Info         deviceInfo    `json:"device"`
+	Smartctl     smartctlField `json:"smartctl"`
+}
+
+type smartctlField struct {
+	Messages []message `json:"messages"`
 }
 
 type message struct {
@@ -95,20 +99,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 					return nil, fmt.Errorf("Failed to get raid device count: %s", err.Error())
 				}
 
-				deviceJSON, err = executeSmartctl(fmt.Sprintf("smartctl -a %s -json -d cciss,%d", dev.Name, n-1))
+				raids, err := getRaidDisks(dev.Name, n-2)
 				if err != nil {
-					return nil, fmt.Errorf("Failed to get RAID disk data from smartctl: %s", err.Error())
+					return nil, fmt.Errorf("Failed to get raid disk data from smartctl: %s", err.Error())
 				}
 
-				var dp deviceParser
-				if err = json.Unmarshal([]byte(deviceJSON), &dp); err != nil {
-					return nil, fmt.Errorf("Failed to unmarshal smartctl RAID response json: %s", err.Error())
-				}
-
-				err = checkErr(dp)
-				if err != nil {
-					return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
-				}
+				out = append(out, raids...)
+				continue
 			}
 
 			out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber})
@@ -160,13 +157,39 @@ func init() {
 		"smart.disk.get", "Returns JSON data of smart device, usage: smart.disk.get[name].")
 }
 
-func checkErr(dp deviceParser) error {
-	if dp.Message.Severity == "error" {
-		if dp.Message.Str == errRaid.Error() {
-			return errRaid
+func getRaidDisks(name string, count int) ([]device, error) {
+	var out []device
+	for i := 0; i <= count; i++ {
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("smartctl -a %s -json -d cciss,%d", name, i))
+		if err != nil {
+			return nil, fmt.Errorf("Failed to get RAID disk data from smartctl: %s", err.Error())
 		}
 
-		return errors.New(dp.Message.Str)
+		var dp deviceParser
+		if err = json.Unmarshal([]byte(deviceJSON), &dp); err != nil {
+			return nil, fmt.Errorf("Failed to unmarshal smartctl RAID response json: %s", err.Error())
+		}
+
+		err = checkErr(dp)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
+		}
+
+		out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber})
+	}
+
+	return out, nil
+}
+
+func checkErr(dp deviceParser) error {
+	for _, m := range dp.Smartctl.Messages {
+		if m.Severity == "error" {
+			if m.Str == errRaid.Error() {
+				return errRaid
+			}
+
+			return errors.New(m.Str)
+		}
 	}
 	return nil
 }
