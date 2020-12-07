@@ -681,35 +681,6 @@ function copyItems($srcHostId, $dstHostId) {
 	return true;
 }
 
-/**
- * Copy applications to a different host.
- *
- * @param string $source_hostid
- * @param string $destination_hostid
- *
- * @return bool
- */
-function copyApplications($source_hostid, $destination_hostid) {
-	$applications_to_create = API::Application()->get([
-		'output' => ['name'],
-		'hostids' => [$source_hostid],
-		'inherited' => false,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-
-	if (!$applications_to_create) {
-		return true;
-	}
-
-	foreach ($applications_to_create as &$application) {
-		$application['hostid'] = $destination_hostid;
-		unset($application['applicationid'], $application['templateid']);
-	}
-	unset($application);
-
-	return (bool) API::Application()->create($applications_to_create);
-}
-
 function get_item_by_itemid($itemid) {
 	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
 	if ($db_items) {

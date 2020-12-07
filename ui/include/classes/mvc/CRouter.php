@@ -57,13 +57,6 @@ class CRouter {
 		// action						controller											layout					view
 		'action.operation.get'				=> ['CControllerActionOperationGet',				'layout.json',			null],
 		'action.operation.validate'			=> ['CControllerActionOperationValidate',			'layout.json',			null],
-		'application.create'				=> ['CControllerApplicationCreate',					null,					null],
-		'application.delete'				=> ['CControllerApplicationDelete',					null,					null],
-		'application.disable'				=> ['CControllerApplicationDisable',				null,					null],
-		'application.edit'					=> ['CControllerApplicationEdit',					'layout.htmlpage',		'configuration.application.edit'],
-		'application.enable'				=> ['CControllerApplicationEnable',					null,					null],
-		'application.list'					=> ['CControllerApplicationList',					'layout.htmlpage',		'configuration.application.list'],
-		'application.update'				=> ['CControllerApplicationUpdate',					null,					null],
 		'auditlog.list'						=> ['CControllerAuditLogList',						'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'				=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'				=> ['CControllerAuthenticationUpdate',				null,					null],

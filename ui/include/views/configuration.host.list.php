@@ -192,7 +192,6 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], 'hosts.php'),
-		_('Applications'),
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
@@ -412,15 +411,6 @@ foreach ($data['hosts'] as $host) {
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
-		[
-			new CLink(_('Applications'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'application.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$host['hostid']])
-			),
-			CViewHelper::showNum($host['applications'])
-		],
 		[
 			new CLink(_('Items'),
 				(new CUrl('items.php'))

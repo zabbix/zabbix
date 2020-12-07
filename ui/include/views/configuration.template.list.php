@@ -160,7 +160,6 @@ $table = (new CTableInfo())
 			(new CUrl('templates.php'))->getUrl()
 		),
 		_('Hosts'),
-		_('Applications'),
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
@@ -247,15 +246,6 @@ foreach ($data['templates'] as $template) {
 				)
 				: _('Hosts'),
 			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
-		],
-		[
-			new CLink(_('Applications'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'application.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-			),
-			CViewHelper::showNum($template['applications'])
 		],
 		[
 			new CLink(_('Items'),

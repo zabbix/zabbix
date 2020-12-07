@@ -170,7 +170,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Hosts')))
 					->setUrl(new CUrl('hosts.php'), 'hosts.php')
 					->setAliases([
-						'application.list', 'application.edit', 'items.php?context=host', 'triggers.php?context=host',
+						'items.php?context=host', 'triggers.php?context=host',
 						'graphs.php?context=host', 'host_discovery.php?context=host',
 						'disc_prototypes.php?context=host', 'trigger_prototypes.php?context=host',
 						'host_prototypes.php?context=host', 'httpconf.php?context=host'

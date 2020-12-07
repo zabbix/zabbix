@@ -146,7 +146,6 @@ $fields = [
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
@@ -251,7 +250,6 @@ $fields = [
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
@@ -282,7 +280,6 @@ $fields = [
 									],
 	// subfilters
 	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -308,7 +305,7 @@ $valid_input = check_fields($fields);
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
-$subfiltersList = ['subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
+$subfiltersList = ['subfilter_types', 'subfilter_value_types', 'subfilter_status',
 	'subfilter_state', 'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
 	'subfilter_history', 'subfilter_trends', 'subfilter_discovered'
 ];
@@ -358,7 +355,6 @@ $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 if (hasRequest('filter_set')) {
 	CProfile::updateArray($prefix.'items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
 	CProfile::updateArray($prefix.'items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
-	CProfile::update($prefix.'items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'items.filter_key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
@@ -385,7 +381,6 @@ elseif (hasRequest('filter_rst')) {
 		CProfile::deleteIdx($prefix.'items.filter_hostids');
 	}
 	CProfile::deleteIdx($prefix.'items.filter_groupids');
-	CProfile::deleteIdx($prefix.'items.filter_application');
 	CProfile::deleteIdx($prefix.'items.filter_name');
 	CProfile::deleteIdx($prefix.'items.filter_type');
 	CProfile::deleteIdx($prefix.'items.filter_key');
@@ -404,7 +399,6 @@ elseif (hasRequest('filter_rst')) {
 
 $_REQUEST['filter_groupids'] = CProfile::getArray($prefix.'items.filter_groupids', []);
 $_REQUEST['filter_hostids'] = CProfile::getArray($prefix.'items.filter_hostids', []);
-$_REQUEST['filter_application'] = CProfile::get($prefix.'items.filter_application', '');
 $_REQUEST['filter_name'] = CProfile::get($prefix.'items.filter_name', '');
 $_REQUEST['filter_type'] = CProfile::get($prefix.'items.filter_type', -1);
 $_REQUEST['filter_key'] = CProfile::get($prefix.'items.filter_key', '');
@@ -1311,15 +1305,6 @@ else {
 		$options['groupids'] = $filter_groupids;
 	}
 
-	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
-		$options['applicationids'] = array_keys(API::Application()->get([
-			'output' => [],
-			'groupids' => array_key_exists('groupids', $options) ? $options['groupids'] : null,
-			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
-			'search' => ['name' => getRequest('filter_application')],
-			'preservekeys' => true
-		]));
-	}
 	if (isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name'])) {
 		$options['search']['name'] = $_REQUEST['filter_name'];
 	}
@@ -1477,31 +1462,8 @@ else {
 				'subfilter_trends' => (!getRequest('subfilter_trends')
 					|| ($trends !== '' && in_array($trends, getRequest('subfilter_trends')))),
 				'subfilter_interval' => (!getRequest('subfilter_interval')
-					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
-				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
+					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval'))))
 			];
-
-			if (!empty($_REQUEST['subfilter_apps'])) {
-				foreach ($item['applications'] as $application) {
-					if (str_in_array($application['name'], $_REQUEST['subfilter_apps'])) {
-						$item['subfilters']['subfilter_apps'] = true;
-						break;
-					}
-				}
-			}
-
-			if (!empty($item['applications'])) {
-				order_result($item['applications'], 'name');
-
-				$applications = [];
-				foreach ($item['applications'] as $application) {
-					$applications[] = $application['name'];
-				}
-				$item['applications_list'] = implode(', ', $applications);
-			}
-			else {
-				$item['applications_list'] = '';
-			}
 		}
 		unset($item);
 

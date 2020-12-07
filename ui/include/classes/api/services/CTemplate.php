@@ -707,17 +707,6 @@ class CTemplate extends CHostGeneral {
 			API::HttpTest()->delete(array_keys($delHttpTests), true);
 		}
 
-		// Applications
-		$delApplications = API::Application()->get([
-			'templateids' => $templateids,
-			'output' => ['applicationid'],
-			'nopermissions' => 1,
-			'preservekeys' => true
-		]);
-		if (!empty($delApplications)) {
-			API::Application()->delete(array_keys($delApplications), true);
-		}
-
 		// Get host prototype operations from LLD overrides where this template is linked.
 		$lld_override_operationids = [];
 

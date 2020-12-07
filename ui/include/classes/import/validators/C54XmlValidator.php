@@ -511,6 +511,12 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+								'tag' =>					['type' => XML_ARRAY, 'rules' => [
+									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
+							]],
 							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -661,6 +667,12 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 									'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING, 'default' => '']
+										]]
+									]],
 									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
 										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -986,6 +998,12 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'required' =>				['type' => XML_STRING, 'default' => ''],
 									'status_codes' =>			['type' => XML_STRING, 'default' => '']
 								]]
+							]],
+							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+								'tag' =>					['type' => XML_ARRAY, 'rules' => [
+									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
 							]]
 						]]
 					]],
@@ -1177,6 +1195,12 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+								'tag' =>					['type' => XML_ARRAY, 'rules' => [
+									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
+							]],
 							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -1325,6 +1349,12 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
 									'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING, 'default' => '']
+										]]
+									]],
 									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
 										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -1648,6 +1678,12 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'timeout' =>				['type' => XML_STRING, 'default' => '15s'],
 									'required' =>				['type' => XML_STRING, 'default' => ''],
 									'status_codes' =>			['type' => XML_STRING, 'default' => '']
+								]]
+							]],
+							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+								'tag' =>					['type' => XML_ARRAY, 'rules' => [
+									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
 							]]
 						]]
