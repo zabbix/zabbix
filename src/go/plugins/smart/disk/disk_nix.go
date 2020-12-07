@@ -1,4 +1,4 @@
-// +build  windows
+// +build !windows
 
 /*
 ** Zabbix
@@ -19,9 +19,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package smart
+package disk
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"zabbix.com/pkg/zbxcmd"
@@ -29,4 +31,13 @@ import (
 
 func executeSmartctl(cmd string) (string, error) {
 	return zbxcmd.Execute(cmd, time.Second*time.Duration(5*time.Second))
+}
+
+func deviceCount(name string) (int, error) {
+	str, err := zbxcmd.Execute(fmt.Sprintf("ls -1 %s*", name), time.Second*time.Duration(5*time.Second))
+	if err != nil {
+		return 0, err
+	}
+
+	return len(strings.Split(str, "\n")), nil
 }

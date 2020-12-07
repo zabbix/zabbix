@@ -1,4 +1,4 @@
-// +build !windows
+// +build  windows
 
 /*
 ** Zabbix
@@ -19,7 +19,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package smart
+package disk
 
 import (
 	"time"
@@ -29,4 +29,8 @@ import (
 
 func executeSmartctl(cmd string) (string, error) {
 	return zbxcmd.Execute(cmd, time.Second*time.Duration(5*time.Second))
+}
+
+func deviceCount(name string) (int, error) {
+	return 0
 }
