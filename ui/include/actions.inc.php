@@ -59,7 +59,6 @@ function condition_type2str($type) {
 		CONDITION_TYPE_DUPTIME => _('Uptime/Downtime'),
 		CONDITION_TYPE_DVALUE => _('Received value'),
 		CONDITION_TYPE_EVENT_ACKNOWLEDGED => _('Event acknowledged'),
-		CONDITION_TYPE_APPLICATION => _('Application'),
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
 		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
@@ -145,7 +144,6 @@ function actionConditionValueToString(array $actions) {
 				case CONDITION_TYPE_DSERVICE_PORT:
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
-				case CONDITION_TYPE_APPLICATION:
 				case CONDITION_TYPE_EVENT_TAG:
 				case CONDITION_TYPE_EVENT_TAG_VALUE:
 					$result[$i][$j] = $condition['value'];
@@ -914,7 +912,6 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_TRIGGER_NAME,
 		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_SEVERITY,
-		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_HOST,
 		CONDITION_TYPE_HOST_GROUP,
 		CONDITION_TYPE_SUPPRESSED,
@@ -941,7 +938,6 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_PROXY
 	];
 	$conditions[EVENT_SOURCE_INTERNAL] = [
-		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_EVENT_TYPE,
 		CONDITION_TYPE_HOST,
 		CONDITION_TYPE_HOST_GROUP,
@@ -1186,11 +1182,6 @@ function get_operators_by_conditiontype($conditiontype) {
 	];
 	$operators[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = [
 		CONDITION_OPERATOR_EQUAL
-	];
-	$operators[CONDITION_TYPE_APPLICATION] = [
-		CONDITION_OPERATOR_EQUAL,
-		CONDITION_OPERATOR_LIKE,
-		CONDITION_OPERATOR_NOT_LIKE
 	];
 	$operators[CONDITION_TYPE_HOST_NAME] = [
 		CONDITION_OPERATOR_LIKE,
