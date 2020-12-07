@@ -1,13 +1,13 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-26T17:09:01Z'
+  date: '2020-12-07T09:00:10Z'
   groups:
     -
       name: Templates/Applications
   templates:
     -
-      template: 'Template App GitLab by HTTP'
-      name: 'Template App GitLab by HTTP'
+      template: 'GitLab by HTTP'
+      name: 'GitLab by HTTP'
       description: |
         Get GitLab metrics by HTTP agent from Prometheus metrics endpoint.
         
@@ -514,7 +514,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'GitLab: Liveness check was failed'
-                  expression: '{Template App GitLab by HTTP:gitlab.liveness.last()}=0'
+                  expression: '{GitLab by HTTP:gitlab.liveness.last()}=0'
         -
           name: 'GitLab: Redis: Client exceptions rate, cache'
           type: DEPENDENT
@@ -898,7 +898,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'GitLab: Liveness check was failed'
-                  expression: '{Template App GitLab by HTTP:gitlab.liveness.last()}=0'
+                  expression: '{GitLab by HTTP:gitlab.liveness.last()}=0'
         -
           name: 'GitLab: User CAPTCHA logins, total'
           type: DEPENDENT
@@ -1163,7 +1163,7 @@ zabbix_export:
                 key: gitlab.get_metrics
           trigger_prototypes:
             -
-              expression: '{Template App GitLab by HTTP:gitlab.puma.active_connections[{#SINGLETON}].min(5m)}/{Template App GitLab by HTTP:gitlab.puma.max_threads[{#SINGLETON}].last()}*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
+              expression: '{GitLab by HTTP:gitlab.puma.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.puma.max_threads[{#SINGLETON}].last()}*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
               name: 'GitLab: Puma instance thread utilization is too hight (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
           url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
@@ -1241,7 +1241,7 @@ zabbix_export:
                 key: gitlab.get_metrics
           trigger_prototypes:
             -
-              expression: '{Template App GitLab by HTTP:gitlab.unicorn.active_connections[{#SINGLETON}].min(5m)}/{Template App GitLab by HTTP:gitlab.unicorn.unicorn_workers[{#SINGLETON}].last()}*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
+              expression: '{GitLab by HTTP:gitlab.unicorn.active_connections[{#SINGLETON}].min(5m)}/{GitLab by HTTP:gitlab.unicorn.unicorn_workers[{#SINGLETON}].last()}*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
               name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
           url: '{$GITLAB.URL}:{$GITLAB.PORT}/-/metrics'
@@ -1294,7 +1294,7 @@ zabbix_export:
           description: 'GitLab instance URL'
   triggers:
     -
-      expression: '{Template App GitLab by HTTP:gitlab.ruby.file_descriptors.max.min(5m)}/{Template App GitLab by HTTP:gitlab.ruby.process_max_fds.last()}*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
+      expression: '{GitLab by HTTP:gitlab.ruby.file_descriptors.max.min(5m)}/{GitLab by HTTP:gitlab.ruby.process_max_fds.last()}*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
       name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
   graphs:
@@ -1304,38 +1304,38 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.database.connection_pool_busy
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.database.connection_pool_connections
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.database.connection_pool_dead
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.database.connection_pool_idle
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.database.connection_pool_waiting
         -
           sortorder: '5'
           drawtype: BOLD_LINE
           color: 6C59DC
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.database.connection_pool_waiting
     -
       name: 'GitLab: HTTP requests rate'
@@ -1343,19 +1343,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.http.requests.4xx.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.http.requests.5xx.rate
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.http.requests.rate
     -
       name: 'GitLab: Redis requests rate'
@@ -1364,42 +1364,42 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.redis.client_requests.shared_state.rate
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.redis.client_requests.cache.rate
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.redis.client_requests.queues.rate
         -
           sortorder: '3'
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.redis.client_exceptions.shared_state.rate
         -
           sortorder: '4'
           color: FC6EA3
           yaxisside: RIGHT
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.redis.client_exceptions.cache.rate
         -
           sortorder: '5'
           color: 6C59DC
           yaxisside: RIGHT
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.redis.client_exceptions.queues.rate
     -
       name: 'GitLab: Ruby: File descriptors'
@@ -1407,26 +1407,26 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.file_descriptors.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.file_descriptors.max
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.file_descriptors.min
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.process_max_fds
     -
       name: 'GitLab: Ruby: RSS memory'
@@ -1434,19 +1434,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.process_resident_memory_bytes.avg
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.process_resident_memory_bytes.min
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Template App GitLab by HTTP'
+            host: 'GitLab by HTTP'
             key: gitlab.ruby.process_resident_memory_bytes.max
   value_maps:
     -
