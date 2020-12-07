@@ -120,12 +120,11 @@ macro_fmttime_LDADD += $(COMMON_LIB_FILES)
 
 macro_fmttime_LDADD += @SERVER_LIBS@
 
-macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@
+macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
 macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxdbcache \
-	-I@top_srcdir@/src/libs/zbxserver \
-	$(VALUECACHE_WRAP_FUNCS)
+	-I@top_srcdir@/src/libs/zbxserver
 
 evaluate_function_SOURCES = \
 	evaluate_function.c \
