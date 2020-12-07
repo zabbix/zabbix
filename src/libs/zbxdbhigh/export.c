@@ -24,14 +24,19 @@
 extern char		*CONFIG_EXPORT_DIR;
 extern zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
-static char	*history_file_name;
-static FILE	*history_file;
+typedef struct
+{
+	char	*name;
+	FILE	*file;
+	time_t	last_check;
+	int	missing;
+}
+zbx_export_file_t;
 
-static char	*trends_file_name;
-static FILE	*trends_file;
+static zbx_export_file_t	*history_file;
+static zbx_export_file_t	*trends_file;
+static zbx_export_file_t	*problems_file;
 
-static char	*problems_file_name;
-static FILE	*problems_file;
 static char	*export_dir;
 
 int	zbx_is_export_enabled(void)
@@ -78,58 +83,94 @@ int	zbx_export_init(char **error)
 
 void	zbx_history_export_init(const char *process_name, int process_num)
 {
-	history_file_name = zbx_dsprintf(NULL, "%s/history-%s-%d.ndjson", export_dir, process_name, process_num);
+	history_file = (zbx_export_file_t *)zbx_malloc(NULL, sizeof(zbx_export_file_t));
 
-	if (NULL == (history_file = fopen(history_file_name, "a")))
+	history_file->name = zbx_dsprintf(NULL, "%s/history-%s-%d.ndjson", export_dir, process_name, process_num);
+
+	if (NULL == (history_file->file = fopen(history_file->name, "a")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot open export file '%s': %s", history_file_name,
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open export file '%s': %s", history_file->name,
 				zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	trends_file_name = zbx_dsprintf(NULL, "%s/trends-%s-%d.ndjson", export_dir, process_name, process_num);
+	history_file->last_check = 0;
+	history_file->missing = 0;
 
-	if (NULL == (trends_file = fopen(trends_file_name, "a")))
+	trends_file = (zbx_export_file_t *)zbx_malloc(NULL, sizeof(zbx_export_file_t));
+
+	trends_file->name = zbx_dsprintf(NULL, "%s/trends-%s-%d.ndjson", export_dir, process_name, process_num);
+
+	if (NULL == (trends_file->file = fopen(trends_file->name, "a")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot open export file '%s': %s", trends_file_name,
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open export file '%s': %s", trends_file->name,
 				zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+	trends_file->last_check = 0;
+	trends_file->missing = 0;
 }
 
 void	zbx_problems_export_init(const char *process_name, int process_num)
 {
-	problems_file_name = zbx_dsprintf(NULL, "%s/problems-%s-%d.ndjson", export_dir, process_name, process_num);
+	problems_file = (zbx_export_file_t *)zbx_malloc(NULL, sizeof(zbx_export_file_t));
 
-	if (NULL == (problems_file = fopen(problems_file_name, "a")))
+	problems_file->name = zbx_dsprintf(NULL, "%s/problems-%s-%d.ndjson", export_dir, process_name, process_num);
+
+	if (NULL == (problems_file->file = fopen(problems_file->name, "a")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot open export file '%s': %s", problems_file_name,
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open export file '%s': %s", problems_file->name,
 				zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+	problems_file->last_check = 0;
+	problems_file->missing = 0;
 }
 
-static void	file_write(const char *buf, size_t count, FILE **file, const char *name)
+static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 {
-#define ZBX_LOGGING_SUSPEND_TIME	10
+#define ZBX_SUSPEND_TIME	10
 
-	static time_t	last_log_time = 0;
 	time_t		now;
 	char		log_str[MAX_STRING_LEN];
 	long		file_offset;
 	size_t		log_str_offset = 0;
 
-	if (NULL == *file && (NULL == (*file = fopen(name, "a"))))
+	now = time(NULL);
+
+	if (1 == file->missing || ZBX_SUSPEND_TIME < now - file->last_check)
+	{
+		if (NULL == (file->file = fopen(file->name, "a")))
+		{
+			if (0 == file->missing)
+				file->missing = 1;
+
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+					file->name, zbx_strerror(errno));
+			goto error;
+		}
+		else if (1 == file->missing)
+		{
+			file->missing = 0;
+			zabbix_log(LOG_LEVEL_ERR, "regained access to export file '%s'", file->name);
+		}
+
+		file->last_check = now;
+	}
+
+	if (NULL == file->file && (NULL == (file->file = fopen(file->name, "a"))))
 	{
 		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
-				name, zbx_strerror(errno));
+				file->name, zbx_strerror(errno));
 		goto error;
 	}
 
-	if (-1 == (file_offset = ftell(*file)))
+	if (-1 == (file_offset = ftell(file->file)))
 	{
 		log_str_offset = zbx_snprintf(log_str, sizeof(log_str),
-				"cannot get current position in export file '%s': %s", name, zbx_strerror(errno));
+				"cannot get current position in export file '%s': %s", file->name, zbx_strerror(errno));
 		goto error;
 	}
 
@@ -137,7 +178,7 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 	{
 		char	filename_old[MAX_STRING_LEN];
 
-		strscpy(filename_old, name);
+		strscpy(filename_old, file->name);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 
 		if (0 == access(filename_old, F_OK) && 0 != remove(filename_old))
@@ -147,70 +188,69 @@ static void	file_write(const char *buf, size_t count, FILE **file, const char *n
 			goto error;
 		}
 
-		if (0 != fclose(*file))
+		if (0 != fclose(file->file))
 		{
 			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot close export file %s': %s",
-					name, zbx_strerror(errno));
-			*file = NULL;
+					file->name, zbx_strerror(errno));
+			file->file = NULL;
 			goto error;
 		}
-		*file = NULL;
+		file->file = NULL;
 
-		if (0 != rename(name, filename_old))
+		if (0 != rename(file->name, filename_old))
 		{
 			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot rename export file '%s': %s",
-					name, zbx_strerror(errno));
+					file->name, zbx_strerror(errno));
 			goto error;
 		}
 
-		if (NULL == (*file = fopen(name, "a")))
+		if (NULL == (file->file = fopen(file->name, "a")))
 		{
 			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
-					name, zbx_strerror(errno));
+					file->name, zbx_strerror(errno));
 			goto error;
 		}
 	}
 
-	if (count != fwrite(buf, 1, count, *file) || '\n' != fputc('\n', *file))
+	if (count != fwrite(buf, 1, count, file->file) || '\n' != fputc('\n', file->file))
 	{
 		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot write to export file '%s': %s",
-				name, zbx_strerror(errno));
+				file->name, zbx_strerror(errno));
 		goto error;
 	}
 
 	return;
 error:
-	if (NULL != *file && 0 != fclose(*file))
+	if (NULL != file->file && 0 != fclose(file->file))
 	{
 		zbx_snprintf(log_str + log_str_offset, sizeof(log_str) - log_str_offset,
-				"; cannot close export file %s': %s", name, zbx_strerror(errno));
+				"; cannot close export file %s': %s", file->name, zbx_strerror(errno));
 	}
 
-	*file = NULL;
-	now = time(NULL);
+	file->file = NULL;
 
-	if (ZBX_LOGGING_SUSPEND_TIME < now - last_log_time)
+	if (ZBX_SUSPEND_TIME < now - file->last_check)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", log_str);
-		last_log_time = now;
+		file->last_check = now;
 	}
 
-#undef ZBX_LOGGING_SUSPEND_TIME
+#undef ZBX_SUSPEND_TIME
 }
 
 void	zbx_problems_export_write(const char *buf, size_t count)
 {
-	file_write(buf, count, &problems_file, problems_file_name);
+	file_write(buf, count, problems_file);
 }
 
 void	zbx_history_export_write(const char *buf, size_t count)
 {
-	file_write(buf, count, &history_file, history_file_name);
+	file_write(buf, count, history_file);
 }
 
 void	zbx_trends_export_write(const char *buf, size_t count)
 {
-	file_write(buf, count, &trends_file, trends_file_name);
+	file_write(buf, count, trends_file);
 }
 
 static void	zbx_flush(FILE *file, const char *file_name)
@@ -221,18 +261,18 @@ static void	zbx_flush(FILE *file, const char *file_name)
 
 void	zbx_problems_export_flush(void)
 {
-	if (NULL != problems_file)
-		zbx_flush(problems_file, problems_file_name);
+	if (NULL != problems_file->file)
+		zbx_flush(problems_file->file, problems_file->name);
 }
 
 void	zbx_history_export_flush(void)
 {
-	if (NULL != history_file)
-		zbx_flush(history_file, history_file_name);
+	if (NULL != history_file->file)
+		zbx_flush(history_file->file, history_file->name);
 }
 
 void	zbx_trends_export_flush(void)
 {
-	if (NULL != trends_file)
-		zbx_flush(trends_file, trends_file_name);
+	if (NULL != trends_file->file)
+		zbx_flush(trends_file->file, trends_file->name);
 }
