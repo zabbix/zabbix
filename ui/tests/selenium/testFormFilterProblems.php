@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/common/testFormFilter.php';
 
 /**
- *
  * @backup profiles
  */
 class testFormFilterProblems extends testFormFilter {
@@ -31,6 +30,7 @@ public static function getCheckCreatedFilterData() {
 		return [
 			[
 				[
+					'expected' => TEST_BAD,
 					'filter' => [
 						'Name' => '',
 						'Show number of records' => true
@@ -40,6 +40,7 @@ public static function getCheckCreatedFilterData() {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'filter' => [
 						'Name' => ''
 					],
@@ -49,6 +50,7 @@ public static function getCheckCreatedFilterData() {
 			// Dataprovider with 1 space instead of name.
 			[
 				[
+					'expected' => TEST_BAD,
 					'filter' => [
 						'Name' => ' '
 					],
@@ -58,6 +60,7 @@ public static function getCheckCreatedFilterData() {
 			// Dataprovider with default name
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Hosts' => ['Host for tag permissions']
 					],
@@ -69,6 +72,7 @@ public static function getCheckCreatedFilterData() {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Problem' => 'non_exist'
 					],
@@ -81,6 +85,7 @@ public static function getCheckCreatedFilterData() {
 			// Dataprovider with symbols instead of name.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Severity' => 'Not classified'
 					],
@@ -94,6 +99,7 @@ public static function getCheckCreatedFilterData() {
 			// Dataprovider with name as cyrillic.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Host groups' => ['Group to check Overview']
 					],
@@ -106,6 +112,7 @@ public static function getCheckCreatedFilterData() {
 			// Two dataproviders with same name and options.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
@@ -114,81 +121,53 @@ public static function getCheckCreatedFilterData() {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
 					'tab_id' => '6'
 				]
-			],
+			]
 		];
 	}
 
 	/**
-	 * @dataProvider getCheckCreatedFilterData
-	 *
 	 * Create and check new filters.
+	 *
+	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
-		$this->checkFilters($data, 'zabbix.php?action=problem.view');
+		$this->page->userLogin('filter-create', 'zabbix');
+		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->createFilter($data);
+		$this->checkFilters($data);
 	}
 
 	/**
-	 * @depends  testFormFilterProblems_CheckCreatedFilter
-	 *
-	 * Delete created filters.
+	 * Delete filters.
 	 */
 	public function testFormFilterProblems_Delete() {
-		$this->deleteFilter('zabbix.php?action=problem.view');
-	}
-
-	public static function getUpdateFormData() {
-		return [
-			[
-				[
-					'filter_form' => [
-						'Host groups' => ['Group to check Overview']
-					],
-					'filter' => [
-						'Name' => 'update_filter_form',
-						'Show number of records' => true
-					],
-					'tab_id' => '1'
-				]
-			]
-		];
+		$this->page->userLogin('filter-delete', 'zabbix');
+		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->deleteFilter();
 	}
 
 	/**
-	 * @backup-once profiles
-	 * @dataProvider getUpdateFormData
-	 *
 	 * Updating filter form.
 	 */
-	public function testFormFilterProblems_UpdateForm($data) {
-		$this->updateFilterForm($data, 'zabbix.php?action=problem.view');
-	}
-
-	public static function getUpdatePropertiesData() {
-		return [
-			[
-				[
-					'filter' => [
-						'Name' => 'update_filter_properties'
-					],
-					'tab_id' => '1'
-				]
-			]
-		];
+	public function testFormFilterProblems_UpdateForm() {
+		$this->page->userLogin('filter-update', 'zabbix');
+		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->updateFilterForm();
 	}
 
 	/**
-	 * @backup-once profiles
-	 * @dataProvider getUpdatePropertiesData
-	 *
 	 * Updating saved filter properties.
 	 */
-	public function testFormFilterProblems_UpdateProperties($data) {
-		$this->updateFilterProperties($data, 'zabbix.php?action=problem.view');
+	public function testFormFilterProblems_UpdateProperties() {
+		$this->page->userLogin('filter-update', 'zabbix');
+		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->updateFilterProperties();
 	}
 
 
@@ -220,7 +199,6 @@ public static function getCheckCreatedFilterData() {
 	/**
 	 * Time period check from saved filter properties and timeselector.
 	 *
-	 * @backup-once profiles
 	 * @dataProvider getCustomTimePeriodData
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {

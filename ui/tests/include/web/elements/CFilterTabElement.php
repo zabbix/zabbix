@@ -76,21 +76,21 @@ class CFilterTabElement extends CElement {
 	/**
 	 * Get filter properties.
 	 *
-	 * @param string $data		filter name to be selected
+	 * @param string $name		filter name to be selected
 	 * @param integer $count	filter name to be selected, if several filters have same names
 	 */
-	public function getProperties($data = null, $count = null) {
-		if ($data !== null && $count === null) {
-			$this->selectTab($data);
+	public function getProperties($name = null, $count = null) {
+		if ($name !== null && $count === null) {
+			$this->selectTab($name);
 			$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click();
 		}
 
-		if ($data !== null && $count !== null) {
-			$this->selectTab($data, $count);
+		if ($name !== null && $count !== null) {
+			$this->selectTab($name, $count);
 			$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click();
 		}
 
-		if ($data === null) {
+		if ($name === null) {
 			$this->query('xpath:.//a[@class="icon-edit"]')->one()->click();
 		}
 	}

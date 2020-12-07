@@ -21,6 +21,7 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for "Hosts and Problems filter save" function tests.
@@ -31,99 +32,97 @@ class testFormFilter extends CWebTest {
 	 * Check created filter.
 	 *
 	 * @param array $data  given data provider
-	 * @param string $url  link to page with filters
 	 */
-	public function checkFilters($data, $url) {
-		$this->page->login()->open($url)->waitUntilReady();
-		$this->createFilter($data);
+	public function checkFilters($data) {
+		$this->page->waitUntilReady();
+		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 
-		if (array_key_exists('error_message', $data)) {
-			return;
-		}
-		else {
-			$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
-			$text = $this->query('xpath://table[@class="list-table"]/tbody/tr/td')->one()->getText();
-			$filtered_rows_count = ($text === 'No data found.') ? 0 : $table->getRows()->count();
-			$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
+				$text = $this->query('xpath://table[@class="list-table"]/tbody/tr/td')->one()->getText();
+				$filtered_rows_count = ($text === 'No data found.') ? 0 : $table->getRows()->count();
 
-			// Checking that data exists after saving filter.
-			if (array_key_exists('filter_form', $data)) {
-				$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->one();
-				$form->checkValue($data['filter_form']);
-			}
+				// Checking that data exists after saving filter.
+				if (array_key_exists('filter_form', $data)) {
+					$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->one();
+					$form->checkValue($data['filter_form']);
+				}
 
-			// Filter default name is Untitled.
-			if (!array_key_exists('Name', $data['filter'])) {
-				$data['filter']['Name'] = 'Untitled';
-			}
+				// Filter default name is Untitled.
+				if (!array_key_exists('Name', $data['filter'])) {
+					$data['filter']['Name'] = 'Untitled';
+				}
 
-			// Checking that name of filter displayed on the tab.
-			$this->assertEquals($data['filter']['Name'], $filter_container->getText());
+				$this->checkName($data['filter']['Name']);
 
-			// Checking that names displayed on the filter tabs same as in drop down list.
-			$filters = $filter_container->getTitles();
-			$this->assertEquals($filters, $this->getDropdownList());
+				// Checking that hosts/problems amount displayed near name in filter tab.
+				if (array_key_exists('Show number of records', $data['filter'])) {
+					$this->query('xpath://a[@class="icon-home tabfilter-item-link"]')->one()->click();
+					$this->assertEquals($filtered_rows_count, $this->query('xpath://li[@data-target="tabfilter_'.$data['tab_id'].
+							'"]/a')->one()->getAttribute('data-counter'));
+				}
 
-			// Checking that name displayed in filter properties.
-			$filter_container->getProperties();
-			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-			$dialog->checkValue(['Name' => $data['filter']['Name']]);
-			$this->query('button:Cancel')->one()->click();
+				// Checking that dropdown/popup tab works.
+				$dropdown = $this->query('class:btn-widget-expand')->asPopupButton()->one();
+				$dropdown->fill($data['filter']['Name']);
+				$this->assertEquals($data['filter']['Name'], $filter_container->getText());
+				break;
 
-			// Checking that hosts/problems amount displayed near name in filter tab.
-			if (array_key_exists('Show number of records', $data['filter'])) {
-				$this->query('xpath://a[@class="icon-home tabfilter-item-link"]')->one()->click();
-				$this->assertEquals($filtered_rows_count, $this->query('xpath://li[@data-target="tabfilter_'.$data['tab_id'].
-						'"]/a')->one()->getAttribute('data-counter'));
-			}
-
-			// Checking that dropdown/popup tab works.
-			$dropdown = $this->query('class:btn-widget-expand')->asPopupButton()->one();
-			$dropdown->fill($data['filter']['Name']);
-			$this->assertEquals($data['filter']['Name'], $filter_container->getText());
+			case TEST_BAD:
+				$message = CMessageElement::find()->one();
+				$this->assertTrue($message->hasLine($data['error_message']));
+				$this->page->refresh();
+				$this->page->waitUntilReady();
+				$this->assertEquals($this->query('xpath://li/ul[@class="ui-sortable-container ui-sortable"]/li')->count(), 1);
+			break;
 		}
 	}
 
 	/**
 	 * Change data in filter form
 	 *
-	 * @param array $data  data added to filter form
-	 * @param string $url  link to page where available to save filter
 	 */
-	public function updateFilterForm($data, $url) {
-		$this->page->login()->open($url)->waitUntilReady();
-		$this->createFilter($data);
-
+	public function updateFilterForm() {
 		// Changing filter data.
-		$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->one();
-		$form->fill(['Host groups' => ['Zabbix servers']]);
-		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
-		$this->page->waitUntilReady();
+		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+		$filter_container->selectTab('update_tab');
+		$form = $this->query('id:tabfilter_1')->asForm()->one();
+		$result_before = $this->tableResults();
 
-		// Checking that filter name became italic.
-		$font_style = $this->query('xpath://a[@class="tabfilter-item-link"]')->one()->getCSSValue('font-style');
-		$this->assertEquals('italic', $font_style);
-
-		// Updating filter.
-		$this->query('xpath://li[@data-target="tabfilter_'.$data['tab_id'].'"]/a')->one()->click();
-		$this->query('button:Update')->one()->click();
+		for ($i = 0; $i < 2; ++$i) {
+			$form->fill(['Host groups' => ['Zabbix servers']]);
+			if ($i === 0) {
+				$this->query('name:filter_apply')->one()->click();
+				$this->assertFalse($result_before === $this->tableResults());
+			}
+			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertEquals('italic', $this->query('xpath://li[@data-target="tabfilter_1"]/a[@class="tabfilter-item-link"]')
+			->one()->getCSSValue('font-style'));
+			$filter_container->selectTab('update_tab');
+			if ($i === 0) {
+				$this->query('button:Reset')->one()->click();
+			}
+			else {
+				$this->assertTrue($result_before === $this->tableResults());
+				$this->query('button:Update')->one()->click();
+			}
+		}
 
 		// This time needed for filter to update table with results.
 		sleep(1);
 
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
-		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
-		$text = $this->query('xpath://table[@class="list-table"]/tbody/tr/td')->one()->getText();
-		$result = ($text === 'No data found.') ? 0 : $table->getRows()->count();
+		$result = $this->tableResults();
 		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertEquals($result, $this->query('xpath://a[@aria-label="'.$data['filter']['Name'].'"]')
+		$this->assertEquals($result, $this->query('xpath://a[@aria-label="update_tab"]')
 				->one()->getAttribute('data-counter'));
 
 		// Checking that hosts/problems amount in filter displayed near name at the tab changed.
-		$this->assertEquals($result, $this->query('xpath://li[@data-target="tabfilter_'.$data['tab_id'].'"]/a')
+		$this->assertEquals($result, $this->query('xpath://li[@data-target="tabfilter_1"]/a')
 				->one()->getAttribute('data-counter'));
 	}
 
@@ -133,10 +132,12 @@ class testFormFilter extends CWebTest {
 	 * @param string $data	data added to filter form
 	 * @param string $url	link to page where available to save filter
 	 */
-	public function updateFilterProperties($data, $url) {
-		$this->page->login()->open($url)->waitUntilReady();
-		$this->createFilter($data);
+	public function updateFilterProperties() {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+
+		// Checking that filter result amount displayed.
+		$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_1"]/a[@data-counter]')->exists());
+		$filter_container->selectTab('update_tab');
 
 		// Changing filter name to empty space.
 		$filter_container->getProperties();
@@ -147,15 +148,15 @@ class testFormFilter extends CWebTest {
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->hasLine('Incorrect value for field "filter_name": cannot be empty.'));
 
-		// Changing filter name and enabling Show number of records
-		$dialog->fill(['Name' => 'updated_filter_name', 'Show number of records' => true]);
+		// Changing filter name and disabling Show number of records
+		$dialog->fill(['Name' => 'updated_filter_name', 'Show number of records' => false]);
 		$dialog->submit();
 		$this->page->waitUntilReady();
 
-		// Checking that filter name changed, and result amount displayed.
-		$this->assertEquals('updated_filter_name', $filter_container->getText());
+		// Checking that filter name changed, and result amount not displayed.
+		$this->checkName('updated_filter_name');
 		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
-		$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_1"]/a[@data-counter]')->one()->isValid());
+		$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]/a[@data-counter]')->exists());
 	}
 
 	/**
@@ -163,11 +164,10 @@ class testFormFilter extends CWebTest {
 	 *
 	 * @param string $url		link to page where available to save filter
 	 */
-	public function deleteFilter($url) {
-		$this->page->login()->open($url)->waitUntilReady();
+	public function deleteFilter() {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 
-		$filters = ['Untitled', 'simple_name', '*;%№:?(', 'кирилица', 'duplicated_name', 'duplicated_name'];
+		$filters = $filter_container->getTitles();
 		foreach ($filters as $filter) {
 			$filter_container->getProperties($filter);
 			$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -216,20 +216,40 @@ class testFormFilter extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
-
-		if (array_key_exists('error_message', $data)) {
-			$message = CMessageElement::find()->one();
-			$this->assertTrue($message->hasLine($data['error_message']));
-		}
-
 		$this->page->waitUntilReady();
 	}
 
-	// Return filter TEST names from droplist.
+	// Returns result amount from table.
+	public function tableResults() {
+		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
+		$text = $this->query('xpath://table[@class="list-table"]/tbody/tr/td')->one()->getText();
+		$result = ($text === 'No data found.') ? 0 : $table->getRows()->count();
+
+		return $result;
+	}
+
+	// Return filter names from droplist.
 	public function getDropdownList() {
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 		$dropdown_filters = CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()->asText();
 		array_shift($dropdown_filters);
 		return $dropdown_filters;
+	}
+
+	// Checking filters name in 3 differente palces: tab list, drop list, options.
+	public function checkName($filter_name) {
+		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+		// Checking that name of filter displayed on the tab.
+		$this->assertEquals($filter_name, $filter_container->getText());
+
+		// Checking that names displayed on the filter tabs same as in drop down list.
+		$filters = $filter_container->getTitles();
+		$this->assertEquals($filters, $this->getDropdownList());
+
+		// Checking that name displayed in filter properties.
+		$filter_container->getProperties();
+		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		$dialog->checkValue(['Name' => $filter_name]);
+		$this->query('button:Cancel')->one()->click();
 	}
 }

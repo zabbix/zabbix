@@ -29,6 +29,7 @@ class testFormFilterHosts extends testFormFilter {
 		return [
 			[
 				[
+					'expected' => TEST_BAD,
 					'filter' => [
 						'Name' => '',
 						'Show number of records' => true
@@ -38,6 +39,7 @@ class testFormFilterHosts extends testFormFilter {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
 					'filter' => [
 						'Name' => ''
 					],
@@ -47,6 +49,7 @@ class testFormFilterHosts extends testFormFilter {
 			// Dataprovider with 1 space instead of name.
 			[
 				[
+					'expected' => TEST_BAD,
 					'filter' => [
 						'Name' => ' '
 					],
@@ -56,6 +59,7 @@ class testFormFilterHosts extends testFormFilter {
 			// Dataprovider with default name
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Host groups' => ['Empty group']
 					],
@@ -67,6 +71,7 @@ class testFormFilterHosts extends testFormFilter {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Name' => 'non_exist'
 					],
@@ -79,6 +84,7 @@ class testFormFilterHosts extends testFormFilter {
 			// Dataprovider with symbols instead of name.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Severity' => 'Not classified'
 					],
@@ -92,6 +98,7 @@ class testFormFilterHosts extends testFormFilter {
 			// Dataprovider with name as cyrillic.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter_form' => [
 						'Host groups' => ['Group to check Overview']
 					],
@@ -104,6 +111,7 @@ class testFormFilterHosts extends testFormFilter {
 			// Two dataproviders with same name and options.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
@@ -112,80 +120,53 @@ class testFormFilterHosts extends testFormFilter {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
 					'tab_id' => '6'
 				]
-			],
+			]
 		];
 	}
 
 	/**
-	 * @dataProvider getCheckCreatedFilterData
-	 *
 	 * Create and check new filters.
+	 *
+	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterHosts_CheckCreatedFilter($data) {
-		$this->checkFilters($data, 'zabbix.php?action=host.view');
+		$this->page->userLogin('filter-create', 'zabbix');
+		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->createFilter($data);
+		$this->page->waitUntilReady();
+		$this->checkFilters($data);
 	}
 
 	/**
-	 * @depends  testFormFilterHosts_CheckCreatedFilter
-	 *
 	 * Delete created filter.
 	 */
 	public function testFormFilterHosts_Delete() {
-		$this->deleteFilter('zabbix.php?action=host.view&filter_rst=1');
-	}
-
-	public static function getUpdateFormData() {
-		return [
-			[
-				[
-					'filter_form' => [
-						'Host groups' => ['Group to check Overview']
-					],
-					'filter' => [
-						'Name' => 'update_filter_form',
-						'Show number of records' => true
-					],
-					'tab_id' => '1'
-				]
-			]
-		];
+		$this->page->userLogin('filter-delete', 'zabbix');
+		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->deleteFilter();
 	}
 
 	/**
-	 * @backup-once profiles
-	 * @dataProvider getUpdateFormData
-	 *
 	 * Updating filter form.
 	 */
-	public function testFormFilterHosts_UpdateForm($data) {
-		$this->updateFilterForm($data, 'zabbix.php?action=host.view&filter_rst=1');
-	}
-
-	public static function getUpdatePropertiesData() {
-		return [
-			[
-				[
-					'filter' => [
-						'Name' => 'update_filter_properties'
-					],
-					'tab_id' => '1'
-				]
-			]
-		];
+	public function testFormFilterHosts_UpdateForm() {
+		$this->page->userLogin('filter-update', 'zabbix');
+		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->updateFilterForm();
 	}
 
 	/**
-	 * @backup-once profiles
-	 * @dataProvider getUpdatePropertiesData
-	 *
 	 * Updating saved filter properties.
 	 */
-	public function testFormFilterHosts_UpdateProperties($data) {
-		$this->updateFilterProperties($data, 'zabbix.php?action=host.view&filter_rst=1');
+	public function testFormFilterHosts_UpdateProperties() {
+		$this->page->userLogin('filter-update', 'zabbix');
+		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->updateFilterProperties();
 	}
 }
