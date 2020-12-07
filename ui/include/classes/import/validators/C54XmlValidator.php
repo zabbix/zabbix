@@ -314,7 +314,9 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 
 	private $FILTER_CONDITION_OPERATOR = [
 		CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
-		CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX
+		CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
+		CXmlConstantValue::CONDITION_EXISTS => CXmlConstantName::EXISTS,
+		CXmlConstantValue::CONDITION_NOT_EXISTS => CXmlConstantName::NOT_EXISTS
 	];
 
 	private $LLD_OVERRIDE_OPERATION_OBJECT = [

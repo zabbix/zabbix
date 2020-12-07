@@ -53,10 +53,12 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
 				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CComboBox('conditions[#{rowNum}][operator]', CONDITION_OPERATOR_REGEXP, null, [
-				CONDITION_OPERATOR_REGEXP => _('matches'),
-				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-			]))->addClass('operator'),
+			(new CSelect('conditions[#{rowNum}][operator]'))
+				->setValue(CONDITION_OPERATOR_REGEXP)
+				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist'))),
 			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setAttribute('placeholder', _('regular expression')),

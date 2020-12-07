@@ -76,7 +76,9 @@ insert_javascript_for_visibilitybox();
 			(new CSelect('overrides_filters[#{rowNum}][operator]'))
 				->setValue(CONDITION_OPERATOR_REGEXP)
 				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match'))),
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist'))),
 			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
 					DB::getFieldLength('lld_override_condition', 'value')))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)

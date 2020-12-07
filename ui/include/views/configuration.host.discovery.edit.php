@@ -675,7 +675,7 @@ $conditionFormList->addRow(_('Type of calculation'),
 $conditionTable = (new CTable())
 	->setId('conditions')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
+	->setHeader([_('Label'), _('Macro'), '', (new CColHeader(_('Regular expression')))->setWidth(300), _('Action')]);
 
 $conditions = $data['conditions'];
 if (!$conditions) {
@@ -689,11 +689,6 @@ if (!$conditions) {
 else {
 	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
 }
-
-$operators = [
-	CONDITION_OPERATOR_REGEXP => _('matches'),
-	CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-];
 
 // fields
 foreach ($conditions as $i => $condition) {
@@ -716,18 +711,26 @@ foreach ($conditions as $i => $condition) {
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
+	if ($condition['operator'] == CONDITION_OPERATOR_EXISTS
+			|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+		$value->addStyle('display: none;');
+	}
+
 	// delete button
-	$deleteButtonCell = [
+	$delete_button_cell = [
 		(new CButton('conditions_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	];
 
-	$row = [$formulaId, $macro,
-		(new CComboBox('conditions['.$i.'][operator]', $condition['operator'], null, $operators))->addClass('operator'),
-		$value,
-		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
-	];
+	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
+		->setValue($condition['operator'])
+		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist')));
+
+	$row = [$formulaId, $macro, $operator_select, $value, (new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)];
 	$conditionTable->addRow($row, 'form_row');
 }
 

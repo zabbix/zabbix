@@ -132,6 +132,11 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
+	if ($overrides_filter['operator'] == CONDITION_OPERATOR_EXISTS
+			|| $overrides_filter['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+		$value->addStyle('display: none;');
+	}
+
 	$delete_button_cell = [
 		(new CButton('overrides_filters_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -142,7 +147,9 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
 		->setValue($overrides_filter['operator'])
 		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')));
+		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
+		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist')));
 
 	if ($options['templated']) {
 		$operator_select->setReadonly();
