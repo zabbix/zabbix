@@ -60,10 +60,10 @@ type message struct {
 }
 
 type device struct {
-	Name         string `json:"#NAME"`
-	DeviceType   string `json:"#TYPE"`
-	Model        string `json:"#MODEL"`
-	SerialNumber string `json:"#SN"`
+	Name         string `json:"{#NAME}"`
+	DeviceType   string `json:"{#TYPE}"`
+	Model        string `json:"{#MODEL}"`
+	SerialNumber string `json:"{#SN}"`
 }
 
 var impl Plugin
