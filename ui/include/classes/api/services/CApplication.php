@@ -399,8 +399,6 @@ class CApplication extends CApiService {
 
 		(new CApplicationManager())->inherit($applications);
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_APPLICATION, $applications);
-
 		return ['applicationids' => $applicationids];
 	}
 
@@ -428,8 +426,6 @@ class CApplication extends CApiService {
 		DB::update('applications', $upd_applications);
 
 		(new CApplicationManager())->inherit($applications);
-
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_APPLICATION, $applications, $db_applications);
 
 		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
@@ -495,8 +491,6 @@ class CApplication extends CApiService {
 		}
 
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
-
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, $db_applications);
 
 		return ['applicationids' => $applicationids];
 	}

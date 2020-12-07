@@ -191,7 +191,6 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
 			AUDIT_RESOURCE_GRAPH_ELEMENT => _('Graph element'),
 			AUDIT_RESOURCE_USER_GROUP => _('User group'),
-			AUDIT_RESOURCE_APPLICATION => _('Application'),
 			AUDIT_RESOURCE_TRIGGER => _('Trigger'),
 			AUDIT_RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
 			AUDIT_RESOURCE_HOST_GROUP => _('Host group'),
