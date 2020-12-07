@@ -4,7 +4,11 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #ifdef __linux__
 	#include <endian.h>
 #else
-	#include <machine/endian.h>
+	#if defined(DUK_F_OLD_SOLARIS)
+		#include <sys/isa_defs.h>
+	#else
+		#include <machine/endian.h>
+	#endif
 #endif
 #include <errno.h>
 #include <limits.h>
@@ -16,6 +20,7 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #include <sys/param.h>
 #include <sys/types.h>
 
+#include "common.h"
 
 /* Structure to save state of computation between the single steps.  */
 struct sha512_ctx
@@ -517,7 +522,7 @@ sha512_crypt_r (const char *key, const char *salt, char *buffer, int buflen)
 
 	if (rounds_custom)
 	{
-		int n = snprintf (cp, MAX (0, buflen), "%s%zu$", sha512_rounds_prefix, rounds);
+		int n = zbx_snprintf (cp, MAX (0, buflen), "%s%zu$", sha512_rounds_prefix, rounds);
 		cp += n;
 		buflen -= n;
 	}

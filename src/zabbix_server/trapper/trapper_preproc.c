@@ -44,10 +44,11 @@ extern int	CONFIG_DOUBLE_PRECISION;
 static void	format_auth_token_hash(const char *auth_token, char *hash_res_stringhexes)
 {
 	char		hash_res[ZBX_SID_AUTH_TOKEN_LENGTH];
+	int		i;
 
 	sha512_hash(auth_token, hash_res);
 
-	for (int i = 0 ; i < ZBX_SID_AUTH_TOKEN_LENGTH; i++)
+	for (i = 0 ; i < ZBX_SID_AUTH_TOKEN_LENGTH; i++)
 	{
 		char z[3];
 		zbx_snprintf(z, 3, "%02x", hash_res[i] & 0xFF);
