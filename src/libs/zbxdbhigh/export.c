@@ -142,12 +142,12 @@ static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 
 	if (1 == file->missing || ZBX_SUSPEND_TIME < now - file->last_check)
 	{
-		if (NULL == (file->file = fopen(file->name, "a")))
+		if (0 != access(file->name, F_OK))
 		{
 			if (0 == file->missing)
 				file->missing = 1;
 
-			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot access export file '%s': %s",
 					file->name, zbx_strerror(errno));
 			goto error;
 		}
@@ -156,11 +156,17 @@ static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 			file->missing = 0;
 			zabbix_log(LOG_LEVEL_ERR, "regained access to export file '%s'", file->name);
 		}
+		else if (0 == file->last_check && NULL == (file->file = fopen(file->name, "a")))
+		{
+			log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
+					file->name, zbx_strerror(errno));
+			goto error;
+		}
 
 		file->last_check = now;
 	}
 
-	if (NULL == file->file && (NULL == (file->file = fopen(file->name, "a"))))
+	if (NULL == file->file && NULL == (file->file = fopen(file->name, "a")))
 	{
 		log_str_offset = zbx_snprintf(log_str, sizeof(log_str), "cannot open export file '%s': %s",
 				file->name, zbx_strerror(errno));
