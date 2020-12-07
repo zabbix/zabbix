@@ -44,7 +44,11 @@ else {
 		->setTitle(_('Graphs'))
 		->setControls(
 			(new CTag('nav', true, ($data['hostid'] == 0)
-				? (new CButton('form', _('Create graph (select host first)')))->setEnabled(false)
+				? (new CButton('form',
+					($data['context'] === 'host')
+						? _('Create graph (select host first)')
+						: _('Create graph (select template first)')
+				))->setEnabled(false)
 				: new CRedirectButton(_('Create graph'), (new CUrl('graphs.php'))
 					->setArgument('hostid', $data['hostid'])
 					->setArgument('form', 'create')

@@ -38,7 +38,11 @@ $widget = (new CWidget())
 							->setArgument('context', $data['context'])
 							->getUrl()
 					)
-					: (new CButton('form', _('Create discovery rule (select host first)')))->setEnabled(false)
+					: (new CButton('form',
+						($data['context'] === 'host')
+							? _('Create discovery rule (select host first)')
+							: _('Create discovery rule (select template first)')
+					))->setEnabled(false)
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	);

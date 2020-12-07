@@ -186,7 +186,11 @@ $widget = (new CWidget())
 				->setArgument('context', $data['context'])
 				->getUrl()
 			)
-			: (new CButton('form', _('Create trigger (select host first)')))->setEnabled(false)
+			: (new CButton('form',
+				($data['context'] === 'host')
+					? _('Create trigger (select host first)')
+					: _('Create trigger (select template first)')
+			))->setEnabled(false)
 		))->setAttribute('aria-label', _('Content controls'))
 	]));
 

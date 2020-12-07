@@ -88,7 +88,11 @@ $widget = (new CWidget())
 				->setArgument('context', $data['context'])
 				->getUrl()
 			)
-			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
+			: (new CButton('form',
+				($data['context'] === 'host')
+					? _('Create web scenario (select host first)')
+					: _('Create web scenario (select template first)')
+			))->setEnabled(false)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
