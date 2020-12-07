@@ -370,7 +370,12 @@ $triggers_form->addItem([
 			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
 			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
 			'trigger.masscopyto' => ['name' => _('Copy')],
-			'trigger.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.trigger' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.trigger');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
 		],
 		$data['checkbox_hash']

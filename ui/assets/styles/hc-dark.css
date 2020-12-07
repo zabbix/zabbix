@@ -3600,7 +3600,8 @@ z-select[disabled] button, z-select[readonly] button,
       max-height: calc(100vh - 190px);
       max-width: inherit;
       margin: 0 -10px 10px;
-      padding: 0 10px; }
+      padding: 0 10px;
+      position: relative; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
@@ -3629,6 +3630,12 @@ z-select[disabled] button, z-select[readonly] button,
     max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-medium {
       min-width: 450px; }
+    .overlay-dialogue.modal-popup.modal-popup-static {
+      max-width: 700px;
+      width: 100%; }
+    .overlay-dialogue.modal-popup.modal-popup-preprocessing {
+      max-width: 900px;
+      width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-generic {
       min-width: 650px; }
   .overlay-dialogue .hintbox-wrap {
@@ -3978,7 +3985,7 @@ z-select[disabled] button, z-select[readonly] button,
   border: 1px dashed #333333; }
 
 .top {
-  vertical-align: top; }
+  vertical-align: top !important; }
 
 .right {
   text-align: right !important; }
@@ -5911,6 +5918,35 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .input-section-header {
   padding-top: 10px; }
+
+.modal-popup-preprocessing .preprocessing-list .step-name {
+  flex: 0 0 180px; }
+.modal-popup-preprocessing .preprocessing-list {
+  min-width: unset;
+  max-width: unset; }
+
+.modal-popup-static .table-forms-container, .modal-popup-static .browser-warning-container,
+.modal-popup-preprocessing .table-forms-container,
+.modal-popup-preprocessing .browser-warning-container {
+  border: none; }
+.modal-popup-static .ui-tabs-nav,
+.modal-popup-preprocessing .ui-tabs-nav {
+  position: sticky;
+  top: 0;
+  background: #070707;
+  z-index: 3; }
+.modal-popup-static .textarea-flexible,
+.modal-popup-preprocessing .textarea-flexible {
+  max-height: 200px;
+  overflow-y: auto; }
+
+.global-macro-table .table-col-value,
+.global-macro-table .table-col-template-value,
+.inherited-macros-table .table-col-value,
+.inherited-macros-table .table-col-template-value,
+.host-macros-table .table-col-value,
+.host-macros-table .table-col-template-value {
+  width: 300px; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }

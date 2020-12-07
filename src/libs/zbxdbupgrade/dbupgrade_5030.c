@@ -44,7 +44,18 @@ typedef struct
 }
 zbx_dbpatch_profile_t;
 
-static void	DBpatch_5030000_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *profile, char **subsect, char **field)
+static int	DBpatch_5030000(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static void	DBpatch_5030001_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *profile, char **subsect, char **field)
 {
 	int	tok_idx = 0;
 	char	*token;
@@ -78,7 +89,7 @@ static void	DBpatch_5030000_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *pr
 	}
 }
 
-static int	DBpatch_5030000(void)
+static int	DBpatch_5030001(void)
 {
 	int		i, ret = SUCCEED;
 	const char	*keys[] =
@@ -114,7 +125,7 @@ static int	DBpatch_5030000(void)
 			continue;
 		}
 
-		DBpatch_5030000_get_key_fields(row, &profile, &subsect, &field);
+		DBpatch_5030001_get_key_fields(row, &profile, &subsect, &field);
 
 		DBfree_result(result);
 
@@ -160,7 +171,7 @@ static int	DBpatch_5030000(void)
 	return ret;
 }
 
-static int	DBpatch_5030001(void)
+static int	DBpatch_5030002(void)
 {
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
 		"'web.items.filter_application',"
@@ -239,5 +250,6 @@ DBPATCH_START(5030)
 
 DBPATCH_ADD(5030000, 0, 1)
 DBPATCH_ADD(5030001, 0, 1)
+DBPATCH_ADD(5030002, 0, 1)
 
 DBPATCH_END()

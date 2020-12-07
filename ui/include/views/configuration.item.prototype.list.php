@@ -166,9 +166,10 @@ foreach ($data['items'] as $item) {
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('group_itemid[]', $item['itemid'])
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('visible[discover]', '1')
-				->setArgument('massupdate', 'discover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('action', $nodiscover
+					? 'itemprototype.massdiscover.enable'
+					: 'itemprototype.massdiscover.disable'
+				)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
@@ -203,7 +204,12 @@ $itemForm->addItem([
 			'itemprototype.massdisable' => ['name' => _('Create disabled'),
 				'confirm' => _('Create items from selected prototypes as disabled?')
 			],
-			'itemprototype.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.itemprototype' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.itemprototype');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?')
 			]

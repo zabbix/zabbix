@@ -3358,7 +3358,7 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
  *             ha           [IN] the host availability data                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
+static int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha)
 {
 	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
@@ -3408,6 +3408,55 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64, ha->hostid);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_update_host_availabilities                                *
+ *                                                                            *
+ * Purpose: sync host availabilities updates into database                    *
+ *                                                                            *
+ * Parameters: host_availabilities [IN] the host availability data            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities)
+{
+	int	txn_error;
+	char	*sql = NULL;
+	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
+	int	i;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	do
+	{
+		size_t	sql_offset = 0;
+
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < host_availabilities->values_num; i++)
+		{
+			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
+					(zbx_host_availability_t *)host_availabilities->values[i]))
+			{
+				continue;
+			}
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+
+		txn_error = DBcommit();
+	}
+	while (ZBX_DB_DOWN == txn_error);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
