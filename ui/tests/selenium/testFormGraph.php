@@ -213,7 +213,7 @@ class testFormGraph extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Graphs']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Graphs"]');
 
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');

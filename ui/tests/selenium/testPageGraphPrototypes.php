@@ -84,7 +84,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		// Check graph prototype number in breadcrumb.
 		$graphs = CDBHelper::getAll($this->sql_graph_prototypes);
 		$count = count($graphs);
-		$xpath = '//ul[contains(@class, "filter-breadcrumb")]//a[text()="Graph prototypes"]/..//sup';
+		$xpath = '//div[@class="header-navigation"]//a[text()="Graph prototypes"]/..//sup';
 		$get_number = $this->zbxTestGetText($xpath);
 		$this->assertEquals($get_number, $count);
 
