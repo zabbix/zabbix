@@ -51,14 +51,12 @@ class C52ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertHosts(array $hosts): array {
-		foreach ($hosts as &$host) {
-			$tls_fields = ['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'];
+		$tls_fields = array_flip(['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
+			'tls_psk'
+		]);
 
-			foreach ($tls_fields as $tls_field) {
-				if (array_key_exists($tls_field, $host)) {
-					unset($host[$tls_field]);
-				}
-			}
+		foreach ($hosts as &$host) {
+			$host = array_diff_key($host, $tls_fields);
 		}
 		unset($host);
 

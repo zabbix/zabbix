@@ -126,6 +126,22 @@ class CProxy extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		/*
+		 * Cleaning the output from write-only properties.
+		 */
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
+				['tls_psk_identity', 'tls_psk']
+			);
+		}
+		/*
+		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
+		* Specify write-only fields in output only if they will not appear in debug mode.
+		*/
+		elseif (is_array($options['output']) && APP::getMode() === APP::EXEC_MODE_API) {
+			$options['output'] = array_diff($options['output'], ['tls_psk_identity', 'tls_psk']);
+		}
+
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -504,21 +520,6 @@ class CProxy extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$api_call = APP::getMode() === APP::EXEC_MODE_API;
-		$output_is_array = is_array($options['output']);
-		$no_psk_fields_in_output = $output_is_array && !in_array('tls_psk_identity', $options['output'])
-				&& !in_array('tls_psk', $options['output']);
-
-		// Cleaning the output from write-only properties.
-		if ((!$options['countOutput'] || $this->requiresPostSqlFiltering($options))
-				&& (($output_is_array && ($api_call || $no_psk_fields_in_output))
-					|| $options['output'] === API_OUTPUT_EXTEND)) {
-			$options['output'] = array_diff(
-				is_array($options['output']) ? $options['output'] : array_keys(DB::getSchema($tableName)['fields']),
-				['tls_psk_identity', 'tls_psk']
-			);
-		}
-
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput'] && $options['selectInterface'] !== null) {

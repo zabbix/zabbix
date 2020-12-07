@@ -44,7 +44,7 @@ $fields = [
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
-									'isset({form}) &&  {form} == "clone" && {form} == "full_clone"'
+									'isset({form}) && ({form} == "clone" || {form} == "full_clone")'
 								],
 	'host' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})',
 									_('Host name')
