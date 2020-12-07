@@ -202,8 +202,9 @@ $url = (new CUrl('triggers.php'))
 
 // create form
 $triggers_form = (new CForm('post', $url))
+	->setName('triggersForm')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->setName('triggersForm');
+	->addVar('context', $data['context']);
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([

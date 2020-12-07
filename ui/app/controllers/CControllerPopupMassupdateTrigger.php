@@ -38,7 +38,8 @@ class CControllerPopupMassupdateTrigger extends CController {
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'manual_close' => 'in '.implode(',', [ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
 			'parent_discoveryid' => 'id',
-			'priority' => 'in '.implode(',', [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER])
+			'priority' => 'in '.implode(',', [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER]),
+			'context' => 'required|string|in '.implode(',', ['host', 'template'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -241,9 +242,15 @@ class CControllerPopupMassupdateTrigger extends CController {
 				'prototype' => $this->hasInput('prototype'),
 				'ids' => $this->getInput('ids', []),
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
+				'context' => $this->getInput('context'),
 				'location_url' => $this->hasInput('prototype')
-					? 'trigger_prototypes.php?parent_discoveryid='.$this->getInput('parent_discoveryid', 0)
-					: 'triggers.php'
+					? (new CUrl('disc_prototypes.php'))
+						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
+						->setArgument('context', $this->getInput('context'))
+						->getUrl()
+					: (new CUrl('triggers.php'))
+						->setArgument('context', $this->getInput('context'))
+						->getUrl()
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

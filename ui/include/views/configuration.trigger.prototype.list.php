@@ -45,7 +45,8 @@ $url = (new CUrl('trigger_prototypes.php'))
 // create form
 $triggersForm = (new CForm('post', $url))
 	->setName('triggersForm')
-	->addVar('parent_discoveryid', $data['parent_discoveryid']);
+	->addVar('parent_discoveryid', $data['parent_discoveryid'])
+	->addVar('context', $data['context']);
 
 // create table
 $triggersTable = (new CTableInfo())

@@ -63,7 +63,8 @@ class CControllerPopupMassupdateItem extends CController {
 			'massupdate_app_action' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'preprocessing_test_type' => 'int32',
 			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
-			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM])
+			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'context' => 'required|string|in '.implode(',', ['host', 'template'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -444,6 +445,7 @@ class CControllerPopupMassupdateItem extends CController {
 				'prototype' => false,
 				'ids' => $this->getInput('ids', []),
 				'hostid' => $this->getInput('hostid', 0),
+				'context' => $this->getInput('context'),
 				'delay_flex' => [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]],
 				'multiple_interface_types' => false,
 				'initial_item_type' => null,
@@ -452,7 +454,9 @@ class CControllerPopupMassupdateItem extends CController {
 				'displayApplications' => true,
 				'display_interfaces' => true,
 				'displayMasteritems' => true,
-				'location_url' => 'items.php'
+				'location_url' => (new CUrl('items.php'))
+					->setArgument('context', $this->getInput('context'))
+					->getUrl()
 			];
 
 			// hosts
