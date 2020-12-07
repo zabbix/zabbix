@@ -190,9 +190,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$actions = $form->getField('Action')->getOptions();
 		foreach ($this->resourcetypes as $type) {
 			$form->fill(['Resource' => $type]);
-			// TODO: should be changed on filter(new CElementFilter(CElementFilter::
-			$enabled = array_values($actions->filter(CElementQuery::ATTRIBUTES_NOT_PRESENT, ['disabled'])->asText());
-			$disabled = array_values($actions->filter(CElementQuery::ATTRIBUTES_PRESENT, ['disabled'])->asText());
+			$enabled = array_values($actions->filter(new CElementFilter(CElementFilter::ATTRIBUTES_NOT_PRESENT, ['disabled']))->asText());
+			$disabled = array_values($actions->filter(new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled']))->asText());
 
 			switch ($type) {
 				case 'All':
