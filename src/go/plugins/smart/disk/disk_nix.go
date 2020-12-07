@@ -29,8 +29,8 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
-func executeSmartctl(cmd string) (string, error) {
-	return zbxcmd.Execute(cmd, time.Second*time.Duration(5*time.Second))
+func executeSmartctl(args string) (string, error) {
+	return zbxcmd.Execute(fmt.Sprintf("sudo smartctl %s", args), time.Second*time.Duration(5*time.Second))
 }
 
 func deviceCount(name string) (int, error) {

@@ -78,7 +78,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		for _, dev := range devices {
-			deviceJSON, err := executeSmartctl(fmt.Sprintf("smartctl -a %s -json", dev.Name))
+			deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
 			if err != nil {
 				return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
 			}
@@ -116,7 +116,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		name := params[0]
 
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("smartctl -a %s -json", name))
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", name))
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +132,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			}
 			var n int
 			n, err = deviceCount(name)
-			deviceJSON, err = executeSmartctl(fmt.Sprintf("smartctl -a %s -json -d cciss,%d", name, n-1))
+			deviceJSON, err = executeSmartctl(fmt.Sprintf("-a %s -json -d cciss,%d", name, n-1))
 			if err != nil {
 				return nil, err
 			}
@@ -160,7 +160,7 @@ func init() {
 func getRaidDisks(name string, count int) ([]device, error) {
 	var out []device
 	for i := 0; i <= count; i++ {
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("smartctl -a %s -json -d cciss,%d", name, i))
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json -d cciss,%d", name, i))
 		if err != nil {
 			return nil, fmt.Errorf("Failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -195,12 +195,12 @@ func checkErr(dp deviceParser) error {
 }
 
 func getDevices() ([]deviceInfo, error) {
-	raidDev, err := scanDevices("smartctl --scan -d sat -j")
+	raidDev, err := scanDevices("--scan -d sat -j")
 	if err != nil {
 		return nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
 	}
 
-	dev, err := scanDevices("smartctl --scan -j")
+	dev, err := scanDevices("--scan -j")
 	if err != nil {
 		return nil, fmt.Errorf("Failed to scan for devices: %s", err)
 	}
@@ -220,9 +220,9 @@ raid:
 	return out, nil
 }
 
-func scanDevices(cmd string) ([]deviceInfo, error) {
+func scanDevices(args string) ([]deviceInfo, error) {
 	var devices devices
-	devicesJSON, err := executeSmartctl(cmd)
+	devicesJSON, err := executeSmartctl(args)
 	if err != nil {
 		return nil, err
 	}
