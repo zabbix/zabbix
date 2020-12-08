@@ -848,11 +848,13 @@ if (isset($_REQUEST['form'])) {
 	}
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	$sortField = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
 		'form' => getRequest('form'),

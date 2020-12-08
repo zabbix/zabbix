@@ -103,7 +103,13 @@ static int	DBpatch_5030001(void)
 		"web.host_discovery.php.sort",
 		"web.host_discovery.php.sortorder",
 		"web.httpconf.php.sort",
-		"web.httpconf.php.sortorder"
+		"web.httpconf.php.sortorder",
+		"web.disc_prototypes.php.sort",
+		"web.disc_prototypes.php.sortorder",
+		"web.trigger_prototypes.php.sort",
+		"web.trigger_prototypes.php.sortorder",
+		"web.host_prototypes.php.sort",
+		"web.host_prototypes.php.sortorder"
 	};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
