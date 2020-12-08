@@ -59,7 +59,7 @@ setlocale(LC_MONETARY, zbx_locale_variants($data['default_lang']));
 $language_error = '';
 if (!function_exists('bindtextdomain')) {
 	$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
-	$lang_select->setEnabled(false);
+	$lang_select->setReadonly();
 }
 elseif ($all_locales_available == 0) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
