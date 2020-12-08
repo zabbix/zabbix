@@ -731,7 +731,8 @@ typedef struct
 {
 	zbx_uint64_t			interfaceid;
 	zbx_agent_availability_t	agent;
-	int				id;	/* ensure chronological order in case of flapping host availability */
+	/* ensure chronological order in case of flapping interface availability */
+	int				id;
 }
 zbx_interface_availability_t;
 
