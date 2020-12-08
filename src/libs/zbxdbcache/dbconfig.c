@@ -3299,7 +3299,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			continue;
 
 		if (ITEM_STATUS_ACTIVE == item->status)
+		{
+			interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
 			dc_interface_update_agent_stats(interface, item->type, -1);
+		}
 
 		itemid = item->itemid;
 
