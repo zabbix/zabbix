@@ -40,7 +40,7 @@ class CWidgetHelper {
 	 * @param string  $type
 	 * @param int     $view_mode  ZBX_WIDGET_VIEW_MODE_NORMAL | ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 	 * @param array   $known_widget_types
-	 * @param CWidgetFieldComboBox|null  $field_rf_rate
+	 * @param CWidgetFieldSelect|null  $field_rf_rate
 	 *
 	 * @return CFormList
 	 */
