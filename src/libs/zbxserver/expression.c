@@ -6832,3 +6832,4 @@ int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *d
 	zbx_dc_set_macro_env(old_macro_env);
 	return ret;
 }
+

@@ -26,6 +26,7 @@
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
+#include "xml.h"
 
 #include "duktape.h"
 
@@ -228,6 +229,9 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	/* initialize HttpRequest and CurlHttpRequest prototypes */
 	if (FAIL == zbx_es_init_httprequest(es, error))
+		goto out;
+
+	if (FAIL == zbx_es_init_xml(es, error))
 		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
