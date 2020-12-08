@@ -2701,7 +2701,6 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
  *             num       - [IN] the number of items (+) added, (-) removed    *
  *                                                                            *
  ******************************************************************************/
-
 static void	dc_interface_update_agent_stats(ZBX_DC_INTERFACE *interface, unsigned char type, int num)
 {
 	if ((NULL != interface) && ((ITEM_TYPE_ZABBIX == type && INTERFACE_TYPE_AGENT == interface->type) ||
@@ -9182,7 +9181,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		if (NULL == (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
 				&dc_item->interfaceid)))
 		{
-					continue;
+			continue;
 		}
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
@@ -9521,7 +9520,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
  *                                                                            *
  * Parameters: dc_interface - [OUT] the interface                             *
  *             now          - [IN] current timestamp                          *
- *             agent        - [IN/OUT] the interface availability data        *
+ *             agent        - [IN/OUT] the agent availability data            *
  *                                                                            *
  * Return value: SUCCEED - at least one availability field was updated        *
  *               FAIL    - no availability fields were updated                *

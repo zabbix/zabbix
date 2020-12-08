@@ -43,7 +43,6 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 void	process_proxyconfig(struct zbx_json_parse *jp_data);
 
 int	get_interface_availability_data(struct zbx_json *json, int *ts);
-int	process_interface_availability(struct zbx_json_parse *jp, char **error);
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
