@@ -69,8 +69,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return
-			'var dashboard = jQuery(".dashbrd-grid-container"),'.
-				'dashboard_data = dashboard.$target.data("dashboardGrid"),'.
+			'var dashboard_data = dashboard.$target.data("dashboardGrid"),'.
 				'filter_select = jQuery("#'.$this->getName().'").get(0);'.
 			'filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');'.
 			'filter_select.selectedIndex = 0;'.
