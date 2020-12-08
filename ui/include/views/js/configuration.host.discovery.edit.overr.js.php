@@ -76,10 +76,12 @@ insert_javascript_for_visibilitybox();
 			(new CSelect('overrides_filters[#{rowNum}][operator]'))
 				->setValue(CONDITION_OPERATOR_REGEXP)
 				->addClass('js-operator')
-				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist'))),
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_OPERATOR_REGEXP => _('matches'),
+					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+					CONDITION_OPERATOR_EXISTS => _('exists'),
+					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+				])),
 			(new CDiv(
 				(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
 					DB::getFieldLength('lld_override_condition', 'value')))
@@ -784,10 +786,9 @@ insert_javascript_for_visibilitybox();
 				}
 			})
 			.on('afteradd.dynamicRows', (event) => {
-				[...event.currentTarget.querySelectorAll('.js-operator')].map((elem) => {
-					elem.removeEventListener('change', toggleConditionValue);
-					elem.addEventListener('change', toggleConditionValue);
-				});
+				[...event.currentTarget.querySelectorAll('.js-operator')]
+					.pop()
+					.addEventListener('change', toggleConditionValue);
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);

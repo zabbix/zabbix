@@ -56,14 +56,18 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 			(new CSelect('conditions[#{rowNum}][operator]'))
 				->setValue(CONDITION_OPERATOR_REGEXP)
 				->addClass('js-operator')
-				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist'))),
-			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
-				->addClass('js-value')
-				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setAttribute('placeholder', _('regular expression')),
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_OPERATOR_REGEXP => _('matches'),
+					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+					CONDITION_OPERATOR_EXISTS => _('exists'),
+					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+				])),
+			(new CDiv(
+				(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
+					->addClass('js-value')
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('regular expression'))
+			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
 			(new CCol(
 				(new CButton('conditions_#{rowNum}_remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -146,10 +150,9 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 					$(this).attr('value', $(this).val());
 				})
 				.on('afteradd.dynamicRows', (event) => {
-					[...event.currentTarget.querySelectorAll('.js-operator')].map((elem) => {
-						elem.removeEventListener('change', toggleConditionValue);
-						elem.addEventListener('change', toggleConditionValue);
-					});
+					[...event.currentTarget.querySelectorAll('.js-operator')]
+						.pop()
+						.addEventListener('change', toggleConditionValue);
 				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).length > 1);

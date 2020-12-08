@@ -674,8 +674,8 @@ $conditionFormList->addRow(_('Type of calculation'),
 // macros
 $conditionTable = (new CTable())
 	->setId('conditions')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', (new CColHeader(_('Regular expression')))->setWidth(300), _('Action')]);
+	->addStyle('width: 100%;')
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
 $conditions = $data['conditions'];
 if (!$conditions) {
@@ -690,10 +690,17 @@ else {
 	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
 }
 
+$operators = CSelect::createOptionsFromArray([
+	CONDITION_OPERATOR_REGEXP => _('matches'),
+	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+	CONDITION_OPERATOR_EXISTS => _('exists'),
+	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+]);
+
 // fields
 foreach ($conditions as $i => $condition) {
 	// formula id
-	$formulaId = [
+	$formulaid = [
 		new CSpan($condition['formulaid']),
 		new CVar('conditions['.$i.'][formulaid]', $condition['formulaid'])
 	];
@@ -705,6 +712,11 @@ foreach ($conditions as $i => $condition) {
 		->addClass('macro')
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $condition['formulaid']);
+
+	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
+		->setValue($condition['operator'])
+		->addClass('js-operator')
+		->addOptions($operators);
 
 	// value
 	$value = (new CTextBox('conditions['.$i.'][value]', $condition['value'], false, 255))
@@ -724,15 +736,14 @@ foreach ($conditions as $i => $condition) {
 			->addClass('element-table-remove')
 	];
 
-	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
-		->setValue($condition['operator'])
-		->addClass('js-operator')
-		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist')));
+	$row = [
+		$formulaid,
+		$macro,
+		$operator_select,
+		(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
+	];
 
-	$row = [$formulaId, $macro, $operator_select, $value, (new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)];
 	$conditionTable->addRow($row, 'form_row');
 }
 

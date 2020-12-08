@@ -113,6 +113,13 @@ else {
 	$overrides_filters = CConditionHelper::sortConditionsByFormulaId($overrides_filters);
 }
 
+$operators = CSelect::createOptionsFromArray([
+	CONDITION_OPERATOR_REGEXP => _('matches'),
+	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+	CONDITION_OPERATOR_EXISTS => _('exists'),
+	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+]);
+
 foreach ($overrides_filters as $i => $overrides_filter) {
 	$formulaid = [
 		new CSpan($overrides_filter['formulaid']),
@@ -126,6 +133,15 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 		->addClass('macro')
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $overrides_filter['formulaid']);
+
+	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
+		->setValue($overrides_filter['operator'])
+		->addClass('js-operator')
+		->addOptions($operators);
+
+	if ($options['templated']) {
+		$operator_select->setReadonly();
+	}
 
 	$value = (new CTextBox('overrides_filters['.$i.'][value]', $overrides_filter['value'],$options['templated'],
 			DB::getFieldLength('lld_override_condition', 'value')))
@@ -144,18 +160,6 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 			->addClass('element-table-remove')
 			->setEnabled(!$options['templated'])
 	];
-
-	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
-		->setValue($overrides_filter['operator'])
-		->addClass('js-operator')
-		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
-		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist')));
-
-	if ($options['templated']) {
-		$operator_select->setReadonly();
-	}
 
 	$row = [
 		$formulaid,
