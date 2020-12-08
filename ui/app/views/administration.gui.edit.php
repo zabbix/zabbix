@@ -130,7 +130,7 @@ $gui_tab = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Max period'), 'max_period'))->setAsteriskMark(),
+		(new CLabel(_('Max period for time selector'), 'max_period'))->setAsteriskMark(),
 		(new CTextBox('max_period', $data['max_period'], false, DB::getFieldLength('config', 'max_period')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
