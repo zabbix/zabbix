@@ -47,7 +47,7 @@ class CWidgetHelper {
 	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
 		$form_list = (new CFormList())
 			->addItem((new CListItem([
-					(new CDiv(new CLabel(_('Type'), 'type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 					(new CDiv((new CSelect('type'))
 						->setFocusableElementId('label-type')
 						->setId('type')
