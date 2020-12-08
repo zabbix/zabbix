@@ -277,7 +277,7 @@ header {
     white-space: nowrap; }
     header .header-controls label {
       line-height: 24px; }
-  header .header-combobox {
+  header .header-z-select {
     max-width: 600px; }
   header a.link-action {
     box-sizing: border-box;
