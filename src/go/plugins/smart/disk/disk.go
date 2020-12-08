@@ -88,8 +88,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				return nil, fmt.Errorf("Failed to unmarshal smartctl response json: %s", err.Error())
 			}
 
-			err = checkErr(dp)
-			if err != nil {
+			if err = checkErr(dp); err != nil {
 				if err != errRaid {
 					return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
 				}
@@ -125,16 +124,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, err
 		}
 
-		err = checkErr(dp)
-		if err != nil {
+		if err = checkErr(dp); err != nil {
 			if err != errRaid {
 				return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
-			}
-			var n int
-			n, err = deviceCount(name)
-			deviceJSON, err = executeSmartctl(fmt.Sprintf("-a %s -json -d cciss,%d", name, n-1))
-			if err != nil {
-				return nil, err
 			}
 		}
 
@@ -160,7 +152,8 @@ func init() {
 func getRaidDisks(name string, count int) ([]device, error) {
 	var out []device
 	for i := 0; i <= count; i++ {
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json -d cciss,%d", name, i))
+		fullName := fmt.Sprintf("%s -d cciss,%d", name, i)
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName))
 		if err != nil {
 			return nil, fmt.Errorf("Failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -175,7 +168,7 @@ func getRaidDisks(name string, count int) ([]device, error) {
 			return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
 		}
 
-		out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber})
+		out = append(out, device{fullName, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber})
 	}
 
 	return out, nil
