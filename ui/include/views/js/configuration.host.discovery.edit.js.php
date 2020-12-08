@@ -55,11 +55,13 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 				->setAttribute('data-formulaid', '#{formulaId}'),
 			(new CSelect('conditions[#{rowNum}][operator]'))
 				->setValue(CONDITION_OPERATOR_REGEXP)
+				->addClass('js-operator')
 				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
 				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
 				->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
 				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_EXISTS, _('does not exist'))),
 			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
+				->addClass('js-value')
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setAttribute('placeholder', _('regular expression')),
 			(new CCol(
@@ -143,6 +145,12 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 					// Change value attribute to trigger MutationObserver event for tab indicator.
 					$(this).attr('value', $(this).val());
 				})
+				.on('afteradd.dynamicRows', (event) => {
+					[...event.currentTarget.querySelectorAll('.js-operator')].map((elem) => {
+						elem.removeEventListener('change', toggleConditionValue);
+						elem.addEventListener('change', toggleConditionValue);
+					});
+				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).length > 1);
 				});
@@ -180,4 +188,22 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 				});
 		});
 	})(jQuery);
+
+	const toggleConditionValue = (event) => {
+		const value = event.currentTarget.closest('.form_row').querySelector('.js-value');
+		const show_value = (event.currentTarget.value == <?= CONDITION_OPERATOR_REGEXP ?>
+				|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+
+		value.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
+
+		if (!show_value) {
+			value.value = '';
+		}
+	};
+
+	document.addEventListener('DOMContentLoaded', () => {
+		[...document.getElementById('conditions').querySelectorAll('.js-operator')].map((elem) => {
+			elem.addEventListener('change', toggleConditionValue);
+		});
+	});
 </script>

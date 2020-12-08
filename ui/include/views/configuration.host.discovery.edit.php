@@ -708,12 +708,13 @@ foreach ($conditions as $i => $condition) {
 
 	// value
 	$value = (new CTextBox('conditions['.$i.'][value]', $condition['value'], false, 255))
+		->addClass('js-value')
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
 	if ($condition['operator'] == CONDITION_OPERATOR_EXISTS
 			|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
-		$value->addStyle('display: none;');
+		$value->addClass(ZBX_STYLE_DISPLAY_NONE);
 	}
 
 	// delete button
@@ -725,6 +726,7 @@ foreach ($conditions as $i => $condition) {
 
 	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
 		->setValue($condition['operator'])
+		->addClass('js-operator')
 		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
 		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
 		->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))

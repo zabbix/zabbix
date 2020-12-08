@@ -97,8 +97,8 @@ $override_evaltype = (new CDiv([
 
 $filter_table = (new CTable())
 	->setId('overrides_filters')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), (new CColHeader('Action'))->setWidth('100%')]);
+	->addStyle('width: 100%;')
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), (new CColHeader(_('Action')))->setWidth('100%')]);
 
 $overrides_filters = $options['overrides_filters'];
 if (!$overrides_filters) {
@@ -129,12 +129,13 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 
 	$value = (new CTextBox('overrides_filters['.$i.'][value]', $overrides_filter['value'],$options['templated'],
 			DB::getFieldLength('lld_override_condition', 'value')))
+		->addClass('js-value')
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
 	if ($overrides_filter['operator'] == CONDITION_OPERATOR_EXISTS
 			|| $overrides_filter['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
-		$value->addStyle('display: none;');
+		$value->addClass(ZBX_STYLE_DISPLAY_NONE);
 	}
 
 	$delete_button_cell = [
@@ -146,6 +147,7 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 
 	$operator_select = (new CSelect('overrides_filters['.$i.'][operator]'))
 		->setValue($overrides_filter['operator'])
+		->addClass('js-operator')
 		->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
 		->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
 		->addOption(new CSelectOption(CONDITION_OPERATOR_EXISTS, _('exists')))
@@ -155,7 +157,14 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 		$operator_select->setReadonly();
 	}
 
-	$row = [$formulaid, $macro, $operator_select, $value, (new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)];
+	$row = [
+		$formulaid,
+		$macro,
+		$operator_select,
+		(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
+	];
+
 	$filter_table->addRow($row, 'form_row');
 }
 
@@ -199,7 +208,7 @@ $overrides_popup_form_list->addRow(_('Operations'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addStyle('width: 100%;')
-		->addStyle('max-width: 775px;')
+		->addStyle('max-width: 788px;')
 );
 
 $output['buttons'] = [
