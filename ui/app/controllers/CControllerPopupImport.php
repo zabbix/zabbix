@@ -72,7 +72,6 @@ class CControllerPopupImport extends CController {
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
-			'applications' => ['createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -90,7 +89,6 @@ class CControllerPopupImport extends CController {
 			case 'host':
 				$rules['groups'] = ['createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false
@@ -108,7 +106,6 @@ class CControllerPopupImport extends CController {
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false
 				];
-				$rules['applications'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false

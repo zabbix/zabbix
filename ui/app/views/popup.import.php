@@ -32,7 +32,6 @@ $titles = [
 	'templates' => _('Templates'),
 	'templateDashboards' => _('Template dashboards'),
 	'templateLinkage' => _('Template linkage'),
-	'applications' => _('Applications'),
 	'items' => _('Items'),
 	'discoveryRules' => _('Discovery rules'),
 	'triggers' => _('Triggers'),

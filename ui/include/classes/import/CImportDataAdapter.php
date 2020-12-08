@@ -105,37 +105,6 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get applications from the imported data.
-	 *
-	 * @return array
-	 */
-	public function getApplications() {
-		$applications = [];
-
-		if (array_key_exists('hosts', $this->data)) {
-			foreach ($this->data['hosts'] as $host) {
-				if (array_key_exists('applications', $host)) {
-					foreach ($host['applications'] as $application) {
-						$applications[$host['host']][$application['name']] = $application;
-					}
-				}
-			}
-		}
-
-		if (array_key_exists('templates', $this->data)) {
-			foreach ($this->data['templates'] as $template) {
-				if (array_key_exists('applications', $template)) {
-					foreach ($template['applications'] as $application) {
-						$applications[$template['template']][$application['name']] = $application;
-					}
-				}
-			}
-		}
-
-		return $applications;
-	}
-
-	/**
 	 * Get value maps from the imported data.
 	 *
 	 * @return array

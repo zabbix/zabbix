@@ -38,11 +38,15 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = self::convertHosts($data['zabbix_export']['templates']);
+		}
+
 		return $data;
 	}
 
 	/**
-	 * Convert hosts.
+	 * Convert hosts and templates.
 	 *
 	 * @static
 	 *
@@ -57,9 +61,84 @@ class C52ImportConverter extends CConverter {
 
 		foreach ($hosts as &$host) {
 			$host = array_diff_key($host, $tls_fields);
+
+			if (array_key_exists('items', $host)) {
+				$host['items'] = self::convertItems($host['items']);
+			}
+
+			if (array_key_exists('discovery_rules', $host)) {
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+			}
+
+			unset($host['applications']);
 		}
 		unset($host);
 
 		return $hosts;
+	}
+
+	/**
+	 * Convert discovery rules.
+	 *
+	 * @static
+	 *
+	 * @param array $discovery_rules
+	 *
+	 * @return array
+	 */
+	private static function convertDiscoveryRules(array $discovery_rules): array {
+		foreach ($discovery_rules as &$discovery_rule) {
+			if (array_key_exists('item_prototypes', $discovery_rule)) {
+				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
+
+				unset($discovery_rule['applications']);
+			}
+		}
+		unset($discovery_rule);
+
+		return $discovery_rules;
+	}
+
+	/**
+	 * Convert items.
+	 *
+	 * @static
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	private static function convertItems(array $items): array {
+		foreach ($items as &$item) {
+			if (array_key_exists('applications', $item)) {
+				$item['tags'] = self::convertApplicationsToTags($item['applications']);
+				unset($item['applications']);
+			}
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	/**
+	 * Convert applications to item tags.
+	 *
+	 * @static
+	 *
+	 * @param array $applications
+	 *
+	 * @return array
+	 */
+	private static function convertApplicationsToTags(array $applications): array {
+		$tags = [];
+
+		foreach (array_values($applications) as $i => $app) {
+			$tags['tag'.($i ? $i : '')] = [
+				'tag' => 'Application',
+				'value' => $app['name']
+			];
+		}
+
+		return $tags;
 	}
 }

@@ -70,7 +70,6 @@ class CConfigurationImport {
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-			'applications' => ['createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -89,8 +88,6 @@ class CConfigurationImport {
 		$object_options = (
 			$options['templateLinkage']['createMissing']
 			|| $options['templateLinkage']['deleteMissing']
-			|| $options['applications']['createMissing']
-			|| $options['applications']['deleteMissing']
 			|| $options['items']['updateExisting']
 			|| $options['items']['createMissing']
 			|| $options['items']['deleteMissing']
@@ -143,7 +140,6 @@ class CConfigurationImport {
 		$this->deleteMissingItems();
 
 		// import objects
-		$this->processApplications();
 		$this->processValueMaps();
 		$this->processHttpTests();
 		$this->processItems();
@@ -155,9 +151,6 @@ class CConfigurationImport {
 		$this->processTemplateDashboards();
 		$this->processScreens();
 		$this->processMediaTypes();
-
-		// Missing applications should be deleted after new application changes are done to all inherited items.
-		$this->deleteMissingApplications();
 
 		return true;
 	}
@@ -173,7 +166,6 @@ class CConfigurationImport {
 		$groupsRefs = [];
 		$templatesRefs = [];
 		$hostsRefs = [];
-		$applicationsRefs = [];
 		$itemsRefs = [];
 		$valueMapsRefs = [];
 		$triggersRefs = [];
@@ -236,12 +228,6 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedApplications() as $host => $applications) {
-			foreach ($applications as $app) {
-				$applicationsRefs[$host][$app['name']] = $app['name'];
-			}
-		}
-
 		foreach ($this->getFormattedValueMaps() as $valuemap) {
 			$valueMapsRefs[$valuemap['name']] = $valuemap['name'];
 		}
@@ -249,10 +235,6 @@ class CConfigurationImport {
 		foreach ($this->getFormattedItems() as $host => $items) {
 			foreach ($items as $item) {
 				$itemsRefs[$host][$item['key_']] = $item['key_'];
-
-				foreach ($item['applications'] as $app) {
-					$applicationsRefs[$host][$app['name']] = $app['name'];
-				}
 
 				if (!empty($item['valuemap'])) {
 					$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
@@ -266,10 +248,6 @@ class CConfigurationImport {
 
 				foreach ($discoveryRule['item_prototypes'] as $itemp) {
 					$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
-
-					foreach ($itemp['applications'] as $app) {
-						$applicationsRefs[$host][$app['name']] = $app['name'];
-					}
 
 					if (!empty($itemp['valuemap'])) {
 						$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
@@ -502,10 +480,6 @@ class CConfigurationImport {
 		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
 			foreach ($httptests as $httptest) {
 				$httptestsRefs[$host][$httptest['name']] = $httptest['name'];
-
-				if (array_key_exists('name', $httptest['application'])) {
-					$applicationsRefs[$host][$httptest['application']['name']] = $httptest['application']['name'];
-				}
 			}
 		}
 
@@ -520,7 +494,6 @@ class CConfigurationImport {
 		$this->referencer->addGroups($groupsRefs);
 		$this->referencer->addTemplates($templatesRefs);
 		$this->referencer->addHosts($hostsRefs);
-		$this->referencer->addApplications($applicationsRefs);
 		$this->referencer->addItems($itemsRefs);
 		$this->referencer->addValueMaps($valueMapsRefs);
 		$this->referencer->addTriggers($triggersRefs);
@@ -615,48 +588,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Import applications.
-	 */
-	protected function processApplications() {
-		if (!$this->options['applications']['createMissing']) {
-			return;
-		}
-
-		$allApplications = $this->getFormattedApplications();
-
-		if (!$allApplications) {
-			return;
-		}
-
-		$applicationsToCreate = [];
-
-		foreach ($allApplications as $host => $applications) {
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
-
-			if (!$this->importedObjectContainer->isHostProcessed($hostId)
-					&& !$this->importedObjectContainer->isTemplateProcessed($hostId)) {
-				continue;
-			}
-
-			foreach ($applications as $application) {
-				$application['hostid'] = $hostId;
-				$appId = $this->referencer->resolveApplication($hostId, $application['name']);
-
-				if (!$appId) {
-					$applicationsToCreate[] = $application;
-				}
-			}
-		}
-
-		if ($applicationsToCreate) {
-			API::Application()->create($applicationsToCreate);
-		}
-
-		// refresh applications because templated ones can be inherited to host and used in items
-		$this->referencer->refreshApplications();
-	}
-
-	/**
 	 * Import value maps.
 	 */
 	protected function processValueMaps() {
@@ -728,24 +659,6 @@ class CConfigurationImport {
 			foreach ($order_tree[$host] as $index => $level) {
 				$item = $items[$index];
 				$item['hostid'] = $hostId;
-
-				if (isset($item['applications']) && $item['applications']) {
-					$applicationsIds = [];
-
-					foreach ($item['applications'] as $application) {
-						$applicationid = $this->referencer->resolveApplication($hostId, $application['name']);
-
-						if ($applicationid) {
-							$applicationsIds[] = $applicationid;
-						}
-						else {
-							throw new Exception(_s('Item "%1$s" on "%2$s": application "%3$s" does not exist.',
-								$item['name'], $host, $application['name']));
-						}
-					}
-
-					$item['applications'] = $applicationsIds;
-				}
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref']);
@@ -1123,17 +1036,6 @@ class CConfigurationImport {
 				foreach ($item_prototypes as $index => $level) {
 					$prototype = $item['item_prototypes'][$index];
 					$prototype['hostid'] = $hostId;
-					$applicationsIds = [];
-
-					foreach ($prototype['applications'] as $application) {
-						$applicationsIds[] = $this->referencer->resolveApplication($hostId, $application['name']);
-					}
-
-					$prototype['applications'] = $applicationsIds;
-
-					if (array_key_exists('application_prototypes', $prototype)) {
-						$prototype['applicationPrototypes'] = $prototype['application_prototypes'];
-					}
 
 					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
 						$interfaceid = $this->referencer->resolveInterface($hostId, $prototype['interface_ref']);
@@ -1554,22 +1456,6 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				if (array_key_exists('name', $httptest['application'])) {
-					$applicationid = $this->referencer->resolveApplication($hostid, $httptest['application']['name']);
-
-					if ($applicationid === false) {
-						throw new Exception(_s('Web scenario "%1$s" on "%2$s": application "%3$s" does not exist.',
-							$httptest['name'], $host, $httptest['application']['name']));
-					}
-
-					$httptest['applicationid'] = $applicationid;
-				}
-				else {
-					$httptest['applicationid'] = 0;
-				}
-
-				unset($httptest['application']);
-
 				$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
 
 				if ($httptestid !== false) {
@@ -1998,62 +1884,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes applications from DB that are missing in XML.
-	 *
-	 * @return null
-	 */
-	protected function deleteMissingApplications() {
-		if (!$this->options['applications']['deleteMissing']) {
-			return;
-		}
-
-		$processedHostIds = $this->importedObjectContainer->getHostIds();
-		$processedTemplateIds = $this->importedObjectContainer->getTemplateIds();
-
-		$processedHostIds = array_merge($processedHostIds, $processedTemplateIds);
-
-		// no hosts or templates have been processed
-		if (!$processedHostIds) {
-			return;
-		}
-
-		$applicationIdsXML = [];
-
-		$allApplications = $this->getFormattedApplications();
-
-		if ($allApplications) {
-			foreach ($allApplications as $host => $applications) {
-				$hostId = $this->referencer->resolveHostOrTemplate($host);
-
-				foreach ($applications as $application) {
-					$applicationId = $this->referencer->resolveApplication($hostId, $application['name']);
-
-					if ($applicationId) {
-						$applicationIdsXML[$applicationId] = $applicationId;
-					}
-				}
-			}
-		}
-
-		$dbApplicationIds = API::Application()->get([
-			'output' => ['applicationid'],
-			'hostids' => $processedHostIds,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'inherited' => false,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-		]);
-
-		$applicationsToDelete = array_diff_key($dbApplicationIds, $applicationIdsXML);
-		if ($applicationsToDelete) {
-			API::Application()->delete(array_keys($applicationsToDelete));
-		}
-
-		// refresh applications because templated ones can be inherited to host and used in items
-		$this->referencer->refreshApplications();
-	}
-
-	/**
 	 * Deletes triggers from DB that are missing in XML.
 	 *
 	 * @return null
@@ -2464,19 +2294,6 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['hosts'];
-	}
-
-	/**
-	 * Get formatted applications.
-	 *
-	 * @return array
-	 */
-	protected function getFormattedApplications() {
-		if (!isset($this->formattedData['applications'])) {
-			$this->formattedData['applications'] = $this->adapter->getApplications();
-		}
-
-		return $this->formattedData['applications'];
 	}
 
 	/**

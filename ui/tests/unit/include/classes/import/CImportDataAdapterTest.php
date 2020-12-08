@@ -34,7 +34,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($adapter->getGroups(), []);
 		$this->assertEquals($adapter->getHosts(), []);
 		$this->assertEquals($adapter->getTemplates(), []);
-		$this->assertEquals($adapter->getApplications(), []);
 		$this->assertEquals($adapter->getItems(), []);
 		$this->assertEquals($adapter->getTriggers(), []);
 		$this->assertEquals($adapter->getGraphs(), []);
@@ -315,23 +314,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'name' => 'export-template',
 				'description' => '',
 				'tags' => []
-			]
-		]);
-	}
-
-	public function testGetApplications() {
-		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
-
-		$this->assertEquals($adapter->getApplications(), [
-			'export-host' => [
-				'app' => [
-					'name' => 'app'
-				]
-			],
-			'export-template' => [
-				'app' => [
-					'name' => 'app'
-				]
 			]
 		]);
 	}
@@ -2240,23 +2222,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'valuemap' => [
 							'name' => '0'
 						]
-					]
-				]
-			]
-		);
-
-		$this->assertEquals($adapter->getApplications(), [
-				'Template_Linux' => [
-					'Filesystem' => [
-						'name' => 'Filesystem'
-					],
-					'Availability' => [
-						'name' => 'Availability'
-					]
-				],
-				'Template_Simple' => [
-					'Simple checks' => [
-						'name' => 'Simple checks'
 					]
 				]
 			]

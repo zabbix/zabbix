@@ -74,17 +74,6 @@ class testConfiguration extends CAPITest {
 			[
 				'export' => [
 					'options' => [
-						'applications' => [
-							'366'
-						]
-					],
-					'format' => 'xml'
-				],
-				'expected_error' => 'Invalid parameter "/options": unexpected parameter "applications".'
-			],
-			[
-				'export' => [
-					'options' => [
 						'groups' => [
 							'50009'
 						],
@@ -416,11 +405,6 @@ class testConfiguration extends CAPITest {
 
 	public static function import_rules_parameters() {
 		return [
-			[[
-				'parameter' => 'applications',
-				'expected' => ['createMissing', 'deleteMissing'],
-				'unexpected' => ['updateExisting']
-			]],
 			[[
 				'parameter' => 'discoveryRules',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
