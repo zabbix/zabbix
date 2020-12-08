@@ -75,6 +75,7 @@ class ZSelect extends HTMLElement {
 
 			case 'width':
 				this.style.width = (new_value === 'auto') ? '100%' : (new_value !== null) ? `${new_value}px` : '';
+				this._button.style.width = (new_value === 'auto') ? '100%' : (new_value !== null) ? `${new_value}px` : '';
 				break;
 		}
 	}
