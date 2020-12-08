@@ -36,7 +36,7 @@ extern int	CONFIG_DOUBLE_PRECISION;
  * Purpose: takes a string token, hashes it with sha-512 and then formats the *
  *          resulting binary into the printable hex string                    *
  *                                                                            *
- * Parameters: auth_token         	- [IN] string auth token              *
+ * Parameters: auth_token		- [IN] string auth token              *
  *             hash_res_stringhexes	- [OUT] hashed and formatted auth     *
  *                                        token                               *
  *                                                                            *
