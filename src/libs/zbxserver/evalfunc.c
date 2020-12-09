@@ -1677,15 +1677,13 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 			goto out;
 		}
 
-		if (0 == (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
-			period = arg1 + (ts.sec - lastaccess);
+		period = arg1 + (ts.sec - lastaccess);
 	}
 	else
 		period = arg1;
 
-	if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) ||
-			(SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
-			1 == values.values_num))
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
+			1 == values.values_num)
 	{
 		*value = zbx_strdup(*value, "0");
 	}
@@ -1706,7 +1704,10 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 			goto out;
 		}
 
-		*value = zbx_strdup(*value, "1");
+		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			*value = zbx_strdup(*value, "0");
+		else
+			*value = zbx_strdup(*value, "1");
 
 		if (0 != item->host.proxy_hostid && 0 != lazy)
 		{
