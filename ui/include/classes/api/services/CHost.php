@@ -162,6 +162,7 @@ class CHost extends CHostGeneral {
 			'selectHostDiscovery'				=> null,
 			'selectTags'						=> null,
 			'selectInheritedTags'				=> null,
+			'selectValueMaps'					=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
 			'preservekeys'						=> false,
@@ -759,6 +760,10 @@ class CHost extends CHostGeneral {
 				$hostInventory['hostid'] = $hostid;
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
+
+			if (array_key_exists('valueMaps', $host)) {
+				$this->createValueMaps($hostid, $host['valueMaps']);
+			}
 		}
 		unset($host);
 
@@ -836,6 +841,10 @@ class CHost extends CHostGeneral {
 				$inventory['hostid'] = $host['hostid'];
 
 				$inventories[] = $inventory;
+			}
+
+			if (array_key_exists('valueMaps', $host)) {
+				$this->updateValueMaps($host['hostid'], $host['valueMaps']);
 			}
 		}
 		unset($host);
@@ -1769,7 +1778,8 @@ class CHost extends CHostGeneral {
 			'severities' =>	[
 				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
 			],
-			'withProblemsSuppressed' =>  ['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL]
+			'withProblemsSuppressed' =>  	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'name,mappings', 'default' => null]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -1953,6 +1963,10 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host "%1$s" cannot be without host group.', $host['host'])
 				);
+			}
+
+			if (array_key_exists('valueMaps', $host)) {
+				$this->validateValueMaps($host['valueMaps']);
 			}
 
 			$host['groups'] = zbx_toArray($host['groups']);
@@ -2140,6 +2154,10 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _(
 					'No permissions to referred object or it does not exist!'
 				));
+			}
+
+			if (array_key_exists('valueMaps', $host)) {
+				$this->validateValueMaps($host['valueMaps']);
 			}
 
 			// Validate "groups" field.

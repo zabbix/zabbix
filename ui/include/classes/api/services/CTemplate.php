@@ -95,6 +95,7 @@ class CTemplate extends CHostGeneral {
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,
 			'selectTags'				=> null,
+			'selectValueMaps'			=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -104,6 +105,7 @@ class CTemplate extends CHostGeneral {
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -299,6 +301,24 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectValueMaps' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'name,mappings', 'default' => null]
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * Add template.
 	 *
 	 * @param array $templates
@@ -362,6 +382,10 @@ class CTemplate extends CHostGeneral {
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
 			}
+
+			if (array_key_exists('valueMaps', $template)) {
+				$this->createValueMaps($templateId, $template['valueMaps']);
+			}
 		}
 
 		return ['templateids' => $templateIds];
@@ -397,6 +421,10 @@ class CTemplate extends CHostGeneral {
 				}
 
 				$groupIds[$group['groupid']] = $group['groupid'];
+			}
+
+			if (array_key_exists('valueMaps', $template)) {
+				$this->validateValueMaps($template['valueMaps']);
 			}
 		}
 		unset($template);
@@ -515,6 +543,10 @@ class CTemplate extends CHostGeneral {
 
 				unset($template['macros']);
 			}
+
+			if (array_key_exists('valueMaps', $template)) {
+				$this->updateValueMaps($template['templateid'], $template['valueMaps']);
+			}
 		}
 		unset($template);
 
@@ -573,6 +605,10 @@ class CTemplate extends CHostGeneral {
 			// Validate tags.
 			if (array_key_exists('tags', $template)) {
 				$this->validateTags($template);
+			}
+
+			if (array_key_exists('valueMaps', $template)) {
+				$this->validateValueMaps($template['valueMaps']);
 			}
 		}
 	}
