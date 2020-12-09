@@ -81,7 +81,6 @@ class testFormFilter extends CWebTest {
 
 	/**
 	 * Change data in filter form
-	 *
 	 */
 	public function updateFilterForm() {
 		// Changing filter data.
@@ -128,9 +127,6 @@ class testFormFilter extends CWebTest {
 
 	/**
 	 * Update filter properties.
-	 *
-	 * @param string $data	data added to filter form
-	 * @param string $url	link to page where available to save filter
 	 */
 	public function updateFilterProperties() {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
@@ -161,8 +157,6 @@ class testFormFilter extends CWebTest {
 
 	/**
 	 * Delete existing filters.
-	 *
-	 * @param string $url		link to page where available to save filter
 	 */
 	public function deleteFilter() {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
@@ -220,7 +214,9 @@ class testFormFilter extends CWebTest {
 		$this->page->waitUntilReady();
 	}
 
-	// Returns result amount from table.
+	/**
+	 * Returns result amount from table.
+	 */
 	public function tableResults() {
 		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
 		$text = $this->query('xpath://table[@class="list-table"]/tbody/tr/td')->one()->getText();
@@ -229,7 +225,9 @@ class testFormFilter extends CWebTest {
 		return $result;
 	}
 
-	// Return filter names from droplist.
+	/**
+	 * Return filter names from droplist.
+	 */
 	public function getDropdownList() {
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 		$dropdown_filters = CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()->asText();
@@ -237,7 +235,11 @@ class testFormFilter extends CWebTest {
 		return $dropdown_filters;
 	}
 
-	// Checking filters name in 3 differente palces: tab list, drop list, options.
+	/**
+	 * Checking filters name in 3 differente palces: tab list, drop list, options.
+	 * 
+	 * @param string $filter_name	filter name, that need to be checked in properties, droplist and tab list
+	 */
 	public function checkName($filter_name) {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		// Checking that name of filter displayed on the tab.

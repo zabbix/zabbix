@@ -62,7 +62,7 @@ class CFilterTabElement extends CElement {
 	 * Select tab by name.
 	 *
 	 * @param string $data		filter name to be selected
-	 * @param integer $count	filter name to be selected, if several filters have same names
+	 * @param integer $count	filter number, if there is several filters with same name
 	 */
 	public function selectTab($data, $count = null) {
 		if ($count !== null) {
@@ -77,7 +77,7 @@ class CFilterTabElement extends CElement {
 	 * Get filter properties.
 	 *
 	 * @param string $name		filter name to be selected
-	 * @param integer $count	filter name to be selected, if several filters have same names
+	 * @param integer $count	filter number, if there is several filters with same name
 	 */
 	public function getProperties($name = null, $count = null) {
 		if ($name !== null && $count === null) {

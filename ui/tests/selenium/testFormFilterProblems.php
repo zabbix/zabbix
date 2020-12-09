@@ -25,8 +25,7 @@ require_once dirname(__FILE__).'/common/testFormFilter.php';
  */
 class testFormFilterProblems extends testFormFilter {
 
-
-public static function getCheckCreatedFilterData() {
+	public static function getCheckCreatedFilterData() {
 		return [
 			[
 				[
