@@ -39,9 +39,7 @@ static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Level",
 	L"/Event/System/Keywords",
 	L"/Event/System/TimeCreated/@SystemTime",
-	L"/Event/EventData/Data",
-	L"/Event/EventData/Data[@Name='TargetSid']",
-	L"/Event/EventData/Data[@Name='SubjectUserSid']"
+	L"/Event/EventData/Data"
 };
 
 #define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
@@ -57,10 +55,6 @@ static const wchar_t	*RENDER_ITEMS[] = {
 #define	VAR_EVENT_DATA_STRING_ARRAY(p, i)		(p[7].StringArr[i])
 #define	VAR_EVENT_DATA_TYPE(p)				(p[7].Type)
 #define	VAR_EVENT_DATA_COUNT(p)				(p[7].Count)
-#define	VAR_EVENT_DATA_NAME_TARGET_SID_TYPE(p)		(p[8].Type)
-#define	VAR_EVENT_DATA_NAME_TARGET_SID(p)		(p[8].SidVal)
-#define	VAR_EVENT_DATA_NAME_SUBJECT_USER_SID_TYPE(p)	(p[9].Type)
-#define	VAR_EVENT_DATA_NAME_SUBJECT_USER_SID(p)		(p[9].SidVal)
 
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
@@ -634,6 +628,57 @@ static void	replace_account_sid(PSID sidVal, char **out_message)
 	zbx_free(tmp);
 }
 
+void	render_event(EVT_HANDLE hEvent, char **out_message)
+{
+	DWORD		status = ERROR_SUCCESS, dwBufferSize = 0, dwBufferUsed = 0, dwPropertyCount = 0;
+	PEVT_VARIANT	pRenderedValues = NULL;
+	EVT_HANDLE	hContext;
+	int		i;
+
+	hContext = EvtCreateRenderContext(0, NULL, EvtRenderContextUser);
+	if (NULL == hContext)
+	{
+		wprintf(L"EvtCreateRenderContext failed with %lu\n", status = GetLastError());
+		goto cleanup;
+	}
+
+	if (!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
+	{
+		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
+		{
+			dwBufferSize = dwBufferUsed;
+			pRenderedValues = (PEVT_VARIANT)malloc(dwBufferSize);
+			if (pRenderedValues)
+			{
+				EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount);
+			}
+			else
+			{
+				wprintf(L"malloc failed\n");
+				status = ERROR_OUTOFMEMORY;
+				goto cleanup;
+			}
+		}
+
+		if (ERROR_SUCCESS != (status = GetLastError()))
+		{
+			wprintf(L"EvtRender failed with %d\n", GetLastError());
+			goto cleanup;
+		}
+	}
+	zabbix_log(LOG_LEVEL_INFORMATION, "success");
+	for (i = 0; i < dwPropertyCount; i++)
+	{
+		if (EvtVarTypeSid == pRenderedValues[i].Type)
+			replace_account_sid(pRenderedValues[i].SidVal, out_message);
+	}
+cleanup:
+	if (hContext)
+		EvtClose(hContext);
+	if (pRenderedValues)
+		zbx_free(pRenderedValues);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_parse_eventlog_message6                                      *
@@ -714,13 +759,7 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	*out_message = expand_message6(pprovider, *event_bookmark);
 
 	if (NULL != *out_message)
-	{
-		if (EvtVarTypeSid == VAR_EVENT_DATA_NAME_SUBJECT_USER_SID_TYPE(renderedContent))
-			replace_account_sid(VAR_EVENT_DATA_NAME_SUBJECT_USER_SID(renderedContent), out_message);
-
-		if (EvtVarTypeSid == VAR_EVENT_DATA_NAME_TARGET_SID_TYPE(renderedContent))
-			replace_account_sid(VAR_EVENT_DATA_NAME_TARGET_SID(renderedContent), out_message);
-	}
+		render_event(*event_bookmark, out_message);
 
 	tmp_str = zbx_unicode_to_utf8(wsource);
 
