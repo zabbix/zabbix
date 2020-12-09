@@ -277,15 +277,15 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			padding: 2px 7px;
 			line-height: 18px;
 			white-space: nowrap;
+			vertical-align: top;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			max-width: 200px;
 
 			a {
 				display: inline-block;
 				margin-top: 2px;
-				max-width: 200px;
 				line-height: 14px;
-				vertical-align: top;
-				text-overflow: ellipsis;
-				overflow: hidden;
 			}
 
 			&.selected {

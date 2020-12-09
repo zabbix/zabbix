@@ -1295,15 +1295,15 @@ pre, pre a, pre td, pre span {
       display: inline-block;
       padding: 2px 7px;
       line-height: 18px;
-      white-space: nowrap; }
+      white-space: nowrap;
+      vertical-align: top;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 200px; }
       .header-navigation > ul li > span a {
         display: inline-block;
         margin-top: 2px;
-        max-width: 200px;
-        line-height: 14px;
-        vertical-align: top;
-        text-overflow: ellipsis;
-        overflow: hidden; }
+        line-height: 14px; }
       .header-navigation > ul li > span.selected {
         background-color: #ffffff;
         border-radius: 2px;
