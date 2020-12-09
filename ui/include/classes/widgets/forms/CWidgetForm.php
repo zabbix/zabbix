@@ -50,7 +50,7 @@ class CWidgetForm {
 		];
 		$rf_rates += CWidgetConfig::getRfRates();
 
-		$rf_rate_field = (new CWidgetFieldComboBox('rf_rate', _('Refresh interval'), $rf_rates))
+		$rf_rate_field = (new CWidgetFieldSelect('rf_rate', _('Refresh interval'), $rf_rates))
 			->setDefault(-1);
 
 		if (array_key_exists('rf_rate', $this->data)) {

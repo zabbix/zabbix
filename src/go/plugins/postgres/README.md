@@ -248,7 +248,7 @@ Then JSON is proceeded by dependent items of pgsql.connections:
 - pgsql.connections.idle - The backend is waiting for a new client command.
 - pgsql.connections.idle_in_transaction - the backend is in a transaction, but is not currently executing a query.
 - pgsql.connections.prepared - number of prepared connections
-- pgsql.connections.total - total numer of connection
+- pgsql.connections.total - total number of connections
 - pgsql.connections.total_pct - percantange of total connections in respect to ‘max_connections’ setting of PostgreSQL server.
 - pgsql.connections.waiting - number of waiting connections.
 - pgsql.connections.idle_in_transaction_aborted - This state is similar to idle in transaction, except one of the statements in the transaction caused an error.

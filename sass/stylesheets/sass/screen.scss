@@ -227,10 +227,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 .object-group {
 	margin-bottom: -1px;
 
-	li {
+	> li {
 		float: left;
 		margin-right: 5px;
+	}
 
+	li {
 		span {
 			display: inline-block;
 			padding: 0 7px;
@@ -295,6 +297,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 		line-height: 14px;
 		vertical-align: top;
 		float: none;
+		margin-right: 5px;
 		display: inline-block;
 
 		.status-container {
@@ -3872,6 +3875,16 @@ $form-icon-btn: (
 			}
 		}
 	}
+
+	z-select {
+		.list {
+			li {
+				float: none;
+				line-height: normal;
+				padding: 5px;
+			}
+		}
+	}
 }
 
 .dashbrd-widget-foot {
@@ -4037,7 +4050,6 @@ $form-icon-btn: (
 
 				.table-forms-row-with-second-field {
 					position: relative;
-					transform: scale(1);
 
 					.table-forms-second-column {
 						position: absolute;
@@ -4058,9 +4070,21 @@ $form-icon-btn: (
 			text-align: right;
 			padding: 0 0 10px;
 
+			z-select {
+				text-align: left;
+				padding: inherit;
+			}
+
 			li {
 				display: inline;
 				padding-left: 10px;
+			}
+
+			z-select {
+				li {
+					display: block;
+					padding-left: 5px;
+				}
 			}
 		}
 
@@ -4930,16 +4954,6 @@ a.red {
 	&:hover,
 	&:focus {
 		color: $link-hover-color;
-	}
-}
-
-select.red {
-	@extend .red;
-}
-
-select {
-	option.red {
-		@extend .red;
 	}
 }
 
@@ -6086,7 +6100,7 @@ svg {
 }
 
 .preprocessing-list {
-	$name-width: 290px;
+	$name-width: 295px;
 	$on-fail-width: 100px;
 	$action-width: 120px;
 

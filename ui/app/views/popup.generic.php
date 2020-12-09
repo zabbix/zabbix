@@ -110,7 +110,15 @@ elseif ($empty_btn) {
 
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
-	$cmb_types = new CComboBox('itemtype', $options['itemtype'], 'javascript: reloadPopup(this.form);');
+	$types_select = (new CSelect('itemtype'))
+		->setId('itemtype')
+		->setFocusableElementId('label-itemtype')
+		->setAttribute('autofocus', 'autofocus')
+		->setValue($options['itemtype']);
+
+	$output['script_inline'] .= '$("#itemtype").on("change", (e) => {'.
+		'reloadPopup($(e.target).closest("form").get(0));'.
+	'});';
 
 	$header_form
 		->addVar('srctbl', $data['popup_type'])
@@ -119,13 +127,13 @@ if ($data['popup_type'] === 'help_items') {
 		->addVar('dstfld1', $options['dstfld1']);
 
 	foreach (CControllerPopupGeneric::ALLOWED_ITEM_TYPES as $type) {
-		$cmb_types->addItem($type, item_type2str($type));
+		$types_select->addOption(new CSelectOption($type, item_type2str($type)));
 	}
 
 	$controls[] = [
-		new CLabel(_('Type'), 'itemtype'),
+		new CLabel(_('Type'), $types_select->getFocusableElementId()),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$cmb_types
+		$types_select
 	];
 }
 

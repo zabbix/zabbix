@@ -79,25 +79,6 @@ function copy_expression(id, type) {
 	}
 }
 
-function cloneRow(elementid, count) {
-	if (typeof(cloneRow.count) === 'undefined') {
-		cloneRow.count = count;
-	}
-	cloneRow.count++;
-
-	var element = $('#' + elementid),
-		tpl = new Template($('<div>').append(element.clone(true)).html()),
-		entry = jQuery(tpl.evaluate({'id' : cloneRow.count}));
-
-	entry.find('*').each(function() {
-		jQuery(this).removeAttr('disabled');
-	});
-
-	entry.attr('id', 'entry_' + cloneRow.count);
-	entry[0].style.display = '';
-	entry.insertBefore(element.parent().children(':last-child'));
-}
-
 function testUserSound(idx) {
 	var element = document.getElementById(idx);
 	var sound = element.options[element.selectedIndex].value;

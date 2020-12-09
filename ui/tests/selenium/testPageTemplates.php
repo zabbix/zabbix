@@ -269,7 +269,7 @@ class testPageTemplates extends CLegacyWebTest {
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
-		$this->assertRowCount(count($hosts));
+		$this->assertTableStats(count($hosts));
 		// Reset Hosts filter after scenario.
 		$this->resetFilter();
 	}
