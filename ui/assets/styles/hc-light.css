@@ -1055,6 +1055,7 @@ z-select,
   z-select button.focusable,
   .z-select button.focusable {
     position: relative;
+    width: 100%;
     height: 24px;
     padding: 3px 18px 3px 4px;
     overflow: hidden;
