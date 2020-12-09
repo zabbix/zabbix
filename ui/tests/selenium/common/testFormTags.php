@@ -389,7 +389,6 @@ class testFormTags extends CWebTest {
 		}
 	}
 
-
 	/**
 	 * Test cloning of host, template, trigger or trigger prototype with tags
 	 *
