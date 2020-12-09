@@ -653,10 +653,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			// copy template screens
 			$dbTemplateScreens = API::TemplateScreen()->get([
-				'noInheritance' => 1,
+				'noInheritance' => true,
 				'output' => ['screenid'],
 				'templateids' => $cloneTemplateId,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 
 			if ($dbTemplateScreens) {

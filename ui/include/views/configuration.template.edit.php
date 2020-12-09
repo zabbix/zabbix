@@ -292,7 +292,7 @@ if ($data['form'] === 'full_clone') {
 
 	// screens
 	$screens = API::TemplateScreen()->get([
-		'noInheritance' => '1',
+		'noInheritance' => true,
 		'templateids' => $data['templateid'],
 		'output' => ['screenid', 'name']
 	]);
