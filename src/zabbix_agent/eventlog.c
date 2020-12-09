@@ -642,7 +642,7 @@ static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_messa
 	}
 
 	if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize, renderedContent,
-			 &dwBufferUsed, &dwPropertyCount))
+			&dwBufferUsed, &dwPropertyCount))
 	{
 		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
 		{
