@@ -1705,9 +1705,12 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 		}
 
 		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
-			*value = zbx_strdup(*value, "0");
-		else
-			*value = zbx_strdup(*value, "1");
+		{
+			*error = zbx_strdup(*error, "history transfer from proxy is still in progress");
+			goto out;
+		}
+
+		*value = zbx_strdup(*value, "1");
 
 		if (0 != item->host.proxy_hostid && 0 != lazy)
 		{
