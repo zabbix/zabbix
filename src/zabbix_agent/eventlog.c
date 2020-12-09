@@ -26,8 +26,10 @@
 #include <strsafe.h>
 #include "eventlog.h"
 #include <delayimp.h>
+#include <sddl.h>
 
-#define	DEFAULT_EVENT_CONTENT_SIZE 256
+#define	DEFAULT_EVENT_CONTENT_SIZE	256
+#define MAX_NAME			256
 
 static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Provider/@Name",
@@ -37,22 +39,28 @@ static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Level",
 	L"/Event/System/Keywords",
 	L"/Event/System/TimeCreated/@SystemTime",
-	L"/Event/EventData/Data"
+	L"/Event/EventData/Data",
+	L"/Event/EventData/Data[@Name='TargetSid']",
+	L"/Event/EventData/Data[@Name='SubjectUserSid']"
 };
 
 #define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
 
-#define	VAR_PROVIDER_NAME(p)			(p[0].StringVal)
-#define	VAR_SOURCE_NAME(p)			(p[1].StringVal)
-#define	VAR_RECORD_NUMBER(p)			(p[2].UInt64Val)
-#define	VAR_EVENT_ID(p)				(p[3].UInt16Val)
-#define	VAR_LEVEL(p)				(p[4].ByteVal)
-#define	VAR_KEYWORDS(p)				(p[5].UInt64Val)
-#define	VAR_TIME_CREATED(p)			(p[6].FileTimeVal)
-#define	VAR_EVENT_DATA_STRING(p)		(p[7].StringVal)
-#define	VAR_EVENT_DATA_STRING_ARRAY(p, i)	(p[7].StringArr[i])
-#define	VAR_EVENT_DATA_TYPE(p)			(p[7].Type)
-#define	VAR_EVENT_DATA_COUNT(p)			(p[7].Count)
+#define	VAR_PROVIDER_NAME(p)				(p[0].StringVal)
+#define	VAR_SOURCE_NAME(p)				(p[1].StringVal)
+#define	VAR_RECORD_NUMBER(p)				(p[2].UInt64Val)
+#define	VAR_EVENT_ID(p)					(p[3].UInt16Val)
+#define	VAR_LEVEL(p)					(p[4].ByteVal)
+#define	VAR_KEYWORDS(p)					(p[5].UInt64Val)
+#define	VAR_TIME_CREATED(p)				(p[6].FileTimeVal)
+#define	VAR_EVENT_DATA_STRING(p)			(p[7].StringVal)
+#define	VAR_EVENT_DATA_STRING_ARRAY(p, i)		(p[7].StringArr[i])
+#define	VAR_EVENT_DATA_TYPE(p)				(p[7].Type)
+#define	VAR_EVENT_DATA_COUNT(p)				(p[7].Count)
+#define	VAR_EVENT_DATA_NAME_TARGET_SID_TYPE(p)		(p[8].Type)
+#define	VAR_EVENT_DATA_NAME_TARGET_SID(p)		(p[8].SidVal)
+#define	VAR_EVENT_DATA_NAME_SUBJECT_USER_SID_TYPE(p)	(p[9].Type)
+#define	VAR_EVENT_DATA_NAME_SUBJECT_USER_SID(p)		(p[9].SidVal)
 
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
@@ -590,6 +598,42 @@ out:
 	return out_message;
 }
 
+static void	replace_account_sid(PSID sidVal, char **out_message)
+{
+	DWORD	nlen = MAX_NAME, dlen = MAX_NAME;
+	wchar_t	name[MAX_NAME], dom[MAX_NAME], *sid = NULL;
+	int	iUse;
+	char	userName[MAX_NAME], domName[MAX_NAME], sidName[MAX_NAME], *tmp, buffer[MAX_NAME * 2];
+
+	if (0 == LookupAccountSid(NULL, sidVal, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "lookup failed");
+		return;
+	}
+
+	if (0 == dlen || 0 == nlen)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "domain is empty");
+		return;
+	}
+
+	if (0 == ConvertSidToStringSid(sidVal, &sid))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "sid convertion failed");
+		return;
+	}
+
+	zbx_unicode_to_utf8_static(name, userName, MAX_NAME);
+	zbx_unicode_to_utf8_static(dom, domName, MAX_NAME);
+	zbx_unicode_to_utf8_static(sid, sidName, MAX_NAME);
+	zbx_snprintf(buffer, sizeof(buffer), "%s/%s", userName, domName);
+	tmp = *out_message;
+	*out_message = string_replace(*out_message, sidName, buffer);
+
+	LocalFree(sid);
+	zbx_free(tmp);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_parse_eventlog_message6                                      *
@@ -668,6 +712,15 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	*out_timestamp = (unsigned long)((VAR_TIME_CREATED(renderedContent) - sec_1970) / 10000000);
 	*out_eventid = VAR_EVENT_ID(renderedContent);
 	*out_message = expand_message6(pprovider, *event_bookmark);
+
+	if (NULL != *out_message)
+	{
+		if (EvtVarTypeSid == VAR_EVENT_DATA_NAME_SUBJECT_USER_SID_TYPE(renderedContent))
+			replace_account_sid(VAR_EVENT_DATA_NAME_SUBJECT_USER_SID(renderedContent), out_message);
+
+		if (EvtVarTypeSid == VAR_EVENT_DATA_NAME_TARGET_SID_TYPE(renderedContent))
+			replace_account_sid(VAR_EVENT_DATA_NAME_TARGET_SID(renderedContent), out_message);
+	}
 
 	tmp_str = zbx_unicode_to_utf8(wsource);
 
