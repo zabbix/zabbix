@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/common/testFormFilter.php';
  */
 class testFormFilterHosts extends testFormFilter {
 
+	public $url = 'zabbix.php?action=host.view';
+
 	public static function getCheckCreatedFilterData() {
 		return [
 			[
@@ -136,10 +138,7 @@ class testFormFilterHosts extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterHosts_CheckCreatedFilter($data) {
-		$this->page->userLogin('filter-create', 'zabbix');
-		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-		$this->createFilter($data);
-		$this->page->waitUntilReady();
+		$this->createFilter($data, 'filter-create');
 		$this->checkFilters($data);
 	}
 
@@ -147,26 +146,20 @@ class testFormFilterHosts extends testFormFilter {
 	 * Delete created filter.
 	 */
 	public function testFormFilterHosts_Delete() {
-		$this->page->userLogin('filter-delete', 'zabbix');
-		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-		$this->deleteFilter();
+		$this->deleteFilter('filter-delete');
 	}
 
 	/**
 	 * Updating filter form.
 	 */
 	public function testFormFilterHosts_UpdateForm() {
-		$this->page->userLogin('filter-update', 'zabbix');
-		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-		$this->updateFilterForm();
+		$this->updateFilterForm('filter-update');
 	}
 
 	/**
 	 * Updating saved filter properties.
 	 */
 	public function testFormFilterHosts_UpdateProperties() {
-		$this->page->userLogin('filter-update', 'zabbix');
-		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-		$this->updateFilterProperties();
+		$this->updateFilterProperties('filter-update');
 	}
 }

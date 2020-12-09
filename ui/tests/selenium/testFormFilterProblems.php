@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/common/testFormFilter.php';
  */
 class testFormFilterProblems extends testFormFilter {
 
+	public $url = 'zabbix.php?action=problem.view';
+
 	public static function getCheckCreatedFilterData() {
 		return [
 			[
@@ -136,9 +138,7 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterProblems_CheckCreatedFilter($data) {
-		$this->page->userLogin('filter-create', 'zabbix');
-		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-		$this->createFilter($data);
+		$this->createFilter($data, 'filter-create');
 		$this->checkFilters($data);
 	}
 
@@ -146,27 +146,21 @@ class testFormFilterProblems extends testFormFilter {
 	 * Delete filters.
 	 */
 	public function testFormFilterProblems_Delete() {
-		$this->page->userLogin('filter-delete', 'zabbix');
-		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-		$this->deleteFilter();
+		$this->deleteFilter('filter-delete');
 	}
 
 	/**
 	 * Updating filter form.
 	 */
 	public function testFormFilterProblems_UpdateForm() {
-		$this->page->userLogin('filter-update', 'zabbix');
-		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-		$this->updateFilterForm();
+		$this->updateFilterForm('filter-update');
 	}
 
 	/**
 	 * Updating saved filter properties.
 	 */
 	public function testFormFilterProblems_UpdateProperties() {
-		$this->page->userLogin('filter-update', 'zabbix');
-		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-		$this->updateFilterProperties();
+		$this->updateFilterProperties('filter-update');
 	}
 
 
@@ -201,8 +195,7 @@ class testFormFilterProblems extends testFormFilter {
 	 * @dataProvider getCustomTimePeriodData
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {
-		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
-		$this->createFilter($data);
+		$this->createFilter($data, 'Admin');
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->one()->getAttribute('data-target');
 		$form = $this->query('id:'.$formid)->asForm()->one();

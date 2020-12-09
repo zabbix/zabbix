@@ -28,18 +28,19 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CFilterTabElement extends CElement {
 
 	/**
-	 * Get names of saved filters tabs. If there is no saved filters, return null.
+	 * Get names of saved filters tabs. If there are no saved filters, return null.
 	 *
 	 * @return array
 	 */
 	public function getTitles() {
 		$result = [];
+		$xpath = 'xpath:.//a[@class="tabfilter-item-link"]';
 
-		if ($this->query('xpath:.//a[@class="tabfilter-item-link"]')->one(false)->isValid() === false) {
+		if ($this->query($xpath)->one(false)->isValid() === false) {
 			$result = null;
 		}
 		else {
-			$tabs = $this->query('xpath:.//a[@class="tabfilter-item-link"]')->all();
+			$tabs = $this->query($xpath)->all();
 			foreach ($tabs as $tab) {
 				$result[] = $tab->getText();
 			}
@@ -53,7 +54,7 @@ class CFilterTabElement extends CElement {
 	 *
 	 * @return string
 	 */
-	public function getText() {
+	public function getTabName() {
 		return $this->query('xpath:.//li[contains(@class, "tabfilter-item-label") and contains(@class, "selected")]/'.
 				'a[@class="tabfilter-item-link"]')->one()->getText();
 	}
@@ -61,15 +62,17 @@ class CFilterTabElement extends CElement {
 	/**
 	 * Select tab by name.
 	 *
-	 * @param string $data		filter name to be selected
+	 * @param string $name		filter name to be selected
 	 * @param integer $count	filter number, if there is several filters with same name
 	 */
-	public function selectTab($data, $count = null) {
+	public function selectTab($name, $count = null) {
+		$xpath = 'xpath:(.//a[@class="tabfilter-item-link" and text()="'.$name.'"])';
+
 		if ($count !== null) {
-			$this->query('xpath:(.//a[@class="tabfilter-item-link" and text()="'.$data.'"])['.$count.']')->one()->click();
+			$this->query($xpath.'['.$count.']')->one()->click();
 		}
 		else {
-			$this->query('xpath:(.//a[@class="tabfilter-item-link" and text()="'.$data.'"])')->one()->click();
+			$this->query($xpath)->one()->click();
 		}
 	}
 
@@ -80,18 +83,10 @@ class CFilterTabElement extends CElement {
 	 * @param integer $count	filter number, if there is several filters with same name
 	 */
 	public function getProperties($name = null, $count = null) {
-		if ($name !== null && $count === null) {
-			$this->selectTab($name);
-			$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click();
-		}
-
-		if ($name !== null && $count !== null) {
+		if ($name !== null) {
 			$this->selectTab($name, $count);
-			$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click();
 		}
 
-		if ($name === null) {
-			$this->query('xpath:.//a[@class="icon-edit"]')->one()->click();
-		}
+		$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click();
 	}
 }
