@@ -44,17 +44,17 @@ static const wchar_t	*RENDER_ITEMS[] = {
 
 #define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
 
-#define	VAR_PROVIDER_NAME(p)				(p[0].StringVal)
-#define	VAR_SOURCE_NAME(p)				(p[1].StringVal)
-#define	VAR_RECORD_NUMBER(p)				(p[2].UInt64Val)
-#define	VAR_EVENT_ID(p)					(p[3].UInt16Val)
-#define	VAR_LEVEL(p)					(p[4].ByteVal)
-#define	VAR_KEYWORDS(p)					(p[5].UInt64Val)
-#define	VAR_TIME_CREATED(p)				(p[6].FileTimeVal)
-#define	VAR_EVENT_DATA_STRING(p)			(p[7].StringVal)
-#define	VAR_EVENT_DATA_STRING_ARRAY(p, i)		(p[7].StringArr[i])
-#define	VAR_EVENT_DATA_TYPE(p)				(p[7].Type)
-#define	VAR_EVENT_DATA_COUNT(p)				(p[7].Count)
+#define	VAR_PROVIDER_NAME(p)			(p[0].StringVal)
+#define	VAR_SOURCE_NAME(p)			(p[1].StringVal)
+#define	VAR_RECORD_NUMBER(p)			(p[2].UInt64Val)
+#define	VAR_EVENT_ID(p)				(p[3].UInt16Val)
+#define	VAR_LEVEL(p)				(p[4].ByteVal)
+#define	VAR_KEYWORDS(p)				(p[5].UInt64Val)
+#define	VAR_TIME_CREATED(p)			(p[6].FileTimeVal)
+#define	VAR_EVENT_DATA_STRING(p)		(p[7].StringVal)
+#define	VAR_EVENT_DATA_STRING_ARRAY(p, i)	(p[7].StringArr[i])
+#define	VAR_EVENT_DATA_TYPE(p)			(p[7].Type)
+#define	VAR_EVENT_DATA_COUNT(p)			(p[7].Count)
 
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
