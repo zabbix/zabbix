@@ -601,6 +601,7 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 
 	if (0 == LookupAccountSid(NULL, sidVal, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
 	{
+		/* don't replace security ID if no mapping between account names and security IDs was done */
 		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid failed:%s", strerror_from_system(GetLastError()));
 		return;
 	}
