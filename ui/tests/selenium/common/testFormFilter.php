@@ -52,8 +52,9 @@ class testFormFilter extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
-				$text = $this->query('xpath://table[@class="list-table"]/tbody/tr/td')->one()->getText();
-				$filtered_rows_count = ($text === 'No data found.') ? 0 : $table->getRows()->count();
+				$filtered_rows_count = ($table->getRows()->asText() === ['No data found.'])
+					? 0
+					: $table->getRows()->count();
 
 				// Checking that data exists after saving filter.
 				if (array_key_exists('filter_form', $data)) {
@@ -101,7 +102,7 @@ class testFormFilter extends CWebTest {
 		// Changing filter data.
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		$filter_container->selectTab('update_tab');
-		$form = $this->query('id:tabfilter_1')->asForm()->one();
+		$form = $this->query('id:tabfilter_1')->asForm()->waitUntilReady()->one();
 		$result_before = $this->tableResults();
 
 		for ($i = 0; $i < 2; ++$i) {
@@ -236,7 +237,7 @@ class testFormFilter extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
-		sleep(1);
+		$this->page->waitUntilReady();
 	}
 
 	/**
