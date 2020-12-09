@@ -248,6 +248,23 @@ static int	DBpatch_5030002(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5030003(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles "
+		"set idx='web.templates.dashbrd.list.sort' where idx='web.dashbrd.list.sort'"))
+	{
+		return FAIL;
+	}
+
+	if (ZBX_DB_OK > DBexecute("update profiles "
+		"set idx='web.templates.dashbrd.list.sortorder' where idx='web.dashbrd.list.sortorder'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -257,5 +274,6 @@ DBPATCH_START(5030)
 DBPATCH_ADD(5030000, 0, 1)
 DBPATCH_ADD(5030001, 0, 1)
 DBPATCH_ADD(5030002, 0, 1)
+DBPATCH_ADD(5030003, 0, 1)
 
 DBPATCH_END()
