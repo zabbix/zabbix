@@ -236,7 +236,7 @@ class testFormFilter extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
-		$this->page->waitUntilReady();
+		sleep(1);
 	}
 
 	/**
