@@ -620,7 +620,7 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 	zbx_unicode_to_utf8_static(name, userName, MAX_NAME);
 	zbx_unicode_to_utf8_static(dom, domName, MAX_NAME);
 	zbx_unicode_to_utf8_static(sid, sidName, MAX_NAME);
-	zbx_snprintf(buffer, sizeof(buffer), "%s/%s", domName, userName);
+	zbx_snprintf(buffer, sizeof(buffer), "%s\\%s", domName, userName);
 	tmp = *out_message;
 	*out_message = string_replace(*out_message, sidName, buffer);
 
