@@ -2163,7 +2163,7 @@ static int	process_interfaces_availability_contents(struct zbx_json_parse *jp_da
 	zbx_uint64_t			interfaceid;
 	struct zbx_json_parse		jp_row;
 	const char			*p = NULL;
-	char				*tmp = NULL;
+	char				*tmp;
 	size_t				tmp_alloc = 129;
 	zbx_interface_availability_t	*ia = NULL;
 	zbx_vector_availability_ptr_t	interfaces;
