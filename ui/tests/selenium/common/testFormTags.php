@@ -321,8 +321,7 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash);
-		}
-
+	}
 
 	/**
 	 * Check result after creating or updating object with tags.
