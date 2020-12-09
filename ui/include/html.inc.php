@@ -438,7 +438,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$list->addItem(new CBreadcrumbs([
-			(new CSpan())->addItem(new CLink(_('Discovery list!'),
+			(new CSpan())->addItem(new CLink(_('Discovery list'),
 				(new CUrl('host_discovery.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
