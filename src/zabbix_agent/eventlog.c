@@ -592,7 +592,7 @@ out:
 	return out_message;
 }
 
-static void	replace_account_sid(PSID sidVal, char **out_message)
+static void	replace_sid_to_account(PSID sidVal, char **out_message)
 {
 	DWORD	nlen = MAX_NAME, dlen = MAX_NAME;
 	wchar_t	name[MAX_NAME], dom[MAX_NAME], *sid = NULL;
@@ -628,55 +628,49 @@ static void	replace_account_sid(PSID sidVal, char **out_message)
 	zbx_free(tmp);
 }
 
-void	render_event(EVT_HANDLE hEvent, char **out_message)
+static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_message)
 {
-	DWORD		status = ERROR_SUCCESS, dwBufferSize = 0, dwBufferUsed = 0, dwPropertyCount = 0;
-	PEVT_VARIANT	pRenderedValues = NULL;
-	EVT_HANDLE	hContext;
+	DWORD		status, dwBufferSize = 0, dwBufferUsed = 0, dwPropertyCount = 0;
+	PEVT_VARIANT	renderedContent = NULL;
+	EVT_HANDLE	render_context;
 	int		i;
 
-	hContext = EvtCreateRenderContext(0, NULL, EvtRenderContextUser);
-	if (NULL == hContext)
+	if (NULL == (render_context = EvtCreateRenderContext(0, NULL, EvtRenderContextUser)))
 	{
-		wprintf(L"EvtCreateRenderContext failed with %lu\n", status = GetLastError());
+		zabbix_log(LOG_LEVEL_INFORMATION, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
 		goto cleanup;
 	}
 
-	if (!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
+	if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize, renderedContent,
+			 &dwBufferUsed, &dwPropertyCount))
 	{
-		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
+		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
 		{
-			dwBufferSize = dwBufferUsed;
-			pRenderedValues = (PEVT_VARIANT)malloc(dwBufferSize);
-			if (pRenderedValues)
-			{
-				EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount);
-			}
-			else
-			{
-				wprintf(L"malloc failed\n");
-				status = ERROR_OUTOFMEMORY;
-				goto cleanup;
-			}
+			zabbix_log(LOG_LEVEL_INFORMATION, "EvtRender failed:%s", strerror_from_system(status));
+			goto cleanup;
 		}
+		
+		dwBufferSize = dwBufferUsed;
+		renderedContent = (PEVT_VARIANT)zbx_malloc(NULL, dwBufferSize);
 
-		if (ERROR_SUCCESS != (status = GetLastError()))
+		if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize,
+				renderedContent, &dwBufferUsed, &dwPropertyCount))
 		{
-			wprintf(L"EvtRender failed with %d\n", GetLastError());
+			zabbix_log(LOG_LEVEL_INFORMATION, "EvtRender failed:%s", strerror_from_system(GetLastError()));
 			goto cleanup;
 		}
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "success");
+
 	for (i = 0; i < dwPropertyCount; i++)
 	{
-		if (EvtVarTypeSid == pRenderedValues[i].Type)
-			replace_account_sid(pRenderedValues[i].SidVal, out_message);
+		if (EvtVarTypeSid == renderedContent[i].Type)
+			replace_sid_to_account(renderedContent[i].SidVal, out_message);
 	}
 cleanup:
-	if (hContext)
-		EvtClose(hContext);
-	if (pRenderedValues)
-		zbx_free(pRenderedValues);
+	if (NULL != render_context)
+		EvtClose(render_context);
+
+	zbx_free(renderedContent);
 }
 
 /******************************************************************************
@@ -759,7 +753,7 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	*out_message = expand_message6(pprovider, *event_bookmark);
 
 	if (NULL != *out_message)
-		render_event(*event_bookmark, out_message);
+		replace_sids_to_accounts(*event_bookmark, out_message);
 
 	tmp_str = zbx_unicode_to_utf8(wsource);
 
