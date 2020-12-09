@@ -601,19 +601,19 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 
 	if (0 == LookupAccountSid(NULL, sidVal, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "lookup failed");
+		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid failed:%s", strerror_from_system(GetLastError()));
 		return;
 	}
 
 	if (0 == dlen || 0 == nlen)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "domain is empty");
+		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid returned empty domain name or user name");
 		return;
 	}
 
 	if (0 == ConvertSidToStringSid(sidVal, &sid))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "sid convertion failed");
+		zabbix_log(LOG_LEVEL_DEBUG, "ConvertSidToStringSid failed:%s", strerror_from_system(GetLastError()));
 		return;
 	}
 
@@ -637,7 +637,7 @@ static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_messa
 
 	if (NULL == (render_context = EvtCreateRenderContext(0, NULL, EvtRenderContextUser)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_WARNING, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
 		goto cleanup;
 	}
 
@@ -646,17 +646,17 @@ static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_messa
 	{
 		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "EvtRender failed:%s", strerror_from_system(status));
+			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(status));
 			goto cleanup;
 		}
-		
+
 		dwBufferSize = dwBufferUsed;
 		renderedContent = (PEVT_VARIANT)zbx_malloc(NULL, dwBufferSize);
 
 		if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize,
 				renderedContent, &dwBufferUsed, &dwPropertyCount))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "EvtRender failed:%s", strerror_from_system(GetLastError()));
+			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(GetLastError()));
 			goto cleanup;
 		}
 	}
