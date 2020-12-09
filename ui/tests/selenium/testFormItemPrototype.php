@@ -507,8 +507,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormItemPrototype_CheckLayout($data) {
-		$context = (array_key_exists('host', $data)) ? 'host' : 'template';
-		$host_name = (array_key_exists('host', $data)) ? $data['host'] : $data['template'];
+		$context = array_key_exists('host', $data) ? 'host' : 'template';
+		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
 
 		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($host_name));
 		$dbRow = DBfetch($dbResult);

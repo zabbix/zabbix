@@ -218,8 +218,8 @@ class testPageItems extends CLegacyWebTest {
 				$this->assertEquals($group, $get_group);
 			}
 		}
-		if(array_key_exists('not_displayed', $data)) {
-			foreach($data['not_displayed'] as $column => $value) {
+		if (array_key_exists('not_displayed', $data)) {
+			foreach ($data['not_displayed'] as $column => $value) {
 				$this->assertNotContains($value, $table->getCells($column));
 			}
 		}

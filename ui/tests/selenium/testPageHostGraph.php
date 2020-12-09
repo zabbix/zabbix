@@ -105,8 +105,8 @@ class testPageHostGraph extends CLegacyWebTest {
 
 			// Check name value.
 			$this->assertEquals($graph['name'],
-					$element->findElement(WebDriverBy::xpath('./td/a[@href="graphs.php?form=update&graphid='
-							.$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]'))->getText()
+					$element->findElement(WebDriverBy::xpath('./td/a[@href="graphs.php?form=update&graphid='.
+							$graph['graphid'].'&context=host&filter_hostids%5B0%5D='.$hostid.'"]'))->getText()
 			);
 
 			// Check width value.

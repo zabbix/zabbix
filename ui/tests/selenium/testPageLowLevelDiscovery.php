@@ -234,7 +234,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getCheckNowData
 	 */
 	public function testPageLowLevelDiscovery_CheckNow($data) {
-		$context = (array_key_exists('template', $data)) ? '&context=template' : '&context=host';
+		$context = array_key_exists('template', $data) ? '&context=template' : '&context=host';
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');

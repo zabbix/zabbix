@@ -78,7 +78,7 @@ class testPageTriggers extends CLegacyWebTest {
 				'Host groups', 'Templates', 'Name', 'Severity', 'Status', 'Tags', 'Inherited', 'With dependencies'
 			];
 		}
-		foreach (['Severity', 'Status','Tags'] as $label) {
+		foreach ($labels as $label) {
 			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
