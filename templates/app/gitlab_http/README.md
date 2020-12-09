@@ -4,10 +4,10 @@
 ## Overview
 
 For Zabbix version: 5.2 and higher  
-The template to monitor GitLab by Zabbix that work without any external scripts.
+The template to monitor GitLab by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `GitLab by HTTP` — collects metrics by HTTP agent from /metrics endpoint.
+Template `GitLab by HTTP` — collects metrics by HTTP agent from GitLab /metrics endpoint.
 See https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html.
 
 
@@ -20,10 +20,10 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-This template works with self-hosted GitLab instances. Metrics are collected from GitLab monitors. Its own internal service metrics, and makes them available at the `/-/metrics` endpoint.
+This template works with self-hosted GitLab instances. Internal service metrics are collected from GitLab /-/metrics endpoint.
 To access the metrics, the client IP address must be [explicitly allowed](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).
-Don't forget change macros {$GITLAB.URL}, {$GITLAB.PORT}. 
-Besides, see the macros section as it will set the trigger values.  
+Don't forget to change the macros {$GITLAB.URL}, {$GITLAB.PORT}. 
+Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your Gitlab instance version and configuration. See [Gitlab’s documentation](https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html) for further information about its metric collection.
 
 
@@ -40,7 +40,7 @@ No specific Zabbix configuration is required.
 |{$GITLAB.PORT} |<p>The port of GitLab web endpoint</p> |`80` |
 |{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>Maximum number of Puma queued requests for trigger expression.</p> |`1` |
 |{$GITLAB.PUMA.UTILIZATION.MAX.WARN} |<p>Maximum percentage of used Puma thread utilization for trigger expression.</p> |`90` |
-|{$GITLAB.REDIS.FAIL.MAX.WARN} |<p>Maximum number of Redis client exeptions for trigger expression.</p> |`2` |
+|{$GITLAB.REDIS.FAIL.MAX.WARN} |<p>Maximum number of Redis client exceptions for trigger expression.</p> |`2` |
 |{$GITLAB.UNICORN.QUEUE.MAX.WARN} |<p>Maximum number of Unicorn queued requests for trigger expression.</p> |`1` |
 |{$GITLAB.UNICORN.UTILIZATION.MAX.WARN} |<p>Maximum percentage of used Unicorn workers utilization for trigger expression.</p> |`90` |
 |{$GITLAB.URL} |<p>GitLab instance URL</p> |`localhost` |
