@@ -1706,7 +1706,7 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 
 		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 		{
-			*error = zbx_strdup(*error, "history transfer from proxy is still in progress");
+			*error = zbx_strdup(*error, "historical data transfer from proxy is still in progress");
 			goto out;
 		}
 
