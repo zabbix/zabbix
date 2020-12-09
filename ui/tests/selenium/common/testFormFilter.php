@@ -237,7 +237,7 @@ class testFormFilter extends CWebTest {
 
 	/**
 	 * Checking filters name in 3 differente palces: tab list, drop list, options.
-	 * 
+	 *
 	 * @param string $filter_name	filter name, that need to be checked in properties, droplist and tab list
 	 */
 	public function checkName($filter_name) {
