@@ -84,13 +84,17 @@ class ConfigurationManager
 					@Override
 					public void execute(Object value)
 					{
+						FileInputStream inStream = null;
+
 						try
 						{
-							Properties props = new Properties(System.getProperties());
-							FileInputStream inStream = new FileInputStream((File)value);
+							Properties props;
+
+							inStream = new FileInputStream((File)value);
+							props = new Properties(System.getProperties());
+
 							props.load(inStream);
-							inStream.close();
-			
+
 							System.setProperties(props);
 						}
 						catch (IOException e)
@@ -100,6 +104,10 @@ class ConfigurationManager
 						catch (SecurityException e)
 						{
 							throw new RuntimeException(e);
+						}
+						finally
+						{
+							try { if (null != inStream) inStream.close(); } catch (Exception e) { }
 						}
 					}
 				}),
