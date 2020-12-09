@@ -613,8 +613,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 		zbx_db_insert_t *db_problem)
 {
 	int			index, i, j;
-	char			key[TAG_NAME_LEN * 4 + 1], value[TAG_VALUE_LEN * 4 + 1];
-	zbx_tag_t		tag_local = {.tag = key, .value = value}, *tag;
+	zbx_tag_t		tag_local, *tag;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_event_tags_t	*local_event_tags;
