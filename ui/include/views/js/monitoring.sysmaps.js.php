@@ -227,15 +227,31 @@ function createFontSelect(string $name): CSelect {
 									',{excludeids: [#{sysmapid}]}), null, this);'
 							)
 					], 'mapSelectRow')
-					->addRow(_('Application'), [
-						(new CTextBox('application'))
-							->setId('application')
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->setId('application-select')
-							->addClass(ZBX_STYLE_BTN_GREY)
-					], 'application-select-row')
+					->addRow(_('Tags'),
+						(new CDiv([
+							(new CTable())
+								->setId('selement-tags')
+								->addRow(
+									(new CCol(
+										(new CRadioButtonList('operator', TAG_EVAL_TYPE_AND_OR))
+											->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+											->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+											->setModern(true)
+									))->setColSpan(4)
+								)
+								->addRow(
+									(new CCol(
+										(new CButton('tags_add', _('Add')))
+											->addClass(ZBX_STYLE_BTN_LINK)
+											->addClass('element-table-add')
+											->removeId()
+									))->setColSpan(3)
+								)
+						]))
+							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+						'tagsSelectRow'
+					)
 					->addRow(_('Automatic icon selection'),
 						new CCheckBox('use_iconmap'),
 						'useIconMapRow'
@@ -881,6 +897,29 @@ function createFontSelect(string $name): CSelect {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('urlrow_#{selementurlid}')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="tag-row-tmpl">
+	<?= (new CRow([
+			(new CTextBox('tags[#{rowNum}][tag]'))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('tags[#{rowNum}][value]'))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
 			->toString()
 	?>
 </script>

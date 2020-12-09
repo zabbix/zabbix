@@ -40,7 +40,7 @@ $header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItem
 $header_form->setId('generic-popup-form');
 
 // Make 'empty' button.
-if ($data['popup_type'] === 'triggers') && !array_key_exists('noempty', $options)) {
+if ($data['popup_type'] === 'triggers' && !array_key_exists('noempty', $options)) {
 	$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
 	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
 	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';

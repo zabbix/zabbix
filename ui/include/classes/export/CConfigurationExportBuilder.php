@@ -1221,14 +1221,16 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatTags(array $tags) {
 		$result = [];
+		$fields = [
+			'tag' => true,
+			'value' => true,
+			'operator' => true
+		];
 
 		CArrayHelper::sort($tags, ['tag', 'value']);
 
 		foreach ($tags as $tag) {
-			$result[] = [
-				'tag' => $tag['tag'],
-				'value' => $tag['value']
-			];
+			$result[] = array_intersect_key($tag, $fields);
 		}
 
 		return $result;
@@ -1524,7 +1526,9 @@ class CConfigurationExportBuilder {
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
-				'urls' => $this->formatMapElementUrls($element['urls'])
+				'urls' => $this->formatMapElementUrls($element['urls']),
+				'operator' => $element['operator'],
+				'tags' => $this->formatTags($element['tags'])
 			];
 		}
 

@@ -838,25 +838,16 @@ ZABBIX.apps.map = (function($) {
 					this.value = isNaN(value) || (value < 10) ? 10 : value;
 				});
 
-				// application selection pop up
-				$('#application-select').click(function(event) {
-					var popup_options = {
-							srctbl: 'applications',
-							srcfld1: 'name',
-							dstfrm: 'selementForm',
-							dstfld1: 'application',
-							real_hosts: '1',
-							with_applications: '1'
-						};
-
-					if ($('#elementType').val() == '3') {
-						popup_options = jQuery.extend(popup_options,
-							getFirstMultiselectValue('elementNameHost', 'elementNameHostGroup')
-						);
-					}
-
-					PopUp('popup.generic', popup_options, null, event.target);
-				});
+				// Init tag fields.
+				$('#selement-tags')
+					.dynamicRows({template: '#tag-row-tmpl', counter: 0})
+					.on('beforeadd.dynamicRows', function() {
+						var options = $('#selement-tags').data('dynamicRows');
+						options.counter = ++options.counter;
+					})
+					.on('afteradd.dynamicRows', function() {
+						$('.textarea-flexible', $('#selement-tags')).textareaFlexible();
+					});
 
 				// mass update form
 				$('#massClose').click(function() {
@@ -1311,6 +1302,8 @@ ZABBIX.apps.map = (function($) {
 					$('#elementNameTriggers').multiSelect('clean');
 					$('#triggerContainer tbody').html('');
 				}
+
+				this.form.cleanTagsField();
 			},
 
 			reorderShapes: function(ids, position) {
@@ -2195,7 +2188,8 @@ ZABBIX.apps.map = (function($) {
 					urls: {},
 					elementName: this.sysmap.defaultIconName, // first image name
 					use_iconmap: '1',
-					application: '',
+					operator: 0, // TAG_EVAL_TYPE_AND_OR
+					tags: [],
 					inherited_label: null
 				};
 			}
@@ -2364,7 +2358,7 @@ ZABBIX.apps.map = (function($) {
 				var fieldName,
 					dataFelds = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'application'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'operator', 'tags'
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
@@ -2658,7 +2652,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'show',
-						value: '#application-select-row',
+						value: '#tagsSelectRow',
 						cond: [
 							{
 								elementType: '0'
@@ -2801,6 +2795,39 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
+			 * Append form tag field options.
+			 *
+			 * @param {array} tags
+			 */
+			addTags: function(tags) {
+				var tpl = new Template($('#tag-row-tmpl').html()),
+					$add_btn_row = $('#selement-tags .element-table-add').closest('tr'),
+					counter = $('#selement-tags').data('dynamicRows').counter;
+
+				for (const i in tags) {
+					var tag = jQuery.extend({tag: '', operator: 0, value: '', rowNum: ++counter}, tags[i]),
+						row = $(tpl.evaluate(tag));
+
+					row.find('[name="tags[' + tag.rowNum + '][tag]"]').val(tag.tag);
+					row.find('[name="tags[' + tag.rowNum + '][operator]"][value="' + tag.operator + '"]')
+						.prop('checked', true);
+					row.find('[name="tags[' + tag.rowNum + '][value]"]').val(tag.value);
+					row.insertBefore($add_btn_row);
+				}
+
+				$('#selement-tags').data('dynamicRows').counter = counter;
+			},
+
+			/**
+			 * Set operator field value.
+			 *
+			 * @param {integer} value
+			 */
+			setOperator: function(value) {
+				$('#operator [name="operator"][value='+value+']').prop('checked', true);
+			},
+
+			/**
 			 * Add triggers to the list.
 			 */
 			addTriggers: function(triggers) {
@@ -2890,6 +2917,18 @@ ZABBIX.apps.map = (function($) {
 				$('#urlContainer tbody tr').remove();
 				this.addUrls(selement.urls);
 
+				// Set tag properties.
+				this.cleanTagsField();
+				if (selement.elementtype === '0' || selement.elementtype === '3') {
+					var tags = selement.tags;
+					if (!tags || Object.getOwnPropertyNames(tags).length == 0) {
+						tags = {0: {}};
+					}
+					this.addTags(tags);
+					this.setOperator(selement.operator);
+				}
+
+				// Iconmap.
 				if (this.sysmap.data.iconmapid === '0') {
 					$('#use_iconmap').prop({
 						checked: false,
@@ -2935,13 +2974,21 @@ ZABBIX.apps.map = (function($) {
 				}
 			},
 
+			cleanTagsField: function() {
+				$('#selement-tags .form_row').remove();
+			},
+
 			/**
 			 * Gets form values for element fields.
 			 *
 			 * @retrurns {Object|Boolean}
 			 */
 			getValues: function() {
-				var values = $(':input', '#selementForm').not(this.actionProcessor.hidden).serializeArray(),
+				$('[type="checkbox"]:not([name^="field_"])');
+				var values = $(':input', '#selementForm')
+						.not(this.actionProcessor.hidden)
+						.not('[name^="tags"]')
+						.serializeArray(),
 					data = {
 						urls: {}
 					},
@@ -2964,6 +3011,22 @@ ZABBIX.apps.map = (function($) {
 					else {
 						data[values[i].name] = values[i].value.toString();
 					}
+				}
+
+				if (data.elementtype == '0' || data.elementtype == '3') {
+					data.tags = [];
+					$('input', '#selementForm').filter(function() {
+						return this.name.match(/tags\[\d+\]\[tag\]/i);
+					}).each(function() {
+						if (this.value !== '') {
+							var nr = parseInt(this.name.match(/^tags\[(\d+)\]\[tag\]$/)[1]);
+							data.tags.push({
+								tag: this.value,
+								operator: $('[name="tags['+nr+'][operator]"]:checked').val(),
+								value: $('[name="tags['+nr+'][value]"]').val()
+							});
+						}
+					});
 				}
 
 				data.elements = {};

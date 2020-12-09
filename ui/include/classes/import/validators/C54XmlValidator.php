@@ -426,11 +426,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-						'application' =>			['type' => XML_ARRAY, 'rules' => [
-							'name' =>					['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]],
 					'items' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
 						'item' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -453,11 +448,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-								'application' =>			['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
 							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
@@ -604,16 +594,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-										'application' =>			['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'application_prototypes' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' =>	['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -941,9 +921,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
 						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'application' =>			['type' => XML_ARRAY, 'rules' => [
-								'name' =>					['type' => XML_STRING | XML_REQUIRED]
-							]],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'attempts' =>				['type' => XML_STRING, 'default' => '1'],
 							'agent' =>					['type' => XML_STRING, 'default' => 'Zabbix'],
@@ -1111,11 +1088,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-						'application' =>			['type' => XML_ARRAY, 'rules' => [
-							'name' =>					['type' => XML_STRING | XML_REQUIRED]
-						]]
-					]],
 					'items' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
 						'item' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -1138,11 +1110,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-								'application' =>			['type' => XML_ARRAY, 'rules' => [
-									'name' =>					['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
 							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
@@ -1287,16 +1254,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-										'application' =>			['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'application_prototypes' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' =>	['type' => XML_ARRAY, 'rules' => [
-											'name' =>					['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -1622,9 +1579,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
 						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'application' =>			['type' => XML_ARRAY, 'rules' => [
-								'name' =>					['type' => XML_STRING | XML_REQUIRED]
-							]],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'attempts' =>				['type' => XML_STRING, 'default' => '1'],
 							'agent' =>					['type' => XML_STRING, 'default' => 'Zabbix'],
@@ -1819,8 +1773,14 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
 							'url' =>					['type' => XML_STRING | XML_REQUIRED],
-							'application' =>			['type' => XML_STRING | XML_REQUIRED],
-							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
+							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED],
+							// TODO miks:
+//							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+//								'tag' =>					['type' => XML_ARRAY, 'rules' => [
+//									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+//									'value' =>					['type' => XML_STRING, 'default' => '']
+//								]]
+//							]]
 						]]
 					]]
 				]]
@@ -1901,11 +1861,18 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'icon_maintenance' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 								'name' =>					['type' => XML_STRING]
 							]],
-							'application' =>			['type' => XML_STRING | XML_REQUIRED],
 							'urls' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'url', 'rules' => [
 								'url' =>					['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'operator' =>				['type' => XML_STRING],
+							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+								'tag' =>					['type' => XML_ARRAY, 'rules' => [
+									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING],
+									'operator' =>				['type' => XML_STRING]
 								]]
 							]]
 						]]

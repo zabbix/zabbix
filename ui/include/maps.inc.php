@@ -470,7 +470,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				while (!empty($sysmapIds)) {
 					$subSysmaps = API::Map()->get([
 						'output' => ['sysmapid'],
-						'selectSelements' => ['elementtype', 'elements', 'application'],
+						'selectSelements' => ['elementtype', 'elements', 'operator', 'tags'],
 						'sysmapids' => $sysmapIds,
 						'preservekeys' => true
 					]);
@@ -677,6 +677,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			}
 		}
 
+		// TODO miks: rework.
 		$subSysmapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
 			$hostsFromHostGroups
 		);

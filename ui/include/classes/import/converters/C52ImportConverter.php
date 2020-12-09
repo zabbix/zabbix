@@ -42,6 +42,10 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['templates'] = self::convertHosts($data['zabbix_export']['templates']);
 		}
 
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
+		}
+
 		return $data;
 	}
 
@@ -140,5 +144,37 @@ class C52ImportConverter extends CConverter {
 		}
 
 		return $tags;
+	}
+
+	/**
+	 * Convert maps.
+	 *
+	 * @static
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	private static function convertMaps(array $maps): array {
+		foreach ($maps as $i => $map) {
+			if (array_key_exists('selements', $map)) {
+				foreach ($map['selements'] as $s => $selement) {
+					$maps[$i]['selements'][$s]['operator'] = (string) CONDITION_EVAL_TYPE_AND_OR;
+
+					if (array_key_exists('application', $selement) && $selement['application'] !== '') {
+						$maps[$i]['selements'][$s]['tags'] = self::convertApplicationsToSteps([[
+							'name' => $selement['application']
+						]]);
+
+						$maps[$i]['selements'][$s]['tags'] = array_map(function($tag) {
+							return $tag + ['operator' => (string) TAG_OPERATOR_LIKE];
+						}, $maps[$i]['selements'][$s]['tags']);
+					}
+					unset($maps[$i]['selements'][$s]['application']);
+				}
+			}
+		}
+
+		return $maps;
 	}
 }
