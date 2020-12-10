@@ -115,12 +115,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		raidTypes := []string{"areca", "cciss", "megaraid"}
 		for _, rDev := range raidDev {
 			for _, rtype := range raidTypes {
-				raids, err := getRaidDisks(rDev.Name, rtype)
-				if err != nil {
-					//TODO maybe check error type to be the not found one
-					continue
-				}
-
+				raids, _ := getRaidDisks(rDev.Name, rtype)
 				out = append(out, raids...)
 			}
 		}
