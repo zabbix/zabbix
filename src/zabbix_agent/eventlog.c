@@ -597,7 +597,7 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 	DWORD	nlen = MAX_NAME, dlen = MAX_NAME;
 	wchar_t	name[MAX_NAME], dom[MAX_NAME], *sid = NULL;
 	int	iUse;
-	char	userName[MAX_NAME], domName[MAX_NAME], sidName[MAX_NAME], *tmp, buffer[MAX_NAME * 2];
+	char	userName[MAX_NAME * 4], domName[MAX_NAME * 4], sidName[MAX_NAME * 4], *tmp, buffer[MAX_NAME * 8];
 
 	if (0 == LookupAccountSid(NULL, sidVal, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
 	{
@@ -638,10 +638,9 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 
 static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_message)
 {
-	DWORD		status, dwBufferSize = 0, dwBufferUsed = 0, dwPropertyCount = 0;
+	DWORD		status, dwBufferSize = 0, dwBufferUsed = 0, dwPropertyCount = 0, i;
 	PEVT_VARIANT	renderedContent = NULL;
 	EVT_HANDLE	render_context;
-	int		i;
 
 	if (NULL == (render_context = EvtCreateRenderContext(0, NULL, EvtRenderContextUser)))
 	{
