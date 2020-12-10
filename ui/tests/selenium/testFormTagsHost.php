@@ -321,7 +321,7 @@ class testFormTagsHost extends CWebTest {
 	public function testFormTagsHost_FullClone() {
 		$this->executeCloning('Full clone');
 	}
-	
+
 	public function testFormTagsHost_TagScreenshot() {
 		$this->page->login()->open('hosts.php');
 		$this->query('link:Host with long tag name and value')->waitUntilPresent()->one()->click();
