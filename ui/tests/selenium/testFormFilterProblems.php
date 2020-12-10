@@ -88,7 +88,7 @@ class testFormFilterProblems extends testFormFilter {
 				[
 					'expected' => TEST_GOOD,
 					'filter_form' => [
-						'Severity' => 'Not classified'
+						'Severity' => 'High'
 					],
 					'filter' => [
 						'Name' => '*;%№:?(',
