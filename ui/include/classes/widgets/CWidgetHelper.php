@@ -64,8 +64,6 @@ class CWidgetHelper {
 					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 				]))->addClass('table-forms-row-with-second-field')
 			)
-
-
 			->addRow(_('Name'),
 				(new CTextBox('name', $name))
 					->setAttribute('placeholder', _('default'))
