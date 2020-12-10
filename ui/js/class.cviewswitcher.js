@@ -193,6 +193,9 @@ CViewSwitcher.prototype = {
 			case 'li':
 				obj.style.display = '';
 				break;
+			case 'z-select':
+				obj.style.display = 'inline-grid';
+				break
 			default:
 				obj.style.display = 'inline';
 		}
