@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-09T09:11:30Z</date>
+   <date>2020-12-10T11:48:44Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -15,7 +15,7 @@
 The metrics are collected by Zabbix agent.&#13;
 &#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411049-discussion-thread-for-official-zabbix-template-amq&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415007-discussion-thread-for-official-zabbix-template-microsoft-exchange&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
@@ -34,7 +34,6 @@ Template tooling version used: 0.38</description>
                <key>perf_counter_en["\MSExchange Active Manager(_total)\Database Mounted"]</key>
                <delay>{$MS.EXCHANGE.PERF.INTERVAL}</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <description>Shows the number of active database copies on the server.</description>
                <applications>
                   <application>
@@ -44,7 +43,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
+                     <params>3h</params>
                   </step>
                </preprocessing>
             </item>
@@ -261,12 +260,6 @@ Template tooling version used: 0.38</description>
                            <name>MS Exchange</name>
                         </application>
                      </applications>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
-                        </step>
-                     </preprocessing>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
@@ -296,7 +289,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>3h</params>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -516,7 +509,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>3m</params>
                         </step>
                      </preprocessing>
                   </item_prototype>
@@ -709,7 +702,7 @@ return JSON.stringify(data);</params>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <trigger_prototypes>
@@ -734,7 +727,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.DB.ACTIVE.READ.WARN}</macro>
                <value>0.02</value>
-               <description>Treshold for active database read operations latency trigger.</description>
+               <description>Threshold for active database read operations latency trigger.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME}</macro>
@@ -744,7 +737,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.DB.ACTIVE.WRITE.WARN}</macro>
                <value>0.05</value>
-               <description>Treshold for active database write operations latency trigger.</description>
+               <description>Threshold for active database write operations latency trigger.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.DB.FAULTS.TIME}</macro>
@@ -754,7 +747,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.DB.FAULTS.WARN}</macro>
                <value>0</value>
-               <description>Treshold for database page faults trigger.</description>
+               <description>Threshold for database page faults trigger.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.DB.PASSIVE.READ.TIME}</macro>
@@ -764,7 +757,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.DB.PASSIVE.READ.WARN}</macro>
                <value>0.2</value>
-               <description>Treshold for passive database read operations latency trigger.</description>
+               <description>Threshold for passive database read operations latency trigger.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME}</macro>
@@ -779,7 +772,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.LDAP.WARN}</macro>
                <value>0.05</value>
-               <description>Treshold for LDAP triggers.</description>
+               <description>Threshold for LDAP triggers.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.LOG.STALLS.TIME}</macro>
@@ -789,7 +782,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.LOG.STALLS.WARN}</macro>
                <value>100</value>
-               <description>Treshold for log records stalled trigger.</description>
+               <description>Threshold for log records stalled trigger.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.PERF.INTERVAL}</macro>
@@ -804,7 +797,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.RPC.COUNT.WARN}</macro>
                <value>70</value>
-               <description>Treshold for LDAP triggers.</description>
+               <description>Threshold for LDAP triggers.</description>
             </macro>
             <macro>
                <macro>{$MS.EXCHANGE.RPC.TIME}</macro>
@@ -814,7 +807,7 @@ return JSON.stringify(data);</params>
             <macro>
                <macro>{$MS.EXCHANGE.RPC.WARN}</macro>
                <value>0.05</value>
-               <description>Treshold for RPC requests latency trigger.</description>
+               <description>Threshold for RPC requests latency trigger.</description>
             </macro>
          </macros>
       </template>
@@ -868,55 +861,6 @@ return JSON.stringify(data);</params>
             <mapping>
                <value>1</value>
                <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>Exchange database content index states</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Healthy</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Crawling</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Seeding</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>FailedAndSuspended</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Suspended</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Disabled</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>AutoSuspended</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>HealthyAndUpgrading</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>DiskUnavailable</newvalue>
             </mapping>
          </mappings>
       </value_map>
