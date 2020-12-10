@@ -423,47 +423,53 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'discoveryconf.php?form=update&druleid=2',
+						'url' => 'zabbix.php?action=discovery.edit&druleid=2',
 						'text_present' => 'Discovery rules'
 					],
 					[
-						'url' => 'discoveryconf.php?form=update&druleid=9999999',
+						'url' => 'zabbix.php?action=discovery.edit&druleid=9999999',
 						'text_not_present' => 'Discovery rules',
+						'access_denied' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'You are logged in as "Admin". You have no permissions to access this page.'
 						]
 					],
 					[
-						'url' => 'discoveryconf.php?form=update&druleid=abc',
+						'url' => 'zabbix.php?action=discovery.edit&druleid=abc',
 						'text_not_present' => 'Discovery rules',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "druleid" is not integer.'
+							'Incorrect value "abc" for "druleid" field.',
+							'Controller: discovery.edit',
+							'action: discovery.edit',
+							'druleid: abc'
 						]
 					],
 					[
-						'url' => 'discoveryconf.php?form=update&druleid=',
+						'url' => 'zabbix.php?action=discovery.edit&druleid=',
 						'text_not_present' => 'Discovery rules',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "druleid" is not integer.'
+							'Incorrect value "" for "druleid" field.',
+							'Controller: discovery.edit',
+							'action: discovery.edit',
+							'druleid:'
 						]
 					],
 					[
-						'url' => 'discoveryconf.php?form=update&druleid=-1',
+						'url' => 'zabbix.php?action=discovery.edit&druleid=-1',
 						'text_not_present' => 'Discovery rules',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "druleid" field.'
+							'Incorrect value "-1" for "druleid" field.',
+							'Controller: discovery.edit',
+							'action: discovery.edit',
+							'druleid: -1'
 						]
 					],
 					[
-						'url' => 'discoveryconf.php?form=update',
-						'text_not_present' => 'Discovery rules',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "druleid" is mandatory.'
-						]
+						'url' => 'zabbix.php?action=discovery.edit',
+						'text_present' => 'Discovery rules'
 					]
 				]
 			],
@@ -1092,6 +1098,9 @@ class testUrlParameters extends CLegacyWebTest {
 			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
 			if (array_key_exists('fatal_error', $test_case)) {
 				$this->zbxTestCheckTitle('Fatal error, please report to the Zabbix team', false);
+			}
+			elseif (array_key_exists('access_denied', $test_case)) {
+				$this->zbxTestCheckTitle('Warning [refreshed every 30 sec.]', false);
 			}
 			else {
 				$this->zbxTestCheckTitle($title, $check_server_name);
