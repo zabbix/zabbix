@@ -179,12 +179,16 @@
 			jQuery('form[name="action.edit"]').submit();
 		});
 
-		jQuery('.js-edit-button').on('click', function() {
+		$('.js-edit-button').on('click', function() {
 			var operation = $(this).data('operation');
 
 			operation_details.open(this, operation.actionid, operation.eventsource, operation.operationtype,
 				JSON.parse($(['#operations_for_popup', operation.operationtype, operation.operationid].join('_')).val())
 			);
+		});
+
+		$('#evaltype').on('change', () => {
+			processTypeOfCalculation();
 		});
 
 		processTypeOfCalculation();

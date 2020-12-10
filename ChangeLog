@@ -1,7 +1,36 @@
+Changes for 5.0.7rc1
+
+New features:
+.........T [ZBXNEXT-6234] added "Disk read/write request avg waiting time" items in Template Module Windows physical disks (mchudinov)
+
+Bug fixes:
+........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
+...G...... [ZBX-18187] fixed agent2 wmi.get returning the wrong result (arimdjonoks)
+...G...... [ZBX-18543] reworked ceph.osd.discovery metric (vadimipatov)
+........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
+.......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)
+.......PS. [ZBX-18662] improved pollers, unreachable pollers, Java pollers and pingers to use less memory (vso)
+.......PS. [ZBX-18553] increased ssh.run[] item data limit to 512KB for pre-processing, data storage limit still remains at 64KB (viktors)
+........S. [ZBX-18423] fixed inconsistent macro expansion with Oracle DB compared with other databases (viktors)
+.........T [ZBX-18658] changed {$AMI.PORT} macro value to 5038, added handling the "Follows" response and situations with unloaded modules (mchudinov)
+A......... [ZBX-18219] fixed custom multiplier preprocessing step validation to accept a string with macros (agriscenko)
+..F....... [ZBX-18198] fixed tags not being expanded automatically on configuration form open (agriscenko)
+A.F....... [ZBX-18397] fixed global macros clearing value on type change from secret to text when value is set and is the same as before (Ivo)
+A......... [ZBX-18357] fixed dashboard view_mode being reset to default on dashboard update (gcalenko, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.6
+
+5.0.6rc1 was released as 5.0.6 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.6rc1
 
 New features:
-.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 ...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
@@ -10,6 +39,12 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
 ..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
 A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
 ..F....... [ZBX-18518] fixed characters counter which were removed in script modal window (gcalenko)
@@ -1831,12 +1866,33 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.28rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
+........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
+.......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)
+.......PS. [ZBX-18662] improved pollers, unreachable pollers, Java pollers and pingers to use less memory (vso)
+........S. [ZBX-18423] fixed inconsistent macro expansion with Oracle DB compared with other databases (viktors)
+A......... [ZBX-18219] fixed custom multiplier preprocessing step validation to accept a string with macros (agriscenko)
+..F....... [ZBX-18422] fixed "server is not running" warning message width (gcalenko)
+..F....... [ZBX-18688] fixed schema name didnt show when available only postgresql (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.27
+
+4.0.27rc1 was released as 4.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.27rc1
 
 New features:
 ..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 
 Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
 A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
 ........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
 .......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)

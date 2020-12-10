@@ -77,8 +77,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition-type'));
+		$this->zbxTestDropdownSelectWait('condition-type', $data['select_tag']);
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 		$this->zbxTestInputType('tag', $data['tag']);
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
@@ -226,7 +226,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with Event tag pair',
 					'select_tag' => 'Event tag pair',
 					'oldtag' => 'Old tag',
-					'newtag' => 'New tag',
+					'newtag' => 'New tag'
 				]
 			],
 			[
@@ -337,8 +337,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition-type'));
+		$this->zbxTestDropdownSelectWait('condition-type', $data['select_tag']);
 
 		if (array_key_exists('operator', $data)) {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['operator'].'"]');
@@ -434,10 +434,10 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition-type'));
+		$this->zbxTestDropdownSelectWait('condition-type', $data['select_tag']);
 		COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if ($data['select_tag'] === 'Event tag pair' && array_key_exists('newtag', $data)) {
@@ -463,7 +463,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with calculation And/Or',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					]
 				]
 			],
@@ -482,7 +482,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with calculation OR',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
 					'calculation' => 'Or'
 				]
@@ -493,7 +493,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag3'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag3']
 
 					],
 				'calculation' => 'Custom expression',
@@ -519,8 +519,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		foreach ($data['tags'] as $tag) {
 			$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-			$this->zbxTestDropdownSelectWait('condition_type', $tag['select_tag']);
+			$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition-type'));
+			$this->zbxTestDropdownSelectWait('condition-type', $tag['select_tag']);
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 			$this->zbxTestInputType('tag', $tag['tag_name']);
@@ -553,7 +553,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with empty expression',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> '',
 					'error_message' => 'Incorrect custom expression "" for correlation "Test create with empty expression": expression is empty.'
@@ -600,7 +600,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Check case sensitive of operator in formula',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'A and Not B',
 					'error_message' => 'Incorrect custom expression "A and Not B" for correlation "Check case sensitive of operator in formula": check expression starting from "Not B".'
@@ -611,7 +611,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Check case sensitive of first operator in formula',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'NOT A and not B',
 					'error_message' => 'Incorrect custom expression "NOT A and not B" for correlation "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
@@ -622,7 +622,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with only NOT in formula',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'not A not B',
 					'error_message' => 'Incorrect custom expression "not A not B" for correlation "Test create with only NOT in formula": check expression starting from " not B".'
@@ -646,8 +646,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		foreach ($data['tags'] as $tag) {
 			$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
-			$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-			$this->zbxTestDropdownSelectWait('condition_type', $tag['select_tag']);
+			$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition-type'));
+			$this->zbxTestDropdownSelectWait('condition-type', $tag['select_tag']);
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 			$this->zbxTestInputType('tag', $tag['tag_name']);
@@ -728,8 +728,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//tr[@id=\'conditions_0\']//button[text()=\'Remove\']');
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
-		$this->zbxTestDropdownSelectWait('condition_type', 'New event tag name');
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition-type'));
+		$this->zbxTestDropdownSelectWait('condition-type', 'New event tag name');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 		$this->zbxTestInputTypeOverwrite('tag', 'New update tag');
 		$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-footer']//button[text()='Add']");

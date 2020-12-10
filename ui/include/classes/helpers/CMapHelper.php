@@ -110,7 +110,7 @@ class CMapHelper {
 			'theme' => $theme,
 			'canvas' => [
 				'width' => $map['width'],
-				'height' => $map['height'],
+				'height' => $map['height']
 			],
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],

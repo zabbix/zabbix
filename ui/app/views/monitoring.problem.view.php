@@ -207,7 +207,9 @@ if ($data['action'] === 'problem.view') {
 	$i = 0;
 	foreach ($filter_inventory as $field) {
 		$filter_inventory_table->addRow([
-			new CComboBox('filter_inventory['.$i.'][field]', $field['field'], null, $data['filter']['inventories']),
+			(new CSelect('filter_inventory['.$i.'][field]'))
+				->setValue($field['field'])
+				->addOptions(CSelect::createOptionsFromArray($data['filter']['inventories'])),
 			(new CTextBox('filter_inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('filter_inventory['.$i.'][remove]', _('Remove')))
@@ -325,7 +327,7 @@ if ($data['action'] === 'problem.view') {
 				(new CLabel(_('Show timeline'), 'filter_show_timeline'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 				(new CCheckBox('filter_show_timeline'))
 					->setChecked($data['filter']['show_timeline'] == 1)
-					->setEnabled($data['filter']['compact_view'] == 0),
+					->setEnabled($data['filter']['compact_view'] == 0)
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		])
 		->addRow(_('Show details'), [

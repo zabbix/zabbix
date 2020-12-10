@@ -191,7 +191,9 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$VFS.DEV.DEVNAME.MATCHES} |<p>This macro is used in physical disks discovery. Can be overridden on the host or linked template level.</p> |`.*` |
 |{$VFS.DEV.DEVNAME.NOT_MATCHES} |<p>This macro is used in physical disks discovery. Can be overridden on the host or linked template level.</p> |`_Total` |
+|{$VFS.DEV.READ.AWAIT.WARN} |<p>Disk read average response time (in s) before the trigger would fire.</p> |`0.02` |
 |{$VFS.DEV.UTIL.MAX.WARN} |<p>The warning threshold of disk time utilization in percent.</p> |`95` |
+|{$VFS.DEV.WRITE.AWAIT.WARN} |<p>Disk write average response time (in s) before the trigger would fire.</p> |`0.02` |
 
 ## Template links
 
@@ -211,12 +213,18 @@ There are no template links in this template.
 |Storage |{#DEVNAME}: Disk write rate |<p>Rate of write operations on the disk.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60] |
 |Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60] |
 |Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60] |
+|Storage |{#DEVNAME}: Disk read request avg waiting time |<p>The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60] |
+|Storage |{#DEVNAME}: Disk write request avg waiting time |<p>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60] |
+|Storage |{#DEVNAME}: Average disk read queue length |<p>Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60] |
+|Storage |{#DEVNAME}: Average disk write queue length |<p>Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_PASSIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m) |<p>The disk appears to be under heavy load</p> |`{TEMPLATE_NAME:perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60].min(15m)}>{$VFS.DEV.UTIL.MAX.WARN}` |WARNING |<p>Manual close: YES</p> |
+|{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m) |<p>The disk appears to be under heavy load</p> |`{TEMPLATE_NAME:perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60].min(15m)}>{$VFS.DEV.UTIL.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m</p><p>- {#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)</p> |
+|{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`{TEMPLATE_NAME:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60].min(15m)} > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
+|{#DEVNAME}: Disk write request responses are too high (write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m) |<p>This trigger might indicate disk {#DEVNAME} saturation.</p> |`{Windows physical disks by Zabbix agent:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 

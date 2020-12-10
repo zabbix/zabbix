@@ -330,7 +330,7 @@
 		]);
 
 		var data = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
+				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
 				.serialize(),
 			dialogueid = $form
 				.closest("[data-dialogueid]")
@@ -393,7 +393,7 @@
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
-				.find('#ports, >input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
+				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
 				.serializeJSON(),
 			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
