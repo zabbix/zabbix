@@ -618,12 +618,12 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 		return;
 	}
 
-	zbx_unicode_to_utf8_static(sid, sidName, MAX_NAME);
-	zbx_unicode_to_utf8_static(name, userName, MAX_NAME);
+	zbx_unicode_to_utf8_static(sid, sidName, sizeof(sidName));
+	zbx_unicode_to_utf8_static(name, userName, sizeof(userName));
 
 	if (0 != dlen)
 	{
-		zbx_unicode_to_utf8_static(dom, domName, MAX_NAME);
+		zbx_unicode_to_utf8_static(dom, domName, sizeof(domName));
 		zbx_snprintf(buffer, sizeof(buffer), "%s\\%s", domName, userName);
 	}
 	else
