@@ -283,6 +283,10 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			max-width: 200px;
 
 			a {
+				vertical-align: top;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				max-width: 200px;
 				display: inline-block;
 				margin-top: 2px;
 				line-height: 14px;
