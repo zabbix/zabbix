@@ -363,6 +363,7 @@ out:
 #endif
 }
 
+#ifdef HAVE_LIBXML2
 /******************************************************************************
  *                                                                            *
  * Function: compare_xml_nodes_by_name                                        *
@@ -549,6 +550,7 @@ static void vector_to_json(zbx_vector_ptr_t *nodes, struct zbx_json *json, char 
 	if (0 != arr_cnt)
 		zbx_json_close(json);
 }
+#endif /* HAVE_LIBXML2 */
 
 /******************************************************************************
  *                                                                            *
@@ -611,9 +613,10 @@ clean:
 	zbx_json_free(&json);
 exit:
 	return ret;
-#endif
+#endif /* HAVE_LIBXML2 */
 }
 
+#ifdef HAVE_LIBXML2
 static void json_to_node(struct zbx_json_parse *jp, xmlDoc *doc, xmlNode *parent_node, char *arr_name, int deep,
 		char **attr, char **attr_val, char **text)
 {
@@ -725,6 +728,7 @@ static void json_to_node(struct zbx_json_parse *jp, xmlDoc *doc, xmlNode *parent
 	}
 	while (NULL != p);
 }
+#endif /* HAVE_LIBXML2 */
 
 /******************************************************************************
  *                                                                            *
@@ -744,7 +748,7 @@ int	zbx_json_to_xml(char *data, char **xstr, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(data);
-	ZBX_UNUSED(jstr);
+	ZBX_UNUSED(xstr);
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
@@ -797,5 +801,5 @@ clean:
 	xmlFreeDoc(doc);
 exit:
 	return ret;
-#endif
+#endif /* HAVE_LIBXML2 */
 }
