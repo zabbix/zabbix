@@ -55,7 +55,6 @@ class CHost extends CHostGeneral {
 	 * @param bool          $options['with_monitored_httptests']           Select hosts only with monitored http tests.
 	 * @param bool          $options['with_graphs']                        Select hosts only with graphs.
 	 * @param bool          $options['with_graph_prototypes']              Select hosts only with graph prototypes.
-	 * @param bool          $options['with_applications']                  Select hosts with applications.
 	 * @param bool          $options['withProblemsSuppressed']             Select hosts that have suppressed problems. (null - all, true - only suppressed, false - unsuppressed)
 	 * @param bool          $options['editable']                           Select hosts only with read-write permission. Ignored for Super admins.
 	 * @param bool          $options['nopermissions']                      Select hosts by ignoring all permissions. Only available inside API calls.
@@ -128,7 +127,6 @@ class CHost extends CHostGeneral {
 			'with_monitored_httptests'			=> null,
 			'with_graphs'						=> null,
 			'with_graph_prototypes'				=> null,
-			'with_applications'					=> null,
 			'withProblemsSuppressed'			=> null,
 			'editable'							=> false,
 			'nopermissions'						=> null,
@@ -441,12 +439,6 @@ class CHost extends CHostGeneral {
 					' AND gi.graphid=g.graphid'.
 					' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
 				')';
-		}
-
-		// with applications
-		if (!is_null($options['with_applications'])) {
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
 		// search

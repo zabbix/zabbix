@@ -389,9 +389,9 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
-		let fields = ['show', 'application', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags',
-				'unacknowledged', 'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age',
-				'tag_name_format', 'evaltype'
+		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_suppressed', 'show_tags', 'unacknowledged',
+				'compact_view', 'show_timeline', 'details', 'highlight_row', 'age_state', 'age', 'tag_name_format',
+				'evaltype'
 			],
 			eventHandler = {
 				show: () => {
@@ -553,20 +553,6 @@ if (array_key_exists('render_html', $data)) {
 					dstfld1: 'hostids_' + data.uniqid,
 				}
 			}
-		});
-
-		// Application
-		$('#application_select_' + data.uniqid).on('click', function() {
-			let options = {
-					srctbl: 'applications',
-					srcfld1: 'name',
-					dstfrm: 'zbx_filter',
-					dstfld1: 'application_' + data.uniqid,
-					with_applications: '1',
-					real_hosts: '1'
-				};
-
-			PopUp('popup.generic', $.extend(options, getFirstMultiselectValue('hostids_' + data.uniqid)), null, this);
 		});
 
 		// Triggers multiselect.

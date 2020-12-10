@@ -84,8 +84,8 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
-		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags'),
 		($data['context'] === 'host') ? _('Info') : null
 	]);
 
@@ -272,9 +272,9 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		CHtml::encode($item['applications_list']),
 		$status,
-		($data['context'] === 'host') ? makeInformationList($info_icons) : null
+		$data['tags'][$item['itemid']],
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null		
 	]);
 }
 

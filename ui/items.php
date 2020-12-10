@@ -369,6 +369,22 @@ if (hasRequest('filter_set')) {
 	CProfile::update($prefix.'items.filter_with_triggers', getRequest('filter_with_triggers', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'items.filter_discovered', getRequest('filter_discovered', -1), PROFILE_TYPE_INT);
 
+	// tags
+	$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+	foreach (getRequest('filter_tags', []) as $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			continue;
+		}
+		$filter_tags['tags'][] = $tag['tag'];
+		$filter_tags['values'][] = $tag['value'];
+		$filter_tags['operators'][] = $tag['operator'];
+	}
+	CProfile::update($prefix.'items.filter.evaltype', getRequest('evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+	CProfile::updateArray($prefix.'items.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+	unset($filter_tags);
+
 	// subfilters
 	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
@@ -1263,6 +1279,17 @@ else {
 	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// Tags filters.
+	$filter_evaltype = CProfile::get($prefix.'items.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
+	$filter_tags = [];
+	foreach (CProfile::getArray($prefix.'items.filter.tags.tag', []) as $i => $tag) {
+		$filter_tags[] = [
+			'tag' => $tag,
+			'value' => CProfile::get($prefix.'items.filter.tags.value', null, $i),
+			'operator' => CProfile::get($prefix.'items.filter.tags.operator', null, $i)
+		];
+	}
+
 	if (count($filter_hostids) == 1) {
 		$hostid = reset($filter_hostids);
 	}
@@ -1290,9 +1317,9 @@ else {
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTriggers' => ['triggerid'],
-		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
+		'selectTags' => ['tag', 'value'],
 		'sortfield' => $sortField,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
@@ -1581,6 +1608,8 @@ else {
 	];
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();
