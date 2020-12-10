@@ -111,6 +111,22 @@ class testFormTagsHost extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'host_name' => 'Host with long tag name and value',
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'Long tag name. Long tag name. Long tag name. Long tag name. Long tag name.'
+									.' Long tag name. Long tag name. Long tag name.',
+							'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'
+									.' Long tag value. Long tag value. Long tag value. Long tag value.'
+						]
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'host_name' => 'Host with empty tag name',
 					'tags' => [
@@ -304,6 +320,16 @@ class testFormTagsHost extends CWebTest {
 
 	public function testFormTagsHost_FullClone() {
 		$this->executeCloning('Full clone');
+	}
+	
+	public function testFormTagsHost_TagScreenshot() {
+		$this->page->login()->open('hosts.php');
+		$this->query('link:Host with long tag name and value')->waitUntilPresent()->one()->click();
+		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
+
+		$form->selectTab('Tags');
+		$screenshot_area = $this->query('id:tags-table')->one();
+		$this->assertScreenshot($screenshot_area);
 	}
 
 	/**
