@@ -224,7 +224,6 @@ class testFormFilter extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
-
 		if (array_key_exists('filter_form', $data)) {
 			$home_form->fill($data['filter_form']);
 		}
