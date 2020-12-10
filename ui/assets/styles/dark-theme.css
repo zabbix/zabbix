@@ -1306,7 +1306,8 @@ pre, pre a, pre td, pre span {
       line-height: 24px; }
       .header-navigation > ul > li ul {
         display: flex;
-        align-items: baseline; }
+        align-items: baseline;
+        flex-wrap: wrap; }
         .header-navigation > ul > li ul li {
           margin-right: 5px; }
         .header-navigation > ul > li ul.breadcrumbs > li {
@@ -1327,10 +1328,6 @@ pre, pre a, pre td, pre span {
       overflow: hidden;
       max-width: 200px; }
       .header-navigation > ul li > span a {
-        vertical-align: top;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 200px;
         display: inline-block;
         margin-top: 2px;
         line-height: 14px; }
