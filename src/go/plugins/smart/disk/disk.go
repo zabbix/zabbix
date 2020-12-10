@@ -112,8 +112,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			}
 		}
 
-		raidTypes := []string{"3ware", "areca", "cciss", "megaraid"}
-
+		raidTypes := []string{"areca", "cciss", "megaraid"}
 		for _, rDev := range raidDev {
 			for _, rtype := range raidTypes {
 				raids, err := getRaidDisks(rDev.Name, rtype)
@@ -199,7 +198,7 @@ func getRaidDisks(name string, rtype string) ([]device, error) {
 			ids = append(ids, table.ID)
 		}
 
-		out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber, ids})
+		out = append(out, device{fullName, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber, ids})
 		i++
 	}
 }
