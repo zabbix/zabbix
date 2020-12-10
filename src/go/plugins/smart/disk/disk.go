@@ -44,10 +44,12 @@ type deviceInfo struct {
 }
 
 type deviceParser struct {
-	ModelName    string        `json:"model_name"`
-	SerialNumber string        `json:"serial_number"`
-	Info         deviceInfo    `json:"device"`
-	Smartctl     smartctlField `json:"smartctl"`
+	ModelName       string          `json:"model_name"`
+	SerialNumber    string          `json:"serial_number"`
+	Info            deviceInfo      `json:"device"`
+	Smartctl        smartctlField   `json:"smartctl"`
+	SmartStatus     *smartStatus    `json:"smart_status,omitempty"`
+	SmartAttributes smartAttributes `json:"ata_smart_attributes"`
 }
 
 type smartctlField struct {
@@ -64,6 +66,19 @@ type device struct {
 	DeviceType   string `json:"{#TYPE}"`
 	Model        string `json:"{#MODEL}"`
 	SerialNumber string `json:"{#SN}"`
+	Ids          []int  `json:"{#IDS}"`
+}
+
+type smartStatus struct {
+	SerialNumber bool `json:"passed"`
+}
+
+type smartAttributes struct {
+	Table []table `json:"table"`
+}
+
+type table struct {
+	ID int `json:"id"`
 }
 
 var impl Plugin
@@ -72,42 +87,43 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	var out []device
 	switch key {
 	case "smart.disk.discovery":
-		devices, err := getDevices()
+		basicDev, raidDev, err := getDevices()
 		if err != nil {
 			return nil, err
 		}
 
-		for _, dev := range devices {
+		for _, dev := range basicDev {
 			deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
 			if err != nil {
 				return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
 			}
-
+			// fmt.Println(deviceJSON)
 			var dp deviceParser
 			if err = json.Unmarshal([]byte(deviceJSON), &dp); err != nil {
 				return nil, fmt.Errorf("Failed to unmarshal smartctl response json: %s", err.Error())
 			}
-
-			if err = checkErr(dp); err != nil {
-				if err != errRaid {
-					return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
-				}
-				var n int
-				n, err = deviceCount(dev.Name)
-				if err != nil {
-					return nil, fmt.Errorf("Failed to get raid device count: %s", err.Error())
+			if dp.SmartStatus != nil {
+				var ids []int
+				for _, table := range dp.SmartAttributes.Table {
+					ids = append(ids, table.ID)
 				}
 
-				raids, err := getRaidDisks(dev.Name, n-2)
+				out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber, ids})
+			}
+		}
+
+		raidTypes := []string{"3ware", "areca", "cciss", "megaraid"}
+
+		for _, rDev := range raidDev {
+			for _, rtype := range raidTypes {
+				raids, err := getRaidDisks(rDev.Name, rtype)
 				if err != nil {
-					return nil, fmt.Errorf("Failed to get raid disk data from smartctl: %s", err.Error())
+					//TODO maybe check error type to be the not found one
+					continue
 				}
 
 				out = append(out, raids...)
-				continue
 			}
-
-			out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber})
 		}
 	case "smart.disk.get":
 		if len(params) != 1 {
@@ -117,11 +133,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", name))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
 		}
+
 		var dp deviceParser
 		if err = json.Unmarshal([]byte(deviceJSON), &dp); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to unmarshal smartctl response json: %s", err.Error())
 		}
 
 		if err = checkErr(dp); err != nil {
@@ -149,29 +166,42 @@ func init() {
 		"smart.disk.get", "Returns JSON data of smart device, usage: smart.disk.get[name].")
 }
 
-func getRaidDisks(name string, count int) ([]device, error) {
+func getRaidDisks(name string, rtype string) ([]device, error) {
 	var out []device
-	for i := 0; i <= count; i++ {
-		fullName := fmt.Sprintf("%s -d cciss,%d", name, i)
+	var i int
+
+	//TODO maybe add a timeout ?
+	if rtype == "areca" {
+		i = 1
+	} else {
+		i = 0
+	}
+
+	for {
+		fullName := fmt.Sprintf("%s -d %s,%d", name, rtype, i)
 		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName))
 		if err != nil {
-			return nil, fmt.Errorf("Failed to get RAID disk data from smartctl: %s", err.Error())
+			return out, fmt.Errorf("Failed to get RAID disk data from smartctl: %s", err.Error())
 		}
 
 		var dp deviceParser
 		if err = json.Unmarshal([]byte(deviceJSON), &dp); err != nil {
-			return nil, fmt.Errorf("Failed to unmarshal smartctl RAID response json: %s", err.Error())
+			return out, fmt.Errorf("Failed to unmarshal smartctl RAID response json: %s", err.Error())
 		}
 
 		err = checkErr(dp)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
+			return out, fmt.Errorf("Failed to get disk data from smartctl: %s", err.Error())
 		}
 
-		out = append(out, device{fullName, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber})
-	}
+		var ids []int
+		for _, table := range dp.SmartAttributes.Table {
+			ids = append(ids, table.ID)
+		}
 
-	return out, nil
+		out = append(out, device{dp.Info.Name, dp.Info.DeviceType, dp.ModelName, dp.SerialNumber, ids})
+		i++
+	}
 }
 
 func checkErr(dp deviceParser) error {
@@ -187,30 +217,29 @@ func checkErr(dp deviceParser) error {
 	return nil
 }
 
-func getDevices() ([]deviceInfo, error) {
-	raidDev, err := scanDevices("--scan -d sat -j")
+func getDevices() (basic []deviceInfo, raid []deviceInfo, err error) {
+	raidTmp, err := scanDevices("--scan -d sat -j")
 	if err != nil {
-		return nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
+		return nil, nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
 	}
 
-	dev, err := scanDevices("--scan -j")
+	basic, err = scanDevices("--scan -j")
 	if err != nil {
-		return nil, fmt.Errorf("Failed to scan for devices: %s", err)
+		return nil, nil, fmt.Errorf("Failed to scan for devices: %s", err)
 	}
-	var out []deviceInfo
-	out = append(out, raidDev...)
+
 raid:
-	for _, d := range dev {
-		for _, rd := range raidDev {
-			if d.Name == rd.Name {
+	for _, tmp := range raidTmp {
+		for _, b := range basic {
+			if tmp.Name == b.Name {
 				continue raid
 			}
 		}
 
-		out = append(out, d)
+		raid = append(raid, tmp)
 	}
 
-	return out, nil
+	return basic, raid, nil
 }
 
 func scanDevices(args string) ([]deviceInfo, error) {
