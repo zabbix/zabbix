@@ -32,7 +32,6 @@ abstract class CControllerProblem extends CController {
 		'show' => TRIGGERS_OPTION_RECENT_PROBLEM,
 		'groupids' => [],
 		'hostids' => [],
-		'application' => '',
 		'triggerids' => [],
 		'name' => '',
 		'severities' => [],

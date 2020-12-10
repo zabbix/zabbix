@@ -36,7 +36,6 @@ $options = [
 			'show' => $data['filter']['show'],
 			'groupids' => $data['filter']['groupids'],
 			'hostids' => $data['filter']['hostids'],
-			'application' => $data['filter']['application'],
 			'triggerids' => $data['filter']['triggerids'],
 			'name' => $data['filter']['name'],
 			'severities' => $data['filter']['severities'],

@@ -71,15 +71,6 @@ $left_column = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->setId('hostids_#{uniqid}')
 	)
-	->addRow(_('Application'), [
-		(new CTextBox('application', $data['application']))
-			->setId('application_#{uniqid}')
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_select', _('Select')))
-			->setId('application_select_#{uniqid}')
-			->addClass(ZBX_STYLE_BTN_GREY)
-	])
 	->addRow((new CLabel(_('Triggers'), 'triggerids_#{uniqid}_ms')),
 		(new CMultiSelect([
 			'name' => 'triggerids[]',
