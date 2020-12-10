@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-09T04:54:23Z</date>
+   <date>2020-12-10T11:38:41Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -188,7 +188,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>3h</params>
                         </step>
                      </preprocessing>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -219,12 +219,12 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}</expression>
-                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (&gt;{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)</name>
+                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXDESTINATIONNAME}"}%)</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}</expression>
-                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}%)</name>
+                           <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXDESTINATIONNAME}"}%)</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -271,10 +271,10 @@ Template tooling version used: 0.38</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].max({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
+                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].max({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].min({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
-                     <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (&lt;={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})</name>
+                     <recovery_expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].min({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
+                     <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (below {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})</name>
                      <priority>AVERAGE</priority>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
@@ -285,10 +285,10 @@ Template tooling version used: 0.38</description>
                      <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
+                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].min({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
-                     <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (&lt;={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})</name>
+                     <recovery_expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].min({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
+                     <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (below {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})</name>
                      <priority>AVERAGE</priority>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
@@ -398,7 +398,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>3h</params>
                         </step>
                      </preprocessing>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -429,7 +429,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -452,18 +452,18 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Memory usage is too high (&gt;{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
+                           <name>Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
                            <priority>AVERAGE</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Broker {#JMXBROKERNAME}: Memory usage is too high (&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
+                                 <name>Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
                                  <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ}, MemoryPercentUsage].min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Memory usage is too high (&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
+                           <name>Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -485,7 +485,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -508,18 +508,18 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Storage usage is too high (&gt;{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
+                           <name>Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
                            <priority>AVERAGE</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Broker {#JMXBROKERNAME}: Storage usage is too high (&gt;{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
+                                 <name>Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
                                  <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},StorePercentUsage].min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Storage usage is too high (&gt;{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
+                           <name>Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -541,7 +541,7 @@ Template tooling version used: 0.38</description>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>10m</params>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
@@ -564,18 +564,18 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.TEMP.MAX.WARN}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Temp usage is too high (&gt;{$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
+                           <name>Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
                            <priority>AVERAGE</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Broker {#JMXBROKERNAME}: Temp usage is too high (&gt;{$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
+                                 <name>Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
                                  <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TempPercentUsage].min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.TEMP.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.TEMP.MAX.HIGH}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Temp usage is too high (&gt;{$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
+                           <name>Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -596,8 +596,8 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max({$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})}&lt;={$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Consumers count is too low (&lt;={$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})</name>
+                           <expression>{max({$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})}&lt;{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Consumers count is too low (below {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME:"{#JMXBROKERNAME}"})</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -662,8 +662,8 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{max({$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})}&lt;={$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Producers count is too low (&lt;={$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})</name>
+                           <expression>{max({$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})}&lt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
+                           <name>Broker {#JMXBROKERNAME}: Producers count is too low (below $ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -676,7 +676,7 @@ Template tooling version used: 0.38</description>
                      <units>s</units>
                      <username>{$ACTIVEMQ.USER}</username>
                      <password>{$ACTIVEMQ.PASSWORD}</password>
-                     <description>The version of the broker.</description>
+                     <description>The uptime of the broker.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#JMXBROKERNAME}</name>
@@ -791,7 +791,7 @@ Template tooling version used: 0.38</description>
          <macros>
             <macro>
                <macro>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}</macro>
-               <value>0</value>
+               <value>1</value>
                <description>Minimum amaunt of consumers for broker. Can be used with broker name as context.</description>
             </macro>
             <macro>
@@ -801,7 +801,7 @@ Template tooling version used: 0.38</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}</macro>
-               <value>0</value>
+               <value>1</value>
                <description>Minimum amaunt of producers for broker. Can be used with broker name as context.</description>
             </macro>
             <macro>
@@ -811,7 +811,7 @@ Template tooling version used: 0.38</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH}</macro>
-               <value>0</value>
+               <value>1</value>
                <description>Minimum amaunt of consumers for destination. Can be used with destination name as context.</description>
             </macro>
             <macro>
@@ -821,7 +821,7 @@ Template tooling version used: 0.38</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH}</macro>
-               <value>0</value>
+               <value>1</value>
                <description>Minimum amaunt of producers for destination. Can be used with destination name as context.</description>
             </macro>
             <macro>
