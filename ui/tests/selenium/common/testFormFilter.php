@@ -225,6 +225,7 @@ class testFormFilter extends CWebTest {
 		$this->page->waitUntilReady();
 		$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
 		if ($this->page->getTitle() === 'Problems') {
+			$this->page->waitUntilReady();
 			$home_form->query('id:show_timeline_0')->one()->asCheckbox()->fill(false);
 		}
 
