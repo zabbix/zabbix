@@ -1049,33 +1049,19 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
 /**
  * @param array  $groupids
  * @param array  $hostids
- * @param string $application
+ * @param array  $tags
+ * @param int    $evaltype
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	if ($application !== '') {
-		$db_applications = API::Application()->get([
-			'output' => ['hostid'],
-			'hostids' => $hostids,
-			'groupids' => $groupids,
-			'search' => ['name' => $application],
-			'preservekeys' => true
-		]);
-
-		$applicationids = array_keys($db_applications);
-		$hostids = array_keys(array_flip(array_column($db_applications, 'hostid')));
-	}
-	else {
-		$applicationids = null;
-	}
+function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?array $tags,
+		int $evaltype = TAG_EVAL_TYPE_AND_OR): array {
 
 	if ($hostids === null) {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
 		$db_hosts = API::Host()->get([
 			'output' => [],
 			'groupids' => $groupids,
-			'applicationids' => $applicationids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
@@ -1084,27 +1070,17 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		$hostids = array_keys($db_hosts);
 	}
 
-	if ($application !== '') {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
-			'selectHosts' => ['name'],
-			'applicationids' => $applicationids,
-			'monitored' => true,
-			'webitems' => true,
-			'preservekeys' => true
-		]);
-	}
-	else {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
-			'selectHosts' => ['name'],
-			'hostids' => $hostids,
-			'groupids' => $groupids,
-			'monitored' => true,
-			'webitems' => true,
-			'preservekeys' => true
-		]);
-	}
+	$db_items = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'selectHosts' => ['name'],
+		'hostids' => $hostids,
+		'groupids' => $groupids,
+		'evaltype' => $evaltype,
+		'tags' => $tags,
+		'monitored' => true,
+		'webitems' => true,
+		'preservekeys' => true
+	]);
 
 	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 
@@ -1117,16 +1093,20 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 }
 
 /**
- * @param array   $groupids
- * @param array   $hostids
- * @param array   $filter
- * @param string  $filter['application']
- * @param int     $filter['show_suppressed']
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param array  $filter
+ * @param array  $filter['tags']
+ * @param int    $filter['evaltype']
+ * @param int    $filter['show_suppressed']
  *
  * @return array
  */
 function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
-	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
+	$tags = (array_key_exists('tags', $filter) && $filter['tags']) ? $filter['tags'] : null;
+	$evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
+
+	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $tags, $evaltype);
 
 	$data = [];
 	$item_counter = [];
@@ -1302,6 +1282,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
  *
  * @return array
  */
+// TODO miks: remove.
 function get_same_applications_for_host(array $applicationIds, $hostId) {
 	$applications = [];
 

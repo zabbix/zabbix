@@ -721,9 +721,10 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
 
 /**
  * @param array  $groupids
- * @param string $application
  * @param array  $host_options
  * @param array  $trigger_options
+ * @param array  $trigger_options['tags']             (optional)
+ * @param int    $trigger_options['evaltype']         (optional)
  * @param array  $problem_options
  * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
@@ -731,8 +732,8 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, string $application, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []): array {
+function getTriggersOverviewData(array $groupids, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []): array {
 
 	$host_options = [
 		'output' => ['hostid', 'name'],
@@ -760,17 +761,7 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 		$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
 		$fetch_hosts = (count($db_hosts) > $limit);
 
-		$applicationids = ($application !== '')
-			? array_keys(API::Application()->get([
-				'output' => [],
-				'hostids' => array_keys($db_hosts),
-				'search' => ['name' => $application],
-				'preservekeys' => true
-			]))
-			: null;
-
 		$db_triggers = getTriggersWithActualSeverity([
-			'applicationids' => $applicationids,
 			'hostids' => array_keys($db_hosts)
 		] + $trigger_options, $problem_options);
 

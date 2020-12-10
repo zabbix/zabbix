@@ -42,7 +42,6 @@ class CScreenDataOverview extends CScreenBase {
 
 		$data = array_combine(['items', 'hosts', 'has_hidden_data'],
 			getDataOverview((array) $groupid, null, [
-				'application' => $this->screenitem['application'],
 				'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE
 			])
 		);

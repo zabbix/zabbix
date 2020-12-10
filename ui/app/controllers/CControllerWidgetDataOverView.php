@@ -36,13 +36,14 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$hostids = $fields['hostids'] ? $fields['hostids'] : null;
+		$fields['tags'] = (array_key_exists('tags', $fields) && $fields['tags']) ? $fields['tags'] : null;
+		$fields['evaltype'] = array_key_exists('evaltype', $fields) ? $fields['evaltype'] : TAG_EVAL_TYPE_AND_OR;
 
 		[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $fields);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groupids' => getSubGroups($fields['groupids']),
-			'application' => $fields['application'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
 			'items' => $items,

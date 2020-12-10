@@ -59,7 +59,6 @@ if (isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])) {
 	$url			= $screenItem['url'];
 	$dynamic		= $screenItem['dynamic'];
 	$sortTriggers	= $screenItem['sort_triggers'];
-	$application	= $screenItem['application'];
 	$maxColumns		= $screenItem['max_columns'];
 }
 else {
@@ -76,7 +75,6 @@ else {
 	$url			= getRequest('url', '');
 	$dynamic		= getRequest('dynamic', SCREEN_SIMPLE_ITEM);
 	$sortTriggers	= getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC);
-	$application	= getRequest('application', '');
 	$maxColumns		= getRequest('max_columns', 3);
 }
 
@@ -600,24 +598,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
-	)
-	->addRow(_('Application'), [
-		(new CTextBox('application', $application))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic", '.
-				json_encode([
-					'srctbl' => 'applications',
-					'srcfld1' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'application',
-					'real_hosts' => '1',
-					'with_applications' => '1'
-				]).', null, this);'
-			)
-	]);
+	);
 }
 
 /*

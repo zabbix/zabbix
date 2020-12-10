@@ -40,7 +40,7 @@ class CScreenTriggersOverview extends CScreenBase {
 		$data = [];
 		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_limit']
-		] = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);
+		] = getTriggersOverviewData((array) $this->screenitem['resourceid']);
 
 		if ($this->screenitem['style'] == STYLE_TOP) {
 			$table = new CPartial('trigoverview.table.top', $data);

@@ -49,7 +49,9 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'only_true' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'filter' => [
 				'value' => ($fields['show'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
-			]
+			],
+			'tags' => (array_key_exists('tags', $fields) && $fields['tags']) ? $fields['tags'] : null,
+			'evaltype' => array_key_exists('evaltype', $fields) ? $fields['evaltype'] : TAG_EVAL_TYPE_AND_OR
 		];
 
 		$problem_options = [
@@ -63,8 +65,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 
 		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_limit']
-		] = getTriggersOverviewData(getSubGroups($fields['groupids']), $fields['application'], $host_options,
-			$trigger_options, $problem_options
+		] = getTriggersOverviewData(getSubGroups($fields['groupids']), $host_options, $trigger_options, $problem_options
 		);
 
 		$this->setResponse(new CControllerResponseData($data));

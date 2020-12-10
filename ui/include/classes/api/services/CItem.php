@@ -61,7 +61,6 @@ class CItem extends CItemGeneral {
 	 * @param array  $options['hostids']
 	 * @param array  $options['groupids']
 	 * @param array  $options['triggerids']
-	 * @param array  $options['applicationids']
 	 * @param bool   $options['status']
 	 * @param bool   $options['templated_items']
 	 * @param bool   $options['editable']
@@ -93,7 +92,6 @@ class CItem extends CItemGeneral {
 			'interfaceids'				=> null,
 			'graphids'					=> null,
 			'triggerids'				=> null,
-			'applicationids'			=> null,
 			'webitems'					=> null,
 			'inherited'					=> null,
 			'templated'					=> null,
@@ -102,8 +100,9 @@ class CItem extends CItemGeneral {
 			'nopermissions'				=> null,
 			'group'						=> null,
 			'host'						=> null,
-			'application'				=> null,
 			'with_triggers'				=> null,
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
+			'tags'						=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -118,7 +117,6 @@ class CItem extends CItemGeneral {
 			'selectTags'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectApplications'		=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'		=> null,
 			'selectPreprocessing'		=> null,
@@ -131,6 +129,8 @@ class CItem extends CItemGeneral {
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+
+		$this->validateGet($options);
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -227,13 +227,11 @@ class CItem extends CItemGeneral {
 			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
-		// applicationids
-		if (!is_null($options['applicationids'])) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where'][] = dbConditionInt('ia.applicationid', $options['applicationids']);
-			$sqlParts['where']['ia'] = 'ia.itemid=i.itemid';
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'i',
+				'item_tag', 'itemid'
+			);
 		}
 
 		// graphids
@@ -349,15 +347,6 @@ class CItem extends CItemGeneral {
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 			$sqlParts['where'][] = ' h.host='.zbx_dbstr($options['host']);
-		}
-
-		// application
-		if (!is_null($options['application'])) {
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where']['aia'] = 'a.applicationid = ia.applicationid';
-			$sqlParts['where']['iai'] = 'ia.itemid=i.itemid';
-			$sqlParts['where'][] = ' a.name='.zbx_dbstr($options['application']);
 		}
 
 		// with_triggers
@@ -985,17 +974,6 @@ class CItem extends CItemGeneral {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$itemids = array_keys($result);
-
-		// adding applications
-		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
-			$applications = API::Application()->get([
-				'output' => $options['selectApplications'],
-				'applicationids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $applications, 'applications');
-		}
 
 		// adding interfaces
 		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {

@@ -576,31 +576,6 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldApplication $field
-	 *
-	 * @return array
-	 */
-	public static function getApplicationSelector($field) {
-		$popup_options = json_encode($field->getFilterParameters());
-
-		if ($field->filter_preselect_host_field) {
-			$popup_options = 'jQuery.extend('.
-				$popup_options.', getFirstMultiselectValue("'.$field->filter_preselect_host_field.'"))';
-		}
-
-		return [
-			(new CTextBox($field->getName(), $field->getValue()))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field))
-				->addClass('simple-textbox'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton($field->getName().'_select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", '.$popup_options.', null, this);')
-		];
-	}
-
-	/**
 	 * Function returns array containing HTML objects filled with given values. Used to generate HTML in widget
 	 * overrides field.
 	 *
