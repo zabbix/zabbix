@@ -77,7 +77,7 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Ensures item label is visible in tab filter navgation.
+	 * Ensures item label is visible in tab filter navigation.
 	 *
 	 * @param {CTabfilterItem} item    Filter item object.
 	 */
