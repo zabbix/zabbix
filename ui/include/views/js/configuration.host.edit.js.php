@@ -612,10 +612,10 @@
 			// If PSK is selected or checked.
 			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
 					|| jQuery('#tls_in_psk').is(':checked')) {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
+				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').show();
 			}
 			else {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
+				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').hide();
 			}
 		});
 
