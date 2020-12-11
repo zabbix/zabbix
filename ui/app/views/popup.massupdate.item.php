@@ -354,7 +354,7 @@ $item_form_list->addRow(
 // Append valuemap to form list.
 $valuemaps_select = (new CSelect('valuemapid'))
 	->setId('valuemapid')
-	->setValue($data['valuemapid'])
+	->setValue(0)
 	->addOption(new CSelectOption(0, _('As is')));
 foreach ($data['valuemaps'] as $valuemap) {
 	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));

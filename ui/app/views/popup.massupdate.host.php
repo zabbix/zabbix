@@ -82,10 +82,10 @@ $hostFormList->addRow(
 // append proxy to form list
 $proxy_select = (new CSelect('proxy_hostid'))
 	->setId('proxy_hostid')
-	->setValue($data['proxy_hostid'])
+	->setValue(0)
 	->addOption(new CSelectOption(0, _('(no proxy)')));
 foreach ($data['proxies'] as $proxie) {
-	$proxy_select->addOption(new CSelectOption($proxie['hostid'], $proxie['host']));
+	$proxy_select->addOption(new CSelectOption($proxie['proxyid'], $proxie['host']));
 }
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))->setLabel(_('Monitored by proxy')),
@@ -96,7 +96,7 @@ $hostFormList->addRow(
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[status]', 'status', _('Original')))->setLabel(_('Status')),
 	(new CSelect('status'))
-		->setValue($data['status'])
+		->setValue(HOST_STATUS_MONITORED)
 		->setId('status')
 		->addOptions(CSelect::createOptionsFromArray([
 			HOST_STATUS_MONITORED => _('Enabled'),
@@ -152,7 +152,7 @@ $ipmiFormList->addRow(
 		->setLabel(_('Authentication algorithm')),
 	(new CSelect('ipmi_authtype'))
 		->setId('ipmi_authtype')
-		->setValue($data['ipmi_authtype'])
+		->setValue(IPMI_AUTHTYPE_DEFAULT)
 		->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
 );
 
@@ -161,7 +161,7 @@ $ipmiFormList->addRow(
 	(new CSelect('ipmi_privilege'))
 		->setId('ipmi_privilege')
 		->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
-		->setValue($data['ipmi_privilege'])
+		->setValue(IPMI_PRIVILEGE_USER)
 );
 
 $ipmiFormList->addRow(
