@@ -573,6 +573,7 @@ form {
 			.link-action {
 				height: 16px;
 				min-width: 1em;
+				@extend %overflow-ellipsis;
 			}
 
 			.separator {
