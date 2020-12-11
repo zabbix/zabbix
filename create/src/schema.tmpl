@@ -314,7 +314,6 @@ FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
-FIELD		|valuemap	|t_varchar(64)	|''	|NOT NULL	|0			|-|valuemap	|name
 FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -349,6 +348,7 @@ FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|valuemap	|t_varchar(64)	|''	|NOT NULL	|0			|-|valuemap	|name
 INDEX		|1		|hostid,key_(1021)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -1883,4 +1883,4 @@ INDEX		|1			|valuemapid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030000	|5030000
+ROW		|5030012	|5030012

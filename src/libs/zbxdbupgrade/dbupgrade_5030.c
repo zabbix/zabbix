@@ -40,6 +40,109 @@ static int	DBpatch_5030000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5030001(void)
+{
+	const ZBX_TABLE table =
+		{"valuemap", "valuemapid", 0,
+			{
+				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030002(void)
+{
+	return DBcreate_index("valuemap", "valuemap_1", "hostid,name", 1);
+}
+
+static int	DBpatch_5030003(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("valuemap", 1, &field);
+}
+
+static int	DBpatch_5030004(void)
+{
+	const ZBX_TABLE table =
+		{"valuemap_mapping", "valuemap_mappingid", 0,
+			{
+				{"valuemap_mappingid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 64, ZBX_TYPE_CHAR,	ZBX_NOTNULL, 0},
+				{"newvalue", "", NULL, NULL, 64, ZBX_TYPE_CHAR,	ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030005(void)
+{
+	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid", 0);
+}
+
+static int	DBpatch_5030006(void)
+{
+	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("valuemap_mapping", 1, &field);
+}
+
+static int	DBpatch_5030007(void)
+{
+	const ZBX_FIELD	field = {"valuemap", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_5030008(void)
+{
+	int	ret;
+
+	ret = DBexecute("update items set valuemap="
+			"(select name from valuemaps where items.valuemapid=valuemaps.valuemapid)"
+			" where valuemapid is not NULL");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030009(void)
+{
+	return DBdrop_foreign_key("items", 3);
+}
+
+static int	DBpatch_5030010(void)
+{
+	return DBdrop_index("items", "items_5");
+}
+
+static int	DBpatch_5030011(void)
+{
+	return DBdrop_field("items", "valuemapid");
+}
+
+static int	DBpatch_5030012(void)
+{
+	return DBdrop_table("mappings");
+}
+
+static int	DBpatch_5030013(void)
+{
+	return DBdrop_table("valuemaps");
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -47,5 +150,18 @@ DBPATCH_START(5030)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(5030000, 0, 1)
+DBPATCH_ADD(5030001, 0, 1)
+DBPATCH_ADD(5030002, 0, 1)
+DBPATCH_ADD(5030003, 0, 1)
+DBPATCH_ADD(5030004, 0, 1)
+DBPATCH_ADD(5030005, 0, 1)
+DBPATCH_ADD(5030006, 0, 1)
+DBPATCH_ADD(5030007, 0, 1)
+DBPATCH_ADD(5030008, 0, 1)
+DBPATCH_ADD(5030009, 0, 1)
+DBPATCH_ADD(5030010, 0, 1)
+DBPATCH_ADD(5030011, 0, 1)
+DBPATCH_ADD(5030012, 0, 1)
+DBPATCH_ADD(5030013, 0, 1)
 
 DBPATCH_END()
