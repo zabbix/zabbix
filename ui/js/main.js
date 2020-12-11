@@ -793,6 +793,10 @@ function getConditionFormula(conditions, evalType) {
 			$row = $(template.evaluate($.extend(data, options.dataCallback(data))));
 
 			for (const name in data) {
+				// Set 'select' value.
+				$row.find('[name$="[' + counter + '][' + name + ']"] option[value="' + data[name] + '"]')
+					.attr('selected', 'selected');
+
 				// Set 'z-select' value.
 				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name])
 					.attr('selected', 'selected');
