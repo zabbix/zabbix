@@ -322,8 +322,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
-				'\0' == *errbuf ? curl_easy_strerror(err) : errbuf));
+		if (CURLE_WRITE_ERROR == err)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "The requested value is too large"));
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
+					'\0' == *errbuf ? curl_easy_strerror(err) : errbuf));
+		}
 		goto clean;
 	}
 
