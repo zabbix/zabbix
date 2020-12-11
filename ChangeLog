@@ -1,11 +1,34 @@
 Changes for 5.0.6rc1
 
 New features:
+.........T [ZBXNEXT-6353] added Morningstar devices monitoring templates (afayantsev)
+.........T [ZBXNEXT-6316] added iTop media (tuskov)
+.........T [ZBXNEXT-6281] added template "Hadoop by HTTP" (mchudinov)
+.........T [ZBXNEXT-6275] added Template "Zookeeper by HTTP" (ychukina)
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
+...G...... [ZBXNEXT-6253] added native system.users.num support to Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6129] added UnitFileState to systemd.unit.discovery for Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-6236] added template "Apache Kafka by JMX" (ychukina)
 ........S. [ZBXNEXT-6247] improved LLD rule processing after reconnecting to proxy (viktors)
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-18517] updated Apache Tomcat by JMX template (tuskov)
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+........S. [ZBX-18655] fixed insert of duplicate key value in interface_snmp for lld host discovery (MVekslers)
+........S. [ZBX-18551] fixed item mapping for LLD overrides (asestakovs)
+........S. [ZBX-18650] fixed logic for processing LLD rule duplicates after reconnecting to proxy (viktors, vso)
+..F....... [ZBX-18588] fixed screen item field "max_columns" being overwritten during import (talbergs)
+..F....... [ZBX-17705] fixed fatal error raised in event notifications when a large amount of notifications is shown (vmaksimovs)
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+..F....... [ZBX-18518] fixed characters counter which were removed in script modal window (gcalenko)
+..F....... [ZBX-18414] fixed override be saved with custom expression even when all rows are removed (miks)
+..F....... [ZBX-18497] fixed macro resolving in http basic authentication username and macros fields (miks)
+..F....... [ZBX-18143] fixed ability to download image of non-existent graph (agriscenko)
+....I..... [ZBX-18359] fixed long data row formatting for OracleDB (kalimulin, viktors)
+...G...... [ZBX-18581] fixed ORA-40478 exception in queries (ychukina)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
 ...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
 A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
 A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)
@@ -1820,8 +1843,13 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.27rc1
 
 New features:
+..F....... [ZBXNEXT-2480] removed autocomplete from fields having sensitive data (gcalenko)
 
 Bug fixes:
+A......... [ZBX-18155] removed positional macros from item names on 'Web monitoring' page (kustalovs, vmurzins)
+A.F....... [ZBX-5842] fixed ability to detect username existence from unsuccessful login message (miks)
+........S. [ZBX-18564] moved taskid calculation to transaction when creating remote command task (wiper)
+.......PS. [ZBX-18487] increased trapper verbosity for DebugLevel=4 when rejecting sender data (akozlovs)
 ...G...... [ZBX-18185] fixed compilation error on Solaris 10 (akozlovs)
 A......... [ZBX-18317] fixed fatal error when updating only discovered triggers and their properties (Ivo)
 A......... [ZBX-18163] fixed deletion of one last remaining main host interface to show error instead of silently deleting the interface (Ivo)

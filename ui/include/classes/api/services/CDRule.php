@@ -886,7 +886,7 @@ class CDRule extends CApiService {
 		if ($actionIds) {
 			DB::update('actions', [
 				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionIds],
+				'where' => ['actionid' => $actionIds]
 			]);
 
 			DB::delete('conditions', [

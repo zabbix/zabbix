@@ -5308,7 +5308,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				]
-			],
+			]
 		];
 
 		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.

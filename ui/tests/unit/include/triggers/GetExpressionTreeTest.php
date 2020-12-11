@@ -87,7 +87,7 @@ class GetExpressionTreeTest extends PHPUnit_Framework_TestCase {
 				$quoted.'>0 and '.$unquoted.'>0 or '.$quoted.'>'.$unquoted.' or '.$quoted.'>0 and '.$unquoted.'>0 or '.
 					$quoted.'>'.$unquoted.' and '.$quoted.'>0',
 				'((E and E) or E or (E and E) or (E and E))'
-			],
+			]
 		];
 	}
 

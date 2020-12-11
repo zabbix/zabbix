@@ -1988,7 +1988,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 					: $items[$items_index]['type'],
 				'source' => ($items_index === false)
 					? $master_items[$master_itemid]['source']
-					: $items[$items_index]['source'],
+					: $items[$items_index]['source']
 			];
 		}
 	}

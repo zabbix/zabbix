@@ -160,7 +160,8 @@ class CControllerAuthenticationUpdate extends CController {
 					'bind_dn' => $config['ldap_bind_dn'],
 					'bind_password' => $config['ldap_bind_password'],
 					'search_attribute' => $config['ldap_search_attribute']
-				]
+				],
+				'detailed_errors' => true
 			]);
 
 			$login = $ldap_validator->validate([

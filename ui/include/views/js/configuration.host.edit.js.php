@@ -111,7 +111,8 @@
 				)
 				->addRow(new CLabel(_('Authentication passphrase'), 'interfaces[#{iface.interfaceid}][details][authpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][authpassphrase]', '#{iface.details.authpassphrase}', false, DB::getFieldLength('interface_snmp', 'authpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete(),
 					'row_snmpv3_authpassphrase_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Privacy protocol'), 'interfaces[#{iface.interfaceid}][details][privprotocol]'),
@@ -123,7 +124,8 @@
 				)
 				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]', '#{iface.details.privpassphrase}', false, DB::getFieldLength('interface_snmp', 'privpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete(),
 					'row_snmpv3_privpassphrase_#{iface.interfaceid}'
 				)
 				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'),

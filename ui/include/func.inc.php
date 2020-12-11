@@ -554,7 +554,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		foreach ([
 			'days' => SEC_PER_DAY,
 			'hours' => SEC_PER_HOUR,
-			'minutes' => SEC_PER_MIN,
+			'minutes' => SEC_PER_MIN
 		] as $part => $sec_per_part) {
 			$v = floor($value_abs_int / $sec_per_part);
 			if ($v > 0) {

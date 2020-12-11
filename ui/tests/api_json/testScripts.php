@@ -545,11 +545,11 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'scriptid' => '6',
-						'name' => 'test',
+						'name' => 'test'
 					],
 					[
 						'scriptid' => '7',
-						'name' => 'test/test/test test',
+						'name' => 'test/test/test test'
 					]
 				],
 				'expected_error' => 'Script menu path "test/test/test test" already used in script name "test".'
@@ -558,11 +558,11 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'scriptid' => '6',
-						'name' => 'test/test',
+						'name' => 'test/test'
 					],
 					[
 						'scriptid' => '7',
-						'name' => 'test',
+						'name' => 'test'
 					]
 				],
 				'expected_error' => 'Script name "test" already used in menu path for script "test/test".'
@@ -1070,7 +1070,7 @@ class testScripts extends CAPITest {
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'script' => [
 					'scriptid' => '6',
-					'name' => 'API script update as zabbix admin',
+					'name' => 'API script update as zabbix admin'
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],
@@ -1104,7 +1104,7 @@ class testScripts extends CAPITest {
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'script' => [
 					'scriptid' => '6',
-					'name' => 'API script update as zabbix user',
+					'name' => 'API script update as zabbix user'
 				],
 				'expected_error' => 'You do not have permission to perform this operation.'
 			],

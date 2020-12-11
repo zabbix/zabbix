@@ -354,7 +354,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty regular expression',
-						'Key' => 'Empty-both-parameters',
+						'Key' => 'Empty-both-parameters'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression']
@@ -367,7 +367,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty pattern of regular expression',
-						'Key' => 'empty-first-parameter',
+						'Key' => 'empty-first-parameter'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_2' => 'test output']
@@ -380,10 +380,10 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty output of regular expression',
-						'Key' => 'empty-second-parameter',
+						'Key' => 'empty-second-parameter'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => 'expression'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression']
 					],
 					'error' => 'Incorrect value for field "params": second parameter is expected.'
 				]
@@ -422,7 +422,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty JavaScript',
-						'Key' => 'item-empty-javascript',
+						'Key' => 'item-empty-javascript'
 					],
 					'preprocessing' => [
 						['type' => 'JavaScript']
@@ -436,7 +436,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Does not match regular expression empty',
-						'Key' => 'does-not-match-regular-expression-empty',
+						'Key' => 'does-not-match-regular-expression-empty'
 					],
 					'preprocessing' => [
 						['type' => 'Does not match regular expression']
@@ -531,7 +531,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat comma',
-						'Key' => 'discard-uncahnged-with-heartbeat-comma',
+						'Key' => 'discard-uncahnged-with-heartbeat-comma'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1,5']
@@ -544,7 +544,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat dot',
-						'Key' => 'discard-uncahnged-with-heartbeat-dot',
+						'Key' => 'discard-uncahnged-with-heartbeat-dot'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
@@ -557,7 +557,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat negative',
-						'Key' => 'discard-uncahnged-with-heartbeat-negative',
+						'Key' => 'discard-uncahnged-with-heartbeat-negative'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '-3']
@@ -1260,7 +1260,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometheus-space-in-pattern'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu usage_metric'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu usage_metric']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -1273,7 +1273,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometheus-digits-in-pattern'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '1223'],
+						['type' => 'Prometheus pattern', 'parameter_1' => '1223']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -2033,7 +2033,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'Right trim',
 				'Left trim',
 				'JavaScript',
-				'Discard unchanged with heartbeat',
+				'Discard unchanged with heartbeat'
 			]), $steps[$i]['on_fail']->isEnabled());
 		}
 
@@ -2068,7 +2068,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'Right trim',
 				'Left trim',
 				'JavaScript',
-				'Discard unchanged with heartbeat',
+				'Discard unchanged with heartbeat'
 			])) {
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 				$this->assertFalse($steps[$i]['on_fail']->isSelected());

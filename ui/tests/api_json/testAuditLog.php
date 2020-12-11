@@ -188,7 +188,7 @@ class testAuditLog extends CAPITest {
 					'output' => ['auditid'],
 					'search' => [
 						'note' => ['[']
-					],
+					]
 				],
 				'expected_result' => [
 					[

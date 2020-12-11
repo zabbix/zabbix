@@ -810,10 +810,16 @@ insert_javascript_for_visibilitybox();
 		this.$form.trimValues(['input[type="text"]']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
+		var form_data = this.$form.serializeJSON();
+		if (Object.keys(form_data.overrides_filters).length <= 1) {
+			delete form_data.overrides_formula;
+			delete form_data.overrides_evaltype;
+		}
+
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: this.$form.serialize(),
+			data: form_data,
 			dataType: 'json',
 			type: 'post'
 		})

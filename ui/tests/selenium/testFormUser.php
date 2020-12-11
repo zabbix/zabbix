@@ -955,7 +955,7 @@ class testFormUser extends CWebTest {
 			'alias' => 'user-zabbix',
 			'old_password' => 'zabbix',
 			'new_password' => 'zabbix_new',
-			'error_message' => 'Login name or password is incorrect.',
+			'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
 			'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
 		];
 		$this->page->login()->open('zabbix.php?action=user.list');

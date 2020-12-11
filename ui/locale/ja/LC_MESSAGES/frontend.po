@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 19:58+0200\n"
-"PO-Revision-Date: 2020-10-05 01:19+0300\n"
+"POT-Creation-Date: 2020-11-20 19:53+0200\n"
+"PO-Revision-Date: 2020-11-16 01:36+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1601853544.000000\n"
+"X-POOTLE-MTIME: 1605483391.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -59,7 +59,7 @@ msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\"のペアで指定してください"
 
 #: include/forms.inc.php:1263
-#: include/views/configuration.host.discovery.edit.php:687
+#: include/views/configuration.host.discovery.edit.php:698
 #: include/views/js/configuration.host.discovery.edit.js.php:90
 #: include/views/js/item.preprocessing.js.php:145
 msgid "$.path.to.node"
@@ -193,7 +193,7 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] "リトライ残り%1$s回"
 
-#: app/views/administration.user.edit.php:377
+#: app/views/administration.user.edit.php:375
 #: include/classes/widgets/CWidgetConfig.php:160
 #: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:312
 #: jsLoader.php:313
@@ -357,8 +357,8 @@ msgstr "<サブメニュー/サブメニュー/...>スクリプト"
 msgid "ADD OVERRIDE"
 msgstr "上書きの追加"
 
-#: app/views/popup.discovery.check.php:112
-#: include/views/js/configuration.host.edit.js.php:120
+#: app/views/popup.discovery.check.php:113
+#: include/views/js/configuration.host.edit.js.php:121
 msgid "AES"
 msgstr "AES"
 
@@ -379,13 +379,6 @@ msgstr "アクセスは拒否されました"
 #: sysmap.php:76
 msgid "Access denied!"
 msgstr "アクセスは拒否されました！"
-
-#: include/classes/api/services/CUser.php:1183
-#: include/classes/api/services/CUser.php:1225
-#, c-format
-msgid "Account is blocked for %1$s second."
-msgid_plural "Account is blocked for %1$s seconds."
-msgstr[0] "アカウントは%1$s秒間ブロックされています。"
 
 #: app/views/monitoring.widget.problems.view.php:64
 #: include/actions.inc.php:157 include/blocks.inc.php:768
@@ -418,13 +411,13 @@ msgstr "確認済の解決済イベント"
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.tags.tab.php:41
 #: app/partials/popup.operations.php:83 app/partials/popup.operations.php:103
-#: app/partials/popup.operations.php:393
+#: app/partials/popup.operations.php:396
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.mediatype.edit.php:98
 #: app/views/administration.mediatype.edit.php:150
 #: app/views/administration.mediatype.list.php:78
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:226
+#: app/views/administration.user.edit.php:224
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.sharing.edit.php:29
 #: app/views/dashboard.sharing.edit.php:50
@@ -443,17 +436,17 @@ msgstr "確認済の解決済イベント"
 #: include/views/configuration.action.edit.php:469
 #: include/views/configuration.correlation.edit.php:53
 #: include/views/configuration.graph.edit.php:362
-#: include/views/configuration.host.discovery.edit.php:476
-#: include/views/configuration.host.discovery.edit.php:575
-#: include/views/configuration.host.discovery.edit.php:725
+#: include/views/configuration.host.discovery.edit.php:487
+#: include/views/configuration.host.discovery.edit.php:586
+#: include/views/configuration.host.discovery.edit.php:736
 #: include/views/configuration.host.edit.php:506
-#: include/views/configuration.host.massupdate.php:226
+#: include/views/configuration.host.massupdate.php:230
 #: include/views/configuration.host.prototype.edit.php:217
-#: include/views/configuration.httpconf.edit.php:206
-#: include/views/configuration.item.edit.php:587
-#: include/views/configuration.item.massupdate.php:243
-#: include/views/configuration.item.prototype.edit.php:553
-#: include/views/configuration.item.prototype.massupdate.php:241
+#: include/views/configuration.httpconf.edit.php:213
+#: include/views/configuration.item.edit.php:596
+#: include/views/configuration.item.massupdate.php:247
+#: include/views/configuration.item.prototype.edit.php:562
+#: include/views/configuration.item.prototype.massupdate.php:245
 #: include/views/configuration.maintenance.edit.php:81
 #: include/views/configuration.services.edit.php:121
 #: include/views/configuration.services.edit.php:174
@@ -583,7 +576,7 @@ msgstr "設定有効期間の終了日時"
 #: app/partials/massupdate.macros.tab.php:77
 #: app/partials/massupdate.macros.tab.php:122
 #: app/partials/popup.operations.php:87 app/partials/popup.operations.php:107
-#: app/partials/popup.operations.php:397
+#: app/partials/popup.operations.php:400
 #: app/views/administration.iconmap.edit.php:102
 #: app/views/administration.iconmap.edit.php:148
 #: app/views/administration.image.edit.php:94
@@ -592,12 +585,12 @@ msgstr "設定有効期間の終了日時"
 #: app/views/administration.mediatype.edit.php:193
 #: app/views/administration.mediatype.edit.php:281
 #: app/views/administration.mediatype.edit.php:347
-#: app/views/administration.proxy.edit.php:133
+#: app/views/administration.proxy.edit.php:134
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:132
-#: app/views/administration.user.edit.php:299
-#: app/views/administration.user.edit.php:476
+#: app/views/administration.user.edit.php:297
+#: app/views/administration.user.edit.php:474
 #: app/views/administration.usergroup.edit.php:142
 #: app/views/administration.usergroup.edit.php:193
 #: app/views/administration.usergroup.edit.php:232
@@ -612,7 +605,7 @@ msgstr "設定有効期間の終了日時"
 #: app/views/monitoring.problem.view.php:223
 #: app/views/monitoring.problem.view.php:270
 #: app/views/popup.condition.common.php:667
-#: app/views/popup.discovery.check.php:135 app/views/popup.httpstep.php:73
+#: app/views/popup.discovery.check.php:137 app/views/popup.httpstep.php:73
 #: app/views/popup.httpstep.php:99 app/views/popup.httpstep.php:123
 #: app/views/popup.httpstep.php:142 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:154 app/views/popup.lldoperation.php:286
@@ -636,38 +629,38 @@ msgstr "設定有効期間の終了日時"
 #: include/views/configuration.graph.edit.php:500
 #: include/views/configuration.host.discovery.edit.php:117
 #: include/views/configuration.host.discovery.edit.php:211
-#: include/views/configuration.host.discovery.edit.php:512
-#: include/views/configuration.host.discovery.edit.php:632
-#: include/views/configuration.host.discovery.edit.php:704
-#: include/views/configuration.host.discovery.edit.php:730
-#: include/views/configuration.host.discovery.edit.php:783
+#: include/views/configuration.host.discovery.edit.php:523
+#: include/views/configuration.host.discovery.edit.php:643
+#: include/views/configuration.host.discovery.edit.php:715
+#: include/views/configuration.host.discovery.edit.php:741
+#: include/views/configuration.host.discovery.edit.php:794
 #: include/views/configuration.host.edit.php:139
-#: include/views/configuration.host.edit.php:766
+#: include/views/configuration.host.edit.php:769
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.list.php:83
 #: include/views/configuration.host.massupdate.php:61
-#: include/views/configuration.host.massupdate.php:220
+#: include/views/configuration.host.massupdate.php:224
 #: include/views/configuration.host.prototype.edit.php:171
 #: include/views/configuration.host.prototype.edit.php:399
-#: include/views/configuration.httpconf.edit.php:126
-#: include/views/configuration.httpconf.edit.php:144
-#: include/views/configuration.httpconf.edit.php:212
-#: include/views/configuration.httpconf.edit.php:261
+#: include/views/configuration.httpconf.edit.php:128
+#: include/views/configuration.httpconf.edit.php:146
+#: include/views/configuration.httpconf.edit.php:219
+#: include/views/configuration.httpconf.edit.php:268
 #: include/views/configuration.item.edit.php:156
 #: include/views/configuration.item.edit.php:250
-#: include/views/configuration.item.edit.php:636
-#: include/views/configuration.item.edit.php:888
+#: include/views/configuration.item.edit.php:645
+#: include/views/configuration.item.edit.php:897
 #: include/views/configuration.item.massupdate.php:136
-#: include/views/configuration.item.massupdate.php:281
-#: include/views/configuration.item.massupdate.php:420
+#: include/views/configuration.item.massupdate.php:285
+#: include/views/configuration.item.massupdate.php:424
 #: include/views/configuration.item.prototype.edit.php:137
 #: include/views/configuration.item.prototype.edit.php:231
-#: include/views/configuration.item.prototype.edit.php:589
-#: include/views/configuration.item.prototype.edit.php:736
+#: include/views/configuration.item.prototype.edit.php:598
+#: include/views/configuration.item.prototype.edit.php:745
 #: include/views/configuration.item.prototype.massupdate.php:132
-#: include/views/configuration.item.prototype.massupdate.php:279
-#: include/views/configuration.item.prototype.massupdate.php:405
-#: include/views/configuration.item.prototype.massupdate.php:480
+#: include/views/configuration.item.prototype.massupdate.php:283
+#: include/views/configuration.item.prototype.massupdate.php:409
+#: include/views/configuration.item.prototype.massupdate.php:484
 #: include/views/configuration.maintenance.edit.php:121
 #: include/views/configuration.maintenance.edit.php:197
 #: include/views/configuration.maintenance.edit.php:268
@@ -825,7 +818,7 @@ msgstr "表示期間 %1$s"
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:610
 #: include/hosts.inc.php:1407 include/items.inc.php:345
 #: include/views/configuration.httpconf.edit.php:104
-#: include/views/js/configuration.host.edit.js.php:163
+#: include/views/js/configuration.host.edit.js.php:165
 msgid "Agent"
 msgstr "エージェント"
 
@@ -892,8 +885,8 @@ msgid "All dashboards"
 msgstr "すべてのダッシュボード"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:335
-#: app/views/administration.user.edit.php:341
+#: app/views/administration.user.edit.php:333
+#: app/views/administration.user.edit.php:339
 msgid "All groups"
 msgstr "すべてのグループ"
 
@@ -943,11 +936,11 @@ msgstr "すべてのテンプレート"
 msgid "Allow manual close"
 msgstr "手動クローズを許可"
 
-#: include/views/configuration.host.discovery.edit.php:535
-#: include/views/configuration.item.edit.php:763
-#: include/views/configuration.item.massupdate.php:385
-#: include/views/configuration.item.prototype.edit.php:659
-#: include/views/configuration.item.prototype.massupdate.php:395
+#: include/views/configuration.host.discovery.edit.php:546
+#: include/views/configuration.item.edit.php:772
+#: include/views/configuration.item.massupdate.php:389
+#: include/views/configuration.item.prototype.edit.php:668
+#: include/views/configuration.item.prototype.massupdate.php:399
 msgid "Allowed hosts"
 msgstr "許可されたホスト"
 
@@ -955,11 +948,11 @@ msgstr "許可されたホスト"
 msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
-#: app/partials/popup.operations.php:376 app/views/popup.lldoverride.php:68
+#: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
 #: include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:117
 #: include/views/configuration.correlation.edit.php:108
-#: include/views/configuration.host.discovery.edit.php:556
+#: include/views/configuration.host.discovery.edit.php:567
 #: include/views/configuration.trigger.prototype.edit.php:143
 #: include/views/configuration.trigger.prototype.edit.php:336
 #: include/views/configuration.triggers.edit.php:164
@@ -967,7 +960,7 @@ msgstr "代わりに、手動でインストールすることができます:"
 msgid "And"
 msgstr "And"
 
-#: app/partials/popup.operations.php:375 app/views/monitoring.host.view.php:52
+#: app/partials/popup.operations.php:378 app/views/monitoring.host.view.php:52
 #: app/views/monitoring.problem.view.php:240
 #: app/views/popup.lldoverride.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
@@ -976,7 +969,7 @@ msgstr "And"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:383
 #: include/views/configuration.action.edit.php:116
 #: include/views/configuration.correlation.edit.php:107
-#: include/views/configuration.host.discovery.edit.php:555
+#: include/views/configuration.host.discovery.edit.php:566
 #: include/views/configuration.host.list.php:53
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/configuration.template.list.php:37
@@ -1045,8 +1038,8 @@ msgid "Application error."
 msgstr "アプリケーションエラー。"
 
 #: app/controllers/CControllerPopupGeneric.php:188
-#: include/views/configuration.item.prototype.edit.php:690
-#: include/views/configuration.item.prototype.massupdate.php:476
+#: include/views/configuration.item.prototype.edit.php:699
+#: include/views/configuration.item.prototype.massupdate.php:480
 msgid "Application prototypes"
 msgstr "アプリケーションプロトタイプ"
 
@@ -1073,12 +1066,12 @@ msgstr "applicationid \"%1$s\"のアプリケーションが存在しません�
 #: include/views/configuration.host.edit.php:235
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:400
-#: include/views/configuration.item.edit.php:798
+#: include/views/configuration.item.edit.php:807
 #: include/views/configuration.item.list.php:73
-#: include/views/configuration.item.massupdate.php:446
-#: include/views/configuration.item.prototype.edit.php:675
+#: include/views/configuration.item.massupdate.php:450
+#: include/views/configuration.item.prototype.edit.php:684
 #: include/views/configuration.item.prototype.list.php:62
-#: include/views/configuration.item.prototype.massupdate.php:401
+#: include/views/configuration.item.prototype.massupdate.php:405
 #: include/views/configuration.template.edit.php:134
 #: include/views/configuration.template.list.php:151
 #: include/views/configuration.template.list.php:238
@@ -1140,12 +1133,12 @@ msgstr "エリアタイプ"
 msgid "Arithmetic"
 msgstr "計算"
 
-#: include/views/configuration.item.edit.php:730
-#: include/views/configuration.item.edit.php:736
-#: include/views/configuration.item.massupdate.php:359
-#: include/views/configuration.item.prototype.edit.php:634
-#: include/views/configuration.item.prototype.edit.php:640
-#: include/views/configuration.item.prototype.massupdate.php:368
+#: include/views/configuration.item.edit.php:739
+#: include/views/configuration.item.edit.php:745
+#: include/views/configuration.item.massupdate.php:363
+#: include/views/configuration.item.prototype.edit.php:643
+#: include/views/configuration.item.prototype.edit.php:649
+#: include/views/configuration.item.prototype.massupdate.php:372
 msgid "As is"
 msgstr "なし"
 
@@ -1269,7 +1262,7 @@ msgstr "AuthNリクエスト"
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
 #: app/views/administration.mediatype.edit.php:83 include/menu.inc.php:167
-#: include/views/configuration.httpconf.edit.php:234
+#: include/views/configuration.httpconf.edit.php:241
 #: include/views/configuration.httpconf.list.php:117
 msgid "Authentication"
 msgstr "認証"
@@ -1280,21 +1273,21 @@ msgstr "認証"
 msgid "Authentication algorithm"
 msgstr "認証アルゴリズム"
 
-#: include/classes/api/services/CUser.php:1569
+#: include/classes/api/services/CUser.php:1573
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "認証に失敗しました：%1$s。"
 
 #: app/partials/popup.operations.php:250
-#: include/views/configuration.host.discovery.edit.php:415
-#: include/views/configuration.item.edit.php:495
+#: include/views/configuration.host.discovery.edit.php:422
+#: include/views/configuration.item.edit.php:500
 #: include/views/configuration.item.massupdate.php:183
-#: include/views/configuration.item.prototype.edit.php:458
+#: include/views/configuration.item.prototype.edit.php:463
 #: include/views/configuration.item.prototype.massupdate.php:179
 msgid "Authentication method"
 msgstr "認証方式"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:315
+#: app/controllers/CControllerAuthenticationUpdate.php:316
 msgid "Authentication method changed"
 msgstr "認証方式を更新しました"
 
@@ -1308,7 +1301,7 @@ msgstr "認証パスフレーズ"
 msgid "Authentication protocol"
 msgstr "認証プロトコル"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:314
+#: app/controllers/CControllerAuthenticationUpdate.php:315
 msgid "Authentication settings updated"
 msgstr "認証の設定を更新しました"
 
@@ -1324,7 +1317,7 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "自動"
 
-#: app/views/administration.user.edit.php:188
+#: app/views/administration.user.edit.php:186
 msgid "Auto-login"
 msgstr "自動ログイン (1ヶ月)"
 
@@ -1332,15 +1325,15 @@ msgstr "自動ログイン (1ヶ月)"
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "自動ログインと自動ログアウトを同時に有効にすることはできません。"
 
-#: app/views/administration.user.edit.php:193
+#: app/views/administration.user.edit.php:191
 msgid "Auto-logout"
 msgstr "自動ログアウト"
 
-#: app/partials/popup.operations.php:364
+#: app/partials/popup.operations.php:367
 #: app/views/administration.miscconfig.edit.php:55
 #: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1344
-#: include/views/configuration.host.edit.php:640
-#: include/views/configuration.host.massupdate.php:206
+#: include/views/configuration.host.edit.php:642
+#: include/views/configuration.host.massupdate.php:210
 #: include/views/configuration.host.prototype.edit.php:322
 msgid "Automatic"
 msgstr "自動"
@@ -1436,9 +1429,9 @@ msgid "Base colour"
 msgstr "基本色"
 
 #: include/httptest.inc.php:28
-#: include/views/configuration.host.discovery.edit.php:282
-#: include/views/configuration.item.edit.php:329
-#: include/views/configuration.item.prototype.edit.php:310
+#: include/views/configuration.host.discovery.edit.php:283
+#: include/views/configuration.item.edit.php:330
+#: include/views/configuration.item.prototype.edit.php:311
 msgid "Basic"
 msgstr "Basic"
 
@@ -1613,12 +1606,12 @@ msgstr "削除できません"
 #: app/views/administration.image.edit.php:96
 #: app/views/administration.mediatype.edit.php:341
 #: app/views/administration.module.edit.php:61
-#: app/views/administration.proxy.edit.php:126
+#: app/views/administration.proxy.edit.php:127
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:126
-#: app/views/administration.user.edit.php:455
-#: app/views/administration.user.edit.php:486
+#: app/views/administration.user.edit.php:453
+#: app/views/administration.user.edit.php:484
 #: app/views/administration.usergroup.edit.php:212
 #: app/views/administration.valuemap.edit.php:92
 #: app/views/js/administration.housekeeping.edit.js.php:76
@@ -1839,11 +1832,11 @@ msgstr "ウィジェットが追加できません: ダッシュボードの空�
 msgid "Cannot add widgets in kiosk mode"
 msgstr "閲覧モードではウィジェットを追加できません"
 
-#: include/classes/validators/CLdapAuthValidator.php:72
+#: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
 msgstr "匿名ではLDAPサーバーにバインドできません。"
 
-#: include/classes/validators/CLdapAuthValidator.php:71
+#: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
 msgstr "LDAPサーバーにバインドできません。"
 
@@ -1883,7 +1876,7 @@ msgstr "トリガーのプロトタイプを複製できません。"
 msgid "Cannot close problem: %1$s."
 msgstr "障害をクローズできません: %1$s。"
 
-#: include/classes/validators/CLdapAuthValidator.php:70
+#: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
 msgstr "LDAPサーバーに接続できません。"
 
@@ -2055,7 +2048,7 @@ msgstr "イメージを削除できません"
 #: include/classes/api/services/CHostInterface.php:622
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたホスト\"%1$s\"のインターフェースを削除できません。"
 
 #: include/classes/api/services/CHost.php:1211
 msgid "Cannot delete inventory."
@@ -2320,7 +2313,7 @@ msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] "Webシナリオを有効にできません"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:213
+#: app/controllers/CControllerPopupTestTriggerExpr.php:211
 msgid "Cannot evaluate expression"
 msgstr "条件式を評価できません"
 
@@ -2790,7 +2783,7 @@ msgstr "アクションを更新できません"
 msgid "Cannot update application"
 msgstr "アプリケーションを更新できません"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:319
+#: app/controllers/CControllerAuthenticationUpdate.php:320
 msgid "Cannot update authentication"
 msgstr "認証の設定を更新できません"
 
@@ -3052,10 +3045,10 @@ msgstr "中央"
 
 #: app/views/administration.proxy.edit.php:95
 #: app/views/administration.proxy.edit.php:103
-#: include/views/configuration.host.edit.php:706
-#: include/views/configuration.host.edit.php:722
-#: include/views/configuration.host.massupdate.php:263
-#: include/views/configuration.host.massupdate.php:271
+#: include/views/configuration.host.edit.php:708
+#: include/views/configuration.host.edit.php:724
+#: include/views/configuration.host.massupdate.php:267
+#: include/views/configuration.host.massupdate.php:275
 #: include/views/configuration.host.prototype.edit.php:335
 #: include/views/configuration.host.prototype.edit.php:351
 msgid "Certificate"
@@ -3084,7 +3077,7 @@ msgstr "PSK変更"
 
 #: app/views/administration.authentication.edit.php:76
 #: app/views/administration.mediatype.edit.php:132
-#: app/views/administration.user.edit.php:129
+#: app/views/administration.user.edit.php:127
 msgid "Change password"
 msgstr "パスワード変更"
 
@@ -3101,9 +3094,9 @@ msgid "Change type"
 msgstr "形式の変更"
 
 #: include/forms.inc.php:184 include/items.inc.php:127
-#: include/views/configuration.item.edit.php:565
+#: include/views/configuration.item.edit.php:574
 #: include/views/configuration.item.massupdate.php:168
-#: include/views/configuration.item.prototype.edit.php:531
+#: include/views/configuration.item.prototype.edit.php:540
 #: include/views/configuration.item.prototype.massupdate.php:164
 msgid "Character"
 msgstr "文字列"
@@ -3176,11 +3169,11 @@ msgstr "DNSサービス起動チェック。DNSがダウン(サーバーが応�
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:659
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr ""
+msgstr "ファイル存在チェック。ファイルが存在しない場合は「0」を返し、指定したタイプのファイルが存在すれば「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:751
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "ホストがICMP pingでアクセス可能かチェック。ICMP pingに失敗した場合は「0」を返し、ICMP pingに成功した場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:467
@@ -3253,9 +3246,9 @@ msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
 msgid "Clear history"
 msgstr "ヒストリを削除"
 
-#: include/views/configuration.httpconf.edit.php:248
-#: include/views/configuration.item.edit.php:872
-#: include/views/configuration.item.edit.php:875
+#: include/views/configuration.httpconf.edit.php:255
+#: include/views/configuration.item.edit.php:881
+#: include/views/configuration.item.edit.php:884
 msgid "Clear history and trends"
 msgstr "ヒストリとトレンドを削除"
 
@@ -3278,7 +3271,7 @@ msgstr "時刻"
 
 #: app/views/administration.iconmap.edit.php:134
 #: app/views/administration.mediatype.edit.php:356
-#: app/views/administration.proxy.edit.php:141
+#: app/views/administration.proxy.edit.php:142
 #: app/views/administration.regex.edit.php:143
 #: app/views/administration.script.edit.php:141
 #: app/views/administration.valuemap.edit.php:112
@@ -3287,13 +3280,13 @@ msgstr "時刻"
 #: include/views/configuration.correlation.edit.php:165
 #: include/views/configuration.discovery.edit.php:141
 #: include/views/configuration.graph.edit.php:492
-#: include/views/configuration.host.discovery.edit.php:763
-#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.discovery.edit.php:774
+#: include/views/configuration.host.edit.php:760
 #: include/views/configuration.hostgroups.edit.php:62
 #: include/views/configuration.host.prototype.edit.php:391
-#: include/views/configuration.httpconf.edit.php:241
-#: include/views/configuration.item.edit.php:858
-#: include/views/configuration.item.prototype.edit.php:725
+#: include/views/configuration.httpconf.edit.php:248
+#: include/views/configuration.item.edit.php:867
+#: include/views/configuration.item.prototype.edit.php:734
 #: include/views/configuration.maintenance.edit.php:260
 #: include/views/configuration.template.edit.php:443
 #: include/views/configuration.trigger.prototype.edit.php:633
@@ -3389,7 +3382,7 @@ msgid "Command"
 msgstr "コマンド"
 
 #: app/controllers/CControllerPopupGeneric.php:374
-#: app/partials/popup.operations.php:312 app/partials/popup.operations.php:323
+#: app/partials/popup.operations.php:315 app/partials/popup.operations.php:326
 #: app/views/administration.script.edit.php:60
 #: app/views/administration.script.list.php:68
 msgid "Commands"
@@ -3480,7 +3473,7 @@ msgstr "ディスカバリルール\"%1$s\"の式\"%3$s\"内で使用されて�
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
 msgstr "\"%1$s\"を上書きするための式\"%3$s\"内の条件\"%2$s\"は定義されていません。"
 
-#: app/partials/popup.operations.php:390
+#: app/partials/popup.operations.php:393
 #: include/views/configuration.action.edit.php:139
 #: include/views/configuration.action.list.php:89
 #: include/views/configuration.correlation.edit.php:120
@@ -3750,12 +3743,12 @@ msgstr ""
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
 msgstr "ソケットファイル(UNIX系OS上)や共有メモリ(Windows上)が使用されるので接続は暗号化されません。"
 
-#: include/views/configuration.host.massupdate.php:294
+#: include/views/configuration.host.massupdate.php:299
 msgid "Connections"
 msgstr "接続"
 
-#: include/views/configuration.host.edit.php:710
-#: include/views/configuration.host.massupdate.php:266
+#: include/views/configuration.host.edit.php:712
+#: include/views/configuration.host.massupdate.php:270
 #: include/views/configuration.host.prototype.edit.php:339
 msgid "Connections from host"
 msgstr "ホストからの接続"
@@ -3764,8 +3757,8 @@ msgstr "ホストからの接続"
 msgid "Connections from proxy"
 msgstr "プロキシからの接続"
 
-#: include/views/configuration.host.edit.php:702
-#: include/views/configuration.host.massupdate.php:259
+#: include/views/configuration.host.edit.php:704
+#: include/views/configuration.host.massupdate.php:263
 #: include/views/configuration.host.prototype.edit.php:331
 msgid "Connections to host"
 msgstr "ホストへの接続"
@@ -3965,11 +3958,11 @@ msgstr "ログの一致行数。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:1123
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr ""
+msgstr "ローレベルディスカバリ処理キュー内にキューイングされた値の数。"
 
 #: include/classes/items/CHelpItems.php:1127
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr ""
+msgstr "保存前処理キュー内にキューイングされた値の数。"
 
 #: include/views/configuration.action.list.php:54
 msgid "Create action"
@@ -4022,10 +4015,10 @@ msgstr "ディスカバリルールの作成(先にホストを選択)"
 #: include/views/configuration.host.prototype.edit.php:120
 #: include/views/configuration.host.prototype.list.php:59
 #: include/views/configuration.host.prototype.list.php:172
-#: include/views/configuration.item.prototype.edit.php:698
+#: include/views/configuration.item.prototype.edit.php:707
 #: include/views/configuration.item.prototype.list.php:63
 #: include/views/configuration.item.prototype.list.php:189
-#: include/views/configuration.item.prototype.massupdate.php:345
+#: include/views/configuration.item.prototype.massupdate.php:349
 #: include/views/configuration.trigger.prototype.edit.php:524
 #: include/views/configuration.trigger.prototype.list.php:58
 #: include/views/configuration.trigger.prototype.list.php:181
@@ -4190,7 +4183,7 @@ msgstr "カスタム"
 #: app/views/popup.lldoverride.php:70
 #: include/views/configuration.action.edit.php:119
 #: include/views/configuration.correlation.edit.php:110
-#: include/views/configuration.host.discovery.edit.php:558
+#: include/views/configuration.host.discovery.edit.php:569
 msgid "Custom expression"
 msgstr "カスタム条件式"
 
@@ -4199,11 +4192,11 @@ msgid "Custom graphs"
 msgstr "カスタムグラフ"
 
 #: app/views/popup.lldoperation.php:163
-#: include/views/configuration.host.discovery.edit.php:518
-#: include/views/configuration.item.edit.php:641
-#: include/views/configuration.item.massupdate.php:287
-#: include/views/configuration.item.prototype.edit.php:594
-#: include/views/configuration.item.prototype.massupdate.php:285
+#: include/views/configuration.host.discovery.edit.php:529
+#: include/views/configuration.item.edit.php:650
+#: include/views/configuration.item.massupdate.php:291
+#: include/views/configuration.item.prototype.edit.php:603
+#: include/views/configuration.item.prototype.massupdate.php:289
 msgid "Custom intervals"
 msgstr "監視間隔のカスタマイズ"
 
@@ -4263,8 +4256,8 @@ msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
 
-#: app/views/popup.discovery.check.php:111
-#: include/views/js/configuration.host.edit.js.php:119
+#: app/views/popup.discovery.check.php:112
+#: include/views/js/configuration.host.edit.js.php:120
 msgid "DES"
 msgstr "DES"
 
@@ -4560,8 +4553,8 @@ msgid "Default theme \"%1$s\"."
 msgstr "デフォルトのテーマ\"%1$s\"。"
 
 #: app/views/popup.lldoperation.php:99
-#: include/views/configuration.item.massupdate.php:233
-#: include/views/configuration.item.prototype.massupdate.php:231
+#: include/views/configuration.item.massupdate.php:237
+#: include/views/configuration.item.prototype.massupdate.php:235
 #: include/views/monitoring.slideconf.edit.php:118
 #: include/views/monitoring.slideconf.list.php:73
 msgid "Delay"
@@ -4576,13 +4569,13 @@ msgstr "遅延時間"
 #: app/views/administration.image.edit.php:79
 #: app/views/administration.mediatype.edit.php:357
 #: app/views/administration.mediatype.list.php:173
-#: app/views/administration.proxy.edit.php:142
+#: app/views/administration.proxy.edit.php:143
 #: app/views/administration.proxy.list.php:175
 #: app/views/administration.regex.edit.php:144
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:142
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:464
+#: app/views/administration.user.edit.php:462
 #: app/views/administration.usergroup.edit.php:221
 #: app/views/administration.usergroup.list.php:228
 #: app/views/administration.user.list.php:210
@@ -4649,7 +4642,7 @@ msgid "Delete dashboard?"
 msgstr "ダッシュボードを削除しますか？"
 
 #: include/views/configuration.discovery.edit.php:142
-#: include/views/configuration.host.discovery.edit.php:775
+#: include/views/configuration.host.discovery.edit.php:786
 msgid "Delete discovery rule?"
 msgstr "ディスカバリルールを削除しますか？"
 
@@ -4680,11 +4673,11 @@ msgstr "選択したWebシナリオのヒストリを削除しますか？"
 msgid "Delete icon map?"
 msgstr "アイコンのマッピングを削除しますか？"
 
-#: include/views/configuration.item.prototype.edit.php:727
+#: include/views/configuration.item.prototype.edit.php:736
 msgid "Delete item prototype?"
 msgstr "アイテムのプロトタイプを削除しますか？"
 
-#: include/views/configuration.item.edit.php:880
+#: include/views/configuration.item.edit.php:889
 msgid "Delete item?"
 msgstr "アイテムを削除しますか？"
 
@@ -4704,7 +4697,7 @@ msgstr "メディアタイプを削除しますか？"
 msgid "Delete missing"
 msgstr "存在しない場合に削除"
 
-#: app/views/administration.proxy.edit.php:144
+#: app/views/administration.proxy.edit.php:145
 msgid "Delete proxy?"
 msgstr "プロキシを削除しますか？"
 
@@ -4774,7 +4767,7 @@ msgstr "選択したホストのプロトタイプを削除しますか？"
 msgid "Delete selected host prototypes?"
 msgstr "選択したホストのプロトタイプを削除しますか？"
 
-#: include/views/configuration.host.edit.php:759
+#: include/views/configuration.host.edit.php:762
 msgid "Delete selected host?"
 msgstr "選択したホストを削除しますか？"
 
@@ -4846,7 +4839,7 @@ msgstr "選択したトリガーのプロトタイプを削除しますか？"
 msgid "Delete selected triggers?"
 msgstr "選択したトリガーを削除しますか？"
 
-#: app/views/administration.user.edit.php:466
+#: app/views/administration.user.edit.php:464
 msgid "Delete selected user?"
 msgstr "選択したユーザーを削除しますか？"
 
@@ -4893,7 +4886,7 @@ msgstr "トリガーのプロトタイプを削除しますか？"
 msgid "Delete trigger?"
 msgstr "トリガーを削除しますか？"
 
-#: include/views/configuration.httpconf.edit.php:253
+#: include/views/configuration.httpconf.edit.php:260
 msgid "Delete web scenario?"
 msgstr "Webシナリオを削除しますか？"
 
@@ -4963,13 +4956,13 @@ msgstr "配布ステータス"
 #: app/views/reports.auditlog.list.php:92
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:235
 #: include/views/configuration.correlation.edit.php:128
-#: include/views/configuration.host.discovery.edit.php:539
+#: include/views/configuration.host.discovery.edit.php:550
 #: include/views/configuration.host.edit.php:191
 #: include/views/configuration.host.massupdate.php:87
-#: include/views/configuration.item.edit.php:831
-#: include/views/configuration.item.massupdate.php:495
-#: include/views/configuration.item.prototype.edit.php:692
-#: include/views/configuration.item.prototype.massupdate.php:518
+#: include/views/configuration.item.edit.php:840
+#: include/views/configuration.item.massupdate.php:499
+#: include/views/configuration.item.prototype.edit.php:701
+#: include/views/configuration.item.prototype.massupdate.php:522
 #: include/views/configuration.maintenance.edit.php:71
 #: include/views/configuration.maintenance.list.php:87
 #: include/views/configuration.template.edit.php:110
@@ -5116,7 +5109,7 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: app/views/administration.miscconfig.edit.php:53
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:236
+#: app/views/administration.user.edit.php:234
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5134,10 +5127,10 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: include/views/configuration.correlation.list.php:50
 #: include/views/configuration.correlation.list.php:100
 #: include/views/configuration.discovery.list.php:50
-#: include/views/configuration.host.edit.php:638
+#: include/views/configuration.host.edit.php:640
 #: include/views/configuration.host.list.php:262
 #: include/views/configuration.host.massupdate.php:114
-#: include/views/configuration.host.massupdate.php:204
+#: include/views/configuration.host.massupdate.php:208
 #: include/views/configuration.host.prototype.edit.php:320
 #: include/views/js/monitoring.sysmaps.js.php:256
 msgid "Disabled"
@@ -5165,9 +5158,9 @@ msgstr "値を破棄"
 #: include/views/configuration.graph.list.php:124
 #: include/views/configuration.host.prototype.edit.php:124
 #: include/views/configuration.host.prototype.list.php:60
-#: include/views/configuration.item.prototype.edit.php:701
+#: include/views/configuration.item.prototype.edit.php:710
 #: include/views/configuration.item.prototype.list.php:64
-#: include/views/configuration.item.prototype.massupdate.php:351
+#: include/views/configuration.item.prototype.massupdate.php:355
 #: include/views/configuration.trigger.prototype.edit.php:525
 #: include/views/configuration.trigger.prototype.list.php:59
 msgid "Discover"
@@ -5234,31 +5227,31 @@ msgstr "ディスカバリオブジェクト"
 
 #: include/classes/items/CHelpItems.php:779
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareクラスターのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareデータストアのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:831
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのデータストアのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:851
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのディスクデバイスのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのファイルシステムのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのディスカバリ、<url> - VMwareサービスURL。JSONで返す"
 
 #: app/controllers/CControllerAuditLogList.php:207
 #: app/views/monitoring.discovery.view.php:49
@@ -5393,18 +5386,18 @@ msgid "Do not calculate"
 msgstr "計算しない"
 
 #: app/views/popup.lldoperation.php:184
-#: include/views/configuration.item.edit.php:672
-#: include/views/configuration.item.massupdate.php:307
-#: include/views/configuration.item.prototype.edit.php:603
-#: include/views/configuration.item.prototype.massupdate.php:305
+#: include/views/configuration.item.edit.php:681
+#: include/views/configuration.item.massupdate.php:311
+#: include/views/configuration.item.prototype.edit.php:612
+#: include/views/configuration.item.prototype.massupdate.php:309
 msgid "Do not keep history"
 msgstr "ヒストリを保存しない"
 
 #: app/views/popup.lldoperation.php:205
-#: include/views/configuration.item.edit.php:709
-#: include/views/configuration.item.massupdate.php:325
-#: include/views/configuration.item.prototype.edit.php:615
-#: include/views/configuration.item.prototype.massupdate.php:323
+#: include/views/configuration.item.edit.php:718
+#: include/views/configuration.item.massupdate.php:329
+#: include/views/configuration.item.prototype.edit.php:624
+#: include/views/configuration.item.prototype.massupdate.php:327
 msgid "Do not keep trends"
 msgstr "トレンドを保存しない"
 
@@ -5585,7 +5578,7 @@ msgstr "各URLの名前は重複できません。同じURL名が使用されて
 msgid "Each item"
 msgstr "アイテムごと"
 
-#: app/views/administration.user.edit.php:284
+#: app/views/administration.user.edit.php:282
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:259
 #: include/views/configuration.action.edit.php:280
@@ -5898,11 +5891,11 @@ msgstr "選択したトリガーを有効にしますか？"
 msgid "Enable selected web scenarios?"
 msgstr "選択したWebシナリオを有効にしますか？"
 
-#: include/views/configuration.host.discovery.edit.php:530
-#: include/views/configuration.item.edit.php:754
-#: include/views/configuration.item.massupdate.php:378
-#: include/views/configuration.item.prototype.edit.php:654
-#: include/views/configuration.item.prototype.massupdate.php:388
+#: include/views/configuration.host.discovery.edit.php:541
+#: include/views/configuration.item.edit.php:763
+#: include/views/configuration.item.massupdate.php:382
+#: include/views/configuration.item.prototype.edit.php:663
+#: include/views/configuration.item.prototype.massupdate.php:392
 msgid "Enable trapping"
 msgstr "トラッピングの有効化"
 
@@ -5913,7 +5906,7 @@ msgstr "トラッピングの有効化"
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:230
+#: app/views/administration.user.edit.php:228
 #: app/views/administration.usergroup.edit.php:78
 #: app/views/administration.usergroup.edit.php:90
 #: app/views/administration.usergroup.edit.php:91
@@ -5937,12 +5930,12 @@ msgstr "トラッピングの有効化"
 #: include/views/configuration.correlation.list.php:108
 #: include/views/configuration.discovery.edit.php:131
 #: include/views/configuration.discovery.list.php:49
-#: include/views/configuration.host.discovery.edit.php:542
+#: include/views/configuration.host.discovery.edit.php:553
 #: include/views/configuration.host.edit.php:211
 #: include/views/configuration.host.list.php:254
 #: include/views/configuration.host.massupdate.php:113
-#: include/views/configuration.httpconf.edit.php:154
-#: include/views/configuration.item.edit.php:838
+#: include/views/configuration.httpconf.edit.php:156
+#: include/views/configuration.item.edit.php:847
 #: include/views/configuration.triggers.edit.php:551
 msgid "Enabled"
 msgstr "有効"
@@ -5951,10 +5944,10 @@ msgstr "有効"
 msgid "Encrypt"
 msgstr "暗号化"
 
-#: app/views/administration.proxy.edit.php:123
+#: app/views/administration.proxy.edit.php:124
 #: app/views/administration.proxy.list.php:74
-#: include/views/configuration.host.edit.php:747
-#: include/views/configuration.host.massupdate.php:316
+#: include/views/configuration.host.edit.php:750
+#: include/views/configuration.host.massupdate.php:321
 #: include/views/configuration.host.prototype.edit.php:376
 msgid "Encryption"
 msgstr "暗号化"
@@ -6118,9 +6111,9 @@ msgstr "WMIクエリを実行して選択したすべてのオブジェクトを
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
 msgstr "WMIクエリを実行して最初の検索結果を返す。リクエストに応じて整数値、浮動小数点値、文字列値、テキスト値を返す。"
 
-#: include/views/configuration.host.discovery.edit.php:766
+#: include/views/configuration.host.discovery.edit.php:777
 #: include/views/configuration.host.discovery.list.php:294
-#: include/views/configuration.item.edit.php:861
+#: include/views/configuration.item.edit.php:870
 #: include/views/configuration.item.list.php:258
 msgid "Execute now"
 msgstr "監視データ取得"
@@ -6138,9 +6131,9 @@ msgid "Executed"
 msgstr "実行"
 
 #: include/items.inc.php:1738
-#: include/views/configuration.host.discovery.edit.php:451
-#: include/views/configuration.item.edit.php:525
-#: include/views/configuration.item.prototype.edit.php:494
+#: include/views/configuration.host.discovery.edit.php:462
+#: include/views/configuration.item.edit.php:534
+#: include/views/configuration.item.prototype.edit.php:503
 msgid "Executed script"
 msgstr "実行するスクリプト"
 
@@ -6479,8 +6472,8 @@ msgid "Filter"
 msgstr "フィルター"
 
 #: app/views/popup.lldoverride.php:163
-#: include/views/configuration.host.discovery.edit.php:637
-#: include/views/configuration.host.discovery.edit.php:754
+#: include/views/configuration.host.discovery.edit.php:648
+#: include/views/configuration.host.discovery.edit.php:765
 msgid "Filters"
 msgstr "フィルター"
 
@@ -6527,12 +6520,12 @@ msgid "Fixed"
 msgstr "固定"
 
 #: app/views/popup.lldoperation.php:118
-#: include/views/configuration.host.discovery.edit.php:481
-#: include/views/configuration.item.edit.php:594
-#: include/views/configuration.item.edit.php:601
-#: include/views/configuration.item.massupdate.php:250
-#: include/views/configuration.item.prototype.edit.php:558
-#: include/views/configuration.item.prototype.massupdate.php:248
+#: include/views/configuration.host.discovery.edit.php:492
+#: include/views/configuration.item.edit.php:603
+#: include/views/configuration.item.edit.php:610
+#: include/views/configuration.item.massupdate.php:254
+#: include/views/configuration.item.prototype.edit.php:567
+#: include/views/configuration.item.prototype.massupdate.php:252
 #: include/views/js/common.item.edit.js.php:33
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:124
 #: include/views/js/configuration.item.massupdate.js.php:36
@@ -6564,8 +6557,8 @@ msgstr "フォントサイズ"
 msgid "Form data"
 msgstr "フォームデータ"
 
-#: include/items.inc.php:1742 include/views/configuration.item.edit.php:543
-#: include/views/configuration.item.prototype.edit.php:510
+#: include/items.inc.php:1742 include/views/configuration.item.edit.php:552
+#: include/views/configuration.item.prototype.edit.php:519
 msgid "Formula"
 msgstr "式"
 
@@ -6612,7 +6605,7 @@ msgstr "開始"
 msgid "Frontend access"
 msgstr "Webインターフェースへのアクセス"
 
-#: app/views/administration.user.edit.php:365
+#: app/views/administration.user.edit.php:363
 msgid "Frontend messaging"
 msgstr "Webインターフェースのアラート表示"
 
@@ -6621,7 +6614,7 @@ msgstr "Webインターフェースのアラート表示"
 msgid "Full"
 msgstr "すべて"
 
-#: include/views/configuration.host.edit.php:758
+#: include/views/configuration.host.edit.php:761
 #: include/views/configuration.template.edit.php:444
 #: include/views/monitoring.screen.edit.php:227
 #: include/views/monitoring.sysmap.edit.php:397
@@ -6690,7 +6683,7 @@ msgstr "値の取得とテスト"
 msgid "Get value from host"
 msgstr "ホストから値を取得"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:50
+#: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: include/triggers.inc.php:1400
 msgid "Given expression is not a macro"
 msgstr "設定した条件式はマクロではありません"
@@ -7087,10 +7080,10 @@ msgstr "HTTP"
 msgid "HTTP agent"
 msgstr "HTTPエージェント"
 
-#: include/views/configuration.host.discovery.edit.php:277
-#: include/views/configuration.httpconf.edit.php:162
-#: include/views/configuration.item.edit.php:324
-#: include/views/configuration.item.prototype.edit.php:305
+#: include/views/configuration.host.discovery.edit.php:278
+#: include/views/configuration.httpconf.edit.php:164
+#: include/views/configuration.item.edit.php:325
+#: include/views/configuration.item.prototype.edit.php:306
 msgid "HTTP authentication"
 msgstr "HTTP認証"
 
@@ -7134,7 +7127,7 @@ msgstr "ハードウェアセンサーの読み込み。 浮動小数点値を�
 #: app/views/popup.httpstep.php:133 app/views/popup.httpstep.php:161
 #: include/views/configuration.host.discovery.edit.php:203
 #: include/views/configuration.host.discovery.edit.php:261
-#: include/views/configuration.httpconf.edit.php:136
+#: include/views/configuration.httpconf.edit.php:138
 #: include/views/configuration.item.edit.php:242
 #: include/views/configuration.item.edit.php:300
 #: include/views/configuration.item.massupdate.php:127
@@ -7160,7 +7153,7 @@ msgid "Height"
 msgstr "高さ"
 
 #: include/menu.inc.php:213 include/menu.inc.php:216
-#: include/views/general.login.php:89
+#: include/views/general.login.php:86
 msgid "Help"
 msgstr "ヘルプ"
 
@@ -7242,8 +7235,8 @@ msgstr "圧縮が有効になっているのでヒストリのクリーンアッ
 msgid "History cleared"
 msgstr "ヒストリを削除しました"
 
-#: include/views/configuration.httpconf.edit.php:249
-#: include/views/configuration.item.edit.php:876
+#: include/views/configuration.httpconf.edit.php:256
+#: include/views/configuration.item.edit.php:885
 msgid "History clearing can take a long time. Continue?"
 msgstr "ヒストリの削除には時間を要します。実行しますか？"
 
@@ -7262,10 +7255,10 @@ msgstr "イベントの履歴"
 
 #: app/controllers/CControllerPopupLldOperation.php:219
 #: app/views/popup.lldoperation.php:179 disc_prototypes.php:148
-#: include/views/configuration.item.edit.php:669
-#: include/views/configuration.item.massupdate.php:303
-#: include/views/configuration.item.prototype.edit.php:600
-#: include/views/configuration.item.prototype.massupdate.php:301 items.php:65
+#: include/views/configuration.item.edit.php:678
+#: include/views/configuration.item.massupdate.php:307
+#: include/views/configuration.item.prototype.edit.php:609
+#: include/views/configuration.item.prototype.massupdate.php:305 items.php:65
 msgid "History storage period"
 msgstr "ヒストリの保存期間"
 
@@ -7311,7 +7304,7 @@ msgstr "横位置"
 #: include/views/configuration.application.list.php:81
 #: include/views/configuration.host.discovery.list.php:171
 #: include/views/configuration.host.edit.php:466
-#: include/views/configuration.host.massupdate.php:304
+#: include/views/configuration.host.massupdate.php:309
 #: include/views/configuration.host.prototype.edit.php:130
 #: include/views/configuration.httpconf.list.php:111
 #: include/views/configuration.item.list.php:65
@@ -7406,7 +7399,7 @@ msgstr[0] "ホストを有効にしました"
 #: app/partials/popup.operations.php:181
 #: app/views/administration.script.edit.php:92
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:332
+#: app/views/administration.user.edit.php:330
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
@@ -7460,7 +7453,7 @@ msgstr "ID \"%1$s\"のホストグループは使用できません。"
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:45
-#: app/partials/popup.operations.php:335
+#: app/partials/popup.operations.php:338
 #: app/views/monitoring.host.view.php:106
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.problem.view.php:103
@@ -7501,11 +7494,11 @@ msgstr "ホストグループ"
 msgid "Host info"
 msgstr "ホスト情報"
 
-#: include/views/configuration.host.discovery.edit.php:387
-#: include/views/configuration.item.edit.php:431
-#: include/views/configuration.item.edit.php:451
+#: include/views/configuration.host.discovery.edit.php:394
+#: include/views/configuration.item.edit.php:436
+#: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.massupdate.php:55
-#: include/views/configuration.item.prototype.edit.php:433
+#: include/views/configuration.item.prototype.edit.php:438
 #: include/views/configuration.item.prototype.massupdate.php:51
 msgid "Host interface"
 msgstr "ホストインターフェース"
@@ -7532,7 +7525,7 @@ msgstr "ホストの障害"
 msgid "Host label type"
 msgstr "ホストのラベルタイプ"
 
-#: include/views/configuration.host.edit.php:624
+#: include/views/configuration.host.edit.php:626
 msgid "Host macros"
 msgstr "ホストマクロ"
 
@@ -7778,9 +7771,9 @@ msgstr "IPアドレスの範囲\"%1$s\"がアドレスの制限\"%2$s\"を超え
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
 #: include/hosts.inc.php:471 include/hosts.inc.php:1410
 #: include/items.inc.php:348 include/views/configuration.host.edit.php:596
-#: include/views/configuration.host.massupdate.php:306
+#: include/views/configuration.host.massupdate.php:311
 #: include/views/configuration.host.prototype.edit.php:298
-#: include/views/js/configuration.host.edit.js.php:166
+#: include/views/js/configuration.host.edit.js.php:168
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -7797,9 +7790,9 @@ msgid "IPMI scripts can be executed only by server."
 msgstr "IPMIスクリプトはサーバーでのみ実行できます。"
 
 #: disc_prototypes.php:114 host_discovery.php:104
-#: include/views/configuration.host.discovery.edit.php:409
-#: include/views/configuration.item.edit.php:476
-#: include/views/configuration.item.prototype.edit.php:453 items.php:127
+#: include/views/configuration.host.discovery.edit.php:416
+#: include/views/configuration.item.edit.php:481
+#: include/views/configuration.item.prototype.edit.php:458 items.php:127
 msgid "IPMI sensor"
 msgstr "IPMIセンサー"
 
@@ -8522,7 +8515,7 @@ msgstr "ディスカバリルール\"%1$s\"のフィルター条件演算子が�
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "アクション\"%1$s\"のフィルター条件タイプが正しくありません。"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:51
+#: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
 #: include/triggers.inc.php:1401
 msgid "Incorrect function is used"
@@ -8614,7 +8607,7 @@ msgstr "トリガー条件式\"%2$s\"に正しくないアイテムキー\"%1$s\
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "スクリーンの要素のアイテムのプロトタイプID\"%1$s\"が正しくありません。"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:52
+#: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1402
 msgid "Incorrect item value type"
 msgstr "アイテムのデータ型が正しくありません"
@@ -8654,7 +8647,7 @@ msgid "Incorrect media type ID."
 msgstr "メディアタイプIDが正しくありません。"
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1282
+#: include/classes/api/services/CUser.php:1284
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "メソッド\"%1$s.%2$s\"が正しくありません。"
@@ -8865,6 +8858,14 @@ msgstr "スクリーン\"%1$s\"の指定されたユーザーグループIDが�
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
+#: include/classes/api/services/CUser.php:1183
+#: include/classes/api/services/CUser.php:1197
+#: include/classes/api/services/CUser.php:1227
+#: include/classes/api/services/CUser.php:1568
+#: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:86
+msgid "Incorrect user name or password or account is temporarily blocked."
+msgstr "不正なユーザー名やパスワードまたはアカウントは一時的にブロックされます。"
+
 #: app/controllers/CControllerPopupGeneric.php:454
 #: include/classes/api/services/CAction.php:811
 #: include/classes/api/services/CAction.php:854
@@ -8971,7 +8972,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:103
 #: app/controllers/CControllerAuthenticationUpdate.php:135
-#: app/controllers/CControllerAuthenticationUpdate.php:201
+#: app/controllers/CControllerAuthenticationUpdate.php:202
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:89
 #: app/controllers/CControllerPopupItemTestGetValue.php:102
@@ -9278,7 +9279,7 @@ msgstr "サービス情報の取得。引数がstateやstartupなら整数値を
 msgid "Inherited"
 msgstr "継承したもの"
 
-#: include/views/configuration.host.edit.php:625
+#: include/views/configuration.host.edit.php:627
 msgid "Inherited and host macros"
 msgstr "継承したマクロとホストマクロ"
 
@@ -9419,15 +9420,15 @@ msgstr "Internet Explorer"
 #: app/partials/monitoring.latest.view.html.php:59
 #: app/views/popup.lldoperation.php:109 include/forms.inc.php:699
 #: include/views/configuration.discovery.list.php:68
-#: include/views/configuration.host.discovery.edit.php:476
+#: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.discovery.list.php:178
 #: include/views/configuration.httpconf.list.php:115
-#: include/views/configuration.item.edit.php:587
+#: include/views/configuration.item.edit.php:596
 #: include/views/configuration.item.list.php:69
-#: include/views/configuration.item.massupdate.php:241
-#: include/views/configuration.item.prototype.edit.php:553
+#: include/views/configuration.item.massupdate.php:245
+#: include/views/configuration.item.prototype.edit.php:562
 #: include/views/configuration.item.prototype.list.php:58
-#: include/views/configuration.item.prototype.massupdate.php:239
+#: include/views/configuration.item.prototype.massupdate.php:243
 #: include/views/configuration.services.edit.php:174
 msgid "Interval"
 msgstr "監視間隔"
@@ -9781,8 +9782,8 @@ msgstr "マクロ\"%1$s\"のタイプが正しくありません。"
 msgid "Invalid user sessions data storage period: %1$s."
 msgstr "ユーザーセッションの保存期間が正しくありません：%1$s。"
 
-#: include/menu.inc.php:59 include/views/configuration.host.edit.php:698
-#: include/views/configuration.host.massupdate.php:315
+#: include/menu.inc.php:59 include/views/configuration.host.edit.php:700
+#: include/views/configuration.host.massupdate.php:320
 #: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:295
 msgid "Inventory"
 msgstr "インベントリ"
@@ -9796,8 +9797,8 @@ msgstr "ホスト\"%1$s\"のインベントリを無効にしました。"
 msgid "Inventory field"
 msgstr "インベントリフィールド"
 
-#: app/partials/popup.operations.php:361
-#: include/views/configuration.host.massupdate.php:200
+#: app/partials/popup.operations.php:364
+#: include/views/configuration.host.massupdate.php:204
 msgid "Inventory mode"
 msgstr "インベントリモード"
 
@@ -9809,9 +9810,9 @@ msgstr "ログイン状態"
 msgid "Issue"
 msgstr "問題"
 
-#: app/views/administration.proxy.edit.php:115
-#: include/views/configuration.host.edit.php:738
-#: include/views/configuration.host.massupdate.php:285
+#: app/views/administration.proxy.edit.php:116
+#: include/views/configuration.host.edit.php:741
+#: include/views/configuration.host.massupdate.php:290
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Issuer"
 msgstr "発行者"
@@ -9836,7 +9837,7 @@ msgstr "イタリア語 (it_IT)"
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
 #: include/forms.inc.php:937 include/views/configuration.graph.edit.php:166
 #: include/views/configuration.graph.edit.php:248
-#: include/views/configuration.item.massupdate.php:503
+#: include/views/configuration.item.massupdate.php:507
 #: include/views/monitoring.screen.constructor.edit.php:245
 #: include/views/monitoring.screen.constructor.edit.php:414
 #: include/views/monitoring.screen.constructor.edit.php:725 items.php:898
@@ -9929,7 +9930,7 @@ msgstr "アイテムの保存前処理の引数が設定されていません：
 #: app/views/popup.lldoperation.php:48
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:937
-#: include/views/configuration.item.prototype.massupdate.php:526
+#: include/views/configuration.item.prototype.massupdate.php:530
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:157
 #: include/views/monitoring.screen.constructor.edit.php:338
 msgid "Item prototype"
@@ -10097,7 +10098,7 @@ msgstr "アイテムを更新しました"
 #: include/classes/widgets/views/widget.hostavail.form.view.php:46
 #: include/hosts.inc.php:468 include/hosts.inc.php:1409
 #: include/items.inc.php:347
-#: include/views/js/configuration.host.edit.js.php:165
+#: include/views/js/configuration.host.edit.js.php:167
 msgid "JMX"
 msgstr "JMX"
 
@@ -10105,10 +10106,10 @@ msgstr "JMX"
 msgid "JMX agent"
 msgstr "JMXエージェント"
 
-#: include/views/configuration.host.discovery.edit.php:422
-#: include/views/configuration.item.edit.php:496
+#: include/views/configuration.host.discovery.edit.php:429
+#: include/views/configuration.item.edit.php:501
 #: include/views/configuration.item.massupdate.php:77
-#: include/views/configuration.item.prototype.edit.php:465
+#: include/views/configuration.item.prototype.edit.php:470
 #: include/views/configuration.item.prototype.massupdate.php:73
 msgid "JMX endpoint"
 msgstr "JMXエンドポイント"
@@ -10152,7 +10153,7 @@ msgid "JSON-rpc version is not specified."
 msgstr "JSON-rpcバージョンがありません。"
 
 #: include/items.inc.php:1797
-#: include/views/configuration.host.discovery.edit.php:652
+#: include/views/configuration.host.discovery.edit.php:663
 msgid "JSONPath"
 msgstr "JSONPath"
 
@@ -10189,15 +10190,15 @@ msgstr "6月"
 msgid "June"
 msgstr "6月"
 
-#: include/views/configuration.host.discovery.edit.php:524
+#: include/views/configuration.host.discovery.edit.php:535
 #: include/views/configuration.host.discovery.list.php:128
 msgid "Keep lost resources period"
 msgstr "存在しなくなったリソースの保持期間"
 
 #: include/httptest.inc.php:30
-#: include/views/configuration.host.discovery.edit.php:284
-#: include/views/configuration.item.edit.php:331
-#: include/views/configuration.item.prototype.edit.php:312
+#: include/views/configuration.host.discovery.edit.php:285
+#: include/views/configuration.item.edit.php:332
+#: include/views/configuration.item.prototype.edit.php:313
 msgid "Kerberos"
 msgstr "Kerberos"
 
@@ -10221,7 +10222,7 @@ msgstr "キー"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "キー\"%1$s\"が<grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]とマッチしません。"
 
-#: app/partials/popup.operations.php:296
+#: app/partials/popup.operations.php:298
 #: include/views/js/common.item.edit.js.php:214
 msgid "Key passphrase"
 msgstr "キーのパスフレーズ"
@@ -10255,7 +10256,7 @@ msgstr "LDAPホスト"
 msgid "LDAP is not configured"
 msgstr "LDAPは設定されていません"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:238
+#: app/controllers/CControllerAuthenticationUpdate.php:239
 msgid "LDAP login successful"
 msgstr "LDAPによるログインが成功しました"
 
@@ -10267,19 +10268,19 @@ msgstr "LDAP認証の設定"
 msgid "LF"
 msgstr "LF"
 
-#: include/views/configuration.host.discovery.edit.php:652
+#: include/views/configuration.host.discovery.edit.php:663
 msgid "LLD macro"
 msgstr "LLDマクロ"
 
-#: include/views/configuration.host.discovery.edit.php:710
-#: include/views/configuration.host.discovery.edit.php:753
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:764
 msgid "LLD macros"
 msgstr "LLDマクロ"
 
-#: app/partials/popup.operations.php:393 app/views/popup.lldoverride.php:101
+#: app/partials/popup.operations.php:396 app/views/popup.lldoverride.php:101
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:56
 #: include/views/configuration.correlation.edit.php:53
-#: include/views/configuration.host.discovery.edit.php:575
+#: include/views/configuration.host.discovery.edit.php:586
 #: include/views/js/monitoring.sysmaps.js.php:134
 #: include/views/js/monitoring.sysmaps.js.php:605
 #: include/views/js/monitoring.sysmaps.js.php:713
@@ -10291,7 +10292,7 @@ msgstr "ラベル"
 msgid "Label location"
 msgstr "ラベルの位置"
 
-#: app/views/administration.user.edit.php:171
+#: app/views/administration.user.edit.php:169
 msgid "Language"
 msgstr "言語"
 
@@ -10564,37 +10565,37 @@ msgstr "リストがありません"
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:631
 msgid "List of block devices and their type. Returns JSON"
-msgstr ""
+msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:539
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr ""
+msgstr "検出されたCPUコアのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:337
 #: include/classes/items/CHelpItems.php:683
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr ""
+msgstr "マウントされたファイルシステムとそのタイプのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:687
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr ""
+msgstr "マウントされたファイルシステムのリスト、それらのタイプ、ディスクスペースとiノードの統計のリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:443
 msgid "List of network interfaces. Returns JSON"
-msgstr ""
+msgstr "ネットワークインターフェースのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:495
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr ""
+msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスの英語でのリスト。JSONで返す"
 
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:491
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr ""
+msgstr "Windowsパフォーマンスカウンターのオブジェクトインスタンスのリスト。JSONで返す"
 
 #: app/views/dashboard.sharing.edit.php:84
 #: include/views/monitoring.screen.edit.php:207
@@ -10664,9 +10665,9 @@ msgid "Location longitude"
 msgstr "経度"
 
 #: include/forms.inc.php:185 include/items.inc.php:129
-#: include/views/configuration.item.edit.php:566
+#: include/views/configuration.item.edit.php:575
 #: include/views/configuration.item.massupdate.php:169
-#: include/views/configuration.item.prototype.edit.php:532
+#: include/views/configuration.item.prototype.edit.php:541
 #: include/views/configuration.item.prototype.massupdate.php:165
 msgid "Log"
 msgstr "ログ"
@@ -10679,10 +10680,10 @@ msgstr "ログローテーションに対応したログファイル監視。ロ
 msgid "Log file monitoring. Returns log"
 msgstr "ログファイル監視。ログ値を返す。"
 
-#: include/views/configuration.item.edit.php:721
-#: include/views/configuration.item.massupdate.php:352
-#: include/views/configuration.item.prototype.edit.php:625
-#: include/views/configuration.item.prototype.massupdate.php:361
+#: include/views/configuration.item.edit.php:730
+#: include/views/configuration.item.massupdate.php:356
+#: include/views/configuration.item.prototype.edit.php:634
+#: include/views/configuration.item.prototype.massupdate.php:365
 msgid "Log time format"
 msgstr "ログの時間の形式"
 
@@ -10697,13 +10698,11 @@ msgstr "マッチしないSNMPトラップをログに記録"
 msgid "Login"
 msgstr "ログイン"
 
-#: include/classes/api/services/CUser.php:1219
+#: include/classes/api/services/CUser.php:1221
 msgid "Login failed."
 msgstr "ログイン失敗。"
 
-#: include/classes/api/services/CUser.php:1196
-#: include/classes/api/services/CUser.php:1565
-#: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:86
+#: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "ログイン名かパスワードが間違っています。"
 
@@ -10764,7 +10763,7 @@ msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値
 #: app/partials/massupdate.macros.tab.php:29
 #: app/views/administration.macros.edit.php:39
 #: app/views/popup.lldoverride.php:101
-#: include/views/configuration.host.discovery.edit.php:575
+#: include/views/configuration.host.discovery.edit.php:586
 msgid "Macro"
 msgstr "マクロ"
 
@@ -10792,8 +10791,8 @@ msgstr "hostmacroid \"%1$s\"を持つマクロは存在しません。"
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
 #: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:902
-#: include/views/configuration.host.edit.php:621
-#: include/views/configuration.host.massupdate.php:308
+#: include/views/configuration.host.edit.php:623
+#: include/views/configuration.host.massupdate.php:313
 #: include/views/configuration.host.prototype.edit.php:303
 #: include/views/configuration.template.edit.php:425
 #: include/views/configuration.template.massupdate.php:162
@@ -10889,11 +10888,11 @@ msgstr "メンテナンス：%1$s"
 msgid "Mandatory parameter is missing."
 msgstr "必須のパラメータが設定されていません。"
 
-#: app/partials/popup.operations.php:363
+#: app/partials/popup.operations.php:366
 #: app/views/administration.miscconfig.edit.php:54
 #: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1343
-#: include/views/configuration.host.edit.php:639
-#: include/views/configuration.host.massupdate.php:205
+#: include/views/configuration.host.edit.php:641
+#: include/views/configuration.host.massupdate.php:209
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Manual"
 msgstr "マニュアル"
@@ -11042,11 +11041,11 @@ msgid "Mass update shapes"
 msgstr "図形の一括更新"
 
 #: disc_prototypes.php:53 host_discovery.php:54
-#: include/views/configuration.host.discovery.edit.php:346
-#: include/views/configuration.item.edit.php:390
-#: include/views/configuration.item.massupdate.php:486
-#: include/views/configuration.item.prototype.edit.php:418
-#: include/views/configuration.item.prototype.massupdate.php:508 items.php:53
+#: include/views/configuration.host.discovery.edit.php:353
+#: include/views/configuration.item.edit.php:395
+#: include/views/configuration.item.massupdate.php:490
+#: include/views/configuration.item.prototype.edit.php:423
+#: include/views/configuration.item.prototype.massupdate.php:512 items.php:53
 msgid "Master item"
 msgstr "マスターアイテム"
 
@@ -11111,8 +11110,8 @@ msgid "May"
 msgstr "5月"
 
 #: app/controllers/CControllerPopupMedia.php:168
-#: app/views/administration.user.edit.php:296
-#: app/views/administration.user.edit.php:311 app/views/popup.media.php:65
+#: app/views/administration.user.edit.php:294
+#: app/views/administration.user.edit.php:309 app/views/popup.media.php:65
 msgid "Media"
 msgstr "メディア"
 
@@ -11158,7 +11157,7 @@ msgstr "メディアタイプがパラメータに設定されていません: %
 msgid "Media type test failed."
 msgstr "メディアタイプのテストに失敗しました。"
 
-#: app/views/js/popup.mediatypetest.edit.js.php:110
+#: app/views/js/popup.mediatypetest.edit.js.php:109
 msgid "Media type test log"
 msgstr "メディアタイプのテストログ"
 
@@ -11238,8 +11237,8 @@ msgstr "メッセージテンプレート"
 msgid "Message templates"
 msgstr "メッセージテンプレート"
 
-#: app/views/administration.user.edit.php:370
-#: app/views/administration.user.edit.php:378
+#: app/views/administration.user.edit.php:368
+#: app/views/administration.user.edit.php:376
 msgid "Message timeout"
 msgstr "表示期間"
 
@@ -11257,7 +11256,7 @@ msgstr "メッセージ/コマンド"
 msgid "Messages"
 msgstr "メッセージ"
 
-#: app/views/administration.user.edit.php:450
+#: app/views/administration.user.edit.php:448
 msgid "Messaging"
 msgstr "アラート表示"
 
@@ -11527,9 +11526,9 @@ msgid "NNTP"
 msgstr "NNTP"
 
 #: include/httptest.inc.php:29
-#: include/views/configuration.host.discovery.edit.php:283
-#: include/views/configuration.item.edit.php:330
-#: include/views/configuration.item.prototype.edit.php:311
+#: include/views/configuration.host.discovery.edit.php:284
+#: include/views/configuration.item.edit.php:331
+#: include/views/configuration.item.prototype.edit.php:312
 msgid "NTLM"
 msgstr "NTLM"
 
@@ -11562,7 +11561,7 @@ msgstr "NTLM"
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
 #: app/partials/monitoring.latest.view.html.php:51
-#: app/partials/popup.operations.php:393
+#: app/partials/popup.operations.php:396
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
 #: app/views/administration.image.edit.php:45
@@ -11618,7 +11617,7 @@ msgstr "NTLM"
 #: include/views/configuration.host.discovery.edit.php:48
 #: include/views/configuration.host.discovery.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:207
-#: include/views/configuration.host.discovery.edit.php:723
+#: include/views/configuration.host.discovery.edit.php:734
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.discovery.list.php:172
 #: include/views/configuration.host.edit.php:474
@@ -11627,14 +11626,14 @@ msgstr "NTLM"
 #: include/views/configuration.hostgroups.list.php:61
 #: include/views/configuration.host.list.php:132
 #: include/views/configuration.host.list.php:183
-#: include/views/configuration.host.massupdate.php:226
+#: include/views/configuration.host.massupdate.php:230
 #: include/views/configuration.host.prototype.edit.php:189
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.list.php:57
 #: include/views/configuration.httpconf.edit.php:63
-#: include/views/configuration.httpconf.edit.php:123
-#: include/views/configuration.httpconf.edit.php:141
-#: include/views/configuration.httpconf.edit.php:199
+#: include/views/configuration.httpconf.edit.php:125
+#: include/views/configuration.httpconf.edit.php:143
+#: include/views/configuration.httpconf.edit.php:206
 #: include/views/configuration.httpconf.list.php:113
 #: include/views/configuration.item.edit.php:71
 #: include/views/configuration.item.edit.php:152
@@ -11741,12 +11740,12 @@ msgid "Never"
 msgstr "未監視"
 
 #: include/views/configuration.httpconf.edit.php:78
-#: include/views/configuration.item.edit.php:787
-#: include/views/configuration.item.prototype.edit.php:663
+#: include/views/configuration.item.edit.php:796
+#: include/views/configuration.item.prototype.edit.php:672
 msgid "New application"
 msgstr "アプリケーションの作成"
 
-#: include/views/configuration.item.prototype.edit.php:677
+#: include/views/configuration.item.prototype.edit.php:686
 msgid "New application prototype"
 msgstr "アプリケーションプロトタイプの作成"
 
@@ -11824,7 +11823,7 @@ msgstr "次のステップ"
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.prototype.list.php:107
 #: include/views/configuration.item.prototype.list.php:154
-#: include/views/configuration.item.prototype.massupdate.php:355
+#: include/views/configuration.item.prototype.massupdate.php:359
 #: include/views/configuration.trigger.prototype.list.php:120
 #: include/views/configuration.trigger.prototype.list.php:135
 #: include/views/configuration.trigger.prototype.massupdate.php:66
@@ -11995,10 +11994,10 @@ msgstr "ディスカバリルールIDが設定されていません。"
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:93
 #: app/views/administration.proxy.edit.php:101
-#: include/views/configuration.host.edit.php:704
-#: include/views/configuration.host.edit.php:714
-#: include/views/configuration.host.massupdate.php:261
-#: include/views/configuration.host.massupdate.php:269
+#: include/views/configuration.host.edit.php:706
+#: include/views/configuration.host.edit.php:716
+#: include/views/configuration.host.massupdate.php:265
+#: include/views/configuration.host.massupdate.php:273
 #: include/views/configuration.host.prototype.edit.php:333
 #: include/views/configuration.host.prototype.edit.php:343
 msgid "No encryption"
@@ -12067,10 +12066,10 @@ msgstr "マップの要素\"%1$s\"にアイコンが存在しません。"
 msgid "No image"
 msgstr "イメージは存在しません"
 
-#: include/views/configuration.host.discovery.edit.php:390
-#: include/views/configuration.item.edit.php:454
+#: include/views/configuration.host.discovery.edit.php:397
+#: include/views/configuration.item.edit.php:459
 #: include/views/configuration.item.massupdate.php:63
-#: include/views/configuration.item.prototype.edit.php:436
+#: include/views/configuration.item.prototype.edit.php:441
 #: include/views/configuration.item.prototype.massupdate.php:59
 #: jsLoader.php:327
 msgid "No interface found"
@@ -12140,8 +12139,8 @@ msgstr "新しいモジュールは見つかりませんでした"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "相関関係\"%1$s\"に実行内容のタイプが定義されていません。"
 
-#: include/classes/api/services/CUser.php:1201
-#: include/classes/api/services/CUser.php:1577
+#: include/classes/api/services/CUser.php:1203
+#: include/classes/api/services/CUser.php:1581
 msgid "No permissions for system access."
 msgstr "システムへのアクセス権がありません。"
 
@@ -12395,17 +12394,17 @@ msgstr "論理値ではないフラグは廃止予定です。"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:160
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
 #: include/profiles.inc.php:276 include/users.inc.php:437
-#: include/views/configuration.host.discovery.edit.php:281
+#: include/views/configuration.host.discovery.edit.php:282
 #: include/views/configuration.host.list.php:353
 #: include/views/configuration.host.list.php:359
 #: include/views/configuration.host.list.php:371
 #: include/views/configuration.host.list.php:374
-#: include/views/configuration.item.edit.php:328
-#: include/views/configuration.item.edit.php:792
-#: include/views/configuration.item.edit.php:806
-#: include/views/configuration.item.prototype.edit.php:309
-#: include/views/configuration.item.prototype.edit.php:670
-#: include/views/configuration.item.prototype.edit.php:685
+#: include/views/configuration.item.edit.php:329
+#: include/views/configuration.item.edit.php:801
+#: include/views/configuration.item.edit.php:815
+#: include/views/configuration.item.prototype.edit.php:310
+#: include/views/configuration.item.prototype.edit.php:679
+#: include/views/configuration.item.prototype.edit.php:694
 #: include/views/configuration.trigger.prototype.edit.php:287
 #: include/views/configuration.triggers.edit.php:311
 #: include/views/js/monitoring.sysmaps.js.php:27
@@ -12663,9 +12662,9 @@ msgid "Numeral systems"
 msgstr "数値変換"
 
 #: include/forms.inc.php:183 include/items.inc.php:125
-#: include/triggers.inc.php:1853 include/views/configuration.item.edit.php:564
+#: include/triggers.inc.php:1853 include/views/configuration.item.edit.php:573
 #: include/views/configuration.item.massupdate.php:167
-#: include/views/configuration.item.prototype.edit.php:530
+#: include/views/configuration.item.prototype.edit.php:539
 #: include/views/configuration.item.prototype.massupdate.php:163
 msgid "Numeric (float)"
 msgstr "数値 (浮動小数)"
@@ -12675,9 +12674,9 @@ msgid "Numeric (integer)"
 msgstr "数値 (整数)"
 
 #: include/forms.inc.php:182 include/items.inc.php:123
-#: include/views/configuration.item.edit.php:563
+#: include/views/configuration.item.edit.php:572
 #: include/views/configuration.item.massupdate.php:166
-#: include/views/configuration.item.prototype.edit.php:529
+#: include/views/configuration.item.prototype.edit.php:538
 #: include/views/configuration.item.prototype.massupdate.php:162
 msgid "Numeric (unsigned)"
 msgstr "数値 (整数)"
@@ -12792,7 +12791,7 @@ msgstr "ON"
 msgid "On status change triggers blink for"
 msgstr "ステータスが変化したイベントの点滅期間"
 
-#: app/views/administration.user.edit.php:376
+#: app/views/administration.user.edit.php:374
 msgid "Once"
 msgstr "一度だけ"
 
@@ -13005,7 +13004,7 @@ msgstr "オペレータ"
 msgid "Options"
 msgstr "オプション"
 
-#: app/partials/popup.operations.php:377 app/views/monitoring.host.view.php:53
+#: app/partials/popup.operations.php:380 app/views/monitoring.host.view.php:53
 #: app/views/monitoring.problem.view.php:241
 #: app/views/popup.lldoverride.php:69
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
@@ -13015,7 +13014,7 @@ msgstr "オプション"
 #: include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:118
 #: include/views/configuration.correlation.edit.php:109
-#: include/views/configuration.host.discovery.edit.php:557
+#: include/views/configuration.host.discovery.edit.php:568
 #: include/views/configuration.host.list.php:54
 #: include/views/configuration.maintenance.edit.php:144
 #: include/views/configuration.template.list.php:38
@@ -13041,11 +13040,11 @@ msgstr "Or"
 #: include/views/configuration.host.massupdate.php:168
 #: include/views/configuration.host.massupdate.php:175
 #: include/views/configuration.host.massupdate.php:182
-#: include/views/configuration.host.massupdate.php:189
-#: include/views/configuration.host.massupdate.php:199
-#: include/views/configuration.host.massupdate.php:215
-#: include/views/configuration.host.massupdate.php:248
-#: include/views/configuration.host.massupdate.php:293
+#: include/views/configuration.host.massupdate.php:191
+#: include/views/configuration.host.massupdate.php:203
+#: include/views/configuration.host.massupdate.php:219
+#: include/views/configuration.host.massupdate.php:252
+#: include/views/configuration.host.massupdate.php:298
 #: include/views/configuration.item.massupdate.php:44
 #: include/views/configuration.item.massupdate.php:54
 #: include/views/configuration.item.massupdate.php:76
@@ -13057,21 +13056,21 @@ msgstr "Or"
 #: include/views/configuration.item.massupdate.php:175
 #: include/views/configuration.item.massupdate.php:182
 #: include/views/configuration.item.massupdate.php:192
-#: include/views/configuration.item.massupdate.php:199
-#: include/views/configuration.item.massupdate.php:206
-#: include/views/configuration.item.massupdate.php:213
-#: include/views/configuration.item.massupdate.php:223
-#: include/views/configuration.item.massupdate.php:295
-#: include/views/configuration.item.massupdate.php:302
-#: include/views/configuration.item.massupdate.php:320
-#: include/views/configuration.item.massupdate.php:344
-#: include/views/configuration.item.massupdate.php:351
-#: include/views/configuration.item.massupdate.php:366
-#: include/views/configuration.item.massupdate.php:377
-#: include/views/configuration.item.massupdate.php:384
-#: include/views/configuration.item.massupdate.php:445
-#: include/views/configuration.item.massupdate.php:485
-#: include/views/configuration.item.massupdate.php:494
+#: include/views/configuration.item.massupdate.php:201
+#: include/views/configuration.item.massupdate.php:208
+#: include/views/configuration.item.massupdate.php:215
+#: include/views/configuration.item.massupdate.php:227
+#: include/views/configuration.item.massupdate.php:299
+#: include/views/configuration.item.massupdate.php:306
+#: include/views/configuration.item.massupdate.php:324
+#: include/views/configuration.item.massupdate.php:348
+#: include/views/configuration.item.massupdate.php:355
+#: include/views/configuration.item.massupdate.php:370
+#: include/views/configuration.item.massupdate.php:381
+#: include/views/configuration.item.massupdate.php:388
+#: include/views/configuration.item.massupdate.php:449
+#: include/views/configuration.item.massupdate.php:489
+#: include/views/configuration.item.massupdate.php:498
 #: include/views/configuration.item.prototype.massupdate.php:40
 #: include/views/configuration.item.prototype.massupdate.php:50
 #: include/views/configuration.item.prototype.massupdate.php:72
@@ -13083,23 +13082,23 @@ msgstr "Or"
 #: include/views/configuration.item.prototype.massupdate.php:171
 #: include/views/configuration.item.prototype.massupdate.php:178
 #: include/views/configuration.item.prototype.massupdate.php:188
-#: include/views/configuration.item.prototype.massupdate.php:195
-#: include/views/configuration.item.prototype.massupdate.php:202
-#: include/views/configuration.item.prototype.massupdate.php:209
-#: include/views/configuration.item.prototype.massupdate.php:219
-#: include/views/configuration.item.prototype.massupdate.php:293
-#: include/views/configuration.item.prototype.massupdate.php:300
-#: include/views/configuration.item.prototype.massupdate.php:318
-#: include/views/configuration.item.prototype.massupdate.php:344
-#: include/views/configuration.item.prototype.massupdate.php:350
-#: include/views/configuration.item.prototype.massupdate.php:360
-#: include/views/configuration.item.prototype.massupdate.php:376
-#: include/views/configuration.item.prototype.massupdate.php:387
-#: include/views/configuration.item.prototype.massupdate.php:394
-#: include/views/configuration.item.prototype.massupdate.php:400
-#: include/views/configuration.item.prototype.massupdate.php:475
-#: include/views/configuration.item.prototype.massupdate.php:507
-#: include/views/configuration.item.prototype.massupdate.php:517
+#: include/views/configuration.item.prototype.massupdate.php:197
+#: include/views/configuration.item.prototype.massupdate.php:204
+#: include/views/configuration.item.prototype.massupdate.php:211
+#: include/views/configuration.item.prototype.massupdate.php:223
+#: include/views/configuration.item.prototype.massupdate.php:297
+#: include/views/configuration.item.prototype.massupdate.php:304
+#: include/views/configuration.item.prototype.massupdate.php:322
+#: include/views/configuration.item.prototype.massupdate.php:348
+#: include/views/configuration.item.prototype.massupdate.php:354
+#: include/views/configuration.item.prototype.massupdate.php:364
+#: include/views/configuration.item.prototype.massupdate.php:380
+#: include/views/configuration.item.prototype.massupdate.php:391
+#: include/views/configuration.item.prototype.massupdate.php:398
+#: include/views/configuration.item.prototype.massupdate.php:404
+#: include/views/configuration.item.prototype.massupdate.php:479
+#: include/views/configuration.item.prototype.massupdate.php:511
+#: include/views/configuration.item.prototype.massupdate.php:521
 #: include/views/configuration.template.massupdate.php:49
 #: include/views/configuration.template.massupdate.php:78
 #: include/views/configuration.template.massupdate.php:125
@@ -13138,8 +13137,8 @@ msgstr "その他"
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "ネットワークインターフェースの送信統計。整数値を返す。"
 
-#: include/views/configuration.item.edit.php:661
-#: include/views/configuration.item.edit.php:697
+#: include/views/configuration.item.edit.php:670
+#: include/views/configuration.item.edit.php:706
 msgctxt "item_form"
 msgid "Overridden by"
 msgstr "次で上書き"
@@ -13163,8 +13162,8 @@ msgstr "\"%1$s\"という名前の上書きはすでに存在します。"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:415
 #: include/classes/widgets/views/widget.svggraph.form.view.php:294
-#: include/views/configuration.host.discovery.edit.php:739
-#: include/views/configuration.host.discovery.edit.php:755
+#: include/views/configuration.host.discovery.edit.php:750
+#: include/views/configuration.host.discovery.edit.php:766
 msgid "Overrides"
 msgstr "上書き"
 
@@ -13185,7 +13184,7 @@ msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
 #: include/classes/setup/CFrontendSetup.php:552
-#: include/classes/validators/CLdapAuthValidator.php:69
+#: include/classes/validators/CLdapAuthValidator.php:76
 msgid "PHP LDAP extension missing."
 msgstr "PHP LDAPモジュールが存在しません。"
 
@@ -13371,15 +13370,15 @@ msgstr "障害イベント生成モード"
 #: app/views/administration.proxy.edit.php:110
 #: app/views/administration.proxy.list.php:124
 #: app/views/administration.proxy.list.php:137
-#: include/views/configuration.host.edit.php:705
-#: include/views/configuration.host.edit.php:718
-#: include/views/configuration.host.edit.php:733
+#: include/views/configuration.host.edit.php:707
+#: include/views/configuration.host.edit.php:720
+#: include/views/configuration.host.edit.php:735
 #: include/views/configuration.host.list.php:362
 #: include/views/configuration.host.list.php:378
 #: include/views/configuration.host.list.php:381
-#: include/views/configuration.host.massupdate.php:262
-#: include/views/configuration.host.massupdate.php:270
-#: include/views/configuration.host.massupdate.php:280
+#: include/views/configuration.host.massupdate.php:266
+#: include/views/configuration.host.massupdate.php:274
+#: include/views/configuration.host.massupdate.php:284
 #: include/views/configuration.host.prototype.edit.php:334
 #: include/views/configuration.host.prototype.edit.php:347
 #: include/views/configuration.host.prototype.edit.php:360
@@ -13388,8 +13387,8 @@ msgstr "PSK"
 
 #: app/views/administration.autoreg.edit.php:56
 #: app/views/administration.proxy.edit.php:105
-#: include/views/configuration.host.edit.php:727
-#: include/views/configuration.host.massupdate.php:274
+#: include/views/configuration.host.edit.php:729
+#: include/views/configuration.host.massupdate.php:278
 #: include/views/configuration.host.prototype.edit.php:355
 msgid "PSK identity"
 msgstr "PSKアイデンティティ"
@@ -13481,39 +13480,39 @@ msgid "Passive"
 msgstr "パッシブ"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:98
-#: app/partials/popup.operations.php:245 app/partials/popup.operations.php:288
+#: app/partials/popup.operations.php:245 app/partials/popup.operations.php:289
 #: app/views/administration.mediatype.edit.php:199
-#: app/views/administration.user.edit.php:112
-#: app/views/administration.user.edit.php:128 disc_prototypes.php:232
+#: app/views/administration.user.edit.php:111
+#: app/views/administration.user.edit.php:126 disc_prototypes.php:232
 #: host_discovery.php:184 httpconf.php:64
 #: include/classes/setup/CSetupWizard.php:262
-#: include/views/configuration.host.discovery.edit.php:299
-#: include/views/configuration.host.discovery.edit.php:417
-#: include/views/configuration.host.discovery.edit.php:446
-#: include/views/configuration.host.edit.php:604
-#: include/views/configuration.host.massupdate.php:190
+#: include/views/configuration.host.discovery.edit.php:302
+#: include/views/configuration.host.discovery.edit.php:424
+#: include/views/configuration.host.discovery.edit.php:455
+#: include/views/configuration.host.edit.php:605
+#: include/views/configuration.host.massupdate.php:192
 #: include/views/configuration.host.prototype.edit.php:294
-#: include/views/configuration.httpconf.edit.php:170
-#: include/views/configuration.item.edit.php:345
-#: include/views/configuration.item.edit.php:483
-#: include/views/configuration.item.edit.php:520
+#: include/views/configuration.httpconf.edit.php:174
+#: include/views/configuration.item.edit.php:347
+#: include/views/configuration.item.edit.php:488
+#: include/views/configuration.item.edit.php:527
 #: include/views/configuration.item.massupdate.php:186
-#: include/views/configuration.item.massupdate.php:214
-#: include/views/configuration.item.prototype.edit.php:326
-#: include/views/configuration.item.prototype.edit.php:460
-#: include/views/configuration.item.prototype.edit.php:489
+#: include/views/configuration.item.massupdate.php:216
+#: include/views/configuration.item.prototype.edit.php:328
+#: include/views/configuration.item.prototype.edit.php:465
+#: include/views/configuration.item.prototype.edit.php:496
 #: include/views/configuration.item.prototype.massupdate.php:182
-#: include/views/configuration.item.prototype.massupdate.php:210
-#: include/views/general.login.php:74
+#: include/views/configuration.item.prototype.massupdate.php:212
+#: include/views/general.login.php:73
 #: include/views/js/common.item.edit.js.php:217 items.php:221
 msgid "Password"
 msgstr "パスワード"
 
-#: app/views/administration.user.edit.php:119
+#: app/views/administration.user.edit.php:118
 msgid "Password (once again)"
 msgstr "パスワード(確認)"
 
-#: app/views/administration.user.edit.php:125
+#: app/views/administration.user.edit.php:123
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "パスワードは内部認証タイプ以外には必須ではありません。"
 
@@ -13560,11 +13559,11 @@ msgid "Performs a DNS query. Returns character string with the required type of 
 msgstr "DNSクエリの実行。要求した情報のタイプの文字列を返す。"
 
 #: app/views/popup.lldoperation.php:110 app/views/report.services.php:37
-#: include/views/configuration.host.discovery.edit.php:476
-#: include/views/configuration.item.edit.php:587
-#: include/views/configuration.item.massupdate.php:242
-#: include/views/configuration.item.prototype.edit.php:553
-#: include/views/configuration.item.prototype.massupdate.php:240
+#: include/views/configuration.host.discovery.edit.php:487
+#: include/views/configuration.item.edit.php:596
+#: include/views/configuration.item.massupdate.php:246
+#: include/views/configuration.item.prototype.edit.php:562
+#: include/views/configuration.item.prototype.massupdate.php:244
 #: include/views/configuration.maintenance.edit.php:81 report4.php:113
 #: srv_status.php:169
 msgid "Period"
@@ -13582,9 +13581,9 @@ msgid "Periods"
 msgstr "監視対象のメンテナンス期間"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:332
-#: app/views/administration.user.edit.php:352
-#: app/views/administration.user.edit.php:359
+#: app/views/administration.user.edit.php:330
+#: app/views/administration.user.edit.php:350
+#: app/views/administration.user.edit.php:357
 #: app/views/administration.usergroup.edit.php:104
 #: app/views/administration.usergroup.edit.php:155
 #: app/views/administration.usergroup.edit.php:206
@@ -13599,7 +13598,7 @@ msgstr "監視対象のメンテナンス期間"
 msgid "Permissions"
 msgstr "権限"
 
-#: app/views/administration.user.edit.php:357
+#: app/views/administration.user.edit.php:355
 msgid "Permissions can be assigned for user groups only."
 msgstr "権限はユーザーグループにのみ割り当てることができます。"
 
@@ -13620,12 +13619,12 @@ msgstr "配置アルゴリズム"
 msgid "Plain text"
 msgstr "プレーンテキスト"
 
-#: app/views/administration.user.edit.php:394
-#: app/views/administration.user.edit.php:426
+#: app/views/administration.user.edit.php:392
+#: app/views/administration.user.edit.php:424
 msgid "Play"
 msgstr "再生"
 
-#: app/views/administration.user.edit.php:374
+#: app/views/administration.user.edit.php:372
 msgid "Play sound"
 msgstr "サウンド再生"
 
@@ -13677,13 +13676,13 @@ msgstr "ポイント"
 msgid "Polish (pl_PL)"
 msgstr "ポーランド語 (pl_PL)"
 
-#: include/views/configuration.item.edit.php:826
+#: include/views/configuration.item.edit.php:835
 msgid "Populates host inventory field"
 msgstr "ホストインベントリフィールドの自動設定"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:160
-#: app/partials/popup.operations.php:305
+#: app/partials/popup.operations.php:308
 #: app/views/administration.authentication.edit.php:96
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
@@ -13723,20 +13722,20 @@ msgstr "POSTデータの形式"
 msgid "Pre-installation summary"
 msgstr "インストール事前準備概要"
 
-#: include/views/configuration.host.discovery.edit.php:747
-#: include/views/configuration.item.edit.php:845
-#: include/views/configuration.item.massupdate.php:504
-#: include/views/configuration.item.prototype.edit.php:710
-#: include/views/configuration.item.prototype.massupdate.php:527
+#: include/views/configuration.host.discovery.edit.php:758
+#: include/views/configuration.item.edit.php:854
+#: include/views/configuration.item.massupdate.php:508
+#: include/views/configuration.item.prototype.edit.php:719
+#: include/views/configuration.item.prototype.massupdate.php:531
 msgid "Preprocessing"
 msgstr "保存前処理"
 
 #: app/views/popup.itemtestedit.view.php:229
-#: include/views/configuration.host.discovery.edit.php:749
-#: include/views/configuration.item.edit.php:847
-#: include/views/configuration.item.massupdate.php:224
-#: include/views/configuration.item.prototype.edit.php:712
-#: include/views/configuration.item.prototype.massupdate.php:220
+#: include/views/configuration.host.discovery.edit.php:760
+#: include/views/configuration.item.edit.php:856
+#: include/views/configuration.item.massupdate.php:228
+#: include/views/configuration.item.prototype.edit.php:721
+#: include/views/configuration.item.prototype.massupdate.php:224
 msgid "Preprocessing steps"
 msgstr "保存前処理の設定"
 
@@ -13751,7 +13750,7 @@ msgstr "前の時間"
 
 #: app/views/administration.iconmap.edit.php:79
 #: app/views/administration.iconmap.edit.php:111
-#: app/views/js/administration.iconmap.edit.js.php:47
+#: app/views/js/administration.iconmap.edit.js.php:45
 #: include/views/configuration.graph.edit.php:472
 msgid "Preview"
 msgstr "プレビュー"
@@ -13804,13 +13803,13 @@ msgstr "プライマリPOC電話番号B"
 msgid "Primary POC screen name"
 msgstr "プライマリPOCスクリーン名"
 
-#: app/views/popup.discovery.check.php:116
-#: include/views/js/configuration.host.edit.js.php:124
+#: app/views/popup.discovery.check.php:117
+#: include/views/js/configuration.host.edit.js.php:125
 msgid "Privacy passphrase"
 msgstr "プライバシーパスフレーズ"
 
-#: app/views/popup.discovery.check.php:109
-#: include/views/js/configuration.host.edit.js.php:117
+#: app/views/popup.discovery.check.php:110
+#: include/views/js/configuration.host.edit.js.php:118
 msgid "Privacy protocol"
 msgstr "プライバシープロトコル"
 
@@ -13821,12 +13820,12 @@ msgstr "プライバシープロトコル"
 msgid "Private"
 msgstr "非公開"
 
-#: app/partials/popup.operations.php:278
-#: include/views/configuration.host.discovery.edit.php:440
-#: include/views/configuration.item.edit.php:514
-#: include/views/configuration.item.massupdate.php:207
-#: include/views/configuration.item.prototype.edit.php:483
-#: include/views/configuration.item.prototype.massupdate.php:203
+#: app/partials/popup.operations.php:279
+#: include/views/configuration.host.discovery.edit.php:449
+#: include/views/configuration.item.edit.php:521
+#: include/views/configuration.item.massupdate.php:209
+#: include/views/configuration.item.prototype.edit.php:490
+#: include/views/configuration.item.prototype.massupdate.php:205
 msgid "Private key file"
 msgstr "秘密鍵ファイル"
 
@@ -13984,7 +13983,7 @@ msgstr "プロキシ"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/views/administration.proxy.edit.php:87
-#: app/views/administration.proxy.edit.php:122
+#: app/views/administration.proxy.edit.php:123
 #: app/views/popup.condition.common.php:507
 #: app/views/popup.itemtestedit.view.php:108 include/actions.inc.php:63
 #: include/views/configuration.discovery.list.php:67
@@ -14056,20 +14055,20 @@ msgid "Public"
 msgstr "公開"
 
 #: app/partials/popup.operations.php:246
-#: include/views/configuration.host.discovery.edit.php:418
-#: include/views/configuration.item.edit.php:484
+#: include/views/configuration.host.discovery.edit.php:425
+#: include/views/configuration.item.edit.php:489
 #: include/views/configuration.item.massupdate.php:187
-#: include/views/configuration.item.prototype.edit.php:461
+#: include/views/configuration.item.prototype.edit.php:466
 #: include/views/configuration.item.prototype.massupdate.php:183
 msgid "Public key"
 msgstr "公開鍵"
 
-#: app/partials/popup.operations.php:268
-#: include/views/configuration.host.discovery.edit.php:433
-#: include/views/configuration.item.edit.php:507
-#: include/views/configuration.item.massupdate.php:200
-#: include/views/configuration.item.prototype.edit.php:476
-#: include/views/configuration.item.prototype.massupdate.php:196
+#: app/partials/popup.operations.php:269
+#: include/views/configuration.host.discovery.edit.php:442
+#: include/views/configuration.item.edit.php:514
+#: include/views/configuration.item.massupdate.php:202
+#: include/views/configuration.item.prototype.edit.php:483
+#: include/views/configuration.item.prototype.massupdate.php:198
 msgid "Public key file"
 msgstr "公開鍵ファイル"
 
@@ -14192,7 +14191,7 @@ msgstr "受信者 (降順)"
 msgid "Recipients"
 msgstr "受信者"
 
-#: app/views/administration.user.edit.php:388
+#: app/views/administration.user.edit.php:386
 #: include/classes/screens/CScreenProblem.php:1083
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14232,7 +14231,7 @@ msgstr "復旧時刻"
 msgid "Rectangle"
 msgstr "長方形"
 
-#: app/views/administration.user.edit.php:203
+#: app/views/administration.user.edit.php:201
 msgid "Refresh"
 msgstr "リフレッシュ"
 
@@ -14260,7 +14259,7 @@ msgstr "Regular"
 
 #: app/controllers/CControllerAuditLogList.php:210
 #: app/views/popup.lldoverride.php:101 include/items.inc.php:1773
-#: include/views/configuration.host.discovery.edit.php:575
+#: include/views/configuration.host.discovery.edit.php:586
 msgid "Regular expression"
 msgstr "正規表現"
 
@@ -14303,7 +14302,7 @@ msgstr "通常アイテム"
 msgid "Release to create a widget."
 msgstr "作成したウィジェットを離す。"
 
-#: include/views/general.login.php:79
+#: include/views/general.login.php:76
 msgid "Remember me for 30 days"
 msgstr "30日間記憶する"
 
@@ -14329,9 +14328,9 @@ msgstr "リモートコマンド"
 #: app/views/administration.mediatype.edit.php:164
 #: app/views/administration.mediatype.edit.php:183
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:287
+#: app/views/administration.user.edit.php:285
 #: app/views/administration.valuemap.edit.php:65
-#: app/views/js/administration.iconmap.edit.js.php:54
+#: app/views/js/administration.iconmap.edit.js.php:52
 #: app/views/js/administration.macros.edit.js.php:45
 #: app/views/js/administration.mediatype.edit.js.php:33
 #: app/views/js/administration.mediatype.edit.js.php:53
@@ -14357,25 +14356,25 @@ msgstr "リモートコマンド"
 #: include/views/configuration.correlation.edit.php:82
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:228
-#: include/views/configuration.host.discovery.edit.php:505
-#: include/views/configuration.host.discovery.edit.php:618
-#: include/views/configuration.host.discovery.edit.php:690
+#: include/views/configuration.host.discovery.edit.php:516
+#: include/views/configuration.host.discovery.edit.php:629
+#: include/views/configuration.host.discovery.edit.php:701
 #: include/views/configuration.host.list.php:73
 #: include/views/configuration.host.massupdate.php:63
-#: include/views/configuration.host.massupdate.php:222
+#: include/views/configuration.host.massupdate.php:226
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.edit.php:267
-#: include/views/configuration.item.edit.php:628
+#: include/views/configuration.item.edit.php:637
 #: include/views/configuration.item.massupdate.php:149
-#: include/views/configuration.item.massupdate.php:274
-#: include/views/configuration.item.massupdate.php:422
+#: include/views/configuration.item.massupdate.php:278
+#: include/views/configuration.item.massupdate.php:426
 #: include/views/configuration.item.prototype.edit.php:154
 #: include/views/configuration.item.prototype.edit.php:248
-#: include/views/configuration.item.prototype.edit.php:582
+#: include/views/configuration.item.prototype.edit.php:591
 #: include/views/configuration.item.prototype.massupdate.php:145
-#: include/views/configuration.item.prototype.massupdate.php:272
-#: include/views/configuration.item.prototype.massupdate.php:407
-#: include/views/configuration.item.prototype.massupdate.php:482
+#: include/views/configuration.item.prototype.massupdate.php:276
+#: include/views/configuration.item.prototype.massupdate.php:411
+#: include/views/configuration.item.prototype.massupdate.php:486
 #: include/views/configuration.maintenance.edit.php:107
 #: include/views/configuration.maintenance.edit.php:166
 #: include/views/configuration.maintenance.edit.php:186
@@ -14493,10 +14492,10 @@ msgstr "%1$sを削除しました"
 #: include/items.inc.php:1777
 #: include/views/configuration.host.massupdate.php:62
 #: include/views/configuration.host.massupdate.php:125
-#: include/views/configuration.host.massupdate.php:221
-#: include/views/configuration.item.massupdate.php:421
-#: include/views/configuration.item.prototype.massupdate.php:406
-#: include/views/configuration.item.prototype.massupdate.php:481
+#: include/views/configuration.host.massupdate.php:225
+#: include/views/configuration.item.massupdate.php:425
+#: include/views/configuration.item.prototype.massupdate.php:410
+#: include/views/configuration.item.prototype.massupdate.php:485
 #: include/views/configuration.template.massupdate.php:56
 #: include/views/configuration.template.massupdate.php:95
 #: include/views/configuration.template.massupdate.php:145
@@ -14546,7 +14545,7 @@ msgid "Request type"
 msgstr "リクエストメソッド"
 
 #: include/classes/setup/CSetupWizard.php:173
-#: include/views/configuration.httpconf.edit.php:202
+#: include/views/configuration.httpconf.edit.php:209
 msgid "Required"
 msgstr "要求文字列"
 
@@ -14812,7 +14811,7 @@ msgstr "行の結合"
 msgid "Rows"
 msgstr "行"
 
-#: app/views/administration.user.edit.php:208
+#: app/views/administration.user.edit.php:206
 msgid "Rows per page"
 msgstr "ページあたりの表示行数"
 
@@ -14927,16 +14926,16 @@ msgstr "SMTPサーバーポート番号"
 #: include/classes/widgets/views/widget.hostavail.form.view.php:45
 #: include/hosts.inc.php:465 include/hosts.inc.php:1408
 #: include/items.inc.php:346
-#: include/views/js/configuration.host.edit.js.php:164
+#: include/views/js/configuration.host.edit.js.php:166
 msgid "SNMP"
 msgstr "SNMP"
 
 #: app/views/popup.discovery.check.php:74 disc_prototypes.php:109
 #: host_discovery.php:100 include/forms.inc.php:274
-#: include/views/configuration.host.discovery.edit.php:400
+#: include/views/configuration.host.discovery.edit.php:407
 #: include/views/configuration.host.discovery.list.php:131
-#: include/views/configuration.item.edit.php:466
-#: include/views/configuration.item.prototype.edit.php:446 items.php:122
+#: include/views/configuration.item.edit.php:471
+#: include/views/configuration.item.prototype.edit.php:451 items.php:122
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
@@ -15003,9 +15002,9 @@ msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr "SQL数: %1$s (selects: %2$s | executes: %3$s)"
 
 #: include/items.inc.php:1740
-#: include/views/configuration.host.discovery.edit.php:459
-#: include/views/configuration.item.edit.php:534
-#: include/views/configuration.item.prototype.edit.php:502
+#: include/views/configuration.host.discovery.edit.php:470
+#: include/views/configuration.item.edit.php:543
+#: include/views/configuration.item.prototype.edit.php:511
 msgid "SQL query"
 msgstr "SQLクエリ"
 
@@ -15028,40 +15027,40 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "SSHエージェント"
 
-#: include/views/configuration.host.discovery.edit.php:323
-#: include/views/configuration.httpconf.edit.php:179
-#: include/views/configuration.item.edit.php:368
-#: include/views/configuration.item.prototype.edit.php:349
+#: include/views/configuration.host.discovery.edit.php:328
+#: include/views/configuration.httpconf.edit.php:185
+#: include/views/configuration.item.edit.php:371
+#: include/views/configuration.item.prototype.edit.php:352
 msgid "SSL certificate file"
 msgstr "SSL証明書ファイル"
 
-#: include/views/configuration.host.discovery.edit.php:331
-#: include/views/configuration.httpconf.edit.php:182
-#: include/views/configuration.item.edit.php:375
-#: include/views/configuration.item.prototype.edit.php:356
+#: include/views/configuration.host.discovery.edit.php:336
+#: include/views/configuration.httpconf.edit.php:188
+#: include/views/configuration.item.edit.php:378
+#: include/views/configuration.item.prototype.edit.php:359
 msgid "SSL key file"
 msgstr "SSL秘密鍵ファイル"
 
-#: include/views/configuration.host.discovery.edit.php:338
-#: include/views/configuration.httpconf.edit.php:185
-#: include/views/configuration.item.edit.php:382
-#: include/views/configuration.item.prototype.edit.php:363
+#: include/views/configuration.host.discovery.edit.php:343
+#: include/views/configuration.httpconf.edit.php:191
+#: include/views/configuration.item.edit.php:385
+#: include/views/configuration.item.prototype.edit.php:366
 msgid "SSL key password"
 msgstr "SSL秘密鍵パスワード"
 
 #: app/views/administration.mediatype.edit.php:82
-#: include/views/configuration.host.discovery.edit.php:315
-#: include/views/configuration.httpconf.edit.php:176
-#: include/views/configuration.item.edit.php:360
-#: include/views/configuration.item.prototype.edit.php:341
+#: include/views/configuration.host.discovery.edit.php:320
+#: include/views/configuration.httpconf.edit.php:182
+#: include/views/configuration.item.edit.php:363
+#: include/views/configuration.item.prototype.edit.php:344
 msgid "SSL verify host"
 msgstr "SSLホスト検証"
 
 #: app/views/administration.mediatype.edit.php:81
-#: include/views/configuration.host.discovery.edit.php:307
-#: include/views/configuration.httpconf.edit.php:173
-#: include/views/configuration.item.edit.php:352
-#: include/views/configuration.item.prototype.edit.php:333
+#: include/views/configuration.host.discovery.edit.php:312
+#: include/views/configuration.httpconf.edit.php:179
+#: include/views/configuration.item.edit.php:355
+#: include/views/configuration.item.prototype.edit.php:336
 msgid "SSL verify peer"
 msgstr "SSLピア検証"
 
@@ -15106,7 +15105,7 @@ msgstr "\"%1$s\"として保存しました"
 msgid "Scan directory"
 msgstr "ディレクトリスキャン"
 
-#: include/views/configuration.httpconf.edit.php:232
+#: include/views/configuration.httpconf.edit.php:239
 msgid "Scenario"
 msgstr "シナリオ"
 
@@ -15119,12 +15118,12 @@ msgid "Scheduled check"
 msgstr "スケジュールされたチェック時刻"
 
 #: app/views/popup.lldoperation.php:119
-#: include/views/configuration.host.discovery.edit.php:482
-#: include/views/configuration.item.edit.php:595
-#: include/views/configuration.item.edit.php:602
-#: include/views/configuration.item.massupdate.php:251
-#: include/views/configuration.item.prototype.edit.php:559
-#: include/views/configuration.item.prototype.massupdate.php:249
+#: include/views/configuration.host.discovery.edit.php:493
+#: include/views/configuration.item.edit.php:604
+#: include/views/configuration.item.edit.php:611
+#: include/views/configuration.item.massupdate.php:255
+#: include/views/configuration.item.prototype.edit.php:568
+#: include/views/configuration.item.prototype.massupdate.php:253
 #: include/views/js/common.item.edit.js.php:36
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:125
 #: include/views/js/configuration.item.massupdate.js.php:39
@@ -15366,8 +15365,8 @@ msgstr "セキュリティ名"
 #: include/views/configuration.graph.edit.php:276
 #: include/views/configuration.item.edit.php:99
 #: include/views/configuration.item.prototype.edit.php:81
-#: include/views/configuration.item.prototype.edit.php:382
-#: include/views/configuration.item.prototype.massupdate.php:443
+#: include/views/configuration.item.prototype.edit.php:387
+#: include/views/configuration.item.prototype.massupdate.php:447
 #: include/views/configuration.services.edit.php:94
 #: include/views/js/monitoring.sysmaps.js.php:213
 #: include/views/js/monitoring.sysmaps.js.php:232
@@ -15382,8 +15381,8 @@ msgstr "選択"
 #: app/views/popup.triggerexpr.php:80
 #: include/views/configuration.graph.edit.php:215
 #: include/views/configuration.graph.edit.php:297
-#: include/views/configuration.item.prototype.edit.php:400
-#: include/views/configuration.item.prototype.massupdate.php:459
+#: include/views/configuration.item.prototype.edit.php:405
+#: include/views/configuration.item.prototype.massupdate.php:463
 msgid "Select prototype"
 msgstr "プロトタイプの選択"
 
@@ -15448,7 +15447,7 @@ msgstr "ユーザーにメッセージを送信"
 msgid "Send only to"
 msgstr "次のメディアのみ使用"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:68
+#: app/views/administration.user.edit.php:224 app/views/popup.media.php:68
 #: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "送信先"
@@ -15607,9 +15606,9 @@ msgstr "サービス"
 msgid "Services form a circular dependency."
 msgstr "サービスの依存関係が循環設定されています。"
 
-#: include/classes/api/services/CUser.php:1331
-#: include/classes/api/services/CUser.php:1344
-#: include/classes/api/services/CUser.php:1370
+#: include/classes/api/services/CUser.php:1333
+#: include/classes/api/services/CUser.php:1346
+#: include/classes/api/services/CUser.php:1372
 msgid "Session terminated, re-login, please."
 msgstr "セッションが切断されました。再度ログインしてください。"
 
@@ -15627,7 +15626,7 @@ msgstr "エラーを設定"
 msgid "Set host inventory mode"
 msgstr "インベントリモードの設定"
 
-#: include/classes/html/CInputSecret.php:81 jsLoader.php:355
+#: include/classes/html/CInputSecret.php:79 jsLoader.php:355
 msgid "Set new value"
 msgstr "新しい値を設定"
 
@@ -15636,15 +15635,15 @@ msgstr "新しい値を設定"
 msgid "Set value to"
 msgstr "値を設定"
 
-#: include/classes/validators/CLdapAuthValidator.php:77
+#: include/classes/validators/CLdapAuthValidator.php:83
 msgid "Setting LDAP dereferencing mode failed."
 msgstr "LDAP逆参照モードの設定に失敗しました。"
 
-#: include/classes/validators/CLdapAuthValidator.php:74
+#: include/classes/validators/CLdapAuthValidator.php:80
 msgid "Setting LDAP protocol failed."
 msgstr "LDAPプロトコルの設定に失敗しました。"
 
-#: include/classes/validators/CLdapAuthValidator.php:76
+#: include/classes/validators/CLdapAuthValidator.php:82
 msgid "Setting LDAP referrals to \"Off\" failed."
 msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 
@@ -15809,7 +15808,7 @@ msgid "Show sidebar"
 msgstr "サイドバーを表示"
 
 #: app/partials/common.filter.trigger.php:168
-#: app/views/administration.user.edit.php:444
+#: app/views/administration.user.edit.php:442
 #: app/views/monitoring.host.view.php:152
 #: app/views/monitoring.problem.view.php:312
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
@@ -15852,10 +15851,10 @@ msgstr "未確認のみ表示"
 msgid "Show unavailable maps"
 msgstr "使用不可なマップの表示"
 
-#: include/views/configuration.item.edit.php:752
-#: include/views/configuration.item.massupdate.php:367
-#: include/views/configuration.item.prototype.edit.php:647
-#: include/views/configuration.item.prototype.massupdate.php:377
+#: include/views/configuration.item.edit.php:761
+#: include/views/configuration.item.massupdate.php:371
+#: include/views/configuration.item.prototype.edit.php:656
+#: include/views/configuration.item.prototype.massupdate.php:381
 msgid "Show value"
 msgstr "値のマッピング"
 
@@ -15879,7 +15878,7 @@ msgstr "サイドバー制御"
 msgid "Sign"
 msgstr "サイン"
 
-#: include/views/general.login.php:64 include/views/general.login.php:82
+#: include/views/general.login.php:64 include/views/general.login.php:79
 msgid "Sign in"
 msgstr "サインイン"
 
@@ -16143,7 +16142,7 @@ msgstr "標準のアイテム"
 msgid "Start in"
 msgstr "開始時刻"
 
-#: include/classes/validators/CLdapAuthValidator.php:75
+#: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
 msgstr "TLS接続の開始に失敗しました。"
 
@@ -16167,7 +16166,7 @@ msgstr "固定"
 
 #: include/classes/items/CHelpItems.php:1195
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
-msgstr ""
+msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmodesは(all, float, uint, str, log, text, not supported)から、casheがhistoryならmodesは(pfree, free, total, used, pused)から、cacheがindexならmodesは(pfree, free, total, used, pused)から、cacheがtrendならmodesは(pfree, free, total, used, pused)から選択。"
 
 #: app/controllers/CControllerPopupGeneric.php:210
 #: app/controllers/CControllerPopupGeneric.php:224
@@ -16209,7 +16208,7 @@ msgstr ""
 #: include/views/configuration.httpconf.list.php:120
 #: include/views/configuration.item.list.php:74
 #: include/views/configuration.item.list.php:144
-#: include/views/configuration.item.massupdate.php:345
+#: include/views/configuration.item.massupdate.php:349
 #: include/views/configuration.triggers.list.php:75
 #: include/views/configuration.triggers.list.php:202 srv_status.php:145
 msgid "Status"
@@ -16231,7 +16230,7 @@ msgstr "ステータスの計算"
 msgid "Status calculation algorithm"
 msgstr "ステータスの計算方法"
 
-#: include/views/configuration.httpconf.edit.php:203
+#: include/views/configuration.httpconf.edit.php:210
 msgid "Status codes"
 msgstr "ステータスコード"
 
@@ -16286,30 +16285,30 @@ msgstr "\"%1$s\"の名前を持つステップがすでに存在します。"
 
 #: app/partials/popup.operations.php:49 httpconf.php:52
 #: include/views/configuration.action.edit.php:170
-#: include/views/configuration.httpconf.edit.php:224
-#: include/views/configuration.httpconf.edit.php:233
+#: include/views/configuration.httpconf.edit.php:231
+#: include/views/configuration.httpconf.edit.php:240
 msgid "Steps"
 msgstr "ステップ"
 
-#: app/views/administration.user.edit.php:399
-#: app/views/administration.user.edit.php:431
+#: app/views/administration.user.edit.php:397
+#: app/views/administration.user.edit.php:429
 msgid "Stop"
 msgstr "停止"
 
 #: app/views/popup.lldoverride.php:57
-#: include/views/configuration.host.discovery.edit.php:724
+#: include/views/configuration.host.discovery.edit.php:735
 msgid "Stop processing"
 msgstr "処理の停止"
 
 #: app/views/popup.lldoperation.php:185 app/views/popup.lldoperation.php:206
-#: include/views/configuration.item.edit.php:673
-#: include/views/configuration.item.edit.php:710
-#: include/views/configuration.item.massupdate.php:308
-#: include/views/configuration.item.massupdate.php:326
-#: include/views/configuration.item.prototype.edit.php:604
-#: include/views/configuration.item.prototype.edit.php:616
-#: include/views/configuration.item.prototype.massupdate.php:306
-#: include/views/configuration.item.prototype.massupdate.php:324
+#: include/views/configuration.item.edit.php:682
+#: include/views/configuration.item.edit.php:719
+#: include/views/configuration.item.massupdate.php:312
+#: include/views/configuration.item.massupdate.php:330
+#: include/views/configuration.item.prototype.edit.php:613
+#: include/views/configuration.item.prototype.edit.php:625
+#: include/views/configuration.item.prototype.massupdate.php:310
+#: include/views/configuration.item.prototype.massupdate.php:328
 msgid "Storage period"
 msgstr "保存期間"
 
@@ -16345,9 +16344,9 @@ msgstr "サブフィルター"
 msgid "Subject"
 msgstr "件名"
 
-#: app/views/administration.proxy.edit.php:118
-#: include/views/configuration.host.edit.php:742
-#: include/views/configuration.host.massupdate.php:288
+#: app/views/administration.proxy.edit.php:119
+#: include/views/configuration.host.edit.php:745
+#: include/views/configuration.host.massupdate.php:293
 #: include/views/configuration.host.prototype.edit.php:370
 msgctxt "encryption certificate"
 msgid "Subject"
@@ -16378,7 +16377,7 @@ msgstr "日"
 msgid "Sunday"
 msgstr "日曜"
 
-#: include/menu.inc.php:197 include/views/general.login.php:96
+#: include/menu.inc.php:197 include/views/general.login.php:93
 msgid "Support"
 msgstr "サポート"
 
@@ -16422,7 +16421,7 @@ msgstr "認証方式の変更を行うと現在のセッション以外はリセ
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "システムのブート時刻。UNIXのタイムスタンプで整数値を返す。"
 
-#: app/views/administration.user.edit.php:181 include/users.inc.php:83
+#: app/views/administration.user.edit.php:179 include/users.inc.php:83
 msgid "System default"
 msgstr "システムデフォルト"
 
@@ -16552,11 +16551,11 @@ msgstr "タグの値"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:382
 #: include/events.inc.php:234 include/events.inc.php:459
-#: include/views/configuration.host.edit.php:612
+#: include/views/configuration.host.edit.php:614
 #: include/views/configuration.host.list.php:170
 #: include/views/configuration.host.list.php:198
-#: include/views/configuration.host.massupdate.php:216
-#: include/views/configuration.host.massupdate.php:307
+#: include/views/configuration.host.massupdate.php:220
+#: include/views/configuration.host.massupdate.php:312
 #: include/views/configuration.maintenance.edit.php:240
 #: include/views/configuration.template.edit.php:417
 #: include/views/configuration.template.list.php:118
@@ -16694,7 +16693,7 @@ msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在します。"
 
 #: app/controllers/CControllerPopupGeneric.php:128
-#: app/partials/popup.operations.php:348
+#: app/partials/popup.operations.php:351
 #: app/views/popup.condition.common.php:344 app/views/search.php:164
 #: app/views/search.php:185 app/views/search.php:189 app/views/search.php:190
 #: app/views/search.php:306 include/menu.inc.php:103
@@ -16704,7 +16703,7 @@ msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在し�
 #: include/views/configuration.hostgroups.list.php:150
 #: include/views/configuration.host.list.php:116
 #: include/views/configuration.host.list.php:193
-#: include/views/configuration.host.massupdate.php:305
+#: include/views/configuration.host.massupdate.php:310
 #: include/views/configuration.host.prototype.edit.php:276
 #: include/views/configuration.host.prototype.list.php:58
 #: include/views/configuration.template.edit.php:28
@@ -16723,7 +16722,7 @@ msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除し�
 msgid "Templates updated"
 msgstr "テンプレートを更新しました"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:226
+#: app/controllers/CControllerPopupTestTriggerExpr.php:224
 #: app/views/administration.authentication.edit.php:265
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
@@ -16731,12 +16730,12 @@ msgstr "テンプレートを更新しました"
 #: app/views/popup.itemtestedit.view.php:313
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1421
-#: include/views/configuration.host.discovery.edit.php:773
 #: include/views/configuration.host.discovery.edit.php:784
-#: include/views/configuration.item.edit.php:868
-#: include/views/configuration.item.edit.php:889
-#: include/views/configuration.item.prototype.edit.php:726
-#: include/views/configuration.item.prototype.edit.php:737
+#: include/views/configuration.host.discovery.edit.php:795
+#: include/views/configuration.item.edit.php:877
+#: include/views/configuration.item.edit.php:898
+#: include/views/configuration.item.prototype.edit.php:735
+#: include/views/configuration.item.prototype.edit.php:746
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:448
 #: include/views/configuration.triggers.edit.php:274
@@ -16793,9 +16792,9 @@ msgstr "テスト用の件名"
 #: include/items.inc.php:131 include/items.inc.php:1772
 #: include/items.inc.php:1776 include/items.inc.php:1780
 #: include/items.inc.php:1784 include/items.inc.php:1788
-#: include/views/configuration.item.edit.php:567
+#: include/views/configuration.item.edit.php:576
 #: include/views/configuration.item.massupdate.php:170
-#: include/views/configuration.item.prototype.edit.php:533
+#: include/views/configuration.item.prototype.edit.php:542
 #: include/views/configuration.item.prototype.massupdate.php:166
 #: include/views/js/monitoring.sysmaps.js.php:329
 #: include/views/js/monitoring.sysmaps.js.php:483
@@ -16922,7 +16921,7 @@ msgstr "トリガーはディスカバリされなかったので次のディス
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Webシナリオが設定されているホストと異なるホストに所属するアプリケーションが利用されています。"
 
-#: app/views/administration.user.edit.php:180
+#: app/views/administration.user.edit.php:178
 msgid "Theme"
 msgstr "テーマ"
 
@@ -16930,7 +16929,7 @@ msgstr "テーマ"
 msgid "This day last week"
 msgstr "先週の今日"
 
-#: include/views/configuration.host.edit.php:677
+#: include/views/configuration.host.edit.php:679
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "このフィールドはアイテム\"%1$s\"によって自動的に設定されます。"
@@ -17070,7 +17069,7 @@ msgstr "PHPのタイムゾーンが設定されていません (\"date.timezone\
 #: app/views/popup.httpstep.php:165 disc_prototypes.php:164
 #: host_discovery.php:120
 #: include/views/configuration.host.discovery.edit.php:163
-#: include/views/configuration.httpconf.edit.php:200
+#: include/views/configuration.httpconf.edit.php:207
 #: include/views/configuration.item.edit.php:202
 #: include/views/configuration.item.prototype.edit.php:183 items.php:158
 msgid "Timeout"
@@ -17196,10 +17195,10 @@ msgstr "トレンドデータ保存期間 \"%1$s\"。"
 
 #: app/controllers/CControllerPopupLldOperation.php:227
 #: app/views/popup.lldoperation.php:200 disc_prototypes.php:156
-#: include/views/configuration.item.edit.php:706
-#: include/views/configuration.item.massupdate.php:321
-#: include/views/configuration.item.prototype.edit.php:612
-#: include/views/configuration.item.prototype.massupdate.php:319 items.php:82
+#: include/views/configuration.item.edit.php:715
+#: include/views/configuration.item.massupdate.php:325
+#: include/views/configuration.item.prototype.edit.php:621
+#: include/views/configuration.item.prototype.massupdate.php:323 items.php:82
 msgid "Trend storage period"
 msgstr "トレンドの保存期間"
 
@@ -17414,7 +17413,7 @@ msgstr "トリガーの復旧条件式には少なくとも1つのhost:keyへの
 msgid "Trigger severities"
 msgstr "トリガーの深刻度"
 
-#: app/views/administration.user.edit.php:443 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:441 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "トリガーの深刻度"
 
@@ -17501,7 +17500,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: app/views/administration.mediatype.list.php:74
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:226
+#: app/views/administration.user.edit.php:224
 #: app/views/dashboard.sharing.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -17520,21 +17519,21 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: include/views/configuration.graph.edit.php:346
 #: include/views/configuration.host.discovery.edit.php:58
 #: include/views/configuration.host.discovery.edit.php:63
-#: include/views/configuration.host.discovery.edit.php:476
+#: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:179
 #: include/views/configuration.item.edit.php:81
 #: include/views/configuration.item.edit.php:86
-#: include/views/configuration.item.edit.php:587
+#: include/views/configuration.item.edit.php:596
 #: include/views/configuration.item.list.php:72
 #: include/views/configuration.item.massupdate.php:45
-#: include/views/configuration.item.massupdate.php:240
+#: include/views/configuration.item.massupdate.php:244
 #: include/views/configuration.item.prototype.edit.php:63
 #: include/views/configuration.item.prototype.edit.php:68
-#: include/views/configuration.item.prototype.edit.php:553
+#: include/views/configuration.item.prototype.edit.php:562
 #: include/views/configuration.item.prototype.list.php:61
 #: include/views/configuration.item.prototype.massupdate.php:41
-#: include/views/configuration.item.prototype.massupdate.php:238
+#: include/views/configuration.item.prototype.massupdate.php:242
 #: include/views/configuration.maintenance.list.php:83
 #: include/views/configuration.services.edit.php:174
 #: include/views/inventory.host.list.php:81
@@ -17564,20 +17563,20 @@ msgstr "タイプ (昇順)"
 msgid "Type (descending)"
 msgstr "タイプ (降順)"
 
-#: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:79
+#: app/partials/popup.operations.php:382 app/views/popup.lldoverride.php:79
 #: include/views/configuration.action.edit.php:123
 #: include/views/configuration.correlation.edit.php:105
-#: include/views/configuration.host.discovery.edit.php:552
+#: include/views/configuration.host.discovery.edit.php:563
 msgid "Type of calculation"
 msgstr "計算のタイプ"
 
 #: app/controllers/CControllerPopupGeneric.php:265
 #: app/controllers/CControllerPopupGeneric.php:328 include/forms.inc.php:179
-#: include/forms.inc.php:659 include/views/configuration.item.edit.php:555
-#: include/views/configuration.item.edit.php:561
+#: include/forms.inc.php:659 include/views/configuration.item.edit.php:564
+#: include/views/configuration.item.edit.php:570
 #: include/views/configuration.item.massupdate.php:163
-#: include/views/configuration.item.prototype.edit.php:521
-#: include/views/configuration.item.prototype.edit.php:527
+#: include/views/configuration.item.prototype.edit.php:530
+#: include/views/configuration.item.prototype.edit.php:536
 #: include/views/configuration.item.prototype.massupdate.php:159
 msgid "Type of information"
 msgstr "データ型"
@@ -17601,7 +17600,7 @@ msgstr "不明"
 #: include/classes/widgets/forms/CWidgetFormUrl.php:31
 #: include/screens.inc.php:43
 #: include/views/configuration.host.discovery.edit.php:78
-#: include/views/configuration.httpconf.edit.php:201
+#: include/views/configuration.httpconf.edit.php:208
 #: include/views/configuration.item.edit.php:117
 #: include/views/configuration.item.massupdate.php:84
 #: include/views/configuration.item.prototype.edit.php:99
@@ -17614,7 +17613,7 @@ msgstr "不明"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:213
+#: app/views/administration.user.edit.php:211
 msgid "URL (after login)"
 msgstr "ログイン後のURL"
 
@@ -17724,9 +17723,9 @@ msgstr "アクション%1$sから想定外の応答を受信しました。"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:231
-#: include/views/configuration.item.edit.php:573
+#: include/views/configuration.item.edit.php:582
 #: include/views/configuration.item.massupdate.php:176
-#: include/views/configuration.item.prototype.edit.php:539
+#: include/views/configuration.item.prototype.edit.php:548
 #: include/views/configuration.item.prototype.massupdate.php:172
 msgid "Units"
 msgstr "単位"
@@ -17772,13 +17771,13 @@ msgstr "不明なエラー"
 msgid "Unknown function."
 msgstr "不明な関数。"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:49
+#: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "不明なアイテム。選択したホストにそのようなアイテムは存在しません"
 
-#: app/controllers/CControllerPopupTestTriggerExpr.php:48
+#: app/controllers/CControllerPopupTestTriggerExpr.php:46
 #: include/triggers.inc.php:1398
 msgid "Unknown host, no such host present in system"
 msgstr "不明なホスト。そのようなホストは存在しません"
@@ -17923,19 +17922,19 @@ msgstr "Up"
 #: app/views/administration.mediatype.edit.php:355
 #: app/views/administration.miscconfig.edit.php:75
 #: app/views/administration.module.edit.php:59
-#: app/views/administration.proxy.edit.php:139
+#: app/views/administration.proxy.edit.php:140
 #: app/views/administration.regex.edit.php:141
 #: app/views/administration.script.edit.php:140
 #: app/views/administration.trigdisplay.edit.php:108
 #: app/views/administration.trigseverity.edit.php:97
-#: app/views/administration.user.edit.php:462
-#: app/views/administration.user.edit.php:485
+#: app/views/administration.user.edit.php:460
+#: app/views/administration.user.edit.php:483
 #: app/views/administration.usergroup.edit.php:219
 #: app/views/administration.valuemap.edit.php:110
 #: app/views/administration.workingtime.edit.php:40
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
-#: app/views/popup.discovery.check.php:135 app/views/popup.httpstep.php:181
+#: app/views/popup.discovery.check.php:137 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:200
 #: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
@@ -17944,16 +17943,16 @@ msgstr "Up"
 #: include/views/configuration.correlation.edit.php:164
 #: include/views/configuration.discovery.edit.php:139
 #: include/views/configuration.graph.edit.php:476
-#: include/views/configuration.host.discovery.edit.php:779
-#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.discovery.edit.php:790
+#: include/views/configuration.host.edit.php:758
 #: include/views/configuration.hostgroups.edit.php:61
-#: include/views/configuration.host.massupdate.php:325
+#: include/views/configuration.host.massupdate.php:330
 #: include/views/configuration.host.prototype.edit.php:389
-#: include/views/configuration.httpconf.edit.php:257
-#: include/views/configuration.item.edit.php:884
-#: include/views/configuration.item.massupdate.php:506
-#: include/views/configuration.item.prototype.edit.php:724
-#: include/views/configuration.item.prototype.massupdate.php:530
+#: include/views/configuration.httpconf.edit.php:264
+#: include/views/configuration.item.edit.php:893
+#: include/views/configuration.item.massupdate.php:510
+#: include/views/configuration.item.prototype.edit.php:733
+#: include/views/configuration.item.prototype.massupdate.php:534
 #: include/views/configuration.maintenance.edit.php:258
 #: include/views/configuration.services.edit.php:359
 #: include/views/configuration.template.edit.php:441
@@ -17979,13 +17978,13 @@ msgstr "既存の設定を上書"
 #: app/views/popup.lldoperation.php:171 discoveryconf.php:40
 #: disc_prototypes.php:60 host_discovery.php:60 host_discovery.php:219
 #: include/forms.inc.php:227 include/views/configuration.discovery.edit.php:63
-#: include/views/configuration.host.discovery.edit.php:466
+#: include/views/configuration.host.discovery.edit.php:477
 #: include/views/configuration.host.discovery.list.php:124
 #: include/views/configuration.httpconf.edit.php:83
-#: include/views/configuration.item.edit.php:577
-#: include/views/configuration.item.massupdate.php:296
-#: include/views/configuration.item.prototype.edit.php:543
-#: include/views/configuration.item.prototype.massupdate.php:294 items.php:59
+#: include/views/configuration.item.edit.php:586
+#: include/views/configuration.item.massupdate.php:300
+#: include/views/configuration.item.prototype.edit.php:552
+#: include/views/configuration.item.prototype.massupdate.php:298 items.php:59
 #: items.php:260
 msgid "Update interval"
 msgstr "監視間隔"
@@ -18041,7 +18040,7 @@ msgstr "Zabbixサーバープロセスの稼働秒数。"
 msgid "Uptime/Downtime"
 msgstr "アップタイム/ダウンタイム"
 
-#: include/views/js/configuration.host.edit.js.php:129
+#: include/views/js/configuration.host.edit.js.php:131
 msgid "Use bulk requests"
 msgstr "bulkリクエストを使用"
 
@@ -18049,7 +18048,7 @@ msgstr "bulkリクエストを使用"
 msgid "Use custom event status colours"
 msgstr "イベントのステータスの文字色を変更"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:84
+#: app/views/administration.user.edit.php:224 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "指定した深刻度のときに使用"
 
@@ -18063,11 +18062,11 @@ msgstr "アイテムで使用"
 
 #: app/controllers/CControllerAuditLogList.php:185
 #: app/partials/popup.operations.php:103
-#: app/views/administration.user.edit.php:217
+#: app/views/administration.user.edit.php:215
 #: app/views/reports.auditlog.list.php:87 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
 #: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:259
-#: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
+#: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:169
 msgid "User"
 msgstr "ユーザー"
 
@@ -18113,7 +18112,7 @@ msgstr "ユーザーを追加しました"
 msgid "User agent string"
 msgstr "ユーザーエージェント文字列"
 
-#: app/views/administration.user.edit.php:323
+#: app/views/administration.user.edit.php:321
 msgid "User can't change type for himself"
 msgstr "ユーザーは自身のユーザータイプを変更できません"
 
@@ -18229,13 +18228,13 @@ msgstr "ユーザーメニュー"
 
 #: app/partials/popup.operations.php:258 disc_prototypes.php:85
 #: host_discovery.php:77
-#: include/views/configuration.host.discovery.edit.php:291
-#: include/views/configuration.host.discovery.edit.php:428
-#: include/views/configuration.item.edit.php:338
-#: include/views/configuration.item.edit.php:502
+#: include/views/configuration.host.discovery.edit.php:292
+#: include/views/configuration.host.discovery.edit.php:435
+#: include/views/configuration.item.edit.php:339
+#: include/views/configuration.item.edit.php:507
 #: include/views/configuration.item.massupdate.php:193
-#: include/views/configuration.item.prototype.edit.php:319
-#: include/views/configuration.item.prototype.edit.php:471
+#: include/views/configuration.item.prototype.edit.php:320
+#: include/views/configuration.item.prototype.edit.php:476
 #: include/views/configuration.item.prototype.massupdate.php:189 items.php:95
 msgid "User name"
 msgstr "ユーザー名"
@@ -18274,8 +18273,8 @@ msgstr "マップ\"%2$s\"のユーザーでの共有にはパラメータ:%1$s �
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"のユーザーでの共有にはパラメータ:%1$s が必要です。"
 
-#: app/views/administration.user.edit.php:322
-#: app/views/administration.user.edit.php:327
+#: app/views/administration.user.edit.php:320
+#: app/views/administration.user.edit.php:325
 #: app/views/administration.user.list.php:65
 #: app/views/administration.user.list.php:94
 msgid "User type"
@@ -18383,7 +18382,7 @@ msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサ�
 
 #: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
-msgstr ""
+msgstr "VMwareハイパーバイザーデータセンターの名前、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。文字列値を返す"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18399,7 +18398,7 @@ msgstr "VMwareハイパーバイザーのデータストアのリスト、<url> 
 
 #: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "VMwareハイパーバイザーの稼働状態ロールアップセンサー、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。0 - 灰; 1 - 緑; 2 - 黄; 3 - 赤を返す"
 
 #: include/classes/items/CHelpItems.php:879
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18479,7 +18478,7 @@ msgstr "VMware仮想マシンの圧縮されたメモリサイズ、<url> - VMwa
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
-msgstr ""
+msgstr "VMware仮想マシンデータセンターの名前、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。文字列値を返す"
 
 #: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -18593,9 +18592,9 @@ msgstr "バリデーション"
 #: include/classes/screens/CScreenPlainText.php:53
 #: include/views/configuration.host.discovery.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:207
-#: include/views/configuration.host.massupdate.php:226
-#: include/views/configuration.httpconf.edit.php:123
-#: include/views/configuration.httpconf.edit.php:141
+#: include/views/configuration.host.massupdate.php:230
+#: include/views/configuration.httpconf.edit.php:125
+#: include/views/configuration.httpconf.edit.php:143
 #: include/views/configuration.item.edit.php:152
 #: include/views/configuration.item.edit.php:246
 #: include/views/configuration.item.massupdate.php:132
@@ -18684,7 +18683,7 @@ msgstr "値のマッピングを更新しました！"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:503
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "英語でWindowsパフォーマンスカウンターの値。数値、文字列値、テキスト値で返す(リクエストに依存)"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:499
@@ -18717,7 +18716,7 @@ msgid "Values without names are not allowed in form fields."
 msgstr "フォームフィールドでは名前を必ず指定してください。"
 
 #: app/views/popup.httpstep.php:114
-#: include/views/configuration.httpconf.edit.php:118
+#: include/views/configuration.httpconf.edit.php:120
 msgid "Variables"
 msgstr "変数"
 
@@ -18849,8 +18848,8 @@ msgstr "Web監視"
 msgid "Web scenario"
 msgstr "Webシナリオ"
 
-#: include/classes/api/managers/CHttpTestManager.php:391
-#: include/classes/api/managers/CHttpTestManager.php:404
+#: include/classes/api/managers/CHttpTestManager.php:366
+#: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
 msgstr "Webシナリオ\"%1$s\"はホスト\"%2$s\"にすでに存在します。"
@@ -18922,7 +18921,7 @@ msgstr "ようこそ"
 msgid "Welcome to"
 msgstr "ようこそ"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:79
+#: app/views/administration.user.edit.php:224 app/views/popup.media.php:79
 msgid "When active"
 msgstr "有効な時間帯"
 
@@ -19210,7 +19209,7 @@ msgstr "毎年"
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.prototype.list.php:107
 #: include/views/configuration.item.prototype.list.php:154
-#: include/views/configuration.item.prototype.massupdate.php:354
+#: include/views/configuration.item.prototype.massupdate.php:358
 #: include/views/configuration.trigger.prototype.list.php:120
 #: include/views/configuration.trigger.prototype.list.php:135
 #: include/views/configuration.trigger.prototype.massupdate.php:67
@@ -19231,7 +19230,7 @@ msgstr "昨日"
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"としてログインしています。"
 
-#: app/views/administration.user.edit.php:167
+#: app/views/administration.user.edit.php:165
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
@@ -19687,7 +19686,7 @@ msgid "cannot be changed"
 msgstr "変更できません"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:135
-#: app/controllers/CControllerAuthenticationUpdate.php:201
+#: app/controllers/CControllerAuthenticationUpdate.php:202
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:154
@@ -19955,7 +19954,7 @@ msgstr "等しくない"
 
 #: app/views/popup.lldoperation.php:63 app/views/popup.lldoverride.php:145
 #: include/actions.inc.php:35
-#: include/views/configuration.host.discovery.edit.php:592
+#: include/views/configuration.host.discovery.edit.php:603
 #: include/views/js/configuration.host.discovery.edit.js.php:58
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:79
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:166
@@ -20006,10 +20005,10 @@ msgstr "第4"
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr "fuzzytime() - アイテムの値(タイムスタンプとして)とZabbixサーバーのタイムスタンプとの差がT秒以下か (1 - T秒以下、0 - それ以外)"
 
-#: include/views/configuration.item.edit.php:653
-#: include/views/configuration.item.edit.php:658
-#: include/views/configuration.item.edit.php:689
-#: include/views/configuration.item.edit.php:694
+#: include/views/configuration.item.edit.php:662
+#: include/views/configuration.item.edit.php:667
+#: include/views/configuration.item.edit.php:698
+#: include/views/configuration.item.edit.php:703
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "データの保存期間設定(全体設定)"
@@ -20072,7 +20071,7 @@ msgid "in"
 msgstr "期間中"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:342
+#: app/views/administration.user.edit.php:340
 msgid "including subgroups"
 msgstr "サブグループを含む"
 
@@ -20254,7 +20253,7 @@ msgstr "マップ"
 
 #: app/views/popup.lldoperation.php:62 app/views/popup.lldoverride.php:144
 #: include/actions.inc.php:34
-#: include/views/configuration.host.discovery.edit.php:591
+#: include/views/configuration.host.discovery.edit.php:602
 #: include/views/js/configuration.host.discovery.edit.js.php:57
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:78
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:165
@@ -20359,7 +20358,7 @@ msgid "new"
 msgstr "新規"
 
 #: disc_prototypes.php:1302 disc_prototypes.php:1326 hosts.php:1374
-#: include/views/configuration.item.massupdate.php:401 templates.php:957
+#: include/views/configuration.item.massupdate.php:405 templates.php:957
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "新規"
@@ -20403,7 +20402,7 @@ msgstr "数値"
 msgid "of"
 msgstr "of"
 
-#: app/views/administration.user.edit.php:261
+#: app/views/administration.user.edit.php:259
 #: include/classes/setup/CFrontendSetup.php:256
 #: include/classes/setup/CFrontendSetup.php:309
 #: include/classes/setup/CFrontendSetup.php:326
@@ -20426,7 +20425,7 @@ msgstr "of"
 msgid "off"
 msgstr "off"
 
-#: app/views/administration.user.edit.php:261
+#: app/views/administration.user.edit.php:259
 #: include/classes/setup/CFrontendSetup.php:309
 #: include/classes/setup/CFrontendSetup.php:326
 #: include/classes/setup/CFrontendSetup.php:347
@@ -20492,7 +20491,7 @@ msgid "regexp() - Regular expression V matching last value in period T (1 - matc
 msgstr "regexp() - 期間T内の最新値の正規表現Vチェック (1 - 見つかった、0 - それ以外)"
 
 #: app/views/popup.lldoverride.php:133
-#: include/views/configuration.host.discovery.edit.php:614
+#: include/views/configuration.host.discovery.edit.php:625
 #: include/views/js/configuration.host.discovery.edit.js.php:62
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:83
 msgid "regular expression"
@@ -20588,10 +20587,10 @@ msgstr "現在時刻より前の時間をを指定してください"
 msgid "show icon mappings"
 msgstr "アイコンのマッピングを表示"
 
-#: include/views/configuration.item.edit.php:744
-#: include/views/configuration.item.massupdate.php:370
-#: include/views/configuration.item.prototype.edit.php:648
-#: include/views/configuration.item.prototype.massupdate.php:380
+#: include/views/configuration.item.edit.php:753
+#: include/views/configuration.item.massupdate.php:374
+#: include/views/configuration.item.prototype.edit.php:657
+#: include/views/configuration.item.prototype.massupdate.php:384
 msgid "show value mappings"
 msgstr "値のマッピングの表示"
 
@@ -20611,7 +20610,7 @@ msgstr "合計"
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - 期間Tでの合計値"
 
-#: include/classes/api/services/CUser.php:1569
+#: include/classes/api/services/CUser.php:1573
 msgid "supplied credentials are not unique"
 msgstr "指定された資格情報はユニークではありません"
 
@@ -20719,7 +20718,7 @@ msgstr "トリガーのプロトタイプは他のテンプレートやホスト
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "リンクのあるトリガーは他のテンプレートやホストに移動できません"
 
-#: app/partials/layout.htmlpage.aside.php:77
+#: app/partials/layout.htmlpage.aside.php:76
 #: include/classes/html/CMultiSelect.php:84 jsLoader.php:261
 msgid "type here to search"
 msgstr "検索文字列を入力"

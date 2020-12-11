@@ -587,7 +587,7 @@ else {
 	$data['actions'] = API::Action()->get([
 		'output' => API_OUTPUT_EXTEND,
 		'search' => [
-			'name' => ($filter['name'] === '') ? null : $filter['name'],
+			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
 		'filter' => [
 			'eventsource' => $data['eventsource'],

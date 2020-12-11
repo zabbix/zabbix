@@ -200,14 +200,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$UPDATED_MACRO1}',
 							'value' => 'updated value1',
-							'description' => 'updated description 1',
+							'description' => 'updated description 1'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'macro' => '{$UPDATED_MACRO2}',
 							'value' => 'Updated value 2',
-							'description' => 'Updated description 2',
+							'description' => 'Updated description 2'
 						]
 					],
 					'success_message' => 'Host prototype updated'
