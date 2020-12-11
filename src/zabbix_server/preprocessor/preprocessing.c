@@ -68,7 +68,7 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 	zbx_uint32_t		data_size = 0;
 	zbx_uint64_t		field_size;
 	unsigned char		*offset = NULL;
-	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)__UINT32_C(0);
+	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
 
 	if (NULL != message)
 	{
