@@ -1703,7 +1703,7 @@ function getTriggerFormData(array $data) {
 				'selectTags' => ['tag', 'value']
 			]);
 
-			if (array_key_exists(0, $host_tags) && array_key_exists('tags', $host_tags[0])) {
+			if ($host_tags) {
 				foreach ($host_tags[0]['tags'] as $tag) {
 					$inherited_tags[$tag['tag'] . ':' . $tag['value']] = $tag;
 					$inherited_tags[$tag['tag'] . ':' . $tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
