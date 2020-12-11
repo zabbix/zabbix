@@ -104,7 +104,7 @@ class testItemPrototype extends CAPITest {
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
-			],
+			]
 		];
 	}
 

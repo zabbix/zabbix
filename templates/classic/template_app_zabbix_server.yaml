@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:14Z'
+  date: '2020-11-11T08:56:34Z'
   groups:
     -
       name: Templates/Applications
@@ -85,6 +85,23 @@ zabbix_export:
               name: 'Zabbix alert syncer processes more than 75% busy'
               priority: AVERAGE
         -
+          name: 'Utilization of availability manager internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,availability manager,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix availability manager processes more than 75% busy'
+              priority: AVERAGE
+        -
           name: 'Utilization of configuration syncer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,configuration syncer,avg,busy]'
@@ -134,6 +151,23 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{avg(10m)}<65'
               name: 'Zabbix escalator processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of history poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,history poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix history poller processes more than 75% busy'
               priority: AVERAGE
         -
           name: 'Utilization of history syncer internal processes, in %'
@@ -515,6 +549,26 @@ zabbix_export:
               priority: AVERAGE
               description: 'Consider increasing CacheSize in the zabbix_server.conf configuration file'
         -
+          name: 'Zabbix trend function cache, % unique requests'
+          type: INTERNAL
+          key: 'zabbix[tcache,cache,pitems]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+        -
+          name: 'Zabbix trend function cache, % misses'
+          type: INTERNAL
+          key: 'zabbix[tcache,cache,pmisses]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          applications:
+            -
+              name: 'Zabbix server'
+        -
           name: 'Zabbix value cache, % used'
           type: INTERNAL
           key: 'zabbix[vcache,buffer,pused]'
@@ -840,6 +894,21 @@ zabbix_export:
                     host: 'Zabbix Server'
   graphs:
     -
+      name: 'Trend function cache effectiveness'
+      graph_items:
+        -
+          sortorder: '1'
+          color: C80000
+          item:
+            host: 'Zabbix Server'
+            key: 'zabbix[tcache,cache,pmisses]'
+        -
+          sortorder: '2'
+          color: 00C800
+          item:
+            host: 'Zabbix Server'
+            key: 'zabbix[tcache,cache,pitems]'
+    -
       name: 'Value cache effectiveness'
       type: STACKED
       graph_items:
@@ -900,163 +969,177 @@ zabbix_export:
       ymax_type_1: FIXED
       graph_items:
         -
+          sortorder: '1'
           color: '990099'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,trapper,avg,busy]'
         -
-          sortorder: '1'
+          sortorder: '2'
           color: '990000'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,poller,avg,busy]'
         -
-          sortorder: '2'
+          sortorder: '3'
           color: 0000EE
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,ipmi poller,avg,busy]'
         -
-          sortorder: '3'
+          sortorder: '4'
           color: FF33FF
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,discoverer,avg,busy]'
         -
-          sortorder: '4'
+          sortorder: '5'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,icmp pinger,avg,busy]'
         -
-          sortorder: '5'
+          sortorder: '6'
           color: '003300'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,http poller,avg,busy]'
         -
-          sortorder: '6'
+          sortorder: '7'
           color: CCCC00
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,proxy poller,avg,busy]'
         -
-          sortorder: '7'
+          sortorder: '8'
           color: 33FFFF
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,unreachable poller,avg,busy]'
         -
-          sortorder: '8'
+          sortorder: '9'
           color: DD0000
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,java poller,avg,busy]'
         -
-          sortorder: '9'
+          sortorder: '10'
           color: '000099'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,snmp trapper,avg,busy]'
         -
-          sortorder: '10'
+          sortorder: '11'
           color: 00FF00
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,vmware collector,avg,busy]'
+        -
+          sortorder: '12'
+          color: 5A2B57
+          item:
+            host: 'Zabbix Server'
+            key: 'zabbix[process,history poller,avg,busy]'
     -
       name: 'Zabbix internal process busy %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
         -
+          sortorder: '1'
           color: 00EE00
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,timer,avg,busy]'
         -
-          sortorder: '1'
+          sortorder: '2'
           color: 0000EE
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,escalator,avg,busy]'
         -
-          sortorder: '2'
+          sortorder: '3'
           color: FFAA00
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,housekeeper,avg,busy]'
         -
-          sortorder: '3'
+          sortorder: '4'
           color: 00EEEE
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,alerter,avg,busy]'
         -
-          sortorder: '4'
+          sortorder: '5'
           color: '990099'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,configuration syncer,avg,busy]'
         -
-          sortorder: '5'
+          sortorder: '6'
           color: EE0000
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,history syncer,avg,busy]'
         -
-          sortorder: '6'
+          sortorder: '7'
           color: FF66FF
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,self-monitoring,avg,busy]'
         -
-          sortorder: '7'
+          sortorder: '8'
           color: '009999'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,task manager,avg,busy]'
         -
-          sortorder: '8'
+          sortorder: '9'
           color: BBBB00
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,ipmi manager,avg,busy]'
         -
-          sortorder: '9'
+          sortorder: '10'
           color: AA0000
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,alert manager,avg,busy]'
         -
-          sortorder: '10'
+          sortorder: '11'
           color: '990000'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,preprocessing manager,avg,busy]'
         -
-          sortorder: '11'
+          sortorder: '12'
           color: '008800'
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,preprocessing worker,avg,busy]'
         -
-          sortorder: '12'
+          sortorder: '13'
           color: 80B0E0
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,lld manager,avg,busy]'
         -
-          sortorder: '13'
+          sortorder: '14'
           color: 4080B0
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,lld worker,avg,busy]'
         -
-          sortorder: '14'
+          sortorder: '15'
           color: 8000FF
           item:
             host: 'Zabbix Server'
             key: 'zabbix[process,alert syncer,avg,busy]'
+        -
+          sortorder: '16'
+          color: 2B5429
+          item:
+            host: 'Zabbix Server'
+            key: 'zabbix[process,availability manager,avg,busy]'
     -
       name: 'Zabbix internal queues'
       graph_items:

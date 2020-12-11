@@ -389,7 +389,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			ZBX_WIDGET_FIELD_TYPE_ITEM => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid'
 		];
 	}
 }

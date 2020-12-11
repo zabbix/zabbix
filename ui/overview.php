@@ -212,6 +212,13 @@ if ($type == SHOW_TRIGGERS) {
 		$host_options['hostids'] = array_keys($filter['hosts']);
 	}
 
+	$data['allowed'] = [
+		'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+		'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+		'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+		'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+	];
+
 	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 		$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
 	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);

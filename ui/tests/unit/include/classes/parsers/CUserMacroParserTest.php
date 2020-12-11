@@ -316,7 +316,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				'context' => null,
 				'regex' => null,
 				'error' => 'incorrect syntax near "{$MACRO2}"'
-			],],
+			]],
 			['{$MACRO1}{$MACRO2}', 9, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO2}',
@@ -324,7 +324,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				'context' => null,
 				'regex' => null,
 				'error' => ''
-			],],
+			]],
 			['abc"def"ghi{$MACRO:""}', 11, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:""}',

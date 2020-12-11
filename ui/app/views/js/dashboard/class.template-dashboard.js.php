@@ -56,7 +56,8 @@
 						'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 						'editable': true,
 						'edit_mode': true,
-						'kioskmode': false
+						'kioskmode': false,
+						'allowed_edit': true
 					}
 				})
 				.dashboardGrid('setWidgetDefaults', this.widget_defaults)

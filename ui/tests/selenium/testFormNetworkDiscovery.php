@@ -32,7 +32,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		return [
 			[
 				[
-					'error' => 'Incorrect value for field "name": cannot be empty.',
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -53,7 +53,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'checks' => [
 						['check_action' => 'Add', 'type' => 'HTTPS', 'ports' => '447']
 					],
-					'error' => 'Discovery rule "Local network" already exists.',
+					'error' => 'Discovery rule "Local network" already exists.'
 				]
 			],
 			[

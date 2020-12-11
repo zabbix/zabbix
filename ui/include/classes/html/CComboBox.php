@@ -138,6 +138,13 @@ class CComboBox extends CTag {
 
 		return $this;
 	}
+
+	public function setAdaptiveWidth($value) {
+		$this->addStyle('max-width: '.$value.'px;');
+		$this->addStyle('width: 100%');
+
+		return $this;
+	}
 }
 
 class COptGroup extends CTag {

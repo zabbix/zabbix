@@ -226,7 +226,7 @@ class testItemState extends CIntegrationTest {
 				$items[] = [
 					'itemid' => $itemid,
 					'status' => ITEM_STATUS_ACTIVE,
-					'delay' => $delay,
+					'delay' => $delay
 				];
 			} else {
 				$items[] = [

@@ -63,7 +63,7 @@ class CScript extends CApiService {
 			'ipmi_error', 'errors_from', 'snmp_errors_from', 'jmx_errors_from', 'ipmi_errors_from', 'disable_until',
 			'snmp_disable_until', 'jmx_disable_until', 'ipmi_disable_until', 'ipmi_authtype', 'ipmi_privilege',
 			'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
-			'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'
+			'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

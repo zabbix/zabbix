@@ -839,7 +839,7 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => ['itemid'],
-			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
+			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid')
 		]);
 		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
 			$childDiscoveryRule['hostPrototypes'] = [];

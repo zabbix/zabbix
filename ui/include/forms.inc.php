@@ -284,7 +284,7 @@ function getItemFilterForm(&$items) {
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
 			1 => _('Inherited items'),
-			0 => _('Not inherited items'),
+			0 => _('Not inherited items')
 		])
 	);
 
@@ -1528,7 +1528,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
 							->removeId()
-					]))->addClass('step-action'),
+					]))->addClass('step-action')
 				]))->addClass('preprocessing-step'),
 				$on_fail_options
 			]))
@@ -2030,18 +2030,22 @@ function renderTagTableRow($index, $tag = '', $value = '', array $options = []) 
 	return (new CRow([
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
-				->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
 				->setAttribute('placeholder', _('tag'))
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
-				->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 				->setAttribute('placeholder', _('value'))
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-			->setEnabled(!$options['readonly'])
+		(new CCol(
+			(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$options['readonly'])
+		))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass(ZBX_STYLE_TOP)
 	]))->addClass('form_row');
 }
 
@@ -2056,7 +2060,9 @@ function renderTagTableRow($index, $tag = '', $value = '', array $options = []) 
  * @return CTable
  */
 function renderTagTable(array $tags, $readonly = false, array $options = []) {
-	$table = (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
+	$table = (new CTable())
+		->addStyle('width:100%;')
+		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
 	$row_options = ['readonly' => $readonly];
 

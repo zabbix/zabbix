@@ -169,7 +169,9 @@ class CMenuHelper {
 				? (new CMenuItem(_('Actions')))->setUrl(new CUrl('actionconf.php'), 'actionconf.php')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
-				? (new CMenuItem(_('Event correlation')))->setUrl(new CUrl('correlation.php'), 'correlation.php')
+				? (new CMenuItem(_('Event correlation')))
+					->setAction('correlation.list')
+					->setAliases(['correlation.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))
@@ -239,7 +241,9 @@ class CMenuHelper {
 					->setAliases(['script.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
-				? (new CMenuItem(_('Queue')))->setUrl(new CUrl('queue.php'), 'queue.php')
+				? (new CMenuItem(_('Queue')))
+					->setAction('queue.overview')
+					->setAliases(['queue.details', 'queue.overview', 'queue.overview.proxy'])
 				: null
 		];
 		$submenu_administration = array_filter($submenu_administration);

@@ -238,6 +238,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		event->trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
 		event->trigger.value = trigger_value;
 		event->trigger.opdata = zbx_strdup(NULL, trigger_opdata);
+		event->trigger.event_name = (NULL != event_name ? zbx_strdup(NULL, event_name) : NULL);
 		event->name = zbx_strdup(NULL, (NULL != event_name ? event_name : trigger_description));
 
 		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -1700,6 +1701,7 @@ static void	zbx_clean_event(DB_EVENT *event)
 		zbx_free(event->trigger.recovery_expression);
 		zbx_free(event->trigger.correlation_tag);
 		zbx_free(event->trigger.opdata);
+		zbx_free(event->trigger.event_name);
 
 		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
 		zbx_vector_ptr_destroy(&event->tags);

@@ -81,7 +81,7 @@ var metrics = pluginMetrics{
 	},
 	keyOSDDiscovery: metric{
 		description: "Returns a list of discovered OSDs.",
-		commands:    []command{cmdOSDCrushRuleDump, cmdOSDCrushTree},
+		commands:    []command{cmdOSDCrushTree},
 		params:      nil,
 		handler:     osdDiscoveryHandler,
 	},

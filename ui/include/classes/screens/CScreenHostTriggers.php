@@ -209,6 +209,14 @@ class CScreenHostTriggers extends CScreenBase {
 
 		$table = (new CTableInfo())->setHeader($header + [_('Age'), _('Info'), _('Ack'), _('Actions')]);
 
+		$allowed = [
+			'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+			'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+		];
+		$allowed_close = CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS);
+
 		foreach ($data['problems'] as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -217,9 +225,15 @@ class CScreenHostTriggers extends CScreenBase {
 			$host = $hosts[$host['hostid']];
 			$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
+			$allowed['close'] = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed_close);
+			$can_be_closed = $allowed['close'];
+
 			// Info.
 			$info_icons = [];
+
 			if ($problem['r_eventid'] != 0) {
+				$can_be_closed = false;
+
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
@@ -237,14 +251,14 @@ class CScreenHostTriggers extends CScreenBase {
 					);
 				}
 			}
-
-			$allowed = [
-				'ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-				'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
-			];
+			else {
+				foreach ($problem['acknowledges'] as $acknowledge) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+						$can_be_closed = false;
+						break;
+					}
+				}
+			}
 
 			// Clock.
 			$clock = $allowed['ui_problems']
@@ -256,9 +270,11 @@ class CScreenHostTriggers extends CScreenBase {
 				)
 				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 
+
 			// Create acknowledge link.
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
-			$problem_update_link = $allowed['ack']
+			$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+					|| $can_be_closed)
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)

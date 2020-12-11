@@ -402,7 +402,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Incorrect value for field "URL": cannot be empty.'
 					],
 					'check_db' => false,
-					'error' => 'Page received incorrect data',
+					'error' => 'Page received incorrect data'
 				]
 			],
 			[
@@ -765,7 +765,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Request body' => 'test',
+						'Request body' => 'test'
 					],
 					'request_type' => 'XML data',
 					'error_details' => [
@@ -914,7 +914,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Enable trapping' => true,
 						'SSL verify peer' => true,
 						'SSL verify host' => true,
-						'Enabled' => false,
+						'Enabled' => false
 					],
 					'query' => [
 						['name' => 'login', 'value' => 'admin'],
@@ -973,7 +973,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com',
 						'HTTP authentication' => 'Kerberos',
 						'User name' => 'admin',
-						'Password' => 'zabbix',
+						'Password' => 'zabbix'
 					],
 					'check_form' => true
 				]
@@ -1110,7 +1110,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'HTTP authentication' => 'Basic',
+						'HTTP authentication' => 'Basic'
 					],
 					'check_form' => true
 				]
@@ -1119,7 +1119,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'HTTP authentication' => 'NTLM',
+						'HTTP authentication' => 'NTLM'
 					],
 					'check_form' => true
 				]
@@ -1128,7 +1128,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'HTTP authentication' => 'Kerberos',
+						'HTTP authentication' => 'Kerberos'
 					],
 					'check_form' => true
 				]
@@ -1139,7 +1139,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'fields' => [
 						'HTTP authentication' => 'Kerberos',
 						'User name' => 'k_admin',
-						'Password' => 'zabbix_k',
+						'Password' => 'zabbix_k'
 					],
 					'check_form' => true
 				]

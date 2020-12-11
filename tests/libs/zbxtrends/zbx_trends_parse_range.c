@@ -27,6 +27,10 @@
 #include "log.h"
 #include "db.h"
 
+int	__wrap_DBis_null(const char *field);
+DB_ROW	__wrap_DBfetch(DB_RESULT result);
+DB_RESULT	__wrap_DBselect(const char *fmt, ...);
+
 int	__wrap_DBis_null(const char *field)
 {
 	ZBX_UNUSED(field);

@@ -4033,6 +4033,7 @@ $form-icon-btn: (
 			max-width: inherit;
 			margin: 0 -10px 10px;
 			padding: 0 10px;
+			position: relative;
 			@extend %webkit-scrollbar;
 
 			.table-forms {
@@ -4086,6 +4087,16 @@ $form-icon-btn: (
 
 		&.modal-popup-medium {
 			min-width: 450px;
+		}
+
+		&.modal-popup-static {
+			max-width: 700px;
+			width: 100%;
+		}
+
+		&.modal-popup-preprocessing {
+			max-width: 900px;
+			width: 100%;
 		}
 
 		&.modal-popup-generic {
@@ -4651,7 +4662,7 @@ $form-icon-btn: (
 }
 
 .top {
-	vertical-align: top;
+	vertical-align: top !important;
 }
 
 .right {
@@ -7319,18 +7330,27 @@ table.preprocessing-test-results {
 }
 
 // Media type test log popup
-#mediatype_testlog {
-	.logitems {
-		overflow: auto;
-		margin-bottom: 10px;
+.mediatypetest-modal {
+	&.overlay-dialogue.modal {
+		.overlay-dialogue-body {
+			overflow-x: auto;
 
+			&::-webkit-scrollbar {
+				height: 9px;
+			}
+		}
+	}
+
+	.logitems {
 		pre {
 			white-space: nowrap;
 		}
 	}
 
 	.logtotalms {
-		margin-bottom: 10px;
+		color: $font-alt-color;
+		float: left;
+		line-height: 24px;
 	}
 }
 
@@ -7417,4 +7437,43 @@ z-select,
 // Used in form lists to separate input elements on sections.
 .input-section-header {
 	padding-top: 10px;
+}
+
+.modal-popup-preprocessing {
+	.preprocessing-list .step-name {
+		flex: 0 0 180px;
+	}
+
+	.preprocessing-list {
+		min-width: unset;
+		max-width: unset;
+	}
+}
+
+.modal-popup-static,
+.modal-popup-preprocessing {
+	.table-forms-container {
+		border: none;
+	}
+
+	.ui-tabs-nav {
+		position: sticky;
+		top: 0;
+		background: $header-bg-color;
+		z-index: 3;
+	}
+
+	.textarea-flexible {
+		max-height: 200px;
+		overflow-y: auto;
+	}
+}
+
+.global-macro-table,
+.inherited-macros-table,
+.host-macros-table {
+	.table-col-value,
+	.table-col-template-value {
+		width: 300px;
+	}
 }
