@@ -1300,7 +1300,7 @@ pre, pre a, pre td, pre span {
       vertical-align: top;
       text-overflow: ellipsis;
       overflow: hidden;
-      max-width: 200px; }
+      max-width: 250px; }
       .header-navigation > ul li > span a {
         vertical-align: top;
         text-overflow: ellipsis;
