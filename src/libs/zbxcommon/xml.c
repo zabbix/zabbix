@@ -582,7 +582,7 @@ int	zbx_xml_to_json(char *data, char **jstr, char **errmsg)
 	zbx_vector_ptr_t	nodes;
 	char*			out;
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, XML_PARSE_NOBLANKS)))
 	{
 		if (NULL != (pErr = xmlGetLastError()))
 			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
