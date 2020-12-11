@@ -187,7 +187,7 @@ class CMacrosResolverHelper {
 			'authpassphrase' => [],
 			'privpassphrase' => [],
 			'contextname' => [],
-			'community' => [],
+			'community' => []
 		];
 
 		foreach ($interfaces as $index => $interface) {

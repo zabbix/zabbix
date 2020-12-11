@@ -448,7 +448,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => '+371 74661x'
 					],
-					'role' => 'Super Admin role',
+					'role' => 'Super admin role',
 					'expected_message' => 'User added'
 				]
 			],

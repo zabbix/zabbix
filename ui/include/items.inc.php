@@ -2007,7 +2007,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 					: $items[$items_index]['type'],
 				'source' => ($items_index === false)
 					? $master_items[$master_itemid]['source']
-					: $items[$items_index]['source'],
+					: $items[$items_index]['source']
 			];
 		}
 	}
@@ -2035,6 +2035,7 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_CALCULATED,
 		ITEM_TYPE_JMX,
 		ITEM_TYPE_HTTPAGENT,
+		ITEM_TYPE_SCRIPT,
 		ITEM_TYPE_SNMP
 	];
 }

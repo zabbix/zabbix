@@ -43,7 +43,7 @@ $widget = (new CWidget())
 							->getUrl() => _('Icon'),
 						$page_url
 							->setArgument('imagetype', IMAGE_TYPE_BACKGROUND)
-							->getUrl() => _('Background'),
+							->getUrl() => _('Background')
 					])
 				])
 				->addItem(

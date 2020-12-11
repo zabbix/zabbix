@@ -49,7 +49,7 @@ func ASMDiskGroupsHandler(ctx context.Context, conn OraClient, params []string) 
 							ROUND(100 - (USABLE_FILE_MB / (TOTAL_MB / 
 							DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3))) * 100, 2)
 				    )
-				)
+				) RETURNING CLOB 
 			)
          FROM 
          	V$ASM_DISKGROUP

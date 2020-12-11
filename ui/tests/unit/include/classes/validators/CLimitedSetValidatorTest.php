@@ -36,7 +36,7 @@ class CLimitedSetValidatorTest extends CValidatorTest {
 			[['values' => [1, 2, 3]], '2'],
 			[['values' => ['1', '2', '3']], 2],
 			[['values' => ['1', '2', '3']], '2'],
-			[['values' => ['one', 'two', 'three']], 'one'],
+			[['values' => ['one', 'two', 'three']], 'one']
 		];
 	}
 
@@ -76,7 +76,7 @@ class CLimitedSetValidatorTest extends CValidatorTest {
 				['values' => ['one', 'two', 'three'], 'messageInvalid' => 'Incorrect value "%1$s"'],
 				'FOUR',
 				'Incorrect value "FOUR"'
-			],
+			]
 		];
 	}
 
@@ -116,7 +116,7 @@ class CLimitedSetValidatorTest extends CValidatorTest {
 				['values' => ['one', 'two', 'three'], 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'],
 				'FOUR',
 				'Incorrect value "FOUR" for "object"'
-			],
+			]
 		];
 	}
 

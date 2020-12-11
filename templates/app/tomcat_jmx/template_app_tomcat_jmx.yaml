@@ -1,0 +1,467 @@
+zabbix_export:
+  version: '5.2'
+  date: '2020-11-23T08:46:30Z'
+  groups:
+    -
+      name: Templates/Applications
+  templates:
+    -
+      template: 'Apache Tomcat JMX'
+      name: 'Apache Tomcat JMX'
+      description: |
+        The template to monitor Apache Tomcat by Zabbix that work without any external scripts.
+        The metrics are collected by JMX.
+        
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/411862-discussion-thread-for-official-zabbix-template-tomcat
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Applications
+      applications:
+        -
+          name: Tomcat
+      items:
+        -
+          name: 'Tomcat: Version'
+          type: JMX
+          key: 'jmx["Catalina:type=Server",serverInfo]'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          username: '{$TOMCAT.USER}'
+          password: '{$TOMCAT.PASSWORD}'
+          description: 'The version of the Tomcat.'
+          applications:
+            -
+              name: Tomcat
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          triggers:
+            -
+              expression: '{diff()}=1 and {strlen()}>0'
+              name: 'Tomcat: Version has been changed'
+              priority: INFO
+              description: 'Tomcat version has changed. Ack to close.'
+              manual_close: 'YES'
+      discovery_rules:
+        -
+          name: 'Protocol handlers discovery'
+          type: JMX
+          key: 'jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]'
+          delay: 1h
+          username: '{$TOMCAT.USER}'
+          password: '{$TOMCAT.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXATTR}'
+                value: ^name$
+                formulaid: A
+          description: 'Discovery for ProtocolHandler'
+          item_prototypes:
+            -
+              name: '{#JMXVALUE}: Gzip compression status'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},compression]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: ProtocolHandler {#JMXVALUE}'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{str(off)} = 1'
+                  name: '{#JMXVALUE}: Gzip compression is disabled'
+                  priority: INFO
+                  description: 'gzip compression is disabled for connector {#JMXVALUE}.'
+                  manual_close: 'YES'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Global request processors discovery'
+          type: JMX
+          key: 'jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]'
+          delay: 1h
+          username: '{$TOMCAT.USER}'
+          password: '{$TOMCAT.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXNAME}'
+                value: '{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}'
+                formulaid: A
+              -
+                macro: '{#JMXNAME}'
+                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery for GlobalRequesProcessor'
+          item_prototypes:
+            -
+              name: '{#JMXNAME}: Bytes received per second'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},bytesReceived]'
+              history: 7d
+              units: B
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Bytes received rate by processor {#JMXNAME}'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXNAME}: Bytes sent per second'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},bytesSent]'
+              history: 7d
+              units: B
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Bytes sent rate by processor {#JMXNAME}'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXNAME}: Errors per second'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},errorCount]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Error rate of request processor {#JMXNAME}'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXNAME}: Requests processing time'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},processingTime]'
+              history: 7d
+              units: s
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'The total time to process all incoming requests of request processor {#JMXNAME}'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXNAME}: Requests per second'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},requestCount]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Rate of requests served by request processor {#JMXNAME}'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          graph_prototypes:
+            -
+              name: '{#JMXNAME}: Traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},bytesSent]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},bytesReceived]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Contexts discovery'
+          type: JMX
+          key: 'jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]'
+          delay: 1h
+          username: '{$TOMCAT.USER}'
+          password: '{$TOMCAT.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXHOST}'
+                value: '{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}'
+                formulaid: A
+              -
+                macro: '{#JMXHOST}'
+                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery for contexts'
+          item_prototypes:
+            -
+              name: '{#JMXHOST}{#JMXCONTEXT}: Sessions active'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},activeSessions]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Active sessions of the application.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXHOST}{#JMXCONTEXT}: Sessions allowed maximum'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},maxActiveSessions]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'The maximum number of active Sessions allowed, or -1 for no limit.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXHOST}{#JMXCONTEXT}: Sessions active maximum so far'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},maxActive]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Maximum number of active sessions so far.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},rejectedSessions]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Rate of sessions we rejected due to maxActive being reached.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXHOST}{#JMXCONTEXT}: Sessions created per second'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},sessionCounter]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Rate of sessions created by this application per second.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: Context {#JMXHOST}{#JMXCONTEXT}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          graph_prototypes:
+            -
+              name: '{#JMXHOST}{#JMXCONTEXT}: Sessions'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},maxActive]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},activeSessions]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},rejectedSessions]'
+                -
+                  sortorder: '3'
+                  drawtype: GRADIENT_LINE
+                  color: A54F10
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},maxActiveSessions]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+        -
+          name: 'Thread pools discovery'
+          type: JMX
+          key: 'jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]'
+          delay: 1h
+          username: '{$TOMCAT.USER}'
+          password: '{$TOMCAT.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXNAME}'
+                value: '{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}'
+                formulaid: A
+              -
+                macro: '{#JMXNAME}'
+                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery for ThreadPool'
+          item_prototypes:
+            -
+              name: '{#JMXNAME}: Threads count'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},currentThreadCount]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Amount of threads the thread pool has right now, both busy and free.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXNAME}: Threads busy'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},currentThreadsBusy]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Number of the requests that are being currently handled.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: '{#JMXNAME}: Threads limit'
+              type: JMX
+              key: 'jmx[{#JMXOBJ},maxThreads]'
+              history: 7d
+              username: '{$TOMCAT.USER}'
+              password: '{$TOMCAT.PASSWORD}'
+              description: 'Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.'
+              application_prototypes:
+                -
+                  name: 'Tomcat: {#JMXTYPE} {#JMXNAME}'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          trigger_prototypes:
+            -
+              expression: '{Apache Tomcat JMX:jmx[{#JMXOBJ},currentThreadsBusy].min({$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})}>{Apache Tomcat JMX:jmx[{#JMXOBJ},maxThreads].last()}*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100'
+              name: '{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"}'
+              priority: HIGH
+              description: 'When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.'
+          graph_prototypes:
+            -
+              name: '{#JMXNAME}: Worker threads'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},maxThreads]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},currentThreadCount]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Apache Tomcat JMX'
+                    key: 'jmx[{#JMXOBJ},currentThreadsBusy]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+      macros:
+        -
+          macro: '{$TOMCAT.LLD.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"'
+        -
+          macro: '{$TOMCAT.LLD.FILTER.NOT_MATCHES}'
+          value: 'CHANGE IF NEEDED'
+          description: 'Filter to exclude discovered objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"'
+        -
+          macro: '{$TOMCAT.PASSWORD}'
+          description: 'Password for JMX'
+        -
+          macro: '{$TOMCAT.THREADS.MAX.PCT}'
+          value: '75'
+          description: 'Threshold for busy worker threads trigger. Can be used with {#JMXNAME} as context.'
+        -
+          macro: '{$TOMCAT.THREADS.MAX.TIME}'
+          value: 5m
+          description: 'The time during which the number of busy threads can exceed the threshold. Can be used with {#JMXNAME} as context.'
+        -
+          macro: '{$TOMCAT.USER}'
+          description: 'User for JMX'

@@ -742,7 +742,9 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	] + $host_options;
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments',
+			'manual_close'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectDependencies' => ['triggerid'],
 		'monitored' => true

@@ -101,6 +101,14 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	}
 
 	/**
+	 * Check that adding two 'Check for not supported value'
+	 * preprocessing steps is impossible.
+	 */
+	public function testFormItemPrototypePreprocessing_RepeatedNotSupported() {
+		$this->checkRepeatedNotSupported();
+	}
+
+	/**
 	 * @dataProvider getItemCustomOnFailData
 	 */
 	public function testFormItemPrototypePreprocessing_CustomOnFail($data) {

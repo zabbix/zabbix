@@ -434,7 +434,7 @@ class CControllerMenuPopup extends CController {
 
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
 						$menu_data = [
-							'type' => 'map_element_image',
+							'type' => 'map_element_image'
 						];
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
@@ -492,7 +492,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataTrigger(array $data) {
 		$db_triggers = API::Trigger()->get([
-			'output' => ['expression', 'url', 'comments'],
+			'output' => ['expression', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 			'triggerids' => $data['triggerid'],
@@ -551,10 +551,6 @@ class CControllerMenuPopup extends CController {
 				'items' => $items,
 				'showEvents' => $show_events,
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-				'allowed_ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-						|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 			];
@@ -566,16 +562,35 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
+			$can_be_closed = ($db_trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+					&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			);
+
 			if (array_key_exists('eventid', $data)) {
 				$menu_data['eventid'] = $data['eventid'];
 
 				$events = API::Event()->get([
-					'output' => ['urls'],
+					'output' => ['r_eventid', 'urls'],
+					'select_acknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
 
 				if ($events) {
-					foreach ($events[0]['urls'] as $url) {
+					$event = $events[0];
+
+					if ($event['r_eventid'] != 0) {
+						$can_be_closed = false;
+					}
+					else {
+						foreach ($event['acknowledges'] as $acknowledge) {
+							if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+								$can_be_closed = false;
+								break;
+							}
+						}
+					}
+
+					foreach ($event['urls'] as $url) {
 						$menu_data['urls'][] = [
 							'label' => $url['name'],
 							'url' => $url['url'],
@@ -598,7 +613,13 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if (array_key_exists('acknowledge', $data)) {
-				$menu_data['acknowledge'] = (bool) $data['acknowledge'];
+				$menu_data['acknowledge'] = ((bool) $data['acknowledge']
+						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
+							|| $can_be_closed
+						)
+				);
 			}
 
 			return $menu_data;
@@ -644,18 +665,26 @@ class CControllerMenuPopup extends CController {
 			$menu_data['params'] = $data['params'];
 		}
 
-		if ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('graphid', $data) && $data['graphid']) {
-			$menu_data['download'] = (bool) API::Graph()->get([
-				'output' => ['graphid'],
-				'graphids' => $data['graphid']
-			]);
-		}
-		elseif ($data['widgetType'] == WIDGET_GRAPH && array_key_exists('itemid', $data) && $data['itemid']) {
-			$menu_data['download'] = (bool) API::Item()->get([
-				'output' => ['itemid'],
-				'itemids' => $data['itemid'],
-				'webitems' => true
-			]);
+		if ($data['widgetType'] == WIDGET_GRAPH) {
+			$options = [];
+
+			if (array_key_exists('dynamic_hostid', $data)) {
+				$options['hostids'] = $data['dynamic_hostid'];
+			}
+
+			if (array_key_exists('graphid', $data) && $data['graphid']) {
+				$menu_data['download'] = (bool) API::Graph()->get($options + [
+					'output' => ['graphid'],
+					'graphids' => $data['graphid']
+				]);
+			}
+			elseif (array_key_exists('itemid', $data) && $data['itemid']) {
+				$menu_data['download'] = (bool) API::Item()->get($options + [
+					'output' => ['itemid'],
+					'itemids' => $data['itemid'],
+					'webitems' => true
+				]);
+			}
 		}
 
 		return $menu_data;

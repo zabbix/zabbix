@@ -119,7 +119,7 @@ trait TableTrait {
 	 * @param integer $count	rows count per page
 	 * @param integer $total	total rows count
 	 */
-	public function assertRowCount($count, $total = null) {
+	public function assertTableStats($count, $total = null) {
 		if ($total === null) {
 			$total = $count;
 		}

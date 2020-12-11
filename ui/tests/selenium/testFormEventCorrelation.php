@@ -226,7 +226,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with Event tag pair',
 					'select_tag' => 'Event tag pair',
 					'oldtag' => 'Old tag',
-					'newtag' => 'New tag',
+					'newtag' => 'New tag'
 				]
 			],
 			[
@@ -463,7 +463,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with calculation And/Or',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					]
 				]
 			],
@@ -482,7 +482,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with calculation OR',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
 					'calculation' => 'Or'
 				]
@@ -493,7 +493,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag3'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag3']
 
 					],
 				'calculation' => 'Custom expression',
@@ -553,7 +553,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with empty expression',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> '',
 					'error_message' => 'Incorrect custom expression "" for correlation "Test create with empty expression": expression is empty.'
@@ -600,7 +600,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Check case sensitive of operator in formula',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'A and Not B',
 					'error_message' => 'Incorrect custom expression "A and Not B" for correlation "Check case sensitive of operator in formula": check expression starting from "Not B".'
@@ -611,7 +611,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Check case sensitive of first operator in formula',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'NOT A and not B',
 					'error_message' => 'Incorrect custom expression "NOT A and not B" for correlation "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
@@ -622,7 +622,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Test create with only NOT in formula',
 					'tags'=>[
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'not A not B',
 					'error_message' => 'Incorrect custom expression "not A not B" for correlation "Test create with only NOT in formula": check expression starting from " not B".'

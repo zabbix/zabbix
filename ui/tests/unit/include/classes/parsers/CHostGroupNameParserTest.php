@@ -238,7 +238,7 @@ class CHostGroupNameParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
 			'match' => $parser->getMatch(),
-			'macros' => $parser->getMacros(),
+			'macros' => $parser->getMacros()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}

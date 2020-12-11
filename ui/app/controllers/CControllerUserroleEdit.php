@@ -135,38 +135,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 				'rules' => $rules_labels,
 				'modules' => $module_labels,
 				'actions' => $actions_labels
-			],
-			'rules' => [
-				CRoleHelper::UI_DEFAULT_ACCESS => true,
-				CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
-				CRoleHelper::MODULES_DEFAULT_ACCESS => true,
-				CRoleHelper::SECTION_UI => [
-					CRoleHelper::UI_MONITORING_DASHBOARD => true,
-					CRoleHelper::UI_MONITORING_PROBLEMS => true,
-					CRoleHelper::UI_MONITORING_HOSTS => true,
-					CRoleHelper::UI_MONITORING_OVERVIEW => true,
-					CRoleHelper::UI_MONITORING_LATEST_DATA => true,
-					CRoleHelper::UI_MONITORING_SCREENS => true,
-					CRoleHelper::UI_MONITORING_MAPS => true,
-					CRoleHelper::UI_MONITORING_SERVICES => true,
-					CRoleHelper::UI_INVENTORY_OVERVIEW => true,
-					CRoleHelper::UI_INVENTORY_HOSTS => true,
-					CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT => true,
-					CRoleHelper::UI_REPORTS_TOP_TRIGGERS => true
-				],
-				CRoleHelper::SECTION_ACTIONS => [
-					CRoleHelper::ACTIONS_EDIT_DASHBOARDS => true,
-					CRoleHelper::ACTIONS_EDIT_MAPS => true,
-					CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS => true,
-					CRoleHelper::ACTIONS_CLOSE_PROBLEMS => true,
-					CRoleHelper::ACTIONS_CHANGE_SEVERITY => true,
-					CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS => true,
-					CRoleHelper::ACTIONS_EXECUTE_SCRIPTS => true
-				],
-				CRoleHelper::SECTION_MODULES => [],
-				CRoleHelper::API_ACCESS => true,
-				CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
-				CRoleHelper::SECTION_API => []
 			]
 		];
 
@@ -176,11 +144,28 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$data['type'] = $this->role['type'];
 			$data['readonly'] = $this->role['readonly'];
 		}
+		else {
+			// The input value will be set in case of read-only role cloning.
+			$data['type'] = $this->getInput('type', $data['type']);
+		}
+
+		$data['rules'] = [
+			CRoleHelper::UI_DEFAULT_ACCESS => true,
+			CRoleHelper::ACTIONS_DEFAULT_ACCESS => true,
+			CRoleHelper::MODULES_DEFAULT_ACCESS => true,
+			CRoleHelper::SECTION_UI => array_fill_keys(CRoleHelper::getAllUiElements((int) $data['type']), true),
+			CRoleHelper::SECTION_ACTIONS => array_fill_keys(CRoleHelper::getAllActions((int) $data['type']), true),
+			CRoleHelper::SECTION_MODULES => [],
+			CRoleHelper::API_ACCESS => true,
+			CRoleHelper::API_MODE => CRoleHelper::API_MODE_DENY,
+			CRoleHelper::SECTION_API => []
+		];
 
 		if ($this->getInput('roleid', 0) != 0) {
 			$data['rules'] = array_merge($data['rules'], $this->getRulesValue((int) $this->role['roleid']));
 		}
 
+		$data['is_own_role'] = ($data['roleid'] == CWebUser::$data['roleid']);
 		$data = $this->overwriteInputs($data);
 
 		$response = new CControllerResponseData($data);
