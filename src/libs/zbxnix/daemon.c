@@ -441,3 +441,4 @@ int	zbx_sigusr_send(int flags)
 
 	return ret;
 }
+

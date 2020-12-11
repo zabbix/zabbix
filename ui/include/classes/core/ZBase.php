@@ -467,6 +467,20 @@ class ZBase {
 			CMessageHelper::setErrorTitle(CCookieHelper::get('system-message-error'));
 			CCookieHelper::unset('system-message-error');
 		}
+		if (CCookieHelper::has('system-message-details')) {
+			$details = json_decode(base64_decode(CCookieHelper::get('system-message-details')), true);
+			if ($details['type'] === 'success') {
+				foreach ($details['messages'] as $message) {
+					CMessageHelper::addSuccess($message);
+				}
+			}
+			else {
+				foreach ($details['messages'] as $message) {
+					CMessageHelper::addError($message);
+				}
+			}
+			CCookieHelper::unset('system-message-details');
+		}
 	}
 
 	/**

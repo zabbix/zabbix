@@ -222,6 +222,15 @@ abstract class CController {
 			return true;
 		}
 
+		try {
+			$max_period = 'now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD);
+		}
+		catch (Exception $x) {
+			access_deny(ACCESS_DENY_PAGE);
+
+			return false;
+		}
+
 		$ts = [];
 		$ts['now'] = time();
 		$range_time_parser = new CRangeTimeParser();
@@ -234,7 +243,7 @@ abstract class CController {
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
-		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+		$range_time_parser->parse($max_period);
 		$max_period = 1 + $ts['now'] - $range_time_parser
 			->getDateTime(true)
 			->getTimestamp();

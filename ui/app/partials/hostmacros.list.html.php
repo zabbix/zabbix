@@ -30,11 +30,12 @@ else {
 	$table = (new CTable())
 		->setId('tbl_macros')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-		->setHeader([
-			(new CColHeader(_('Macro')))->setWidth(ZBX_TEXTAREA_MACRO_WIDTH),
-			(new CColHeader(_('Value')))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
-			_('Description'),
-			$data['readonly'] ? null : ''
+		->addClass('host-macros-table')
+		->setColumns([
+			(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
+			(new CTableColumn(_('Value')))->addClass('table-col-value'),
+			(new CTableColumn(_('Description')))->addClass('table-col-description'),
+			$data['readonly'] ? null : (new CTableColumn())->addClass('table-col-action')
 		]);
 
 	foreach ($data['macros'] as $i => $macro) {
