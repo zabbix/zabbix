@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-04 19:53+0200\n"
+"POT-Creation-Date: 2020-12-11 19:53+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -283,7 +283,7 @@ msgstr "(無系統代理程式)"
 msgid "0 - use default port"
 msgstr ""
 
-#: include/triggers.inc.php:1857
+#: include/triggers.inc.php:1829
 msgid "0 or 1"
 msgstr "0 或 1"
 
@@ -432,9 +432,9 @@ msgstr ""
 #: include/views/configuration.action.edit.php:56
 #: include/views/configuration.action.edit.php:169
 #: include/views/configuration.action.edit.php:173
-#: include/views/configuration.action.edit.php:315
-#: include/views/configuration.action.edit.php:398
-#: include/views/configuration.action.edit.php:468
+#: include/views/configuration.action.edit.php:329
+#: include/views/configuration.action.edit.php:419
+#: include/views/configuration.action.edit.php:496
 #: include/views/configuration.correlation.edit.php:53
 #: include/views/configuration.graph.edit.php:375
 #: include/views/configuration.host.discovery.edit.php:490
@@ -617,10 +617,10 @@ msgstr "作用中直到"
 #: app/views/popup.triggerwizard.php:110 app/views/popup.triggerwizard.php:144
 #: include/classes/widgets/CWidgetHelper.php:502 include/forms.inc.php:1474
 #: include/forms.inc.php:1993 include/views/configuration.action.edit.php:130
-#: include/views/configuration.action.edit.php:300
-#: include/views/configuration.action.edit.php:379
-#: include/views/configuration.action.edit.php:452
-#: include/views/configuration.action.edit.php:491
+#: include/views/configuration.action.edit.php:314
+#: include/views/configuration.action.edit.php:400
+#: include/views/configuration.action.edit.php:480
+#: include/views/configuration.action.edit.php:519
 #: include/views/configuration.application.edit.php:64
 #: include/views/configuration.correlation.edit.php:97
 #: include/views/configuration.correlation.edit.php:180
@@ -929,7 +929,7 @@ msgstr ""
 msgid "All templates"
 msgstr ""
 
-#: include/triggers.inc.php:1249
+#: include/triggers.inc.php:1221
 #: include/views/configuration.trigger.prototype.edit.php:503
 #: include/views/configuration.trigger.prototype.massupdate.php:62
 #: include/views/configuration.triggers.edit.php:529
@@ -950,7 +950,7 @@ msgid "Alternatively, you can install it manually:"
 msgstr ""
 
 #: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
-#: include/triggers.inc.php:1317
+#: include/triggers.inc.php:1289
 #: include/views/configuration.action.edit.php:120
 #: include/views/configuration.correlation.edit.php:112
 #: include/views/configuration.host.discovery.edit.php:574
@@ -986,7 +986,7 @@ msgstr "且/或"
 #: app/views/administration.user.list.php:74
 #: app/views/monitoring.host.view.php:141
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
-#: include/triggers.inc.php:1856
+#: include/triggers.inc.php:1828
 #: include/views/configuration.action.list.php:70
 #: include/views/configuration.correlation.list.php:48
 #: include/views/configuration.discovery.list.php:48
@@ -1131,7 +1131,7 @@ msgstr "區域尺寸"
 msgid "Area type"
 msgstr "區域類型"
 
-#: include/items.inc.php:1804
+#: include/items.inc.php:1799
 msgid "Arithmetic"
 msgstr ""
 
@@ -1208,7 +1208,7 @@ msgstr ""
 msgid "At least one operation must be selected."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:501
+#: include/views/configuration.action.edit.php:529
 msgid "At least one operation must exist."
 msgstr ""
 
@@ -1472,7 +1472,7 @@ msgstr ""
 msgid "Bold line"
 msgstr "粗線"
 
-#: include/items.inc.php:1817
+#: include/items.inc.php:1812
 msgid "Boolean to decimal"
 msgstr ""
 
@@ -1560,7 +1560,7 @@ msgstr ""
 msgid "CRLF"
 msgstr ""
 
-#: include/items.inc.php:1801
+#: include/items.inc.php:1796
 msgid "CSV to JSON"
 msgstr ""
 
@@ -3061,8 +3061,8 @@ msgid "Certificate"
 msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:65
-#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1808
-#: include/items.inc.php:1812
+#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1803
+#: include/items.inc.php:1807
 msgctxt "noun"
 msgid "Change"
 msgstr ""
@@ -3087,7 +3087,7 @@ msgstr ""
 msgid "Change password"
 msgstr "修改密碼"
 
-#: include/items.inc.php:1813
+#: include/items.inc.php:1808
 msgid "Change per second"
 msgstr ""
 
@@ -3135,15 +3135,15 @@ msgstr "檢查已存在."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "檢查開始於\"%1$s\"的表示式部份."
 
-#: include/items.inc.php:1845
+#: include/items.inc.php:1840
 msgid "Check for error in JSON"
 msgstr ""
 
-#: include/items.inc.php:1849
+#: include/items.inc.php:1844
 msgid "Check for error in XML"
 msgstr ""
 
-#: include/items.inc.php:1853
+#: include/items.inc.php:1848
 msgid "Check for error using regular expression"
 msgstr ""
 
@@ -3281,7 +3281,7 @@ msgstr "Clock"
 #: app/views/administration.regex.edit.php:147
 #: app/views/administration.script.edit.php:141
 #: app/views/administration.valuemap.edit.php:112
-#: include/views/configuration.action.edit.php:480
+#: include/views/configuration.action.edit.php:508
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.correlation.edit.php:169
 #: include/views/configuration.discovery.edit.php:144
@@ -3394,7 +3394,7 @@ msgstr "命令"
 msgid "Commands"
 msgstr "命令"
 
-#: include/items.inc.php:1260
+#: include/items.inc.php:1255
 msgctxt "SNMP Community"
 msgid "Community"
 msgstr ""
@@ -3848,7 +3848,7 @@ msgstr ""
 msgid "Content menu"
 msgstr ""
 
-#: app/views/popup.discovery.check.php:81 include/items.inc.php:1256
+#: app/views/popup.discovery.check.php:81 include/items.inc.php:1251
 #: include/views/js/configuration.host.edit.js.php:96
 msgid "Context name"
 msgstr ""
@@ -4209,7 +4209,7 @@ msgstr "自訂標示給類型 \"%1$s\"的拓墣圖 \"%2$s\"組件, 其不得為�
 msgid "Custom message"
 msgstr ""
 
-#: include/items.inc.php:1805
+#: include/items.inc.php:1800
 msgid "Custom multiplier"
 msgstr "自訂倍數"
 
@@ -4226,7 +4226,7 @@ msgstr "自訂篩選"
 msgid "Custom script"
 msgstr "自訂腳本"
 
-#: include/items.inc.php:1828
+#: include/items.inc.php:1823
 msgid "Custom scripts"
 msgstr ""
 
@@ -4624,7 +4624,7 @@ msgstr "刪除並清除模板? (警告: 所有連結的主機將被清除!)"
 msgid "Delete application?"
 msgstr "刪除應用集?"
 
-#: include/views/configuration.action.edit.php:482
+#: include/views/configuration.action.edit.php:510
 msgid "Delete current action?"
 msgstr "刪除目前的動作?"
 
@@ -4920,7 +4920,7 @@ msgstr "禁止"
 msgid "Dependencies"
 msgstr "相依關係"
 
-#: include/triggers.inc.php:2581
+#: include/triggers.inc.php:2553
 msgid "Dependent"
 msgstr "相依"
 
@@ -4928,7 +4928,7 @@ msgstr "相依"
 msgid "Dependent item"
 msgstr ""
 
-#: app/views/popup.generic.php:313 include/triggers.inc.php:2581
+#: app/views/popup.generic.php:313 include/triggers.inc.php:2553
 #: include/views/configuration.services.edit.php:160
 #: include/views/configuration.trigger.prototype.list.php:87
 #: include/views/configuration.triggers.list.php:241
@@ -4972,8 +4972,8 @@ msgstr "描述"
 #: app/views/reports.auditlog.list.php:93 include/blocks.inc.php:617
 #: include/func.inc.php:1606 include/views/configuration.action.edit.php:169
 #: include/views/configuration.action.edit.php:173
-#: include/views/configuration.action.edit.php:315
-#: include/views/configuration.action.edit.php:398
+#: include/views/configuration.action.edit.php:329
+#: include/views/configuration.action.edit.php:419
 #: include/views/inventory.host.view.php:247
 msgid "Details"
 msgstr "細節"
@@ -5116,7 +5116,7 @@ msgstr "停用選取的網頁檢測？"
 #: include/html.inc.php:306 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:185 include/maps.inc.php:320
-#: include/triggers.inc.php:2060 include/users.inc.php:86
+#: include/triggers.inc.php:2032 include/users.inc.php:86
 #: include/views/configuration.action.list.php:72
 #: include/views/configuration.action.list.php:118
 #: include/views/configuration.correlation.list.php:50
@@ -5135,11 +5135,11 @@ msgstr "停用的"
 msgid "Disaster"
 msgstr "災難"
 
-#: include/items.inc.php:1857
+#: include/items.inc.php:1852
 msgid "Discard unchanged"
 msgstr ""
 
-#: include/items.inc.php:1861
+#: include/items.inc.php:1856
 msgid "Discard unchanged with heartbeat"
 msgstr ""
 
@@ -5400,7 +5400,7 @@ msgstr ""
 msgid "Do you wish to replace the conditional expression?"
 msgstr "您想要替換條件式表示式嗎?"
 
-#: include/items.inc.php:1841
+#: include/items.inc.php:1836
 msgid "Does not match regular expression"
 msgstr ""
 
@@ -5576,9 +5576,9 @@ msgstr ""
 #: app/views/administration.user.edit.php:287
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:258
-#: include/views/configuration.action.edit.php:279
-#: include/views/configuration.action.edit.php:358
-#: include/views/configuration.action.edit.php:431
+#: include/views/configuration.action.edit.php:286
+#: include/views/configuration.action.edit.php:372
+#: include/views/configuration.action.edit.php:452
 #: include/views/configuration.maintenance.edit.php:104
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.trigger.prototype.edit.php:293
@@ -5915,8 +5915,8 @@ msgstr ""
 #: app/views/popup.triggerwizard.php:134 include/discovery.inc.php:107
 #: include/html.inc.php:302 include/httptest.inc.php:46
 #: include/items.inc.php:138 include/items.inc.php:141
-#: include/items.inc.php:182 include/triggers.inc.php:1254
-#: include/triggers.inc.php:2057
+#: include/items.inc.php:182 include/triggers.inc.php:1226
+#: include/triggers.inc.php:2029
 #: include/views/configuration.action.edit.php:144
 #: include/views/configuration.action.list.php:71
 #: include/views/configuration.action.list.php:126
@@ -6028,7 +6028,7 @@ msgstr ""
 msgid "Event details"
 msgstr "事件細節"
 
-#: include/triggers.inc.php:1244
+#: include/triggers.inc.php:1216
 msgid "Event generation"
 msgstr "事件產出"
 
@@ -6125,7 +6125,7 @@ msgstr "執行在"
 msgid "Executed"
 msgstr ""
 
-#: include/items.inc.php:1738
+#: include/items.inc.php:1733
 #: include/views/configuration.host.discovery.edit.php:465
 #: include/views/configuration.item.edit.php:532
 #: include/views/configuration.item.prototype.edit.php:508
@@ -6552,7 +6552,7 @@ msgstr ""
 msgid "Form data"
 msgstr ""
 
-#: include/items.inc.php:1742 include/views/configuration.item.edit.php:550
+#: include/items.inc.php:1737 include/views/configuration.item.edit.php:550
 #: include/views/configuration.item.prototype.edit.php:524
 msgid "Formula"
 msgstr "公式"
@@ -6679,7 +6679,7 @@ msgid "Get value from host"
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: include/triggers.inc.php:1400
+#: include/triggers.inc.php:1372
 msgid "Given expression is not a macro"
 msgstr "此表示式不是巨集"
 
@@ -7153,7 +7153,7 @@ msgstr "高"
 msgid "Help"
 msgstr "說明"
 
-#: include/items.inc.php:1825
+#: include/items.inc.php:1820
 msgid "Hexadecimal to decimal"
 msgstr ""
 
@@ -7296,7 +7296,7 @@ msgstr "横向對齊"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
-#: include/triggers.inc.php:1212
+#: include/triggers.inc.php:1184
 #: include/views/configuration.application.list.php:81
 #: include/views/configuration.host.discovery.list.php:184
 #: include/views/configuration.host.edit.php:461
@@ -7992,7 +7992,7 @@ msgstr "維修中"
 msgid "In progress"
 msgstr "作業中"
 
-#: include/items.inc.php:1833
+#: include/items.inc.php:1828
 msgid "In range"
 msgstr ""
 
@@ -8028,7 +8028,7 @@ msgstr ""
 
 #: app/partials/monitoring.host.view.html.php:92
 #: include/classes/screens/CScreenProblem.php:412
-#: include/hostgroups.inc.php:289 include/triggers.inc.php:2212
+#: include/hostgroups.inc.php:289 include/triggers.inc.php:2184
 #: include/views/configuration.host.list.php:250
 #: include/views/inventory.host.view.php:40
 msgid "Inaccessible maintenance"
@@ -8041,11 +8041,11 @@ msgstr ""
 
 #: include/graphs.inc.php:274 include/hosts.inc.php:631
 #: include/hosts.inc.php:802 include/httptest.inc.php:217
-#: include/items.inc.php:889 include/triggers.inc.php:2351
+#: include/items.inc.php:889 include/triggers.inc.php:2323
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2551 include/triggers.inc.php:2559
+#: include/triggers.inc.php:2523 include/triggers.inc.php:2531
 msgid "Inaccessible trigger"
 msgstr ""
 
@@ -8514,7 +8514,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1401
+#: include/triggers.inc.php:1373
 msgid "Incorrect function is used"
 msgstr "使用了不正確的方程式"
 
@@ -8605,7 +8605,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
-#: include/triggers.inc.php:1402
+#: include/triggers.inc.php:1374
 msgid "Incorrect item value type"
 msgstr ""
 
@@ -9212,7 +9212,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:311
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:109
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:124
-#: include/items.inc.php:2040 include/screens.inc.php:300
+#: include/items.inc.php:2035 include/screens.inc.php:300
 #: include/screens.inc.php:314 include/screens.inc.php:429
 #: include/screens.inc.php:443 include/sounds.inc.php:113
 #: include/validate.inc.php:332
@@ -10004,15 +10004,15 @@ msgstr "項目使用不正確的介面類型."
 msgid "Item values"
 msgstr ""
 
-#: include/items.inc.php:2076
+#: include/items.inc.php:2071
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 
-#: include/items.inc.php:2063
+#: include/items.inc.php:2058
 msgid "Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval."
 msgstr ""
 
-#: include/items.inc.php:2068
+#: include/items.inc.php:2063
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
 msgstr ""
 
@@ -10149,7 +10149,7 @@ msgstr "JSON-rpc 參數不是一個陣列."
 msgid "JSON-rpc version is not specified."
 msgstr "JSON-rpc 版本並未指定."
 
-#: include/items.inc.php:1797
+#: include/items.inc.php:1792
 #: include/views/configuration.host.discovery.edit.php:669
 msgid "JSONPath"
 msgstr ""
@@ -10167,7 +10167,7 @@ msgid "Japanese (ja_JP)"
 msgstr "日語 (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:219 include/forms.inc.php:1323
-#: include/items.inc.php:1829 include/views/js/item.preprocessing.js.php:181
+#: include/items.inc.php:1824 include/views/js/item.preprocessing.js.php:181
 msgid "JavaScript"
 msgstr ""
 
@@ -10451,7 +10451,7 @@ msgstr "左側"
 msgid "Left Y"
 msgstr ""
 
-#: include/items.inc.php:1789
+#: include/items.inc.php:1784
 msgid "Left trim"
 msgstr ""
 
@@ -11046,7 +11046,7 @@ msgstr ""
 msgid "Master item"
 msgstr ""
 
-#: include/items.inc.php:1837
+#: include/items.inc.php:1832
 msgid "Matches regular expression"
 msgstr ""
 
@@ -11512,7 +11512,7 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr ""
 
-#: include/triggers.inc.php:1245
+#: include/triggers.inc.php:1217
 msgid "Multiple PROBLEM events"
 msgstr "多重問題(PROBLEM)事件"
 
@@ -11815,7 +11815,7 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
 #: include/events.inc.php:359 include/events.inc.php:591
-#: include/triggers.inc.php:1251 include/triggers.inc.php:1256
+#: include/triggers.inc.php:1223 include/triggers.inc.php:1228
 #: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
@@ -12411,7 +12411,7 @@ msgid "None"
 msgstr "無"
 
 #: app/views/popup.generic.php:530 include/graphs.inc.php:24
-#: include/items.inc.php:156 include/triggers.inc.php:1244
+#: include/items.inc.php:156 include/triggers.inc.php:1216
 #: include/views/configuration.triggers.list.php:71
 #: include/views/monitoring.history.php:253
 msgid "Normal"
@@ -12429,7 +12429,7 @@ msgstr ""
 msgid "Not Ack"
 msgstr "非知悉"
 
-#: app/partials/dataoverview.table.left.php:58
+#: app/partials/dataoverview.table.left.php:60
 #: app/partials/dataoverview.table.top.php:57
 #: app/partials/trigoverview.table.left.php:62
 #: app/partials/trigoverview.table.top.php:61
@@ -12655,20 +12655,20 @@ msgstr ""
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr ""
 
-#: include/items.inc.php:1816 include/items.inc.php:1820
-#: include/items.inc.php:1824
+#: include/items.inc.php:1811 include/items.inc.php:1815
+#: include/items.inc.php:1819
 msgid "Numeral systems"
 msgstr ""
 
 #: include/forms.inc.php:191 include/items.inc.php:125
-#: include/triggers.inc.php:1853 include/views/configuration.item.edit.php:567
+#: include/triggers.inc.php:1825 include/views/configuration.item.edit.php:567
 #: include/views/configuration.item.massupdate.php:173
 #: include/views/configuration.item.prototype.edit.php:540
 #: include/views/configuration.item.prototype.massupdate.php:169
 msgid "Numeric (float)"
 msgstr "數字的 (浮點)"
 
-#: include/triggers.inc.php:1854
+#: include/triggers.inc.php:1826
 msgid "Numeric (integer)"
 msgstr ""
 
@@ -12740,7 +12740,7 @@ msgstr ""
 msgid "Oct"
 msgstr "十月"
 
-#: include/items.inc.php:1821
+#: include/items.inc.php:1816
 msgid "Octal to decimal"
 msgstr ""
 
@@ -12961,8 +12961,8 @@ msgid "Operational data"
 msgstr ""
 
 #: app/views/popup.lldoverride.php:190
-#: include/views/configuration.action.edit.php:305
-#: include/views/configuration.action.edit.php:469
+#: include/views/configuration.action.edit.php:319
+#: include/views/configuration.action.edit.php:497
 #: include/views/configuration.action.list.php:90
 #: include/views/configuration.correlation.edit.php:159
 #: include/views/configuration.correlation.list.php:66
@@ -13010,7 +13010,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
-#: include/triggers.inc.php:1317
+#: include/triggers.inc.php:1289
 #: include/views/configuration.action.edit.php:121
 #: include/views/configuration.correlation.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:575
@@ -13867,7 +13867,7 @@ msgstr ""
 msgid "Problem display"
 msgstr "問題顯示"
 
-#: include/triggers.inc.php:1237
+#: include/triggers.inc.php:1209
 #: include/views/js/configuration.triggers.edit.js.php:46
 msgid "Problem expression"
 msgstr ""
@@ -13948,15 +13948,15 @@ msgstr ""
 msgid "Process tags"
 msgstr ""
 
-#: include/items.inc.php:1864 include/items.inc.php:1868
+#: include/items.inc.php:1859 include/items.inc.php:1863
 msgid "Prometheus"
 msgstr ""
 
-#: include/items.inc.php:1865
+#: include/items.inc.php:1860
 msgid "Prometheus pattern"
 msgstr ""
 
-#: include/items.inc.php:1869
+#: include/items.inc.php:1864
 msgid "Prometheus to JSON"
 msgstr ""
 
@@ -14198,7 +14198,7 @@ msgstr ""
 msgid "Recovery"
 msgstr "恢復"
 
-#: include/triggers.inc.php:1241
+#: include/triggers.inc.php:1213
 #: include/views/configuration.trigger.prototype.edit.php:286
 #: include/views/configuration.trigger.prototype.edit.php:369
 #: include/views/configuration.triggers.edit.php:310
@@ -14212,7 +14212,7 @@ msgstr ""
 msgid "Recovery expression syntax error."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:386
+#: include/views/configuration.action.edit.php:407
 msgid "Recovery operations"
 msgstr ""
 
@@ -14257,7 +14257,7 @@ msgid "Regular"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:210
-#: app/views/popup.lldoverride.php:101 include/items.inc.php:1773
+#: app/views/popup.lldoverride.php:101 include/items.inc.php:1768
 #: include/views/configuration.host.discovery.edit.php:593
 msgid "Regular expression"
 msgstr "正規表示式"
@@ -14348,10 +14348,10 @@ msgstr "遠端命令"
 #: include/classes/widgets/CWidgetHelper.php:490
 #: include/classes/widgets/CWidgetHelper.php:534 include/forms.inc.php:1454
 #: include/forms.inc.php:1962 include/views/configuration.action.edit.php:94
-#: include/views/configuration.action.edit.php:264
-#: include/views/configuration.action.edit.php:285
-#: include/views/configuration.action.edit.php:364
-#: include/views/configuration.action.edit.php:437
+#: include/views/configuration.action.edit.php:268
+#: include/views/configuration.action.edit.php:296
+#: include/views/configuration.action.edit.php:382
+#: include/views/configuration.action.edit.php:462
 #: include/views/configuration.correlation.edit.php:82
 #: include/views/configuration.host.discovery.edit.php:131
 #: include/views/configuration.host.discovery.edit.php:227
@@ -14488,7 +14488,7 @@ msgctxt "screen reader"
 msgid "Removed, %1$s"
 msgstr ""
 
-#: include/items.inc.php:1777
+#: include/items.inc.php:1772
 #: include/views/configuration.host.massupdate.php:62
 #: include/views/configuration.host.massupdate.php:131
 #: include/views/configuration.host.massupdate.php:237
@@ -14785,7 +14785,7 @@ msgstr "右"
 msgid "Right Y"
 msgstr ""
 
-#: include/items.inc.php:1785
+#: include/items.inc.php:1780
 msgid "Right trim"
 msgstr ""
 
@@ -15000,7 +15000,7 @@ msgstr ""
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr ""
 
-#: include/items.inc.php:1740
+#: include/items.inc.php:1735
 #: include/views/configuration.host.discovery.edit.php:473
 #: include/views/configuration.item.edit.php:541
 #: include/views/configuration.item.prototype.edit.php:516
@@ -15664,7 +15664,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormProblems.php:203
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:164 include/triggers.inc.php:1222
+#: include/events.inc.php:164 include/triggers.inc.php:1194
 #: include/views/configuration.item.list.php:144
 #: include/views/configuration.trigger.prototype.edit.php:76
 #: include/views/configuration.trigger.prototype.list.php:54
@@ -15898,7 +15898,7 @@ msgstr ""
 msgid "Simple"
 msgstr "簡單"
 
-#: include/items.inc.php:1809
+#: include/items.inc.php:1804
 msgid "Simple change"
 msgstr ""
 
@@ -16319,12 +16319,12 @@ msgstr "Straight"
 msgid "Strict"
 msgstr ""
 
-#: include/triggers.inc.php:1855
+#: include/triggers.inc.php:1827
 msgid "String"
 msgstr ""
 
-#: include/items.inc.php:1792 include/items.inc.php:1796
-#: include/items.inc.php:1800
+#: include/items.inc.php:1787 include/items.inc.php:1791
+#: include/items.inc.php:1795
 msgid "Structured data"
 msgstr ""
 
@@ -16788,9 +16788,9 @@ msgid "Test subject"
 msgstr ""
 
 #: include/classes/html/CMacroValue.php:138 include/forms.inc.php:194
-#: include/items.inc.php:131 include/items.inc.php:1772
-#: include/items.inc.php:1776 include/items.inc.php:1780
-#: include/items.inc.php:1784 include/items.inc.php:1788
+#: include/items.inc.php:131 include/items.inc.php:1767
+#: include/items.inc.php:1771 include/items.inc.php:1775
+#: include/items.inc.php:1779 include/items.inc.php:1783
 #: include/views/configuration.item.edit.php:570
 #: include/views/configuration.item.massupdate.php:176
 #: include/views/configuration.item.prototype.edit.php:543
@@ -16973,7 +16973,7 @@ msgstr ""
 msgid "Threshold"
 msgstr ""
 
-#: include/items.inc.php:1856 include/items.inc.php:1860
+#: include/items.inc.php:1851 include/items.inc.php:1855
 msgid "Throttling"
 msgstr ""
 
@@ -17215,7 +17215,7 @@ msgstr "趨勢"
 #: app/controllers/CControllerPopupTriggerWizard.php:293
 #: app/views/popup.services.php:48 include/actions.inc.php:46
 #: include/classes/graphdraw/CLineGraphDraw.php:475 include/events.inc.php:227
-#: include/maps.inc.php:26 include/triggers.inc.php:1216
+#: include/maps.inc.php:26 include/triggers.inc.php:1188
 #: include/views/configuration.services.edit.php:95
 #: include/views/configuration.services.edit.php:125
 #: include/views/configuration.triggers.edit.php:558
@@ -17465,7 +17465,7 @@ msgstr "觸發器已删除"
 msgid "Triggers top 100"
 msgstr "前百大觸發器"
 
-#: include/items.inc.php:1781
+#: include/items.inc.php:1776
 msgid "Trim"
 msgstr ""
 
@@ -17742,7 +17742,7 @@ msgstr "單位"
 #: include/items.inc.php:167 include/maintenances.inc.php:33
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:56 include/triggers.inc.php:120
-#: include/triggers.inc.php:267 include/triggers.inc.php:2057
+#: include/triggers.inc.php:267 include/triggers.inc.php:2029
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:245
 #: include/views/configuration.triggers.list.php:72
@@ -17767,12 +17767,12 @@ msgstr "未知的方程式."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
-#: include/triggers.inc.php:1399
+#: include/triggers.inc.php:1371
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主機項目, 在所選的主機中沒有這樣的項目"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:46
-#: include/triggers.inc.php:1398
+#: include/triggers.inc.php:1370
 msgid "Unknown host, no such host present in system"
 msgstr "未知的主機, 在系統中沒有出現這樣的主機."
 
@@ -17790,7 +17790,7 @@ msgstr "未知的資源"
 msgid "Unknown step failed: %1$s"
 msgstr ""
 
-#: include/items.inc.php:1390
+#: include/items.inc.php:1385
 msgid "Unknown value type"
 msgstr "未知的值類型"
 
@@ -17932,7 +17932,7 @@ msgstr "上"
 #: app/views/popup.lldoperation.php:292 app/views/popup.lldoverride.php:200
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:95
 #: app/views/popup.triggerwizard.php:144
-#: include/views/configuration.action.edit.php:479
+#: include/views/configuration.action.edit.php:507
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.correlation.edit.php:168
 #: include/views/configuration.discovery.edit.php:142
@@ -17983,7 +17983,7 @@ msgstr "更新現有的"
 msgid "Update interval"
 msgstr "更新間隔"
 
-#: include/views/configuration.action.edit.php:459
+#: include/views/configuration.action.edit.php:487
 msgid "Update operations"
 msgstr ""
 
@@ -17998,7 +17998,7 @@ msgid "Updated status of host \"%1$s\"."
 msgstr ""
 
 #: include/classes/screens/CScreenActions.php:165
-#: include/classes/screens/CScreenDataOverview.php:74
+#: include/classes/screens/CScreenDataOverview.php:54
 #: include/classes/screens/CScreenEvents.php:144
 #: include/classes/screens/CScreenHostgroupTriggers.php:157
 #: include/classes/screens/CScreenHostsInfo.php:118
@@ -18554,9 +18554,9 @@ msgstr ""
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/items.inc.php:1832 include/items.inc.php:1836
-#: include/items.inc.php:1840 include/items.inc.php:1844
-#: include/items.inc.php:1848 include/items.inc.php:1852
+#: include/items.inc.php:1827 include/items.inc.php:1831
+#: include/items.inc.php:1835 include/items.inc.php:1839
+#: include/items.inc.php:1843 include/items.inc.php:1847
 msgid "Validation"
 msgstr ""
 
@@ -18732,8 +18732,8 @@ msgid "Verify database certificate"
 msgstr ""
 
 #: app/views/administration.module.edit.php:39
-#: app/views/administration.module.list.php:75 include/items.inc.php:1255
-#: include/items.inc.php:1259
+#: app/views/administration.module.list.php:75 include/items.inc.php:1250
+#: include/items.inc.php:1254
 msgid "Version"
 msgstr ""
 
@@ -19078,7 +19078,7 @@ msgstr ""
 msgid "X2"
 msgstr ""
 
-#: include/items.inc.php:1793
+#: include/items.inc.php:1788
 msgid "XML XPath"
 msgstr ""
 
@@ -19196,7 +19196,7 @@ msgstr "每年"
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
 #: include/events.inc.php:359 include/events.inc.php:591
-#: include/triggers.inc.php:1250 include/triggers.inc.php:1255
+#: include/triggers.inc.php:1222 include/triggers.inc.php:1227
 #: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
@@ -20111,7 +20111,7 @@ msgstr ""
 msgid "invalid byte sequence in UTF-8"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:117 include/items.inc.php:2040
+#: include/classes/graphdraw/CLineGraphDraw.php:117 include/items.inc.php:2035
 msgid "invalid delay"
 msgstr ""
 
