@@ -378,7 +378,7 @@ abstract class CHostBase extends CApiService {
 
 			$fields = is_array($options['selectValueMaps'])
 				? array_flip($options['selectValueMaps'])
-				: ['name' => '', 'mappings' => ''];
+				: ['valuemapid' => '', 'name' => '', 'mappings' => ''];
 			$valuemaps = $this->getValueMaps($hostids, $options['selectValueMaps']);
 
 			foreach ($valuemaps as $valuemap) {
