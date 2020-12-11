@@ -761,8 +761,8 @@ class CHost extends CHostGeneral {
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
 
-			if (array_key_exists('valueMaps', $host)) {
-				$this->createValueMaps($hostid, $host['valueMaps']);
+			if (array_key_exists('valuemaps', $host)) {
+				$this->createValueMaps($hostid, $host['valuemaps']);
 			}
 		}
 		unset($host);
@@ -843,8 +843,8 @@ class CHost extends CHostGeneral {
 				$inventories[] = $inventory;
 			}
 
-			if (array_key_exists('valueMaps', $host)) {
-				$this->updateValueMaps($host['hostid'], $host['valueMaps']);
+			if (array_key_exists('valuemaps', $host)) {
+				$this->updateValueMaps($host['hostid'], $host['valuemaps']);
 			}
 		}
 		unset($host);
@@ -1965,8 +1965,8 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			if (array_key_exists('valueMaps', $host)) {
-				$this->validateValueMaps($host['valueMaps']);
+			if (array_key_exists('valuemaps', $host)) {
+				$this->validateValueMaps($host['valuemaps']);
 			}
 
 			$host['groups'] = zbx_toArray($host['groups']);
@@ -2156,8 +2156,8 @@ class CHost extends CHostGeneral {
 				));
 			}
 
-			if (array_key_exists('valueMaps', $host)) {
-				$this->validateValueMaps($host['valueMaps']);
+			if (array_key_exists('valuemaps', $host)) {
+				$this->validateValueMaps($host['valuemaps']);
 			}
 
 			// Validate "groups" field.

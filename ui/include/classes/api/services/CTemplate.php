@@ -383,8 +383,8 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
 			}
 
-			if (array_key_exists('valueMaps', $template)) {
-				$this->createValueMaps($templateId, $template['valueMaps']);
+			if (array_key_exists('valuemaps', $template)) {
+				$this->createValueMaps($templateId, $template['valuemaps']);
 			}
 		}
 
@@ -423,8 +423,8 @@ class CTemplate extends CHostGeneral {
 				$groupIds[$group['groupid']] = $group['groupid'];
 			}
 
-			if (array_key_exists('valueMaps', $template)) {
-				$this->validateValueMaps($template['valueMaps']);
+			if (array_key_exists('valuemaps', $template)) {
+				$this->validateValueMaps($template['valuemaps']);
 			}
 		}
 		unset($template);
@@ -544,8 +544,8 @@ class CTemplate extends CHostGeneral {
 				unset($template['macros']);
 			}
 
-			if (array_key_exists('valueMaps', $template)) {
-				$this->updateValueMaps($template['templateid'], $template['valueMaps']);
+			if (array_key_exists('valuemaps', $template)) {
+				$this->updateValueMaps($template['templateid'], $template['valuemaps']);
 			}
 		}
 		unset($template);
@@ -607,8 +607,8 @@ class CTemplate extends CHostGeneral {
 				$this->validateTags($template);
 			}
 
-			if (array_key_exists('valueMaps', $template)) {
-				$this->validateValueMaps($template['valueMaps']);
+			if (array_key_exists('valuemaps', $template)) {
+				$this->validateValueMaps($template['valuemaps']);
 			}
 		}
 	}

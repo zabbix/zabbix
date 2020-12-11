@@ -356,4 +356,148 @@ abstract class CHostBase extends CApiService {
 			DB::insert('host_tag', $insert);
 		}
 	}
+
+	/**
+	 * Adds the related objects requested by "select*" options to the resulting object set.
+	 *
+	 * @param array $options
+	 * @param array $result   An object hash with PKs as keys.
+	 *
+	 * @return array mixed
+	 */
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+		$hostids = array_keys($result);
+
+		// Add value mapping.
+		if ($options['selectValueMaps'] !== null) {
+			$fields = is_array($options['selectValueMaps'])
+				? array_flip($options['selectValueMaps'])
+				: ['name' => '', 'mappings' => ''];
+			$valuemaps = $this->getValueMaps($hostids, $options['selectValueMaps']);
+
+			foreach ($valuemaps as $valuemap) {
+				$result[$valuemap['hostid']]['valuemaps'][] = array_intersect_key($valuemap, $fields);
+			}
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Get value mapping for host/template/hostprototype as associative array where key is valuemapid.
+	 *
+	 * @param array        $hostids  Array of host/template/hostprototype ids.
+	 * @param array|string $output   Array of value mapping fields to be returned or, API_OUTPUT_EXTEND for all fields.
+	 * @return array
+	 */
+	protected function getValueMaps(array $hostids, $output): array {
+		$params = [
+			'output' => ['valuemapid', 'hostid'],
+			'filter' => ['hostid' => $hostids]
+		];
+
+		if ($this->outputIsRequested('name', $output)) {
+			$params['output'][] = 'name';
+		}
+
+		$valuemaps = DBfetchArrayAssoc(DBselect(DB::makeSql('valuemap', $params)), 'valuemapid');
+
+		if ($this->outputIsRequested('mappings', $output) && $valuemaps) {
+			$params = [
+				'output' => ['valuemapid', 'value', 'newvalue'],
+				'filter' => ['valuemapid' => array_keys($valuemaps)]
+			];
+			$query = DBselect(DB::makeSql('valuemap_mapping', $params));
+
+			while ($mapping = DBfetch($query)) {
+				$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+					'key' => $mapping['value'],
+					'value' => $mapping['newvalue']
+				];
+			}
+		}
+
+		return $valuemaps;
+	}
+
+	/**
+	 * Replace host/template/hostprototype value mapping.
+	 *
+	 * @param string $hostid     Id of host/template/hostprototype.
+	 * @param array  $valuemaps  Array of new value maps data.
+	 */
+	protected function updateValueMaps($hostid, $valuemaps) {
+		$this->deleteValueMaps([$hostid]);
+
+		if ($valuemaps) {
+			$this->createValueMaps($hostid, $valuemaps);
+		}
+	}
+
+	/**
+	 * Create value maps for host/template/hostprototype.
+	 *
+	 * @param string $hostid                   Id of host/template/hostprototype.
+	 * @param array  $valuemaps                Array of value maps to be created.
+	 * @param string $valuemaps[]['name']      Name of value mapping.
+	 * @param string $valuemaps[]['mappings']  Array with arrays of 'key' and 'value' pair for single mapping.
+	 */
+	protected function createValueMaps($hostid, array $valuemaps) {
+		$insert_rows = [];
+
+		foreach ($valuemaps as $valuemap) {
+			$insert_rows[] = [
+				'hostid' => $hostid,
+				'name' => $valuemap['name']
+			];
+		}
+
+		$valuemapids = DB::insert('valuemap', $insert_rows, true);
+		$valuemaps = array_combine($valuemapids, $valuemaps);
+		$insert_rows = [];
+
+		foreach ($valuemaps as $valuemapid => $valuemap) {
+			foreach ($valuemap['mappings'] as $mapping) {
+				$insert_rows[] = [
+					'valuemapid' => $valuemapid,
+					'value' => $mapping['key'],
+					'newvalue' => $mapping['value']
+				];
+			}
+		}
+
+		DB::insert('valuemap_mapping', $insert_rows, true);
+	}
+
+	/**
+	 * Delete value maps of specific host/template/hostprototype.
+	 *
+	 * @param array $hostids  Array of host ids.
+	 */
+	protected function deleteValueMaps(array $hostids) {
+		DB::delete('valuemap', ['hostid' => $hostids]);
+	}
+
+	/**
+	 * Validate valueMaps property.
+	 *
+	 * @param array  $valuemaps  Array of value maps to validate.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateValueMaps(array $valuemaps) {
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+			'name'	=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
+			'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
+				'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
+				'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
 }
