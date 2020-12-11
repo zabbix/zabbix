@@ -389,7 +389,6 @@ abstract class CHostBase extends CApiService {
 		return $result;
 	}
 
-
 	/**
 	 * Get value mapping for host/template/hostprototype as associative array where key is valuemapid.
 	 *
@@ -434,10 +433,61 @@ abstract class CHostBase extends CApiService {
 	 * @param array  $valuemaps  Array of new value maps data.
 	 */
 	protected function updateValueMaps($hostid, $valuemaps) {
-		$this->deleteValueMaps([$hostid]);
+		$update = [];
+		$insert = [];
+		$db_valuemaps = $this->getValueMaps([$hostid], API_OUTPUT_EXTEND);
 
-		if ($valuemaps) {
-			$this->createValueMaps($hostid, $valuemaps);
+		foreach ($valuemaps as $valuemap) {
+			if (array_key_exists('valuemapid', $valuemap) && array_key_exists($valuemap['valuemapid'], $db_valuemaps)) {
+				$update[$valuemap['valuemapid']] = $valuemap;
+			}
+			else {
+				$insert[] = $valuemap;
+			}
+		}
+
+		$delete = array_diff_key($db_valuemaps, $update);
+
+		if ($delete) {
+			DB::delete('valuemap', ['valuemapid' => array_keys($delete)]);
+		}
+
+		if ($insert) {
+			$this->createValueMaps($hostid, $insert);
+		}
+
+		if (!$update) {
+			return;
+		}
+
+		foreach ($update as $valuemap) {
+			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
+			$diff = array_diff($db_valuemap, $valuemap);
+			unset($diff['valuemapid'], $diff['mappings']);
+
+			if ($db_valuemap['name'] !== $valuemap['name']) {
+				DB::update('valuemap', [
+					'values' => ['name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				]);
+			}
+
+			$mappings = CArrayHelper::unsetEqualValues($valuemap['mappings'], $db_valuemap['mappings']);
+
+			if ($mappings) {
+				$insert = [];
+
+				foreach ($valuemap['mappings'] as $mapping) {
+					$insert_rows[] = [
+						'valuemapid' => $valuemap['valuemapid'],
+						'value' => $mapping['key'],
+						'newvalue' => $mapping['value']
+					];
+				}
+
+				DB::delete('valuemap_mapping', ['valuemapid' => $valuemap['valuemapid']]);
+				DB::insert('valuemap_mapping', $insert_rows, true);
+			}
 		}
 	}
 
@@ -474,35 +524,5 @@ abstract class CHostBase extends CApiService {
 		}
 
 		DB::insert('valuemap_mapping', $insert_rows, true);
-	}
-
-	/**
-	 * Delete value maps of specific host/template/hostprototype.
-	 *
-	 * @param array $hostids  Array of host ids.
-	 */
-	protected function deleteValueMaps(array $hostids) {
-		DB::delete('valuemap', ['hostid' => $hostids]);
-	}
-
-	/**
-	 * Validate valueMaps property.
-	 *
-	 * @param array  $valuemaps  Array of value maps to validate.
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function validateValueMaps(array $valuemaps) {
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-			'name'	=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-			'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
-				'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
-				'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
 	}
 }

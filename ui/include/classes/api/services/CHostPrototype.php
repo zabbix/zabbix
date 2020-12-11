@@ -477,6 +477,7 @@ class CHostPrototype extends CHostBase {
 			]],
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'valuemaps' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'valuemapid'	=> ['type' => API_ID],
 				'name'	=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 				'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
 					'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
