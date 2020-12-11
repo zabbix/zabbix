@@ -21,7 +21,6 @@
 #include "nodecommand.h"
 #include "trapper_preproc.h"
 #include "comms.h"
-#include "zbxserver.h"
 #include "db.h"
 #include "log.h"
 #include "../scripts/scripts.h"

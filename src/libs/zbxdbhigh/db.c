@@ -3486,7 +3486,7 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
 
 	if (NULL == (result = DBselect(
-			"select u.userid,u.roleid,r.type,t.expires_at "
+			"select u.userid,u.roleid,r.type"
 				" from token t,users u,role r"
 			" where t.userid=u.userid"
 				" and t.token='%s'"

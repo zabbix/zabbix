@@ -23,7 +23,6 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "trapper_preproc.h"
-#include "trapper.h"
 #include "../preprocessor/preproc_history.h"
 #include "sha512crypt.h"
 
@@ -51,7 +50,7 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 	for (i = 0 ; i < ZBX_SID_AUTH_TOKEN_LENGTH; i++)
 	{
 		char z[3];
-		zbx_snprintf(z, 3, "%02x", hash_res[i] & 0xFF);
+		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res[i]);
 		hash_res_stringhexes[i * 2] = z[0];
 		hash_res_stringhexes[i * 2 + 1] = z[1];
 	}

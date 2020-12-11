@@ -22,7 +22,6 @@
 #include "comms.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxserver.h"
 #include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
