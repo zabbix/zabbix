@@ -371,6 +371,11 @@ abstract class CHostBase extends CApiService {
 
 		// Add value mapping.
 		if ($options['selectValueMaps'] !== null) {
+			foreach ($result as &$element) {
+				$element['valuemaps'] = [];
+			}
+			unset($element);
+
 			$fields = is_array($options['selectValueMaps'])
 				? array_flip($options['selectValueMaps'])
 				: ['name' => '', 'mappings' => ''];
