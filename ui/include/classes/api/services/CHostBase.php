@@ -427,7 +427,7 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Replace host/template/hostprototype value mapping.
+	 * Update host/template/hostprototype value mapping.
 	 *
 	 * @param string $hostid     Id of host/template/hostprototype.
 	 * @param array  $valuemaps  Array of new value maps data.
@@ -462,8 +462,6 @@ abstract class CHostBase extends CApiService {
 
 		foreach ($update as $valuemap) {
 			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
-			$diff = array_diff($db_valuemap, $valuemap);
-			unset($diff['valuemapid'], $diff['mappings']);
 
 			if ($db_valuemap['name'] !== $valuemap['name']) {
 				DB::update('valuemap', [
