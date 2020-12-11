@@ -58,8 +58,7 @@ class CConfigurationExport {
 			'screens' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => [],
-			'valueMaps' => []
+			'mediaTypes' => []
 		];
 
 		$this->options = array_merge($this->options, $options);
@@ -75,8 +74,7 @@ class CConfigurationExport {
 			'screens' => [],
 			'images' => [],
 			'maps' => [],
-			'mediaTypes' => [],
-			'valueMaps' => []
+			'mediaTypes' => []
 		];
 
 		$this->dataFields = [
@@ -182,10 +180,6 @@ class CConfigurationExport {
 				$this->builder->buildMediaTypes($schema['rules']['media_types'], $this->data['mediaTypes']);
 			}
 
-			if ($this->data['valueMaps']) {
-				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
-			}
-
 			return $this->writer->write($this->builder->getExport());
 		}
 		catch (CConfigurationExportException $e) {
@@ -282,6 +276,7 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => API_OUTPUT_EXTEND,
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -327,6 +322,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => API_OUTPUT_EXTEND,
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		]);
