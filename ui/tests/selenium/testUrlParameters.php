@@ -420,7 +420,7 @@ class testUrlParameters extends CLegacyWebTest {
 			[
 				'title' => 'Configuration of discovery rules',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=discovery.edit&druleid=2',
