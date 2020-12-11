@@ -86,7 +86,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'checks' => [
 						['check_action' => 'Add', 'type' => 'HTTP', 'ports' => '7555']
 					],
-					'error' => 'Field "Update interval" is not correct: a time unit is expected'
+					'error' => 'Incorrect value for field "delay": a time unit is expected'
 				]
 			],
 			// Error in checks.
@@ -96,7 +96,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'proxy' => 'Active proxy 3',
 					'iprange' => '192.168.0.1-25',
 					'delay' => '1m',
-					'error' => 'Cannot save discovery rule without checks.'
+					'error' => 'Field "dchecks" is mandatory.'
 				]
 			],
 			[
@@ -106,7 +106,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 						['check_action' => 'Add', 'type' => 'POP'],
 						['check_action' => 'Remove']
 					],
-					'error' => 'Cannot save discovery rule without checks.'
+					'error' => 'Field "dchecks" is mandatory.'
 				]
 			],
 			[
@@ -160,7 +160,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickButtonText('Create discovery rule');
 		$this->fillInFields($data);
 
@@ -318,7 +318,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormNetworkDiscovery_Create($data) {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickButtonText('Create discovery rule');
 		$this->fillInFields($data);
 
@@ -354,7 +354,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'old_name' => 'Discovery rule for update',
 					'delay' => 'text',
-					'error' => 'Field "Update interval" is not correct: a time unit is expected'
+					'error' => 'Incorrect value for field "delay": a time unit is expected'
 				]
 			],
 			[
@@ -363,7 +363,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'checks' => [
 						['check_action' => 'Remove']
 					],
-					'error' => 'Cannot save discovery rule without checks.'
+					'error' => 'Field "dchecks" is mandatory.'
 				]
 			],
 			[
@@ -398,7 +398,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickLinkText($data['old_name']);
 		$this->fillInFields($data);
 
@@ -473,7 +473,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormNetworkDiscovery_Update($data) {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickLinkText($data['old_name']);
 		$this->fillInFields($data);
 
@@ -525,7 +525,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		foreach (CDBHelper::getRandom('SELECT name FROM drules', 3) as $discovery) {
 			$this->zbxTestClickLinkTextWait($discovery['name']);
 			$this->zbxTestClickWait('update');
@@ -632,7 +632,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 	public function testFormNetworkDiscovery_Delete() {
 		$name = 'Discovery rule to check delete';
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickAndAcceptAlert('delete');
@@ -645,7 +645,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	}
 
 	public function testFormNetworkDiscovery_Clone() {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		foreach (CDBHelper::getRandom('SELECT name FROM drules WHERE druleid IN (2,3)', 2) as $drule) {
 			$this->zbxTestClickLinkTextWait($drule['name']);
 			$this->zbxTestWaitForPageToLoad();
@@ -707,7 +707,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 
 		if ($action === 'create') {
 			$discovery = [
