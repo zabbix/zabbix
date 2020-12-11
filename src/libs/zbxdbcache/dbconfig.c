@@ -5112,6 +5112,90 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_item_tags                                                 *
+ *                                                                            *
+ * Purpose: Updates item tags in configuration cache                          *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - itemtagid                                                    *
+ *           1 - itemid                                                       *
+ *           2 - tag                                                          *
+ *           3 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_item_tags(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+	int			found, ret, index;
+	zbx_uint64_t		itemid, itemtagid;
+	ZBX_DC_ITEM		*item;
+	zbx_dc_item_tag_t	*item_tag;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(itemid, row[1]);
+
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			continue;
+
+		ZBX_STR2UINT64(itemtagid, row[0]);
+
+		item_tag = (zbx_dc_item_tag_t *)DCfind_id(&config->item_tags, itemtagid, sizeof(zbx_dc_item_tag_t), &found);
+		DCstrpool_replace(found, &item_tag->tag, row[2]);
+		DCstrpool_replace(found, &item_tag->value, row[3]);
+
+		if (0 == found)
+		{
+			item_tag->itemid = itemid;
+			zbx_vector_ptr_append(&item->tags, item_tag);
+		}
+	}
+
+	/* remove unused trigger tags */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_search(&config->item_tags, &rowid)))
+			continue;
+
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_tag->itemid)))
+		{
+			if (FAIL != (index = zbx_vector_ptr_search(&item->tags, item_tag,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			{
+				zbx_vector_ptr_remove_noorder(&item->tags, index);
+
+				/* recreate empty tags vector to release used memory */
+				if (0 == item->tags.values_num)
+				{
+					zbx_vector_ptr_destroy(&item->tags);
+					zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func,
+							__config_mem_realloc_func, __config_mem_free_func);
+				}
+			}
+		}
+
+		zbx_strpool_release(item_tag->tag);
+		zbx_strpool_release(item_tag->value);
+
+		zbx_hashset_remove_direct(&config->trigger_tags, item_tag);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_host_tags                                                 *
  *                                                                            *
  * Purpose: Updates host tags in configuration cache                          *
@@ -5746,11 +5830,12 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
-			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2;
+			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
+			item_tag_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync,
-			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, host_tag_sync,
+			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, item_tag_sync, host_tag_sync,
 			correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync, itempp_sync,
 			itemscrp_sync, maintenance_sync, maintenance_period_sync, maintenance_tag_sync,
 			maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
@@ -5804,6 +5889,7 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 
 	zbx_dbsync_init(&action_condition_sync, mode);
 	zbx_dbsync_init(&trigger_tag_sync, mode);
+	zbx_dbsync_init(&item_tag_sync, mode);
 	zbx_dbsync_init(&host_tag_sync, mode);
 	zbx_dbsync_init(&correlation_sync, mode);
 	zbx_dbsync_init(&corr_condition_sync, mode);
@@ -6008,6 +6094,12 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	DCsync_itemscript_param(&itemscrp_sync);
 	itemscrp_sec2 = zbx_time() - sec;
 
+	/* relies on items, must be after DCsync_items() */
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_item_tags(&item_tag_sync))
+		goto out;
+	item_tag_sec = zbx_time() - sec;
+
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
 
@@ -6110,6 +6202,10 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	trigger_tag_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
+	DCsync_item_tags(&item_tag_sync);
+	item_tag_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 	DCsync_correlations(&correlation_sync);
 	correlation_sec2 = zbx_time() - sec;
 
@@ -6158,11 +6254,12 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
-				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec;
+				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec +
+				item_tag_sec;
 		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
-				itempp_sec2 + maintenance_sec2 + update_sec;
+				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
@@ -6228,6 +6325,10 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, host_tag_sec, host_tag_sec2, host_tag_sync.add_num,
 				host_tag_sync.update_num, host_tag_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, item_tag_sec, item_tag_sec2, item_tag_sync.add_num,
+				item_tag_sync.update_num, item_tag_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, fsec, fsec2, func_sync.add_num, func_sync.update_num,

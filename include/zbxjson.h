@@ -175,6 +175,7 @@
 #define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
+#define ZBX_PROTO_TAG_ITEM_TAGS			"item_tags"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

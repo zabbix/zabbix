@@ -1029,7 +1029,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			*name;
 	DC_ITEM			*item;
-	zbx_vector_ptr_t	applications;
+	zbx_vector_ptr_t	item_tags;
 }
 zbx_item_info_t;
 
@@ -1037,9 +1037,9 @@ zbx_item_info_t;
  *                                                                            *
  * Function: db_get_items_info_by_itemid                                      *
  *                                                                            *
- * Purpose: get items name and applications                                   *
+ * Purpose: get items name and item tags                                      *
  *                                                                            *
- * Parameters: items_info - [IN/OUT] output item name and applications        *
+ * Parameters: items_info - [IN/OUT] output item name and item tags           *
  *             itemids    - [IN] the item identifiers                         *
  *                                                                            *
  ******************************************************************************/
@@ -1073,9 +1073,9 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,a.name"
-			" from applications a,items_applications i"
-			" where a.applicationid=i.applicationid"
+			"select i.itemid,it.tag"
+			" from item_tag it"
+			" where it.itemid=i.itemid"
 				" and");
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids->values, itemids->values_num);
@@ -1095,7 +1095,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_vector_ptr_append(&item_info->applications, zbx_strdup(NULL, row[1]));
+		zbx_vector_ptr_append(&item_info->item_tags, zbx_strdup(NULL, row[1]));
 	}
 	DBfree_result(result);
 }
@@ -1111,8 +1111,8 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
  ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_vector_ptr_clear_ext(&item_info->applications, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&item_info->applications);
+	zbx_vector_ptr_clear_ext(&item_info->item_tags, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
 }
 
@@ -1170,10 +1170,10 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 
 		zbx_json_close(&json);
 
-		zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
 
-		for (j = 0; j < item_info->applications.values_num; j++)
-			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
+		for (j = 0; j < item_info->item_tags.values_num; j++)
+			zbx_json_addstring(&json, NULL, item_info->item_tags.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1268,10 +1268,10 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 		zbx_json_close(&json);
 
-		zbx_json_addarray(&json, ZBX_PROTO_TAG_APPLICATIONS);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_ITEM_TAGS);
 
-		for (j = 0; j < item_info->applications.values_num; j++)
-			zbx_json_addstring(&json, NULL, item_info->applications.values[j], ZBX_JSON_TYPE_STRING);
+		for (j = 0; j < item_info->item_tags.values_num; j++)
+			zbx_json_addstring(&json, NULL, item_info->item_tags.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, item->itemid);
@@ -1375,7 +1375,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		item_info.itemid = item->itemid;
 		item_info.name = NULL;
 		item_info.item = item;
-		zbx_vector_ptr_create(&item_info.applications);
+		zbx_vector_ptr_create(&item_info.item_tags);
 		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
@@ -1403,7 +1403,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 			item_info.itemid = item->itemid;
 			item_info.name = NULL;
 			item_info.item = item;
-			zbx_vector_ptr_create(&item_info.applications);
+			zbx_vector_ptr_create(&item_info.item_tags);
 			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}
