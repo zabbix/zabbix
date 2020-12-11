@@ -155,16 +155,16 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information')),
-        (new CSelect('value_type'))
-            ->setId('value_type')
-            ->setValue(ITEM_VALUE_TYPE_UINT64)
-            ->addOptions(CSelect::createOptionsFromArray([
-                ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-                ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-                ITEM_VALUE_TYPE_STR => _('Character'),
-                ITEM_VALUE_TYPE_LOG => _('Log'),
-                ITEM_VALUE_TYPE_TEXT => _('Text')
-            ]))
+		(new CSelect('value_type'))
+			->setId('value_type')
+			->setValue(ITEM_VALUE_TYPE_UINT64)
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	)
 	// Append units to form list.
 	->addRow(
@@ -174,13 +174,13 @@ $item_form_list
 	// Append authtype to form list.
 	->addRow(
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))->setLabel(_('Authentication method')),
-        (new CSelect('authtype'))
-            ->setId('authtype')
-            ->setValue(ITEM_AUTHTYPE_PASSWORD)
-            ->addOptions(CSelect::createOptionsFromArray([
-                ITEM_AUTHTYPE_PASSWORD => _('Password'),
-                ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-            ]))
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue(ITEM_AUTHTYPE_PASSWORD)
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
 	)
 	// Append username to form list.
 	->addRow(
@@ -353,9 +353,9 @@ $item_form_list->addRow(
 
 // Append valuemap to form list.
 $valuemaps_select = (new CSelect('valuemapid'))
-    ->setId('valuemapid')
-    ->setValue($data['valuemapid'])
-    ->addOption(new CSelectOption(0, _('As is')));
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->addOption(new CSelectOption(0, _('As is')));
 foreach ($data['valuemaps'] as $valuemap) {
 	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
