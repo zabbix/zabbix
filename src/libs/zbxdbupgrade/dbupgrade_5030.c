@@ -106,25 +106,39 @@ static int	DBpatch_5030007(void)
 
 static int	DBpatch_5030008(void)
 {
-	return DBdrop_foreign_key("items", 3);
+	int	ret;
+
+	ret = DBexecute("update items set valuemap="
+			"(select name from valuemaps where items.valuemapid=valuemaps.valuemapid)"
+			" where valuemapid is not NULL");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_5030009(void)
 {
-	return DBdrop_index("items", "items_5");
+	return DBdrop_foreign_key("items", 3);
 }
 
 static int	DBpatch_5030010(void)
 {
-	return DBdrop_field("items", "valuemapid");
+	return DBdrop_index("items", "items_5");
 }
 
 static int	DBpatch_5030011(void)
 {
-	return DBdrop_table("mappings");
+	return DBdrop_field("items", "valuemapid");
 }
 
 static int	DBpatch_5030012(void)
+{
+	return DBdrop_table("mappings");
+}
+
+static int	DBpatch_5030013(void)
 {
 	return DBdrop_table("valuemaps");
 }
@@ -148,5 +162,6 @@ DBPATCH_ADD(5030009, 0, 1)
 DBPATCH_ADD(5030010, 0, 1)
 DBPATCH_ADD(5030011, 0, 1)
 DBPATCH_ADD(5030012, 0, 1)
+DBPATCH_ADD(5030013, 0, 1)
 
 DBPATCH_END()
