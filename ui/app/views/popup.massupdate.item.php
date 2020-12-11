@@ -355,7 +355,8 @@ $item_form_list->addRow(
 $valuemaps_select = (new CSelect('valuemapid'))
 	->setId('valuemapid')
 	->setValue(0)
-	->addOption(new CSelectOption(0, _('As is')));
+	->addOption(new CSelectOption(0, _('As is')))
+	->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
 foreach ($data['valuemaps'] as $valuemap) {
 	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }

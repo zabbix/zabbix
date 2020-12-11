@@ -165,6 +165,17 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @param int $value
+	 *
+	 * @return self
+	 */
+	public function setAdaptiveWidth(int $value): self {
+		$this->addStyle('max-width: '.$value.'px;');
+
+		return $this->setWidthAuto();
+	}
+
+	/**
 	 * Set custom template for options.
 	 *
 	 * @param string $template
