@@ -1882,8 +1882,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.28rc1
 
 New features:
+.....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+.......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
+.......PS. [ZBX-18755] fixed possibility of out of memory error when replacing string in mail, calculated checks, actions and when linking template (vso)
+..F....... [ZBX-18486] fixed screen inheritance from a linked template in the full clone case (ozdancuka)
 ........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
 ........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
 .......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)
