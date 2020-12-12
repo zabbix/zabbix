@@ -1,6 +1,12 @@
 Changes for 5.4.0alpha1
 
 New features:
+A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
+...G...... [ZBXNEXT-6319] added systemd.unit.get item key to Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6345] added substitution of SID to account name and domain name in eventlog message (vso)
+.....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
+.........T [ZBXNEXT-6329] added Template "GitLab by HTTP" (ychukina)
+A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from frontend (rlataria)
 ..F....... [ZBXNEXT-6294] replaced mass update pages with popup windows (rlataria)
 ..F....... [ZBXNEXT-6325] moved "Event correlation" to MVC and removed tabs in edit view (talbergs)
 .........T [ZBXNEXT-6234] added "Disk read/write request avg waiting time" items in template Windows physical disks (mchudinov)
@@ -28,6 +34,18 @@ New features:
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18086] fixed missing data selection in data overview and trigger overview screens (miks)
+.......PS. [ZBX-18418] set trigger behavior of nodata() for proxy is the same as for server (MVekslers)
+.......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
+........S. [ZBX-18736] added missing idle statistics from lld manager process title (wiper)
+...G...... [ZBX-18583] changed system command execution to avoid parameter quoting issues (wiper)
+A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (vmaksimovs)
+..F....... [ZBX-17583] fixed dashboard scroll to position where new widget is added (rlataria)
+..F....... [ZBX-18723] fixed broken tab layout while sortable (rlataria)
+..F....... [ZBX-18148] fixed inability to edit action operation when using special characters in custom message (agriscenko)
+........S. [ZBX-18116] fixed identical tags in webhook (arimdjonoks)
+..F....... [ZBX-18469] changed label for max_period field on administration GUI page (vmaksimovs)
+.........T [ZBX-18706] reworked Template "Ceph by Zabbix Agent2" OSD discovery (ychukina)
 ..F....... [ZBX-18714] fixed inability to copy widgets of templated dashboards (agriscenko)
 ........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
 ...G...... [ZBX-18187] fixed agent2 wmi.get returning the wrong result (arimdjonoks)
