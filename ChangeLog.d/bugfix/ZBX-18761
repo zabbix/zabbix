@@ -1,1 +1,0 @@
-.......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
