@@ -1932,6 +1932,13 @@ class CHost extends CHostGeneral {
 		$host_db_fields = ['host' => null];
 
 		$groupids = [];
+		$valuemap_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+			'name'	=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
+			'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
+				'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
+				'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
+			]]
+		]];
 
 		foreach ($hosts as &$host) {
 			// Validate mandatory fields.
@@ -1965,8 +1972,9 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			if (array_key_exists('valuemaps', $host)) {
-				$this->validateValueMaps($host['valuemaps']);
+			if (array_key_exists('valuemaps', $host)
+					&& !CApiInputValidator::validate($valuemap_rules, $host['valuemaps'], '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			$host['groups'] = zbx_toArray($host['groups']);
@@ -2135,6 +2143,14 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateUpdate(array $hosts, array $db_hosts) {
 		$host_db_fields = ['hostid' => null];
+		$valuemap_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+			'valuemapid'	=> ['type' => API_ID],
+			'name'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
+			'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
+				'key'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
+				'value'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
+			]]
+		]];
 
 		foreach ($hosts as &$host) {
 			// Validate mandatory fields.
@@ -2156,10 +2172,6 @@ class CHost extends CHostGeneral {
 				));
 			}
 
-			if (array_key_exists('valuemaps', $host)) {
-				$this->validateValueMaps($host['valuemaps']);
-			}
-
 			// Validate "groups" field.
 			if (array_key_exists('groups', $host)) {
 				if (!is_array($host['groups']) || !$host['groups']) {
@@ -2179,6 +2191,11 @@ class CHost extends CHostGeneral {
 						);
 					}
 				}
+			}
+
+			if (array_key_exists('valuemaps', $host)
+					&& !CApiInputValidator::validate($valuemap_rules, $host['valuemaps'], '/', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// Permissions to host groups is validated in massUpdate().

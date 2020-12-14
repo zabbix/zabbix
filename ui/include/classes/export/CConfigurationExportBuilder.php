@@ -213,18 +213,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format valuemaps.
-	 *
-	 * @param array $schema     Tag schema from validation class.
-	 * @param array $valuemaps  Export data.
-	 */
-	public function buildValueMaps(array $schema, array $valuemaps) {
-		$valuemaps = $this->formatValueMaps($valuemaps);
-
-		$this->data['value_maps'] = $this->build($schema, $valuemaps, 'value_maps');
-	}
-
-	/**
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
@@ -269,7 +257,8 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
-				'tags' => $this->formatTags($template['tags'])
+				'tags' => $this->formatTags($template['tags']),
+				'valuemaps' => $this->formatValueMaps($template['valuemaps']),
 			];
 		}
 
@@ -316,6 +305,7 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($host['macros']),
 				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
+				'valuemaps' => $this->formatValueMaps($host['valuemaps']),
 				'tags' => $this->formatTags($host['tags'])
 			];
 		}
@@ -394,28 +384,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format mappings.
-	 *
-	 * @param array $mappings
-	 *
-	 * @return array
-	 */
-	protected function formatMappings(array $mappings) {
-		$result = [];
-
-		CArrayHelper::sort($mappings, ['value']);
-
-		foreach ($mappings as $mapping) {
-			$result[] = [
-				'value' => $mapping['value'],
-				'newvalue' => $mapping['newvalue']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format media types.
 	 *
 	 * @param array $media_types
@@ -485,10 +453,8 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($valuemaps, ['name']);
 
 		foreach ($valuemaps as $valuemap) {
-			$result[] = [
-				'name' => $valuemap['name'],
-				'mappings' => $this->formatMappings($valuemap['mappings'])
-			];
+			CArrayHelper::sort($valuemap['mappings'], ['key']);
+			$result[] = $valuemap;
 		}
 
 		return $result;
