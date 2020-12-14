@@ -618,13 +618,7 @@ function getHostAvailabilityTable($host_interfaces): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
-		$ip_or_dns = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 		$description = null;
-
-		if ($interface['useip'] == INTERFACE_USE_IP
-				&& filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-			$ip_or_dns = '['.$ip_or_dns.']';
-		}
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
@@ -637,7 +631,7 @@ function getHostAvailabilityTable($host_interfaces): CHostAvailability {
 		$interfaces[] = [
 			'type' => $interface['type'],
 			'available' => $interface['available'],
-			'interface' => $ip_or_dns.':'.$interface['port'],
+			'interface' => getHostInterface($interface),
 			'description' => $description,
 			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
 		];

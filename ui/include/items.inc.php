@@ -1247,14 +1247,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	$options_by_type = [];
 
 	foreach ($interfaces as $interface) {
-		$ip_or_dns = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-
-		if ($interface['useip'] == INTERFACE_USE_IP
-				&& filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-			$ip_or_dns = '['.$ip_or_dns.']';
-		}
-
-		$option = new CSelectOption($interface['interfaceid'], $ip_or_dns.':'.$interface['port']);
+		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 			$version = $interface['details']['version'];
