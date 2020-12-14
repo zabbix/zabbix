@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-10T11:48:44Z</date>
+   <date>2020-12-11T20:10:17Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,6 +13,7 @@
          <name>Microsoft Exchange Server 2016 by Zabbix agent active</name>
          <description>The template to monitor Microsoft Exchange Server 2016 by Zabbix that work without any external scripts.&#13;
 The metrics are collected by Zabbix agent active.&#13;
+Recommended to use it with "OS Windows by Zabbix agent active" template.&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415007-discussion-thread-for-official-zabbix-template-microsoft-exchange&#13;
@@ -521,7 +522,10 @@ Template tooling version used: 0.38</description>
                      <delay>{$MS.EXCHANGE.PERF.INTERVAL}</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <description>Database state.</description>
+                     <description>Database state. Possible values:&#13;
+0: Database without any copy and dismounted.&#13;
+1: Database is a primary database and mounted.&#13;
+2: Database is a passive copy and the state is healthy.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Database {#INSTANCE}</name>
@@ -685,65 +689,6 @@ data.forEach(function(instance) {
 return JSON.stringify(data);</params>
                   </step>
                </preprocessing>
-            </discovery_rule>
-            <discovery_rule>
-               <name>Services discovery</name>
-               <type>ZABBIX_ACTIVE</type>
-               <key>service.discovery</key>
-               <delay>1h</delay>
-               <filter>
-                  <evaltype>AND</evaltype>
-                  <conditions>
-                     <condition>
-                        <macro>{#SERVICE.STARTUP}</macro>
-                        <value>{0</value>
-                        <formulaid>A</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#SERVICE.DISPLAYNAME}</macro>
-                        <value>Microsoft Exchange</value>
-                        <formulaid>B</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#SERVICE.NAME}</macro>
-                        <value>MSExchangeNotificationsBroker</value>
-                        <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>C</formulaid>
-                     </condition>
-                  </conditions>
-               </filter>
-               <description>Discovery of Exchange services.</description>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>MS Exchange: {#SERVICE.NAME}: Status</name>
-                     <type>ZABBIX_ACTIVE</type>
-                     <key>service.info["{#SERVICE.NAME}"]</key>
-                     <history>7d</history>
-                     <applications>
-                        <application>
-                           <name>MS Exchange</name>
-                        </application>
-                     </applications>
-                     <valuemap>
-                        <name>Windows service state</name>
-                     </valuemap>
-                     <preprocessing>
-                        <step>
-                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1h</params>
-                        </step>
-                     </preprocessing>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{last()}&lt;&gt;0</expression>
-                           <name>MS Exchange: {#SERVICE.NAME} is not running</name>
-                           <priority>HIGH</priority>
-                           <description>{#SERVICE.NAME} is not in running state.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
-                  </item_prototype>
-               </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
