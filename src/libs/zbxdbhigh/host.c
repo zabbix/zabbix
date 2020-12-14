@@ -4727,8 +4727,6 @@ typedef struct
 {
 	zbx_uint64_t		templateid;
 	zbx_uint64_t		httptestid;
-	zbx_uint64_t		t_applicationid;
-	zbx_uint64_t		h_applicationid;
 	char			*name;
 	char			*delay;
 	zbx_vector_ptr_t	fields;
@@ -4770,21 +4768,19 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	httptestitem_t		*httptestitem;
 	httpstepitem_t		*httpstepitem;
 	zbx_vector_uint64_t	httptestids;	/* the list of web scenarios which should be added to a host */
-	zbx_vector_uint64_t	applications;
 	zbx_vector_uint64_t	items;
-	zbx_uint64_t		httptestid, httpstepid, applicationid, itemid;
+	zbx_uint64_t		httptestid, httpstepid, itemid;
 	int			i, j, k;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&httptestids);
-	zbx_vector_uint64_create(&applications);
 	zbx_vector_uint64_create(&items);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.agent,t.authentication,"
+			"select t.httptestid,t.name,t.delay,t.status,t.agent,t.authentication,"
 				"t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
 			" from httptest t"
 				" left join httptest h"
@@ -4811,20 +4807,16 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		if (0 == httptest->httptestid)
 		{
 			httptest->name = zbx_strdup(NULL, row[1]);
-			ZBX_DBROW2UINT64(httptest->t_applicationid, row[2]);
-			httptest->delay = zbx_strdup(NULL, row[3]);
-			httptest->status = (unsigned char)atoi(row[4]);
-			httptest->agent = zbx_strdup(NULL, row[5]);
-			httptest->authentication = (unsigned char)atoi(row[6]);
-			httptest->http_user = zbx_strdup(NULL, row[7]);
-			httptest->http_password = zbx_strdup(NULL, row[8]);
-			httptest->http_proxy = zbx_strdup(NULL, row[9]);
-			httptest->retries = atoi(row[10]);
+			httptest->delay = zbx_strdup(NULL, row[2]);
+			httptest->status = (unsigned char)atoi(row[3]);
+			httptest->agent = zbx_strdup(NULL, row[4]);
+			httptest->authentication = (unsigned char)atoi(row[5]);
+			httptest->http_user = zbx_strdup(NULL, row[6]);
+			httptest->http_password = zbx_strdup(NULL, row[7]);
+			httptest->http_proxy = zbx_strdup(NULL, row[8]);
+			httptest->retries = atoi(row[9]);
 
 			zbx_vector_uint64_append(&httptestids, httptest->templateid);
-
-			if (0 != httptest->t_applicationid)
-				zbx_vector_uint64_append(&applications, httptest->t_applicationid);
 		}
 	}
 	DBfree_result(result);
@@ -4982,40 +4974,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			httpfield->value = zbx_strdup(NULL, row[4]);
 
 			zbx_vector_ptr_append(&httpstep->fields, httpfield);
-		}
-		DBfree_result(result);
-	}
-
-	/* applications */
-	if (0 != applications.values_num)
-	{
-		zbx_vector_uint64_sort(&applications, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&applications, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t.applicationid,h.applicationid"
-				" from applications t"
-					" join applications h"
-						" on t.name=h.name"
-							" and h.hostid=" ZBX_FS_UI64
-				" where", hostid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.applicationid",
-				applications.values, applications.values_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(applicationid, row[0]);
-
-			for (i = 0; i < httptests->values_num; i++)
-			{
-				httptest = (httptest_t *)httptests->values[i];
-
-				if (httptest->t_applicationid == applicationid)
-					ZBX_STR2UINT64(httptest->h_applicationid, row[1]);
-			}
 		}
 		DBfree_result(result);
 	}
@@ -5179,7 +5137,6 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&items);
-	zbx_vector_uint64_destroy(&applications);
 	zbx_vector_uint64_destroy(&httptestids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -5235,9 +5192,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	{
 		httptestid = DBget_maxid_num("httptest", num_httptests);
 
-		zbx_db_insert_prepare(&db_insert_htest, "httptest", "httptestid", "name", "applicationid", "delay",
-				"status", "agent", "authentication", "http_user", "http_password", "http_proxy",
-				"retries", "hostid", "templateid", NULL);
+		zbx_db_insert_prepare(&db_insert_htest, "httptest", "httptestid", "name", "delay", "status", "agent",
+				"authentication", "http_user", "http_password", "http_proxy", "retries", "hostid",
+				"templateid", NULL);
 	}
 
 	if (httptests->values_num != num_httptests)
@@ -5295,10 +5252,9 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			httptest->httptestid = httptestid++;
 
 			zbx_db_insert_add_values(&db_insert_htest, httptest->httptestid, httptest->name,
-					httptest->h_applicationid, httptest->delay, (int)httptest->status,
-					httptest->agent, (int)httptest->authentication, httptest->http_user,
-					httptest->http_password, httptest->http_proxy, httptest->retries, hostid,
-					httptest->templateid);
+					httptest->delay, (int)httptest->status, httptest->agent,
+					(int)httptest->authentication, httptest->http_user, httptest->http_password,
+					httptest->http_proxy, httptest->retries, hostid, httptest->templateid);
 
 			for (j = 0; j < httptest->fields.values_num; j++)
 			{
