@@ -33,20 +33,15 @@ class CFilterTabElement extends CElement {
 	 * @return array
 	 */
 	public function getTitles() {
-		$result = [];
+//		$result = [];
 		$xpath = 'xpath:.//a[@class="tabfilter-item-link"]';
 
-		if ($this->query($xpath)->one(false)->isValid() === false) {
-			$result = null;
-		}
-		else {
-			$tabs = $this->query($xpath)->all();
-			foreach ($tabs as $tab) {
-				$result[] = $tab->getText();
-			}
+		$tabs = $this->query($xpath)->all();
+		if ($tabs->count() > 0) {
+			return $tabs->asText();
 		}
 
-		return $result;
+		return null;
 	}
 
 	/**
@@ -54,7 +49,7 @@ class CFilterTabElement extends CElement {
 	 *
 	 * @return string
 	 */
-	public function getTabName() {
+	public function getSelectedTabName() {
 		return $this->query('xpath:.//li[contains(@class, "tabfilter-item-label") and contains(@class, "selected")]/'.
 				'a[@class="tabfilter-item-link"]')->one()->getText();
 	}
@@ -66,7 +61,7 @@ class CFilterTabElement extends CElement {
 	 * @param integer $count	filter number, if there is several filters with same name
 	 */
 	public function selectTab($name, $count = null) {
-		$xpath = 'xpath:(.//a[@class="tabfilter-item-link" and text()="'.$name.'"])';
+		$xpath = 'xpath:(.//a[@class="tabfilter-item-link" and text()='.CXPathHelper::escapeQuotes($name).'])';
 
 		if ($count !== null) {
 			$this->query($xpath.'['.$count.']')->one()->click();
@@ -77,12 +72,12 @@ class CFilterTabElement extends CElement {
 	}
 
 	/**
-	 * Get filter properties.
+	 * Select filter properties.
 	 *
 	 * @param string $name		filter name to be selected
 	 * @param integer $count	filter number, if there is several filters with same name
 	 */
-	public function getProperties($name = null, $count = null) {
+	public function selectProperties($name = null, $count = null) {
 		if ($name !== null) {
 			$this->selectTab($name, $count);
 		}

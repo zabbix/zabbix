@@ -206,7 +206,7 @@ class testFormFilterProblems extends testFormFilter {
 
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
-			$filter_container->getProperties();
+			$filter_container->selectProperties();
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 			$dialog->fill(['Set custom time period' => true, 'From' => '2020-10-23 18:00']);
 			$dialog->submit();
