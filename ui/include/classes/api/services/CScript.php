@@ -60,8 +60,7 @@ class CScript extends CApiService {
 		$group_fields = ['groupid', 'name', 'flags', 'internal'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
 			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status',
-			'maintenance_type', 'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-			'tls_psk_identity', 'tls_psk'
+			'maintenance_type', 'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

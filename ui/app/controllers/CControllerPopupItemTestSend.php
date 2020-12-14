@@ -254,7 +254,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		// Get value from host.
 		if ($this->get_value_from_host) {
 			// Get post data for particular item type.
-			$item_test_data = $this->getItemTestProperties($this->getInputAll());
+			$item_test_data = $this->getItemTestProperties($this->getInputAll(), true);
 
 			// Apply effective macros values to properties.
 			$item_test_data = $this->resolveItemPropertyMacros($item_test_data);

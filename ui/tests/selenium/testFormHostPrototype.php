@@ -798,8 +798,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Check input fields.
 		if (array_key_exists('psk', $data)) {
-			$this->zbxTestAssertElementValue('tls_psk_identity', $data['psk']['identity']);
-			$this->zbxTestAssertElementValue('tls_psk', $data['psk']['number']);
+			$this->assertTrue($this->query('button:Change PSK')->exists());
 		}
 		if (array_key_exists('issuer', $data)) {
 			$this->zbxTestAssertElementValue('tls_issuer', $data['issuer']);
