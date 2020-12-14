@@ -28,7 +28,6 @@ typedef struct
 {
 	char	*name;
 	FILE	*file;
-	time_t	last_check;
 	int	missing;
 }
 zbx_export_file_t;
@@ -89,6 +88,8 @@ static int	open_export_file(zbx_export_file_t *file, char **error)
 		return FAIL;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "successfully created export file '%s'", file->name);
+
 	return SUCCEED;
 }
 
@@ -106,7 +107,6 @@ static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *proce
 		exit(EXIT_FAILURE);
 	}
 
-	file->last_check = 0;
 	file->missing = 0;
 
 	return file;
@@ -125,35 +125,32 @@ void	zbx_problems_export_init(const char *process_name, int process_num)
 
 static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 {
-#define ZBX_SUSPEND_TIME	10
+#define ZBX_LOGGING_SUSPEND_TIME	10
 
+	static time_t	last_log_time = 0;
 	time_t		now;
 	char		*error_msg = NULL;
 	long		file_offset;
 
-	now = time(NULL);
-
-	if (ZBX_SUSPEND_TIME < now - file->last_check)
+	if (0 == file->missing && 0 != access(file->name, F_OK))
 	{
-		if (0 == file->missing && 0 != access(file->name, F_OK))
-				file->missing = 1;
+		if (NULL != file->file && 0 != fclose(file->file))
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot close export file '%s': %s",file->name, zbx_strerror(errno));
 
-		if (1 == file->missing)
-		{
-			if (SUCCEED == open_export_file(file, &error_msg))
-			{
-				file->missing = 0;
-				zabbix_log(LOG_LEVEL_ERR, "regained access to export file '%s'", file->name);
-			}
-			else
-				goto error;
-		}
-
-		file->last_check = now;
+		file->file = NULL;
 	}
 
 	if (NULL == file->file && FAIL == open_export_file(file, &error_msg))
+	{
+		file->missing = 1;
 		goto error;
+	}
+
+	if (1 == file->missing)
+	{
+		file->missing = 0;
+		zabbix_log(LOG_LEVEL_ERR, "regained access to export file '%s'", file->name);
+	}
 
 	if (-1 == (file_offset = ftell(file->file)))
 	{
@@ -212,16 +209,17 @@ error:
 	}
 
 	file->file = NULL;
+	now = time(NULL);
 
-	if (ZBX_SUSPEND_TIME < now - file->last_check)
+	if (ZBX_LOGGING_SUSPEND_TIME < now - last_log_time)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", error_msg);
-		file->last_check = now;
+		last_log_time = now;
 	}
 
 	zbx_free(error_msg);
 
-#undef ZBX_SUSPEND_TIME
+#undef ZBX_LOGGING_SUSPEND_TIME
 }
 
 void	zbx_problems_export_write(const char *buf, size_t count)
