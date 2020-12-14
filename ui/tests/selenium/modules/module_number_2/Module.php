@@ -18,7 +18,7 @@ class Module extends CModule {
 			->find(_('Monitoring'))
 			->getSubMenu()
 			->add(
-				(new \CMenuItem(_('2nd Module')))->setAction('second.module')
+				(new \CMenuItem('2nd Module'))->setAction('second.module')
 			);
 	}
 }
