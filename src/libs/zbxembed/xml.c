@@ -22,21 +22,6 @@
 #include "embed.h"
 #include "duktape.h"
 #include "xml.h"
-#include "zbxserver.h"
-
-/******************************************************************************
- *                                                                            *
- * Function: es_xml_dtor                                                      *
- *                                                                            *
- * Purpose: XML destructor                                                    *
- *                                                                            *
- ******************************************************************************/
-static duk_ret_t	es_xml_dtor(duk_context *ctx)
-{
-	ZBX_UNUSED(ctx);
-
-	return 0;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -52,8 +37,7 @@ static duk_ret_t	es_xml_ctor(duk_context *ctx)
 
 	duk_push_this(ctx);
 
-	duk_push_c_function(ctx, es_xml_dtor, 1);
-	duk_set_finalizer(ctx, -2);
+	duk_set_finalizer(ctx, -1);
 
 	return 0;
 }
@@ -71,15 +55,14 @@ static duk_ret_t	es_xml_query(duk_context *ctx)
 	int			err_index = -1;
 	char			*err = NULL;
 
-	zbx_variant_set_str(&value, zbx_strdup(NULL, duk_to_string(ctx, 0)));
+	zbx_variant_set_str(&value, zbx_strdup(NULL, duk_safe_to_string(ctx, 0)));
 
-	if (FAIL == zbx_query_xpath(&value, duk_to_string(ctx, 1), &err))
+	if (FAIL == zbx_query_xpath(&value, duk_safe_to_string(ctx, 1), &err))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, err);
 		goto out;
 	}
 	duk_push_string(ctx, value.data.str);
-
 out:
 	zbx_variant_clear(&value);
 	zbx_free(err);
@@ -108,7 +91,6 @@ static duk_ret_t	es_xml_from_json(duk_context *ctx)
 		goto out;
 	}
 	duk_push_string(ctx, str);
-
 out:
 	zbx_free(str);
 	zbx_free(error);
@@ -137,7 +119,6 @@ static duk_ret_t	es_xml_to_json(duk_context *ctx)
 		goto out;
 	}
 	duk_push_string(ctx, str);
-
 out:
 	zbx_free(str);
 	zbx_free(error);
@@ -155,7 +136,6 @@ static const duk_function_list_entry	xml_methods[] = {
 	{NULL, NULL, 0}
 };
 
-
 static int	es_xml_create_object(duk_context *ctx)
 {
 	duk_push_c_function(ctx, es_xml_ctor, 0);
@@ -167,7 +147,8 @@ static int	es_xml_create_object(duk_context *ctx)
 		return FAIL;
 
 	duk_new(ctx, 0);
-	duk_put_global_string(ctx, "XML");
+	if (1 != duk_put_global_string(ctx, "XML"))
+		return FAIL;
 
 	return SUCCEED;
 }

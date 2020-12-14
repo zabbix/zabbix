@@ -6605,34 +6605,20 @@ static int	substitute_macros_xml_impl(char **data, const DC_ITEM *item, const st
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
+	if (FAIL == zbx_open_xml(*data, 0, maxerrlen, (void **)&doc, (void **)&root_element, &error))
 	{
-		if (NULL != (pErr = xmlGetLastError()))
-			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
-		else
-			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
+		if (NULL == doc)
+			goto exit;
 
-		goto exit;
-	}
-
-	if (NULL == (root_element = xmlDocGetRootElement(doc)))
-	{
-		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
-		goto clean;
+		if (NULL == root_element)
+			goto clean;
 	}
 
 	substitute_macros_in_xml_elements(item, jp_row, lld_macro_paths, root_element);
 	xmlDocDumpMemory(doc, &mem, &size);
 
-	if (NULL == mem)
-	{
-		if (NULL != (pErr = xmlGetLastError()))
-			zbx_snprintf(error, maxerrlen, "Cannot save XML: %s", pErr->message);
-		else
-			zbx_snprintf(error, maxerrlen, "Cannot save XML");
-
+	if (FAIL == zbx_check_xml_memory((char *)mem, maxerrlen, &error))
 		goto clean;
-	}
 
 	zbx_free(*data);
 	*data = zbx_malloc(NULL, size + 1);
@@ -6832,4 +6818,3 @@ int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *d
 	zbx_dc_set_macro_env(old_macro_env);
 	return ret;
 }
-

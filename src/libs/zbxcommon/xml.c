@@ -18,14 +18,13 @@
 **/
 
 #include "common.h"
-#include "zbxalgo.h"
 #include "zbxjson.h"
-/* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/tree.h>
 #	include <libxml/xpath.h>
 #endif
+#include "log.h"
+#include "zbxalgo.h"
+#include "../zbxalgo/vectorimpl.h"
 
 #define XML_TEXT_NAME	"text"
 #define XML_CDATA_NAME	"cdata"
@@ -33,17 +32,22 @@
 #define XML_JSON_TRUE	1
 #define XML_JSON_FALSE	0
 
-typedef struct
-{
-	char *		 	name;
-	char *		 	value;
-	zbx_vector_str_t 	attributes;
-	zbx_vector_ptr_t	chnodes;
-	int			array;
-}
-zbx_xml_node_t;
-
 static char	data_static[ZBX_MAX_B64_LEN];
+
+typedef struct _zbx_xml_node_t zbx_xml_node_t;
+
+ZBX_PTR_VECTOR_DECL(xml_node_ptr, zbx_xml_node_t *);
+
+struct _zbx_xml_node_t
+{
+	char				*name;
+	char				*value;
+	zbx_vector_str_t		attributes;
+	zbx_vector_xml_node_ptr_t	chnodes;
+	int				is_array;
+};
+
+ZBX_PTR_VECTOR_IMPL(xml_node_ptr, zbx_xml_node_t *);
 
 /******************************************************************************
  *                                                                            *
@@ -299,15 +303,18 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
 	{
-		pErr = xmlGetLastError();
-		*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+		if (NULL != (pErr = xmlGetLastError()))
+			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+		else
+			*errmsg = zbx_strdup(*errmsg, "cannot parse xpath");
 		goto out;
 	}
 
 	switch (xpathObj->type)
 	{
 		case XPATH_NODESET:
-			xmlBufferLocal = xmlBufferCreate();
+			if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+				break;
 
 			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 			{
@@ -336,8 +343,8 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
 
 			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90    */
-			/* so simply check the if the result starts with digit (accounting for -inf) */
-			if (*(ptr = buffer) == '-')
+			/* so simply check the result starts with digit (accounting for -inf) */
+			if ('-' == *(ptr = buffer))
 				ptr++;
 			if (0 != isdigit(*ptr))
 			{
@@ -349,12 +356,11 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
 			break;
 		default:
-			*errmsg = zbx_strdup(*errmsg, "Unknown result");
+			*errmsg = zbx_dsprintf(*errmsg, "Unknown XPath object type %d", (int)xpathObj->type);
 			break;
 	}
 out:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeObject(xpathObj);
 
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
@@ -370,30 +376,30 @@ out:
  *                                                                            *
  * Purpose: compare two xml nodes by name                                     *
  *                                                                            *
- * Comments: This function is used to sort xml nodes by name             .    *
+ * Comments: This function is used to sort xml nodes by name                  *
  *                                                                            *
  ******************************************************************************/
 static int	compare_xml_nodes_by_name(const void *d1, const void *d2)
 {
 	zbx_xml_node_t	*p1 = *(zbx_xml_node_t **)d1;
 	zbx_xml_node_t	*p2 = *(zbx_xml_node_t **)d2;
-	int 		res;
+	int		res;
 
 	res = strcmp(p1->name, p2->name);
 	if (0 == res)
 	{
-		p1->array = XML_JSON_TRUE;
-		p2->array = XML_JSON_TRUE;
+		/* set is_array value for nodes with equal names to collect them further in JSON array */
+		p1->is_array = XML_JSON_TRUE;
+		p2->is_array = XML_JSON_TRUE;
 	}
 
 	return res;
 }
 
-
 static void	zbx_xml_node_free(zbx_xml_node_t *node)
 {
-	zbx_vector_ptr_clear_ext(&node->chnodes, (zbx_clean_func_t)zbx_xml_node_free);
-	zbx_vector_ptr_destroy(&node->chnodes);
+	zbx_vector_xml_node_ptr_clear_ext(&node->chnodes, zbx_xml_node_free);
+	zbx_vector_xml_node_ptr_destroy(&node->chnodes);
 	zbx_vector_str_clear_ext(&node->attributes, zbx_str_free);
 	zbx_vector_str_destroy(&node->attributes);
 	zbx_free(node->name);
@@ -401,23 +407,37 @@ static void	zbx_xml_node_free(zbx_xml_node_t *node)
 	zbx_free(node);
 }
 
-static void xml_to_vector(xmlNode *xml_node, zbx_vector_ptr_t *nodes)
+/******************************************************************************
+ *                                                                            *
+ * Function: xml_to_vector                                                    *
+ *                                                                            *
+ * Purpose: to collect content of XML document nodes in vector                *
+ *                                                                            *
+ * Parameters: xml_node       - [IN] parent XML node structure                *
+ *             nodes - [OUT] vector of child XML nodes                        *
+ *                                                                            *
+ * Return value: none                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 {
 	xmlChar			*value;
 	xmlAttr			*attr;
 
-	for (;NULL != xml_node; xml_node = xml_node->next)
+	for (; NULL != xml_node; xml_node = xml_node->next)
 	{
-		zbx_xml_node_t *node;
+		zbx_xml_node_t	*node;
 
 		node = (zbx_xml_node_t *)zbx_malloc(NULL, sizeof(zbx_xml_node_t));
-		node->name = NULL;
-		if (0 != xml_node->name)
-			node->name = zbx_strdup(NULL,(char *)xml_node->name);
-		node->value = NULL;
-		node->array = XML_JSON_FALSE;
+		if (NULL != xml_node->name)
+			node->name = zbx_strdup(NULL, (char *)xml_node->name);
+		else
+			node->name = NULL;
 
-		zbx_vector_ptr_create(&node->chnodes);
+		node->value = NULL;
+		node->is_array = XML_JSON_FALSE;
+
+		zbx_vector_xml_node_ptr_create(&node->chnodes);
 		zbx_vector_str_create(&node->attributes);
 
 		switch (xml_node->type)
@@ -426,13 +446,13 @@ static void xml_to_vector(xmlNode *xml_node, zbx_vector_ptr_t *nodes)
 				if (NULL == (value = xmlNodeGetContent(xml_node)))
 					break;
 
-				node->value = zbx_strdup(NULL,(char *)value);
+				node->value = zbx_strdup(NULL, (char *)value);
 				xmlFree(value);
 				break;
 			case XML_CDATA_SECTION_NODE:
 				if (NULL == (value = xmlNodeGetContent(xml_node)))
 					break;
-				node->value = zbx_strdup(NULL,(char *)value);
+				node->value = zbx_strdup(NULL, (char *)value);
 				node->name = zbx_strdup(node->name, XML_CDATA_NAME);
 				xmlFree(value);
 				break;
@@ -447,24 +467,41 @@ static void xml_to_vector(xmlNode *xml_node, zbx_vector_ptr_t *nodes)
 
 					zbx_snprintf_alloc(&attr_name, &attr_name_alloc, &attr_name_offset, "@%s",
 							attr->name);
-					value = xmlGetProp(xml_node, attr->name);
 					zbx_vector_str_append(&node->attributes, attr_name);
-					zbx_vector_str_append(&node->attributes, zbx_strdup(NULL, (char *)value));
-					xmlFree(value);
-
+					if (NULL != (value = xmlGetProp(xml_node, attr->name)))
+					{
+						zbx_vector_str_append(&node->attributes, zbx_strdup(NULL,
+								(char *)value));
+						xmlFree(value);
+					}
+					else
+						zbx_vector_str_append(&node->attributes, (char *)NULL);
 				}
 				break;
 			default:
+				zabbix_log(LOG_LEVEL_DEBUG, "Unsupported XML node type %d, ignored",
+						(int)xml_node->type);
 				break;
-
 		}
 		xml_to_vector(xml_node->children, &node->chnodes);
-		zbx_vector_ptr_append(nodes, node);
-		zbx_vector_ptr_sort(nodes, compare_xml_nodes_by_name);
+		zbx_vector_xml_node_ptr_append(nodes, node);
 	}
+	zbx_vector_xml_node_ptr_sort(nodes, compare_xml_nodes_by_name);
 }
 
-static int is_data(zbx_xml_node_t *node)
+/******************************************************************************
+ *                                                                            *
+ * Function: is_data                                                          *
+ *                                                                            *
+ * Purpose: to check if node is leaf node with text content                   *
+ *                                                                            *
+ * Parameters: node       - [IN] node structure                               *
+ *                                                                            *
+ * Return value: SUCCEED - node has text content                              *
+ *               FAIL    - node has not content                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_data(zbx_xml_node_t *node)
 {
 	if (0 == strcmp(XML_TEXT_NAME, node->name) || 0 == strcmp(XML_CDATA_NAME, node->name))
 		return SUCCEED;
@@ -472,42 +509,56 @@ static int is_data(zbx_xml_node_t *node)
 	return FAIL;
 }
 
-static void vector_to_json(zbx_vector_ptr_t *nodes, struct zbx_json *json, char **text)
+/******************************************************************************
+ *                                                                            *
+ * Function: vector_to_json                                                   *
+ *                                                                            *
+ * Purpose: to write content of vector into JSON document                     *
+ *                                                                            *
+ * Parameters: nodes   - [IN] vector of nodes                                 *
+ *             json    - [IN/OUT] JSON structure                              *
+ *             text    - [OUT] text content for given node                    *
+ *                                                                            *
+ * Return value: none                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *json, char **text)
 {
-	int		i, j;
-	int		is_object;
-	int		arr_cnt = 0;
-	char		*arr_name = NULL;
-	char		*tag, *out_text;
+	int		i, j, is_object, arr_cnt = 0;
+	char		*tag, *out_text, *arr_name = NULL;
 	zbx_xml_node_t	*node;
 
 	*text = NULL;
 	for (i = 0; i < nodes->values_num; i++)
 	{
-		node = (zbx_xml_node_t *)nodes->values[i];
+		node = nodes->values[i];
 
-		if ((XML_JSON_FALSE == node->array && 0 != arr_cnt) || (XML_JSON_TRUE == node->array &&
+		if ((XML_JSON_FALSE == node->is_array && 0 != arr_cnt) || (XML_JSON_TRUE == node->is_array &&
 				NULL != arr_name && 0 != strcmp(arr_name, node->name)))
 		{
-			zbx_json_close(json);
+			if (FAIL == zbx_json_close(json))
+				THIS_SHOULD_NEVER_HAPPEN;
 			arr_name = NULL;
 			arr_cnt = 0;
 		}
 
-		if (XML_JSON_TRUE == node->array && 0 == arr_cnt)
+		if (XML_JSON_TRUE == node->is_array)
 		{
-			zbx_json_addarray(json, node->name);
-			arr_name = node->name;
-		}
-		if (XML_JSON_TRUE == node->array)
+			if (0 == arr_cnt)
+			{
+				zbx_json_addarray(json, node->name);
+				arr_name = node->name;
+			}
 			arr_cnt++;
+		}
 
 		is_object = XML_JSON_FALSE;
 		if (0 != node->chnodes.values_num)
 		{
 			zbx_xml_node_t	*chnode;
 
-			chnode = (zbx_xml_node_t*)node->chnodes.values[0];
+			/* if first child node is not data node that is enough to recognize current node as object */
+			chnode = node->chnodes.values[0];
 			if (FAIL == is_data(chnode))
 				is_object = XML_JSON_TRUE;
 		}
@@ -515,14 +566,9 @@ static void vector_to_json(zbx_vector_ptr_t *nodes, struct zbx_json *json, char 
 			is_object = XML_JSON_TRUE;
 
 		if (XML_JSON_TRUE == is_object)
-		{
-			tag = node->name;
-			if (0 != arr_cnt)
-				tag = NULL;
-			zbx_json_addobject(json, tag);
-		}
+			zbx_json_addobject(json, 0 != arr_cnt ? NULL : node->name);
 
-		for(j = 0; j < node->attributes.values_num; j+=2)
+		for (j = 0; j < node->attributes.values_num; j += 2)
 		{
 			zbx_json_addstring(json, node->attributes.values[j], node->attributes.values[j + 1],
 					ZBX_JSON_TYPE_STRING);
@@ -534,23 +580,115 @@ static void vector_to_json(zbx_vector_ptr_t *nodes, struct zbx_json *json, char 
 
 		if (NULL != out_text || (XML_JSON_FALSE == is_object && FAIL == is_data(node)))
 		{
-			tag = node->name;
 			if (0 != node->attributes.values_num)
 				tag = XML_TEXT_TAG;
 			else if (0 != arr_cnt)
 				tag = NULL;
+			else
+				tag = node->name;
 			zbx_json_addstring(json, tag, out_text, ZBX_JSON_TYPE_STRING);
 		}
 
-		if (XML_JSON_TRUE == is_object)
-		{
-			zbx_json_close(json);
-		}
+		if (XML_JSON_TRUE == is_object && FAIL == zbx_json_close(json))
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
-	if (0 != arr_cnt)
-		zbx_json_close(json);
+	if (0 != arr_cnt && FAIL == zbx_json_close(json))
+		THIS_SHOULD_NEVER_HAPPEN;
 }
 #endif /* HAVE_LIBXML2 */
+
+#ifdef HAVE_LIBXML2
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_open_xml                                                     *
+ *                                                                            *
+ * Purpose: to create xmlDoc and it's root node for input data                *
+ *                                                                            *
+ * Parameters: data      - [IN] input data                                    *
+ *             options   - [IN] XML options                                   *
+ *             maxerrlen - [IN] the size of error buffer, -1 to ignore        *
+ *             xml_doc   - [OUT] pointer to xmlDoc structure                  *
+ *             root_node - [OUT] pointer to xmlNode structure                 *
+ *             errmsg    - [OUTY] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - xmlDoc and root node structure created             *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg)
+{
+	xmlErrorPtr	pErr;
+
+	if (NULL == (*xml_doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, options)))
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+		{
+			if (0 > maxerrlen)
+				*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
+			else
+				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML value: %s", pErr->message);
+		}
+		else
+		{
+			if (0 > maxerrlen)
+				*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
+			else
+				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML value");
+		}
+
+		return FAIL;
+	}
+
+	if (NULL == (*root_node = xmlDocGetRootElement((xmlDoc *)*xml_doc)))
+	{
+		if (0 > maxerrlen)
+			*errmsg = zbx_dsprintf(*errmsg, "Cannot parse XML root");
+		else
+			zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML root");
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_xml_memory                                             *
+ *                                                                            *
+ * Purpose: to check xml memory to be valid                                   *
+ *                                                                            *
+ * Parameters: mem       - [IN] pointer to memory                             *
+ *             maxerrlen - [IN] the size of error buffer, -1 to ignore        *
+ *             errmsg    - [OUTY] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - xml memory is not NULL                             *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg)
+{
+	xmlErrorPtr	pErr;
+
+	if (NULL == mem)
+	{
+		if (NULL != (pErr = xmlGetLastError()))
+			if (0 > maxerrlen)
+				*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
+			else
+				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot save XML: %s", pErr->message);
+		else
+			if (0 > maxerrlen)
+				*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
+			else
+				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot save XML");
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -574,64 +712,73 @@ int	zbx_xml_to_json(char *data, char **jstr, char **errmsg)
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
-	struct zbx_json		json;
-	xmlDoc			*doc = NULL;
-	xmlErrorPtr		pErr;
-	xmlNode			*node;
-	int			ret = FAIL;
-	zbx_vector_ptr_t	nodes;
-	char*			out;
+	struct zbx_json			json;
+	xmlDoc				*doc = NULL;
+	xmlNode				*node;
+	int				ret = FAIL;
+	zbx_vector_xml_node_ptr_t	nodes;
+	char				*out;
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, XML_PARSE_NOBLANKS)))
+	if (FAIL == zbx_open_xml(data, XML_PARSE_NOBLANKS, -1, (void **)&doc, (void **)&node, errmsg))
 	{
-		if (NULL != (pErr = xmlGetLastError()))
-			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
-		else
-			*errmsg = zbx_strdup(*errmsg, "cannot parse xml value");
-		goto exit;
+		if (NULL == doc)
+			goto exit;
+
+		if (NULL == node)
+			goto clean;
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (NULL == (node = xmlDocGetRootElement(doc)))
-	{
-		*errmsg = zbx_dsprintf(*errmsg, "Cannot parse XML root");
-		goto clean;
-	}
-
-	zbx_vector_ptr_create(&nodes);
+	zbx_vector_xml_node_ptr_create(&nodes);
 
 	xml_to_vector(node, &nodes);
 	vector_to_json(&nodes, &json, &out);
 	*jstr = zbx_strdup(*jstr, json.buffer);
 	ret = SUCCEED;
 
-	zbx_vector_ptr_clear_ext(&nodes, (zbx_clean_func_t)zbx_xml_node_free);
-	zbx_vector_ptr_destroy(&nodes);
+	zbx_vector_xml_node_ptr_clear_ext(&nodes, zbx_xml_node_free);
+	zbx_vector_xml_node_ptr_destroy(&nodes);
+	zbx_json_free(&json);
 clean:
 	xmlFreeDoc(doc);
-	zbx_json_free(&json);
 exit:
 	return ret;
 #endif /* HAVE_LIBXML2 */
 }
 
 #ifdef HAVE_LIBXML2
-static void json_to_node(struct zbx_json_parse *jp, xmlDoc *doc, xmlNode *parent_node, char *arr_name, int deep,
+/******************************************************************************
+ *                                                                            *
+ * Function: json_to_xmlnode                                                  *
+ *                                                                            *
+ * Purpose: to write content of JSON document into XML node                   *
+ *                                                                            *
+ * Parameters: jp             - [IN] JSON parse structure                     *
+ *             arr_name       - [IN] name of parrent array                    *
+ *             deep           - [IN] node deep level                          *
+ *             doc            - [IN/OUT] xml document structure               *
+ *             parent_node    - [IN/OUT] parent XML node                      *
+ *             attr           - [OUT] node attribute name                     *
+ *             attr_val       - [OUT] node attribute value                    *
+ *             text           - [OUT] node content                            *
+ *                                                                            *
+ * Return value: none                                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, xmlDoc *doc, xmlNode *parent_node,
 		char **attr, char **attr_val, char **text)
 {
-	xmlNode			*node;
 	const char		*p = NULL, *p1 = NULL;
-	struct zbx_json_parse	jp_data;
 	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
-	char 			*attr_loc = NULL, *attr_val_loc = NULL, *text_loc = NULL, *array_loc;
-	int			idx;
+	char			*array_loc, *attr_loc = NULL, *attr_val_loc = NULL, *text_loc = NULL;
+	int			idx = 0;
 	int			set_attr, set_text;
-	char 			*pname, *pvalue;
+	char			*pname, *pvalue = NULL;
+	xmlNode			*node;
+	struct zbx_json_parse	jp_data;
 	zbx_json_type_t		type;
 
-	idx = 0;
-	pvalue = NULL;
 	do
 	{
 		set_attr = 0;
@@ -710,7 +857,7 @@ static void json_to_node(struct zbx_json_parse *jp, xmlDoc *doc, xmlNode *parent
 
 			if (SUCCEED == zbx_json_brackets_open(p, &jp_data))
 			{
-				json_to_node(&jp_data, doc, node, array_loc, deep+1, &attr_loc, &attr_val_loc,
+				json_to_xmlnode(&jp_data, array_loc, deep + 1, doc, node, &attr_loc, &attr_val_loc,
 						&text_loc);
 			}
 		}
@@ -736,15 +883,15 @@ static void json_to_node(struct zbx_json_parse *jp, xmlDoc *doc, xmlNode *parent
  *                                                                            *
  * Purpose: convert JSON format value to XML format                           *
  *                                                                            *
- * Parameters: data   - [IN] the JSON data to process                         *
- *             jstr   - [OUT] the XML output                                  *
- *             errmsg - [OUT] error message                                   *
+ * Parameters: json_data   - [IN] the JSON data to process                    *
+ *             xstr        - [OUT] the XML output                             *
+ *             errmsg      - [OUT] error message                              *
  *                                                                            *
  * Return value: SUCCEED - the value was processed successfully               *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_to_xml(char *data, char **xstr, char **errmsg)
+int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(data);
@@ -753,8 +900,7 @@ int	zbx_json_to_xml(char *data, char **xstr, char **errmsg)
 	return FAIL;
 #else
 	struct zbx_json_parse	jp;
-	char 			*attr = NULL, *attr_val = NULL, *text = NULL;
-
+	char			*attr = NULL, *attr_val = NULL, *text = NULL;
 	xmlDoc 			*doc = NULL;
 	xmlErrorPtr		pErr;
 	xmlChar			*xmem;
@@ -769,13 +915,13 @@ int	zbx_json_to_xml(char *data, char **xstr, char **errmsg)
 		goto exit;
 	}
 
-	if (SUCCEED != zbx_json_open(data, &jp))
+	if (SUCCEED != zbx_json_open(json_data, &jp))
 	{
 		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 		goto clean;
 	}
 
-	json_to_node(&jp, doc, NULL, NULL, 0, &attr, &attr_val, &text);
+	json_to_xmlnode(&jp, NULL, 0, doc, NULL, &attr, &attr_val, &text);
 
 	xmlDocDumpMemory(doc, &xmem, &size);
 
@@ -783,15 +929,8 @@ int	zbx_json_to_xml(char *data, char **xstr, char **errmsg)
 	zbx_free(attr_val);
 	zbx_free(attr);
 
-	if (NULL == xmem)
-	{
-		if (NULL != (pErr = xmlGetLastError()))
-			*errmsg = zbx_dsprintf(*errmsg, "Cannot save XML: %s", pErr->message);
-		else
-			*errmsg = zbx_strdup(*errmsg, "Cannot save XML");
-
+	if (FAIL == zbx_check_xml_memory((char *)xmem, -1, errmsg))
 		goto clean;
-	}
 
 	*xstr = zbx_malloc(*xstr, (size_t)size + 1);
 	memcpy(*xstr, (const char *)xmem, (size_t)size + 1);
