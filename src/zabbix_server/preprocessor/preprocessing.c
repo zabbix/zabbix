@@ -1034,9 +1034,9 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
 		{
-			result = NULL;
-			state = ITEM_STATE_NOTSUPPORTED;
-			error = "Value is too large.";
+			result_ptr.result = NULL;
+			value.state = ITEM_STATE_NOTSUPPORTED;
+			value.error = "Value is too large.";
 		}
 	}
 
