@@ -5161,7 +5161,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		}
 	}
 
-	/* remove unused trigger tags */
+	/* remove unused item tags */
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
@@ -5188,7 +5188,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		zbx_strpool_release(item_tag->tag);
 		zbx_strpool_release(item_tag->value);
 
-		zbx_hashset_remove_direct(&config->trigger_tags, item_tag);
+		zbx_hashset_remove_direct(&config->item_tags, item_tag);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
