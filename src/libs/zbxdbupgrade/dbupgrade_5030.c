@@ -202,17 +202,20 @@ static int	DBpatch_5030009(void)
 
 			pair = pairs.values[i];
 
-			if (NULL == (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &pair.second)))
-				THIS_SHOULD_NEVER_HAPPEN;
-
-			zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, pair.first, valuemap->name);
-
-			for (j = 0; j < valuemap->mappings.values_num; j++)
+			if (NULL != (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &pair.second)))
 			{
-				zbx_db_insert_add_values(&db_insert_valuemap_mapping, __UINT64_C(0), valuemapid,
-						valuemap->mappings.values[j].first,
-						valuemap->mappings.values[j].second);
+				zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, pair.first, valuemap->name);
+
+				for (j = 0; j < valuemap->mappings.values_num; j++)
+				{
+					zbx_db_insert_add_values(&db_insert_valuemap_mapping, __UINT64_C(0), valuemapid,
+							valuemap->mappings.values[j].first,
+							valuemap->mappings.values[j].second);
+				}
 			}
+			else
+
+				THIS_SHOULD_NEVER_HAPPEN;
 
 			valuemapid++;
 			i++;
