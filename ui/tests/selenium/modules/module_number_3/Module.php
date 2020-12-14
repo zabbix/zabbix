@@ -15,7 +15,7 @@ class Module extends CModule {
 		$menu = APP::Component()->get('menu.main');
 
 		$menu
-			->find(_('Monitoring'))
+			->find('Monitoring')
 			->getSubMenu()
 			->add(
 				(new \CMenuItem('Dummy module'))->setAction('third.module')
