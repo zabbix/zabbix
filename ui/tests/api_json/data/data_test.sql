@@ -1055,7 +1055,7 @@ INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (
 INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1010,1);
 INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (1011,1);
 INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (1008,'92d');
-INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (111,1);
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (1011,1);
 INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (1008,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
 INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (1009,3);
 INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1007,1);
