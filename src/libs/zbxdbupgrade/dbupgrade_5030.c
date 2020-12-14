@@ -30,6 +30,17 @@
 
 extern unsigned char	program_type;
 
+static int	DBpatch_5030000(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 typedef struct
 {
 	zbx_uint64_t	id;
@@ -44,18 +55,7 @@ typedef struct
 }
 zbx_dbpatch_profile_t;
 
-static int	DBpatch_5030000(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.queue.config'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static void	DBpatch_5030001_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *profile, char **subsect, char **field)
+static void	DBpatch_5030001_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *profile, char **subsect, char **field, char **key)
 {
 	int	tok_idx = 0;
 	char	*token;
@@ -80,6 +80,10 @@ static void	DBpatch_5030001_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *pr
 		if (1 == tok_idx)
 		{
 			*subsect = zbx_strdup(*subsect, token);
+		}
+		else if (2 == tok_idx)
+		{
+			*key = zbx_strdup(*key, token);
 		}
 		else if (3 == tok_idx)
 		{
@@ -109,7 +113,9 @@ static int	DBpatch_5030001(void)
 		"web.trigger_prototypes.php.sort",
 		"web.trigger_prototypes.php.sortorder",
 		"web.host_prototypes.php.sort",
-		"web.host_prototypes.php.sortorder"
+		"web.host_prototypes.php.sortorder",
+		"web.dashbrd.list.sort",
+		"web.dashbrd.list.sortorder"
 	};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -117,7 +123,7 @@ static int	DBpatch_5030001(void)
 
 	for (i = 0; SUCCEED == ret && i < (int)ARRSIZE(keys); i++)
 	{
-		char			*subsect = NULL, *field = NULL;
+		char			*subsect = NULL, *field = NULL, *key = NULL;
 		DB_ROW			row;
 		DB_RESULT		result;
 		zbx_dbpatch_profile_t	profile = {0};
@@ -131,11 +137,11 @@ static int	DBpatch_5030001(void)
 			continue;
 		}
 
-		DBpatch_5030001_get_key_fields(row, &profile, &subsect, &field);
+		DBpatch_5030001_get_key_fields(row, &profile, &subsect, &field, &key);
 
 		DBfree_result(result);
 
-		if (NULL == subsect || NULL == field)
+		if (NULL == subsect || NULL == field || NULL == key)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to parse profile key fields for key '%s'", keys[i]);
 			ret = FAIL;
@@ -143,9 +149,9 @@ static int	DBpatch_5030001(void)
 
 		if (SUCCEED == ret && ZBX_DB_OK > DBexecute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.hosts.%s.php.%s'," ZBX_FS_UI64 ","
+				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.hosts.%s.%s.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
+				DBget_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 		{
 			ret = FAIL;
@@ -153,9 +159,9 @@ static int	DBpatch_5030001(void)
 
 		if (SUCCEED == ret && ZBX_DB_OK > DBexecute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
-				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.templates.%s.php.%s'," ZBX_FS_UI64 ","
+				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.templates.%s.%s.%s'," ZBX_FS_UI64 ","
 				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-				DBget_maxid("profiles"), profile.userid, subsect, field, profile.idx2, profile.value_id,
+				DBget_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2, profile.value_id,
 				profile.value_int, profile.value_str, profile.source, profile.type))
 		{
 			ret = FAIL;
@@ -179,32 +185,18 @@ static int	DBpatch_5030001(void)
 
 static int	DBpatch_5030002(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("delete from profiles where "
-		"idx like 'web.items.%%filter%%' or "
-		"idx like 'web.triggers.%%filter%%' or "
-		"idx like 'web.graphs.%%filter%%' or "
-		"idx like 'web.host_discovery.%%filter%%' or "
-		"idx like 'web.httpconf.%%filter%%' or "
-		"idx like 'web.disc_prototypes.%%filter%%' or "
-		"idx like 'web.trigger_prototypes.%%filter%%' or "
-		"idx like 'web.host_prototypes.%%filter%%'"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5030003(void)
-{
-	if (ZBX_DB_OK > DBexecute("update profiles "
-		"set idx='web.templates.dashbrd.list.sort' where idx='web.dashbrd.list.sort'"))
-	{
-		return FAIL;
-	}
-
-	if (ZBX_DB_OK > DBexecute("update profiles "
-		"set idx='web.templates.dashbrd.list.sortorder' where idx='web.dashbrd.list.sortorder'"))
+			"idx like 'web.items.%%filter%%' or "
+			"idx like 'web.triggers.%%filter%%' or "
+			"idx like 'web.graphs.%%filter%%' or "
+			"idx like 'web.host_discovery.%%filter%%' or "
+			"idx like 'web.httpconf.%%filter%%' or "
+			"idx like 'web.disc_prototypes.%%filter%%' or "
+			"idx like 'web.trigger_prototypes.%%filter%%' or "
+			"idx like 'web.host_prototypes.%%filter%%'"))
 	{
 		return FAIL;
 	}
@@ -221,6 +213,5 @@ DBPATCH_START(5030)
 DBPATCH_ADD(5030000, 0, 1)
 DBPATCH_ADD(5030001, 0, 1)
 DBPATCH_ADD(5030002, 0, 1)
-DBPATCH_ADD(5030003, 0, 1)
 
 DBPATCH_END()
