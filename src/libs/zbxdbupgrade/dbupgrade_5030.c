@@ -42,20 +42,29 @@ static int	DBpatch_5030000(void)
 
 static int	DBpatch_5030001(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	const ZBX_FIELD field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("scripts", &field, &old_field);
 }
 
+static int	DBpatch_5030001(void)
+{
+	const ZBX_FIELD	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
 static int	DBpatch_5030002(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
+	const ZBX_FIELD old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
+	return DBmodify_field_type("scripts", &field, &old_field);
+}
+
+static int	DBpatch_5030003(void)
+{
 	const ZBX_TABLE	table =
 			{"script_param", "script_paramid", 0,
 				{
@@ -72,21 +81,15 @@ static int	DBpatch_5030002(void)
 
 }
 
-static int	DBpatch_5030003(void)
+static int	DBpatch_5030004(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"script_paramid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("script_param", 1, &field);
 }
 
-static int	DBpatch_5030004(void)
+static int	DBpatch_5030005(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBcreate_index("script_param", "script_param_1", "scriptid,name", 1);
 }
 
@@ -101,5 +104,6 @@ DBPATCH_ADD(5030001, 0, 1)
 DBPATCH_ADD(5030002, 0, 1)
 DBPATCH_ADD(5030003, 0, 1)
 DBPATCH_ADD(5030004, 0, 1)
+DBPATCH_ADD(5030005, 0, 1)
 
 DBPATCH_END()
