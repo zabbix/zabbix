@@ -214,7 +214,6 @@ static int	DBpatch_5030009(void)
 				}
 			}
 			else
-
 				THIS_SHOULD_NEVER_HAPPEN;
 
 			valuemapid++;
