@@ -585,7 +585,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 	}
 
 	if memtype != "pmem" {
-		return int(memSize), nil
+		return uint64(memSize), nil
 	}
 	return memSize, nil
 }
