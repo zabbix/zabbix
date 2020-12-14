@@ -357,6 +357,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interface_port_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['port']
 			),
+			'preproc_item' => $this->preproc_item,
 			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [
