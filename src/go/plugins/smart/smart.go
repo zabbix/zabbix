@@ -35,7 +35,7 @@ type Devices struct {
 //Device -
 type Device struct {
 	Name         string `json:"{#NAME}"`
-	DeviceType   string `json:"{#TYPE}"`
+	DeviceType   string `json:"{#DISKTYPE}"`
 	Model        string `json:"{#MODEL}"`
 	SerialNumber string `json:"{#SN}"`
 }
@@ -61,8 +61,7 @@ type DeviceParser struct {
 }
 
 type deviceInfo struct {
-	Name       string `json:"name"`
-	DeviceType string `json:"type"`
+	Name string `json:"name"`
 }
 
 type smartctlField struct {

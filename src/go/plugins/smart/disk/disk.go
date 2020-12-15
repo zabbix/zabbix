@@ -45,7 +45,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		for _, dev := range parsedDevices {
-			out = append(out, smart.Device{Name: dev.Info.Name, DeviceType: dev.Info.DeviceType, Model: dev.ModelName,
+			var t string
+			if dev.RotationRate == 0 {
+				t = "ssd"
+			} else {
+				t = "hdd"
+			}
+			out = append(out, smart.Device{Name: dev.Info.Name, DeviceType: t, Model: dev.ModelName,
 				SerialNumber: dev.SerialNumber})
 		}
 
