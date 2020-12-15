@@ -82,9 +82,9 @@ class testMultiselect extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$widget_type = $form->getField('Type')->asDropdown()->getText();
+		$widget_type = $form->getField('Type')->asZDropdown()->getText();
 		if($widget_type !== $widget){
-			$form->getField('Type')->asDropdown()->select($widget);
+			$form->getField('Type')->asZDropdown()->select($widget);
 			$form->waitUntilReloaded();
 		}
 		$element = $form->getField('Items')->query('tag:input')->one();

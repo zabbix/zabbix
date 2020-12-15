@@ -77,7 +77,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 
 		$this->zbxTestDropdownAssertSelected('urls[0][elementtype]', 'Host');
-		$this->zbxTestDropdownHasOptions('urls_0_elementtype', ['Host', 'Host group', 'Image', 'Map', 'Trigger']);
+		$this->zbxTestDropdownHasOptions('urls[0][elementtype]', ['Host', 'Host group', 'Image', 'Map', 'Trigger']);
 
 		$this->zbxTestAssertElementPresentId('urls_0_name');
 		$this->zbxTestAssertElementPresentId('urls_0_url');

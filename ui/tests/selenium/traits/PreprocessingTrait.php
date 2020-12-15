@@ -34,7 +34,7 @@ trait PreprocessingTrait {
 		return [
 			[
 				'name'		=> 'type',
-				'selector'	=> 'xpath:.//select[contains(@id, "_type")]',
+				'selector'	=> 'xpath:.//z-select[contains(@id, "_type")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
