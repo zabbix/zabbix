@@ -113,9 +113,7 @@ static int	DBpatch_5030001(void)
 		"web.trigger_prototypes.php.sort",
 		"web.trigger_prototypes.php.sortorder",
 		"web.host_prototypes.php.sort",
-		"web.host_prototypes.php.sortorder",
-		"web.dashbrd.list.sort",
-		"web.dashbrd.list.sortorder"
+		"web.host_prototypes.php.sortorder"
 	};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -205,6 +203,49 @@ static int	DBpatch_5030002(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5030003(void)
+{
+	int			i, ret = SUCCEED;
+	char			*subsect = NULL, *field = NULL, *key = NULL;
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_dbpatch_profile_t	profile = {0};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+
+	result = DBselect("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
+			" from profiles where idx in ('web.dashbrd.list.sort','web.dashbrd.list.sortorder')");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DBpatch_5030001_get_key_fields(row, &profile, &subsect, &field, &key);
+
+		if (ZBX_DB_OK > DBexecute("insert into profiles "
+				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
+				"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'web.templates.%s.%s.%s'," ZBX_FS_UI64 ","
+				ZBX_FS_UI64 ",%d,'%s','%s',%d)",
+				DBget_maxid("profiles"), profile.userid, subsect, key, field, profile.idx2,
+				profile.value_id, profile.value_int, profile.value_str, profile.source, profile.type))
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+
+	DBfree_result(result);
+
+	zbx_free(profile.idx);
+	zbx_free(profile.value_str);
+	zbx_free(profile.source);
+	zbx_free(subsect);
+	zbx_free(field);
+	zbx_free(key);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -214,5 +255,6 @@ DBPATCH_START(5030)
 DBPATCH_ADD(5030000, 0, 1)
 DBPATCH_ADD(5030001, 0, 1)
 DBPATCH_ADD(5030002, 0, 1)
+DBPATCH_ADD(5030003, 0, 1)
 
 DBPATCH_END()
