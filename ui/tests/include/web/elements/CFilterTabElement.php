@@ -76,7 +76,7 @@ class CFilterTabElement extends CElement {
 	 * @param string $name		filter name to be selected
 	 * @param integer $count	filter number, if there is several filters with same name
 	 */
-	public function selectProperties($name = null, $count = null) {
+	public function editProperties($name = null, $count = null) {
 		if ($name !== null) {
 			$this->selectTab($name, $count);
 		}

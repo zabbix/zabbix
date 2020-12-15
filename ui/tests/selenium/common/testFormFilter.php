@@ -156,7 +156,7 @@ class testFormFilter extends CWebTest {
 		$filter_container->selectTab('update_tab');
 
 		// Changing filter name to empty space.
-		$filter_container->selectProperties();
+		$filter_container->editProperties();
 		$this->page->waitUntilReady();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill(['Name' => '']);
@@ -186,7 +186,7 @@ class testFormFilter extends CWebTest {
 
 		$filters = $filter_container->getTitles();
 		foreach ($filters as $filter) {
-			$filter_container->selectProperties($filter);
+			$filter_container->editProperties($filter);
 			$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$dialog->query('button:Delete')->one()->click();
 			$this->page->acceptAlert();
@@ -202,7 +202,7 @@ class testFormFilter extends CWebTest {
 			}
 
 			// Checking that deleted filter doesn't exists in filters dropdown list.
-			$this->assertEquals($filters, $this->getDropdownFiltersList());
+			$this->assertEquals($filters, $this->getDropdownFilterNames());
 		}
 	}
 
@@ -249,7 +249,7 @@ class testFormFilter extends CWebTest {
 	/**
 	 * Return filter names from droplist.
 	 */
-	public function getDropdownFiltersList() {
+	public function getDropdownFilterNames() {
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 		$dropdown_filters = CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()->asText();
 		array_shift($dropdown_filters);
@@ -269,10 +269,10 @@ class testFormFilter extends CWebTest {
 
 		// Checking that names displayed on the filter tabs same as in drop down list.
 		$filters = $filter_container->getTitles();
-		$this->assertEquals($filters, $this->getDropdownFiltersList());
+		$this->assertEquals($filters, $this->getDropdownFilterNames());
 
 		// Checking that name displayed in filter properties.
-		$filter_container->selectProperties();
+		$filter_container->editProperties();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->checkValue(['Name' => $filter_name]);
 		$this->query('button:Cancel')->one()->click();
