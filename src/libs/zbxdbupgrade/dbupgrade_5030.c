@@ -178,6 +178,7 @@ static int	DBpatch_5030001(void)
 		zbx_free(profile.source);
 		zbx_free(subsect);
 		zbx_free(field);
+		zbx_free(key);
 	}
 
 	return ret;
