@@ -190,6 +190,7 @@ func getRaidJsons(name string, rtype string) (map[string]string, error) {
 		}
 
 		out[fullName] = deviceJSON
+		i++
 	}
 }
 
