@@ -7751,6 +7751,18 @@ return [
 				'length' => 20,
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid'
+			],
+			'display_period' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '30'
+			],
+			'auto_start' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
@@ -7814,10 +7826,10 @@ return [
 			]
 		]
 	],
-	'widget' => [
-		'key' => 'widgetid',
+	'dashboard_page' => [
+		'key' => 'dashboard_pageid',
 		'fields' => [
-			'widgetid' => [
+			'dashboard_pageid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -7828,6 +7840,41 @@ return [
 				'length' => 20,
 				'ref_table' => 'dashboard',
 				'ref_field' => 'dashboardid'
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'display_period' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'sortorder' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'widget' => [
+		'key' => 'widgetid',
+		'fields' => [
+			'widgetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'dashboard_pageid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'dashboard_page',
+				'ref_field' => 'dashboard_pageid'
 			],
 			'type' => [
 				'null' => false,
