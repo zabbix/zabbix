@@ -369,6 +369,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					}
 					elseif (array_key_exists($i, $result['steps'])) {
 						$step += $result['steps'][$i];
+						if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+							$step['result'] = $preproc_test_data['value'];
+						}
 
 						if (array_key_exists('error', $step)) {
 							// If error happened and no value is set, frontend shows label 'No value'.

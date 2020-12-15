@@ -245,12 +245,11 @@ out:
 static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	char			*values[2] = {NULL, NULL}, *preproc_error = NULL;
-	int			ret = FAIL, i, values_num = 0, single, state, bypass_first;
-	unsigned char		value_type;
+	int			i, single, state, bypass_first, ret = FAIL, values_num = 0;
+	unsigned char		value_type, first_step_type;
 	zbx_vector_ptr_t	steps, results, history;
 	zbx_timespec_t		ts[2];
 	zbx_preproc_result_t	*result;
-	unsigned char		first_step_type;
 
 	zbx_vector_ptr_create(&steps);
 	zbx_vector_ptr_create(&results);
@@ -318,15 +317,16 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 		zbx_json_addstring(json, ZBX_PROTO_TAG_PREVIOUS, "true", ZBX_JSON_TYPE_INT);
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
+
+	if (1 == bypass_first)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, ZBX_PROTO_TAG_VALUE, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(json);
+	}
+
 	if (0 != steps.values_num)
 	{
-		if (1 == bypass_first)
-		{
-			zbx_json_addobject(json, NULL);
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
-			zbx_json_close(json);
-		}
-
 		for (i = 0; i < results.values_num; i++)
 		{
 			result = (zbx_preproc_result_t *)results.values[i];
