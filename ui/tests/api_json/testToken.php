@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testToken extends CAPITest {
 
 	protected static $unique_counter = 1;
+
 	protected static function uniqueName(): string {
 		return 'name'.static::$unique_counter ++;
 	}
@@ -1198,5 +1199,30 @@ class testToken extends CAPITest {
 				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($admin_tokenid)),
 				'Admin token value re-updated'
 		);
+	}
+
+	private function countAuditActions(int $action): int {
+		return count(DB::select('auditlog', ['output' => [], 'filter' => [
+				'resourcetype' => AUDIT_RESOURCE_AUTH_TOKEN,
+				'action' => $action
+		]]));
+	}
+
+	public function testToken_auditlogs(): void {
+		$add_records = $this->countAuditActions(AUDIT_ACTION_ADD);
+		$update_records = $this->countAuditActions(AUDIT_ACTION_UPDATE);
+		$delete_records = $this->countAuditActions(AUDIT_ACTION_DELETE);
+
+		['result' => ['tokenids' => [$new_id]]] = $this->call('token.create', ['name' => 'audit 1']);
+		$this->assertEquals($add_records + 1, $this->countAuditActions(AUDIT_ACTION_ADD));
+
+		$this->call('token.update', ['tokenid' => $new_id, 'name' => 'audit 2']);
+		$this->assertEquals($update_records + 1, $this->countAuditActions(AUDIT_ACTION_UPDATE));
+
+		$this->call('token.generate', [$new_id]);
+		$this->assertEquals($update_records + 2, $this->countAuditActions(AUDIT_ACTION_UPDATE));
+
+		$this->call('token.delete', [$new_id]);
+		$this->assertEquals($delete_records + 1, $this->countAuditActions(AUDIT_ACTION_DELETE));
 	}
 }
