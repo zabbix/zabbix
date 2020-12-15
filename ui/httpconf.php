@@ -814,11 +814,13 @@ else {
 
 	$options = [
 		'output' => ['httptestid', $sortField],
+		'selectTags' => ['tag', 'value'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids,
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+		'preservekeys' => true
 	];
 	if ($data['filter']['status'] != -1) {
 		$options['filter']['status'] = $data['filter']['status'];
@@ -833,12 +835,14 @@ else {
 			' INNER JOIN hosts h ON h.hostid=ht.hostid'.
 			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
 	);
-	$httpTests = [];
+	$http_tests = [];
 	while ($dbHttpTest = DBfetch($dbHttpTests)) {
-		$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+		$http_tests[$dbHttpTest['httptestid']] = $dbHttpTest + [
+			'tags' => $httpTests[$dbHttpTest['httptestid']]['tags']
+		];
 	}
 
-	order_result($httpTests, $sortField, $sortOrder);
+	order_result($http_tests, $sortField, $sortOrder);
 
 	// pager
 	if (hasRequest('page')) {
@@ -853,13 +857,12 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder,
+	$data['paging'] = CPagerHelper::paginate($page_num, $http_tests, $sortOrder, 
 		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
 	);
 
-	// Get the error column data only for hosts.
 	if ($data['context'] === 'host') {
-		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
+		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($http_tests));
 
 		foreach ($httpTestsLastData as $httpTestId => &$lastData) {
 			if ($lastData['lastfailedstep'] !== null) {
@@ -875,19 +878,21 @@ else {
 	$dbHttpSteps = DBselect(
 		'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
 			' FROM httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+			' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($http_tests, 'httptestid')).
 			' GROUP BY hs.httptestid'
 	);
 	while ($dbHttpStep = DBfetch($dbHttpSteps)) {
-		$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
+		$http_tests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
 	}
 
-	order_result($httpTests, $sortField, $sortOrder);
+	order_result($http_tests, $sortField, $sortOrder);
 
-	$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
-	$data['httpTests'] = $httpTests;
+	$data['parent_templates'] = getHttpTestParentTemplates($http_tests);
+	$data['http_tests'] = $http_tests;
 	$data['httpTestsLastData'] = $httpTestsLastData;
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['tags'] = makeTags($data['http_tests'], true, 'httptestid', ZBX_TAG_COUNT_DEFAULT);
 
 	// render view
 	echo (new CView('configuration.httpconf.list', $data))->getOutput();

@@ -52,9 +52,10 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
-		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
-		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_('Last check')))->addStyle('width: 11%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 11%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
+		(new CColHeader(_('Tags')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -64,9 +65,10 @@ else {
 		$col_check_all->addStyle('width: 15px'),
 		$col_host->addStyle('width: 17%'),
 		$col_name->addStyle('width: 40%'),
-		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
-		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_('Last check')))->addStyle('width: 11%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 11%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
+		(new CColHeader(_('Tags')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%')
 	]);
 }
@@ -206,6 +208,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
+			$data['tags'][$itemid],
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -218,6 +221,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
+			$data['tags'][$itemid],
 			$actions
 		]);
 	}

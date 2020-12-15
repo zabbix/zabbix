@@ -40,6 +40,8 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_show_details' =>		'in 1',
 			'filter_set' =>					'in 1',
 			'filter_rst' =>					'in 1',
+			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'filter_tags' =>				'array',
 
 			// table sorting inputs
 			'sort' =>						'in host,name,lastclock',
@@ -73,6 +75,24 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0),
 				PROFILE_TYPE_INT
 			);
+
+			// tags
+			$evaltype = getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
+			CProfile::update('web.latest.filter.evaltype', $evaltype, PROFILE_TYPE_INT);
+
+			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+			foreach (getRequest('filter_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+				$filter_tags['tags'][] = $tag['tag'];
+				$filter_tags['values'][] = $tag['value'];
+				$filter_tags['operators'][] = $tag['operator'];
+			}
+			CProfile::updateArray('web.latest.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+			unset($filter_tags, $evaltype);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.latest.filter.groupids');
@@ -80,20 +100,15 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::delete('web.latest.filter.select');
 			CProfile::delete('web.latest.filter.show_without_data');
 			CProfile::delete('web.latest.filter.show_details');
+			CProfile::deleteIdx('web.latest.filter.evaltype');
+			CProfile::deleteIdx('web.latest.filter.tags.tag');
+			CProfile::deleteIdx('web.latest.filter.tags.value');
+			CProfile::deleteIdx('web.latest.filter.tags.operator');
 		}
 
 		// Force-check "Show items without data" if there are no hosts selected.
 		$filter_hostids = CProfile::getArray('web.latest.filter.hostids');
 		$filter_show_without_data = $filter_hostids ? CProfile::get('web.latest.filter.show_without_data', 1) : 1;
-
-		$filter_tags = [];
-		if (!$filter_tags) {
-			$filter_tags = [[
-				'tag' => '',
-				'operator' => TAG_OPERATOR_LIKE,
-				'value' => ''
-			]];
-		}
 
 		$filter = [
 			'groupids' => CProfile::getArray('web.latest.filter.groupids'),
@@ -101,9 +116,18 @@ class CControllerLatestView extends CControllerLatest {
 			'select' => CProfile::get('web.latest.filter.select', ''),
 			'show_without_data' => $filter_show_without_data,
 			'show_details' => CProfile::get('web.latest.filter.show_details', 0),
-			'tags' => $filter_tags,
-			'evaltype' => TAG_EVAL_TYPE_AND_OR
+			'evaltype' => CProfile::get('web.latest.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'tags' => []
 		];
+
+		// Tags filters.
+		foreach (CProfile::getArray('web.latest.filter.tags.tag', []) as $i => $tag) {
+			$filter['tags'][] = [
+				'tag' => $tag,
+				'value' => CProfile::get('web.latest.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.latest.filter.tags.operator', null, $i)
+			];
+		}
 
 		$sort_field = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.latest.sortorder', ZBX_SORT_UP));
@@ -120,6 +144,8 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('filter_select', $filter['select'])
 			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
 			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
+			->setArgument('filter_evaltype', $filter['evaltype'])
+			->setArgument('filter_tags', $filter['tags'])
 			->setArgument('sort', $sort_field)
 			->setArgument('sortorder', $sort_order)
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
@@ -146,8 +172,17 @@ class CControllerLatestView extends CControllerLatest {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-			]
+			],
+			'tags' => makeTags($prepared_data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
 		] + $prepared_data;
+
+		if (!$data['filter']['tags']) {
+			$data['filter']['tags'] = [[
+				'tag' => '',
+				'operator' => TAG_OPERATOR_LIKE,
+				'value' => ''
+			]];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));

@@ -31,6 +31,11 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter['groupids']           Filter items by host groups.
 	 * @param array  $filter['hostids']            Filter items by hosts.
 	 * @param string $filter['select']             Filter items by name.
+	 * @param int    $filter['evaltype']           Filter evaltype.
+	 * @param array  $filter['tags']               Filter tags.
+	 * @param string $filter['tags'][]['tag']
+	 * @param string $filter['tags'][]['value']
+	 * @param int    $filter['tags'][]['operator']
 	 * @param int    $filter['show_without_data']  Include items with empty history.
 	 * @param string $sort_field                   Sorting field.
 	 * @param string $sort_order                   Sorting order.
@@ -78,6 +83,8 @@ abstract class CControllerLatest extends CController {
 				'output' => ['itemid', 'hostid', 'value_type'],
 				'hostids' => [$hostid],
 				'webitems' => true,
+				'evaltype' => $filter['evaltype'],
+				'tags' => $filter['tags'] ? $filter['tags'] : null,
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE]
 				],
@@ -99,6 +106,7 @@ abstract class CControllerLatest extends CController {
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
 				],
+				'selectTags' => ['tag', 'value'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true

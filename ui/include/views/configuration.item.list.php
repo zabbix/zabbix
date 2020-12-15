@@ -49,7 +49,11 @@ $widget = (new CWidget())
 if ($data['hostid'] != 0) {
 	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
 }
-$widget->addItem($data['main_filter']);
+
+$widget->addItem(new CPartial('configuration.filter.items', [
+	'filter_data' => $data['filter_data'],
+	'items' => $data['items']
+]));
 
 $url = (new CUrl('items.php'))
 	->setArgument('context', $data['context'])

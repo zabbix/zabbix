@@ -278,6 +278,8 @@ $fields = [
 										IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
 										null
 									],
+	'filter_evaltype' =>			[T_ZBX_INT, O_OPT, null,	IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null],
+	'filter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
 	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -291,6 +293,7 @@ $fields = [
 	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
@@ -385,6 +388,21 @@ if (hasRequest('filter_set')) {
 	CProfile::updateArray($prefix.'items.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 	unset($filter_tags);
 
+	// Subfilter tags.
+	$subf_tags = [];
+	if (hasRequest('subfilter_tags')) {
+		foreach (getRequest('subfilter_tags', []) as $tag) {
+			if ($tag['tag'] !== null) {
+				$subf_tags[$tag['tag'].':'.$tag['value']] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value'] ? $tag['value'] : ''
+				];
+			}
+		}
+	}
+	CProfile::updateArray($prefix.'items.subfilter_tags.tag', array_column($subf_tags, 'tag'), PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.subfilter_tags.value', array_column($subf_tags, 'value'), PROFILE_TYPE_STR);
+
 	// subfilters
 	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
@@ -410,6 +428,12 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx($prefix.'items.filter_inherited');
 	CProfile::deleteIdx($prefix.'items.filter_with_triggers');
 	CProfile::deleteIdx($prefix.'items.filter_discovered');
+	CProfile::deleteIdx($prefix.'items.filter.tags.tag');
+	CProfile::deleteIdx($prefix.'items.filter.tags.value');
+	CProfile::deleteIdx($prefix.'items.filter.tags.operator');
+	CProfile::deleteIdx($prefix.'items.filter.evaltype');
+	CProfile::deleteIdx($prefix.'items.subfilter_tags.tag');
+	CProfile::deleteIdx($prefix.'items.subfilter_tags.value');
 	DBend();
 }
 
@@ -1279,7 +1303,7 @@ else {
 	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	// Tags filters.
+	// Filter and subfilter tags.
 	$filter_evaltype = CProfile::get($prefix.'items.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
 	$filter_tags = [];
 	foreach (CProfile::getArray($prefix.'items.filter.tags.tag', []) as $i => $tag) {
@@ -1287,6 +1311,14 @@ else {
 			'tag' => $tag,
 			'value' => CProfile::get($prefix.'items.filter.tags.value', null, $i),
 			'operator' => CProfile::get($prefix.'items.filter.tags.operator', null, $i)
+		];
+	}
+	$subfilter_tags = [];
+	foreach (CProfile::getArray($prefix.'items.subfilter_tags.tag', []) as $i => $tag) {
+		$val = CProfile::get($prefix.'items.filter.tags.value', '', $i);
+		$subfilter_tags[$tag.':'.$val] = [
+			'tag' => $tag,
+			'value' => $val
 		];
 	}
 
@@ -1321,6 +1353,8 @@ else {
 		'selectItemDiscovery' => ['ts_delete'],
 		'selectTags' => ['tag', 'value'],
 		'sortfield' => $sortField,
+		'evaltype' => $filter_evaltype,
+		'tags' => $filter_tags,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
@@ -1489,7 +1523,11 @@ else {
 				'subfilter_trends' => (!getRequest('subfilter_trends')
 					|| ($trends !== '' && in_array($trends, getRequest('subfilter_trends')))),
 				'subfilter_interval' => (!getRequest('subfilter_interval')
-					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval'))))
+					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
+				'subfilter_tags' => (!$subfilter_tags
+					|| (bool) array_intersect_key($subfilter_tags, array_flip(array_map(function($tag) {
+							return $tag['tag'].':'.$tag['value'];
+						}, $item['tags']))))
 			];
 		}
 		unset($item);
@@ -1519,7 +1557,61 @@ else {
 		}
 	}
 
+<<<<<<< HEAD
 	$data['main_filter'] = getItemFilterForm($data);
+=======
+	$data['filter_data'] = [
+		'groupids' => hasRequest('filter_groupids')
+			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => getRequest('filter_groupids'),
+				'editable' => true
+			]), ['groupid' => 'id'])
+			: [],
+		'hostids' => hasRequest('filter_hostids')
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => getRequest('filter_hostids'),
+				'templated_hosts' => true,
+				'editable' => true
+			]), ['hostid' => 'id'])
+			: [],
+		'filter_name' => getRequest('filter_name'),
+		'filter_key' => getRequest('filter_key'),
+		'filter_type' => getRequest('filter_type'),
+		'filter_snmp_oid' => getRequest('filter_snmp_oid'),
+		'filter_value_type' => getRequest('filter_value_type'),
+		'filter_delay' => getRequest('filter_delay'),
+		'filter_history' => getRequest('filter_history'),
+		'filter_trends' => getRequest('filter_trends'),
+		'filter_status' => getRequest('filter_status'),
+		'filter_state' => getRequest('filter_state'),
+		'filter_templated_items' => getRequest('filter_templated_items'),
+		'filter_with_triggers' => getRequest('filter_with_triggers'),
+		'filter_discovery' => getRequest('filter_discovery'),
+		'filter_evaltype' => $filter_evaltype,
+		'filter_tags' => $filter_tags,
+		'subfilter_hosts' => getRequest('subfilter_hosts'),
+		'subfilter_types' => getRequest('subfilter_types'),
+		'subfilter_status' => getRequest('subfilter_status'),
+		'subfilter_state' => getRequest('subfilter_state'),
+		'subfilter_value_types' => getRequest('subfilter_value_types'),
+		'subfilter_templated_items' => getRequest('subfilter_templated_items'),
+		'subfilter_with_triggers' => getRequest('subfilter_with_triggers'),
+		'subfilter_discovery' => getRequest('subfilter_discovery'),
+		'subfilter_history' => getRequest('subfilter_history'),
+		'subfilter_trends' => getRequest('subfilter_trends'),
+		'subfilter_interval' => getRequest('subfilter_interval'),
+		'subfilter_tags' => $subfilter_tags
+	];
+	if (!$data['filter_data']['filter_tags']) {
+		$data['filter_data']['filter_tags'] = [[
+			'tag' => '',
+			'value' => '',
+			'operator' => TAG_OPERATOR_LIKE
+		]];
+	}
+>>>>>>> b3b2be6063... ..F....... [ZBXNEXT-2976] added tags column and filter fields in multiple places
 
 	// Remove subfiltered items.
 	foreach ($data['items'] as $number => $item) {

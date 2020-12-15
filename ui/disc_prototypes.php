@@ -826,7 +826,7 @@ else {
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'selectApplications' => API_OUTPUT_EXTEND,
+		'selectTags' => ['tag', 'value'],
 		'sortfield' => $sortField,
 		'limit' => $limit
 	]);
@@ -871,6 +871,8 @@ else {
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
 
 	// render view
 	echo (new CView('configuration.item.prototype.list', $data))->getOutput();

@@ -41,31 +41,31 @@ $widget = (new CWidget())
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter_tags_table = (new CTable())
-		->setId('filter-tags_#{uniqid}')
+		->setId('filter-tags')
 		->addRow(
 			(new CCol(
-				(new CRadioButtonList('evaltype', (int) $data['filter']['evaltype']))
-					->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
-					->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
+				(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+					->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+					->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 					->setModern(true)
-					->setId('evaltype_#{uniqid}')
+					->setId('filter_evaltype')
 			))->setColSpan(4)
 		);
 
 	foreach ($data['filter']['tags'] as $i => $tag) {
 		$filter_tags_table->addRow([
-			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
+			(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
+			(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
 				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
 				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 				->setModern(true),
-			(new CTextBox('tags['.$i.'][value]', $tag['value']))
+			(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
-				(new CButton('tags['.$i.'][remove]', _('Remove')))
+				(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
 					->removeId()
@@ -144,7 +144,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 }
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config'])
+	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
+		'tags'
+	])
 )));
 
 $widget->show();

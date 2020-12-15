@@ -128,13 +128,14 @@ $httpTable = (new CTableInfo())
 		_('Authentication'),
 		_('HTTP proxy'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags'),
 		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
-$httpTests = $this->data['httpTests'];
+$http_tests = $data['http_tests'];
 
-foreach ($httpTests as $httpTestId => $httpTest) {
+foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
 	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
 	$name[] = new CLink(CHtml::encode($httpTest['name']),
@@ -190,6 +191,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status']))
 			->addSID(),
+		$data['tags'][$httpTest['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
