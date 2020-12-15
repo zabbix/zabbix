@@ -33,6 +33,7 @@ import (
 	_ "zabbix.com/plugins/postgres"
 	_ "zabbix.com/plugins/proc"
 	_ "zabbix.com/plugins/redis"
+	_ "zabbix.com/plugins/smart/attribute"
 	_ "zabbix.com/plugins/smart/disk"
 	_ "zabbix.com/plugins/system/cpu"
 	_ "zabbix.com/plugins/system/swap"
