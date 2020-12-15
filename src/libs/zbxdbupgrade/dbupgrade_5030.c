@@ -55,7 +55,7 @@ typedef struct
 }
 zbx_dbpatch_profile_t;
 
-static void	DBpatch_5030001_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *profile, char **subsect, char **field, char **key)
+static void	DBpatch_get_key_fields(DB_ROW row, zbx_dbpatch_profile_t *profile, char **subsect, char **field, char **key)
 {
 	int	tok_idx = 0;
 	char	*token;
@@ -135,7 +135,7 @@ static int	DBpatch_5030001(void)
 			continue;
 		}
 
-		DBpatch_5030001_get_key_fields(row, &profile, &subsect, &field, &key);
+		DBpatch_get_key_fields(row, &profile, &subsect, &field, &key);
 
 		DBfree_result(result);
 
@@ -205,7 +205,7 @@ static int	DBpatch_5030002(void)
 
 static int	DBpatch_5030003(void)
 {
-	int			i, ret = SUCCEED;
+	int			ret = SUCCEED;
 	char			*subsect = NULL, *field = NULL, *key = NULL;
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -214,13 +214,12 @@ static int	DBpatch_5030003(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-
 	result = DBselect("select profileid,userid,idx,idx2,value_id,value_int,value_str,source,type"
 			" from profiles where idx in ('web.dashbrd.list.sort','web.dashbrd.list.sortorder')");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBpatch_5030001_get_key_fields(row, &profile, &subsect, &field, &key);
+		DBpatch_get_key_fields(row, &profile, &subsect, &field, &key);
 
 		if (ZBX_DB_OK > DBexecute("insert into profiles "
 				"(profileid,userid,idx,idx2,value_id,value_int,value_str,source,type) values "
