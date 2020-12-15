@@ -230,6 +230,10 @@ func (dp DeviceParser) checkErr() (err error) {
 		err = fmt.Errorf("%s, %s", err.Error(), m.Str)
 	}
 
+	if err == nil {
+		err = fmt.Errorf("unknown error from smartctl")
+	}
+
 	return
 }
 
