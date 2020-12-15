@@ -108,7 +108,10 @@ func GetParsedDevices(p *plugin.Base) ([]DeviceParser, error) {
 			return nil, fmt.Errorf("Failed to unmarshal smartctl response json: %s", err.Error())
 		}
 
-		dp.checkErr()
+		if err = dp.checkErr(); err != nil {
+			return nil, fmt.Errorf("Smartctl failed to get device data: %s", err.Error())
+		}
+
 		if dp.SmartStatus != nil {
 			out = append(out, dp)
 		}
@@ -119,7 +122,7 @@ func GetParsedDevices(p *plugin.Base) ([]DeviceParser, error) {
 		for _, rtype := range raidTypes {
 			raids, err := getRaidDisks(rDev.Name, rtype)
 			if err != nil {
-				p.Tracef("Stopped looking for RAID devices of %s type, found %d, err:", rtype, len(raids), err.Error())
+				p.Tracef("stopped looking for RAID devices of %s type, found %d, err:", rtype, len(raids), err.Error())
 			}
 			out = append(out, raids...)
 		}
@@ -175,7 +178,7 @@ func getRaidJsons(name string, rtype string) (map[string]string, error) {
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
-		// fmt.Println(deviceJSON)
+
 		out[fullName] = deviceJSON
 	}
 }
@@ -214,19 +217,17 @@ func getRaidDisks(name string, rtype string) ([]DeviceParser, error) {
 }
 
 func (dp DeviceParser) checkErr() (err error) {
-	if dp.Smartctl.ExitStatus == 0 {
+	if dp.Smartctl.ExitStatus != 2 {
 		return
 	}
 
 	for _, m := range dp.Smartctl.Messages {
-		if m.Severity == "error" {
-			if err == nil {
-				err = errors.New(m.Str)
-				continue
-			}
-
-			err = fmt.Errorf("%s, %s", err.Error(), m.Str)
+		if err == nil {
+			err = errors.New(m.Str)
+			continue
 		}
+
+		err = fmt.Errorf("%s, %s", err.Error(), m.Str)
 	}
 
 	return
