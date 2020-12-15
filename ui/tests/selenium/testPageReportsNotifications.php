@@ -73,21 +73,15 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '4', '',
-									'', '', '', '', '', '', '12'
-							]
+							'notifications' => [ '', '', '', '4', '', '', '', '', '', '', '', '12']
 						],
 						[
 							'alias' => 'guest',
-							'notifications' => [ '', '2', '', '', '',
-									'', '', '', '', '10', '', ''
-							]
+							'notifications' => [ '', '2', '', '', '', '', '', '', '', '10', '', '']
 						],
 						[
 							'alias' => 'test-user',
-							'notifications' => [ '', '', '3', '', '',
-								'', '', '', '', '', '11', ''
-							]
+							'notifications' => [ '', '', '3', '', '', '', '', '', '', '', '11', '']
 						]
 					]
 				]
@@ -104,13 +98,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '', '', '', '', '', '',
-								'15', '']
+							'notifications' => [ '', '', '', '', '', '', '', '', '', '', '15', '']
 						],
 						[
 							'alias' => 'user-for-blocking',
-							'notifications' => [ '', '', '', '', '', '',
-								'14', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '', '', '14', '', '', '', '', '']
 						]
 					]
 				]
@@ -122,13 +114,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '', '',
-								'16', '']
+							'notifications' => [ '', '', '', '', '', '16', '']
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '15',
-								'7', '']
+							'notifications' => [ '', '', '', '', '15', '7', '']
 						]
 					]
 				]
