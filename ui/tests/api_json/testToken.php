@@ -230,7 +230,7 @@ class testToken extends CAPITest {
 						'userid' => 1
 					]
 				],
-				'expected_error' => 'API token "the-same-1" already exists for user "1".'
+				'expected_error' => 'Invalid parameter "/3": value (name, userid)=(the-same-1, 1) already exists.'
 			],
 			[
 				'tokens' => [
@@ -890,6 +890,252 @@ class testToken extends CAPITest {
 
 		if ($expected['error'] === null) {
 			$this->assertEquals($result['result'], $expected['result']);
+		}
+	}
+
+	public static function token_update(): array {
+		return [
+			'#1 case "tokenid is mandatory"' =>
+				[
+					'request' => [
+						[
+							'name' => 'test-name-y'
+						]
+					],
+					'expect_error' => 'Invalid parameter "/1": the parameter "tokenid" is missing.'
+				],
+			'#2 case "tokenid must be unique"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '1',
+							'name' => 'test-name-y'
+						],
+						[
+							'tokenid' => '1',
+							'name' => 'test-name-x'
+						]
+					],
+					'expect_error' => 'Invalid parameter "/2": value (tokenid)=(1) already exists.'
+				],
+			'#3 case "name field can be updated"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'name' => 'update-super-admin-1-updated'
+						]
+					],
+					'expect_error' => null
+				],
+			'#4 case "description field can be updated"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'description' => 'update-super-admin-1-updated'
+						]
+					],
+					'expect_error' => null
+				],
+			'#5 case "status field can be updated"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'status' => ZBX_AUTH_TOKEN_DISABLED
+						]
+					],
+					'expect_error' => null
+				],
+			'#6 case "status field can be updated #2"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'status' => ZBX_AUTH_TOKEN_ENABLED
+						]
+					],
+					'expect_error' => null
+				],
+			'#7 case "expires_at field can be updated"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'expires_at' => time() + 3600
+						]
+					],
+					'expect_error' => null
+				],
+			'#8 case "expires_at field can be updated #2"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'expires_at' => 0
+						]
+					],
+					'expect_error' => null
+				],
+			'#9 case "token field cannot be updated"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'token' => bin2hex(random_bytes(64))
+						]
+					],
+					'expect_error' => 'Invalid parameter "/1": unexpected parameter "token".'
+				],
+			'#10 case "userid field cannot be updated"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15',
+							'userid' => '4'
+						]
+					],
+					'expect_error' => 'Invalid parameter "/1": unexpected parameter "userid".'
+				],
+			'#11 case "non-super admin cannot update tokens of other users"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15', // Belongs to other user.
+							'name' => 'update-test-name-x'
+						],
+						[
+							'tokenid' => '18', // Belongs to this user.
+							'name' => 'update-test-name-y'
+						]
+					],
+					'expect_error' => 'No permissions to referred object or it does not exist!',
+					'auth' => [
+						'username' => 'zabbix-user',
+						'password' => 'zabbix'
+					]
+				],
+			'#12 case "super admin can update tokens for other users"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '15', // Belongs to this user.
+							'name' => 'update-test-name-x'
+						],
+						[
+							'tokenid' => '18', // Belongs to other user.
+							'name' => 'update-test-name-y'
+						]
+					],
+					'expect_error' => null
+				],
+			'#13 case "user can update token name to the same name"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '17',
+							'name' => 'update-user-1' // This name exists in DB.
+						],
+						[
+							'tokenid' => '19',
+							'name' => 'update-user-3', // This name exists in DB.
+							'description' => 'new description'
+						]
+					],
+					'expect_error' => null
+				],
+			'#14 case "user cannot update token Y name if such name is used in token X"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '20',
+							'name' => 'update-user-5' // This user has token (ID: 21) using this name.
+						]
+					],
+					'expect_error' => 'API token "update-user-5" already exists for user "5".'
+				],
+			/* '#15 case "user can swap names between tokens"' => */
+			/* 	[ */
+			/* 		'request' => [ */
+			/* 			[ */
+			/* 				'tokenid' => '20', */
+			/* 				'name' => 'update-user-5' // This user has token (ID: 21) using this name. */
+			/* 			], */
+			/* 			[ */
+			/* 				'tokenid' => '21', */
+			/* 				'name' => 'update-user-4' // This user has token (ID: 20) using this name. */
+			/* 			] */
+			/* 		], */
+			/* 		'expect_error' => null */
+			/* 	], */
+			/* '#16 case "user can move name between tokens"' => */
+			/* 	[ */
+			/* 		'request' => [ */
+			/* 			[ */
+			/* 				'tokenid' => '21', */
+			/* 				'name' => 'update-user-6' // DB has (ID: 22) named "update-user-6" */
+			/* 			], */
+			/* 			[ */
+			/* 				'tokenid' => '22', */
+			/* 				'name' => 'update-user-6-backup' // DB has (ID: 22) named "update-user-6" */
+			/* 			] */
+			/* 		], */
+			/* 		'expect_error' => null */
+			/* 	], */
+			'#17 case "cannot update identical token names within request"' =>
+				[
+					'request' => [
+						[
+							'tokenid' => '20',
+							'name' => 'update-user-22'
+						],
+						[
+							'tokenid' => '21',
+							'name' => 'update-user-22'
+						]
+					],
+					'expected_error' => 'Invalid parameter "/2": value (userid, name)=(5, update-user-22) already exists.'
+				]
+		];
+	}
+
+	/**
+	 * @dataProvider token_update
+	 */
+	public function testToken_Update($tokens, $expect_error = null, array $auth = []): void {
+		if ($auth) {
+			$this->authorize($auth['username'], $auth['password']);
+		}
+
+		$result = $this->call('token.update', $tokens, $expect_error);
+
+		if ($expect_error === null) {
+			$db_tokens = DB::select('token', [
+				'output' => ['tokenid', 'name', 'description', 'status', 'expires_at'],
+				'tokenids' => $result['result']['tokenids'],
+				'sortfield' => ['tokenid']
+			]);
+
+			foreach ($db_tokens as $index => $db_token) {
+				$token = $tokens[$index];
+
+				if (array_key_exists('name', $token)) {
+					$this->assertEquals($token['name'], $db_token['name']);
+				}
+
+				if (array_key_exists('description', $token)) {
+					$this->assertEquals($token['description'], $db_token['description']);
+				}
+
+				if (array_key_exists('status', $token)) {
+					$this->assertEquals($token['status'], $db_token['status']);
+				}
+
+				if (array_key_exists('expires_at', $token)) {
+					$this->assertEquals($token['expires_at'], $db_token['expires_at']);
+				}
+			}
 		}
 	}
 }

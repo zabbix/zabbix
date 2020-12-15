@@ -1442,3 +1442,11 @@ INSERT INTO token (tokenid, userid, name, token) VALUES (11, 5, 'test-token', '6
 INSERT INTO token (tokenid, userid, name, expires_at) VALUES (12, 5, 'test-expires', 123);
 INSERT INTO token (tokenid, userid, name) VALUES (13, 12, 'test-1');
 INSERT INTO token (tokenid, userid, name) VALUES (14, 12, 'test-2');
+INSERT INTO token (tokenid, userid, name) VALUES (15, 1, 'update-super-admin-1');
+INSERT INTO token (tokenid, userid, name) VALUES (16, 1, 'update-super-admin-2');
+INSERT INTO token (tokenid, userid, name) VALUES (17, 5, 'update-user-1');
+INSERT INTO token (tokenid, userid, name) VALUES (18, 5, 'update-user-2');
+INSERT INTO token (tokenid, userid, name) VALUES (19, 5, 'update-user-3');
+INSERT INTO token (tokenid, userid, name) VALUES (20, 5, 'update-user-4');
+INSERT INTO token (tokenid, userid, name) VALUES (21, 5, 'update-user-5');
+INSERT INTO token (tokenid, userid, name) VALUES (22, 5, 'update-user-6');
