@@ -93,6 +93,13 @@ static int	DBpatch_5030006(void)
 	return DBcreate_index("script_param", "script_param_1", "scriptid,name", 1);
 }
 
+static int	DBpatch_5030007(void)
+{
+	const ZBX_FIELD field = {"type", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("scripts", &field);
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -106,5 +113,6 @@ DBPATCH_ADD(5030003, 0, 1)
 DBPATCH_ADD(5030004, 0, 1)
 DBPATCH_ADD(5030005, 0, 1)
 DBPATCH_ADD(5030006, 0, 1)
+DBPATCH_ADD(5030007, 0, 1)
 
 DBPATCH_END()
