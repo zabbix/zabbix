@@ -1138,4 +1138,65 @@ class testToken extends CAPITest {
 			}
 		}
 	}
+
+	public function testToken_Generate(): void {
+		$adminid = 1;
+		$userid = 5;
+		$this->authorize('Admin', 'zabbix'); // Super admin role (ID = 1)
+		['result' => ['tokenids' => $tokenids]] = $this->call('token.create', [
+			['name' => '1', 'userid' => 5],
+			['name' => '1', 'userid' => 1]
+		], null);
+
+		[$user_tokenid, $admin_tokenid] = $tokenids;
+
+		// Token ids must be unique.
+		$this->call('token.generate', [1, 1],
+				'Invalid parameter "/2": value (1) already exists.'
+		);
+
+		// User role cannot generate other tokens.
+		$this->authorize('zabbix-user', 'zabbix'); // User role (ID = 5)
+		$this->call('token.generate', [$user_tokenid, $admin_tokenid],
+				'No permissions to referred object or it does not exist!'
+		);
+
+		// After successful generate call, session user becomes the record creator.
+		$this->assertEquals($adminid,
+				CDBHelper::getValue('SELECT creator_userid FROM token WHERE tokenid='.zbx_dbstr($user_tokenid))
+		);
+		['result' => [['token' => $token]]] = $this->call('token.generate', [$user_tokenid]);
+		$this->assertEquals($userid,
+				CDBHelper::getValue('SELECT creator_userid FROM token WHERE tokenid='.zbx_dbstr($user_tokenid))
+		);
+
+		// The generated token hash matches record in DB.
+		$this->assertEquals(hash('sha512', $token),
+				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($user_tokenid)),
+				'User token value updated'
+		);
+
+		// Super admin can generate/regenerate token for anyone.
+		$this->authorize('Admin', 'zabbix'); // Super admin role (ID = 1)
+		['result' => $tokens] = $this->call('token.generate', [$user_tokenid, $admin_tokenid]);
+		[['token' => $user_token], ['token' => $admin_token]] = $tokens;
+
+		// After successful generate call, session user becomes the record creator.
+		$this->assertEquals($adminid,
+				CDBHelper::getValue('SELECT creator_userid FROM token WHERE tokenid='.zbx_dbstr($user_tokenid))
+		);
+		$this->assertEquals($adminid,
+				CDBHelper::getValue('SELECT creator_userid FROM token WHERE tokenid='.zbx_dbstr($admin_tokenid))
+		);
+
+		// The generated token hash matches record in DB.
+		$this->assertEquals(hash('sha512', $user_token),
+				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($user_tokenid)),
+				'User token value updated'
+		);
+		$this->assertEquals(hash('sha512', $admin_token),
+				CDBHelper::getValue('SELECT token FROM token WHERE tokenid='.zbx_dbstr($admin_tokenid)),
+				'Admin token value re-updated'
+		);
+	}
 }

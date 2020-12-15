@@ -28,7 +28,8 @@ class CToken extends CApiService {
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS],
+		'generate' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'action' => CRoleHelper::ACTIONS_MANAGE_API_TOKENS]
 	];
 
 	protected const AUDIT_RESOURCE = AUDIT_RESOURCE_AUTH_TOKEN;
@@ -421,5 +422,53 @@ class CToken extends CApiService {
 		}
 
 		$this->checkDuplicateNames($test_tokens);
+	}
+
+	/**
+	 * @param array $tokenids
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @return array
+	 */
+	public function generate(array $tokenids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $tokenids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_tokens = $this->get([
+			'output' => ['tokenid', 'name'],
+			'tokenids' => $tokenids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_tokens) != count($tokenids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$response = [];
+		$upd_tokens = [];
+		foreach ($tokenids as $tokenid) {
+			$token = bin2hex(random_bytes(32));
+			$response[] = [
+				'tokenid' => $tokenid,
+				'token' => $token
+			];
+			$upd_tokens[] = [
+				'values' => ['token' => hash('sha512', $token), 'creator_userid' => self::$userData['userid']],
+				'where' => ['tokenid' => $tokenid]
+			];
+		}
+
+		DB::update('token', $upd_tokens);
+		array_walk($db_tokens, function (&$db_token) {
+			$db_token['token'] = '';
+		});
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, static::AUDIT_RESOURCE, $response, $db_tokens);
+
+		return $response;
 	}
 }

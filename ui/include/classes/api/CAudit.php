@@ -103,6 +103,9 @@ class CAudit {
 			'globalmacro' => [
 				'fields' => ['value' => true],
 				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+			],
+			'token' => [
+				'fields' => ['token' => true]
 			]
 		];
 
