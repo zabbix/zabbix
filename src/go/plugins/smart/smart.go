@@ -179,6 +179,16 @@ func getRaidJsons(name string, rtype string) (map[string]string, error) {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
 
+		var dp DeviceParser
+		if err = json.Unmarshal([]byte(deviceJSON), &dp); err != nil {
+			return out, fmt.Errorf("failed to unmarshal smartctl RAID response json: %s", err.Error())
+		}
+
+		err = dp.checkErr()
+		if err != nil {
+			return out, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error())
+		}
+
 		out[fullName] = deviceJSON
 	}
 }
