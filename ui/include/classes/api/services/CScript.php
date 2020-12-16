@@ -229,11 +229,22 @@ class CScript extends CApiService {
 		$this->validateCreate($scripts);
 
 		$scriptids = DB::insert('scripts', $scripts);
+		$scripts_params = [];
 
 		foreach ($scripts as $index => &$script) {
 			$script['scriptid'] = $scriptids[$index];
+
+			if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
+				foreach ($script['parameters'] as $param) {
+					$scripts_params[] = ['scriptid' => $script['scriptid']] + $param;
+				}
+			}
 		}
 		unset($script);
+
+		if ($scripts_params) {
+			DB::insertBatch('script_param', $scripts_params);
+		}
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCRIPT, $scripts);
 
@@ -252,14 +263,19 @@ class CScript extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_SCRIPT_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'name')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI])],
+			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_WEBHOOK])],
 			'execute_on' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY])],
 			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'description')],
 			'usrgrpid' =>		['type' => API_ID],
 			'groupid' =>		['type' => API_ID],
 			'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
-			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')]
+			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
+			'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:60'],
+			'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('script_param', 'value')]
+			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -280,14 +296,19 @@ class CScript extends CApiService {
 		$this->validateUpdate($scripts, $db_scripts);
 
 		$upd_scripts = [];
+		$scripts_params = [];
+		$default_timeout = DB::getDefaults('scripts')['timeout'];
 
 		foreach ($scripts as $script) {
-			$db_script = $db_scripts[$script['scriptid']];
+			$scriptid = $script['scriptid'];
+			$db_script = $db_scripts[$scriptid];
+			$db_type = $db_script['type'];
+			$type = array_key_exists('type', $script) ? $script['type'] : $db_type;
 
 			$upd_script = [];
 
 			// strings
-			foreach (['name', 'command', 'description', 'confirmation'] as $field_name) {
+			foreach (['name', 'command', 'description', 'confirmation', 'timeout'] as $field_name) {
 				if (array_key_exists($field_name, $script) && $script[$field_name] !== $db_script[$field_name]) {
 					$upd_script[$field_name] = $script[$field_name];
 				}
@@ -299,16 +320,78 @@ class CScript extends CApiService {
 				}
 			}
 
+			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
+				foreach ($script['parameters'] as $param) {
+					$scripts_params[$scriptid][$param['name']] = $param['value'];
+				}
+			}
+
+			if ($type != $db_type && $db_type == ZBX_SCRIPT_TYPE_WEBHOOK) {
+				$upd_script['timeout'] = $default_timeout;
+				$upd_script['parameters'] = [];
+			}
+
 			if ($upd_script) {
 				$upd_scripts[] = [
 					'values' => $upd_script,
-					'where' => ['scriptid' => $script['scriptid']]
+					'where' => ['scriptid' => $scriptid]
 				];
 			}
 		}
 
 		if ($upd_scripts) {
 			DB::update('scripts', $upd_scripts);
+		}
+
+		if ($scripts_params) {
+			$ins_script_param = [];
+			$del_script_param = [];
+			$upd_script_param = [];
+			$db_scripts_params = DB::select('script_param', [
+				'output' => ['script_paramid', 'scriptid', 'name', 'value'],
+				'filter' => ['scriptid' => array_keys($scripts_params)]
+			]);
+
+			foreach ($db_scripts_params as $param) {
+				$scriptid = $param['scriptid'];
+
+				if (!array_key_exists($scriptid, $scripts_params)) {
+					$del_script_param[] = $param['script_paramid'];
+				}
+				elseif (!array_key_exists($param['name'], $scripts_params[$scriptid])) {
+					$del_script_param[] = $param['script_paramid'];
+				}
+				elseif ($scripts_params[$scriptid][$param['name']] !== $param['value']) {
+					$upd_script_param[] = [
+						'values' => ['value' => $scripts_params[$scriptid][$param['name']]],
+						'where' => ['script_paramid' => $param['script_paramid']]
+					];
+					unset($scripts_params[$scriptid][$param['name']]);
+				}
+				else {
+					unset($scripts_params[$scriptid][$param['name']]);
+				}
+			}
+
+			$scripts_params = array_filter($scripts_params);
+
+			foreach ($scripts_params as $scriptid => $params) {
+				foreach ($params as $name => $value) {
+					$ins_script_param[] = compact('scriptid', 'name', 'value');
+				}
+			}
+
+			if ($del_script_param) {
+				DB::delete('script_param', ['script_paramid' => array_keys(array_flip($del_script_param))]);
+			}
+
+			if ($upd_script_param) {
+				DB::update('script_param', $upd_script_param);
+			}
+
+			if ($ins_script_param) {
+				DB::insert('script_param', $ins_script_param);
+			}
 		}
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, $scripts, $db_scripts);
@@ -330,14 +413,19 @@ class CScript extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['scriptid'], ['name']], 'fields' => [
 			'scriptid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_SCRIPT_NAME, 'length' => DB::getFieldLength('scripts', 'name')],
-			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI])],
+			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_WEBHOOK])],
 			'execute_on' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY])],
 			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'description')],
 			'usrgrpid' =>		['type' => API_ID],
 			'groupid' =>		['type' => API_ID],
 			'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
-			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')]
+			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
+			'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:60'],
+			'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('script_param', 'value')]
+			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -345,7 +433,7 @@ class CScript extends CApiService {
 
 		$db_scripts = DB::select('scripts', [
 			'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid', 'groupid',
-				'host_access', 'confirmation'
+				'host_access', 'confirmation', 'timeout'
 			],
 			'scriptids' => zbx_objectValues($scripts, 'scriptid'),
 			'preservekeys' => true
@@ -384,13 +472,22 @@ class CScript extends CApiService {
 	 */
 	private function checkExecutionType(array $scripts) {
 		foreach ($scripts as &$script) {
-			if (array_key_exists('type', $script) && $script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
-				if (!array_key_exists('execute_on', $script)) {
-					$script['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_SERVER;
+			/*
+			 * Actually the 'execute_on' parameter affects only the custom script execution from server side. For other
+			 * script types the script will always be executed depending on whether the host is monitored by Zabbix
+			 * server or proxy. Nevertheless, for this case from API side is allowed to modify this parameter just to
+			 * avoid misunderstandings working with API from the users side.
+			 */
+			if (array_key_exists('type', $script) && $script['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+					&& array_key_exists('execute_on', $script)
+					&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
+				$message = _('IPMI scripts can be executed only by server.');
+
+				if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+					$message = _('Webhook scripts can be executed only by server.');
 				}
-				elseif ($script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('IPMI scripts can be executed only by server.'));
-				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, $message);
 			}
 		}
 		unset($script);
@@ -616,24 +713,54 @@ class CScript extends CApiService {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-			'scriptid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'scriptid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'hostid' =>		['type' => API_ID],
+			'eventid' =>	['type' => API_ID],
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_hosts = API::Host()->get([
-			'output' => [],
-			'hostids' => $data['hostid']
-		]);
-		if (!$db_hosts) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		if ((!array_key_exists('hostid', $data) && !array_key_exists('eventid', $data))
+				|| (array_key_exists('hostid', $data) && array_key_exists('eventid', $data))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot execute script without hostid or eventid parameter.'));
+		}
+
+		$hostids = $data['hostid'];
+		$is_event = false;
+
+		if (array_key_exists('eventid', $data)) {
+			$db_events = API::Event()->get([
+				'output' => [],
+				'selectHosts' => ['hostid'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'eventids' => $data['eventid']
+			]);
+			if (!$db_events) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$hostids = array_column($db_events[0]['hosts'], 'hostid');
+			$is_event = true;
+		}
+		else {
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $data['hostid']
+			]);
+			if (!$db_hosts) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
 		$db_scripts = $this->get([
 			'output' => [],
-			'hostids' => $data['hostid'],
+			'hostids' => $hostids,
 			'scriptids' => $data['scriptid']
 		]);
 		if (!$db_scripts) {
@@ -645,13 +772,17 @@ class CScript extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $zabbix_server->executeScript($data['scriptid'], $data['hostid'], self::$userData['sessionid']);
+		$result = $zabbix_server->executeScript($data['scriptid'], self::$userData['sessionid'],
+			$is_event ? null : $data['hostid'],
+			$is_event ? $data['eventid'] : null
+		);
 
 		if ($result !== false) {
 			// return the result in a backwards-compatible format
 			return [
 				'response' => 'success',
-				'value' => $result
+				'value' => $result,
+				'debug' => $zabbix_server->getDebug()
 			];
 		}
 		else {
@@ -754,6 +885,24 @@ class CScript extends CApiService {
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
+
+		if ($this->outputIsRequested('parameters', $options['output'])) {
+			foreach ($result as $scriptid => $script) {
+				$result[$scriptid]['parameters'] = [];
+			}
+
+			$parameters = DB::select('script_param', [
+				'output' => ['scriptid', 'name', 'value'],
+				'filter' => ['scriptid' => array_keys($result)]
+			]);
+
+			foreach ($parameters as $parameter) {
+				$result[$parameter['scriptid']]['parameters'][] = [
+					'name' => $parameter['name'],
+					'value' => $parameter['value']
+				];
+			}
+		}
 
 		return $this->addRelatedGroupsAndHosts($options, $result);
 	}

@@ -141,22 +141,33 @@ class CZabbixServer {
 	}
 
 	/**
-	 * Executes a script on the given host and returns the result.
+	 * Executes a script on the given host or event and returns the result.
 	 *
-	 * @param $scriptId
-	 * @param $hostId
+	 * @param $scriptid
 	 * @param $sid
+	 * @param $hostid
+	 * @param $eventid
 	 *
 	 * @return bool|array
 	 */
-	public function executeScript($scriptId, $hostId, $sid) {
-		return $this->request([
+	public function executeScript(string $scriptid, string $sid, string $hostid = null, string $eventid = null) {
+		$params = [
 			'request' => 'command',
-			'scriptid' => $scriptId,
-			'hostid' => $hostId,
+			'scriptid' => $scriptid,
+			'hostid' => $hostid,
 			'sid' => $sid,
 			'clientip' => CWebUser::getIp()
-		]);
+		];
+
+		if ($hostid !== null) {
+			$params['hostid'] = $hostid;
+		}
+
+		if ($eventid !== null) {
+			$params['eventid'] = $eventid;
+		}
+
+		return $this->request($params);
 	}
 
 	/**
