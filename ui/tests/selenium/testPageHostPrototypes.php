@@ -36,7 +36,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('xpath://form[@name="hosts"]/table[@class="list-table"]')->asTable()->one();
 		$headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
 		$this->assertSame($headers, $table->getHeadersText());
 
