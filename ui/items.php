@@ -282,6 +282,7 @@ $fields = [
 										null
 									],
 	'filter_ipmi_sensor' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_valuemapids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	// subfilters
 	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, null,	null,		null],

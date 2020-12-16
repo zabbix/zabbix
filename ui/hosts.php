@@ -108,6 +108,7 @@ $fields = [
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'valuemap' => 				[T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"host.export","host.massdelete","host.massdisable",'.
@@ -811,7 +812,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'inventory_mode' => getRequest('inventory_mode'),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? []
-					: getRequest('host_inventory', [])
+					: getRequest('host_inventory', []),
+				'valuemaps' => getRequest('valuemap', [])
 			];
 
 			if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || ($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
@@ -1125,7 +1127,10 @@ elseif (hasRequest('form')) {
 		'tls_issuer' => getRequest('tls_issuer', ''),
 		'tls_subject' => getRequest('tls_subject', ''),
 		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
-		'tls_psk' => getRequest('tls_psk', '')
+		'tls_psk' => getRequest('tls_psk', ''),
+
+		// Valuemap
+		'valuemaps' => getRequest('valuemap', [])
 	];
 
 	if (!hasRequest('form_refresh')) {
@@ -1142,6 +1147,7 @@ elseif (hasRequest('form')) {
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
 				'selectTags' => ['tag', 'value'],
+				'selectValueMaps' => ['name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
@@ -1204,6 +1210,9 @@ elseif (hasRequest('form')) {
 				$data['visiblename'] = '';
 			}
 
+			// Valuemap
+			$data['valuemaps'] = $dbHost['valuemaps'];
+
 			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
 		}
 		else {
@@ -1219,6 +1228,7 @@ elseif (hasRequest('form')) {
 				'selectParentTemplates' => ['templateid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectHostDiscovery' => ['parent_hostid'],
+				'selectValueMaps' => ['name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
@@ -1228,6 +1238,9 @@ elseif (hasRequest('form')) {
 				$data['discoveryRule'] = $dbHost['discoveryRule'];
 				$data['hostDiscovery'] = $dbHost['hostDiscovery'];
 			}
+
+			// Valuemap
+			$data['valuemaps'] = $dbHost['valuemaps'];
 
 			$templateids = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 			$data['original_templates'] = array_combine($templateids, $templateids);

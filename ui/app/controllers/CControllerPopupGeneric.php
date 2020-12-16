@@ -404,6 +404,19 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
+			],
+			'valuemaps' => [
+				'title' => _('Value mapping'),
+				'min_user_type' => USER_TYPE_SUPER_ADMIN,
+				'allowed_src_fields' => 'valuemapid,name',
+				'form' => [
+					'name' => 'valuemapform',
+					'id' => 'valuemaps'
+				],
+				'table_columns' => [
+					_('Name'),
+					_('Mapping')
+				]
 			]
 		];
 	}
@@ -464,7 +477,8 @@ class CControllerPopupGeneric extends CController {
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
 			'filter_hostid_rst' =>					'in 1',
-			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'hostids' => 							'array'
 		];
 
 		// Set destination and source field validation roles.
@@ -1341,6 +1355,31 @@ class CControllerPopupGeneric extends CController {
 
 				foreach ($api_methods as $api_method) {
 					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];
+				}
+
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'valuemaps':
+				$records = [];
+				$options += [
+					'output' => ['valuemaps'],
+					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+					'hostids' => $this->getInput('hostids', []),
+					'preservekeys' => true
+				];
+
+				$hosts = API::Host()->get($options);
+
+				foreach ($hosts as $host) {
+					$valuemaps = $host['valuemaps'];
+					foreach ($valuemaps as $valuemap) {
+						$records[$valuemap['valuemapid']] = [
+							'id' => $valuemap['valuemapid'],
+							'name' => $valuemap['name'],
+							'mappings' => $valuemap['mappings']
+						];
+					}
 				}
 
 				CArrayHelper::sort($records, ['name']);

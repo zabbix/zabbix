@@ -170,6 +170,8 @@ class CRouter {
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
+		'popup.valuemap.edit'			=> ['CControllerPopupValueMapEdit',					'layout.json',			'popup.valuemap.edit'],
+		// 'popup.valuemap.create'			=> ['CControllerPopupValueMapCreate',				'layout.json',			null],
 		'popup.import'					=> ['CControllerPopupImport',						'layout.json',			'popup.import'],
 		'problem.view'					=> ['CControllerProblemView',						'layout.htmlpage',		'monitoring.problem.view'],
 		'problem.view.refresh'			=> ['CControllerProblemViewRefresh',				'layout.json',			null],

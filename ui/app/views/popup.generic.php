@@ -621,6 +621,41 @@ switch ($data['popup_type']) {
 		}
 		unset($data['table_records']);
 		break;
+
+	case 'valuemaps':
+		foreach ($data['table_records'] as $item) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$item['id'].']', $item['id'])
+				: null;
+
+			if (array_key_exists('_disabled', $item)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$name = $item['name'];
+
+				unset($data['table_records'][$item['id']]);
+			}
+			else {
+				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
+						zbx_jsvalue($item['id']).', '.$options['parentid'].');';
+
+				$name = (new CLink($item['name'], 'javascript:void(0);'))
+					->setId('spanid'.$item['id'])
+					->onClick($js_action.$js_action_onclick);
+			}
+
+			$span = [];
+
+			foreach ($item['mappings'] as $mapping) {
+				$span[] = $mapping['key'].' ⇒ '.$mapping['value'];
+				$span[] = BR();
+			}
+
+			$table->addRow([$check_box, $name, $span]);
+		}
+		break;
 }
 
 // Add submit button at footer.

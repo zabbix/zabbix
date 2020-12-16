@@ -65,6 +65,7 @@ $fields = [
 	'mass_action_tpls'	=> [T_ZBX_INT, O_OPT, null, IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]), null ],
 	'mass_clear_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
+	'valuemap'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massupdate","template.massupdateform",'.
@@ -142,6 +143,8 @@ $macros = array_filter($macros, function($macro) {
 
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
+
+$valuemaps = getRequest('valuemap', []);
 
 /*
  * Actions
@@ -565,7 +568,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'templates' => $templates,
 			'macros' => $macros,
 			'tags' => $tags,
-			'description' => getRequest('description', '')
+			'description' => getRequest('description', ''),
+			'valuemaps' => $valuemaps
 		];
 
 		if ($templateId == 0) {
@@ -776,7 +780,8 @@ if (hasRequest('templates') && (getRequest('action') === 'template.massupdatefor
 		],
 		'macros_visible' => getRequest('mass_update_macros', ZBX_ACTION_ADD),
 		'description' => getRequest('description'),
-		'linked_templates' => getRequest('linked_templates', [])
+		'linked_templates' => getRequest('linked_templates', []),
+		'valuemaps' => $valuemaps
 	];
 
 	// sort templates
@@ -818,7 +823,8 @@ elseif (hasRequest('form')) {
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
-		'macros' => $macros
+		'macros' => $macros,
+		'valuemaps' => $valuemaps
 	];
 
 	if ($data['templateid'] != 0) {
@@ -828,6 +834,7 @@ elseif (hasRequest('form')) {
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
+			'selectValueMaps' => ['name', 'mappings'],
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
@@ -840,6 +847,8 @@ elseif (hasRequest('form')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
 		}
+
+		$data['valuemaps'] = $data['dbTemplate']['valuemaps'];
 	}
 
 	// description

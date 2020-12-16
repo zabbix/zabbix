@@ -93,7 +93,8 @@ function getItemFilterForm(&$items) {
 	$filter_state				= $_REQUEST['filter_state'];
 	$filter_templated_items		= $_REQUEST['filter_templated_items'];
 	$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
-	$filter_discovery           = $_REQUEST['filter_discovery'];
+	$filter_discovery			= $_REQUEST['filter_discovery'];
+	$filter_valuemaps			= $_REQUEST['filter_valuemapids'];
 	$subfilter_hosts			= $_REQUEST['subfilter_hosts'];
 	$subfilter_apps				= $_REQUEST['subfilter_apps'];
 	$subfilter_types			= $_REQUEST['subfilter_types'];
@@ -102,7 +103,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_state			= $_REQUEST['subfilter_state'];
 	$subfilter_templated_items	= $_REQUEST['subfilter_templated_items'];
 	$subfilter_with_triggers	= $_REQUEST['subfilter_with_triggers'];
-	$subfilter_discovery        = $_REQUEST['subfilter_discovery'];
+	$subfilter_discovery		= $_REQUEST['subfilter_discovery'];
 	$subfilter_history			= $_REQUEST['subfilter_history'];
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
@@ -289,8 +290,37 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 5
+	// FIXME: add API call.
+	// $valuemaps_filter = $filter_valuemaps
+	// 	? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+	// 		'output' => ['valuemapid', 'name'],
+	// 		'hostids' => $filter_valuemaps,
+	// 		'editable' => true
+	// 	]), ['valuemapid' => 'id'])
+	// 	: [];
+	$valuemaps_filter = [];
+
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
+	$filterColumn2->addRow(_('Value mapping'),
+		(new CMultiSelect([
+			'name' => 'filter_valuemapids[]',
+			'object_name' => 'valuemaps',
+			'data' => $valuemaps_filter,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_valuemapids_',
+					'hostids' => array_column($host_filter, 'id'),
+					'editable' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		'filter_snmp_oid_row'
 	);
 	$filterColumn4->addRow(_('Discovery'),
 		new CComboBox('filter_discovery', $filter_discovery, null, [
@@ -844,7 +874,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
-		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'new_application' => getRequest('new_application', ''),
@@ -857,7 +886,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'publickey' => getRequest('publickey', ''),
 		'privatekey' => getRequest('privatekey', ''),
 		'logtimefmt' => getRequest('logtimefmt', ''),
-		'valuemaps' => null,
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
@@ -1047,7 +1075,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['value_type'] = $data['item']['value_type'];
 		$data['trapper_hosts'] = $data['item']['trapper_hosts'];
 		$data['units'] = $data['item']['units'];
-		$data['valuemapid'] = $data['item']['valuemapid'];
 		$data['hostid'] = $data['item']['hostid'];
 		$data['params'] = $data['item']['params'];
 		$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
@@ -1211,26 +1238,26 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
-			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
-		if ($data['valuemapid'] != 0) {
-			$valuemaps = API::ValueMap()->get([
-				'output' => ['name'],
-				'valuemapids' => [$data['valuemapid']]
-			]);
+	// if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
+	// 		&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
+	// 	if ($data['valuemapid'] != 0) {
+	// 		$valuemaps = API::ValueMap()->get([
+	// 			'output' => ['name'],
+	// 			'valuemapids' => [$data['valuemapid']]
+	// 		]);
 
-			if ($valuemaps) {
-				$data['valuemaps'] = $valuemaps[0]['name'];
-			}
-		}
-	}
-	else {
-		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name']
-		]);
+	// 		if ($valuemaps) {
+	// 			$data['valuemaps'] = $valuemaps[0]['name'];
+	// 		}
+	// 	}
+	// }
+	// else {
+	// 	$data['valuemaps'] = API::ValueMap()->get([
+	// 		'output' => ['valuemapid', 'name']
+	// 	]);
 
-		CArrayHelper::sort($data['valuemaps'], ['name']);
-	}
+	// 	CArrayHelper::sort($data['valuemaps'], ['name']);
+	// }
 
 	// possible host inventories
 	if ($data['parent_discoveryid'] == 0) {

@@ -545,6 +545,33 @@ switch ($data['method']) {
 					$result[] = ['id' => $api_method, 'name' => $api_method];
 				}
 				break;
+
+			case 'valuemaps':
+				$result = [];
+
+				$hosts = API::Host()->get([
+					'output' => ['valuemaps'],
+					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+					// 'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'hostids' => [$data['hostid']],
+					'preservekeys' => true
+				]);
+
+				if ($hosts) {
+					foreach ($hosts as $host) {
+						$valuemaps = $host['valuemaps'];
+						foreach ($valuemaps as $valuemap) {
+							$result[$valuemap['valuemapid']] = [
+								'id' => $valuemap['valuemapid'],
+								'name' => $valuemap['name'],
+								'mappings' => $valuemap['mappings']
+							];
+						}
+					}
+
+					CArrayHelper::sort($result, ['name']);
+				}
+				break;
 		}
 		break;
 

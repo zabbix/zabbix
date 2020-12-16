@@ -350,7 +350,7 @@ jQuery(function($) {
 	 * @param array  data.values   values
 	 * @param string data.parentId parent id
 	 */
-	$(document).on('add.popup', function(e, data) {
+	$(document).on('add.popup', function (e, data) {
 		// multiselect check
 		if ($('#' + data.parentId).hasClass('multiselect')) {
 			var items = [];
