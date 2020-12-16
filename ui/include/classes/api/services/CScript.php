@@ -55,7 +55,7 @@ class CScript extends CApiService {
 	 */
 	public function get(array $options) {
 		$script_fields = ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
-			'confirmation', 'type', 'execute_on'
+			'confirmation', 'type', 'execute_on', 'timeout', 'parameters'
 		];
 		$group_fields = ['groupid', 'name', 'flags', 'internal'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
@@ -297,7 +297,6 @@ class CScript extends CApiService {
 
 		$upd_scripts = [];
 		$scripts_params = [];
-		$default_timeout = DB::getDefaults('scripts')['timeout'];
 
 		foreach ($scripts as $script) {
 			$scriptid = $script['scriptid'];
@@ -321,14 +320,18 @@ class CScript extends CApiService {
 			}
 
 			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
+				$params = [];
+
 				foreach ($script['parameters'] as $param) {
-					$scripts_params[$scriptid][$param['name']] = $param['value'];
+					$params[$param['name']] = $param['value'];
 				}
+
+				$scripts_params[$scriptid] = $params;
+				unset($script['parameters']);
 			}
 
 			if ($type != $db_type && $db_type == ZBX_SCRIPT_TYPE_WEBHOOK) {
-				$upd_script['timeout'] = $default_timeout;
-				$upd_script['parameters'] = [];
+				$upd_script['timeout'] = DB::getDefault('scripts', 'timeout');
 			}
 
 			if ($upd_script) {
