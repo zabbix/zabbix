@@ -33,12 +33,11 @@ zbx_trends_parse_range_LDADD = \
 
 zbx_trends_parse_range_LDADD += @SERVER_LIBS@
 
-zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ 
-
-zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBfetch \
 	-Wl,--wrap=DBselect \
 	-Wl,--wrap=DBis_null
-	
+
+zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
