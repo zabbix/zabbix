@@ -154,7 +154,7 @@ static int	DBpatch_5030012(void)
 
 static int	DBpatch_5030013(void)
 {
-	return DBcreate_index("widget", "dashboard_pageid_1", "dashboard_pageid", 0);
+	return DBcreate_index("widget", "widget_1", "dashboard_pageid", 0);
 }
 
 static int	DBpatch_5030014(void)
