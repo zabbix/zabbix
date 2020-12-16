@@ -35,7 +35,9 @@ $widget = (new CWidget())
 			))
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'host']).', null), null, this);'
+					)
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -486,7 +488,12 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			'host.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.host' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 		]
 	)

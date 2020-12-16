@@ -48,6 +48,7 @@ typedef enum
 	ZBX_MUTEX_KSTAT,
 #endif
 	ZBX_MUTEX_MODBUS,
+	ZBX_MUTEX_TREND_FUNC,
 	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }

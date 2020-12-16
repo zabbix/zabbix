@@ -298,7 +298,7 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority'],
+						'output' => ['priority', 'manual_close'],
 						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
@@ -936,6 +936,13 @@ class CScreenProblem extends CScreenBase {
 				$dependencies = getTriggerDependencies($data['triggers']);
 			}
 
+			$allowed = [
+				'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+				'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+				'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+				'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			];
+
 			// Add problems to table.
 			foreach ($data['problems'] as $eventid => $problem) {
 				$trigger = $data['triggers'][$problem['objectid']];
@@ -965,10 +972,13 @@ class CScreenProblem extends CScreenBase {
 					$cell_r_clock = '';
 				}
 
+				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED && $allowed['close']);
+
 				if ($problem['r_eventid'] != 0) {
 					$value = TRIGGER_VALUE_FALSE;
 					$value_str = _('RESOLVED');
 					$value_clock = $problem['r_clock'];
+					$can_be_closed = false;
 				}
 				else {
 					$in_closing = false;
@@ -976,6 +986,7 @@ class CScreenProblem extends CScreenBase {
 					foreach ($problem['acknowledges'] as $acknowledge) {
 						if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 							$in_closing = true;
+							$can_be_closed = false;
 							break;
 						}
 					}
@@ -1102,7 +1113,8 @@ class CScreenProblem extends CScreenBase {
 				}
 
 				// Create acknowledge link.
-				$problem_update_link = $this->data['allowed_ack']
+				$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity']
+						|| $allowed['acknowledge'] || $can_be_closed)
 					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 						->addClass(ZBX_STYLE_LINK_ALT)
@@ -1138,7 +1150,12 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'popup.acknowledge.edit' => ['name' => _('Mass update'), 'disabled' => !$this->data['allowed_ack']]
+				'popup.acknowledge.edit' => [
+					'name' => _('Mass update'),
+					'disabled' => !($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+							|| $allowed['close']
+					)
+				]
 			], 'problem');
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);

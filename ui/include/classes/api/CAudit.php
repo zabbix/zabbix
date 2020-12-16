@@ -91,21 +91,24 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => [
-				'fields' => ['passwd' => true]
-			],
 			'config' => [
 				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
-			],
-			'media_type' => [
-				'fields' => ['passwd' => true]
 			],
 			'globalmacro' => [
 				'fields' => ['value' => true],
 				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 			],
+			'hosts' => [
+				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			],
+			'media_type' => [
+				'fields' => ['passwd' => true]
+			],
 			'token' => [
 				'fields' => ['token' => true]
+			],
+			'users' => [
+				'fields' => ['passwd' => true]
 			]
 		];
 

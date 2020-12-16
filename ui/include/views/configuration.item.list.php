@@ -261,7 +261,12 @@ $itemForm->addItem([
 			'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
 			'item.massclearhistory' => $massclearhistory,
 			'item.masscopyto' => ['name' => _('Copy')],
-			'item.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.item' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.item');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
 		],
 		$data['checkbox_hash']

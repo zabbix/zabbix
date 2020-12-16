@@ -87,7 +87,7 @@ $grouping_column = ($filter['groupby'] === '') ? _('Field') : $inventories[$filt
 
 $table = (new CTableInfo())->setHeader([
 	make_sorting_header($grouping_column, 'inventory_field', $sortField, $sortOrder),
-	make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
+	make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder)
 ]);
 
 // To show a report, we will need a host group and a field to aggregate.

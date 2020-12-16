@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:47Z'
   media_types:
     -
@@ -205,7 +205,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__ilert_incident_url}'
       event_menu_name: 'iLert incident'
       description: |
-        Please refer to https://docs.ilert.com/integration/zabbix 
+        Please refer to https://docs.ilert.com/integrations/zabbix/native 
           
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "iLert". You can also rewrite the incident summary via ".ILERT.INCIDENT.SUMMARY" parameter or leave it empty to use the standard pattern.

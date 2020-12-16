@@ -241,3 +241,38 @@ void 	zbx_set_metric_thread_signal_handler(void)
 	sigaction(SIGSEGV, &phan, NULL);
 	sigaction(SIGBUS, &phan, NULL);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_block_signals                                                *
+ *                                                                            *
+ * Purpose: block signals to avoid interruption                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_block_signals(sigset_t *orig_mask)
+{
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_unblock_signals                                              *
+ *                                                                            *
+ * Purpose: unblock signals after blocking                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_unblock_signals(const sigset_t *orig_mask)
+{
+	if (0 > sigprocmask(SIG_SETMASK, orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
+}

@@ -244,7 +244,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						],
 						[
 							'type' => 'Plain text',
-							'header' => 'Plain text',
+							'header' => 'Plain text'
 						],
 						[
 							'type' => 'Plain text',
@@ -252,7 +252,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						],
 						[
 							'type' => 'Plain text',
-							'header' => 'Plain text',
+							'header' => 'Plain text'
 						],
 						[
 							'type' => 'URL',
