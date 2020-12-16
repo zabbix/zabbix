@@ -1708,7 +1708,6 @@ INDEX		|1			|dashboardid
 
 TABLE|widget|widgetid|ZBX_DASHBOARD
 FIELD		|widgetid		|t_id		|	|NOT NULL	|0
-FIELD		|dashboard_pageid	|t_id		|	|NOT NULL	|0			|1|dashboard_page
 FIELD		|type			|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|x			|t_integer	|'0'	|NOT NULL	|0
@@ -1716,6 +1715,7 @@ FIELD		|y			|t_integer	|'0'	|NOT NULL	|0
 FIELD		|width			|t_integer	|'1'	|NOT NULL	|0
 FIELD		|height			|t_integer	|'2'	|NOT NULL	|0
 FIELD		|view_mode		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|dashboard_pageid	|t_id		|	|NOT NULL	|0		|1|dashboard_page
 INDEX		|1			|dashboard_pageid
 
 TABLE|widget_field|widget_fieldid|ZBX_DASHBOARD
