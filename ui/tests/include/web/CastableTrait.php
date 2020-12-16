@@ -286,4 +286,15 @@ trait CastableTrait {
 	public function asHostInterfaceElement($options = []) {
 		return $this->cast(CHostInterfaceElement::class, $options);
 	}
+
+	/**
+	 * Cast object to FilterTab element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFilterTabElement
+	 */
+	public function asFilterTab($options = []) {
+		return $this->cast(CFilterTabElement::class, $options);
+	}
 }
