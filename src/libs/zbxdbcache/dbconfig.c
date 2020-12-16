@@ -9178,14 +9178,14 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
 		if (NULL == (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
 				&dc_item->interfaceid)))
 		{
 			continue;
 		}
-
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			continue;
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
 		{
@@ -9356,13 +9356,13 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
-
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
 		if (SUCCEED != zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
 			continue;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
 
 		switch (errcodes[i])
 		{

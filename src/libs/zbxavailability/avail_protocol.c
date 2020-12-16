@@ -65,7 +65,7 @@ void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
 	while (data < end)
 	{
 		zbx_interface_availability_t	*interface_availability;
-		size_t				deserialize_error_len;
+		zbx_uint32_t			deserialize_error_len;
 
 
 		interface_availability = (zbx_interface_availability_t *)zbx_malloc(NULL,
