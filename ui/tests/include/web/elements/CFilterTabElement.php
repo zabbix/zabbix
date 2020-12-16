@@ -33,9 +33,7 @@ class CFilterTabElement extends CElement {
 	 * @return array
 	 */
 	public function getTitles() {
-		$xpath = 'xpath:.//a[@class="tabfilter-item-link"]';
-
-		$tabs = $this->query($xpath)->all();
+		$tabs = $this->query('xpath:.//a[@class="tabfilter-item-link"]')->all();
 		if ($tabs->count() > 0) {
 			return $tabs->asText();
 		}
