@@ -83,7 +83,7 @@ static int	DBpatch_5030004(void)
 
 static int	DBpatch_5030005(void)
 {
-	const ZBX_FIELD	field = {"script_paramid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"scriptid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("script_param", 1, &field);
 }
