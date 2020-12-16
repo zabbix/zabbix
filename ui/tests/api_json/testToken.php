@@ -1225,4 +1225,18 @@ class testToken extends CAPITest {
 		$this->call('token.delete', [$new_id]);
 		$this->assertEquals($delete_records + 1, $this->countAuditActions(AUDIT_ACTION_DELETE));
 	}
+
+	public function testToken_deleteTokenCreator(): void {
+		['result' => [['creator_userid' => $creator_userid]]] = $this->call('token.get', [
+			'output' => ['creator_userid'],
+			'tokenids' => 23
+		]);
+		$this->assertEquals(20, $creator_userid);
+		$this->call('user.delete', [20]);
+		['result' => [['creator_userid' => $creator_userid]]] = $this->call('token.get', [
+			'output' => ['creator_userid'],
+			'tokenids' => 23
+		]);
+		$this->assertEquals(0, $creator_userid);
+	}
 }

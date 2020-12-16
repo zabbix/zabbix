@@ -1450,3 +1450,6 @@ INSERT INTO token (tokenid, userid, name) VALUES (19, 5, 'update-user-3');
 INSERT INTO token (tokenid, userid, name) VALUES (20, 5, 'update-user-4');
 INSERT INTO token (tokenid, userid, name) VALUES (21, 5, 'update-user-5');
 INSERT INTO token (tokenid, userid, name) VALUES (22, 5, 'update-user-6');
+INSERT INTO users (userid,alias,passwd,roleid) VALUES (20,'token-creator','5fce1b3e34b520afeffb37ce08c7cd66',2);
+INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90020,90000,20);
+INSERT INTO token (tokenid, userid, creator_userid, name) VALUES (23, 5, 20, 'delete-user-6');
