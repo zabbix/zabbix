@@ -347,7 +347,7 @@ if ($data['admin']) {
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $discovery_count]
-			: [_('Discovery'), $discovery_count];
+			: _('Discovery');
 
 		$httptests_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
