@@ -32,6 +32,7 @@ $widget = (new CWidget())
 
 // Append languages to form list.
 $lang_select = (new CSelect('default_lang'))
+	->setId('default_lang')
 	->setValue($data['default_lang'])
 	->setAttribute('autofocus', 'autofocus');
 
