@@ -40,35 +40,15 @@ class CScreenDataOverview extends CScreenBase {
 				->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$data = [];
-		if ($this->screenitem['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop((array) $groupid, null,
-				$this->screenitem['application']
-			);
+		$data = array_combine(['items', 'hosts', 'has_hidden_data'],
+			getDataOverview((array) $groupid, null, [
+				'application' => $this->screenitem['application'],
+				'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE
+			])
+		);
 
-			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
-				ZBX_PROBLEM_SUPPRESSED_FALSE
-			);
-			$data['db_hosts'] = $db_hosts;
-			$data['items_by_name'] = $items_by_name;
-			$data['has_hidden_data'] = $has_hidden_data;
-
-			$table = new CPartial('dataoverview.table.top', $data);
-		}
-		else {
-			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft((array) $groupid, null,
-				$this->screenitem['application']
-			);
-
-			$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
-				ZBX_PROBLEM_SUPPRESSED_FALSE
-			);
-			$data['db_hosts'] = $db_hosts;
-			$data['items_by_name'] = $items_by_name;
-			$data['has_hidden_data'] = $has_hidden_data;
-
-			$table = new CPartial('dataoverview.table.left', $data);
-		}
+		$partial = ($this->screenitem['style'] == STYLE_TOP) ? 'dataoverview.table.top' : 'dataoverview.table.left';
+		$table = new CPartial($partial, $data);
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))

@@ -498,7 +498,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'correlation.php',
+				'url' => 'zabbix.php?action=correlation.list',
 				'title' =>	'Event correlation rules',
 				'header' => 'Event correlation',
 				'users' => [
@@ -508,7 +508,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'correlation.php?form=Create+correlation',
+				'url' => 'zabbix.php?action=correlation.edit',
 				'title' =>	'Event correlation rules',
 				'users' => [
 					'guest' => false,
@@ -517,7 +517,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'discoveryconf.php',
+				'url' => 'zabbix.php?action=discovery.list',
 				'title' =>	'Configuration of discovery rules',
 				'header' => 'Discovery rules',
 				'users' => [

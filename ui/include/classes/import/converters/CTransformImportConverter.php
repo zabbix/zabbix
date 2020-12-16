@@ -31,40 +31,6 @@ class CTransformImportConverter extends CConverter {
 	}
 
 	public function convert($data) {
-		$data['zabbix_export'] = $this->convertTlsAccept($data['zabbix_export']);
-
-		return $data;
-	}
-
-	/**
-	 * Converter for tls_accept tag.
-	 * Problem that in XML schema we store tag value as array, but API may work only with string for this tag.
-	 * And it is why preproccesor option in XmlValidator does not suit us.
-	 *
-	 * @param array $data
-	 * @param array $rules
-	 *
-	 * @return array
-	 */
-	protected function convertTlsAccept(array $data) {
-		// Exit if import does not have hosts.
-		if (!array_key_exists('hosts', $data)) {
-			return $data;
-		}
-
-		foreach ($data['hosts'] as &$host) {
-			// If tls_accept not default value.
-			if (is_array($host['tls_accept'])) {
-				$result = 0;
-				// Convert tls_accept values for API.
-				foreach ($host['tls_accept'] as $value) {
-					$result += $value;
-				}
-
-				$host['tls_accept'] = (string) $result;
-			}
-		}
-
 		return $data;
 	}
 }

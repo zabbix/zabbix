@@ -168,8 +168,10 @@ tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml"
 
 tests: tests_build
-	cd tests && \
-	./tests_run.pl
+	tests/tests_run.pl
+
+clean: clean-recursive
+	cd tests && $(MAKE) clean
 endif
 
-.PHONY: test tests
+.PHONY: test tests clean

@@ -36,9 +36,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'mass_update_groups' => [T_ZBX_INT, O_OPT, null,	IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-								null
-							],
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
 	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
@@ -48,36 +45,19 @@ $fields = [
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
 	'groupids'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
-	'mass_update_tags'	=> [T_ZBX_INT, O_OPT, null,		IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-								null
-							],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'mass_update_macros' => [T_ZBX_INT, O_OPT, null,
-								IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
-								null
-							],
-	'macros_add'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'macros_update'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'macros_remove'		=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'macros_remove_all' => [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'visible'			=> [T_ZBX_STR, O_OPT, null,			null,	null],
-	'mass_action_tpls'	=> [T_ZBX_INT, O_OPT, null, IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]), null ],
-	'mass_clear_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
 	'valuemap'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"template.export","template.massupdate","template.massupdateform",'.
-									'"template.massdelete","template.massdeleteclear"'
-								),
+								IN('"template.export","template.massdelete","template.massdeleteclear"'),
 								null
 							],
 	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'masssave'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'full_clone'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
@@ -213,296 +193,6 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);
-	}
-}
-elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' && hasRequest('masssave')) {
-	$templateids = getRequest('templates', []);
-	$visible = getRequest('visible', []);
-
-	try {
-		DBstart();
-
-		$options = [
-			'output' => ['templateid'],
-			'templateids' => $templateids
-		];
-
-		if (array_key_exists('groups', $visible)) {
-			$options['selectGroups'] = ['groupid'];
-		}
-
-		if (array_key_exists('linked_templates', $visible)
-				&& !(getRequest('mass_action_tpls') == ZBX_ACTION_REPLACE && !hasRequest('mass_clear_tpls'))) {
-			$options['selectParentTemplates'] = ['templateid'];
-		}
-
-		if (array_key_exists('tags', $visible)) {
-			$mass_update_tags = getRequest('mass_update_tags', ZBX_ACTION_ADD);
-
-			if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
-				$options['selectTags'] = ['tag', 'value'];
-			}
-
-			$unique_tags = [];
-
-			foreach ($tags as $tag) {
-				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-			}
-
-			$tags = array_values($unique_tags);
-		}
-
-		if (array_key_exists('macros', $visible)) {
-			$mass_update_macros = getRequest('mass_update_macros', ZBX_ACTION_ADD);
-
-			if ($mass_update_macros == ZBX_ACTION_ADD || $mass_update_macros == ZBX_ACTION_REPLACE
-					|| $mass_update_macros == ZBX_ACTION_REMOVE) {
-				$options['selectMacros'] = ['hostmacroid', 'macro'];
-			}
-		}
-
-		$templates = API::Template()->get($options);
-
-		if (array_key_exists('groups', $visible)) {
-			$new_groupids = [];
-			$remove_groupids = [];
-			$mass_update_groups = getRequest('mass_update_groups', ZBX_ACTION_ADD);
-
-			if ($mass_update_groups == ZBX_ACTION_ADD || $mass_update_groups == ZBX_ACTION_REPLACE) {
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					$ins_groups = [];
-
-					foreach (getRequest('groups', []) as $new_group) {
-						if (is_array($new_group) && array_key_exists('new', $new_group)) {
-							$ins_groups[] = ['name' => $new_group['new']];
-						}
-						else {
-							$new_groupids[] = $new_group;
-						}
-					}
-
-					if ($ins_groups) {
-						if (!$result = API::HostGroup()->create($ins_groups)) {
-							throw new Exception();
-						}
-
-						$new_groupids = array_merge($new_groupids, $result['groupids']);
-					}
-				}
-				else {
-					$new_groupids = getRequest('groups', []);
-				}
-			}
-			elseif ($mass_update_groups == ZBX_ACTION_REMOVE) {
-				$remove_groupids = getRequest('groups', []);
-			}
-		}
-
-		$new_values = [];
-
-		if (array_key_exists('description', $visible)) {
-			$new_values['description'] = getRequest('description');
-		}
-
-		$template_macros_add = [];
-		$template_macros_update = [];
-		$template_macros_remove = [];
-		foreach ($templates as &$template) {
-			if (array_key_exists('groups', $visible)) {
-				if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-					$current_groupids = zbx_objectValues($template['groups'], 'groupid');
-					$template['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
-						'groupid'
-					);
-				}
-				elseif ($new_groupids && $mass_update_groups == ZBX_ACTION_REPLACE) {
-					$template['groups'] = zbx_toObject($new_groupids, 'groupid');
-				}
-				elseif ($remove_groupids) {
-					$current_groupids = zbx_objectValues($template['groups'], 'groupid');
-					$template['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
-				}
-			}
-
-			if (array_key_exists('linked_templates', $visible)) {
-				$parent_templateids = array_key_exists('parentTemplates', $template)
-					? zbx_objectValues($template['parentTemplates'], 'templateid')
-					: [];
-
-				switch (getRequest('mass_action_tpls')) {
-					case ZBX_ACTION_ADD:
-						$template['templates'] = array_unique(
-							array_merge($parent_templateids, getRequest('linked_templates', []))
-						);
-						break;
-
-					case ZBX_ACTION_REPLACE:
-						$template['templates'] = getRequest('linked_templates', []);
-						if (getRequest('mass_clear_tpls')) {
-							$template['templates_clear'] = array_unique(
-								array_diff($parent_templateids, getRequest('linked_templates', []))
-							);
-						}
-						break;
-
-					case ZBX_ACTION_REMOVE:
-						$template['templates'] = array_unique(
-							array_diff($parent_templateids, getRequest('linked_templates', []))
-						);
-						if (getRequest('mass_clear_tpls')) {
-							$template['templates_clear'] = array_unique(getRequest('linked_templates', []));
-						}
-						break;
-				}
-			}
-
-			if (array_key_exists('tags', $visible)) {
-				if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
-					$unique_tags = [];
-
-					foreach (array_merge($template['tags'], $tags) as $tag) {
-						$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-					}
-
-					$template['tags'] = array_values($unique_tags);
-				}
-				elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
-					$template['tags'] = $tags;
-				}
-				elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
-					$diff_tags = [];
-
-					foreach ($template['tags'] as $a) {
-						foreach ($tags as $b) {
-							if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-								continue 2;
-							}
-						}
-
-						$diff_tags[] = $a;
-					}
-
-					$template['tags'] = $diff_tags;
-				}
-			}
-
-			if (array_key_exists('macros', $visible)) {
-				switch ($mass_update_macros) {
-					case ZBX_ACTION_ADD:
-						if ($macros) {
-							$update_existing = getRequest('macros_add', 0);
-
-							foreach ($macros as $macro) {
-								foreach ($template['macros'] as $template_macro) {
-									if ($macro['macro'] === $template_macro['macro']) {
-										if ($update_existing) {
-											$macro['hostmacroid'] = $template_macro['hostmacroid'];
-											$template_macros_update[] = $macro;
-										}
-
-										continue 2;
-									}
-								}
-
-								$macro['hostid'] = $template['templateid'];
-								$template_macros_add[] = $macro;
-							}
-						}
-						break;
-
-					case ZBX_ACTION_REPLACE: // In Macros its update.
-						if ($macros) {
-							$add_missing = getRequest('macros_update', 0);
-
-							foreach ($macros as $macro) {
-								foreach ($template['macros'] as $template_macro) {
-									if ($macro['macro'] === $template_macro['macro']) {
-										$macro['hostmacroid'] = $template_macro['hostmacroid'];
-										$template_macros_update[] = $macro;
-
-										continue 2;
-									}
-								}
-
-								if ($add_missing) {
-									$macro['hostid'] = $template['templateid'];
-									$template_macros_add[] = $macro;
-								}
-							}
-						}
-						break;
-
-					case ZBX_ACTION_REMOVE:
-						if ($macros) {
-							$except_selected = getRequest('macros_remove', 0);
-
-							$macro_names = array_column($macros, 'macro');
-
-							foreach ($template['macros'] as $template_macro) {
-								if ((!$except_selected && in_array($template_macro['macro'], $macro_names))
-										|| ($except_selected && !in_array($template_macro['macro'], $macro_names))) {
-									$template_macros_remove[] = $template_macro['hostmacroid'];
-								}
-							}
-						}
-						break;
-
-					case ZBX_ACTION_REMOVE_ALL:
-						if (!getRequest('macros_remove_all', 0)) {
-							throw new Exception();
-						}
-
-						$template['macros'] = [];
-						break;
-				}
-
-				if ($mass_update_macros != ZBX_ACTION_REMOVE_ALL) {
-					unset($template['macros']);
-				}
-			}
-
-			unset($template['parentTemplates']);
-
-			$template = $new_values + $template;
-		}
-		unset($template);
-
-		if (!API::Template()->update($templates)) {
-			throw new Exception();
-		}
-
-		/**
-		 * Macros must be updated separately, since calling API::UserMacro->replaceMacros() inside
-		 * API::Template->update() results in loss of secret macro values.
-		 */
-		if ($template_macros_remove) {
-			if (!API::UserMacro()->delete($template_macros_remove)) {
-				throw new Exception();
-			}
-		}
-
-		if ($template_macros_add) {
-			if (!API::UserMacro()->create($template_macros_add)) {
-				throw new Exception();
-			}
-		}
-
-		if ($template_macros_update) {
-			if (!API::UserMacro()->update($template_macros_update)) {
-				throw new Exception();
-			}
-		}
-
-		DBend(true);
-
-		uncheckTableRows();
-		show_message(_('Templates updated'));
-
-		unset($_REQUEST['masssave'], $_REQUEST['form'], $_REQUEST['templates']);
-	}
-	catch (Exception $e) {
-		DBend(false);
-		show_error_message(_('Cannot update templates'));
 	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -761,59 +451,7 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 /*
  * Display
  */
-if (hasRequest('templates') && (getRequest('action') === 'template.massupdateform' || hasRequest('masssave'))) {
-	$data = [
-		'templates' => getRequest('templates', []),
-		'visible' => getRequest('visible', []),
-		'mass_action_tpls' => getRequest('mass_action_tpls'),
-		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
-		'groups' => getRequest('groups', []),
-		'mass_update_groups' => getRequest('mass_update_groups', ZBX_ACTION_ADD),
-		'tags' => $tags,
-		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
-		'macros' => $macros,
-		'macros_checkbox' => [
-			ZBX_ACTION_ADD => getRequest('macros_add', '0'),
-			ZBX_ACTION_REPLACE => getRequest('macros_update', '0'),
-			ZBX_ACTION_REMOVE => getRequest('macros_remove', '0'),
-			ZBX_ACTION_REMOVE_ALL => getRequest('macros_remove_all', '0')
-		],
-		'macros_visible' => getRequest('mass_update_macros', ZBX_ACTION_ADD),
-		'description' => getRequest('description'),
-		'linked_templates' => getRequest('linked_templates', []),
-		'valuemaps' => $valuemaps
-	];
-
-	// sort templates
-	natsort($data['linked_templates']);
-
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-
-	// get templates data
-	$data['linked_templates'] = $data['linked_templates']
-		? CArrayHelper::renameObjectsKeys(API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $data['linked_templates']
-		]), ['templateid' => 'id'])
-		: [];
-
-	$data['groups'] = $data['groups']
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $data['groups'],
-			'editable' => true
-		]), ['groupid' => 'id'])
-		: [];
-
-	if (!$data['macros']) {
-		$data['macros'] = [['macro' => '', 'type' => ZBX_MACRO_TYPE_TEXT, 'value' => '', 'description' => '']];
-	}
-
-	$view = new CView('configuration.template.massupdate', $data);
-}
-elseif (hasRequest('form')) {
+if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),

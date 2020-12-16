@@ -313,8 +313,7 @@ class CConfigurationExport {
 		$hosts = API::Host()->get([
 			'output' => [
 				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-				'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk', 'inventory_mode'
+				'name', 'description', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
