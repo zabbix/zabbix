@@ -89,14 +89,14 @@ static int	DBpatch_5030006(void)
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK > DBexecute(
 			"insert into dashboard_page (dashboard_pageid,dashboardid)"
 			" select dashboardid,dashboardid from dashboard"))
 	{
-		return SUCCEED;
+		return FAIL;
 	}
 
-	return FAIL;
+	return SUCCEED;
 }
 
 static int	DBpatch_5030007(void)
@@ -104,14 +104,14 @@ static int	DBpatch_5030007(void)
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= DBexecute(
+	if (ZBX_DB_OK > DBexecute(
 			"insert into ids select 'dashboard_page','dashboardpage_id',nextid from ids"
 			" where table_name='dashboard' and field_name='dashboardid'"))
 	{
-		return SUCCEED;
+		return FAIL;
 	}
 
-	return FAIL;
+	return SUCCEED;
 }
 
 static int	DBpatch_5030008(void)
