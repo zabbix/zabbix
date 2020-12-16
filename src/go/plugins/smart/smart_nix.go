@@ -23,7 +23,6 @@ package smart
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"zabbix.com/pkg/zbxcmd"
@@ -31,13 +30,4 @@ import (
 
 func executeSmartctl(args string) (string, error) {
 	return zbxcmd.Execute(fmt.Sprintf("sudo smartctl %s", args), time.Second*time.Duration(5*time.Second))
-}
-
-func deviceCount(name string) (int, error) {
-	str, err := zbxcmd.Execute(fmt.Sprintf("ls -1 %s*", name), time.Second*time.Duration(5*time.Second))
-	if err != nil {
-		return 0, err
-	}
-
-	return len(strings.Split(str, "\n")), nil
 }
