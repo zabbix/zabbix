@@ -1697,16 +1697,16 @@ function getTriggerFormData(array $data) {
 				}
 			}
 
-			$host_tags = API::Host()->get([
+			$db_hosts = API::Host()->get([
 				'output' => [],
-				'hostids' => $data['hostid'],
-				'selectTags' => ['tag', 'value']
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid']
 			]);
 
-			if ($host_tags) {
-				foreach ($host_tags[0]['tags'] as $tag) {
-					$inherited_tags[$tag['tag'] . ':' . $tag['value']] = $tag;
-					$inherited_tags[$tag['tag'] . ':' . $tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag;
+					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
 				}
 			}
 
