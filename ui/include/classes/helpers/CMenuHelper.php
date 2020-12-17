@@ -202,7 +202,7 @@ class CMenuHelper {
 						'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
 						'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
 						'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
-						'conf.import.php?rules_preset=valuemap'
+						'conf.import.php?rules_preset=valuemap', 'token.list', 'token.edit', 'token.view'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)

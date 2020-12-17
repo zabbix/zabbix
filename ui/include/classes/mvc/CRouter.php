@@ -218,6 +218,7 @@ class CRouter {
 		'template.dashboard.edit'			=> ['CControllerTemplateDashboardEdit',				'layout.htmlpage',		'configuration.dashboard.edit'],
 		'template.dashboard.list'			=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
 		'template.dashboard.update'			=> ['CControllerTemplateDashboardUpdate',			'layout.json',			null],
+		'token.list'						=> ['CControllerTokenList',							'layout.htmlpage',		'administration.token.list'],
 		'timeselector.update'				=> ['CControllerTimeSelectorUpdate',				'layout.json',			null],
 		'trigdisplay.edit'					=> ['CControllerTrigDisplayEdit',					'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.update'				=> ['CControllerTrigDisplayUpdate',					null,					null],

@@ -883,13 +883,17 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'module.list')
 		->getUrl();
 
+	$tokens_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'token.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
 	return [
 		'main_section' => [
-			'items' => [
+			'items' => array_filter([
 				$gui_url          => _('GUI'),
 				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
@@ -900,8 +904,11 @@ function getAdministrationGeneralSubmenu() {
 				$valuemap_url     => _('Value mapping'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
+				$tokens_url       => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
+										? _('API Tokens')
+										: null,
 				$miscconfig_url   => _('Other')
-			]
+			])
 		]
 	];
 }

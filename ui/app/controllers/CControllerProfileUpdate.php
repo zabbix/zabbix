@@ -73,6 +73,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.slides.filter.active':
 				case 'web.sysmapconf.filter.active':
 				case 'web.templates.filter.active':
+				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
