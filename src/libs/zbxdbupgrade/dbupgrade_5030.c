@@ -128,18 +128,93 @@ valuemap_t;
 
 static int	DBpatch_5030009(void)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
-	int				ret = SUCCEED, i, j;
-	zbx_hashset_t			valuemaps;
-	zbx_hashset_iter_t		iter;
-	valuemap_t			valuemap_local, *valuemap;
-	zbx_uint64_t			valuemapid;
-	zbx_vector_uint64_pair_t	pairs;
+	return DBdrop_foreign_key("items", 3);
+}
+
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		valuemapid;
+	zbx_vector_uint64_t	itemids;
+}
+host_t;
+
+static int	host_compare_func(const void *d1, const void *d2)
+{
+	const host_t	*h1 = *(const host_t **)d1;
+	const host_t	*h2 = *(const host_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(h1->hostid, h2->hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(h1->valuemapid, h2->valuemapid);
+
+	return 0;
+}
+
+static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids, zbx_vector_uint64_t *itemids)
+{
+	DB_RESULT	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i1.itemid"
+			" from items i1"
+				" where exists ("
+					"select null"
+					" from items i2"
+					" where i2.templateid=i1.itemid"
+				")"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids->values,
+			templateids->values_num);
+	zbx_vector_uint64_clear(templateids);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		zbx_vector_uint64_append(templateids, itemid);
+	}
+	DBfree_result(result);
+
+	if (0 == templateids->values_num)
+		return;
+
+	zbx_vector_uint64_append_array(itemids, templateids->values, templateids->values_num);
+
+	get_template_itemids_by_templateids(templateids, itemids);
+}
+
+static void	host_free(host_t *host)
+{
+	zbx_vector_uint64_destroy(&host->itemids);
+	zbx_free(host);
+}
+
+static int	DBpatch_5030010(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED, i, j;
+	zbx_hashset_t		valuemaps;
+	zbx_hashset_iter_t	iter;
+	valuemap_t		valuemap_local, *valuemap;
+	zbx_uint64_t		valuemapid;
+	zbx_vector_ptr_t	hosts;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	templateids;
 
 	zbx_hashset_create(&valuemaps, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_pair_create(&pairs);
-	zbx_vector_uint64_pair_reserve(&pairs, 1000);
+	zbx_vector_ptr_create(&hosts);
+	zbx_vector_ptr_reserve(&hosts, 1000);
+	zbx_vector_uint64_create(&templateids);
+	zbx_vector_uint64_reserve(&templateids, 1000);
 
 	result = DBselect(
 			"select v.valuemapid,v.name,m.value,m.newvalue"
@@ -166,7 +241,7 @@ static int	DBpatch_5030009(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select hostid,valuemapid"
+	result = DBselect("select hostid,valuemapid,itemid"
 			" from items"
 			" where templateid is null"
 				" and valuemapid is not null"
@@ -174,21 +249,34 @@ static int	DBpatch_5030009(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_pair_t	pair;
+		host_t		host_local, *host;
+		zbx_uint64_t	itemid;
 
-		ZBX_STR2UINT64(pair.first, row[0]);
-		ZBX_STR2UINT64(pair.second, row[1]);
+		ZBX_STR2UINT64(host_local.hostid, row[0]);
+		ZBX_STR2UINT64(host_local.valuemapid, row[1]);
+		ZBX_STR2UINT64(itemid, row[2]);
 
-		zbx_vector_uint64_pair_append(&pairs, pair);
+		if (FAIL == (i = zbx_vector_ptr_search(&hosts, &host_local, host_compare_func)))
+		{
+			host = zbx_malloc(NULL, sizeof(host_t));
+			host->hostid = host_local.hostid;
+			host->valuemapid = host_local.valuemapid;
+			zbx_vector_uint64_create(&host->itemids);
+
+			zbx_vector_ptr_append(&hosts, host);
+		}
+		else
+			host = (host_t *)hosts.values[i];
+
+		zbx_vector_uint64_append(&host->itemids, itemid);
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_pair_sort(&pairs, ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC);
-	zbx_vector_uint64_pair_uniq(&pairs, ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC);
+	valuemapid = DBget_maxid_num("valuemap", hosts.values_num);
 
-	valuemapid = DBget_maxid_num("valuemap", pairs.values_num);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for(i = 0; i < pairs.values_num;)
+	for(i = 0; i < hosts.values_num;)
 	{
 		zbx_db_insert_t	db_insert_valuemap, db_insert_valuemap_mapping;
 
@@ -196,15 +284,15 @@ static int	DBpatch_5030009(void)
 		zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
 				"valuemapid", "value", "newvalue", NULL);
 
-		while(i < pairs.values_num)
+		while(i < hosts.values_num)
 		{
-			zbx_uint64_pair_t	pair;
+			host_t	*host;
 
-			pair = pairs.values[i];
+			host = (host_t *)hosts.values[i];
 
-			if (NULL != (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &pair.second)))
+			if (NULL != (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
 			{
-				zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, pair.first, valuemap->name);
+				zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, host->hostid, valuemap->name);
 
 				for (j = 0; j < valuemap->mappings.values_num; j++)
 				{
@@ -215,6 +303,27 @@ static int	DBpatch_5030009(void)
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
+					" where", valuemapid);
+			zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
+					host->itemids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
+			get_template_itemids_by_templateids(&templateids, &host->itemids);
+
+			/* make sure if multiple hosts are linked to same not nested template then there is only */
+			/* update by templateid from template and no selection by numerous itemids               */
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
+					" where", valuemapid);
+			zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", host->itemids.values,
+					host->itemids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			valuemapid++;
 			i++;
@@ -231,6 +340,13 @@ static int	DBpatch_5030009(void)
 		zbx_db_insert_clean(&db_insert_valuemap_mapping);
 	}
 
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
 	zbx_hashset_iter_reset(&valuemaps, &iter);
 	while (NULL != (valuemap = (valuemap_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -244,34 +360,28 @@ static int	DBpatch_5030009(void)
 		zbx_vector_ptr_pair_destroy(&valuemap->mappings);
 	}
 
+	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)host_free);
+	zbx_vector_ptr_destroy(&hosts);
 	zbx_hashset_destroy(&valuemaps);
 
-	zbx_vector_uint64_pair_destroy(&pairs);
+	zbx_vector_uint64_destroy(&templateids);
 
 	return ret;
 }
 
-static int	DBpatch_5030010(void)
-{
-	return DBdrop_foreign_key("items", 3);
-}
-
 static int	DBpatch_5030011(void)
 {
-	return DBdrop_index("items", "items_5");
+	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("items", 3, &field);
 }
 
 static int	DBpatch_5030012(void)
 {
-	return DBdrop_field("items", "valuemapid");
-}
-
-static int	DBpatch_5030013(void)
-{
 	return DBdrop_table("mappings");
 }
 
-static int	DBpatch_5030014(void)
+static int	DBpatch_5030013(void)
 {
 	return DBdrop_table("valuemaps");
 }
@@ -296,6 +406,5 @@ DBPATCH_ADD(5030010, 0, 1)
 DBPATCH_ADD(5030011, 0, 1)
 DBPATCH_ADD(5030012, 0, 1)
 DBPATCH_ADD(5030013, 0, 1)
-DBPATCH_ADD(5030014, 0, 1)
 
 DBPATCH_END()
