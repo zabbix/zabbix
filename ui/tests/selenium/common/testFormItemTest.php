@@ -651,8 +651,9 @@ class testFormItemTest extends CWebTest {
 	 * @param string	$create_link	url for creating new item
 	 * @param arary		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
+	 * @param boolean   $lld            true if lld, false if item or item prototype
 	 */
-	public function checkTestItem($create_link, $data, $is_host) {
+	public function checkTestItem($create_link, $data, $is_host, $lld = false) {
 		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
@@ -689,8 +690,13 @@ class testFormItemTest extends CWebTest {
 				$this->assertTrue($get_host_value->isEnabled());
 				$this->assertTrue($get_host_value->isChecked());
 
-				$not_supported = $test_form->query('id:not_supported')->asCheckbox()->one();
-				$this->assertFalse($not_supported->isEnabled());
+				if ($lld === false) {
+					$not_supported = $test_form->query('id:not_supported')->asCheckbox()->one();
+					$this->assertFalse($not_supported->isEnabled());
+				}
+				else {
+					$not_supported = null;
+				}
 
 				if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
 					$elements = [
@@ -866,7 +872,7 @@ class testFormItemTest extends CWebTest {
 				}
 
 				// Check value fields.
-				$this->checkValueFields($data, $not_supported);
+				$this->checkValueFields($data, $not_supported, $lld);
 
 				// Change interface fields in testing form.
 				if (CTestArrayHelper::get($data, 'interface')) {
@@ -909,14 +915,16 @@ class testFormItemTest extends CWebTest {
 					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
 					$overlay->query('button:Test')->waitUntilVisible()->one();
 
-					$this->assertTrue($not_supported->isEnabled());
-					$this->assertFalse($not_supported->isChecked());
+					if ($lld === false) {
+						$this->assertTrue($not_supported->isEnabled());
+						$this->assertFalse($not_supported->isChecked());
+					}
 
 					/*
 					 * Check that value fields still present after "Get value
 					 * from host" checkbox is unset.
 					 */
-					$this->checkValueFields($data, $not_supported);
+					$this->checkValueFields($data, $not_supported, $lld);
 				}
 
 				// Compare data macros with macros from test table.
@@ -982,7 +990,7 @@ class testFormItemTest extends CWebTest {
 	 *
 	 * @param array $data data provider
 	 */
-	private function checkValueFields($data, $not_supported) {
+	private function checkValueFields($data, $not_supported, $lld = false) {
 		$test_form = $this->query('id:preprocessing-test-form')
 				->waitUntilPresent()->one()->waitUntilReady();
 		$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
@@ -1008,9 +1016,10 @@ class testFormItemTest extends CWebTest {
 					}
 				}
 			}
-
-			$not_supported->check();
-			$this->assertFalse($value->isEnabled());
+			if ($lld === false){
+				$not_supported->check();
+				$this->assertFalse($value->isEnabled());
+			}
 		}
 		else {
 			$this->assertTrue($value->isEnabled(!$checked));

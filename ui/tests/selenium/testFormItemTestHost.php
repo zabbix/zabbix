@@ -118,6 +118,6 @@ class testFormItemTestHost extends testFormItemTest {
 	 * @depends testFormItemTestHost_CheckLLDTestButtonState
 	 */
 	public function testFormItemTestHost_TestLLD($data) {
-		$this->checkTestItem($this->getCreateLink('host_discovery'), $data, self::IS_HOST);
+		$this->checkTestItem($this->getCreateLink('host_discovery'), $data, self::IS_HOST, true);
 	}
 }
