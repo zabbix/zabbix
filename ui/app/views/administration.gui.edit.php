@@ -85,6 +85,7 @@ $gui_tab = (new CFormList())
 			->setValue($data['default_theme'])
 			->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
 			->setAttribute('autofocus', 'autofocus')
+			->setId('default_theme')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))
