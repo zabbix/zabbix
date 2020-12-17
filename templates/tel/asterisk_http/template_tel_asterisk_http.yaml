@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:43Z'
+  version: '5.4'
+  date: '2020-11-27T10:47:13Z'
   groups:
     -
       name: Templates/Telephony
@@ -9,9 +9,7 @@ zabbix_export:
       template: 'Asterisk by HTTP'
       name: 'Asterisk by HTTP'
       description: |
-        The template gets Asterisk metrics from AMI by HTTP agent.
-        Enable the mini-HTTP Server, add the option webenabled=yes in the general section of manager.conf file and create Asterisk Manager user.
-        Do not forget to define {$AMI.USERNAME} and {$AMI.SECRET} macros.
+        The template gets Asterisk metrics from AMI by HTTP agent. You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and create Asterisk Manager user with system and command write permissions within your Asterisk instance. Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status. Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level. If there are errors, increase the logging to debug level and see the Zabbix server log.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk
         
@@ -145,7 +143,7 @@ zabbix_export:
                           }
                   
                           var match = response.match('Response: (.+)\r\n');
-                          if (match !== null && match[1] !== 'Success' && match[1] !== 'Goodbye') {
+                          if (match !== null && match[1] !== 'Success' && match[1] !== 'Goodbye' && match[1] !== 'Follows') {
                               var message = 'Request failed with message ' + match[1];
                   
                               match = response.match('Message: (.+)\r\n');
@@ -180,12 +178,14 @@ zabbix_export:
                       },
                       iax: {
                           trunks: [],
+                          online: 0,
                           offline: 0,
                           unmonitored: 0,
                           total: 0
                       },
                       pjsip: {
                           trunks: [],
+                          available: 0,
                           unavailable: 0,
                           total: 0
                       },
@@ -196,28 +196,120 @@ zabbix_export:
                   };
                   
                   function block2Object(text) {
-                      var arr_fields = [],
+                      var fields = [],
                           dict = {};
                   
                       text.split('\r\n').forEach(function (line) {
-                          arr_fields = line.split(': ');
-                          dict[arr_fields[0]] = arr_fields[1];
+                          fields = line.split(': ');
+                          dict[fields[0]] = fields[1];
                       })
                   
                       return dict;
                   }
                   
                   function text2Object(text) {
-                      var arr_blocks = text.split('\r\n\r\n'),
+                      var blocks = text.split('\r\n\r\n'),
                           arr = [],
                           i = 1,
-                          j = arr_blocks.length - 2;
+                          j = blocks.length - 2;
                   
                       for (i; i < j; i++) {
-                          arr.push(block2Object(arr_blocks[i]));
+                          arr.push(block2Object(blocks[i]));
                       }
                   
                       return arr;
+                  }
+                  
+                  function getSipPeers() {
+                      var response = Ami.request(url, 'SIPpeers'),
+                          elements = text2Object(response.body);
+                      asterisk.sip.total = elements.length;
+                      asterisk.sip.trunks = elements.filter(function (element) {
+                          return element.ObjectName.search(Ami.params.trunk) != -1;
+                      });
+                      elements.forEach(function (element) {
+                          if (element.IPaddress === '-none-') {
+                              switch (element.Status) {
+                                  case 'Unmonitored':
+                                      asterisk.sip.unmonitored_offline++;
+                                      break;
+                  
+                                  case 'UNKNOWN':
+                                      asterisk.sip.monitored_offline++;
+                                      break;
+                              }
+                          }
+                          else {
+                              if (element.Status === 'Unmonitored') {
+                                  asterisk.sip.unmonitored_online++;
+                              }
+                              else {
+                                  asterisk.sip.monitored_online++;
+                                  if (element.Status.search('^OK') != -1) {
+                                      element.Status = element.Status.split(' ')[0];
+                                  }
+                              }
+                          }
+                      });
+                      asterisk.sip.trunks.forEach(function (trunk) {
+                          var active_channels = channels.match(new RegExp(' SIP/' + trunk.ObjectName.split('/')[0], 'g'));
+                          trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+                      });
+                  }
+                  
+                  function getIaxPeerList() {
+                      response = Ami.request(url, 'IAXpeerlist');
+                      elements = text2Object(response.body);
+                      asterisk.iax.total = elements.length;
+                      asterisk.iax.trunks = elements.filter(function (element) {
+                          return element.ObjectName.search(Ami.params.trunk) != -1;
+                      });
+                      elements.forEach(function (element) {
+                          if (element.Status.search('^OK') != -1) {
+                              element.Status = element.Status.split(' ')[0];
+                          }
+                          switch (element.Status) {
+                              case 'Unmonitored':
+                                  asterisk.iax.unmonitored++;
+                                  break;
+                  
+                              case 'UNKNOWN':
+                                  asterisk.iax.offline++;
+                                  break;
+                          }
+                      });
+                      asterisk.iax.online = asterisk.iax.total - asterisk.iax.offline;
+                      asterisk.iax.trunks.forEach(function (trunk) {
+                          var active_channels = channels.match(new RegExp('( IAX2/' + trunk.ObjectName.split('/')[0] +
+                              '| IAX2/' + trunk.ObjectUsername + ')', 'g'));
+                          trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+                      });
+                  }
+                  
+                  function getPjsipShowEndpoints() {
+                      response = Ami.request(url, 'PJSIPShowEndpoints');
+                      elements = text2Object(response.body);
+                      asterisk.pjsip.total = elements.length;
+                      asterisk.pjsip.trunks = elements.filter(function (element) {
+                          return element.ObjectName.search(Ami.params.trunk) != -1;
+                      });
+                  
+                      elements.forEach(function (element) {
+                          if (element.DeviceState === 'Unavailable') {
+                              asterisk.pjsip.unavailable++;
+                          }
+                      });
+                      asterisk.pjsip.available = asterisk.pjsip.total - asterisk.pjsip.unavailable;
+                      asterisk.pjsip.trunks.forEach(function (trunk) {
+                          var active_channels = channels.match(new RegExp(' PJSIP/' + trunk.ObjectName.split('/')[0], 'g'));
+                          trunk.active_channels = (active_channels === null) ? 0 : active_channels.length;
+                      });
+                  }
+                  
+                  function getQueueSummary() {
+                      response = Ami.request(url, 'QueueSummary');
+                      asterisk.queue.queues = text2Object(response.body);
+                      asterisk.queue.total = asterisk.queue.queues.length;
                   }
                   
                   var cookie = value.match(/mansession_id="([0-9A-z]+)"/);
@@ -259,90 +351,27 @@ zabbix_export:
                       }
                   });
                   
-                  response = Ami.request(url, 'SIPpeers');
-                  arr_elements = text2Object(response.body);
-                  asterisk.sip.total = arr_elements.length;
-                  asterisk.sip.trunks = arr_elements.filter(function (element) {
-                      return element.ObjectName.search(Ami.params.trunk) != -1;
-                  });
-                  arr_elements.forEach(function (element) {
-                      if (element.IPaddress === '-none-') {
-                          switch (element.Status) {
-                              case 'Unmonitored':
-                                  asterisk.sip.unmonitored_offline++;
-                                  break;
+                  response = Ami.request(url, 'ListCommands');
+                  var list = response.body;
+                  if (list.includes('SIPpeers')) {
+                      getSipPeers();
+                  }
+                  if (list.includes('IAXpeerlist')) {
+                      getIaxPeerList();
+                  }
+                  if (list.includes('PJSIPShowEndpoints')) {
+                      getPjsipShowEndpoints();
+                  }
+                  if (list.includes('QueueSummary')) {
+                      getQueueSummary();
+                  }
                   
-                              case 'UNKNOWN':
-                                  asterisk.sip.monitored_offline++;
-                                  break;
-                          }
-                      } else {
-                          if (element.Status === 'Unmonitored') {
-                              asterisk.sip.unmonitored_online++;
-                          } else {
-                              asterisk.sip.monitored_online++;
-                              if (element.Status.search('^OK') != -1) {
-                                  element.Status = element.Status.split(' ')[0]
-                              }
-                          }
-                      }
-                  });
-                  asterisk.sip.trunks.forEach(function (trunk) {
-                      l = channels.match(new RegExp(' SIP/' + trunk.ObjectName.split('/')[0], 'g'));
-                      trunk.active_channels = (l === null) ? 0 : l.length;
-                  });
-                  
-                  response = Ami.request(url, 'IAXpeerlist');
-                  arr_elements = text2Object(response.body);
-                  asterisk.iax.total = arr_elements.length;
-                  asterisk.iax.trunks = arr_elements.filter(function (element) {
-                      return element.ObjectName.search(Ami.params.trunk) != -1;
-                  });
-                  arr_elements.forEach(function (element) {
-                      if (element.Status.search('^OK') != -1) {
-                          element.Status = element.Status.split(' ')[0]
-                      }
-                      switch (element.Status) {
-                          case 'Unmonitored':
-                              asterisk.iax.unmonitored++;
-                              break;
-                  
-                          case 'UNKNOWN':
-                              asterisk.iax.offline++;
-                              break;
-                      }
-                  });
-                  asterisk.iax.trunks.forEach(function (trunk) {
-                      l = channels.match(new RegExp('( IAX2/' + trunk.ObjectName.split('/')[0] +
-                          '| IAX2/' + trunk.ObjectUsername + ')', 'g'));
-                      trunk.active_channels = (l === null) ? 0 : l.length;
-                  });
-                  
-                  response = Ami.request(url, 'PJSIPShowEndpoints');
-                  arr_elements = text2Object(response.body);
-                  asterisk.pjsip.total = arr_elements.length;
-                  asterisk.pjsip.trunks = arr_elements.filter(function (element) {
-                      return element.ObjectName.search(Ami.params.trunk) != -1;
-                  });
-                  
-                  arr_elements.forEach(function (element) {
-                      if (element.DeviceState === 'Unavailable') {
-                          asterisk.pjsip.unavailable++;
-                      }
-                  });
-                  asterisk.pjsip.trunks.forEach(function (trunk) {
-                      l = channels.match(new RegExp(' PJSIP/' + trunk.ObjectName.split('/')[0], 'g'));
-                      trunk.active_channels = (l === null) ? 0 : l.length;
-                  });
-                  
-                  response = Ami.request(url, 'QueueSummary');
-                  asterisk.queue.queues = text2Object(response.body);
-                  asterisk.queue.total = asterisk.queue.queues.length;
-                  
-                  response = Ami.request(url, 'Logoff');
+                  try {
+                      response = Ami.request(url, 'Logoff');
+                  }
+                  catch (e) {}
                   
                   return JSON.stringify(asterisk);
-                  
           url: '{$AMI.URL}'
           query_fields:
             -
@@ -370,6 +399,23 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.iax.offline
+          master_item:
+            key: asterisk.get_stats
+        -
+          name: 'Asterisk: IAX online peers'
+          type: DEPENDENT
+          key: asterisk.iax.online
+          delay: '0'
+          history: 7d
+          description: 'The number of online IAX peers.'
+          applications:
+            -
+              name: Asterisk
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.iax.online
           master_item:
             key: asterisk.get_stats
         -
@@ -404,6 +450,23 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.iax.unmonitored
+          master_item:
+            key: asterisk.get_stats
+        -
+          name: 'Asterisk: PJSIP available endpoints'
+          type: DEPENDENT
+          key: asterisk.pjsip.available
+          delay: '0'
+          history: 7d
+          description: 'The number of available PJSIP peers.'
+          applications:
+            -
+              name: Asterisk
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.pjsip.available
           master_item:
             key: asterisk.get_stats
         -
@@ -700,7 +763,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
-                  name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m'
+                  name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The IAX trunk may not be able to process new calls.'
             -
@@ -778,7 +841,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
-                  name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m'
+                  name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The PJSIP trunk may not be able to process new calls.'
             -
@@ -872,7 +935,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}'
-                  name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m'
+                  name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)'
                   priority: WARNING
                   description: 'There is a large number of calls in the queue.'
             -
@@ -933,7 +996,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min(10m)}>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
-                  name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m'
+                  name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
                   priority: WARNING
                   description: 'The SIP trunk may not be able to process new calls.'
             -
@@ -988,7 +1051,7 @@ zabbix_export:
       macros:
         -
           macro: '{$AMI.PORT}'
-          value: '8088'
+          value: '5038'
           description: 'AMI port number for checking service availability.'
         -
           macro: '{$AMI.QUEUE_CALLERS.MAX.WARN}'
@@ -1047,10 +1110,16 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'Asterisk by HTTP'
-            key: asterisk.iax.offline
+            key: asterisk.iax.online
         -
           sortorder: '1'
           color: 2774A4
+          item:
+            host: 'Asterisk by HTTP'
+            key: asterisk.iax.offline
+        -
+          sortorder: '2'
+          color: F63100
           item:
             host: 'Asterisk by HTTP'
             key: asterisk.iax.unmonitored
@@ -1059,6 +1128,12 @@ zabbix_export:
       graph_items:
         -
           color: 1A7C11
+          item:
+            host: 'Asterisk by HTTP'
+            key: asterisk.pjsip.available
+        -
+          sortorder: '1'
+          color: 2774A4
           item:
             host: 'Asterisk by HTTP'
             key: asterisk.pjsip.unavailable

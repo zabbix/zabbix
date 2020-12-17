@@ -200,14 +200,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$UPDATED_MACRO1}',
 							'value' => 'updated value1',
-							'description' => 'updated description 1',
+							'description' => 'updated description 1'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'macro' => '{$UPDATED_MACRO2}',
 							'value' => 'Updated value 2',
-							'description' => 'Updated description 2',
+							'description' => 'Updated description 2'
 						]
 					],
 					'success_message' => 'Host prototype updated'
@@ -467,7 +467,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormHostPrototypeMacros_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99205', 'host-prototype');
+		$this->createSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99205',
+				'host-prototype');
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -511,7 +512,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormHostPrototypeMacros_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'host-prototype');
+		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99206',
+				'host-prototype');
 	}
 
 	public function getRevertSecretMacrosData() {
@@ -540,7 +542,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormHostPrototypeMacros_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'host-prototype');
+		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99206',
+				'host-prototype');
 	}
 
 	public function getCreateVaultMacrosData() {
@@ -685,7 +688,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getCreateVaultMacrosData
 	 */
 	public function testFormHostPrototypeMacros_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99205', 'host-prototype');
+		$this->createVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90001&hostid=99205',
+				'host-prototype');
 	}
 
 	public function getUpdateVaultMacrosData() {
@@ -730,6 +734,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
 	public function testFormHostPrototypeMacros_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90003&hostid=90008', 'host-prototype');
+		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008',
+				'host-prototype');
 	}
 }

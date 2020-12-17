@@ -190,25 +190,31 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
+			->setArgument('context', 'host')
 	);
 	$triggersLink = new CLink(_('Triggers'),
 		(new CUrl('triggers.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
+			->setArgument('context', 'host')
 	);
 	$graphsLink = new CLink(_('Graphs'),
 		(new CUrl('graphs.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
+			->setArgument('context', 'host')
 	);
 	$discoveryLink = new CLink(_('Discovery'),
 		(new CUrl('host_discovery.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
+			->setArgument('context', 'host')
 	);
-	$webLink = new CLink(_('Web'), (new CUrl('httpconf.php'))
+	$webLink = new CLink(_('Web'),
+		(new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
+			->setArgument('context', 'host')
 	);
 }
 else {

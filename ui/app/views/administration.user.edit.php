@@ -136,12 +136,15 @@ else {
 
 // Append languages, timezones & themes to form list.
 $lang_combobox = (new CComboBox('lang', $data['lang']))->addItem(LANG_DEFAULT, _('System default'));
-$timezone_combobox = (new CComboBox('timezone', $data['timezone']))->addItem(TIMEZONE_DEFAULT, _('System default'));
+$timezone_combobox = new CSelect('timezone');
 $theme_combobox = (new CComboBox('theme', $data['theme']))->addItem(THEME_DEFAULT, _('System default'));
 
 if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
 	$lang_combobox->setEnabled(false);
-	$timezone_combobox->setEnabled(false);
+	$timezone_combobox
+		->addOptions(CSelect::createOptionsFromArray([TIMEZONE_DEFAULT => $data['timezones'][TIMEZONE_DEFAULT]]))
+		->setValue(TIMEZONE_DEFAULT)
+		->setDisabled();
 	$theme_combobox->setEnabled(false);
 }
 else {
@@ -179,14 +182,16 @@ else {
 		$lang_combobox = [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')];
 	}
 
-	$timezones = DateTimeZone::listIdentifiers();
-	$timezone_combobox->addItems(array_combine($timezones, $timezones));
+	$timezone_combobox
+		->addOptions(CSelect::createOptionsFromArray($data['timezones']))
+		->setValue($data['timezone'])
+		->setFocusableElementId('timezone-select');
 	$theme_combobox->addItems(APP::getThemes());
 }
 
 $user_form_list
 	->addRow(_('Language'), $lang_combobox)
-	->addRow(_('Time zone'), $timezone_combobox)
+	->addRow(new CLabel(_('Time zone'), 'timezone-select'), $timezone_combobox)
 	->addRow(_('Theme'), $theme_combobox);
 
 // Append auto-login & auto-logout to form list.
@@ -311,7 +316,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 						'dstfrm' => $user_form->getName()
 					]).', null, this);'
 				)
-				->addClass(ZBX_STYLE_BTN_LINK),
+				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -344,7 +349,7 @@ if ($data['action'] === 'user.edit') {
 		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(),
 			(new CDiv([
 				$role_multiselect,
-				new CDiv(_('User can\'t change role for himself'))
+				new CDiv(_('User cannot change own role.'))
 			]))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('multiselect-description-container')

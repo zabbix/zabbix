@@ -53,7 +53,7 @@ class testFormTriggerTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Trigger with tags',
-						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0'
 					],
 					'tags' => [
 						[
@@ -88,7 +88,7 @@ class testFormTriggerTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Trigger with equal tag names',
-						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0'
 					],
 					'tags' => [
 						[
@@ -109,7 +109,7 @@ class testFormTriggerTags extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Trigger with equal tag values',
-						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0'
 					],
 					'tags' => [
 						[
@@ -130,7 +130,7 @@ class testFormTriggerTags extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Trigger with empty tag name',
-						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0'
 					],
 					'tags' => [
 						[
@@ -148,7 +148,7 @@ class testFormTriggerTags extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Trigger with equal tags',
-						'Expression' => '{Simple form test host:test-item-reuse.last()}=0',
+						'Expression' => '{Simple form test host:test-item-reuse.last()}=0'
 					],
 					'tags' => [
 						[
@@ -367,7 +367,7 @@ class testFormTriggerTags extends CWebTest {
 
 	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['fields']['Name']));
-		$this->page->open('triggers.php?form=update&triggerid='.$id.'&groupid=0');
+		$this->page->open('triggers.php?form=update&context=host&triggerid='.$id.'&groupid=0');
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
 

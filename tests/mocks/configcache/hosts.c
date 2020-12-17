@@ -34,6 +34,8 @@
 
 extern zbx_mock_config_t	mock_config;
 
+void	mock_config_free_hosts(void);
+
 void	mock_config_load_hosts(const char *path)
 {
 	zbx_mock_handle_t	hhosts, handle;
@@ -79,7 +81,7 @@ void	mock_config_load_hosts(const char *path)
 	mock_config.initialized |= ZBX_MOCK_CONFIG_HOSTS;
 }
 
-void	mock_config_free_hosts()
+void	mock_config_free_hosts(void)
 {
 	int	i;
 

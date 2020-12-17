@@ -765,7 +765,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
 			'match' => $parser->getMatch(),
-			'range' => $parser->getRange(),
+			'range' => $parser->getRange()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}

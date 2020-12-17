@@ -71,7 +71,7 @@ class testFormLogin extends CLegacyWebTest {
 				'password' => '',
 				'success_expected' => true,
 				'dbCheck' => false
-			]],
+			]]
 		];
 	}
 

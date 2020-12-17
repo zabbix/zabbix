@@ -57,7 +57,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid']);
+		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid'].'&context=host');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger updated');
@@ -91,7 +91,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceTrigger_SimpleCreate($data) {
-		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->templateid);
+		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$this->templateid);
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 		$this->zbxTestInputType('description', $data['description']);
@@ -131,7 +131,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		$template_tags = [
 			['name'=>'template', 'value'=>'template'],
-			['name'=>'test', 'value'=>'inheritance'],
+			['name'=>'test', 'value'=>'inheritance']
 		];
 		$template_tags_count = count($template_tags);
 
@@ -153,7 +153,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		$templated_trigger_tags = [
 			['name'=>'tag1', 'value'=>'trigger'],
-			['name'=>'tag2', 'value'=>'templated'],
+			['name'=>'tag2', 'value'=>'templated']
 		];
 		$templated_trigger_tags_count = count($templated_trigger_tags);
 
@@ -165,7 +165,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$this->assertEquals('Trigger updated', $message->getTitle());
 		// Check inherited trigger on host.
 		// Go to host.
-		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
+		$this->page->login()->open('triggers.php?filter_set=1&context=host&filter_hostids[0]='.$this->hostid);
 		// Go to inherited trigger.
 		$host_triggers_table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 		$host_triggers_table->query('link', $inherited_trigger)->one()->click();

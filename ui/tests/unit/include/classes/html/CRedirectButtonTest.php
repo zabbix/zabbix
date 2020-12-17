@@ -44,7 +44,7 @@ class CRedirectButtonTest extends CTagTest {
 			[
 				['caption', 'url"&"'],
 				'<button type="button" data-url="url&quot;&&quot;">caption</button>'
-			],
+			]
 		];
 	}
 

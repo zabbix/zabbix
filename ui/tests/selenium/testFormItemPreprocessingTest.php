@@ -84,7 +84,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 						['type' => 'JSONPath', 'parameter_1' => '{$WORKING_HOURS}'],
 						['type' => 'Custom multiplier', 'parameter_1' => '{$DEFAULT_DELAY}'],
 						['type' => 'JavaScript', 'parameter_1' => '{$LOCALIP}'],
-						['type' => 'Does not match regular expression', 'parameter_1' => '{$_}'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '{$_}']
 					],
 					'macros' => [
 						[
@@ -294,7 +294,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Simple change'],
 						['type' => 'Discard unchanged'],
-						['type' => 'In range', 'parameter_1' => '1', 'parameter_2' => ''],
+						['type' => 'In range', 'parameter_1' => '1', 'parameter_2' => '']
 					],
 					'action' => 'Test'
 				]
@@ -422,7 +422,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	}
 
 	private function openPreprocessing($data) {
-		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
+		$this->page->login()->open('items.php?form=create&context=host&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key';
 		$form->fill(['Key' => $key]);

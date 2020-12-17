@@ -297,7 +297,6 @@ class CSetupWizard extends CForm {
 
 		$table->addRow(_('Database port'), [
 			(new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false))
-				->removeAttribute('style')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
@@ -435,7 +434,6 @@ class CSetupWizard extends CForm {
 
 		$table->addRow(_('Port'),
 			(new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5, false, false, false))
-				->removeAttribute('style')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
@@ -454,13 +452,15 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stage4(): array {
-		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[ZBX_DEFAULT_TIMEZONE] = CDateTimeZoneHelper::getSystemDateTimeZone();
+		$timezones += (new CDateTimeZoneHelper())->getAllDateTimeZones();
 
 		$table = (new CFormList())
-			->addRow(_('Default time zone'),
-				new CComboBox('default_timezone', $this->getConfig('default_timezone'), null,
-					[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
-				)
+			->addRow(new CLabel(_('Default time zone'), 'default-timezone-select'),
+				(new CSelect('default_timezone'))
+					->setValue($this->getConfig('default_timezone', ZBX_DEFAULT_TIMEZONE))
+					->addOptions(CSelect::createOptionsFromArray($timezones))
+					->setFocusableElementId('default-timezone-select')
 			)
 			->addRow(_('Default theme'),
 				new CComboBox('default_theme', $this->getConfig('default_theme'), 'submit()', APP::getThemes())
@@ -655,7 +655,7 @@ class CSetupWizard extends CForm {
 				new CTag('ol', true, [
 					new CTag('li', true, new CLink(_('Download the configuration file'), 'setup.php?save_config=1')),
 					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
-				]),
+				])
 			];
 		}
 		else {

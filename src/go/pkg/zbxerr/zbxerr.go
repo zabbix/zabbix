@@ -87,6 +87,7 @@ func (e ZabbixError) Raw() string {
 
 var (
 	ErrorInvalidParams       = New("invalid parameters")
+	ErrorTooFewParameters    = New("too few parameters")
 	ErrorTooManyParameters   = New("too many parameters")
 	ErrorCannotFetchData     = New("cannot fetch data")
 	ErrorCannotUnmarshalJSON = New("cannot unmarshal JSON")

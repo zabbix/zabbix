@@ -31,6 +31,19 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 */
 	protected $allow_empty_password;
 
+
+	/**
+	 * @var array
+	 */
+	protected $timezones;
+
+	protected function init() {
+		parent::init();
+
+		$this->timezones = array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones());
+		$this->timezones[] = TIMEZONE_DEFAULT;
+	}
+
 	/**
 	 * Get groups gui access.
 	 *
