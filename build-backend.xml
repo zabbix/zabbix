@@ -45,7 +45,7 @@
 		</exec>
 		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">
 			<arg line="--enable=all"/>
-			<arg line="-j4"/>
+			<arg line="-j5"/>
 			<arg line="-I/usr/include"/>
 			<arg line="-I/usr/local/include"/>
 			<arg line="-I./include"/>

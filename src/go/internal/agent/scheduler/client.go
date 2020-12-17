@@ -98,7 +98,7 @@ func (c *client) ID() uint64 {
 	return c.id
 }
 
-// Output returns client ouput interface where plugins results can be written.
+// Output returns client output interface where plugins results can be written.
 // While it's used by tasks to implement ContextProvider interface, client output cannot
 // change, so no synchronization is required.
 func (c *client) Output() plugin.ResultWriter {

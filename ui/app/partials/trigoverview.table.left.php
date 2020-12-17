@@ -57,7 +57,7 @@ foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 	$table->addRow($row);
 }
 
-if ($data['exceeded_hosts'] || $data['exceeded_trigs']) {
+if ($data['exceeded_limit']) {
 	$table->setFooter([
 		(new CCol(_('Not all results are displayed. Please provide more specific search criteria.')))
 			->setColSpan($table->getNumCols())
