@@ -218,7 +218,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
@@ -232,7 +232,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Severity' => ['Average', 'Disaster'],
+						'Severity' => ['Average', 'Disaster']
 					],
 					'result' => [
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
@@ -260,7 +260,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Discovered' => 'Yes'
 					],
 					'result' => [
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -272,7 +272,7 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -284,7 +284,7 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -296,7 +296,7 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -309,7 +309,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -319,7 +319,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Status' => 'Disabled'
 					],
 					'result' => [
-						'Trigger disabled with tags',
+						'Trigger disabled with tags'
 					]
 				]
 			],
@@ -342,7 +342,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Problem'
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -357,7 +357,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' =>'Problem',
 						'Inherited' =>'Yes',
 						'Discovered' =>'No',
-						'With dependencies' =>'Yes',
+						'With dependencies' =>'Yes'
 					],
 					'tag_options' => [
 						'type' => 'Or',
@@ -367,7 +367,7 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -375,7 +375,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Host groups' => 'Zabbix servers',
+						'Host groups' => 'Zabbix servers'
 					]
 				]
 			],
@@ -541,7 +541,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',

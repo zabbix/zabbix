@@ -23,34 +23,30 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
 /**
  * @backup hosts
  */
-class testFormHostPrototypeMacros extends testFormMacros {
-
-	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
-	const LLD_ID			= 90001;
-	const IS_PROTOTYPE	= true;
+class testFormMacrosHost extends testFormMacros {
 
 	use MacrosTrait;
 
 	/**
-	 * The name of the host for updating macros, id=99200.
+	 * The name of the host for updating macros, id=20006.
 	 *
 	 * @var string
 	 */
-	protected $host_name_update = 'Host prototype for macros {#UPDATE}';
+	protected $host_name_update = 'Host for trigger description macros';
 
 	/**
-	 * The name of the host for removing macros, id=99201.
+	 * The name of the host for removing macros, id=30010.
 	 *
 	 * @var string
 	 */
-	protected $host_name_remove = 'Host prototype for macros {#DELETE}';
+	protected $host_name_remove = 'Host for macros remove';
 
-	public static function getCreateHostPrototypeMacrosData() {
+	public static function getCreateMacrosHostData() {
 		return [
 			[
 				[
 					'expected' => TEST_GOOD,
-					'Name' => 'Host prototype With {#MACROS}',
+					'Name' => 'Host With Macros',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -100,13 +96,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => ''
 						]
 					],
-					'success_message' => 'Host prototype added'
+						'success_message' => 'Host added'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in {#MACROS}',
+					'Name' => 'Host Without dollar in Macros',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -114,14 +110,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error_message' => 'Cannot add host prototype',
+					'error_message' => 'Cannot add host',
 					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Host prototype With empty {#MACRO}',
+					'Name' => 'Host With empty Macro',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -131,14 +127,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description'
 						]
 					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error_message' => 'Cannot add host',
+					'error_details' => 'Invalid macro "": macro is empty.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Host prototype With repeated {#MACROS}',
+					'Name' => 'Host With repeated Macros',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -153,14 +149,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error_message' => 'Cannot add host',
+					'error_details' => 'Macro "{$MACRO}" is not unique.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Host prototype With repeated regex {#MACROS}',
+					'Name' => 'Host With repeated regex Macros',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -175,21 +171,21 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
+					'error_message' => 'Cannot add host',
+					'error_details' => 'Macro "{$MACRO:regex:"^[0-9].*$"}" is not unique.'
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getCreateHostPrototypeMacrosData
+	 * @dataProvider getCreateMacrosHostData
 	 */
-	public function testFormHostPrototypeMacros_Create($data) {
-		$this->checkCreate($data, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+	public function testFormMacrosHost_Create($data) {
+		$this->checkCreate($data, 'hosts', 'host');
 	}
 
-	public static function getUpdateHostPrototypeMacrosData() {
+	public static function getUpdateMacrosHostData() {
 		return [
 			[
 				[
@@ -200,17 +196,17 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$UPDATED_MACRO1}',
 							'value' => 'updated value1',
-							'description' => 'updated description 1',
+							'description' => 'updated description 1'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'macro' => '{$UPDATED_MACRO2}',
 							'value' => 'Updated value 2',
-							'description' => 'Updated description 2',
+							'description' => 'Updated description 2'
 						]
 					],
-					'success_message' => 'Host prototype updated'
+					'success_message' => 'Host updated'
 				]
 			],
 			[
@@ -237,7 +233,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Updated Description 3'
 						]
 					],
-					'success_message' => 'Host prototype updated'
+					'success_message' => 'Host updated'
 				]
 			],
 			[
@@ -266,7 +262,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Описание'
 						]
 					],
-					'success_message' => 'Host prototype updated'
+					'success_message' => 'Host updated'
 				]
 			],
 			[
@@ -295,7 +291,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Описание'
 						]
 					],
-					'success_message' => 'Host prototype updated'
+					'success_message' => 'Host updated'
 				]
 			],
 			[
@@ -309,7 +305,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error_message' => 'Cannot update host prototype',
+					'error_message' => 'Cannot update host',
 					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
 				]
 			],
@@ -326,8 +322,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description'
 						]
 					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error_message' => 'Cannot update host',
+					'error_details' => 'Invalid macro "": macro is empty.'
 				]
 			],
 			[
@@ -350,14 +346,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error_message' => 'Cannot update host',
+					'error_details' => 'Macro "{$MACRO}" is not unique.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex {#MACROS}',
+					'Name' => 'With repeated regex Macros',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -374,14 +370,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot update host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+					'error_message' => 'Cannot update host',
+					'error_details' => 'Macro "{$M:regex:"[a-z]"}" is not unique.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'With repeated regex {#MACROS} and quotes',
+					'Name' => 'With repeated regex Macros and quotes',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -398,7 +394,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot update host prototype',
+					'error_message' => 'Cannot update host',
 					'error_details' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
 				]
 			]
@@ -406,18 +402,63 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateHostPrototypeMacrosData
+	 * @dataProvider getUpdateMacrosHostData
 	 */
-	public function testFormHostPrototypeMacros_Update($data) {
-		$this->checkUpdate($data, $this->host_name_update, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+	public function testFormMacrosHost_Update($data) {
+		$this->checkUpdate($data, $this->host_name_update, 'hosts', 'host');
 	}
 
-	public function testFormHostPrototypeMacros_Remove() {
-		$this->checkRemove($this->host_name_remove, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+	public function testFormMacrosHost_Remove() {
+		$this->checkRemove($this->host_name_remove, 'hosts', 'host');
 	}
 
-	public function testFormHostPrototypeMacros_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
+	public function testFormMacrosHost_ChangeRemoveInheritedMacro() {
+		$this->checkChangeRemoveInheritedMacro('hosts', 'host');
+	}
+
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text'
+				]
+			],
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$TEXT_HOST_MACRO}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getSecretMacrosLayoutData
+	 */
+	public function testFormMacrosHost_CheckSecretMacrosLayout($data) {
+		$this->checkSecretMacrosLayout($data, 'hosts.php?form=update&hostid=99011', 'hosts');
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -425,9 +466,11 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'macro_fields' => [
-						'macro' => '{$Z_SECRET_MACRO}',
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'macro' => '{$SECRET_MACRO}',
 						'value' => [
-							'text' => 'secret value',
+							'text' => 'host secret value',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret description'
@@ -438,9 +481,9 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'macro_fields' => [
-						'macro' => '{$Z_TEXT_MACRO}',
+						'macro' => '{$TEXT_MACRO}',
 						'value' => [
-							'text' => 'plain text value',
+							'text' => 'host plain text value',
 							'type' => 'Secret text'
 						],
 						'description' => 'plain text description'
@@ -451,7 +494,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'macro_fields' => [
-						'macro' => '{$Z_SECRET_EMPTY_MACRO}',
+						'macro' => '{$SECRET_EMPTY_MACRO}',
 						'value' => [
 							'text' => '',
 							'type' => 'Secret text'
@@ -466,52 +509,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateSecretMacrosData
 	 */
-	public function testFormHostPrototypeMacros_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99205', 'host-prototype');
-	}
-
-	public function getUpdateSecretMacrosData() {
-		return [
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 0,
-					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
-					'value' => [
-						'text' => 'Updated secret value'
-					]
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 1,
-					'macro' => '{$PROTOTYPE_SECRET_2_TEXT}',
-					'value' => [
-						'text' => 'Updated text value',
-						'type' => 'Text'
-					]
-				]
-			],
-			[
-				[
-					'action' => USER_ACTION_UPDATE,
-					'index' => 2,
-					'macro' => '{$PROTOTYPE_TEXT_2_SECRET}',
-					'value' => [
-						'text' => 'Updated new secret value',
-						'type' => 'Secret text'
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getUpdateSecretMacrosData
-	 */
-	public function testFormHostPrototypeMacros_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'host-prototype');
+	public function testFormMacrosHost_CreateSecretMacros($data) {
+		$this->createSecretMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
 	}
 
 	public function getRevertSecretMacrosData() {
@@ -519,7 +518,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'macro_fields' => [
-						'macro' => '{$Z_HOST_PROTOTYPE_MACRO_REVERT}',
+						'macro' => '{$SECRET_HOST_MACRO_REVERT}',
 						'value' => 'Secret host value'
 					]
 				]
@@ -527,7 +526,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'macro_fields' => [
-						'macro' => '{$Z_HOST_PROTOTYPE_MACRO_2_TEXT_REVERT}',
+						'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
 						'value' => 'Secret host value 2'
 					],
 					'set_to_text' => true
@@ -539,8 +538,60 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
-	public function testFormHostPrototypeMacros_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'host-prototype');
+	public function testFormMacrosHost_RevertSecretMacroChanges($data) {
+		$this->revertSecretMacroChanges($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+	}
+
+	public function getUpdateSecretMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
+					'value' => [
+						'text' => 'Updated secret value'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 3,
+					'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
+					'value' => [
+						'text' => 'New text value',
+						'type' => 'Text'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 4,
+					'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
+					'value' => [
+						'text' => 'New secret value',
+						'type' => 'Secret text'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateSecretMacrosData
+	 */
+	public function testFormMacrosHost_UpdateSecretMacros($data) {
+		$this->updateSecretMacros($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+	}
+
+	public function testFormMacrosHost_ResolveSecretMacro() {
+		$macro = [
+			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
+			'value' => 'Value 2 B resolved'
+		];
+		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
 	}
 
 	public function getCreateVaultMacrosData() {
@@ -556,7 +607,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description'
 					],
-					'title' => 'Host prototype updated'
+					'title' => 'Host updated'
 				]
 			],
 			[
@@ -570,7 +621,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description7'
 					],
-					'title' => 'Host prototype updated'
+					'title' => 'Host updated'
 				]
 			],
 			[
@@ -584,7 +635,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description2'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO3}": incorrect syntax near "path:".'
 				]
 			],
@@ -599,7 +650,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description3'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO4}": incorrect syntax near "/path:key".'
 				]
 			],
@@ -614,7 +665,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description4'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO5}": incorrect syntax near "path:key".'
 				]
 			],
@@ -629,7 +680,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description5'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO6}": incorrect syntax near ":key".'
 				]
 			],
@@ -644,7 +695,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description6'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO7}": incorrect syntax near "path".'
 				]
 			],
@@ -659,7 +710,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description8'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO8}": incorrect syntax near "/secret/path:key".'
 				]
 			],
@@ -674,7 +725,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						],
 						'description' => 'vault description9'
 					],
-					'title' => 'Cannot update host prototype',
+					'title' => 'Cannot update host',
 					'message' => 'Invalid value for macro "{$VAULT_MACRO9}": cannot be empty.'
 				]
 			]
@@ -684,8 +735,8 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
-	public function testFormHostPrototypeMacros_CreateVaultMacros($data) {
-		$this->createVaultMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99205', 'host-prototype');
+	public function testFormMacrosHost_CreateVaultMacros($data) {
+		$this->createVaultMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
 	}
 
 	public function getUpdateVaultMacrosData() {
@@ -693,7 +744,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 0,
+					'index' => 2,
 					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
 					'value' => [
 						'text' => 'secret/path:key'
@@ -704,7 +755,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 0,
+					'index' => 2,
 					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
 					'value' => [
 						'text' => 'new/path/to/secret:key'
@@ -715,7 +766,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			[
 				[
 					'action' => USER_ACTION_UPDATE,
-					'index' => 0,
+					'index' => 2,
 					'macro' => '{$VAULT_HOST_MACRO3_CHANGED}',
 					'value' => [
 						'text' => 'new/path/to/secret:key'
@@ -729,7 +780,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
-	public function testFormHostPrototypeMacros_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90003&hostid=90008', 'host-prototype');
+	public function testFormMacrosHost_UpdateVaultMacros($data) {
+		$this->updateVaultMacros($data, 'hosts.php?form=update&hostid=99011', 'hosts');
 	}
 }

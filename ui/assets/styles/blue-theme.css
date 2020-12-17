@@ -952,7 +952,8 @@ footer {
         margin-left: 3px;
         margin-right: 3px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(3) > ul > li {
-      vertical-align: top; }
+      vertical-align: top;
+      height: 24px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(1), .filter-container.tabfilter-container nav > ul > li:nth-child(3) {
       white-space: nowrap; }
   .filter-container.tabfilter-container nav {
@@ -961,7 +962,7 @@ footer {
       display: inline-block;
       height: 22px;
       line-height: 22px;
-      vertical-align: middle; }
+      vertical-align: top; }
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
@@ -5859,13 +5860,16 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-#mediatype_testlog .logitems {
-  overflow: auto;
-  margin-bottom: 10px; }
-  #mediatype_testlog .logitems pre {
-    white-space: nowrap; }
-#mediatype_testlog .logtotalms {
-  margin-bottom: 10px; }
+.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
+  overflow-x: auto; }
+  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
+    height: 9px; }
+.mediatypetest-modal .logitems pre {
+  white-space: nowrap; }
+.mediatypetest-modal .logtotalms {
+  color: #768d99;
+  float: left;
+  line-height: 24px; }
 
 #itemsTable .table-col-handle {
   width: 26px; }

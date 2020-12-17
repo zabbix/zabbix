@@ -169,7 +169,7 @@ class C44ImportConverter extends CConverter {
 				: '',
 			'privpassphrase' => ($data['type'] === CXmlConstantName::SNMPV3)
 				? (array_key_exists('snmpv3_privpassphrase', $data) ? $data['snmpv3_privpassphrase'] : '')
-				: '',
+				: ''
 		];
 	}
 

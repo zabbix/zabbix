@@ -36,7 +36,7 @@ $fields = [
 	'iconid' =>			[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
 	'width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'unavailable' =>	[T_ZBX_INT, O_OPT, null, IN([0, 1]),		null],
+	'unavailable' =>	[T_ZBX_INT, O_OPT, null, IN([0, 1]),		null]
 ];
 check_fields($fields);
 

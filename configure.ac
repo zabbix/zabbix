@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[5.2.1rc2])
+AC_INIT([Zabbix],[5.2.3rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -99,8 +99,20 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #endif
 ])
 
+AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
+checked_werror_cpp_CFLAGS=""
 saved_CFLAGS="$CFLAGS"
-CFLAGS="-Werror $CFLAGS"
+CFLAGS="$CFLAGS -Werror=cpp"
+AC_TRY_COMPILE(,[
+  void f() {};
+],checked_werror_cpp_CFLAGS="-Werror=cpp"
+  AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no)
+)
+CFLAGS="$saved_CFLAGS"
+
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -1366,7 +1378,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"

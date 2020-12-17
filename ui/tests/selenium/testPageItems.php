@@ -129,7 +129,7 @@ class testPageItems extends CLegacyWebTest {
 						['Test Item Template' => 'Macro value: Value 2 B resolved'],
 						['Host for trigger tags filtering' => 'Trapper'],
 						['ЗАББИКС Сервер' => 'Utilization of snmp trapper data collector processes, in %'],
-						['ЗАББИКС Сервер' => 'Utilization of trapper data collector processes, in %'],
+						['ЗАББИКС Сервер' => 'Utilization of trapper data collector processes, in %']
 					]
 				]
 			],
