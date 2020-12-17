@@ -23,21 +23,46 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/plugins/smart"
 )
 
+// Options -
+type Options struct {
+	Timeout int `conf:"optional,range=1:30"`
+}
+
+// Plugin -
 type Plugin struct {
 	plugin.Base
+	options Options
 }
 
 var impl Plugin
 
+// Configure -
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	if err := conf.Unmarshal(options, &p.options); err != nil {
+		p.Warningf("cannot unmarshal configuration options: %s", err)
+	}
+	if p.options.Timeout == 0 {
+		p.options.Timeout = global.Timeout
+	}
+}
+
+// Validate -
+func (p *Plugin) Validate(options interface{}) error {
+	var o Options
+	return conf.Unmarshal(options, &o)
+}
+
+// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
 	case "smart.attribute.discovery":
 		var out []smart.Attribute
-		parsedDevices, err := smart.GetParsedDevices(&p.Base)
+		parsedDevices, err := smart.GetParsedDevices(&p.Base, p.options.Timeout)
 		if err != nil {
 			return nil, err
 		}
@@ -67,6 +92,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "attribute",
+	plugin.RegisterMetrics(&impl, "Attribute",
 		"smart.attribute.discovery", "Returns JSON array of smart device attributes, usage: smart.attribute.discovery.")
 }

@@ -61,7 +61,8 @@ type DeviceParser struct {
 }
 
 type deviceInfo struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	DevType string `json:"type"`
 }
 
 type smartctlField struct {
@@ -89,15 +90,16 @@ type table struct {
 }
 
 //GetParsedDevices -
-func GetParsedDevices(p *plugin.Base) ([]DeviceParser, error) {
+func GetParsedDevices(p *plugin.Base, timeout int) ([]DeviceParser, error) {
 	var out []DeviceParser
-	basicDev, raidDev, err := getDevices()
+	found := make(map[string]bool)
+	basicDev, raidDev, err := getDevices(timeout)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, dev := range basicDev {
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name), timeout)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
 		}
@@ -112,14 +114,17 @@ func GetParsedDevices(p *plugin.Base) ([]DeviceParser, error) {
 		}
 
 		if dp.SmartStatus != nil {
-			out = append(out, dp)
+			if !found[dp.SerialNumber] {
+				found[dp.SerialNumber] = true
+				out = append(out, dp)
+			}
 		}
 	}
 
 	raidTypes := []string{"3ware", "areca", "cciss", "megaraid"}
 	for _, rDev := range raidDev {
 		for _, rtype := range raidTypes {
-			raids, err := getRaidDisks(rDev.Name, rtype)
+			raids, err := getRaidDisks(rDev.Name, rtype, timeout)
 			if err != nil {
 				p.Tracef("stopped looking for RAID devices of %s type, found %d, err:", rtype, len(raids), err.Error())
 			}
@@ -131,15 +136,15 @@ func GetParsedDevices(p *plugin.Base) ([]DeviceParser, error) {
 }
 
 //GetDeviceJsons -
-func GetDeviceJsons(p *plugin.Base) (map[string]string, error) {
+func GetDeviceJsons(p *plugin.Base, timeout int) (map[string]string, error) {
 	out := make(map[string]string)
-	basicDev, raidDev, err := getDevices()
+	basicDev, raidDev, err := getDevices(timeout)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, dev := range basicDev {
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name), timeout)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
 		}
@@ -149,7 +154,7 @@ func GetDeviceJsons(p *plugin.Base) (map[string]string, error) {
 	raidTypes := []string{"3ware", "areca", "cciss", "megaraid"}
 	for _, rDev := range raidDev {
 		for _, rtype := range raidTypes {
-			raids, err := getRaidJsons(rDev.Name, rtype)
+			raids, err := getRaidJsons(rDev.Name, rtype, timeout)
 			if err != nil {
 				p.Tracef("Stopped looking for RAID devices of %s type, found %d, err:", rtype, len(raids), err.Error())
 			}
@@ -162,7 +167,7 @@ func GetDeviceJsons(p *plugin.Base) (map[string]string, error) {
 	return out, nil
 }
 
-func getRaidJsons(name string, rtype string) (map[string]string, error) {
+func getRaidJsons(name string, rtype string, timeout int) (map[string]string, error) {
 	out := make(map[string]string)
 	var i int
 	if rtype == "areca" {
@@ -173,7 +178,7 @@ func getRaidJsons(name string, rtype string) (map[string]string, error) {
 
 	for {
 		fullName := fmt.Sprintf("%s -d %s,%d", name, rtype, i)
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName))
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName), timeout)
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -193,8 +198,7 @@ func getRaidJsons(name string, rtype string) (map[string]string, error) {
 	}
 }
 
-//TODO maybe add a timeout ?
-func getRaidDisks(name string, rtype string) ([]DeviceParser, error) {
+func getRaidDisks(name string, rtype string, timeout int) ([]DeviceParser, error) {
 	var out []DeviceParser
 	var i int
 	if rtype == "areca" {
@@ -205,7 +209,7 @@ func getRaidDisks(name string, rtype string) ([]DeviceParser, error) {
 
 	for {
 		fullName := fmt.Sprintf("%s -d %s,%d", name, rtype, i)
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName))
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName), timeout)
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -247,13 +251,13 @@ func (dp DeviceParser) checkErr() (err error) {
 	return
 }
 
-func getDevices() (basic []deviceInfo, raid []deviceInfo, err error) {
-	raidTmp, err := scanDevices("--scan -d sat -j")
+func getDevices(timeout int) (basic []deviceInfo, raid []deviceInfo, err error) {
+	raidTmp, err := scanDevices("--scan -d sat -j", timeout)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
 	}
 
-	basic, err = scanDevices("--scan -j")
+	basic, err = scanDevices("--scan -j", timeout)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to scan for devices: %s", err)
 	}
@@ -272,9 +276,9 @@ raid:
 	return basic, raid, nil
 }
 
-func scanDevices(args string) ([]deviceInfo, error) {
+func scanDevices(args string, timeout int) ([]deviceInfo, error) {
 	var devices Devices
-	devicesJSON, err := executeSmartctl(args)
+	devicesJSON, err := executeSmartctl(args, timeout)
 	if err != nil {
 		return nil, err
 	}

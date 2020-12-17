@@ -23,36 +23,54 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/plugins/smart"
 )
 
+// Options -
+type Options struct {
+	Timeout int `conf:"optional,range=1:30"`
+}
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	options Options
 }
 
 var impl Plugin
+
+// Configure -
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	if err := conf.Unmarshal(options, &p.options); err != nil {
+		p.Warningf("cannot unmarshal configuration options: %s", err)
+	}
+
+	if p.options.Timeout == 0 {
+		p.options.Timeout = global.Timeout
+	}
+}
+
+// Validate -
+func (p *Plugin) Validate(options interface{}) error {
+	var o Options
+	return conf.Unmarshal(options, &o)
+}
 
 //Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
 	case "smart.disk.discovery":
 		var out []smart.Device
-		parsedDevices, err := smart.GetParsedDevices(&p.Base)
+		parsedDevices, err := smart.GetParsedDevices(&p.Base, p.options.Timeout)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, dev := range parsedDevices {
-			var t string
-			if dev.RotationRate == 0 {
-				t = "ssd"
-			} else {
-				t = "hdd"
-			}
-			out = append(out, smart.Device{Name: dev.Info.Name, DeviceType: t, Model: dev.ModelName,
-				SerialNumber: dev.SerialNumber})
+			out = append(out, smart.Device{Name: dev.Info.Name, DeviceType: getType(dev.Info.DevType, dev.RotationRate),
+				Model: dev.ModelName, SerialNumber: dev.SerialNumber})
 		}
 
 		jsonArray, err := json.Marshal(out)
@@ -62,7 +80,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		return string(jsonArray), nil
 	case "smart.disk.get":
-		deviceJsons, err := smart.GetDeviceJsons(&p.Base)
+		deviceJsons, err := smart.GetDeviceJsons(&p.Base, p.options.Timeout)
 		if err != nil {
 			return nil, err
 		}
@@ -84,21 +102,45 @@ func setDiskType(deviceJsons map[string]string) []interface{} {
 		b := make(map[string]interface{})
 		json.Unmarshal([]byte(v), &b)
 		b["disk_name"] = k
-		rate, ok := b["rotation_rate"]
-		if ok {
-			if rate == 0 {
-				b["disk_type"] = "ssd"
-			} else {
-				b["disk_type"] = "hdd"
+		var devType string
+		if dev, ok := b["device"]; ok {
+			s, ok := dev.(string)
+			if ok {
+				info := make(map[string]string)
+				err := json.Unmarshal([]byte(s), &info)
+				if err == nil {
+					devType = info["type"]
+				}
 			}
-		} else {
-			b["disk_type"] = "unknown"
 		}
 
+		rateInt := -1
+		if rate, ok := b["rotation_rate"]; ok {
+			if r, ok := rate.(int); ok {
+				rateInt = r
+			}
+		}
+
+		b["disk_type"] = getType(devType, rateInt)
 		out = append(out, b)
 	}
 
 	return out
+}
+
+func getType(devType string, rate int) (out string) {
+	out = "unknown"
+	if devType == "nvme" {
+		out = "nvme"
+	} else {
+		if rate == 0 {
+			out = "ssd"
+		} else {
+			out = "hdd"
+		}
+	}
+
+	return
 }
 
 func init() {
