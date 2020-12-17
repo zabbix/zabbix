@@ -422,7 +422,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 	}
 
 	private function openPreprocessing($data) {
-		$this->page->login()->open('items.php?form=create&hostid='.self::HOST_ID);
+		$this->page->login()->open('items.php?form=create&context=host&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key';
 		$form->fill(['Key' => $key]);

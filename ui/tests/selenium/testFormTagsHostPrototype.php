@@ -170,7 +170,7 @@ class testFormTagsHostPrototype extends CWebTest {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
 
-		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
+		$this->page->login()->open('host_prototypes.php?context=host&parent_discoveryid='.self::DICROVERY_RULE_ID);
 		$this->query('button:Create host prototype')->waitUntilPresent()->one()->click();
 		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Host name' => $data['host_name']]);
@@ -277,7 +277,7 @@ class testFormTagsHostPrototype extends CWebTest {
 		$old_hash = CDBHelper::getHash($sql_hosts);
 		$data['host_name'] = $this->update_prototype;
 
-		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
+		$this->page->login()->open('host_prototypes.php?context=host&parent_discoveryid='.self::DICROVERY_RULE_ID);
 		$this->query('link', $this->update_prototype)->waitUntilPresent()->one()->click();
 		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 
@@ -307,7 +307,7 @@ class testFormTagsHostPrototype extends CWebTest {
 	public function testFormTagsHostPrototype_Clone() {
 		$new_name = 'Cloned {#HOST} prototype with tags for cloning';
 
-		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
+		$this->page->login()->open('host_prototypes.php?context=host&parent_discoveryid='.self::DICROVERY_RULE_ID);
 		$this->query('link', $this->clone_prototype)->waitUntilPresent()->one()->click();
 		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->getField('Host name')->fill($new_name);
@@ -338,7 +338,7 @@ class testFormTagsHostPrototype extends CWebTest {
 
 	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_name']));
-		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.self::DICROVERY_RULE_ID.'&hostid='.$id);
+		$this->page->open('host_prototypes.php?form=update&context=host&parent_discoveryid='.self::DICROVERY_RULE_ID.'&hostid='.$id);
 		$form = $this->query('id:host-prototype-form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
 

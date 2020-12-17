@@ -293,7 +293,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getUrlParseData
 	 */
 	public function testFormItemHttpAgent_UrlParse($data) {
-		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID);
+		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID.'&context=host');
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
 		$this->zbxTestInputTypeWait('url', $data['url']);
@@ -322,7 +322,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Test form validation.
 	 */
 	private function executeValidation($data, $action) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 
 		switch ($action) {
 			case 'create':
@@ -987,7 +987,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getCreataData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
@@ -1201,7 +1201,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$data['fields']['Name'] = $update_item;
 		}
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestClickLinkTextWait($update_item);
 
 		$this->fillFields($data['fields']);
@@ -1238,7 +1238,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 
 		$sql = 'SELECT name'.
 				' FROM items'.
@@ -1269,7 +1269,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE name='.zbx_dbstr($clone_item);
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestClickLinkTextWait($clone_item);
 		$this->zbxTestClickWait('clone');
 
@@ -1309,7 +1309,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_Delete() {
 		$name = 'Http agent item for delete';
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickAndAcceptAlert('delete');
 
@@ -1334,7 +1334,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 
 		$this->fillFields($data);
@@ -1354,7 +1354,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	private function executeCancelAction($action) {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 
 		foreach (CDBHelper::getRandom('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.
 				' AND hostid='.self::HOSTID , 1) as $item) {

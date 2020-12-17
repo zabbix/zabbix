@@ -65,6 +65,7 @@ $fields = [
 													]),
 													null
 												],
+	'context' =>								[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -131,7 +132,6 @@ if (hasRequest('triggerid')) {
 		access_deny();
 	}
 }
-
 
 $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {
@@ -499,18 +499,21 @@ if (isset($_REQUEST['form'])) {
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
+		'context' => getRequest('context')
 	]);
 
 	// render view
 	echo (new CView('configuration.trigger.prototype.edit', $data))->getOutput();
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	$sortField = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'description'));
+	$sortOrder = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
@@ -519,7 +522,8 @@ else {
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'dependencyTriggers' => []
+		'dependencyTriggers' => [],
+		'context' => getRequest('context')
 	];
 
 	// get triggers
@@ -548,7 +552,9 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['triggers'], $sortOrder,
-		(new CUrl('trigger_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
 	);
 
 	$data['triggers'] = API::TriggerPrototype()->get([

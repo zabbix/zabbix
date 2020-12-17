@@ -36,8 +36,12 @@ else {
 		->addItem(get_header_host_table('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
+$url = (new CUrl('graphs.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$graphForm = (new CForm())
+$graphForm = (new CForm('post', $url))
 	->setName('graphForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
@@ -77,6 +81,7 @@ if ($discovered_graph) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 			->setArgument('graphid', $data['graphDiscovery']['parent_graphid'])
+			->setArgument('context', $data['context'])
 	));
 }
 
@@ -476,7 +481,7 @@ if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
-		url_params(['graphid', 'parent_discoveryid', 'hostid'])
+		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
 	);
 
 	if ($readonly) {
@@ -491,14 +496,14 @@ if ($data['graphid'] != 0) {
 		$updateButton, [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))
+			new CButtonCancel(url_params(['parent_discoveryid', 'context']).url_param('hostid', $data['hostid']))
 		]
 	));
 }
 else {
 	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))]
+		[new CButtonCancel(url_params(['parent_discoveryid', 'context']).url_param('hostid', $data['hostid']))]
 	));
 }
 

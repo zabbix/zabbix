@@ -879,7 +879,7 @@ class testFormWebStep extends CLegacyWebTest {
 	 * @dataProvider steps
 	 */
 	public function testFormWebStep_CreateSteps($data) {
-		$this->zbxTestLogin('httpconf.php?groupid=0&hostid=40001&form=Create+web+scenario');
+		$this->zbxTestLogin('httpconf.php?groupid=0&context=host&hostid=40001&form=Create+web+scenario');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestCheckHeader('Web monitoring');
 

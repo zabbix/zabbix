@@ -255,6 +255,7 @@ foreach ($data['rows'] as $row_index => $row) {
 			$item_key = (new CLink($item['key_expanded'], (new CUrl('items.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $item['itemid'])
+				->setArgument('context', 'host')
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREEN);

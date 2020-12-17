@@ -367,7 +367,7 @@ class testFormTriggerTags extends CWebTest {
 
 	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['fields']['Name']));
-		$this->page->open('triggers.php?form=update&triggerid='.$id.'&groupid=0');
+		$this->page->open('triggers.php?form=update&context=host&triggerid='.$id.'&groupid=0');
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
 

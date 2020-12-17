@@ -161,7 +161,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * Check resolved trigger context menu on overview page, if trigger url without {EVENT.ID} macro.
 	 */
 	public function testPageTriggerUrl_OverviewPageTriggerWithoutEventId() {
-		$url = 'triggers.php?form=update&triggerid=100039';
+		$url = 'triggers.php?form=update&triggerid=100039&context=host';
 		$filter = [
 			'Show' => 'Any',
 			'Name' => '3_trigger_Disaster'

@@ -829,7 +829,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
-		$item_url = 'items.php?filter_set=1&filter_hostids%5B0%5D=99134';
+		$item_url = 'items.php?filter_set=1&context=host&filter_hostids%5B0%5D=99134';
 		$macro = [
 			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'

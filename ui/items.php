@@ -225,6 +225,7 @@ $fields = [
 											')',
 										_('Password')
 									],
+	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -269,13 +270,12 @@ $fields = [
 	'filter_state' =>				[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
 										null
 									],
-	'filter_templated_items' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
+	'filter_inherited' =>			[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
 	'filter_with_triggers' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
-	'filter_discovery' =>			[T_ZBX_INT, O_OPT, null,
+	'filter_discovered' =>			[T_ZBX_INT, O_OPT, null,
 										IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
 										null
 									],
-	'filter_ipmi_sensor' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
 	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -283,9 +283,9 @@ $fields = [
 	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_templated_items' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_inherited' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_discovery' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -305,8 +305,8 @@ $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
 $subfiltersList = ['subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
-	'subfilter_state', 'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-	'subfilter_history', 'subfilter_trends', 'subfilter_discovery'
+	'subfilter_state', 'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+	'subfilter_history', 'subfilter_trends', 'subfilter_discovered'
 ];
 
 /*
@@ -346,87 +346,86 @@ if (!empty($hosts)) {
 	$_REQUEST['filter_hostids'] = [$host['hostid']];
 }
 
+$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+
 /*
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::updateArray('web.items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
-	CProfile::updateArray('web.items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
-	CProfile::update('web.items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_value_type', getRequest('filter_value_type', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_history', getRequest('filter_history', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_trends', getRequest('filter_trends', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_templated_items', getRequest('filter_templated_items', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_with_triggers', getRequest('filter_with_triggers', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_discovery', getRequest('filter_discovery', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.items.filter_ipmi_sensor', getRequest('filter_ipmi_sensor', ''), PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+	CProfile::update($prefix.'items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter_key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_value_type', getRequest('filter_value_type', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter_delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_history', getRequest('filter_history', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_trends', getRequest('filter_trends', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'items.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter_inherited', getRequest('filter_inherited', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter_with_triggers', getRequest('filter_with_triggers', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter_discovered', getRequest('filter_discovered', -1), PROFILE_TYPE_INT);
 
 	// subfilters
 	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
-		CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
+		CProfile::update($prefix.'items.'.$name, '', PROFILE_TYPE_STR);
 	}
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
-	if (count(CProfile::getArray('web.items.filter_hostids', [])) != 1) {
-		CProfile::deleteIdx('web.items.filter_hostids');
+	if (count(CProfile::getArray($prefix.'items.filter_hostids', [])) != 1) {
+		CProfile::deleteIdx($prefix.'items.filter_hostids');
 	}
-	CProfile::deleteIdx('web.items.filter_groupids');
-	CProfile::deleteIdx('web.items.filter_application');
-	CProfile::deleteIdx('web.items.filter_name');
-	CProfile::deleteIdx('web.items.filter_type');
-	CProfile::deleteIdx('web.items.filter_key');
-	CProfile::deleteIdx('web.items.filter_snmp_oid');
-	CProfile::deleteIdx('web.items.filter_value_type');
-	CProfile::deleteIdx('web.items.filter_delay');
-	CProfile::deleteIdx('web.items.filter_history');
-	CProfile::deleteIdx('web.items.filter_trends');
-	CProfile::deleteIdx('web.items.filter_status');
-	CProfile::deleteIdx('web.items.filter_state');
-	CProfile::deleteIdx('web.items.filter_templated_items');
-	CProfile::deleteIdx('web.items.filter_with_triggers');
-	CProfile::deleteIdx('web.items.filter_ipmi_sensor');
-	CProfile::deleteIdx('web.items.filter_discovery');
+	CProfile::deleteIdx($prefix.'items.filter_groupids');
+	CProfile::deleteIdx($prefix.'items.filter_application');
+	CProfile::deleteIdx($prefix.'items.filter_name');
+	CProfile::deleteIdx($prefix.'items.filter_type');
+	CProfile::deleteIdx($prefix.'items.filter_key');
+	CProfile::deleteIdx($prefix.'items.filter_snmp_oid');
+	CProfile::deleteIdx($prefix.'items.filter_value_type');
+	CProfile::deleteIdx($prefix.'items.filter_delay');
+	CProfile::deleteIdx($prefix.'items.filter_history');
+	CProfile::deleteIdx($prefix.'items.filter_trends');
+	CProfile::deleteIdx($prefix.'items.filter_status');
+	CProfile::deleteIdx($prefix.'items.filter_state');
+	CProfile::deleteIdx($prefix.'items.filter_inherited');
+	CProfile::deleteIdx($prefix.'items.filter_with_triggers');
+	CProfile::deleteIdx($prefix.'items.filter_discovered');
 	DBend();
 }
 
-$_REQUEST['filter_groupids'] = CProfile::getArray('web.items.filter_groupids', []);
-$_REQUEST['filter_hostids'] = CProfile::getArray('web.items.filter_hostids', []);
-$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application', '');
-$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name', '');
-$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
-$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key', '');
-$_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid', '');
-$_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
-$_REQUEST['filter_delay'] = CProfile::get('web.items.filter_delay', '');
-$_REQUEST['filter_history'] = CProfile::get('web.items.filter_history', '');
-$_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends', '');
-$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status', -1);
-$_REQUEST['filter_state'] = CProfile::get('web.items.filter_state', -1);
-$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
-$_REQUEST['filter_discovery'] = CProfile::get('web.items.filter_discovery', -1);
-$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
-$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor', '');
+$_REQUEST['filter_groupids'] = CProfile::getArray($prefix.'items.filter_groupids', []);
+$_REQUEST['filter_hostids'] = CProfile::getArray($prefix.'items.filter_hostids', []);
+$_REQUEST['filter_application'] = CProfile::get($prefix.'items.filter_application', '');
+$_REQUEST['filter_name'] = CProfile::get($prefix.'items.filter_name', '');
+$_REQUEST['filter_type'] = CProfile::get($prefix.'items.filter_type', -1);
+$_REQUEST['filter_key'] = CProfile::get($prefix.'items.filter_key', '');
+$_REQUEST['filter_snmp_oid'] = CProfile::get($prefix.'items.filter_snmp_oid', '');
+$_REQUEST['filter_value_type'] = CProfile::get($prefix.'items.filter_value_type', -1);
+$_REQUEST['filter_delay'] = CProfile::get($prefix.'items.filter_delay', '');
+$_REQUEST['filter_history'] = CProfile::get($prefix.'items.filter_history', '');
+$_REQUEST['filter_trends'] = CProfile::get($prefix.'items.filter_trends', '');
+$_REQUEST['filter_status'] = CProfile::get($prefix.'items.filter_status', -1);
+$_REQUEST['filter_state'] = CProfile::get($prefix.'items.filter_state', -1);
+$_REQUEST['filter_inherited'] = CProfile::get($prefix.'items.filter_inherited', -1);
+$_REQUEST['filter_discovered'] = CProfile::get($prefix.'items.filter_discovered', -1);
+$_REQUEST['filter_with_triggers'] = CProfile::get($prefix.'items.filter_with_triggers', -1);
 
 // subfilters
 foreach ($subfiltersList as $name) {
 	if (isset($_REQUEST['subfilter_set'])) {
 		$_REQUEST[$name] = getRequest($name, []);
-		CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
+		CProfile::update($prefix.'items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
 	}
 	else {
 		$_REQUEST[$name] = [];
-		$subfiltersVal = CProfile::get('web.items.'.$name);
-		if (!zbx_empty($subfiltersVal)) {
-			$_REQUEST[$name] = explode(';', $subfiltersVal);
+		$subfilters_value = CProfile::get($prefix.'items.'.$name);
+		if (!zbx_empty($subfilters_value)) {
+			$_REQUEST[$name] = explode(';', $subfilters_value);
 			$_REQUEST[$name] = array_combine($_REQUEST[$name], $_REQUEST[$name]);
 		}
 	}
@@ -1252,11 +1251,11 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 }
 // list of items
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$sortField = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	if (count($filter_hostids) == 1) {
 		$hostid = reset($filter_hostids);
@@ -1270,7 +1269,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $hostid,
-		'is_template' => true
+		'is_template' => true,
+		'context' => getRequest('context')
 	];
 
 	// items
@@ -1280,6 +1280,7 @@ else {
 			'itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'error',
 			'templateid', 'flags', 'state', 'master_itemid'
 		],
+		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTriggers' => ['triggerid'],
@@ -1378,20 +1379,16 @@ else {
 		$options['filter']['status'] = ITEM_STATUS_ACTIVE;
 		$options['filter']['state'] = $_REQUEST['filter_state'];
 	}
-	if (isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items'])
-			&& $_REQUEST['filter_templated_items'] != -1) {
-		$options['inherited'] = $_REQUEST['filter_templated_items'];
+
+	if (getRequest('filter_inherited', -1) != -1) {
+		$options['inherited'] = getRequest('filter_inherited');
 	}
-	if (isset($_REQUEST['filter_discovery']) && !zbx_empty($_REQUEST['filter_discovery'])
-			&& $_REQUEST['filter_discovery'] != -1) {
-		$options['filter']['flags'] = $_REQUEST['filter_discovery'];
+	if (getRequest('filter_discovered', -1) != -1) {
+		$options['filter']['flags'] = getRequest('filter_discovered');
 	}
 	if (isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers'])
 			&& $_REQUEST['filter_with_triggers'] != -1) {
 		$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
-	}
-	if (isset($_REQUEST['filter_ipmi_sensor']) && !zbx_empty($_REQUEST['filter_ipmi_sensor'])) {
-		$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 	}
 
 	$data['items'] = API::Item()->get($options);
@@ -1450,12 +1447,16 @@ else {
 					|| uint_in_array($item['status'], $_REQUEST['subfilter_status']),
 				'subfilter_state' => empty($_REQUEST['subfilter_state'])
 					|| uint_in_array($item['state'], $_REQUEST['subfilter_state']),
-				'subfilter_templated_items' => empty($_REQUEST['subfilter_templated_items'])
-					|| ($item['templateid'] == 0 && uint_in_array(0, $_REQUEST['subfilter_templated_items'])
-					|| ($item['templateid'] > 0 && uint_in_array(1, $_REQUEST['subfilter_templated_items']))),
-				'subfilter_discovery' => empty($_REQUEST['subfilter_discovery'])
-					|| ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && uint_in_array(0, $_REQUEST['subfilter_discovery'])
-					|| ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && uint_in_array(1, $_REQUEST['subfilter_discovery']))),
+				'subfilter_inherited' =>  !getRequest('subfilter_inherited')
+					|| ($item['templateid'] == 0 && uint_in_array(0, getRequest('subfilter_inherited'))
+					|| ($item['templateid'] > 0 && uint_in_array(1, getRequest('subfilter_inherited')))),
+				'subfilter_discovered' => !getRequest('subfilter_discovered')
+					|| ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
+						&& uint_in_array(0, getRequest('subfilter_discovered'))
+						|| ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+							&& uint_in_array(1, getRequest('subfilter_discovered'))
+						)
+					),
 				'subfilter_with_triggers' => empty($_REQUEST['subfilter_with_triggers'])
 					|| (count($item['triggers']) == 0 && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
 					|| (count($item['triggers']) > 0 && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])),
@@ -1508,7 +1509,7 @@ else {
 		if (!$atLeastOne) {
 			foreach ($subfiltersList as $name) {
 				$_REQUEST[$name] = [];
-				CProfile::update('web.items.'.$name, '', PROFILE_TYPE_STR);
+				CProfile::update($prefix.'items.'.$name, '', PROFILE_TYPE_STR);
 				foreach ($data['items'] as &$item) {
 					$item['subfilters'][$name] = true;
 				}
@@ -1517,7 +1518,7 @@ else {
 		}
 	}
 
-	$data['main_filter'] = getItemFilterForm($data['items']);
+	$data['main_filter'] = getItemFilterForm($data);
 
 	// Remove subfiltered items.
 	foreach ($data['items'] as $number => $item) {
@@ -1577,7 +1578,9 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder, new CUrl('items.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder,
+		(new CUrl('items.php'))->setArgument('context', $data['context'])
+	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 
