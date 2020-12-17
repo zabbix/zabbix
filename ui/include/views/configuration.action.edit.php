@@ -258,16 +258,23 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
-								ACTION_OPERATION.','.json_encode($operation_for_popup).')'
-							)
-							->addClass(ZBX_STYLE_BTN_LINK),
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_OPERATION
+							])),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('removeOperation('.$operationid.', '.ACTION_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
-							new CVar('operations['.$operationid.']', $operation)
+							new CVar('operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -279,16 +286,23 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
-								ACTION_OPERATION.','.json_encode($operation_for_popup).')'
-							)
-							->addClass(ZBX_STYLE_BTN_LINK),
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_OPERATION
+							])),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('removeOperation('.$operationid.', '.ACTION_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
-							new CVar('operations['.$operationid.']', $operation)
+							new CVar('operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -360,10 +374,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
-								ACTION_RECOVERY_OPERATION.','.json_encode($operation_for_popup).')'
-							)
-							->addClass(ZBX_STYLE_BTN_LINK),
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_RECOVERY_OPERATION
+							])),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick(
@@ -371,7 +389,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
-							new CVar('recovery_operations['.$operationid.']', $operation)
+							new CVar('recovery_operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -435,10 +456,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
-								ACTION_ACKNOWLEDGE_OPERATION.','.json_encode($operation_for_popup).')'
-							)
-							->addClass(ZBX_STYLE_BTN_LINK),
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_ACKNOWLEDGE_OPERATION
+							])),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_ACKNOWLEDGE_OPERATION.
@@ -446,7 +471,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 								)
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
-							new CVar('ack_operations['.$operationid.']', $operation)
+							new CVar('ack_operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_ACKNOWLEDGE_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)

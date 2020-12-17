@@ -952,7 +952,8 @@ footer {
         margin-left: 3px;
         margin-right: 3px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(3) > ul > li {
-      vertical-align: top; }
+      vertical-align: top;
+      height: 24px; }
     .filter-container.tabfilter-container nav > ul > li:nth-child(1), .filter-container.tabfilter-container nav > ul > li:nth-child(3) {
       white-space: nowrap; }
   .filter-container.tabfilter-container nav {
@@ -961,7 +962,7 @@ footer {
       display: inline-block;
       height: 22px;
       line-height: 22px;
-      vertical-align: middle; }
+      vertical-align: top; }
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
