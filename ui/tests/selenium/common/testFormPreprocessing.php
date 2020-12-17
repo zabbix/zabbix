@@ -1899,10 +1899,10 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
 		$this->query('id:param_add')->one()->click();
 
-		$this->assertTrue($this->query('xpath://select[@id="preprocessing_0_type"]'.
-				'//option[text()="Check for not supported value"]')->one()->isEnabled());
-		$this->assertFalse($this->query('xpath://select[@id="preprocessing_1_type"]'.
-				'//option[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertTrue($this->query('xpath://z-select[@id="preprocessing_0_type"]'.
+				'//li[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://z-select[@id="preprocessing_1_type"]'.
+				'//li[text()="Check for not supported value"]')->one()->isEnabled());
 	}
 
 	/*

@@ -70,14 +70,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->assertEquals($form->getField($name)->getValue(), $value);
 				switch ($value) {
 					case 'SNMP agent':
-						$this->assertTrue($form->query('id:filter_snmp_oid')->one()->isVisible());
+						$this->assertTrue($form->getField('SNMP OID')->isVisible());
 						break;
 					case 'Zabbix trapper':
-						$this->assertFalse($form->query('id:filter_delay_row')->one()->isVisible());
+						$this->assertFalse($form->getField('Update interval')->isVisible());
 						break;
 					case 'Normal':
 					case 'Not supported':
-						$this->assertFalse($form->query('id:filter_status')->one()->isEnabled());
+						$this->assertFalse($form->getField('Status')->isEnabled());
+						$this->assertEquals('all', $form->getField('Status')->getText());
 						break;
 				}
 			}
