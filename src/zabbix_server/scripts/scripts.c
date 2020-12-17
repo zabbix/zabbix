@@ -28,9 +28,20 @@
 #include "log.h"
 #include "zbxtasks.h"
 #include "scripts.h"
+#include "zbxjson.h"
+#include "zbxembed.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
+
+static zbx_es_t	es_engine;
+
+typedef struct
+{
+	char	*name;
+	char	*value;
+}
+zbx_webhook_param_t;
 
 static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)
@@ -367,6 +378,8 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
+		case ZBX_SCRIPT_TYPE_WEBHOOK:
+			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
 			{
@@ -436,6 +449,91 @@ out:
 	return ret;
 }
 
+static int	DBfetch_webhook_params(zbx_uint64_t scriptid, struct zbx_json *json_data)
+{
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect(
+			"select name,value from script_param"
+			" where scriptid=" ZBX_FS_UI64,
+			scriptid);
+
+	if (NULL == result)
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_webhook_param_t param;
+		param.name = zbx_strdup(param.name, row[0]);
+		param.value = zbx_strdup(param.value, row[1]);
+		zbx_json_addstring(json_data, param.name, param.value, ZBX_JSON_TYPE_STRING);
+		zbx_free(param.name);
+		zbx_free(param.value);
+	}
+
+	zbx_json_close(json_data);
+
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result)
+{
+        int             	size, ret = SUCCEED;
+        char            	*bytecode = NULL, *errmsg = NULL;
+        zbx_es_t        	es;
+	struct zbx_json		json_data;
+
+	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	DBfetch_webhook_params(scriptid, &json_data);
+        zbx_es_init(&es);
+
+        if (FAIL == zbx_es_init_env(&es, &errmsg))
+        {
+                *error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
+                zbx_free(errmsg);
+                return FAIL;
+        }
+
+        /*if (0 != timeout)
+                zbx_es_set_timeout(&es, timeout);*/
+
+        if (FAIL == zbx_es_compile(&es, command, &bytecode, &size, &errmsg))
+        {
+                *error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
+                zbx_free(errmsg);
+		ret = FAIL;
+                goto out;
+        }
+
+        if (FAIL == zbx_es_execute(&es, NULL, bytecode, size, json_data.buffer, result, &errmsg))
+        {
+                *error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
+                zbx_free(errmsg);
+		ret = FAIL;
+                goto out;
+        }
+out:
+        if (FAIL == zbx_es_destroy_env(&es, &errmsg))
+        {
+                zbx_error("cannot destroy scripting environment: %s", errmsg);
+                zbx_free(result);
+        }
+
+	zbx_free(bytecode);
+	zbx_free(errmsg);
+	zbx_json_free(&json_data);
+
+        return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_script_execute                                               *
@@ -458,6 +556,9 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 
 	switch (script->type)
 	{
+		case ZBX_SCRIPT_TYPE_WEBHOOK:
+			ret = zbx_global_webhook_execute(script->scriptid, script->command, &error, result);
+			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
 			{
