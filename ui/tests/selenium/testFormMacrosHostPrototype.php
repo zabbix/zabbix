@@ -183,7 +183,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getCreateHostPrototypeMacrosData
+	 * @dataProvider getCreateMacrosHostPrototypeData
 	 */
 	public function testFormMacrosHostPrototype_Create($data) {
 		$this->checkCreate($data, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
@@ -406,7 +406,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateHostPrototypeMacrosData
+	 * @dataProvider getUpdateMacrosHostPrototypeData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
 		$this->checkUpdate($data, $this->host_name_update, 'host-prototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
