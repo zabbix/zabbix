@@ -145,6 +145,17 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @param string|null $name
+	 *
+	 * @return self
+	 */
+	public function setName($name): self {
+		$this->name = $name;
+
+		return $this;
+	}
+
+	/**
 	 * @param int $width
 	 *
 	 * @return self
