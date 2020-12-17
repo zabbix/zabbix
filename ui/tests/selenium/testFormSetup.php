@@ -40,20 +40,20 @@ class testFormSetup extends CWebTest {
 		];
 	}
 
-	public function testFormSetup_checkWelcomeSectionLayout() {
+	public function testFormSetup_welcomeSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
-		// Check Welcome section
+		// Check Welcome section.
 		$this->assertEquals("Welcome to\nZabbix 5.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 	}
 
-	public function testFormSetup_checkPrerequisitesSectionLayout() {
+	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 		$this->clickSectionButton('Next step');
 
-		// Check Pre-requisites section
+		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
 		$headers = $this->query('class:list-table')->asTable()->one()->getHeadersText();
 		$this->assertEquals(['', 'Current value', 'Required', ''], $headers);
@@ -92,38 +92,38 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 	}
 
-	public function testFormSetup_checkDbConnectionSectionLayout() {
+	public function testFormSetup_dbConnectionSectionLayout() {
 		$this->openSpecifiedSection('Configure DB connection');
 
-		// Check Configure DB connection section
+		// Check Configure DB connection section.
 		$fields = [
-			'Database host',
-			'Database port',
-			'Database name',
-			'User',
-			'Password'
+			'Database host' => 'localhost',
+			'Database port' => '0',
+			'Database name' => 'zabbix',
+			'User' => 'zabbix',
+			'Password' => ''
 		];
 		$text = 'Please create database manually, and set the configuration parameters for connection to this database. '.
 				'Press "Next step" button when done.';
 		$this->checkPageTextElements('Configure DB connection', $text);
 		$form = $this->query('xpath://form')->asForm()->one();
 
-		// Check input fieldsin Configure DB connection section for each DB type
+		// Check input fieldsin Configure DB connection section for each DB type.
 		$db_parameters = $this->getDbParameters();
 		$db_types = $form->getField('Database type')->getOptions()->asText();
 		foreach ($db_types as $db_type) {
 			$form->getField('Database type')->select($db_type);
 			$form->invalidate();
-			switch($db_type) {
+			switch ($db_type) {
 				case 'Oracle':
 					$this->assertFalse($form->query('xpath://label[text()="Database schema"]')->one(false)->isDisplayed());
 					$this->assertFalse($form->query('xpath://label[text()="Database TLS encryption"]')->one(false)->isDisplayed());
 					break;
 
 				case 'MySQL':
-					// Check that Database schema field is not available
+					// Check that Database schema field is not available.
 					$this->assertFalse($form->query('xpath://label[text()="Database schema"]')->one(false)->isDisplayed());
-					// Check TLS fields if such should be displayed
+					// Check TLS fields if such should be displayed.
 					if ($db_parameters['Database host'] === 'localhost') {
 						$tls_text = 'Connection will not be encrypted because it uses a socket file (on Unix) or shared '.
 								'memory (Windows).';
@@ -137,27 +137,26 @@ class testFormSetup extends CWebTest {
 					break;
 
 				case 'PostgreSQL':
-					// Check that Database Schema and Database TLS encryption fields are visible
+					// Check that Database Schema and Database TLS encryption fields are visible.
 					$schema_field = $form->getField('Database schema');
-					$this->assertTrue($schema_field->isValid());
 					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
 					$this->checkTlsFieldsLayout();
 					break;
 			}
 
-			foreach ($fields as $field_name) {
+			foreach ($fields as $field_name => $field_value) {
 				$maxlength = ($field_name === 'Database port') ? 5 : 255;
 				$field = $form->getField($field_name);
-				$this->assertTrue($field->isValid());
+				$this->assertEquals($field_value, $field->getValue());
 				$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 			}
 		}
 	}
 
-	public function testFormSetup_checkZabbixServerSectionLayout() {
+	public function testFormSetup_zabbixServerSectionLayout() {
 		$this->openSpecifiedSection('Zabbix server details');
 
-		// Check Zabbix server details section
+		// Check Zabbix server details section.
 		$server_params = [
 			'Host' => 'localhost',
 			'Port' => '10051',
@@ -178,7 +177,7 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 	}
 
-	public function testFormSetup_checkSummarySection() {
+	public function testFormSetup_summarySection() {
 		$this->openSpecifiedSection('Pre-installation summary');
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
@@ -207,8 +206,8 @@ class testFormSetup extends CWebTest {
 		}
 		$summary_fields['Database port'] = ($db_parameters['Database port'] === '0') ? 'default' : $db_parameters['Database port'];
 		foreach ($summary_fields as $field_name => $value) {
-			$xpath = 'xpath://span[text()="'.$field_name.'"]/../../div[@class="table-forms-td-right"]';
-			// Assert contains is used as Password length can differ
+			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
+			// Assert contains is used as Password length can differ.
 			if ($field_name === 'Database password') {
 				$this->assertContains($value, $this->query($xpath)->one()->getText());
 			}
@@ -219,14 +218,14 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 	}
 
-	public function testFormSetup_checkInstallSection() {
+	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
 		$this->checkPageTextElements('Install', '/conf/zabbix.conf.php" created.');
 		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
 				$this->query('class:green')->one()->getText());
 		$this->checkButtons('last section');
 
-		// Check that Dashboard view is opened after completing the form
+		// Check that Dashboard view is opened after completing the form.
 		$this->query('button:Finish')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
@@ -234,7 +233,7 @@ class testFormSetup extends CWebTest {
 
 	public function getDbConnectionDetails() {
 		return [
-			// Incorrect DB host
+			// Incorrect DB host.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -419,7 +418,7 @@ class testFormSetup extends CWebTest {
 					'check_port' => 0
 				]
 			],
-			// Non-default port
+			// Non-default port.
 			[
 				[
 					'field' => [
@@ -435,33 +434,33 @@ class testFormSetup extends CWebTest {
 	/**
 	 * @dataProvider getDbConnectionDetails
 	 */
-	public function testFormSetup_checkDbConfigSectionParameters($data) {
-		// Prepare array with DB parameter values
+	public function testFormSetup_dbConfigSectionParameters($data) {
+		// Prepare array with DB parameter values.
 		$db_parameters = $this->getDbParameters();
 		$db_parameters[$data['field']['name']] = $data['field']['value'];
 
-		// Use default database port if specified in data provider
+		// Use default database port if specified in data provider.
 		if (array_key_exists('change_port', $data)) {
 			$db_parameters['Database port'] = ($db_parameters['Database type'] === 'PostgreSQL') ? 5432 : 3306;
 		}
 
-		// Skip the case with invalid DB schema if DB type is MySQL
+		// Skip the case with invalid DB schema if DB type is MySQL.
 		if ($data['field']['name'] === 'Database schema' && $db_parameters['Database type'] === 'MySQL') {
 
 			return;
 		}
-		// Open "Configure DB connection" section
+		// Open "Configure DB connection" section.
 		$this->openSpecifiedSection('Configure DB connection');
 
-		// Fill Database connection parameters
+		// Fill Database connection parameters.
 		$form = $this->query('xpath://form')->asForm()->one();
-		// Fill required TLS rellated field values
+		// Fill required TLS rellated field values.
 		if (array_key_exists('tls_encryption', $data)) {
-			// TLS fields are not present in case if DB type = MySQL and for DB host = localhost
+			// TLS fields are not present in case if DB type = MySQL and for DB host = localhost.
 			if (($db_parameters['Database type'] === 'MySQL' && $db_parameters['Database host'] === 'localhost')) {
 				$tls_text = 'Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows).';
 				$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
-				// Skip data provider as TLS encryption firlds are not visible
+				// Skip data provider as TLS encryption firlds are not visible.
 
 				return;
 			}
@@ -487,10 +486,10 @@ class testFormSetup extends CWebTest {
 			$this->assertEquals($data['check_port'], $form->getField('Database port')->getValue());
 		}
 
-		// Check the outcome for the specified database configuration
+		// Check the outcome for the specified database configuration.
 		$this->clickSectionButton('Next step');
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			// Define the reference error message details and assert error message
+			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {
 				$error_details = $data['error_details'];
 			}
@@ -507,7 +506,7 @@ class testFormSetup extends CWebTest {
 
 	public function getDbConnectionDetailsForTls() {
 		return [
-			// TLS available when IP address is used as host name - MySQL
+			// TLS available when IP address is used as host name - MySQL.
 			[
 				[
 					'fields' => [
@@ -517,7 +516,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS available when string is used as host name - MySQL
+			// TLS available when string is used as host name - MySQL.
 			[
 				[
 					'fields' => [
@@ -527,7 +526,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS available when empty space is used as host name - MySQL
+			// TLS available when empty space is used as host name - MySQL.
 			[
 				[
 					'fields' => [
@@ -537,7 +536,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS NOT available when host name is empty - MySQL
+			// TLS NOT available when host name is empty - MySQL.
 			[
 				[
 					'fields' => [
@@ -546,7 +545,7 @@ class testFormSetup extends CWebTest {
 					]
 				]
 			],
-			// TLS NOT available when host name is equal to "localhost" - MySQL
+			// TLS NOT available when host name is equal to "localhost" - MySQL.
 			[
 				[
 					'fields' => [
@@ -555,7 +554,7 @@ class testFormSetup extends CWebTest {
 					]
 				]
 			],
-			// TLS is available when host name starts with a slash - MySQL
+			// TLS is available when host name starts with a slash - MySQL.
 			[
 				[
 					'fields' => [
@@ -565,7 +564,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS available when IP address is used as host name - PostgreSQL
+			// TLS available when IP address is used as host name - PostgreSQL.
 			[
 				[
 					'fields' => [
@@ -575,7 +574,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS available when string is used as host name - PostgreSQL
+			// TLS available when string is used as host name - PostgreSQL.
 			[
 				[
 					'fields' => [
@@ -585,7 +584,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS available when empty space is used as host name - PostgreSQL
+			// TLS available when empty space is used as host name - PostgreSQL.
 			[
 				[
 					'fields' => [
@@ -595,7 +594,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS NOT available when host name is empty - PostgreSQL
+			// TLS NOT available when host name is empty - PostgreSQL.
 			[
 				[
 					'fields' => [
@@ -604,7 +603,7 @@ class testFormSetup extends CWebTest {
 					]
 				]
 			],
-			// TLS is available when host name is equal to "localhost" - PostgreSQL
+			// TLS is available when host name is equal to "localhost" - PostgreSQL.
 			[
 				[
 					'fields' => [
@@ -614,7 +613,7 @@ class testFormSetup extends CWebTest {
 					'tls_displayed' => true
 				]
 			],
-			// TLS NOT available when host name starts with a slash - PostgreSQL
+			// TLS NOT available when host name starts with a slash - PostgreSQL.
 			[
 				[
 					'fields' => [
@@ -629,18 +628,18 @@ class testFormSetup extends CWebTest {
 	/**
 	 * @dataProvider getDbConnectionDetailsForTls
 	 */
-	public function testFormSetup_checkTlsParameterPresence($data) {
-		// Open "Configure DB connection" section
+	public function testFormSetup_tlsParameterPresence($data) {
+		// Open "Configure DB connection" section.
 		$this->openSpecifiedSection('Configure DB connection');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$database_types = $form->getField('Database type')->getOptions()->asText();
 
-		// Skip data provider if the defined DB type is not available on the current machine
+		// Skip data provider if the defined DB type is not available on the current machine.
 		if (!in_array($data['fields']['Database type'], $database_types)) {
 
 			return;
 		}
-		// Fill DB parameters and check if TLS parameters are displayed
+		// Fill DB parameters and check if TLS parameters are displayed.
 		$form->fill($data['fields']);
 		$form->invalidate();
 		$this->page->removeFocus();
@@ -671,7 +670,7 @@ class testFormSetup extends CWebTest {
 		}
 	}
 
-	public function testFormSetup_checkZabbixServerSectionParameters() {
+	public function testFormSetup_zabbixServerSectionParameters() {
 		// Open Zabbix server configuration section.
 		$this->openSpecifiedSection('Zabbix server details');
 
@@ -697,7 +696,7 @@ class testFormSetup extends CWebTest {
 		$form->fill($server_parameters);
 		$this->clickSectionButton('Next step');
 
-		// Check that the fields are filled correctly in the Pre-installation summary section
+		// Check that the fields are filled correctly in the Pre-installation summary section.
 		$summary_fields = [
 			'Zabbix server' => $server_parameters['Host'],
 			'Zabbix server port' => $server_parameters['Port'],
@@ -705,23 +704,23 @@ class testFormSetup extends CWebTest {
 		];
 
 		foreach ($summary_fields as $field_name => $value) {
-			$xpath = 'xpath://span[text()="'.$field_name.'"]/../../div[@class="table-forms-td-right"]';
+			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
 			$this->assertEquals($value, $this->query($xpath)->one()->getText());
 		}
 		$this->clickSectionButton('Next step');
 
-		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place
+		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place.
 		sleep(3);
 		$this->clickSectionButton('Finish');
 
-		// Check Zabbix server params
+		// Check Zabbix server params.
 		$this->assertEquals($server_parameters['Name'].': Dashboard', $this->page->getTitle());
 		$system_info = CDashboardElement::find()->one()->getWidget('System information')->getContent();
 		$this->assertContains($server_parameters['Host'].':'.$server_parameters['Port'], $system_info->getText());
 	}
 
-	public function testFormSetup_checkBackButtons() {
-		// Open the Pre-installation summary section
+	public function testFormSetup_backButtons() {
+		// Open the Pre-installation summary section.
 		$this->openSpecifiedSection('Pre-installation summary');
 
 		// Proceed back to the 1st section of the setup form
@@ -742,13 +741,13 @@ class testFormSetup extends CWebTest {
 	}
 
 	public function testFormSetup_restoreServerConfig() {
-		// Open the last section of the setup form
+		// Open the last section of the setup form.
 		$this->openSpecifiedSection('Zabbix server details');
-		// Restore Zabbix server name field value
+		// Restore Zabbix server name field value.
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->getField('Name')->fill('TEST_SERVER_NAME');
 		$this->clickSectionButton('Next step', 2);
-		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place
+		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place.
 		sleep(3);
 		$this->clickSectionButton('Finish');
 	}
@@ -760,7 +759,7 @@ class testFormSetup extends CWebTest {
 	 * @param	string	$text		text that should be present in a paragraph of the current setup form section
 	 */
 	private function checkPageTextElements($title, $text = null) {
-		$this->assertTrue($this->query('xpath://h1[text()="'.$title.'"]')->one()->isValid());
+		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
 		$this->checkSections($title);
 		if ($text) {
 			$this->assertContains($text, $this->query('xpath:.//p')->one()->getText());
@@ -773,7 +772,7 @@ class testFormSetup extends CWebTest {
 	 * @param	string	$section	position of current section in the form (first, last, middle)
 	 */
 	private function checkButtons($section = 'middle section') {
-		switch($section) {
+		switch ($section) {
 			case 'first section':
 				$buttons = [
 					'Cancel' => true,
@@ -821,9 +820,9 @@ class testFormSetup extends CWebTest {
 		];
 
 		foreach ($sections as $section_name) {
-			$section = $this->query('xpath://li[text()="'.$section_name.'"]')->one();
+			$section = $this->query('xpath://li[text()='.CXPathHelper::escapeQuotes($section_name).']')->one();
 			$this->assertTrue($section->isValid());
-			// It is required to check that all sections are grayed out because Install is the last step
+			// It is required to check that all sections are grayed out because Install is the last step.
 			if ($section_name === $current || $current === 'Install') {
 				$this->assertEquals('setup-left-current', $section->getAttribute('class'));
 			}
@@ -850,17 +849,17 @@ class testFormSetup extends CWebTest {
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
 		$this->clickSectionButton('Next step', 2);
-		// No actions required in case of Configure DB connection section
+		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {
 			return;
 		}
-		// Define the number of clicks on the Next step button depending on the name of the desired section
+		// Define the number of clicks on the Next step button depending on the name of the desired section.
 		$skip_sections = [
 			'Zabbix server details' => 1,
 			'Pre-installation summary' => 2,
 			'Install' => 3
 		];
-		// Fill in DB parameters and navigate to the desired section
+		// Fill in DB parameters and navigate to the desired section.
 		$db_parameters = $this->getDbParameters();
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->fill($db_parameters);
@@ -881,7 +880,7 @@ class testFormSetup extends CWebTest {
 			'User' => $DB['USER'],
 			'Password' => $DB['PASSWORD']
 		];
-		$db_parameters['Database type'] = ($DB['TYPE'] === 'POSTGRESQL') ? 'PostgreSQL' : 'MySQL';
+		$db_parameters['Database type'] = ($DB['TYPE'] === ZBX_DB_POSTGRESQL) ? 'PostgreSQL' : 'MySQL';
 
 		return $db_parameters;
 	}
