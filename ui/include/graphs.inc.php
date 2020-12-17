@@ -302,7 +302,7 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$url = (new CUrl('graphs.php'));
+		$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
 
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
@@ -340,7 +340,9 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 		$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$url = (new CUrl('graphs.php'))->setArgument('form', 'update');
+			$url = (new CUrl('graphs.php'))
+				->setArgument('form', 'update')
+				->setArgument('context', 'template');
 
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);

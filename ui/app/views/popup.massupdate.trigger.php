@@ -36,6 +36,7 @@ $form = (new CForm())
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
+	->addVar('context', $data['context'])
 	->disablePasswordAutofill();
 
 	if ($data['prototype']) {

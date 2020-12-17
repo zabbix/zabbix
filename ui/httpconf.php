@@ -83,13 +83,14 @@ $fields = [
 	'ssl_cert_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_password'	=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'],
+	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
 		IN([-1, HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED]), null
 	],
-	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'filter_groupids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'filter_hostids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -544,7 +545,8 @@ if (isset($_REQUEST['form'])) {
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
-		'templates' => []
+		'templates' => [],
+		'context' => getRequest('context')
 	];
 
 	$host = API::Host()->get([
@@ -575,7 +577,8 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
 		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			$data['context']
 		);
 
 		$data['agent'] = ZBX_AGENT_OTHER;
@@ -739,31 +742,37 @@ if (isset($_REQUEST['form'])) {
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$data = [
+		'context' => getRequest('context')
+	];
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';
+
+	$sortField = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	if (hasRequest('filter_set')) {
-		CProfile::update('web.httpconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
-		CProfile::updateArray('web.httpconf.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
-		CProfile::updateArray('web.httpconf.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+		CProfile::update($prefix.'httpconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::updateArray($prefix.'httpconf.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
+		CProfile::updateArray($prefix.'httpconf.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 	}
 	elseif (hasRequest('filter_rst')) {
-		CProfile::delete('web.httpconf.filter_status');
-		CProfile::deleteIdx('web.httpconf.filter_groups');
+		CProfile::delete($prefix.'httpconf.filter_status');
+		CProfile::deleteIdx($prefix.'httpconf.filter_groupids');
 
-		$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.httpconf.filter_hostids', []));
+		$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'httpconf.filter_hostids', []));
 		if (count($filter_hostids) != 1) {
-			CProfile::deleteIdx('web.httpconf.filter_hostids');
+			CProfile::deleteIdx($prefix.'httpconf.filter_hostids');
 		}
 	}
 
 	$filter = [
-		'status' => CProfile::get('web.httpconf.filter_status', -1),
-		'groups' => CProfile::getArray('web.httpconf.filter_groups', null),
-		'hosts' => CProfile::getArray('web.httpconf.filter_hostids', null)
+		'status' => CProfile::get($prefix.'httpconf.filter_status', -1),
+		'groups' => CProfile::getArray($prefix.'httpconf.filter_groupids', null),
+		'hosts' => CProfile::getArray($prefix.'httpconf.filter_hostids', null)
 	];
 
 	// Get host groups.
@@ -781,18 +790,28 @@ else {
 		$filter_groupids = getSubGroups($filter_groupids);
 	}
 
-	// Get hosts.
-	$filter['hosts'] = $filter['hosts']
-		? CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $filter['hosts'],
-			'templated_hosts' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]), ['hostid' => 'id'])
-		: [];
+	if ($data['context'] === 'host') {
+		$filter['hosts'] = $filter['hosts']
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter['hosts'],
+				'editable' => true,
+				'preservekeys' => true
+			]), ['hostid' => 'id'])
+			: [];
+	}
+	else {
+		$filter['hosts'] = $filter['hosts']
+			? CArrayHelper::renameObjectsKeys(API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter['hosts'],
+				'editable' => true,
+				'preservekeys' => true
+			]), ['templateid' => 'id'])
+			: [];
+	}
 
-	$data = [
+	$data += [
 		'hostid' => (count($filter['hosts']) == 1)
 			? reset($filter['hosts'])['id']
 			: getRequest('hostid', 0),
@@ -802,25 +821,15 @@ else {
 		'paging' => null,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'profileIdx' => 'web.httpconf.filter',
-		'active_tab' => CProfile::get('web.httpconf.filter.active', 1)
+		'profileIdx' => $prefix.'httpconf.filter',
+		'active_tab' => CProfile::get($prefix.'httpconf.filter.active', 1)
 	];
-
-	// show the error column only for hosts
-	if (getRequest('hostid') != 0) {
-		$data['showInfoColumn'] = (bool) API::Host()->get([
-			'hostids' => getRequest('hostid'),
-			'output' => ['status']
-		]);
-	}
-	else {
-		$data['showInfoColumn'] = true;
-	}
 
 	$options = [
 		'output' => ['httptestid', $sortField],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids,
+		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
@@ -858,9 +867,12 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder, new CUrl('httpconf.php'));
+	$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder,
+		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
+	);
 
-	if($data['showInfoColumn']) {
+	// Get the error column data only for hosts.
+	if ($data['context'] === 'host') {
 		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
 
 		foreach ($httpTestsLastData as $httpTestId => &$lastData) {

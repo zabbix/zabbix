@@ -31,19 +31,22 @@ $widget = (new CWidget())
 				(new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->setArgument('form', 'create')
+					->setArgument('context', $data['context'])
 			))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
-// create form
-$triggersForm = (new CForm())
-	->setName('triggersForm')
-	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-
 $url = (new CUrl('trigger_prototypes.php'))
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->setArgument('context', $data['context'])
 	->getUrl();
+
+// create form
+$triggersForm = (new CForm('post', $url))
+	->setName('triggersForm')
+	->addVar('parent_discoveryid', $data['parent_discoveryid'])
+	->addVar('context', $data['context']);
 
 // create table
 $triggersTable = (new CTableInfo())
@@ -60,14 +63,15 @@ $triggersTable = (new CTableInfo())
 		_('Tags')
 	]);
 
-$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
-	'sources' => ['expression', 'recovery_expression']
+	'sources' => ['expression', 'recovery_expression'],
+	'context' => $data['context']
 ]);
 
-foreach ($this->data['triggers'] as $trigger) {
+foreach ($data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
-	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
+	$trigger['discoveryRuleid'] = $data['parent_discoveryid'];
 
 	// description
 	$description = [];
@@ -77,10 +81,11 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	$description[] = new CLink(
 		CHtml::encode($trigger['description']),
-		'trigger_prototypes.php?'.
-			'form=update'.
-			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&triggerid='.$triggerid
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('triggerid', $triggerid)
+			->setArgument('context', $data['context'])
 	);
 
 	if ($trigger['dependencies']) {
@@ -97,15 +102,21 @@ foreach ($this->data['triggers'] as $trigger) {
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
-					'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').
-						'&triggerid='.$depTrigger['triggerid']))
-					->addClass(triggerIndicatorStyle($depTrigger['status']));
+					(new CUrl('trigger_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+						->setArgument('triggerid', $depTrigger['triggerid'])
+						->setArgument('context', $data['context'])
+				))->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 			elseif ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
-					'triggers.php?form=update&triggerid='.$depTrigger['triggerid']))
-					->addClass(triggerIndicatorStyle($depTrigger['status']));
+					(new CUrl('triggers.php'))
+						->setArgument('form', 'update')
+						->setArgument('triggerid', $depTrigger['triggerid'])
+						->setArgument('context', $data['context'])
+				))->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 
 			$triggerDependencies[] = BR();
@@ -118,13 +129,15 @@ foreach ($this->data['triggers'] as $trigger) {
 	// status
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
-		'trigger_prototypes.php?'.
-			'action='.(($trigger['status'] == TRIGGER_STATUS_DISABLED)
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('g_triggerid', $triggerid)
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'triggerprototype.massenable'
 				: 'triggerprototype.massdisable'
-			).
-			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid']
+			)
+			->setArgument('context', $data['context'])
+			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status']))
@@ -140,6 +153,7 @@ foreach ($this->data['triggers'] as $trigger) {
 					? 'triggerprototype.discover.enable'
 					: 'triggerprototype.discover.disable'
 				)
+				->setArgument('context', $data['context'])
 				->setArgumentSID()
 				->getUrl()
 		))
@@ -175,7 +189,7 @@ foreach ($this->data['triggers'] as $trigger) {
 // append table to form
 $triggersForm->addItem([
 	$triggersTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'triggerprototype.massenable' => ['name' => _('Create enabled'),

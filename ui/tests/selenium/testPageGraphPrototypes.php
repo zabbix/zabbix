@@ -70,7 +70,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 	}
 
 	public function testPageGraphPrototypes_CheckLayout() {
-		$this->zbxTestLogin('graphs.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('graphs.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');
 		// Check create button.
@@ -135,7 +135,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
-		$this->zbxTestLogin('graphs.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('graphs.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 
 		if ($data['graphs'] != 'all') {
@@ -186,7 +186,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('graphs.php?parent_discoveryid='.$parent_discovery_id);
+		$this->zbxTestLogin('graphs.php?parent_discoveryid='.$parent_discovery_id.'&context=host');
 		$this->zbxTestCheckboxSelect('all_graphs');
 		$this->zbxTestClickButton('graph.massdelete');
 		$this->zbxTestAcceptAlert();

@@ -1756,7 +1756,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getFiltersTabData
 	 */
 	public function testFormLowLevelDiscovery_FiltersTab($data) {
-		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?form=create&context=host&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
@@ -1896,7 +1896,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getFiltersTabValidationData
 	 */
 	public function testFormLowLevelDiscovery_FiltersTabValidation($data) {
-		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?form=create&context=host&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
@@ -2028,7 +2028,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$sql_items = "SELECT * FROM items ORDER BY itemid";
 		$old_hash = CDBHelper::getHash($sql_items);
 
-		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$this->hostid.'&context=host');
 		$this->query('button:Create discovery rule')->one()->click();
 
 		$form = $this->query('name:itemForm')->asForm()->one();
@@ -2085,7 +2085,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	private function checkLLDMacrosFormFields($data) {
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
-		$this->page->open('host_discovery.php?form=update&itemid='.$id);
+		$this->page->open('host_discovery.php?form=update&context=host&itemid='.$id);
 		$form = $this->query('name:itemForm')->asForm()->one();
 		$form->selectTab('LLD macros');
 		$table = $form->getField('LLD macros');

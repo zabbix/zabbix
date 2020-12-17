@@ -27,29 +27,10 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		// Disable the status filter when using the state filter.
-		$('#filter_state').on('change', (event, save_value = true) => {
-			const $state = $(event.currentTarget);
-			const $status = $('#filter_status');
-
-			if ($state.val() == -1) {
-				// Restore the last remembered status filter value.
-				if ($status.prop('disabled') && typeof $status.data('last-value') !== 'undefined') {
-					$status.val($status.data('last-value'));
-				}
-
-				$status.prop('disabled', false);
-			}
-			else {
-				// Remember the last status filter value.
-				if (!$status.prop('disabled') && save_value) {
-					$status.data('last-value', $status.val());
-				}
-
-				$status
-					.prop('disabled', true)
-					.val(<?= ITEM_STATUS_ACTIVE ?>);
-			}
-		})
-		.trigger('change', false);
+		$('#filter_state')
+			.on('change', function() {
+				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
+			})
+			.trigger('change');
 	});
 </script>
