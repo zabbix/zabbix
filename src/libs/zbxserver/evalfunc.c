@@ -3309,7 +3309,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	value_esc = DBdyn_escape_string(value);
 	result = DBselect(
 			"select newvalue"
-			" from mappings"
+			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
 				" and value" ZBX_SQL_STRCMP,
 			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
