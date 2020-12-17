@@ -486,52 +486,53 @@ out:
 
 static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result)
 {
-        int             	size, ret = SUCCEED;
-        char            	*bytecode = NULL, *errmsg = NULL;
-        zbx_es_t        	es;
+	int			size, ret = SUCCEED;
+	char			*bytecode = NULL, *errmsg = NULL;
+	zbx_es_t		es;
 	struct zbx_json		json_data;
 
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	DBfetch_webhook_params(scriptid, &json_data);
-        zbx_es_init(&es);
+	zbx_es_init(&es);
 
-        if (FAIL == zbx_es_init_env(&es, &errmsg))
-        {
-                *error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
-                zbx_free(errmsg);
-                return FAIL;
-        }
+	if (FAIL == zbx_es_init_env(&es, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
+		zbx_free(errmsg);
+		return FAIL;
+	}
 
-        /*if (0 != timeout)
-                zbx_es_set_timeout(&es, timeout);*/
+	/*if (0 != timeout)
+		zbx_es_set_timeout(&es, timeout);*/
 
-        if (FAIL == zbx_es_compile(&es, command, &bytecode, &size, &errmsg))
-        {
-                *error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
-                zbx_free(errmsg);
+	if (FAIL == zbx_es_compile(&es, command, &bytecode, &size, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
+		zbx_free(errmsg);
 		ret = FAIL;
-                goto out;
-        }
+		goto out;
+	}
 
-        if (FAIL == zbx_es_execute(&es, NULL, bytecode, size, json_data.buffer, result, &errmsg))
-        {
-                *error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
-                zbx_free(errmsg);
+	if (FAIL == zbx_es_execute(&es, NULL, bytecode, size, json_data.buffer, result, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
+		zbx_free(errmsg);
 		ret = FAIL;
-                goto out;
-        }
+		goto out;
+	}
+
 out:
-        if (FAIL == zbx_es_destroy_env(&es, &errmsg))
-        {
-                zbx_error("cannot destroy scripting environment: %s", errmsg);
-                zbx_free(result);
-        }
+	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
+	{
+		zbx_error("cannot destroy scripting environment: %s", errmsg);
+		zbx_free(result);
+	}
 
 	zbx_free(bytecode);
 	zbx_free(errmsg);
 	zbx_json_free(&json_data);
 
-        return ret;
+	return ret;
 }
 
 /******************************************************************************
