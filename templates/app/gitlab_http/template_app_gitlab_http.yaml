@@ -1279,7 +1279,7 @@ zabbix_export:
         -
           macro: '{$GITLAB.REDIS.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of Redis client exeptions for trigger expression.'
+          description: 'Maximum number of Redis client exceptions for trigger expression.'
         -
           macro: '{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
           value: '1'

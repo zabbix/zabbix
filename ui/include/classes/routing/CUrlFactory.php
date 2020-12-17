@@ -36,9 +36,6 @@ class CUrlFactory {
 			'remove' => ['itemid'],
 			'add' => ['hostid', 'parent_discoveryid']
 		],
-		'discoveryconf.php' => [
-			'remove' => ['druleid']
-		],
 		'graphs.php' => [
 			'remove' => ['graphid'],
 			'add' => ['hostid', 'parent_discoveryid']

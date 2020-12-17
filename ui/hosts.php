@@ -40,7 +40,7 @@ $fields = [
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
-									'isset({form}) && {form} == "full_clone"'
+									'isset({form}) && ({form} == "clone" || {form} == "full_clone")'
 								],
 	'host' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})',
 									_('Host name')
@@ -76,6 +76,7 @@ $fields = [
 	'tls_issuer' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'tls_psk_identity' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
 	'tls_psk' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'psk_edit_mode' =>			[T_ZBX_INT, O_OPT, null,			IN([0,1]),	null],
 	'flags' =>					[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null
 								],
@@ -306,7 +307,7 @@ elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone')
 		unset($interface);
 	}
 
-	if (hasRequest('full_clone')) {
+	if (hasRequest('clone') || hasRequest('full_clone')) {
 		$_REQUEST['clone_hostid'] = $_REQUEST['hostid'];
 	}
 
@@ -343,8 +344,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$dbHost = API::Host()->get([
 				'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxy_hostid', 'ipmi_authtype',
-					'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_psk_identity',
-					'tls_psk', 'tls_issuer', 'tls_subject', 'flags'
+					'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
+					'tls_subject', 'flags'
 				],
 				'hostids' => $hostId,
 				'editable' => true
@@ -453,8 +454,27 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			];
 
 			if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || ($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$host['tls_psk_identity'] = getRequest('tls_psk_identity', '');
-				$host['tls_psk'] = getRequest('tls_psk', '');
+				// Add values to PSK fields from cloned host.
+				if ($create && (getRequest('form', '') === 'clone' || getRequest('form', '') === 'full_clone')
+						&& getRequest('clone_hostid', 0) != 0) {
+					$clone_hosts = API::Host()->get([
+						'output' => ['tls_psk_identity', 'tls_psk'],
+						'hostids' => getRequest('clone_hostid'),
+						'editable' => true
+					]);
+					$clone_host = reset($clone_hosts);
+
+					$host['tls_psk_identity'] = $clone_host['tls_psk_identity'];
+					$host['tls_psk'] = $clone_host['tls_psk'];
+				}
+
+				if (hasRequest('tls_psk_identity')) {
+					$host['tls_psk_identity'] = getRequest('tls_psk_identity');
+				}
+
+				if (hasRequest('tls_psk')) {
+					$host['tls_psk'] = getRequest('tls_psk');
+				}
 			}
 
 			if ($host['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
@@ -697,7 +717,8 @@ if (hasRequest('form')) {
 		'tls_issuer' => getRequest('tls_issuer', ''),
 		'tls_subject' => getRequest('tls_subject', ''),
 		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
-		'tls_psk' => getRequest('tls_psk', '')
+		'tls_psk' => getRequest('tls_psk', ''),
+		'psk_edit_mode' => getRequest('psk_edit_mode', 1)
 	];
 
 	if (!hasRequest('form_refresh')) {
@@ -705,7 +726,7 @@ if (hasRequest('form')) {
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'proxy_hostid', 'host', 'name', 'status', 'ipmi_authtype', 'ipmi_privilege',
 					'ipmi_username', 'ipmi_password', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-					'tls_subject', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
+					'tls_subject', 'inventory_mode'
 				],
 				'selectGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
@@ -768,8 +789,10 @@ if (hasRequest('form')) {
 			$data['tls_accept'] = $dbHost['tls_accept'];
 			$data['tls_issuer'] = $dbHost['tls_issuer'];
 			$data['tls_subject'] = $dbHost['tls_subject'];
-			$data['tls_psk_identity'] = $dbHost['tls_psk_identity'];
-			$data['tls_psk'] = $dbHost['tls_psk'];
+
+			if ($dbHost['tls_connect'] == HOST_ENCRYPTION_PSK || ($dbHost['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				$data['psk_edit_mode'] = 0;
+			}
 
 			// display empty visible name if equal to host name
 			if ($data['host'] === $data['visiblename']) {

@@ -388,15 +388,12 @@ $encryption_form_list = (new CFormList('encryption'))
 				->setAttribute('disabled', 'disabled')
 			)
 	)
-	->addRow(_('PSK identity'),
-		(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAttribute('disabled', 'disabled')
-	)
 	->addRow(_('PSK'),
-		(new CTextBox('tls_psk', $parentHost['tls_psk'], false, 512))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAttribute('disabled', 'disabled')
+		(new CSimpleButton(_('Change PSK')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->setEnabled(false),
+		null,
+		'tls_psk'
 	)
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $parentHost['tls_issuer'], false, 1024))

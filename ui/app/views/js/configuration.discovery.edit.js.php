@@ -154,7 +154,13 @@
 			var value = list[i];
 
 			if (typeof value.dcheckid === 'undefined') {
-				value.dcheckid = getUniqueId();
+				for (;;) {
+					value.dcheckid = getUniqueId();
+
+					if (typeof ZBX_CHECKLIST[value.dcheckid] === 'undefined') {
+						break;
+					}
+				}
 			}
 
 			if (typeof ZBX_CHECKLIST[value.dcheckid] === 'undefined') {
@@ -226,8 +232,9 @@
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(<?= json_encode(_('Add')) ?>)
-				.attr({id: 'add', name: 'add'});
+				.text(t('Add'))
+				.val('discovery.create')
+				.attr({id: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');
 			jQuery('#name').focus();
@@ -432,4 +439,9 @@
 
 		return false;
 	}
+
+	$(() => {
+		const $form = $(document.forms['discoveryForm']);
+		$form.on('submit', () => $form.trimValues(['#name', '#iprange', '#delay']));
+	});
 </script>
