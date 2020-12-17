@@ -148,8 +148,12 @@ $theme_select = (new CSelect('theme'))
 
 $language_error = null;
 if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
-	$lang_select->setReadonly();
-	$theme_select->setReadonly();
+	$lang_select
+		->setName(null)
+		->setReadonly();
+	$theme_select
+		->setName(null)
+		->setReadonly();
 	$timezone_select
 		->addOption(new CSelectOption(TIMEZONE_DEFAULT, $data['timezones'][TIMEZONE_DEFAULT]))
 		->setValue(TIMEZONE_DEFAULT)
