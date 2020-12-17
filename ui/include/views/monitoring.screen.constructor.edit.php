@@ -132,7 +132,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'dstfld1' => 'resourceid',
 					'real_hosts' => '1',
 					'with_graphs' => '1'
-				],
+				]
 			]
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -394,7 +394,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'real_hosts' => true,
 						'webitems' => true
 					]
-				],
+				]
 			]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(true)

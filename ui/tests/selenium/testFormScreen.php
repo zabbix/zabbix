@@ -60,7 +60,7 @@ class testFormScreen extends CLegacyWebTest {
 					'name' => 'Test Screen',
 					'error_msg' => 'Cannot add screen',
 					'errors' => [
-						'Screen "Test Screen" already exists.',
+						'Screen "Test Screen" already exists.'
 					]
 
 				]
@@ -73,7 +73,7 @@ class testFormScreen extends CLegacyWebTest {
 					'rows' => 1,
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "Name": cannot be empty.',
+						'Incorrect value for field "Name": cannot be empty.'
 					]
 
 				]
@@ -87,7 +87,7 @@ class testFormScreen extends CLegacyWebTest {
 					'remove_owner' => true,
 					'error_msg' => 'Cannot add screen',
 					'errors' => [
-						'Screen owner cannot be empty.',
+						'Screen owner cannot be empty.'
 					]
 				]
 			],
@@ -100,7 +100,7 @@ class testFormScreen extends CLegacyWebTest {
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value "0" for "Columns" field: must be between 1 and 100.',
-						'Incorrect value "0" for "Rows" field: must be between 1 and 100.',
+						'Incorrect value "0" for "Rows" field: must be between 1 and 100.'
 					]
 				]
 			],
@@ -113,7 +113,7 @@ class testFormScreen extends CLegacyWebTest {
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value "101" for "Columns" field: must be between 1 and 100.',
-						'Incorrect value "101" for "Rows" field: must be between 1 and 100.',
+						'Incorrect value "101" for "Rows" field: must be between 1 and 100.'
 					]
 				]
 			]

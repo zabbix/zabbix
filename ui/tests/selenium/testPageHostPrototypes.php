@@ -46,7 +46,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 			$this->assertFalse($element->isEnabled());
 		}
 
-		$this->assertRowCount(self::HOST_PROTOTYPES_COUNT);
+		$this->assertTableStats(self::HOST_PROTOTYPES_COUNT);
 
 		// Check tags on the specific host prototype.
 		$tags = $table->findRow('Name', 'Host prototype {#1}')->getColumn('Tags')->query('class:tag')->all();

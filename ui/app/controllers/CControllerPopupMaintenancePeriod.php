@@ -101,7 +101,7 @@ class CControllerPopupMaintenancePeriod extends CController {
 			case TIMEPERIOD_TYPE_WEEKLY:
 				$rules = [
 					'every'	=>		'required|ge 1',
-					'days' =>		'required|not_empty',
+					'days' =>		'required|not_empty'
 				];
 
 				break;

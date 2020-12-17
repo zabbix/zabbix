@@ -71,10 +71,10 @@ class CRoleHelper {
 	public const ACTIONS_EDIT_DASHBOARDS = 'actions.edit_dashboards';
 	public const ACTIONS_EDIT_MAPS = 'actions.edit_maps';
 	public const ACTIONS_EDIT_MAINTENANCE = 'actions.edit_maintenance';
+	public const ACTIONS_ADD_PROBLEM_COMMENTS = 'actions.add_problem_comments';
+	public const ACTIONS_CHANGE_SEVERITY = 'actions.change_severity';
 	public const ACTIONS_ACKNOWLEDGE_PROBLEMS = 'actions.acknowledge_problems';
 	public const ACTIONS_CLOSE_PROBLEMS = 'actions.close_problems';
-	public const ACTIONS_CHANGE_SEVERITY = 'actions.change_severity';
-	public const ACTIONS_ADD_PROBLEM_COMMENTS = 'actions.add_problem_comments';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_DEFAULT_ACCESS = 'actions.default_access';
 	public const DEFAULT_ACCESS_DISABLED = 0;
@@ -229,7 +229,7 @@ class CRoleHelper {
 			self::API_ACCESS => (bool) $role['rules'][self::API_ACCESS],
 			self::API_MODE => (bool) $role['rules'][self::API_MODE],
 			self::SECTION_API => $role['rules'][self::SECTION_API],
-			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS],
+			self::ACTIONS_DEFAULT_ACCESS => (bool) $role['rules'][self::ACTIONS_DEFAULT_ACCESS]
 		];
 
 		foreach ($role['rules'][self::SECTION_UI] as $rule) {
@@ -486,10 +486,10 @@ class CRoleHelper {
 		}
 
 		$labels += [
+			self::ACTIONS_ADD_PROBLEM_COMMENTS => _('Add problem comments'),
+			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
 			self::ACTIONS_ACKNOWLEDGE_PROBLEMS => _('Acknowledge problems'),
 			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
-			self::ACTIONS_CHANGE_SEVERITY => ('Change severity'),
-			self::ACTIONS_ADD_PROBLEM_COMMENTS => _('Add problem comments'),
 			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts')
 		];
 

@@ -105,10 +105,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
 			],
 			'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
-			'allowed_ack' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 		]));
 	}
 

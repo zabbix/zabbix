@@ -63,7 +63,7 @@ class CRowTest extends CTagTest {
 			[
 				['', null, 'myid'],
 				'<tr id="myid"><td></td></tr>'
-			],
+			]
 		];
 	}
 

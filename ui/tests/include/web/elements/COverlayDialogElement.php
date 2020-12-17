@@ -100,7 +100,7 @@ class COverlayDialogElement extends CElement {
 	 */
 	public function close() {
 		$this->query('class:overlay-close-btn')->one()->click();
-		return $this->waitUntilNotPresent();
+		return $this->ensureNotPresent();
 	}
 
 	/**

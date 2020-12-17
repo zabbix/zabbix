@@ -272,7 +272,7 @@ class CUser extends CApiService {
 		}
 
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
-		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
@@ -402,7 +402,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
-		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
@@ -847,7 +847,7 @@ class CUser extends CApiService {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
 				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their role.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change own role.'));
 				}
 
 				if (array_key_exists('usrgrps', $user)) {

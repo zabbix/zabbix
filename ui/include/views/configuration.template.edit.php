@@ -184,7 +184,7 @@ if ($data['form'] === 'full_clone') {
 		'inherited' => false,
 		'hostids' => $data['templateid'],
 		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND
 	]);
 	if (!empty($hostGraphs)) {
 		$graphsList = [];
@@ -204,7 +204,7 @@ if ($data['form'] === 'full_clone') {
 	$hostDiscoveryRules = API::DiscoveryRule()->get([
 		'inherited' => false,
 		'hostids' => $data['templateid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND
 	]);
 
 	if ($hostDiscoveryRules) {
@@ -228,7 +228,7 @@ if ($data['form'] === 'full_clone') {
 			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		]);
 
 		if ($hostItemPrototypes) {
@@ -273,7 +273,7 @@ if ($data['form'] === 'full_clone') {
 			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		]);
 		if (!empty($hostGraphPrototypes)) {
 			$prototypeList = [];
@@ -293,7 +293,7 @@ if ($data['form'] === 'full_clone') {
 	// Dashboards
 	$dashboards = API::TemplateDashboard()->get([
 		'output' => ['dashboardid', 'name'],
-		'templateids' => $data['templateid'],
+		'templateids' => $data['templateid']
 	]);
 	if (!empty($dashboards)) {
 		$dashboardList = [];

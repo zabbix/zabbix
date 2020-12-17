@@ -366,9 +366,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	const char *q;
 	const char *r;
 	char *t;
-	long len;
-	long diff;
-	unsigned long count = 0;
+	long len, diff, count = 0;
 
 	assert(str);
 	assert(sub_str1);

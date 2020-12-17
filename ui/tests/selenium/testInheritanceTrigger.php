@@ -131,7 +131,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		$template_tags = [
 			['name'=>'template', 'value'=>'template'],
-			['name'=>'test', 'value'=>'inheritance'],
+			['name'=>'test', 'value'=>'inheritance']
 		];
 		$template_tags_count = count($template_tags);
 
@@ -153,7 +153,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		$templated_trigger_tags = [
 			['name'=>'tag1', 'value'=>'trigger'],
-			['name'=>'tag2', 'value'=>'templated'],
+			['name'=>'tag2', 'value'=>'templated']
 		];
 		$templated_trigger_tags_count = count($templated_trigger_tags);
 

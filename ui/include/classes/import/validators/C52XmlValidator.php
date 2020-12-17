@@ -2420,7 +2420,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_HOST:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_HOST:
 				return ['type' => XML_ARRAY, 'rules' => [
-					'host' => ['type' => XML_STRING | XML_REQUIRED],
+					'host' => ['type' => XML_STRING | XML_REQUIRED]
 				]];
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
@@ -2428,7 +2428,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 				return ['type' => XML_ARRAY, 'rules' => [
 					'host' => ['type' => XML_STRING | XML_REQUIRED],
-					'key' => ['type' => XML_STRING | XML_REQUIRED],
+					'key' => ['type' => XML_STRING | XML_REQUIRED]
 				]];
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
@@ -2436,7 +2436,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 				return ['type' => XML_ARRAY, 'rules' => [
 					'host' => ['type' => XML_STRING | XML_REQUIRED],
-					'name' => ['type' => XML_STRING | XML_REQUIRED],
+					'name' => ['type' => XML_STRING | XML_REQUIRED]
 				]];
 			default:
 				return ['type' => XML_STRING | XML_REQUIRED];
