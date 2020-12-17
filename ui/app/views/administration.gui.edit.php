@@ -28,8 +28,11 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $gui_tab = (new CFormList())
-	->addRow(_('Default theme'),
-		(new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes()))
+	->addRow(new CLabel(_('Default theme'), 'label-default-theme'),
+		(new CSelect('default_theme'))
+			->setFocusableElementId('label-default-theme')
+			->setValue($data['default_theme'])
+			->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),

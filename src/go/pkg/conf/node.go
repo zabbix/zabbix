@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// Package conf provides .conf file loading and unmarshaling
+// Package conf provides .conf file loading and unmarshalling
 package conf
 
 import (

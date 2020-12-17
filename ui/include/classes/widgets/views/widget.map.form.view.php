@@ -50,7 +50,7 @@ $form_list->addRow(
 if (array_key_exists('filter_widget_reference', $fields)) {
 	$form_list->addRow(
 		CWidgetHelper::getLabel($fields['filter_widget_reference']),
-		CWidgetHelper::getEmptyComboBox($fields['filter_widget_reference'])
+		CWidgetHelper::getEmptySelect($fields['filter_widget_reference'])
 	);
 	$scripts[] = $fields['filter_widget_reference']->getJavascript();
 }

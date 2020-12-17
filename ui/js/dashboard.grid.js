@@ -61,6 +61,10 @@
 			widget_actions['itemid'] = widget['fields']['itemid'];
 		}
 
+		if (widget.fields.dynamic && widget.fields.dynamic == 1 && data.dashboard.dynamic_hostid !== null) {
+			widget_actions['dynamic_hostid'] = data.dashboard.dynamic_hostid;
+		}
+
 		widget['content_header'] = $('<div>', {'class': classes['head']})
 			.append($('<h4>').text((widget['header'] !== '')
 				? widget['header']
@@ -2416,6 +2420,7 @@
 					promiseScrollIntoView($obj, data, pos)
 						.then(function() {
 							methods.addWidget.call($obj, widget_data);
+							data['pos-action'] = '';
 
 							// New widget is last element in data['widgets'] array.
 							widget = data['widgets'].slice(-1)[0];
@@ -2560,7 +2565,10 @@
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'action': function() {}
+					'action': function() {
+						// Clear action.
+						data['pos-action'] = '';
+					}
 				}
 			],
 			'dialogueid': 'widgetConfg'
@@ -2771,9 +2779,6 @@
 		// Add new widget user interaction handlers.
 		$.subscribe('overlay.close', function(e, dialogue) {
 			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
-				data['pos-action'] = '';
-
-				resizeDashboardGrid($obj, data);
 				resetNewWidgetPlaceholderState(data);
 			}
 		});
@@ -2871,7 +2876,7 @@
 					return;
 				}
 
-				if (data['pos-action'] !== 'add' && !$target.is($obj)
+				if (data['pos-action'] !== 'add' && data['pos-action'] !== 'addmodal' && !$target.is($obj)
 						&& !$target.is(data.new_widget_placeholder.getObject())
 						&& !data.new_widget_placeholder.getObject().has($target).length) {
 					data.add_widget_dimension = {};
@@ -3565,6 +3570,15 @@
 			$.each(data['widgets'], function(index, widget) {
 				if (widget.fields.dynamic && widget.fields.dynamic == 1) {
 					updateWidgetContent($this, data, widget);
+
+					var widget_actions = $('.btn-widget-action', widget['content_header']).data('menu-popup').data;
+
+					if (data.dashboard.dynamic_hostid !== null) {
+						widget_actions.dynamic_hostid = data.dashboard.dynamic_hostid;
+					}
+					else {
+						delete widget_actions.dynamic_hostid;
+					}
 				}
 			});
 		},
@@ -3869,6 +3883,8 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['pos-action'] = 'paste';
+
 				hideMessageExhausted(data);
 
 				var new_widget = data.storage.readKey('dashboard.copied_widget');
@@ -3971,6 +3987,7 @@
 					.always(function() {
 						// Mark dashboard as updated.
 						data['options']['updated'] = true;
+						data['pos-action'] = '';
 
 						clearDashboardBusy(data, 'pasteWidget', dashboard_busy_item);
 					});
@@ -4320,6 +4337,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['pos-action'] = 'addmodal';
 				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},

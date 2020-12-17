@@ -805,7 +805,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($groupLinks as $groupLink) {
 			$result[] = [
-				'group' => $groupLink['groupid'],
+				'group' => $groupLink['groupid']
 			];
 		}
 

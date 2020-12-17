@@ -1,0 +1,1329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-11-09T12:44:49Z</date>
+   <groups>
+      <group>
+         <name>Templates/Modules</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Net Morningstar TriStar PWM SNMP</template>
+         <name>Template Net Morningstar TriStar PWM SNMP</name>
+         <description>MIBs used:&#13;
+TRISTAR&#13;
+&#13;
+Template tooling version used: 0.38</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Array</name>
+            </application>
+            <application>
+               <name>Battery</name>
+            </application>
+            <application>
+               <name>Counter</name>
+            </application>
+            <application>
+               <name>Load</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Battery: Battery Voltage discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.30.0</snmp_oid>
+               <key>battery.voltage.discovery[batteryVoltage.0]</key>
+               <delay>15m</delay>
+               <history>0</history>
+               <value_type>FLOAT</value_type>
+               <units>V</units>
+               <description>MIB: TRISTAR&#13;
+Description:Battery voltage&#13;
+Scaling Factor:0.002950042724609375&#13;
+Units:V&#13;
+Range:[0.0, 80.0]&#13;
+Modbus address:0x0008</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.002950042725</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Status: Control Mode</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.45.0</snmp_oid>
+               <key>control.mode[controlMode.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>MIB: TRISTAR&#13;
+Description:Control Mode&#13;
+Modbus address:0x001A&#13;
+&#13;
+0: charge&#13;
+1: loadControl&#13;
+2: diversion&#13;
+3: lighting</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>TriStar PWM control mode</name>
+               </valuemap>
+            </item>
+            <item>
+               <name>Counter: Amp-hours</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.39.0</snmp_oid>
+               <key>counter.charge_amp_hours[ahResettable.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Ah</units>
+               <description>MIB: TRISTAR&#13;
+Description:Ah (Resettable)&#13;
+Scaling Factor:0.1&#13;
+Units:Ah&#13;
+Range:[0.0, 50000.0]&#13;
+Modbus addresses:H=0x0011 L=0x0012</description>
+               <applications>
+                  <application>
+                     <name>Counter</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.1</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Counter: KW-hours</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.49.0</snmp_oid>
+               <key>counter.charge_kw_hours[kilowattHours.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!kWh</units>
+               <description>MIB: TRISTAR&#13;
+Description:Kilowatt Hours&#13;
+Scaling Factor:1.0&#13;
+Units:kWh&#13;
+Range:[0.0, 5000.0]&#13;
+Modbus address:0x001E</description>
+               <applications>
+                  <application>
+                     <name>Counter</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+                  <step>
+                     <type>REGEX</type>
+                     <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Status: Alarms</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.42.0</snmp_oid>
+               <key>status.alarms[alarms.0]</key>
+               <history>1h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>MIB: TRISTAR&#13;
+Description:Alarms&#13;
+Modbus addresses:H=0x001D L=0x0017</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var FIELDS = [
+  'rtsOpen',
+  'rtsShorted',
+  'rtsDisconnected',
+  'heatsinkTempSensorOpen',
+  'heatsinkTempSensorShorted',
+  'tristarHot',
+  'currentLimit',
+  'currentOffset',
+  'batterySense',
+  'batterySenseDisconnected',
+  'uncalibrated',
+  'rtsMiswire',
+  'highVoltageDisconnect',
+  'diversionLoadNearMax',
+  'systemMiswire',
+  'mosfetSOpen',
+  'p12VoltageReferenceOff',
+  'loadDisconnectState',
+];
+
+var flags = parseInt(value.replace(/\x20/g, ''), 16),
+  result = [];
+
+for (var i = 0, f = 1 &lt;&lt; 31 &gt;&gt;&gt; 0, l = FIELDS.length; i &lt; l; i++, f &gt;&gt;&gt;= 1) {
+    if (flags &amp; f) {
+        result.push(FIELDS[i]);
+    }
+}
+
+return result.length ? result.join('\n') : 'No alarms';
+</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{count(#3,"rtsShorted","like")}=2</expression>
+                     <name>Status: Device has "rtsShorted" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"rtsDisconnected","like")}=2</expression>
+                     <name>Status: Device has "rtsDisconnected" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"heatsinkTempSensorOpen","like")}=2</expression>
+                     <name>Status: Device has "heatsinkTempSensorOpen" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"heatsinkTempSensorShorted","like")}=2</expression>
+                     <name>Status: Device has "heatsinkTempSensorShorted" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"tristarHot","like")}=2</expression>
+                     <name>Status: Device has "tristarHot" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"currentLimit","like")}=2</expression>
+                     <name>Status: Device has "currentLimit" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"currentOffset","like")}=2</expression>
+                     <name>Status: Device has "currentOffset" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"batterySense","like")}=2</expression>
+                     <name>Status: Device has "batterySense" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"batterySenseDisconnected","like")}=2</expression>
+                     <name>Status: Device has "batterySenseDisconnected" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"uncalibrated","like")}=2</expression>
+                     <name>Status: Device has "uncalibrated" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"rtsMiswire","like")}=2</expression>
+                     <name>Status: Device has "rtsMiswire" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
+                     <name>Status: Device has "highVoltageDisconnect" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"diversionLoadNearMax","like")}=2</expression>
+                     <name>Status: Device has "diversionLoadNearMax" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"systemMiswire","like")}=2</expression>
+                     <name>Status: Device has "systemMiswire" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"mosfetSOpen","like")}=2</expression>
+                     <name>Status: Device has "mosfetSOpen" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"p12VoltageReferenceOff","like")}=2</expression>
+                     <name>Status: Device has "p12VoltageReferenceOff" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"loadDisconnectState","like")}=2</expression>
+                     <name>Status: Device has "loadDisconnectState" alarm flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Status: Faults</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.43.0</snmp_oid>
+               <key>status.faults[faults.0]</key>
+               <history>1h</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>MIB: TRISTAR&#13;
+Description:Battery voltage&#13;
+Scaling Factor:0.002950042724609375&#13;
+Units:V&#13;
+Range:[0.0, 80.0]&#13;
+Modbus address:0x0008</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var FIELDS = [
+  'externalShort',
+  'overcurrent',
+  'mosfetSShorted',
+  'softwareFault',
+  'highVoltageDisconnect',
+  'tristarHot',
+  'dipSwitchChange',
+  'customSettingsEdit',
+  'reset',
+  'systemMiswire',
+  'rtsShorted',
+  'rtsDisconnected',
+];
+
+var flags = parseInt(value.replace(/\x20/g, ''), 16),
+  result = [];
+
+for (var i = 0, f = 1 &lt;&lt; 31 &gt;&gt;&gt; 0, l = FIELDS.length; i &lt; l; i++, f &gt;&gt;&gt;= 1) {
+    if (flags &amp; f) {
+        result.push(FIELDS[i]);
+    }
+}
+
+return result.length ? result.join('\n') : 'No faults';
+</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{count(#3,"externalShort","like")}=2</expression>
+                     <name>Status: Device has "externalShort" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"overcurrent","like")}=2</expression>
+                     <name>Status: Device has "overcurrent" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"mosfetSShorted","like")}=2</expression>
+                     <name>Status: Device has "mosfetSShorted" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"softwareFault","like")}=2</expression>
+                     <name>Status: Device has "softwareFault" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"highVoltageDisconnect","like")}=2</expression>
+                     <name>Status: Device has "highVoltageDisconnect" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"tristarHot","like")}=2</expression>
+                     <name>Status: Device has "tristarHot" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"dipSwitchChange","like")}=2</expression>
+                     <name>Status: Device has "dipSwitchChange" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"customSettingsEdit","like")}=2</expression>
+                     <name>Status: Device has "customSettingsEdit" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"reset","like")}=2</expression>
+                     <name>Status: Device has "reset" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"systemMiswire","like")}=2</expression>
+                     <name>Status: Device has "systemMiswire" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"rtsShorted","like")}=2</expression>
+                     <name>Status: Device has "rtsShorted" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{count(#3,"rtsDisconnected","like")}=2</expression>
+                     <name>Status: Device has "rtsDisconnected" faults flag</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Status: Uptime</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+               <key>status.uptime</key>
+               <history>7d</history>
+               <units>uptime</units>
+               <description>Device uptime in seconds</description>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Status: Device has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(5m)}=1</expression>
+                     <name>Status: Failed to fetch data (or no data for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 5 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Temperature: Battery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.37.0</snmp_oid>
+               <key>temp.battery[batteryTemperature.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>C</units>
+               <description>MIB: TRISTAR&#13;
+Description:Battery Temperature&#13;
+Scaling Factor:1.0&#13;
+Units:deg C&#13;
+Range:[-40, 120]&#13;
+Modbus address:0x000F</description>
+               <applications>
+                  <application>
+                     <name>Temperature</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{max(5m)}&lt;{$BATTERY.TEMP.MIN.WARN}</expression>
+                     <name>Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
+                           <expression>{Template Net Morningstar TriStar PWM SNMP:temp.battery[batteryTemperature.0].max(5m)}&lt;{$BATTERY.TEMP.MIN.CRIT}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{max(5m)}&lt;{$BATTERY.TEMP.MIN.CRIT}</expression>
+                     <name>Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$BATTERY.TEMP.MAX.WARN}</expression>
+                     <name>Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>WARNING</priority>
+                     <dependencies>
+                        <dependency>
+                           <name>Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)</name>
+                           <expression>{Template Net Morningstar TriStar PWM SNMP:temp.battery[batteryTemperature.0].min(5m)}&gt;{$BATTERY.TEMP.MAX.CRIT}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$BATTERY.TEMP.MAX.CRIT}</expression>
+                     <name>Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)</name>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Temperature: Heatsink</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>1.3.6.1.4.1.33333.8.36.0</snmp_oid>
+               <key>temp.heatsink[heatsinkTemperature.0]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>C</units>
+               <description>MIB: TRISTAR&#13;
+Description:Heatsink Temperature&#13;
+Scaling Factor:1.0&#13;
+Units:deg C&#13;
+Range:[-40, 120]&#13;
+Modbus address:0x000E</description>
+               <applications>
+                  <application>
+                     <name>Temperature</name>
+                  </application>
+               </applications>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Battery voltage discovery</name>
+               <type>DEPENDENT</type>
+               <key>battery.voltage.discovery</key>
+               <delay>0</delay>
+               <description>Discovery for battery voltage triggers</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Battery: Voltage{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.30.0</snmp_oid>
+                     <key>battery.voltage[batteryVoltage.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: TRISTAR&#13;
+Description:Battery voltage&#13;
+Scaling Factor:0.002950042724609375&#13;
+Units:V&#13;
+Range:[0.0, 80.0]&#13;
+Modbus address:0x0008</description>
+                     <applications>
+                        <application>
+                           <name>Battery</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.002950042725</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.WARN}</expression>
+                           <name>Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
+                                 <expression>{Template Net Morningstar TriStar PWM SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{max(5m)}&lt;{#VOLTAGE.MIN.CRIT}</expression>
+                           <name>Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.WARN}</expression>
+                           <name>Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
+                                 <expression>{Template Net Morningstar TriStar PWM SNMP:battery.voltage[batteryVoltage.0{#SINGLETON}].min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{#VOLTAGE.MAX.CRIT}</expression>
+                           <name>Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Battery: Voltage{#SINGLETON}</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Morningstar TriStar PWM SNMP</host>
+                              <key>battery.voltage[batteryVoltage.0{#SINGLETON}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>battery.voltage.discovery[batteryVoltage.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var v_range = [
+      [[0, 18], [12, 15, 11.5, 15.5]],
+      [[18, 36], [24, 30, 23, 31]],
+      [[36, 99], [48, 60, 46, 62]],
+  ],
+  result = [];
+
+for (var idx in v_range) {
+    if (v_range[idx][0][0] &lt; value &amp;&amp; value &lt;= v_range[idx][0][1]) {
+        result = [{
+            '{#VOLTAGE.MIN.WARN}': parseInt({$VOLTAGE.MIN.WARN}) || v_range[idx][1][0],
+            '{#VOLTAGE.MAX.WARN}': parseInt({$VOLTAGE.MAX.WARN}) || v_range[idx][1][1],
+            '{#VOLTAGE.MIN.CRIT}': parseInt({$VOLTAGE.MIN.CRIT}) || v_range[idx][1][2],
+            '{#VOLTAGE.MAX.CRIT}': parseInt({$VOLTAGE.MAX.CRIT}) || v_range[idx][1][3],
+            '{#SINGLETON}': ''
+        }];
+        break;
+    }
+}
+
+return JSON.stringify(result);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Charge + Diversion mode discovery</name>
+               <type>DEPENDENT</type>
+               <key>controlmode.charge_diversion.discovery</key>
+               <delay>0</delay>
+               <lifetime>1h</lifetime>
+               <description>Discovery for device in charge and diversion modes</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Battery: Charge State{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.46.0</snmp_oid>
+                     <key>charge.state[controlState.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>MIB: TRISTAR&#13;
+Description:Control State&#13;
+Modbus address:0x001B</description>
+                     <applications>
+                        <application>
+                           <name>Battery</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>TriStar PWM charge state</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}={$CHARGE.STATE.WARN}</expression>
+                           <name>Battery: Device charge in warning state</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Battery: Device charge in critical state</name>
+                                 <expression>{Template Net Morningstar TriStar PWM SNMP:charge.state[controlState.0{#SINGLETON}].last()}={$CHARGE.STATE.CRIT}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}={$CHARGE.STATE.CRIT}</expression>
+                           <name>Battery: Device charge in critical state</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Battery: Target Voltage{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.38.0</snmp_oid>
+                     <key>target.voltage[targetVoltage.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: TRISTAR&#13;
+Description:Target Regulation Voltage&#13;
+Scaling Factor:0.002950042724609375&#13;
+Units:V&#13;
+Range:[0.0, 80.0]&#13;
+Modbus address:0x0010</description>
+                     <applications>
+                        <application>
+                           <name>Battery</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.002950042725</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>control.mode[controlMode.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var mode = parseInt(value);
+return JSON.stringify((mode === 0 || mode === 2) ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Charge mode discovery</name>
+               <type>DEPENDENT</type>
+               <key>controlmode.charge.discovery</key>
+               <delay>0</delay>
+               <lifetime>1h</lifetime>
+               <description>Discovery for device in charge mode</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Array: Voltage{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.32.0</snmp_oid>
+                     <key>array.voltage[arrayloadVoltage.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: TRISTAR&#13;
+Description:Array/Load Voltage&#13;
+Scaling Factor:0.00424652099609375&#13;
+Units:V&#13;
+Range:[0, 80]&#13;
+Modbus address:0x000A</description>
+                     <applications>
+                        <application>
+                           <name>Array</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.004246520996</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Battery: Charge Current{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.33.0</snmp_oid>
+                     <key>charge.current[chargeCurrent.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>A</units>
+                     <description>MIB: TRISTAR&#13;
+Description:Charge Current&#13;
+Scaling Factor:0.002034515380859375&#13;
+Units:A&#13;
+Range:[0, 60]&#13;
+Modbus address:0x000B</description>
+                     <applications>
+                        <application>
+                           <name>Battery</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.002034515381</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Array: Voltage{#SINGLETON}</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Morningstar TriStar PWM SNMP</host>
+                              <key>array.voltage[arrayloadVoltage.0{#SINGLETON}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Battery: Charge Current{#SINGLETON}</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Morningstar TriStar PWM SNMP</host>
+                              <key>charge.current[chargeCurrent.0{#SINGLETON}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>control.mode[controlMode.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(parseInt(value) === 0 ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Diversion mode discovery</name>
+               <type>DEPENDENT</type>
+               <key>controlmode.diversion.discovery</key>
+               <delay>0</delay>
+               <lifetime>1h</lifetime>
+               <description>Discovery for device in diversion mode</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Load: PWM Duty Cycle{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.48.0</snmp_oid>
+                     <key>diversion.pwm_duty_cycle[pwmDutyCycle.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>MIB: TRISTAR&#13;
+Description:PWM Duty Cycle&#13;
+Scaling Factor:0.392156862745098&#13;
+Units:%&#13;
+Range:[0.0, 100.0]&#13;
+Modbus address:0x001C</description>
+                     <applications>
+                        <application>
+                           <name>Load</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.3921568627</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>control.mode[controlMode.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(parseInt(value) === 2 ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Load + Diversion mode discovery</name>
+               <type>DEPENDENT</type>
+               <key>controlmode.load_diversion.discovery</key>
+               <delay>0</delay>
+               <lifetime>1h</lifetime>
+               <description>Discovery for device in load and diversion modes</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Load: Current{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.34.0</snmp_oid>
+                     <key>load.current[loadCurrent.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>A</units>
+                     <description>MIB: TRISTAR&#13;
+Description:Load Current&#13;
+Scaling Factor:0.00966400146484375&#13;
+Units:A&#13;
+Range:[0, 60]&#13;
+Modbus address:0x000C</description>
+                     <applications>
+                        <application>
+                           <name>Load</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.009664001465</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Load: Voltage{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.32.0</snmp_oid>
+                     <key>load.voltage[arrayloadVoltage.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>V</units>
+                     <description>MIB: TRISTAR&#13;
+Description:Array/Load Voltage&#13;
+Scaling Factor:0.00424652099609375&#13;
+Units:V&#13;
+Range:[0, 80]&#13;
+Modbus address:0x000A</description>
+                     <applications>
+                        <application>
+                           <name>Load</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.004246520996</params>
+                        </step>
+                        <step>
+                           <type>REGEX</type>
+                           <params>^(\d+)(\.\d{1,2})?
+\1\2</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Load: Current{#SINGLETON}</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Morningstar TriStar PWM SNMP</host>
+                              <key>load.current[loadCurrent.0{#SINGLETON}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>Load: Voltage{#SINGLETON}</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Net Morningstar TriStar PWM SNMP</host>
+                              <key>load.voltage[arrayloadVoltage.0{#SINGLETON}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>control.mode[controlMode.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var mode = parseInt(value);
+return JSON.stringify((mode === 1 || mode === 2) ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Load mode discovery</name>
+               <type>DEPENDENT</type>
+               <key>controlmode.load.discovery</key>
+               <delay>0</delay>
+               <lifetime>1h</lifetime>
+               <description>Discovery for device in load mode</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Load: State{#SINGLETON}</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.33333.8.47.0</snmp_oid>
+                     <key>load.state[loadState.0{#SINGLETON}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>MIB: TRISTAR&#13;
+Description:Load State&#13;
+Modbus address:0x001B&#13;
+&#13;
+0: Start&#13;
+1: Normal&#13;
+2: LvdWarning&#13;
+3: Lvd&#13;
+4: Fault&#13;
+5: Disconnect&#13;
+6: LvdWarning1&#13;
+7: OverrideLvd&#13;
+8: Equalize</description>
+                     <applications>
+                        <application>
+                           <name>Load</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>TriStar PWM load state</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}={$LOAD.STATE.WARN:"lvdWarning"}  or {last()}={$LOAD.STATE.WARN:"override"}</expression>
+                           <name>Load: Device load in warning state</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Load: Device load in critical state</name>
+                                 <expression>{Template Net Morningstar TriStar PWM SNMP:load.state[loadState.0{#SINGLETON}].last()}={$LOAD.STATE.CRIT:"lvd"} or {Template Net Morningstar TriStar PWM SNMP:load.state[loadState.0{#SINGLETON}].last()}={$LOAD.STATE.CRIT:"fault"}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}={$LOAD.STATE.CRIT:"lvd"} or {last()}={$LOAD.STATE.CRIT:"fault"}</expression>
+                           <name>Load: Device load in critical state</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>control.mode[controlMode.0]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(parseInt(value) === 1 ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$BATTERY.TEMP.MAX.CRIT}</macro>
+               <value>60</value>
+               <description>Battery high temperature critical value</description>
+            </macro>
+            <macro>
+               <macro>{$BATTERY.TEMP.MAX.WARN}</macro>
+               <value>45</value>
+               <description>Battery high temperature warning value</description>
+            </macro>
+            <macro>
+               <macro>{$BATTERY.TEMP.MIN.CRIT}</macro>
+               <value>-20</value>
+               <description>Battery low temperature critical value</description>
+            </macro>
+            <macro>
+               <macro>{$BATTERY.TEMP.MIN.WARN}</macro>
+               <value>0</value>
+               <description>Battery low temperature warning value</description>
+            </macro>
+            <macro>
+               <macro>{$CHARGE.STATE.CRIT}</macro>
+               <value>4</value>
+               <description>fault</description>
+            </macro>
+            <macro>
+               <macro>{$CHARGE.STATE.WARN}</macro>
+               <value>2</value>
+               <description>disconnect</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.CRIT:"fault"}</macro>
+               <value>4</value>
+               <description>fault</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.CRIT:"lvd"}</macro>
+               <value>3</value>
+               <description>lvd</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.WARN:"disconnect"}</macro>
+               <value>5</value>
+               <description>disconnect</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.WARN:"lvdWarning"}</macro>
+               <value>2</value>
+               <description>lvdWarning</description>
+            </macro>
+            <macro>
+               <macro>{$LOAD.STATE.WARN:"override"}</macro>
+               <value>7</value>
+               <description>override</description>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MAX.CRIT}</macro>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MAX.WARN}</macro>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MIN.CRIT}</macro>
+            </macro>
+            <macro>
+               <macro>{$VOLTAGE.MIN.WARN}</macro>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>Temperature: Battery/Heatsink</name>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template Net Morningstar TriStar PWM SNMP</host>
+                  <key>temp.battery[batteryTemperature.0]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>2774A4</color>
+               <item>
+                  <host>Template Net Morningstar TriStar PWM SNMP</host>
+                  <key>temp.heatsink[heatsinkTemperature.0]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>TriStar PWM charge state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Start</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>NightCheck</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Disconnect</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Night</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Fault</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Bulk</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Absorption</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Float</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>Equalize</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>TriStar PWM load state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Start</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Normal</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>LvdWarning</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Lvd</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Fault</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Disconnect</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>LvdWarning1</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>OverrideLvd</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>Equalize</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>TriStar PWM control mode</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Charge</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>LoadControl</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Diversion</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Lighting</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

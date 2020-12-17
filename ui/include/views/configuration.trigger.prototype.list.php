@@ -187,7 +187,7 @@ $triggersForm->addItem([
 			'triggerprototype.massupdateform' => ['name' => _('Mass update')],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?')
-			],
+			]
 		],
 		$this->data['parent_discoveryid']
 	)

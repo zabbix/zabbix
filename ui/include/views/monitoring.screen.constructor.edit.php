@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.screen.constructor.edit.js.php');
 $action = 'screenedit.php?form=update&screenid='.getRequest('screenid');
 if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.getRequest('screenitemid');
@@ -97,8 +98,12 @@ if (array_key_exists('templateid', $data['screen'])) {
 }
 
 $screenFormList = (new CFormList())
-	->addRow((new CLabel(_('Resource'), 'resourcetype')),
-		(new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources))
+	->addRow((new CLabel(_('Resource'), 'label-resourcetype')),
+		(new CSelect('resourcetype'))
+			->setId('resourcetype')
+			->setFocusableElementId('label-resourcetype')
+			->setValue($resourceType)
+			->addOptions(CSelect::createOptionsFromArray($screenResources))
 	);
 
 /*
@@ -150,7 +155,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 				] : [
 					'real_hosts' => '1',
 					'with_graphs' => '1'
-				]),
+				])
 			]
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -207,7 +212,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 						'hostid' => $data['screen']['templateid']
 					] : [
 						'real_hosts' => '1'
-					]),
+					])
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -435,7 +440,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 						'real_hosts' => !array_key_exists('templateid', $data['screen']),
 						'webitems' => true
 					]
-				],
+				]
 			]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(true)
@@ -541,12 +546,15 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$screenFormList->addRow(
-		_('Sort triggers by'),
-		new CComboBox('sort_triggers', $sortTriggers, null, [
-			SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
-			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
-			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
-		])
+		new CLabel(_('Sort triggers by'), 'label-sort-triggers'),
+		(new CSelect('sort_triggers'))
+			->setFocusableElementId('label-sort-triggers')
+			->setValue($sortTriggers)
+			->addOptions(CSelect::createOptionsFromArray([
+				SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
+				SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
+				SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
+			]))
 	);
 }
 
@@ -561,17 +569,20 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$screenFormList->addRow(
-		_('Sort entries by'),
-		new CComboBox('sort_triggers', $sortTriggers, null, [
-			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
-			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
-			SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
-			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
-			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
-		])
+		new CLabel(_('Sort entries by'), 'label-sort-triggers'),
+		(new CSelect('sort_triggers'))
+			->setFocusableElementId('label-sort-triggers')
+			->setValue($sortTriggers)
+			->addOptions(CSelect::createOptionsFromArray([
+				SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
+				SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
+				SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
+				SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type (ascending)'),
+				SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status (descending)'),
+				SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
+				SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
+				SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
+			]))
 	);
 }
 
@@ -700,11 +711,17 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 	$item = false;
 
-	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'submit()', [
-		TIME_TYPE_LOCAL => _('Local time'),
-		TIME_TYPE_SERVER => _('Server time'),
-		TIME_TYPE_HOST => _('Host time')
-	]));
+	$screenFormList->addRow(new CLabel(_('Time type'), 'label-time-type'),
+		(new CSelect('style'))
+			->setValue($style)
+			->setId('style')
+			->setFocusableElementId('label-time-type')
+			->addOptions(CSelect::createOptionsFromArray([
+				TIME_TYPE_LOCAL => _('Local time'),
+				TIME_TYPE_SERVER => _('Server time'),
+				TIME_TYPE_HOST => _('Host time')
+			]))
+	);
 
 	if ($style == TIME_TYPE_HOST) {
 		if ($resourceId > 0) {

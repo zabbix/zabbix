@@ -42,7 +42,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 					'severity_name_4' => 'sev 4',
 					'severity_color_4' => '444444',
 					'severity_name_5' => 'sev 5',
-					'severity_color_5' => '555555',
+					'severity_color_5' => '555555'
 				],
 				true,
 				[
@@ -57,55 +57,55 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 					'severity_name_4' => 'sev 4',
 					'severity_color_4' => '444444',
 					'severity_name_5' => 'sev 5',
-					'severity_color_5' => '555555',
+					'severity_color_5' => '555555'
 				]
 			],
 			[
 				[
-					'severity_name_0' => '',
+					'severity_name_0' => ''
 				],
 				false,
 				null
 			],
 			[
 				[
-					'severity_color_0' => '',
+					'severity_color_0' => ''
 				],
 				false,
 				null
 			],
 			[
 				[
-					'severity_color_0' => 'ccc',
+					'severity_color_0' => 'ccc'
 				],
 				false,
 				null
 			],
 			[
 				[
-					'severity_color_0' => 'yuttrt',
+					'severity_color_0' => 'yuttrt'
 				],
 				false,
 				null
 			],
 			[
 				[
-					'severity_color_0' => '1234567',
+					'severity_color_0' => '1234567'
 				],
 				true,
 				[
-					'severity_color_0' => '123456',
-				],
+					'severity_color_0' => '123456'
+				]
 			],
 			[
 				[
-					'severity_name_0' => 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii more than 32 chars',
+					'severity_name_0' => 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii more than 32 chars'
 				],
 				true,
 				[
-					'severity_name_0' => 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii',
-				],
-			],
+					'severity_name_0' => 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
+				]
+			]
 		];
 		return $data;
 	}

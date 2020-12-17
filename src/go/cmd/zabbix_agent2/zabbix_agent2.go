@@ -517,7 +517,7 @@ func main() {
 
 	// split shutdown in two steps to ensure that result cache is still running while manager is
 	// being stopped, because there might be pending exporters that could block if result cache
-	// is stoppped and its input channel is full.
+	// is stopped and its input channel is full.
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].StopCache()
 	}

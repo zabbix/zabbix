@@ -418,6 +418,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getSelectedCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isSelected();
+		};
+	}
+
+	/**
 	 * Check if text is present.
 	 *
 	 * @param string $text    text to be present
@@ -492,6 +503,7 @@ class CElement extends CBaseElement implements IWaitable {
 		$classes = explode(' ', parent::getAttribute('class'));
 
 		$is_enabled = parent::isEnabled()
+				&& (parent::getAttribute('disabled') === null)
 				&& (!array_intersect(['disabled', 'readonly'], $classes))
 				&& (parent::getAttribute('readonly') === null);
 

@@ -60,7 +60,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => 'Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template "Test Template" already exists.',
+						'Template "Test Template" already exists.'
 					]
 
 				]
@@ -72,7 +72,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'visible_name' => 'Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Test template with visible name" already exists.',
+						'Template with the same visible name "Test template with visible name" already exists.'
 					]
 
 				]
@@ -83,7 +83,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => '',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "Template name": cannot be empty.',
+						'Incorrect value for field "Template name": cannot be empty.'
 					]
 
 				]
@@ -95,7 +95,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'remove_group' => 'Templates',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Field "groups" is mandatory.',
+						'Field "groups" is mandatory.'
 					]
 
 				]
@@ -271,7 +271,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(2, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
 	}
 
 		public function testFormTemplate_Delete() {

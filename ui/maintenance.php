@@ -86,7 +86,7 @@ if (isset($_REQUEST['maintenanceid'])) {
 		'selectTimeperiods' => API_OUTPUT_EXTEND,
 		'selectTags' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'maintenanceids' => getRequest('maintenanceid'),
+		'maintenanceids' => getRequest('maintenanceid')
 	]);
 	if (empty($dbMaintenance)) {
 		access_deny();
@@ -216,7 +216,7 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
  * Display
  */
 $data = [
-	'form' => getRequest('form'),
+	'form' => getRequest('form')
 ];
 
 if (!empty($data['form'])) {

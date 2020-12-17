@@ -273,7 +273,7 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 
 		$('#test_item').on('click', function() {
 			var step_nums = [];
-			$('select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
+			$('z-select[name^="preprocessing"][name$="[type]"]', $('#preprocessing')).each(function() {
 				var str = $(this).attr('name');
 				step_nums.push(str.substr(14, str.length - 21));
 			});

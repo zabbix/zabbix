@@ -712,7 +712,7 @@ if (isset($_REQUEST['form'])) {
 			'query_fields' => [],
 			'post_fields' => [],
 			'variables' => [],
-			'headers' => [],
+			'headers' => []
 		];
 
 		if (array_key_exists('pairs', $step)) {

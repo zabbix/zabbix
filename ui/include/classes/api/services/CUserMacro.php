@@ -281,16 +281,21 @@ class CUserMacro extends CApiService {
 			$upd_globalmacro = [];
 
 			// strings
-			foreach (['macro', 'value', 'description', 'type'] as $field_name) {
+			foreach (['macro', 'value', 'description'] as $field_name) {
 				if (array_key_exists($field_name, $globalmacro)
 						&& $globalmacro[$field_name] !== $db_globalmacro[$field_name]) {
 					$upd_globalmacro[$field_name] = $globalmacro[$field_name];
 				}
 			}
 
-			if (array_key_exists('type', $globalmacro) && $globalmacro['type'] != $db_globalmacro['type']
-					&& $db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
-				$upd_globalmacro += ['value' => ''];
+			// integers
+			if (array_key_exists('type', $globalmacro) && $globalmacro['type'] != $db_globalmacro['type']) {
+				$upd_globalmacro['type'] = $globalmacro['type'];
+			}
+
+			if (array_key_exists('type', $upd_globalmacro) && $db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET
+					&& !array_key_exists('value', $globalmacro)) {
+				$upd_globalmacro['value'] = '';
 			}
 
 			if ($upd_globalmacro) {
