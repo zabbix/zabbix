@@ -441,7 +441,6 @@ class testFormTags extends CWebTest {
 				}
 			}
 			unset($options);
-
 		}
 		unset($tag);
 
