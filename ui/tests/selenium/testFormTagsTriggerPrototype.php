@@ -21,44 +21,38 @@
 require_once dirname(__FILE__).'/common/testFormTags.php';
 
 /**
- * @backup hosts
+ * @backup triggers
  */
-class testFormTagsHost extends testFormTags {
+class testFormTagsTriggerPrototype extends testFormTags {
 
-	public $update_name = 'Host with tags for updating';
-	public $clone_name = 'Host with tags for cloning';
-	public $link = 'hosts.php';
-	public $saved_link = 'hosts.php?form=update&hostid=';
+	public $update_name = 'Trigger prototype with tags for updating';
+	public $clone_name = 'Trigger prototype with tags for cloning';
+	public $link = 'trigger_prototypes.php?parent_discoveryid=33800';
+	public $saved_link = 'trigger_prototypes.php?form=update&parent_discoveryid=33800&triggerid=';
 
 	/**
-	 * Test creating of Host with tags.
+	 * Test creating of Trigger prototype with tags.
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testFormTagsHost_Create($data) {
-		$this->checkTagsCreate($data, 'host');
+	public function testFormTagsTriggerPrototype_Create($data) {
+		$expression = '{Simple form test host:item-prototype-form1.last()}=0';
+		$this->checkTagsCreate($data, 'trigger prototype', $expression);
 	}
 
 	/**
-	 * Test update of Host with tags.
+	 * Test update of Trigger prototype with tags.
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormTagsHost_Update($data) {
-		$this->checkTagsUpdate($data, 'host');
+	public function testFormTagsTriggerPrototype_Update($data) {
+		$this->checkTagsUpdate($data, 'trigger prototype');
 	}
 
 	/**
-	 * Test cloning of Host with tags.
+	 * Test cloning of Trigger prototype with tags.
 	 */
-	public function testFormTagsHost_Clone() {
-		$this->executeCloning('host', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Host with tags.
-	 */
-	public function testFormTagsHost_FullClone() {
-		$this->executeCloning('host', 'Full clone');
+	public function testFormTagsTriggerPrototype_Clone() {
+		$this->executeCloning('trigger prototype', 'Clone');
 	}
 }
