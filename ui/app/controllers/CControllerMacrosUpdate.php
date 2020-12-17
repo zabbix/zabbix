@@ -75,10 +75,29 @@ class CControllerMacrosUpdate extends CController {
 				unset($macros[$idx], $db_macros[$macro['globalmacroid']]);
 
 				// If the macro is unchanged - skip it.
-				if ($dbMacro['macro'] === $macro['macro'] && (array_key_exists('value', $dbMacro)
-							&& $dbMacro['value'] === $macro['value']) && $dbMacro['type'] === $macro['type']
-						&& $dbMacro['description'] === $macro['description']) {
-					continue;
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					if (!array_key_exists('value', $macro)) {
+						if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['type'] == $macro['type']
+								&& $dbMacro['description'] === $macro['description']) {
+							continue;
+						}
+					}
+				}
+				else {
+					if ($dbMacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+						if ($dbMacro['macro'] === $macro['macro']
+								&& $dbMacro['type'] == $macro['type']
+								&& $dbMacro['description'] === $macro['description']) {
+							continue;
+						}
+					}
+					else {
+						if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
+								&& $dbMacro['type'] == $macro['type']
+								&& $dbMacro['description'] === $macro['description']) {
+							continue;
+						}
+					}
 				}
 
 				$macros_to_update[] = $macro;

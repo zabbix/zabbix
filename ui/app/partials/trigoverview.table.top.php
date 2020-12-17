@@ -56,7 +56,7 @@ foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 	$table->addRow($row);
 }
 
-if ($data['exceeded_hosts'] || $data['exceeded_trigs']) {
+if ($data['exceeded_limit']) {
 	$table->setFooter([
 		(new CCol(_('Not all results are displayed. Please provide more specific search criteria.')))
 			->setColSpan($table->getNumCols())

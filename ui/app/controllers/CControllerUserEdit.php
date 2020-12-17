@@ -27,8 +27,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
-		$timezones = DateTimeZone::listIdentifiers();
-		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -42,7 +40,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', $timezones),
+			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
@@ -105,6 +103,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password2' => '',
 			'lang' => $db_defaults['lang'],
 			'timezone' => $db_defaults['timezone'],
+			'timezones' => $this->timezones,
 			'theme' => $db_defaults['theme'],
 			'autologin' => $db_defaults['autologin'],
 			'autologout' => '0',

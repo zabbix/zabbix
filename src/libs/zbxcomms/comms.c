@@ -531,6 +531,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
+	zbx_socket_clean(s);
+
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -549,7 +551,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 #endif
-	zbx_socket_clean(s);
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
 	memset(&hints, 0x00, sizeof(struct addrinfo));
