@@ -24,10 +24,32 @@
  */
 
 $this->addJsFile('multiselect.js');
+$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.script.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Scripts'));
+
+$row_template = (new CTag('script', true))
+->setId('parameters_row')
+->setAttribute('type', 'text/x-jquery-tmpl')
+->addItem(
+	(new CRow([
+		(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('script_param', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('$(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))->addClass('form_row')
+);
+
+$widget->addItem($row_template);
 
 $scriptForm = (new CForm())
 	->setId('scriptForm')
@@ -35,6 +57,37 @@ $scriptForm = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
+
+$parameters_table = (new CTable())
+	->setId('parameters_table')
+	->setHeader([
+		(new CColHeader(_('Name')))->setWidth('50%'),
+		(new CColHeader(_('Value')))->setWidth('50%'),
+		_('Action')
+	])
+	->setAttribute('style', 'width: 100%;');
+
+foreach ($data['parameters'] as $parameter) {
+	$parameters_table->addRow([
+		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('script_param', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', $parameter['value'], false,
+			DB::getFieldLength('script_param', 'value')
+		))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('$(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	], 'form_row');
+}
+
+$parameters_table->addRow([(new CButton('parameter_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
 
 $scriptFormList = (new CFormList())
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -46,8 +99,9 @@ $scriptFormList = (new CFormList())
 	)
 	->addRow((new CLabel(_('Type'), 'type')),
 		(new CRadioButtonList('type', (int) $data['type']))
-			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
+			->addValue(_('Webhook'), ZBX_SCRIPT_TYPE_WEBHOOK)
 			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
 			->setModern(true)
 	)
 	->addRow((new CLabel(_('Execute on'), 'execute_on')),
@@ -69,6 +123,27 @@ $scriptFormList = (new CFormList())
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
+		(new CDiv($parameters_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'row_webhook_parameters'
+	)
+	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
+		(new CMultilineInput('script', $data['script'], [
+			'title' => _('JavaScript'),
+			'placeholder' => _('script'),
+			'placeholder_textarea' => 'return value',
+			'grow' => 'auto',
+			'rows' => 0,
+			'maxlength' => DB::getFieldLength('scripts', 'command')
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(new CLabel(_('Timeout'), 'timeout'),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

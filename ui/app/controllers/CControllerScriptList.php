@@ -102,6 +102,10 @@ class CControllerScriptList extends CController {
 		$groupids = [];
 
 		foreach ($data['scripts'] as &$script) {
+			if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+				$script['command'] = '';
+			}
+
 			$script['userGroupName'] = null; // all user groups
 			$script['hostGroupName'] = null; // all host groups
 
