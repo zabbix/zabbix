@@ -34,6 +34,7 @@ $widget = (new CWidget())
 $lang_select = (new CSelect('default_lang'))
 	->setId('default_lang')
 	->setValue($data['default_lang'])
+	->setFocusableElementId('label-default-lang')
 	->setAttribute('autofocus', 'autofocus');
 
 $all_locales_available = 1;
@@ -67,16 +68,16 @@ elseif ($all_locales_available == 0) {
 }
 
 $gui_tab = (new CFormList())
-	->addRow(_('Default language'),
+	->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()),
 		($language_error !== '')
 			? [$lang_select, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
 			: $lang_select
 	)
-	->addRow(new CLabel(_('Default time zone'), 'default-timezone-select'),
+	->addRow(new CLabel(_('Default time zone'), 'label-default-timezone'),
 		(new CSelect('default_timezone'))
 			->addOptions(CSelect::createOptionsFromArray($data['timezones']))
 			->setValue($data['default_timezone'])
-			->setFocusableElementId('default-timezone-select')
+			->setFocusableElementId('label-default-timezone')
 			->setId('default_timezone')
 	)
 	->addRow(new CLabel(_('Default theme'), 'label-default-theme'),
