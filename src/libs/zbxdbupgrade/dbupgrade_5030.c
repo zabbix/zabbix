@@ -99,23 +99,7 @@ static int	DBpatch_5030006(void)
 
 static int	DBpatch_5030007(void)
 {
-	const ZBX_FIELD	field = {"valuemap", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("items", &field);
-}
-
-static int	DBpatch_5030008(void)
-{
-	int	ret;
-
-	ret = DBexecute("update items set valuemap="
-			"(select name from valuemaps where items.valuemapid=valuemaps.valuemapid)"
-			" where valuemapid is not NULL");
-
-	if (ZBX_DB_OK > ret)
-		return FAIL;
-
-	return SUCCEED;
+	return DBdrop_foreign_key("items", 3);
 }
 
 typedef struct
@@ -125,11 +109,6 @@ typedef struct
 	zbx_vector_ptr_pair_t	mappings;
 }
 valuemap_t;
-
-static int	DBpatch_5030009(void)
-{
-	return DBdrop_foreign_key("items", 3);
-}
 
 typedef struct
 {
@@ -196,7 +175,7 @@ static void	host_free(host_t *host)
 	zbx_free(host);
 }
 
-static int	DBpatch_5030010(void)
+static int	DBpatch_5030008(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -369,19 +348,19 @@ static int	DBpatch_5030010(void)
 	return ret;
 }
 
-static int	DBpatch_5030011(void)
+static int	DBpatch_5030009(void)
 {
 	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("items", 3, &field);
 }
 
-static int	DBpatch_5030012(void)
+static int	DBpatch_5030010(void)
 {
 	return DBdrop_table("mappings");
 }
 
-static int	DBpatch_5030013(void)
+static int	DBpatch_5030011(void)
 {
 	return DBdrop_table("valuemaps");
 }
@@ -404,7 +383,5 @@ DBPATCH_ADD(5030008, 0, 1)
 DBPATCH_ADD(5030009, 0, 1)
 DBPATCH_ADD(5030010, 0, 1)
 DBPATCH_ADD(5030011, 0, 1)
-DBPATCH_ADD(5030012, 0, 1)
-DBPATCH_ADD(5030013, 0, 1)
 
 DBPATCH_END()
