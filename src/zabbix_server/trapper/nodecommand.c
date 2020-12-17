@@ -204,7 +204,7 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
  *                                                                            *
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char *sessionid, const char *clientip,
-		char **result)
+		char **result, char **debug)
 {
 	char		error[MAX_STRING_LEN];
 	int		ret = FAIL, rc;
@@ -246,7 +246,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 		const char	*poutput = NULL, *perror = NULL;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			ret = zbx_script_execute(&script, &host, result, error, sizeof(error));
+			ret = zbx_script_execute(&script, &host, result, error, sizeof(error), debug);
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 
@@ -282,6 +282,7 @@ fail:
 int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
 {
 	char		*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN], clientip[MAX_STRING_LEN];
+	char		*debug = NULL;
 	int		ret = FAIL;
 	zbx_uint64_t	scriptid, hostid;
 	struct zbx_json	j;
@@ -313,10 +314,14 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, &result)))
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != *debug)
+			zbx_json_addraw(&j, "debug", debug);
+
 		send = j.buffer;
 	}
 finish:

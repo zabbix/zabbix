@@ -1198,7 +1198,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			{
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 				{
-					rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error));
+					rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else

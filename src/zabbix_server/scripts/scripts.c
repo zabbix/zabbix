@@ -484,7 +484,7 @@ out:
 	return ret;
 }
 
-static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result)
+static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result, char **debug)
 {
 	int			size, ret = SUCCEED;
 	char			*bytecode = NULL, *errmsg = NULL;
@@ -502,8 +502,8 @@ static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command
 		return FAIL;
 	}
 
-	/*if (0 != timeout)
-		zbx_es_set_timeout(&es, timeout);*/
+	if (NULL != debug)
+		zbx_es_debug_enable(&es);
 
 	if (FAIL == zbx_es_compile(&es, command, &bytecode, &size, &errmsg))
 	{
@@ -522,6 +522,8 @@ static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command
 	}
 
 out:
+	*debug = zbx_strdup(*debug, zbx_es_debug_info(&es));
+
 	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
 	{
 		zbx_error("cannot destroy scripting environment: %s", errmsg);
@@ -547,7 +549,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
-		size_t max_error_len)
+		size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -558,7 +560,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_global_webhook_execute(script->scriptid, script->command, &error, result);
+			ret = zbx_global_webhook_execute(script->scriptid, script->command, &error, result, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
