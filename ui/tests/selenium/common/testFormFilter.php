@@ -59,6 +59,7 @@ class testFormFilter extends CWebTest {
 
 				// Checking that data exists after saving filter.
 				if (array_key_exists('filter_form', $data)) {
+					$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 					$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->one();
 					$form->checkValue($data['filter_form']);
 				}
@@ -101,9 +102,11 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 		// Changing filter data.
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$filter_container->selectTab('update_tab');
 		$form = $this->query('id:tabfilter_1')->asForm()->waitUntilReady()->one();
 		$result_before = $this->getTableResults();
+		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 
 		for ($i = 0; $i < 2; ++$i) {
 			$form->fill(['Host groups' => ['Zabbix servers']]);
@@ -113,6 +116,7 @@ class testFormFilter extends CWebTest {
 			}
 			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
 			$this->page->waitUntilReady();
+			$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 			$this->assertEquals('italic', $this->query('xpath://li[@data-target="tabfilter_1"]/a[@class="tabfilter-item-link"]')
 			->one()->getCSSValue('font-style'));
 			$filter_container->selectTab('update_tab');
@@ -149,6 +153,7 @@ class testFormFilter extends CWebTest {
 	public function updateFilterProperties($user) {
 		$this->page->userLogin($user, 'zabbix');
 		$this->page->open($this->url)->waitUntilReady();
+		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 
 		// Checking that filter result amount displayed.
