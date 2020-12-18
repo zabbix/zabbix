@@ -1,6 +1,7 @@
 Changes for 5.4.0alpha1
 
 New features:
+..F.I..... [ZBX-2594] separated host and template related objects: items, triggers, graphs, low-level discovery rules, web scenarios (dgoloscapov, Ivo)
 A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
 ...G...... [ZBXNEXT-6319] added systemd.unit.get item key to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6345] added substitution of SID to account name and domain name in eventlog message (vso)
