@@ -104,6 +104,7 @@ class testFormFilter extends CWebTest {
 		$filter_container->selectTab('update_tab');
 		$form = $this->query('id:tabfilter_1')->asForm()->waitUntilReady()->one();
 		$result_before = $this->getTableResults();
+		sleep(3);
 
 		for ($i = 0; $i < 2; ++$i) {
 			$form->fill(['Host groups' => ['Zabbix servers']]);
@@ -113,6 +114,7 @@ class testFormFilter extends CWebTest {
 			}
 			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
 			$this->page->waitUntilReady();
+			sleep(3);
 			$this->assertEquals('italic', $this->query('xpath://li[@data-target="tabfilter_1"]/a[@class="tabfilter-item-link"]')
 			->one()->getCSSValue('font-style'));
 			$filter_container->selectTab('update_tab');
@@ -150,6 +152,7 @@ class testFormFilter extends CWebTest {
 		$this->page->userLogin($user, 'zabbix');
 		$this->page->open($this->url)->waitUntilReady();
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
+		sleep(3);
 
 		// Checking that filter result amount displayed.
 		$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_1"]/a[@data-counter]')->exists());
