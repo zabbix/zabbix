@@ -51,7 +51,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->clickSectionButton('Next step');
+		$this->query('button:Next step')->one()->click();
 
 		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
@@ -487,7 +487,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Check the outcome for the specified database configuration.
-		$this->clickSectionButton('Next step');
+		$this->query('button:Next step')->one()->click();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {
@@ -689,12 +689,12 @@ class testFormSetup extends CWebTest {
 		// Check that port number higher than 65535 is not accepted.
 		// Uncomment the below section once ZBX-18627 is merged.
 //		$form->getField('Port')->fill('65536');
-//		$this->clickSectionButton('Next step');
+//		$this->query('button:Next step')->one()->click();
 //		$this->assertMessage(TEST_BAD, 'Cannot connect to the database.', 'Incorrect value "99999" for "Database port" '.
 //				'field: must be between 0 and 65535.');
 
 		$form->fill($server_parameters);
-		$this->clickSectionButton('Next step');
+		$this->query('button:Next step')->one()->click();
 
 		// Check that the fields are filled correctly in the Pre-installation summary section.
 		$summary_fields = [
@@ -707,11 +707,11 @@ class testFormSetup extends CWebTest {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($field_name).']/../../div[@class="table-forms-td-right"]';
 			$this->assertEquals($value, $this->query($xpath)->one()->getText());
 		}
-		$this->clickSectionButton('Next step');
+		$this->query('button:Next step')->one()->click();
 
 		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place.
 		sleep(3);
-		$this->clickSectionButton('Finish');
+		$this->query('button:Finish')->one()->click();
 
 		// Check Zabbix server params.
 		$this->assertEquals($server_parameters['Name'].': Dashboard', $this->page->getTitle());
@@ -724,19 +724,19 @@ class testFormSetup extends CWebTest {
 		$this->openSpecifiedSection('Pre-installation summary');
 
 		// Proceed back to the 1st section of the setup form
-		$this->clickSectionButton('Back');
+		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Zabbix server details', $this->query('xpath://h1')->one()->getText());
-		$this->clickSectionButton('Back');
+		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Configure DB connection', $this->query('xpath://h1')->one()->getText());
-		$this->clickSectionButton('Back');
+		$this->query('button:Back')->one()->click();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
-		$this->clickSectionButton('Back');
+		$this->query('button:Back')->one()->click();
 		$this->assertEquals("Welcome to\nZabbix 5.0", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 
 		// Cancel setup form update
-		$this->clickSectionButton('Cancel');
+		$this->query('button:Cancel')->one()->click();
 		$this->assertContains('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
@@ -746,10 +746,11 @@ class testFormSetup extends CWebTest {
 		// Restore Zabbix server name field value.
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->getField('Name')->fill('TEST_SERVER_NAME');
-		$this->clickSectionButton('Next step', 2);
+		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click();
 		// Need to wait for 3s for php cache to reload and for zabbix server parameter the changes to take place.
 		sleep(3);
-		$this->clickSectionButton('Finish');
+		$this->query('button:Finish')->one()->click();
 	}
 
 	/**
@@ -830,25 +831,14 @@ class testFormSetup extends CWebTest {
 	}
 
 	/**
-	 * Function clicks on the specified button specified number of times (in different sections).
-	 *
-	 * @param	string	$button		tite of the button that should be clicked
-	 * @param	integer	$times		number of times that the specified button should be clicked
-	 */
-	private function clickSectionButton($button, $times = 1) {
-		for ($i = 0; $i < $times; $i++) {
-			$this->query('button', $button)->one()->click();
-		}
-	}
-
-	/**
 	 * Function opens the setup form and navigates to the specified section.
 	 *
 	 * @param	string	$section	the name of the section to be opened
 	 */
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->clickSectionButton('Next step', 2);
+		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {
 			return;
@@ -863,7 +853,9 @@ class testFormSetup extends CWebTest {
 		$db_parameters = $this->getDbParameters();
 		$form = $this->query('xpath://form')->asForm()->one();
 		$form->fill($db_parameters);
-		$this->clickSectionButton('Next step', $skip_sections[$section]);
+		for ($i = 0; $i < $skip_sections[$section]; $i++) {
+			$this->query('button:Next step')->one()->click();
+		}
 	}
 
 	/**
