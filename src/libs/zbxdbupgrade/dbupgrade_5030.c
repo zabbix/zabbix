@@ -210,7 +210,6 @@ static int	DBpatch_5030008(void)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	templateids, discovered_itemids;
-	char			buffer[MAX_STRING_LEN];
 
 	zbx_hashset_create(&valuemaps, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -317,6 +316,7 @@ static int	DBpatch_5030008(void)
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
 					host->itemids.values_num);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
 			get_template_itemids_by_templateids(&templateids, &host->itemids, &discovered_itemids);
@@ -331,8 +331,13 @@ static int	DBpatch_5030008(void)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
-			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where", valuemapid);
-			DBexecute_multiple_query(buffer, "itemid", &discovered_itemids);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
+					" where", valuemapid);
+			zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
+					discovered_itemids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			zbx_vector_uint64_clear(&discovered_itemids);
 
 			valuemapid++;
