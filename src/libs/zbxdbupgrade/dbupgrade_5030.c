@@ -129,7 +129,7 @@ static int	host_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	get_discovery_itemids(const zbx_vector_uint64_t *itemids, zbx_vector_uint64_t *discovered_itemids)
+static void	get_discovered_itemids(const zbx_vector_uint64_t *itemids, zbx_vector_uint64_t *discovered_itemids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -354,7 +354,7 @@ static int	DBpatch_5030008(void)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			/* get discovered itemids for not templated items */
-			get_discovery_itemids(&host->itemids, &discovered_itemids);
+			get_discovered_itemids(&host->itemids, &discovered_itemids);
 
 			zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
 			get_template_itemids_by_templateids(&templateids, &host->itemids, &discovered_itemids);
