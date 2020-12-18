@@ -471,7 +471,7 @@ class CDBHelper {
 							'values' => [
 								'r_eventid' => $fields['eventid'],
 								'r_clock' => $fields['clock'],
-								'r_ns' => $fields['ns'],
+								'r_ns' => $fields['ns']
 							],
 							'where' => ['eventid' => array_column($problems, 'eventid')]
 						]);

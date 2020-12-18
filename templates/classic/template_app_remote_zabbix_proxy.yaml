@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:11Z'
+  date: '2020-11-11T11:18:03Z'
   groups:
     -
       name: Templates/Applications
@@ -15,6 +15,30 @@ zabbix_export:
         -
           name: 'Zabbix proxy'
       items:
+        -
+          name: 'Utilization of availability manager internal processes, in %'
+          type: DEPENDENT
+          key: process.availability_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix proxy'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''availability manager''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix availability manager processes more than 75% busy'
+              priority: AVERAGE
         -
           name: 'Utilization of configuration syncer internal processes, in %'
           type: DEPENDENT
@@ -110,6 +134,30 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: '{avg(10m)}<65'
               name: 'Zabbix heartbeat sender processes more than 75% busy'
+              priority: AVERAGE
+        -
+          name: 'Utilization of history poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.history_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          applications:
+            -
+              name: 'Zabbix proxy'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''history poller''].busy.avg'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          triggers:
+            -
+              expression: '{avg(10m)}>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: '{avg(10m)}<65'
+              name: 'Zabbix history poller processes more than 75% busy'
               priority: AVERAGE
         -
           name: 'Utilization of history syncer internal processes, in %'
@@ -868,115 +916,129 @@ zabbix_export:
       ymax_type_1: FIXED
       graph_items:
         -
+          sortorder: '1'
           color: '990099'
           item:
             host: 'Remote Zabbix proxy'
             key: process.trapper.avg.busy
         -
-          sortorder: '1'
+          sortorder: '2'
           color: '990000'
           item:
             host: 'Remote Zabbix proxy'
             key: process.poller.avg.busy
         -
-          sortorder: '2'
+          sortorder: '3'
           color: 0000EE
           item:
             host: 'Remote Zabbix proxy'
             key: process.ipmi_poller.avg.busy
         -
-          sortorder: '3'
+          sortorder: '4'
           color: FF33FF
           item:
             host: 'Remote Zabbix proxy'
             key: process.discoverer.avg.busy
         -
-          sortorder: '4'
+          sortorder: '5'
           color: 00EE00
           item:
             host: 'Remote Zabbix proxy'
             key: process.icmp_pinger.avg.busy
         -
-          sortorder: '5'
+          sortorder: '6'
           color: '003300'
           item:
             host: 'Remote Zabbix proxy'
             key: process.http_poller.avg.busy
         -
-          sortorder: '6'
+          sortorder: '7'
           color: 33FFFF
           item:
             host: 'Remote Zabbix proxy'
             key: process.unreachable_poller.avg.busy
         -
-          sortorder: '7'
+          sortorder: '8'
           color: DD0000
           item:
             host: 'Remote Zabbix proxy'
             key: process.java_poller.avg.busy
         -
-          sortorder: '8'
+          sortorder: '9'
           color: '000099'
           item:
             host: 'Remote Zabbix proxy'
             key: process.snmp_trapper.avg.busy
         -
-          sortorder: '9'
+          sortorder: '10'
           color: 00FF00
           item:
             host: 'Remote Zabbix proxy'
             key: process.vmware_collector.avg.busy
+        -
+          sortorder: '11'
+          color: BB2A02
+          item:
+            host: 'Remote Zabbix proxy'
+            key: process.history_poller.avg.busy
     -
       name: 'Zabbix internal process busy %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
         -
+          sortorder: '1'
           color: FFAA00
           item:
             host: 'Remote Zabbix proxy'
             key: process.housekeeper.avg.busy
         -
-          sortorder: '1'
+          sortorder: '2'
           color: '990099'
           item:
             host: 'Remote Zabbix proxy'
             key: process.configuration_syncer.avg.busy
         -
-          sortorder: '2'
+          sortorder: '3'
           color: EE0000
           item:
             host: 'Remote Zabbix proxy'
             key: process.history_syncer.avg.busy
         -
-          sortorder: '3'
+          sortorder: '4'
           color: FF66FF
           item:
             host: 'Remote Zabbix proxy'
             key: process.self-monitoring.avg.busy
         -
-          sortorder: '4'
+          sortorder: '5'
           color: '960000'
           item:
             host: 'Remote Zabbix proxy'
             key: process.heartbeat_sender.avg.busy
         -
-          sortorder: '5'
+          sortorder: '6'
           item:
             host: 'Remote Zabbix proxy'
             key: process.data_sender.avg.busy
         -
-          sortorder: '6'
+          sortorder: '7'
           color: '009999'
           item:
             host: 'Remote Zabbix proxy'
             key: process.task_manager.avg.busy
         -
-          sortorder: '7'
+          sortorder: '8'
           color: BBBB00
           item:
             host: 'Remote Zabbix proxy'
             key: process.ipmi_manager.avg.busy
+        -
+          sortorder: '9'
+          color: F230E0
+          item:
+            host: 'Remote Zabbix proxy'
+            key: process.availability_manager.avg.busy
     -
       name: 'Zabbix proxy performance'
       graph_items:

@@ -230,7 +230,7 @@ class testFormTemplateMacros extends testFormMacros {
 						[
 							'macro' => '{$UPDATED_MACRO3}',
 							'value' => '',
-							'description' => 'Updated Description 3',
+							'description' => 'Updated Description 3'
 						]
 					],
 					'success_message' => 'Template updated'

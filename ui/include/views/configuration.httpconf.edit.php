@@ -30,8 +30,12 @@ if (!empty($this->data['hostid'])) {
 	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
+$url = (new CUrl('httpconf.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$http_form = (new CForm())
+$http_form = (new CForm('post', $url))
 	->setId('http-form')
 	->setName('httpForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -257,16 +261,17 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid'])))
-		->setEnabled(!$data['templated']);
-	$buttons[] = new CButtonCancel();
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']),
+		'context'
+	))->setEnabled(!$data['templated']);
+	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$http_tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		[new CButtonCancel(url_param('context'))]
 	));
 }
 

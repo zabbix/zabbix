@@ -325,7 +325,7 @@ jQuery(function($) {
 
 			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup($obj, resp.data, event, options);
+				showMenuPopup($obj, jQuery.extend({context: data.context}, resp.data), event, options);
 			});
 
 			$(document)

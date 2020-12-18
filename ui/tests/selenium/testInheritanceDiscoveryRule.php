@@ -49,7 +49,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$sqlDiscovery = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
-		$this->zbxTestLogin('host_discovery.php?form=update&itemid='.$data['itemid']);
+		$this->zbxTestLogin('host_discovery.php?form=update&context=host&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
@@ -96,7 +96,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
-		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&hostid='.$this->templateid);
+		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&context=template&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -153,7 +153,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				}
 
 				// Host form check.
-				$this->zbxTestLogin('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$this->hostid);
+				$this->zbxTestLogin('host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$this->hostid);
 				$this->zbxTestClickLinkText($data['name']);
 				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');

@@ -718,7 +718,7 @@ class CTrigger extends CTriggerGeneral {
 			if (!isset($triggers[$dep['triggerid']])) {
 				$triggers[$triggerId] = [
 					'triggerid' => $triggerId,
-					'dependencies' => [],
+					'dependencies' => []
 				];
 			}
 			$triggers[$triggerId]['dependencies'][] = $dep['dependsOnTriggerid'];
@@ -1008,7 +1008,7 @@ class CTrigger extends CTriggerGeneral {
 			$triggerDependencyTemplates = API::Template()->get([
 				'output' => ['templateid'],
 				'triggerids' => $trigger['dependencies'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
 
@@ -1215,7 +1215,7 @@ class CTrigger extends CTriggerGeneral {
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}

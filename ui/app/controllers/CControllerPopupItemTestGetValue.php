@@ -138,7 +138,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		// Get post data for particular item type.
-		$data = $this->getItemTestProperties($this->getInputAll());
+		$data = $this->getItemTestProperties($this->getInputAll(), true);
 
 		// Apply effective macros values to properties.
 		$data = $this->resolveItemPropertyMacros($data);

@@ -32,6 +32,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 					(new CUrl('graphs.php'))
 						->setArgument('form', 'create')
 						->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+						->setArgument('context', $data['context'])
 						->getUrl()
 				))
 			))->setAttribute('aria-label', _('Content controls'))
@@ -43,10 +44,15 @@ else {
 		->setTitle(_('Graphs'))
 		->setControls(
 			(new CTag('nav', true, ($data['hostid'] == 0)
-				? (new CButton('form', _('Create graph (select host first)')))->setEnabled(false)
+				? (new CButton('form',
+					($data['context'] === 'host')
+						? _('Create graph (select host first)')
+						: _('Create graph (select template first)')
+				))->setEnabled(false)
 				: new CRedirectButton(_('Create graph'), (new CUrl('graphs.php'))
 					->setArgument('hostid', $data['hostid'])
 					->setArgument('form', 'create')
+					->setArgument('context', $data['context'])
 					->getUrl()
 				)
 			))
@@ -58,16 +64,19 @@ else {
 	}
 
 	// Add filter tab.
+	$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+
 	$widget->addItem(
-		(new CFilter(new CUrl('graphs.php')))
+		(new CFilter((new CUrl('graphs.php'))->setArgument('context', $data['context'])))
 			->setProfile($data['profileIdx'])
 			->setActiveTab($data['active_tab'])
+			->addvar('context', $data['context'])
 			->addFilterTab(_('Filter'), [
 				(new CFormList())
 					->addRow(
 						(new CLabel(_('Host groups'), 'filter_groups__ms')),
 						(new CMultiSelect([
-							'name' => 'filter_groups[]',
+							'name' => 'filter_groupids[]',
 							'object_name' => 'hostGroup',
 							'data' => $data['filter']['groups'],
 							'popup' => [
@@ -75,26 +84,26 @@ else {
 									'srctbl' => 'host_groups',
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
-									'dstfld1' => 'filter_groups_',
+									'dstfld1' => 'filter_groupids_',
 									'with_hosts_and_templates' => 1,
 									'editable' => 1,
 									'enrich_parent_groups' => true
-								]
+								] + $hg_ms_params
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
-						(new CLabel(_('Hosts'), 'filter_hosts__ms')),
+						(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
 						(new CMultiSelect([
 							'name' => 'filter_hostids[]',
-							'object_name' => 'host_templates',
+							'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 							'data' => $data['filter']['hosts'],
 							'popup' => [
 								'filter_preselect_fields' => [
-									'hostgroups' => 'filter_groups_'
+									'hostgroups' => 'filter_groupids_'
 								],
 								'parameters' => [
-									'srctbl' => 'host_templates',
+									'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_hostids_',
@@ -107,16 +116,20 @@ else {
 	);
 }
 
+$url = (new CUrl('graphs.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$graphForm = (new CForm())
+$graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->addVar('hostid', $this->data['hostid']);
+	->addVar('hostid', $data['hostid']);
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
 
 // create table
-$url = (new CUrl('graphs.php'))->getUrl();
 $discover = null;
 $info_column = null;
 
@@ -124,7 +137,7 @@ if ($data['parent_discoveryid']) {
 	$discover = make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url);
 }
 else {
-	$info_column = _('Info');
+	$info_column = ($data['context'] === 'host') ? _('Info') : null;
 }
 
 $graphTable = (new CTableInfo())
@@ -132,7 +145,7 @@ $graphTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_graphs'))->onClick("checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		!empty($this->data['hostid']) ? null : _('Hosts'),
+		($data['hostid'] == 0) ? ($data['context'] === 'host') ? _('Host') : _('Template') : null,
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Width'),
 		_('Height'),
@@ -166,6 +179,7 @@ foreach ($data['graphs'] as $graph) {
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
+				->setArgument('context', $data['context'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -175,7 +189,8 @@ foreach ($data['graphs'] as $graph) {
 	$url = (new CUrl('graphs.php'))
 		->setArgument('form', 'update')
 		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-		->setArgument('graphid', $graphid);
+		->setArgument('graphid', $graphid)
+		->setArgument('context', $data['context']);
 
 	if ($data['parent_discoveryid'] === null) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
@@ -193,6 +208,7 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->setArgument('graphid', $graphid)
 					->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+					->setArgument('context', $data['context'])
 					->getUrl()
 			))
 				->addSID()
@@ -228,11 +244,11 @@ $buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->
 // append table to form
 $graphForm->addItem([
 	$graphTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_graphid', $buttonsArray,
-		$this->data['parent_discoveryid']
-			? $this->data['parent_discoveryid']
-			: $this->data['hostid']
+		$data['parent_discoveryid']
+			? $data['parent_discoveryid']
+			: $data['hostid']
 	)
 ]);
 

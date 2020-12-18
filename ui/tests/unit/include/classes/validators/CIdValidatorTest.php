@@ -37,7 +37,7 @@ class CIdValidatorTest extends CValidatorTest {
 			[[], '1'],
 			[[], '9223372036854775807'],
 			[['empty' => true], 0],
-			[['empty' => true], '0'],
+			[['empty' => true], '0']
 		];
 	}
 

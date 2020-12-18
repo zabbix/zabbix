@@ -337,6 +337,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Content menu'));
 
+	$context = $is_template ? 'template' : 'host';
+
 	/*
 	 * the count of rows
 	 */
@@ -362,6 +364,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				(new CUrl('items.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['items'])
 		]);
@@ -376,6 +379,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				(new CUrl('triggers.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['triggers'])
 		]);
@@ -389,6 +393,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
+				->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['graphs'])
 		]);
@@ -418,6 +423,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$db_host['hostid']])
+				->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['discoveries'])
 		]);
@@ -432,6 +438,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				(new CUrl('httpconf.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_host['httpTests'])
 		]);
@@ -444,7 +451,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
 				CHtml::encode($db_discovery_rule['name']),
-				'host_discovery.php?form=update&itemid='.$db_discovery_rule['itemid']
+					(new CUrl('host_discovery.php'))
+						->setArgument('form', 'update')
+						->setArgument('itemid', $db_discovery_rule['itemid'])
+						->setArgument('context', $context)
 			)
 		);
 
@@ -457,6 +467,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				new CLink(_('Discovery list'), (new CUrl('host_discovery.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
+					->setArgument('context', $context)
 				)
 			),
 			'/',
@@ -465,7 +476,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// item prototypes
 		$item_prototypes = new CSpan([
-			new CLink(_('Item prototypes'), 'disc_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']),
+			new CLink(_('Item prototypes'),
+				(new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
 			CViewHelper::showNum($db_discovery_rule['items'])
 		]);
 		if ($current_element == 'items') {
@@ -476,7 +491,9 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		// trigger prototypes
 		$trigger_prototypes = new CSpan([
 			new CLink(_('Trigger prototypes'),
-				'trigger_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']
+				(new CUrl('trigger_prototypes.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum($db_discovery_rule['triggers'])
 		]);
@@ -487,10 +504,14 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// graph prototypes
 		$graph_prototypes = new CSpan([
-			new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$db_discovery_rule['itemid']),
+			new CLink(_('Graph prototypes'),
+				(new CUrl('graphs.php'))
+					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
+			),
 			CViewHelper::showNum($db_discovery_rule['graphs'])
 		]);
-		if ($current_element == 'graphs') {
+		if ($current_element === 'graphs') {
 			$graph_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
 		$content_menu->addItem($graph_prototypes);
@@ -498,7 +519,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		// host prototypes
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			$host_prototypes = new CSpan([
-				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']),
+				new CLink(_('Host prototypes'),
+					(new CUrl('host_prototypes.php'))
+						->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
+						->setArgument('context', $context)
+				),
 				CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
 			]);
 			if ($current_element == 'hosts') {

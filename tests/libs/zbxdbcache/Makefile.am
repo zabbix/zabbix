@@ -39,6 +39,9 @@ CACHE_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
@@ -89,10 +92,9 @@ zbx_vc_get_values_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_vc_get_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
-zbx_vc_get_values_LDFLAGS = @SERVER_LDFLAGS@
+zbx_vc_get_values_LDFLAGS = @SERVER_LDFLAGS@ $(COMMON_WRAP_FUNCS)
 
 zbx_vc_get_values_CFLAGS = \
-	$(COMMON_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
@@ -105,10 +107,9 @@ zbx_vc_add_values_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_vc_add_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
-zbx_vc_add_values_LDFLAGS = @SERVER_LDFLAGS@
+zbx_vc_add_values_LDFLAGS = @SERVER_LDFLAGS@ $(COMMON_WRAP_FUNCS)
 
 zbx_vc_add_values_CFLAGS = \
-	 $(COMMON_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
@@ -121,10 +122,9 @@ zbx_vc_get_value_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_vc_get_value_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
-zbx_vc_get_value_LDFLAGS = @SERVER_LDFLAGS@
+zbx_vc_get_value_LDFLAGS = @SERVER_LDFLAGS@ $(COMMON_WRAP_FUNCS)
 
 zbx_vc_get_value_CFLAGS = \
-	 $(COMMON_WRAP_FUNCS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory \
@@ -159,38 +159,36 @@ dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs
 dc_expand_user_macros_in_expression_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/tests/mocks/configcache \
-	-I@top_srcdir@/src/libs/zbxdbcache \
-	-Wl,--wrap=zbx_hashset_search
+	-I@top_srcdir@/src/libs/zbxdbcache
 dc_expand_user_macros_in_expression_SOURCES = \
 	dc_expand_user_macros_in_expression.c 
 dc_expand_user_macros_in_expression_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
 	$(CACHE_LIBS) @SERVER_LIBS@
-dc_expand_user_macros_in_expression_LDFLAGS = @SERVER_LDFLAGS@
-
+dc_expand_user_macros_in_expression_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_hashset_search
 dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/tests/mocks/configcache \
-	-I@top_srcdir@/src/libs/zbxdbcache \
-	-Wl,--wrap=zbx_hashset_search
+	-I@top_srcdir@/src/libs/zbxdbcache
 dc_expand_user_macros_in_func_params_SOURCES = \
 	dc_expand_user_macros_in_func_params.c 
 dc_expand_user_macros_in_func_params_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
 	$(CACHE_LIBS) @SERVER_LIBS@ 
-dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@
-
+dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_hashset_search
 dc_expand_user_macros_in_calcitem_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/tests/mocks/configcache \
-	-I@top_srcdir@/src/libs/zbxdbcache \
-	-Wl,--wrap=zbx_hashset_search
+	-I@top_srcdir@/src/libs/zbxdbcache
 dc_expand_user_macros_in_calcitem_SOURCES = \
 	dc_expand_user_macros_in_calcitem.c 
 dc_expand_user_macros_in_calcitem_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
 	$(CACHE_LIBS) @SERVER_LIBS@ 
-dc_expand_user_macros_in_calcitem_LDFLAGS = @SERVER_LDFLAGS@
+dc_expand_user_macros_in_calcitem_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_hashset_search
 
 dc_function_calculate_nextcheck_CFLAGS = \
 	-I@top_srcdir@/tests

@@ -550,7 +550,7 @@ class testHostPrototype extends CAPITest {
 					]
 				],
 				'expected_error' => "No default interface for \"JMX\" type on \"new {#HOST} 26\"."
-			],
+			]
 		];
 	}
 

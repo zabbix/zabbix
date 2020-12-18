@@ -28,7 +28,7 @@ class CControllerDashboardWidgetCheck extends CController {
 			'templateid' => 'db dashboard.templateid',
 			'type' => 'required|string',
 			'name' => 'required|string',
-			'fields' => 'json',
+			'fields' => 'json'
 		];
 
 		$ret = $this->validateInput($fields);

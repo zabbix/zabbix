@@ -52,7 +52,7 @@ $fields = [
 	// ajax
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"'],
+	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"']
 ];
 check_fields($fields);
 

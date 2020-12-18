@@ -118,7 +118,7 @@ GetOptions(
 
 pod2usage(-verbose => 2, -noperldoc => 1) if ($help);
 
-my $iter = path(".")->iterator({
+my $iter = path(dirname(Cwd::abs_path(__FILE__)))->iterator({
 	'recurse'		=> 1,
 	'follow_symlinks'	=> 0
 });

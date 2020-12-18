@@ -38,9 +38,9 @@ class CScreenTriggersOverview extends CScreenBase {
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
 		$data = [];
-		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
-		) = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);
+		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
+			$data['hosts_by_name'], $data['exceeded_limit']
+		] = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);
 
 		if ($this->screenitem['style'] == STYLE_TOP) {
 			$table = new CPartial('trigoverview.table.top', $data);

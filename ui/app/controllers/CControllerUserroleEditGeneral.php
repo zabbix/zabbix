@@ -28,7 +28,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		$rules = [
 			CRoleHelper::UI_DEFAULT_ACCESS => $this->getInput('ui_default_access'),
 			CRoleHelper::ACTIONS_DEFAULT_ACCESS => $this->getInput('actions_default_access'),
-			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access'),
+			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access')
 		];
 
 		$rules += $this->getUiSectionRules($user_type);

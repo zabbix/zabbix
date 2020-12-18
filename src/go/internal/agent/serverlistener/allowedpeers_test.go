@@ -100,9 +100,9 @@ var testCases = []testCase{
 			"::127.0.0.1,::127.0.0.1/128,::1,::1/96,::,::/0,0.0.0.0/0,0000:0000:0000:0000:0000:0000:0000:0000/0", false},
 	{59, "IPv6 unspecified address in list, connection from IPv6", "::1", "::", true},
 	{60, "IPv6 unspecified address in list, connection from IPv4", "127.0.0.1", "::", true},
-	{61, "DNS name as allowed addres", "127.0.0.1", "localhost", false},
-	{62, "DNS name as denied addres", "127.0.0.2", "localhost", true},
-	{63, "DNS name as denied IPv6 addres", "::2", "localhost", true},
+	{61, "DNS name as allowed address", "127.0.0.1", "localhost", false},
+	{62, "DNS name as denied address", "127.0.0.2", "localhost", true},
+	{63, "DNS name as denied IPv6 address", "::2", "localhost", true},
 }
 
 type testCase struct {

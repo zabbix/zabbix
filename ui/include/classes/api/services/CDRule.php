@@ -695,6 +695,12 @@ class CDRule extends CApiService {
 
 		$druleids = DB::insert('drules', $drules);
 
+		array_walk($drules, function (&$drule, $index) use ($druleids) {
+			$drule['druleid'] = $druleids[$index];
+		});
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_DISCOVERY_RULE, $drules);
+
 		$create_dchecks = [];
 		foreach ($drules as $dnum => $drule) {
 			foreach ($drule['dchecks'] as $dcheck) {
@@ -755,8 +761,6 @@ class CDRule extends CApiService {
 
 		$default_values = DB::getDefaults('dchecks');
 
-		$upd_drules = [];
-
 		foreach ($drules as $drule) {
 			$db_drule = $db_drules[$drule['druleid']];
 
@@ -799,6 +803,8 @@ class CDRule extends CApiService {
 				DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
 			}
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DISCOVERY_RULE, $drules, $db_drules);
 
 		return ['druleids' => $druleids];
 	}
@@ -893,7 +899,7 @@ class CDRule extends CApiService {
 		if ($actionIds) {
 			DB::update('actions', [
 				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionIds],
+				'where' => ['actionid' => $actionIds]
 			]);
 
 			DB::delete('conditions', [

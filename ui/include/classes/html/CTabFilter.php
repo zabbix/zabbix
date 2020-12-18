@@ -261,11 +261,11 @@ class CTabFilter extends CDiv {
 			$this->getNavigation(),
 			(new CDiv([
 				(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
-				$this->buttons,
+				$this->buttons
 			]))
 				->addClass('tabfilter-content-container')
 				->addClass($this->options['expanded'] ? null : ZBX_STYLE_DISPLAY_NONE),
-			$templates,
+			$templates
 		]);
 	}
 
