@@ -494,6 +494,35 @@ out:
 	return ret;
 }
 
+static int	DBfetch_webhook_timeout(zbx_uint64_t scriptid, int *timeout)
+{
+	int		ret = SUCCEED;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*tm = NULL;
+
+	result = DBselect(
+			"select timeout from scripts"
+			" where scriptid=" ZBX_FS_UI64,
+			scriptid);
+
+	if (NULL == result)
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL != (row = DBfetch(result)))
+		tm = zbx_strdup(tm, row[0]);
+
+	if (FAIL == is_time_suffix(tm, timeout, ZBX_LENGTH_UNLIMITED))
+		ret = FAIL;
+out:
+	zbx_free(tm);
+	DBfree_result(result);
+	return ret;
+}
+
 static int	DBfetch_webhook_params(zbx_uint64_t scriptid, struct zbx_json *json_data)
 {
 	int		ret = FAIL;
@@ -525,14 +554,13 @@ static int	DBfetch_webhook_params(zbx_uint64_t scriptid, struct zbx_json *json_d
 
 out:
 	DBfree_result(result);
-
 	return ret;
 }
 
 static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result,
 		char **debug)
 {
-	int			size, ret = SUCCEED;
+	int			size, ret = SUCCEED, timeout;
 	char			*bytecode = NULL, *errmsg = NULL;
 	zbx_es_t		es;
 	struct zbx_json		json_data;
@@ -550,6 +578,9 @@ static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command
 
 	if (NULL != debug)
 		zbx_es_debug_enable(&es);
+
+	if (SUCCEED == DBfetch_webhook_timeout(scriptid, &timeout))
+		zbx_es_set_timeout(&es, timeout);
 
 	if (FAIL == zbx_es_compile(&es, command, &bytecode, &size, &errmsg))
 	{
