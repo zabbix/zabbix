@@ -102,8 +102,8 @@ func isWinLauncher() bool {
 	return false
 }
 
-func setServiceRun(forground bool) {
-	winServiceRun = !forground
+func setServiceRun(foreground bool) {
+	winServiceRun = !foreground
 }
 
 func fatalCloseOSItems() {
@@ -458,7 +458,7 @@ loop:
 				closeChan <- true
 				break loop
 			default:
-				log.Warningf("unsupported windows service command recieved")
+				log.Warningf("unsupported windows service command received")
 			}
 		case <-stopChan:
 			changes <- svc.Status{State: svc.StopPending}

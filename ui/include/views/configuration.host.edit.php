@@ -195,18 +195,13 @@ $hostList->addRow(_('Description'),
 );
 
 // Proxy
-if ($data['readonly']) {
-	$proxy = (new CTextBox(null,
-		($data['proxy_hostid'] == 0) ? _('(no proxy)') : $data['proxies'][$data['proxy_hostid']], true)
-	)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-	$hostList->addVar('proxy_hostid', $data['proxy_hostid']);
-}
-else {
-	$proxy = new CComboBox('proxy_hostid', $data['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']);
-	$proxy->setEnabled(true);
-}
-
-$hostList->addRow(_('Monitored by proxy'), $proxy);
+$hostList->addRow(new CLabel(_('Monitored by proxy'), 'label-proxy'),
+	(new CSelect('proxy_hostid'))
+		->setValue($data['proxy_hostid'])
+		->setFocusableElementId('label-proxy')
+		->setReadonly($data['readonly'])
+		->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+);
 
 $hostList->addRow(_('Enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
@@ -577,26 +572,26 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
  * IPMI
  */
 if ($data['readonly']) {
-	$cmbIPMIAuthtype = [
+	$ipmi_authtype_select = [
 		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_authtype', $data['ipmi_authtype'])
 	];
-	$cmbIPMIPrivilege = [
+	$ipmi_privilege_select = [
 		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_privilege', $data['ipmi_privilege'])
 	];
 }
 else {
-	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
-	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
+	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, ipmiAuthTypes());
+	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, ipmiPrivileges());
 }
 
 $divTabs->addTab('ipmiTab', _('IPMI'),
 	(new CFormList())
-		->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
-		->addRow(_('Privilege level'), $cmbIPMIPrivilege)
+		->addRow(_('Authentication algorithm'), $ipmi_authtype_select)
+		->addRow(_('Privilege level'), $ipmi_privilege_select)
 		->addRow(_('Username'),
 			(new CTextBox('ipmi_username', $data['ipmi_username'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

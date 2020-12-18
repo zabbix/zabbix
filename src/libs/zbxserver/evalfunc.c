@@ -1677,15 +1677,13 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 			goto out;
 		}
 
-		if (0 == (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
-			period = arg1 + (ts.sec - lastaccess);
+		period = arg1 + (ts.sec - lastaccess);
 	}
 	else
 		period = arg1;
 
-	if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) ||
-			(SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
-			1 == values.values_num))
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
+			1 == values.values_num)
 	{
 		*value = zbx_strdup(*value, "0");
 	}
@@ -1703,6 +1701,12 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 		{
 			*error = zbx_strdup(*error,
 					"item does not have enough data after server start or item creation");
+			goto out;
+		}
+
+		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+		{
+			*error = zbx_strdup(*error, "historical data transfer from proxy is still in progress");
 			goto out;
 		}
 

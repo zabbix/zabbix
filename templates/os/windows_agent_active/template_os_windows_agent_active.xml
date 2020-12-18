@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-19T17:59:02Z</date>
+   <date>2020-11-22T08:28:49Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1447,8 +1447,81 @@ return JSON.stringify({"data": output})</params>
                            <priority>WARNING</priority>
                            <description>The disk appears to be under heavy load</description>
                            <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#DEVNAME}: Disk read request responses are too high (read &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m</name>
+                                 <expression>{Template Module Windows physical disks by Zabbix agent active:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60].min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}</expression>
+                              </dependency>
+                              <dependency>
+                                 <name>{#DEVNAME}: Disk write request responses are too high (write &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)</name>
+                                 <expression>{Template Module Windows physical disks by Zabbix agent active:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
+                              </dependency>
+                           </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Average disk read queue length</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Disk read request avg waiting time</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(15m)} &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}</expression>
+                           <name>{#DEVNAME}: Disk read request responses are too high (read &gt; {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m</name>
+                           <priority>WARNING</priority>
+                           <description>This trigger might indicate disk {#DEVNAME} saturation.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Disk write request avg waiting time</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Average disk write queue length</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>{#DEVNAME}: Disk average queue size (avgqu-sz)</name>
@@ -1493,7 +1566,57 @@ return JSON.stringify({"data": output})</params>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Module Windows physical disks by Zabbix agent active:perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60].min(15m)} &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}</expression>
+                     <name>{#DEVNAME}: Disk write request responses are too high (write &gt; {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"}s for 15m)</name>
+                     <priority>WARNING</priority>
+                     <description>This trigger might indicate disk {#DEVNAME} saturation.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger_prototype>
+               </trigger_prototypes>
                <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#DEVNAME}: Disk average queue length</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>{#DEVNAME}: Disk average waiting time</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template Module Windows physical disks by Zabbix agent active</host>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
                   <graph_prototype>
                      <name>{#DEVNAME}: Disk read/write rates</name>
                      <graph_items>
@@ -1559,9 +1682,19 @@ return JSON.stringify({"data": output})</params>
                <description>This macro is used in physical disks discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
+               <macro>{$VFS.DEV.READ.AWAIT.WARN}</macro>
+               <value>0.02</value>
+               <description>Disk read average response time (in s) before the trigger would fire.</description>
+            </macro>
+            <macro>
                <macro>{$VFS.DEV.UTIL.MAX.WARN}</macro>
                <value>95</value>
                <description>The warning threshold of disk time utilization in percent.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.DEV.WRITE.AWAIT.WARN}</macro>
+               <value>0.02</value>
+               <description>Disk write average response time (in s) before the trigger would fire.</description>
             </macro>
          </macros>
       </template>
