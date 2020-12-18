@@ -361,7 +361,6 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 	}
 out:
 	xmlXPathFreeObject(xpathObj);
-
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 
@@ -383,17 +382,8 @@ static int	compare_xml_nodes_by_name(const void *d1, const void *d2)
 {
 	zbx_xml_node_t	*p1 = *(zbx_xml_node_t **)d1;
 	zbx_xml_node_t	*p2 = *(zbx_xml_node_t **)d2;
-	int		res;
 
-	res = strcmp(p1->name, p2->name);
-	if (0 == res)
-	{
-		/* set is_array value for nodes with equal names to collect them further in JSON array */
-		p1->is_array = XML_JSON_TRUE;
-		p2->is_array = XML_JSON_TRUE;
-	}
-
-	return res;
+	return strcmp(p1->name, p2->name);
 }
 
 static void	zbx_xml_node_free(zbx_xml_node_t *node)
@@ -411,18 +401,20 @@ static void	zbx_xml_node_free(zbx_xml_node_t *node)
  *                                                                            *
  * Function: xml_to_vector                                                    *
  *                                                                            *
- * Purpose: to collect content of XML document nodes in vector                *
+ * Purpose: to collect content of XML document nodes into vector              *
  *                                                                            *
- * Parameters: xml_node       - [IN] parent XML node structure                *
- *             nodes - [OUT] vector of child XML nodes                        *
- *                                                                            *
- * Return value: none                                                         *
+ * Parameters: xml_node  - [IN] parent XML node structure                     *
+ *             nodes     - [OUT] vector of child XML nodes                    *
  *                                                                            *
  ******************************************************************************/
 static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 {
-	xmlChar			*value;
-	xmlAttr			*attr;
+	int				index;
+	xmlChar				*value;
+	xmlAttr				*attr;
+	zbx_vector_xml_node_ptr_t	nodes_local;
+
+	zbx_vector_xml_node_ptr_create(&nodes_local);
 
 	for (; NULL != xml_node; xml_node = xml_node->next)
 	{
@@ -484,9 +476,31 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 				break;
 		}
 		xml_to_vector(xml_node->children, &node->chnodes);
-		zbx_vector_xml_node_ptr_append(nodes, node);
+		zbx_vector_xml_node_ptr_append(&nodes_local, node);
 	}
-	zbx_vector_xml_node_ptr_sort(nodes, compare_xml_nodes_by_name);
+
+	zbx_vector_xml_node_ptr_reserve(nodes, (size_t)nodes_local.values_num);
+	while (0 < nodes_local.values_num)
+	{
+		zbx_xml_node_t	*first_node, *next_node;
+
+		first_node = nodes_local.values[0];
+		zbx_vector_xml_node_ptr_remove(&nodes_local, 0);
+		zbx_vector_xml_node_ptr_append(nodes, first_node);
+
+		while (FAIL != (index = zbx_vector_xml_node_ptr_search(&nodes_local, first_node,
+				compare_xml_nodes_by_name)))
+		{
+			first_node->is_array = XML_JSON_TRUE;
+			next_node = nodes_local.values[index];
+			next_node->is_array = XML_JSON_TRUE;
+			zbx_vector_xml_node_ptr_remove(&nodes_local, index);
+			zbx_vector_xml_node_ptr_append(nodes, next_node);
+		}
+	}
+
+	zbx_vector_xml_node_ptr_clear_ext(&nodes_local, zbx_xml_node_free);
+	zbx_vector_xml_node_ptr_destroy(&nodes_local);
 }
 
 /******************************************************************************
@@ -696,18 +710,18 @@ int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg)
  *                                                                            *
  * Purpose: convert XML format value to JSON format                           *
  *                                                                            *
- * Parameters: data   - [IN] the XML data to process                          *
- *             jstr   - [OUT] the JSON output                                 *
- *             errmsg - [OUT] error message                                   *
+ * Parameters: xml_data - [IN] the XML data to process                        *
+ *             jstr     - [OUT] the JSON output                               *
+ *             errmsg   - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - the value was processed successfully               *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_xml_to_json(char *data, char **jstr, char **errmsg)
+int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
-	ZBX_UNUSED(data);
+	ZBX_UNUSED(xml_data);
 	ZBX_UNUSED(jstr);
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
@@ -719,7 +733,7 @@ int	zbx_xml_to_json(char *data, char **jstr, char **errmsg)
 	zbx_vector_xml_node_ptr_t	nodes;
 	char				*out;
 
-	if (FAIL == zbx_open_xml(data, XML_PARSE_NOBLANKS, -1, (void **)&doc, (void **)&node, errmsg))
+	if (FAIL == zbx_open_xml(xml_data, XML_PARSE_NOBLANKS, -1, (void **)&doc, (void **)&node, errmsg))
 	{
 		if (NULL == doc)
 			goto exit;
@@ -755,29 +769,25 @@ exit:
  * Purpose: to write content of JSON document into XML node                   *
  *                                                                            *
  * Parameters: jp             - [IN] JSON parse structure                     *
- *             arr_name       - [IN] name of parrent array                    *
- *             deep           - [IN] node deep level                          *
+ *             arr_name       - [IN] name of parent array                     *
+ *             deep           - [IN] node depth level                         *
  *             doc            - [IN/OUT] xml document structure               *
  *             parent_node    - [IN/OUT] parent XML node                      *
  *             attr           - [OUT] node attribute name                     *
  *             attr_val       - [OUT] node attribute value                    *
  *             text           - [OUT] node content                            *
  *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
  ******************************************************************************/
 static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep, xmlDoc *doc, xmlNode *parent_node,
 		char **attr, char **attr_val, char **text)
 {
-	const char		*p = NULL, *p1 = NULL;
-	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
-	char			*array_loc, *attr_loc = NULL, *attr_val_loc = NULL, *text_loc = NULL;
-	int			idx = 0;
-	int			set_attr, set_text;
-	char			*pname, *pvalue = NULL;
+	const char		*json_string_ptr = NULL, *json_string_ptr_old = NULL;
+	char			*array_loc, *pname, name[MAX_STRING_LEN], value[MAX_STRING_LEN], *attr_loc = NULL,
+			*attr_val_loc = NULL, *text_loc = NULL, *pvalue = NULL;
+	int			set_attr, set_text, idx = 0;
+	zbx_json_type_t		type;
 	xmlNode			*node;
 	struct zbx_json_parse	jp_data;
-	zbx_json_type_t		type;
 
 	do
 	{
@@ -786,12 +796,12 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		array_loc = NULL;
 		pname = NULL;
 
-		if (NULL != (p = zbx_json_pair_next(jp, p, name, sizeof(name))))
+		if (NULL != (json_string_ptr = zbx_json_pair_next(jp, json_string_ptr, name, sizeof(name))))
 		{
 			pname = name;
 
-			if (NULL == zbx_json_decodevalue(p, value, sizeof(value), &type))
-				type = zbx_json_valuetype(p);
+			if (NULL == zbx_json_decodevalue(json_string_ptr, value, sizeof(value), &type))
+				type = zbx_json_valuetype(json_string_ptr);
 			else
 				pvalue = xml_escape_dyn(value);
 			if ('@' == name[0])
@@ -801,19 +811,20 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		}
 		else
 		{
-			p = p1;
-			if (NULL != (p = zbx_json_next_value(jp, p, value, sizeof(value), &type)))
+			json_string_ptr = json_string_ptr_old;
+			if (NULL != (json_string_ptr = zbx_json_next_value(jp, json_string_ptr, value, sizeof(value),
+					&type)))
 			{
 				pvalue = xml_escape_dyn(value);
 			}
 			else
 			{
-				p = p1;
-				if (NULL != (p = zbx_json_next(jp, p)))
-					type = zbx_json_valuetype(p);
+				json_string_ptr = json_string_ptr_old;
+				if (NULL != (json_string_ptr = zbx_json_next(jp, json_string_ptr)))
+					type = zbx_json_valuetype(json_string_ptr);
 			}
 		}
-		p1 = p;
+		json_string_ptr_old = json_string_ptr;
 
 		if (0 != set_attr)
 		{
@@ -825,7 +836,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		{
 			*text = zbx_strdup(*text, pvalue);
 		}
-		else if (NULL != p)
+		else if (NULL != json_string_ptr)
 		{
 			pname = (NULL == arr_name) ? pname : arr_name;
 			node = NULL;
@@ -855,7 +866,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 					node = xmlAddChild(parent_node, node);
 			}
 
-			if (SUCCEED == zbx_json_brackets_open(p, &jp_data))
+			if (SUCCEED == zbx_json_brackets_open(json_string_ptr, &jp_data))
 			{
 				json_to_xmlnode(&jp_data, array_loc, deep + 1, doc, node, &attr_loc, &attr_val_loc,
 						&text_loc);
@@ -873,7 +884,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		zbx_free(pvalue);
 		idx++;
 	}
-	while (NULL != p);
+	while (NULL != json_string_ptr);
 }
 #endif /* HAVE_LIBXML2 */
 
@@ -894,7 +905,7 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
-	ZBX_UNUSED(data);
+	ZBX_UNUSED(json_data);
 	ZBX_UNUSED(xstr);
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;

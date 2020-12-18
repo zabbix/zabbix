@@ -85,7 +85,7 @@ static duk_ret_t	es_xml_from_json(duk_context *ctx)
 	int	err_index = -1;
 	char	*str = NULL, *error = NULL;
 
-	if (FAIL == zbx_json_to_xml((char *)duk_to_string(ctx, 0), &str, &error))
+	if (FAIL == zbx_json_to_xml((char *)duk_safe_to_string(ctx, 0), &str, &error))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
 		goto out;
@@ -113,7 +113,7 @@ static duk_ret_t	es_xml_to_json(duk_context *ctx)
 	int	err_index = -1;
 	char	*str = NULL, *error = NULL;
 
-	if (FAIL == zbx_xml_to_json((char *)duk_to_string(ctx, 0), &str, &error))
+	if (FAIL == zbx_xml_to_json((char *)duk_safe_to_string(ctx, 0), &str, &error))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
 		goto out;

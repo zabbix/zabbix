@@ -29,7 +29,6 @@
 #include "dbcache.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
-#	include <libxml/tree.h>
 #	include <libxml/xpath.h>
 #	include <libxml/xmlerror.h>
 
@@ -6598,7 +6597,6 @@ static int	substitute_macros_xml_impl(char **data, const DC_ITEM *item, const st
 	return FAIL;
 #else
 	xmlDoc		*doc;
-	xmlErrorPtr	pErr;
 	xmlNode		*root_element;
 	xmlChar		*mem;
 	int		size, ret = FAIL;
