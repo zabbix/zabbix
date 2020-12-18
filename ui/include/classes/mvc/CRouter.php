@@ -218,6 +218,7 @@ class CRouter {
 		'template.dashboard.edit'			=> ['CControllerTemplateDashboardEdit',				'layout.htmlpage',		'configuration.dashboard.edit'],
 		'template.dashboard.list'			=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
 		'template.dashboard.update'			=> ['CControllerTemplateDashboardUpdate',			'layout.json',			null],
+		'token.delete'						=> ['CControllerTokenDelete',						null,					null],
 		'token.disable'						=> ['CControllerTokenDisable',						null,					null],
 		'token.enable'						=> ['CControllerTokenEnable',						null,					null],
 		'token.list'						=> ['CControllerTokenList',							'layout.htmlpage',		'administration.token.list'],
