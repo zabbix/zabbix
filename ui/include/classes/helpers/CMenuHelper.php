@@ -154,7 +154,7 @@ class CMenuHelper {
 						'triggers.php?context=template', 'graphs.php?context=template',
 						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
 						'trigger_prototypes.php?context=template', 'host_prototypes.php?context=template',
-						'httpconf.php?context=template', 'conf.import.php?rules_preset=template'
+						'httpconf.php?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -164,8 +164,7 @@ class CMenuHelper {
 						'application.list', 'application.edit', 'items.php?context=host', 'triggers.php?context=host',
 						'graphs.php?context=host', 'host_discovery.php?context=host',
 						'disc_prototypes.php?context=host', 'trigger_prototypes.php?context=host',
-						'host_prototypes.php?context=host', 'httpconf.php?context=host',
-						'conf.import.php?rules_preset=host'
+						'host_prototypes.php?context=host', 'httpconf.php?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
