@@ -222,9 +222,9 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation                    *
  *                                                                            *
- * Parameters: filter          - [IN] the lld filter                          *
- *             jp_row          - [IN] the lld data row                        *
+ * Parameters: jp_row          - [IN] the lld data row                        *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             condition       - [IN] the lld filter condition                *
  *             info            - [OUT] the warning description                *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
@@ -262,7 +262,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 	{
 		ret = SUCCEED;
 	}
-	else
+	else if (CONDITION_OPERATOR_EXIST != condition->op)
 	{
 		*info = zbx_strdcatf(*info,
 				"Cannot accurately apply filter: no value received for macro \"%s\".\n",
