@@ -129,13 +129,46 @@ static int	host_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+static void	get_discovery_itemids(const zbx_vector_uint64_t *itemids, zbx_vector_uint64_t *discovered_itemids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i2.itemid"
+			" from items i1,item_discovery i2"
+			" where i2.parent_itemid=i1.itemid"
+			" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.itemid", itemids->values, itemids->values_num);
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		zbx_vector_uint64_append(discovered_itemids, itemid);
+	}
+	DBfree_result(result);
+}
+
 static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids, zbx_vector_uint64_t *itemids,
 		zbx_vector_uint64_t *discovered_itemids)
 {
-	DB_RESULT	result;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	DB_ROW		row;
+	DB_RESULT		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW			row;
+	zbx_vector_uint64_t	templateids_tmp;
+
+	zbx_vector_uint64_create(&templateids_tmp);
+	zbx_vector_uint64_append_array(&templateids_tmp, templateids->values, templateids->values_num);
+
+	zbx_vector_uint64_clear(templateids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i1.itemid"
 			" from items i1"
@@ -145,8 +178,8 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 					" where i2.templateid=i1.itemid"
 				")"
 				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids->values,
-			templateids->values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
+			templateids_tmp.values_num);
 
 	result = DBselect("%s", sql);
 	zbx_free(sql);
@@ -166,9 +199,8 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 			" from items i1,item_discovery i2"
 			" where i2.parent_itemid=i1.itemid"
 			" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids->values,
-			templateids->values_num);
-	zbx_vector_uint64_clear(templateids);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.templateid", templateids_tmp.values,
+			templateids_tmp.values_num);
 
 	result = DBselect("%s", sql);
 	zbx_free(sql);
@@ -182,6 +214,8 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 		zbx_vector_uint64_append(discovered_itemids, itemid);
 	}
 	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&templateids_tmp);
 
 	if (0 == templateids->values_num)
 		return;
@@ -310,6 +344,7 @@ static int	DBpatch_5030008(void)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 
+			/* update valuemapid for top level items on a template/host */
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
 					" where", valuemapid);
 			zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -317,6 +352,9 @@ static int	DBpatch_5030008(void)
 					host->itemids.values_num);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+			/* get discovered itemids for not templated items */
+			get_discovery_itemids(&host->itemids, &discovered_itemids);
 
 			zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
 			get_template_itemids_by_templateids(&templateids, &host->itemids, &discovered_itemids);
@@ -331,14 +369,17 @@ static int	DBpatch_5030008(void)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
-					" where", valuemapid);
-			zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
-					discovered_itemids.values_num);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-			zbx_vector_uint64_clear(&discovered_itemids);
+			if (0 != discovered_itemids.values_num)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid="
+						ZBX_FS_UI64 " where", valuemapid);
+				zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
+						discovered_itemids.values_num);
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+				zbx_vector_uint64_clear(&discovered_itemids);
+			}
 
 			valuemapid++;
 			i++;
