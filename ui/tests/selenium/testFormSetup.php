@@ -48,8 +48,7 @@ class testFormSetup extends CWebTest {
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$this->assertEquals('English (en_GB)', $form->getField('Default language')->getValue());
-		$hintbox = $form->query('xpath:.//span[contains(@class, "icon-info")]')->one();
-		$hintbox->click();
+		$hintbox = $form->query('xpath:.//span[contains(@class, "icon-info")]')->one()->click();
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
 		$this->assertEquals($hint_text, $this->query('class:hint-box')->one()->getText());
@@ -163,13 +162,22 @@ class testFormSetup extends CWebTest {
 			$credentials_field = $form->getField('Store credentials in');
 			$this->assertEquals('Plain text', $credentials_field->getSelected());
 
-			$credentials_field->select('HashiCorp Vault');
-			$form->invalidate();
 			$vault_fields = [
 				'Vault API endpoint',
 				'Vault secret path',
 				'Vault authentication token'
 			];
+			foreach ($vault_fields as $field_name) {
+				$this->assertFalse($form->getField($field_name)->isVisible());
+			}
+
+			// Check layout when "Store credetials in" is set to "HashiCorp Vault".
+			$credentials_field->select('HashiCorp Vault');
+			$form->invalidate();
+			foreach (['User', 'Password'] as $field_name) {
+				$this->assertFalse($form->getField($field_name)->isVisible());
+			}
+
 			foreach ($vault_fields as $field_name) {
 				$vault_maxlength = ($field_name === 'Vault authentication token') ? 2048 : 255;
 				$field = $form->getField($field_name);
@@ -530,7 +538,7 @@ class testFormSetup extends CWebTest {
 			if (($db_parameters['Database type'] === 'MySQL' && $db_parameters['Database host'] === 'localhost')) {
 				$tls_text = 'Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows).';
 				$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
-				// Skip data provider as TLS encryption firlds are not visible.
+				// Skip data provider as TLS encryption fields are not visible.
 
 				return;
 			}
