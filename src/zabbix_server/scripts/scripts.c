@@ -30,6 +30,7 @@
 #include "scripts.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
+#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -344,11 +345,15 @@ void	zbx_script_clean(zbx_script_t *script)
  *                                                                            *
  ******************************************************************************/
 int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
-		size_t max_error_len)
+		size_t max_error_len, zbx_uint64_t eventid)
 {
+	DB_EVENT	*event = NULL;
+	zbx_vector_ptr_t	events;
+	zbx_vector_uint64_t	eventids;
 	int		ret = FAIL;
 	zbx_uint64_t	groupid, userid;
 	zbx_uint64_t	*p_userid = NULL;
+	int		macro_mask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -379,6 +384,40 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 					NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
+			macro_mask = MACRO_TYPE_SCRIPT;
+
+			if (ZBX_MAX_UINT64 != eventid) {
+				zbx_vector_ptr_create(&events);
+				zbx_vector_uint64_create(&eventids);
+				zbx_vector_uint64_append(&eventids, eventid);
+
+				zbx_db_get_events_by_eventids(&eventids, &events);
+
+				if (0 < eventids.values_num)
+				{
+					event = (DB_EVENT*)events.values[0];
+					macro_mask |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY);
+				}
+
+				zbx_vector_ptr_destroy(&events);
+				zbx_vector_uint64_destroy(&eventids);
+			}
+
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
+					NULL, NULL, NULL, &script->command, macro_mask, error, max_error_len))
+			{
+				goto out;
+			}
+
+			if (SUCCEED != substitute_simple_macros(NULL, event, NULL, p_userid, NULL, host, NULL, NULL,
+					NULL, NULL, &script->command_orig, macro_mask, error, max_error_len))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
+
+			if (NULL != event)
+				zbx_clean_event(event);
+
 			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
@@ -386,14 +425,17 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				zbx_strlcpy(error, "Unknown script identifier.", max_error_len);
 				goto out;
 			}
-			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
+
+			if (0 == host->hostid && groupid > 0 &&
+					SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
 				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
 						max_error_len);
 				goto out;
 			}
 			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
-				SUCCEED != check_user_permissions(user->userid, host, script))
+					(SUCCEED != check_user_permissions(user->userid, host, script) ||
+					0 == host->hostid))
 			{
 				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
 						max_error_len);
@@ -409,30 +451,33 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				p_userid = &userid;
 			}
 
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL,
-					NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
-			{
-				goto out;
-			}
+			if (ZBX_SCRIPT_TYPE_WEBHOOK != script->type) {
+				if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host,
+						NULL, NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error,
+						max_error_len))
+				{
+					goto out;
+				}
 
-			/* expand macros in command_orig used for non-secure logging */
-			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL,
-					NULL, NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
-			{
-				/* script command_orig is a copy of script command - if the script command  */
-				/* macro substitution succeeded, then it will succeed also for command_orig */
-				THIS_SHOULD_NEVER_HAPPEN;
+				/* expand macros in command_orig used for non-secure logging */
+				if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL,
+						NULL, NULL, NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error,
+						max_error_len))
+				{
+					/* script command_orig is a copy of script command - if the script command  */
+					/* macro substitution succeeded, then it will succeed also for command_orig */
+					THIS_SHOULD_NEVER_HAPPEN;
+				}
 			}
-
-			/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
-			if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
+			else if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
 			{
+				/* DBget_script_by_scriptid() may overwrite script type with anything but global script... */
 				THIS_SHOULD_NEVER_HAPPEN;
 				goto out;
 			}
 
 			/* ...therefore this recursion is no more than two layers deep */
-			if (FAIL == zbx_script_prepare(script, host, user, error, max_error_len))
+			if (FAIL == zbx_script_prepare(script, host, user, error, max_error_len, eventid))
 				goto out;
 
 			break;
@@ -484,7 +529,8 @@ out:
 	return ret;
 }
 
-static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result, char **debug)
+static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result,
+		char **debug)
 {
 	int			size, ret = SUCCEED;
 	char			*bytecode = NULL, *errmsg = NULL;
