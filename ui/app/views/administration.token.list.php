@@ -110,7 +110,9 @@ $widget = (new CWidget())
 	)
 	->addItem($filter);
 
-$token_form = (new CForm('get'))->setName('token_form');
+$token_form = (new CForm('get'))
+	->addVar('action_src', 'token.list')
+	->setName('token_form');
 
 $token_table = (new CTableInfo())
 	->setHeader([
@@ -171,6 +173,7 @@ foreach ($data['tokens'] as $token) {
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['lastaccess']),
 		$token['status'] == ZBX_AUTH_TOKEN_ENABLED
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
+					->setArgument('action_src', 'token.list')
 					->setArgument('action', 'token.disable')
 					->setArgument('tokenids', (array) $token['tokenid'])
 					->getUrl()
@@ -179,6 +182,7 @@ foreach ($data['tokens'] as $token) {
 				->addClass(ZBX_STYLE_GREEN)
 				->addSID()
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
+					->setArgument('action_src', 'token.list')
 					->setArgument('action', 'token.enable')
 					->setArgument('tokenids', (array) $token['tokenid'])
 					->getUrl()
