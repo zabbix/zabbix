@@ -46,7 +46,7 @@ static int	DBpatch_5030001(void)
 		{"token", "tokenid", 0,
 			{
 				{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR	, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, 0, 0},

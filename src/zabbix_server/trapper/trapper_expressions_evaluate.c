@@ -18,8 +18,9 @@
 **/
 
 #include "common.h"
-#include "zbxserver.h"
-#include "trapper_preproc.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
+#include "trapper_auth.h"
 #include "trapper_expressions_evaluate.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
@@ -31,7 +32,7 @@ static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, z
 	int			ret = FAIL;
 	struct zbx_json_parse	jp_data, jp_expressions;
 
-	if (FAIL == get_user(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;

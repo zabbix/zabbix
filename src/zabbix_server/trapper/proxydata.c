@@ -22,11 +22,11 @@
 #include "log.h"
 #include "proxy.h"
 
-#include "proxydata.h"
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxtasks.h"
 #include "mutexs.h"
 #include "daemon.h"
+
+#include "proxydata.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;

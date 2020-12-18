@@ -17,9 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef __SHA512CRYPT_H
-#define __SHA512CRYPT_H
+#ifndef ZABBIX_TRAPPER_AUTH_H
+#define ZABBIX_TRAPPER_AUTH_H
 
-void sha512_hash(const char *in, char *out);
+#include "comms.h"
+#include "zbxjson.h"
+
+int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, char **result);
 
 #endif

@@ -18,12 +18,12 @@
 **/
 
 #include "common.h"
-#include "nodecommand.h"
-#include "trapper_preproc.h"
 #include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "../scripts/scripts.h"
+#include "trapper_auth.h"
+#include "nodecommand.h"
 
 /******************************************************************************
  *                                                                            *
@@ -210,8 +210,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 	DC_HOST		host;
 	zbx_script_t	script;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 ,
-			__func__, scriptid, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64,
+			__func__, scriptid, hostid, user->userid);
 
 	*error = '\0';
 
@@ -297,7 +297,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 		goto finish;
 	}
 
-	if (FAIL == get_user(jp, &user, &result))
+	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))

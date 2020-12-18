@@ -19,28 +19,29 @@
 
 #include "common.h"
 
-#include "comms.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
 #include "proxy.h"
 #include "zbxself.h"
 
-#include "trapper.h"
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
 #include "../alerter/alerter_protocol.h"
-#include "trapper_preproc.h"
-#include "trapper_expressions_evaluate.h"
 
 #include "daemon.h"
 #include "zbxcrypto.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "zbxipcservice.h"
-#include "trapper_item_test.h"
 #include "../poller/checks_snmp.h"
+
+#include "trapper_auth.h"
+#include "trapper_preproc.h"
+#include "trapper_expressions_evaluate.h"
+#include "trapper_item_test.h"
+#include "trapper.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -328,7 +329,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == get_user(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
@@ -492,7 +493,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (FAIL == get_user(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
 		error = zbx_strdup(NULL, "Permission denied.");
 		goto fail;
@@ -942,7 +943,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == get_user(jp, &user, NULL))
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
 		zbx_send_response(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;

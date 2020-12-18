@@ -22,8 +22,9 @@
 #include "log.h"
 #include "proxy.h"
 
-#include "proxyconfig.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
+
+#include "proxyconfig.h"
 
 /******************************************************************************
  *                                                                            *
