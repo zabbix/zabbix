@@ -59,6 +59,10 @@ func (p *Plugin) Validate(options interface{}) error {
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if err = smart.CheckVerson(&p.Base, p.options.Timeout); err != nil {
+		return
+	}
+
 	switch key {
 	case "smart.attribute.discovery":
 		var out []smart.Attribute
@@ -76,7 +80,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			}
 
 			for _, attr := range dev.SmartAttributes.Table {
-				out = append(out, smart.Attribute{Name: dev.Info.Name, DeviceType: t, ID: attr.ID, Attrname: attr.Attrname, Thresh: attr.Thresh})
+				out = append(out, smart.Attribute{Name: smart.CutPrefix(dev.Info.Name), DeviceType: t, ID: attr.ID, Attrname: attr.Attrname, Thresh: attr.Thresh})
 			}
 		}
 

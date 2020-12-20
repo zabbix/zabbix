@@ -60,16 +60,20 @@ func (p *Plugin) Validate(options interface{}) error {
 
 //Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if err = smart.CheckVerson(&p.Base, p.options.Timeout); err != nil {
+		return
+	}
+
 	switch key {
 	case "smart.disk.discovery":
-		var out []smart.Device
+		out := []smart.Device{}
 		parsedDevices, err := smart.GetParsedDevices(&p.Base, p.options.Timeout)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, dev := range parsedDevices {
-			out = append(out, smart.Device{Name: dev.Info.Name, DeviceType: getType(dev.Info.DevType, dev.RotationRate),
+			out = append(out, smart.Device{Name: smart.CutPrefix(dev.Info.Name), DeviceType: getType(dev.Info.DevType, dev.RotationRate),
 				Model: dev.ModelName, SerialNumber: dev.SerialNumber})
 		}
 
@@ -85,7 +89,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, err
 		}
 
-		jsonArray, err := json.Marshal(setDiskType(deviceJsons))
+		jsonArray, err := json.Marshal(setDiskFields(deviceJsons))
 		if err != nil {
 			return nil, err
 		}
@@ -96,12 +100,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return nil, fmt.Errorf("Incorrect key.")
 }
 
-func setDiskType(deviceJsons map[string]string) []interface{} {
+func setDiskFields(deviceJsons map[string]string) []interface{} {
 	var out []interface{}
 	for k, v := range deviceJsons {
 		b := make(map[string]interface{})
 		json.Unmarshal([]byte(v), &b)
-		b["disk_name"] = k
+		b["disk_name"] = smart.CutPrefix(k)
 		var devType string
 		if dev, ok := b["device"]; ok {
 			s, ok := dev.(string)

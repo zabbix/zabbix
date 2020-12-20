@@ -23,9 +23,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"zabbix.com/pkg/plugin"
 )
+
+const supportedSmartctl = 7.1
 
 // Devices -
 type Devices struct {
@@ -65,9 +69,14 @@ type deviceInfo struct {
 	DevType string `json:"type"`
 }
 
+type smartctl struct {
+	Smartctl smartctlField `json:"smartctl"`
+}
+
 type smartctlField struct {
 	Messages   []message `json:"messages"`
 	ExitStatus int       `json:"exit_status"`
+	Version    []int     `json:"version"`
 }
 
 type message struct {
@@ -167,6 +176,46 @@ func GetDeviceJsons(p *plugin.Base, timeout int) (map[string]string, error) {
 	return out, nil
 }
 
+// CheckVerson -
+func CheckVerson(p *plugin.Base, timeout int) error {
+	var smartctl smartctl
+	devicesJSON, err := executeSmartctl("--scan -j", timeout)
+	if err != nil {
+		p.Errf("failed to execute smartctl: %s", err.Error())
+		return fmt.Errorf("Could not execute smartctl")
+	}
+
+	if err = json.Unmarshal([]byte(devicesJSON), &smartctl); err != nil {
+		return fmt.Errorf("Fail to unmarshal smartctl response: %s", err)
+	}
+
+	if len(smartctl.Smartctl.Version) < 1 {
+		return fmt.Errorf("Invalid smartctl version")
+	}
+	var version string
+	if len(smartctl.Smartctl.Version) >= 2 {
+		version = fmt.Sprintf("%d.%d", smartctl.Smartctl.Version[0], smartctl.Smartctl.Version[1])
+	} else {
+		version = fmt.Sprintf("%d", smartctl.Smartctl.Version[0])
+	}
+
+	v, err := strconv.ParseFloat(version, 64)
+	if err != nil {
+		return fmt.Errorf("Failed to parse smartctl version")
+	}
+
+	if v < supportedSmartctl {
+		return fmt.Errorf("Incorrect smartctl version, must be %v or higher", supportedSmartctl)
+	}
+
+	return nil
+}
+
+// CutPrefix -
+func CutPrefix(in string) string {
+	return strings.TrimPrefix(in, "/dev/")
+}
+
 func getRaidJsons(name string, rtype string, timeout int) (map[string]string, error) {
 	out := make(map[string]string)
 	var i int
@@ -252,14 +301,14 @@ func (dp DeviceParser) checkErr() (err error) {
 }
 
 func getDevices(timeout int) (basic []deviceInfo, raid []deviceInfo, err error) {
-	raidTmp, err := scanDevices("--scan -d sat -j", timeout)
-	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
-	}
-
 	basic, err = scanDevices("--scan -j", timeout)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to scan for devices: %s", err)
+	}
+
+	raidTmp, err := scanDevices("--scan -d sat -j", timeout)
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
 	}
 
 raid:
