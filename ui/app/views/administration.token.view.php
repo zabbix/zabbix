@@ -52,7 +52,7 @@ $token_from_list = (new CFormList())
 			->setEnabled(false)
 	);
 
-$token_view = (new CTabView())->addTab('token', _('Token'), $token_from_list);
+$token_view = (new CTabView())->addTab('token', '', $token_from_list);
 
 $token_view->setFooter(makeFormFooter((new CRedirectButton(_('Close'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'token.list')
