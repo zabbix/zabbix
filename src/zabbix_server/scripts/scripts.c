@@ -599,7 +599,8 @@ static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command
 	}
 
 out:
-	*debug = zbx_strdup(*debug, zbx_es_debug_info(&es));
+	if (NULL != debug)
+		*debug = zbx_strdup(*debug, zbx_es_debug_info(&es));
 
 	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
 	{
