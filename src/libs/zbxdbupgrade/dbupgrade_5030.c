@@ -245,6 +245,7 @@ static int	DBpatch_5030008(void)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	templateids, discovered_itemids;
+	zbx_db_insert_t		db_insert_valuemap, db_insert_valuemap_mapping;
 
 	zbx_hashset_create(&valuemaps, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -321,46 +322,36 @@ static int	DBpatch_5030008(void)
 
 	valuemapid_update = valuemapid = DBget_maxid_num("valuemap", hosts.values_num);
 
-	for(i = 0; i < hosts.values_num;)
+
+	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
+	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
+			"valuemapid", "value", "newvalue", NULL);
+
+	for(i = 0; i < hosts.values_num; i++, valuemapid++)
 	{
-		zbx_db_insert_t	db_insert_valuemap, db_insert_valuemap_mapping;
+		zbx_host_t	*host;
 
-		zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
-		zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
-				"valuemapid", "value", "newvalue", NULL);
+		host = (zbx_host_t *)hosts.values[i];
 
-		while(i < hosts.values_num)
+		if (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
 		{
-			zbx_host_t	*host;
+			zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, host->hostid, valuemap->name);
 
-			host = (zbx_host_t *)hosts.values[i];
-
-			if (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
+			for (j = 0; j < valuemap->mappings.values_num; j++)
 			{
-				zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, host->hostid, valuemap->name);
-
-				for (j = 0; j < valuemap->mappings.values_num; j++)
-				{
-					zbx_db_insert_add_values(&db_insert_valuemap_mapping, __UINT64_C(0), valuemapid,
-							valuemap->mappings.values[j].first,
-							valuemap->mappings.values[j].second);
-				}
+				zbx_db_insert_add_values(&db_insert_valuemap_mapping, __UINT64_C(0), valuemapid,
+						valuemap->mappings.values[j].first,
+						valuemap->mappings.values[j].second);
 			}
-
-			valuemapid++;
-			i++;
-
-			if (1000 < db_insert_valuemap.rows.values_num)
-				break;
 		}
-
-		zbx_db_insert_execute(&db_insert_valuemap);
-		zbx_db_insert_clean(&db_insert_valuemap);
-
-		zbx_db_insert_autoincrement(&db_insert_valuemap_mapping, "valuemap_mappingid");
-		zbx_db_insert_execute(&db_insert_valuemap_mapping);
-		zbx_db_insert_clean(&db_insert_valuemap_mapping);
 	}
+
+	zbx_db_insert_execute(&db_insert_valuemap);
+	zbx_db_insert_clean(&db_insert_valuemap);
+
+	zbx_db_insert_autoincrement(&db_insert_valuemap_mapping, "valuemap_mappingid");
+	zbx_db_insert_execute(&db_insert_valuemap_mapping);
+	zbx_db_insert_clean(&db_insert_valuemap_mapping);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
