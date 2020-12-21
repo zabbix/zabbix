@@ -64,7 +64,7 @@ $filter
 	]);
 
 $widget = (new CWidget())
-	->setTitle(_('API Tokens'))
+	->setTitle(_('API tokens'))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create API token'),

@@ -99,7 +99,7 @@ $filter
 	]);
 
 $widget = (new CWidget())
-	->setTitle(_('API Tokens'))
+	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setControls(
 		(new CTag('nav', true,

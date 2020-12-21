@@ -179,7 +179,7 @@ class CControllerTokenList extends CController {
 		);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('API Tokens'));
+		$response->setTitle(_('API tokens'));
 		$this->setResponse($response);
 	}
 }

@@ -24,7 +24,7 @@
  */
 
 $widget = (new CWidget())
-	->setTitle(_('API Tokens'))
+	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $token_form = (new CForm())

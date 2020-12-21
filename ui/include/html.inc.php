@@ -905,7 +905,7 @@ function getAdministrationGeneralSubmenu() {
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
 				$tokens_url       => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-										? _('API Tokens')
+										? _('API tokens')
 										: null,
 				$miscconfig_url   => _('Other')
 			])

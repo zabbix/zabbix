@@ -48,7 +48,7 @@ class CControllerTokenView extends CController {
 	protected function doAction() {
 		$data = $this->getInputAll();
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('API Tokens'));
+		$response->setTitle(_('API tokens'));
 		$this->setResponse($response);
 	}
 }
