@@ -322,7 +322,6 @@ static int	DBpatch_5030008(void)
 
 	valuemapid_update = valuemapid = DBget_maxid_num("valuemap", hosts.values_num);
 
-
 	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
 	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
 			"valuemapid", "value", "newvalue", NULL);
