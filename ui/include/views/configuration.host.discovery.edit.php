@@ -29,7 +29,11 @@ $widget = (new CWidget())
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
 
-$form = (new CForm())
+$url = (new CUrl('host_discovery.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
+$form = (new CForm('post', $url))
 	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -876,16 +880,17 @@ if (!empty($data['itemid'])) {
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
-	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
-		->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel();
+	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid', 'context']),
+		'context'
+	))->setEnabled(!$data['limited']);
+	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel()]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('context'))]
 	));
 }
 

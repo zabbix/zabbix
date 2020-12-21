@@ -29,8 +29,12 @@ $triggersWidget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
 	->addItem(get_header_host_table('triggers', $data['hostid'], $data['parent_discoveryid']));
 
+$url = (new CUrl('trigger_prototypes.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$triggersForm = (new CForm())
+$triggersForm = (new CForm('post', $url))
 	->setId('triggers-prototype-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -570,12 +574,19 @@ foreach ($data['db_dependencies'] as $dependency) {
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$description = (new CLink($depTriggerDescription,
-			'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').'&triggerid='.$dependency['triggerid']
+			(new CUrl('trigger_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				->setArgument('triggerid', $dependency['triggerid'])
+				->setArgument('context', $data['context'])
 		))->setAttribute('target', '_blank');
 	}
 	elseif ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = (new CLink($depTriggerDescription,
-			'triggers.php?form=update&triggerid='.$dependency['triggerid']
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('triggerid', $dependency['triggerid'])
+				->setArgument('context', $data['context'])
 		))->setAttribute('target', '_blank');
 	}
 
@@ -631,7 +642,7 @@ $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList
 // append buttons to form
 if (!empty($data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
-		url_params(['form', 'triggerid', 'parent_discoveryid'])
+		url_params(['form', 'triggerid', 'parent_discoveryid', 'context']), 'context'
 	);
 
 	if ($data['limited']) {
@@ -642,14 +653,14 @@ if (!empty($data['triggerid'])) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('parent_discoveryid'))
+			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid'))]
+		[new CButtonCancel(url_params(['parent_discoveryid', 'context']))]
 	));
 }
 

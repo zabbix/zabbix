@@ -140,7 +140,9 @@ foreach ($this->data['groups'] as $group) {
 	if ($group['discoveryRule']) {
 		if ($data['allowed_ui_conf_hosts']) {
 			$lld_name = (new CLink($group['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+					->setArgument('context', 'host')
 			));
 		}
 		else {

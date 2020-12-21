@@ -34,9 +34,14 @@ $widget = (new CWidget())
 					? new CRedirectButton(_('Create item'), (new CUrl('items.php'))
 						->setArgument('form', 'create')
 						->setArgument('hostid', $data['hostid'])
+						->setArgument('context', $data['context'])
 						->getUrl()
 					)
-					: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
+					: (new CButton('form',
+						($data['context'] === 'host')
+							? _('Create item (select host first)')
+							: _('Create item (select template first)')
+					))->setEnabled(false)
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
@@ -46,14 +51,19 @@ if ($data['hostid'] != 0) {
 }
 $widget->addItem($data['main_filter']);
 
+$url = (new CUrl('items.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$itemForm = (new CForm())->setName('items');
-$itemForm->addVar('checkbox_hash', $data['checkbox_hash']);
+$itemForm = (new CForm('post', $url))
+	->setName('items')
+	->addVar('checkbox_hash', $data['checkbox_hash'])
+	->addVar('context', $data['context']);
+
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
 }
-
-$url = (new CUrl('items.php'))->getUrl();
 
 // create table
 $itemTable = (new CTableInfo())
@@ -62,7 +72,11 @@ $itemTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
-		($data['hostid'] == 0) ? _('Host') : null,
+		($data['hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -72,14 +86,15 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		_('Info')
+		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $current_time = time();
 
 $data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
 	'html' => true,
-	'sources' => ['expression', 'recovery_expression']
+	'sources' => ['expression', 'recovery_expression'],
+	'context' => $data['context']
 ]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
@@ -93,7 +108,9 @@ foreach ($data['items'] as $item) {
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
-			(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+			(new CUrl('disc_prototypes.php'))
+				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+				->setArgument('context', $data['context'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -106,7 +123,11 @@ foreach ($data['items'] as $item) {
 		}
 		else {
 			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-				'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
+				(new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', $item['hostid'])
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->setArgument('context', $data['context'])
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL);
@@ -116,31 +137,30 @@ foreach ($data['items'] as $item) {
 	}
 
 	$description[] = new CLink(CHtml::encode($item['name_expanded']),
-		'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
+		(new CUrl('items.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $item['hostid'])
+			->setArgument('itemid', $item['itemid'])
+			->setArgument('context', $data['context'])
 	);
 
 	// status
 	$status = new CCol((new CLink(
-		itemIndicator($item['status'], $item['state']),
-		'?group_itemid[]='.$item['itemid'].
-			'&hostid='.$item['hostid'].
-			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
+			itemIndicator($item['status'], $item['state']),
+			(new CUrl('items.php'))
+				->setArgument('group_itemid[]', $item['itemid'])
+				->setArgument('hostid', $item['hostid'])
+				->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
+					? 'item.massenable'
+					: 'item.massdisable'
+				)
+				->setArgument('context', $data['context'])
+				->getUrl()
+		))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status'], $item['state']))
 		->addSID()
 	);
-
-	// info
-	$info_icons = [];
-
-	if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-		$info_icons[] = makeErrorIcon($item['error']);
-	}
-
-	// discovered item lifetime indicator
-	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
-	}
 
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -161,7 +181,11 @@ foreach ($data['items'] as $item) {
 		else {
 			$trigger_description[] = new CLink(
 				CHtml::encode($trigger['description']),
-				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+				(new CUrl('triggers.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', key($trigger['hosts']))
+					->setArgument('triggerid', $trigger['triggerid'])
+					->setArgument('context', $data['context'])
 			);
 		}
 
@@ -203,7 +227,7 @@ foreach ($data['items'] as $item) {
 	$wizard = (new CSpan(
 		(new CButton(null))
 			->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getItem($item['itemid']))
+			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]))
 	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
@@ -223,6 +247,20 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
+	// info
+	if ($data['context'] === 'host') {
+		$info_icons = [];
+
+		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
+			$info_icons[] = makeErrorIcon($item['error']);
+		}
+
+		// discovered item lifetime indicator
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
+		}
+	}
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
@@ -236,39 +274,49 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
-		makeInformationList($info_icons)
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
-$massclearhistory = [
-	'name' => _('Clear history'),
-	'confirm' => _('Delete history of selected items?'),
-	'disabled' => $data['is_template']
+$button_list = [
+	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
+	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')]
 ];
 
-if ($data['config']['compression_status']) {
-	unset($massclearhistory['confirm']);
+if ($data['context'] === 'host') {
+	$massclearhistory = [
+		'name' => _('Clear history'),
+		'confirm' => _('Delete history of selected items?'),
+		'disabled' => $data['is_template']
+	];
+
+	if ($data['config']['compression_status']) {
+		unset($massclearhistory['confirm']);
+	}
+
+	$button_list += [
+		'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
+		'item.massclearhistory' => $massclearhistory
+	];
 }
 
-// append table to form
-$itemForm->addItem([
-	$itemTable,
-	$data['paging'],
-	new CActionButtonList('action', 'group_itemid',
-		[
-			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
-			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
-			'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
-			'item.massclearhistory' => $massclearhistory,
-			'item.masscopyto' => ['name' => _('Copy')],
-			'item.massupdateform' => ['name' => _('Mass update')],
-			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
-		],
-		$data['checkbox_hash']
-	)
-]);
+$button_list += [
+	'item.masscopyto' => ['name' => _('Copy')],
+	'popup.massupdate.item' => [
+		'content' => (new CButton('', _('Mass update')))
+			->onClick("return openMassupdatePopup(this, 'popup.massupdate.item');")
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeAttribute('id')
+	],
+	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
+];
 
-// append form to widget
+// Append table to form.
+$itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action', 'group_itemid', $button_list,
+	$data['checkbox_hash']
+)]);
+
+// Append form to widget.
 $widget->addItem($itemForm);
 
 $widget->show();

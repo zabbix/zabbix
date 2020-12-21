@@ -32,8 +32,12 @@ if ($data['hostid'] != 0) {
 	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
+$url = (new CUrl('triggers.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$triggersForm = (new CForm())
+$triggersForm = (new CForm('post', $url))
 	->setid('triggers-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -79,6 +83,7 @@ if ($discovered_trigger) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 			->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
+			->setArgument('context', $data['context'])
 	));
 }
 
@@ -593,8 +598,12 @@ foreach ($data['db_dependencies'] as $dependency) {
 
 	$dependenciesTable->addRow(
 		(new CRow([
-			(new CLink($dep_trigger_description, 'triggers.php?form=update&triggerid='.$dependency['triggerid']))
-				->setAttribute('target', '_blank'),
+			(new CLink($dep_trigger_description,
+				(new CUrl('triggers.php'))
+					->setArgument('form', 'update')
+					->setArgument('triggerid', $dependency['triggerid'])
+					->setArgument('context', $data['context'])
+			))->setAttribute('target', '_blank'),
 			(new CCol(
 				$discovered_trigger
 					? null
@@ -636,16 +645,16 @@ if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
-			(new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid'])))
+			(new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid', 'context']), 'context'))
 				->setEnabled(!$data['limited']),
-			new CButtonCancel()
+			new CButtonCancel(url_param('context'))
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		[new CButtonCancel(url_param('context'))]
 	));
 }
 

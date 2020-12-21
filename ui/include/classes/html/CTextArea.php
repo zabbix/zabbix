@@ -105,6 +105,12 @@ class CTextArea extends CTag {
 		return $this;
 	}
 
+	public function setAdaptiveWidth($value) {
+		$this->addStyle('max-width: '.$value.'px;');
+		$this->addStyle('width: 100%;');
+		return $this;
+	}
+
 	public function setEnabled($value) {
 		if ($value) {
 			$this->removeAttribute('disabled');

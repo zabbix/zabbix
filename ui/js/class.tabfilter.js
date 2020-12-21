@@ -415,7 +415,10 @@ class CTabFilter extends CBaseComponent {
 			 */
 			tabSortChanged: (ev, ui) => {
 				// Update order of this._items array.
-				var from, to, item_moved, target = ui.item[0].querySelector('[data-target] .tabfilter-item-link');
+				let from,
+					to,
+					item_moved;
+				const target = ui.item[0].querySelector('[data-target] .tabfilter-item-link');
 
 				this._items.forEach((item, index) => from = (item._target === target) ? index : from);
 				this._target.querySelectorAll('nav [data-target] .tabfilter-item-link')
@@ -668,6 +671,21 @@ class CTabFilter extends CBaseComponent {
 		$('.ui-sortable-container', this._target).sortable({
 			items: '.tabfilter-item-label:not(:first-child)',
 			update: this._events.tabSortChanged,
+			stop: (_, ui) => {
+				const $item = ui.item;
+
+				/**
+				 * Remove inline style positon, left and top that stay after sortable.
+				 * This styles broken tabs layout.
+				 */
+				if ($item.css('position') === 'relative') {
+					$item.css({
+						'position': '',
+						'left': '',
+						'top': ''
+					});
+				}
+			},
 			axis: 'x',
 			containment: 'parent'
 		});

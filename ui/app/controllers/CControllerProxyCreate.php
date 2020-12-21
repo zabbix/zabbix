@@ -39,10 +39,12 @@ class CControllerProxyCreate extends CController {
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
 				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
+			'psk_edit_mode' =>	'in 0,1',
+			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_subject' => 	'db       hosts.tls_subject',
+			'clone_proxyid' =>	'db       hosts.hostid',
 			'form_refresh' =>	'int32'
 		];
 
@@ -71,6 +73,18 @@ class CControllerProxyCreate extends CController {
 
 	protected function doAction() {
 		$proxy = [];
+
+		if ($this->hasInput('clone_proxyid')) {
+			$clone_proxies = API::Proxy()->get([
+				'output' => ['tls_psk_identity', 'tls_psk'],
+				'proxyids' => $this->getInput('clone_proxyid'),
+				'editable' => true
+			]);
+			$clone_proxy = reset($clone_proxies);
+
+			$proxy['tls_psk_identity'] = $clone_proxy['tls_psk_identity'];
+			$proxy['tls_psk'] = $clone_proxy['tls_psk'];
+		}
 
 		$this->getInputs($proxy, ['host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 			'tls_subject', 'tls_psk_identity', 'tls_psk'

@@ -26,7 +26,7 @@ class testTriggerExpressions extends CWebTest {
 
 	public function testTriggerExpressions_SimpleTest() {
 		// Open advanced editor for testing trigger expression results.
-		$this->page->login()->open('triggers.php?form=update&triggerid='.self::TRIGGER_ID);
+		$this->page->login()->open('triggers.php?form=update&context=host&triggerid='.self::TRIGGER_ID);
 		$this->query('button:Expression constructor')->waitUntilPresent()->one()->click();
 		$this->query('button:Test')->waitUntilPresent()->one()->click();
 
