@@ -106,6 +106,11 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 .........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.3
+
+5.2.3rc1 was released as 5.2.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.2.3rc1
 
 New features:
@@ -428,6 +433,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.7
+
+5.0.7rc1 was released as 5.0.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.7rc1
