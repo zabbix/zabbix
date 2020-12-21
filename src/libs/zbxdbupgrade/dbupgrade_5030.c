@@ -258,13 +258,19 @@ static int	DBpatch_5030008(void)
 	zbx_vector_uint64_reserve(&discovered_itemids, 1000);
 
 	result = DBselect(
-			"select v.valuemapid,v.name,m.value,m.newvalue"
+			"select m.valuemapid,v.name,m.value,m.newvalue"
 			" from valuemaps v"
-			" join mappings m on v.valuemapid=m.valuemapid");
+			" left join mappings m on v.valuemapid=m.valuemapid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_ptr_pair_t	pair;
+
+		if (SUCCEED == DBis_null(row[0]))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "empty valuemap '%s' was removed", row[1]);
+			continue;
+		}
 
 		ZBX_STR2UINT64(valuemap_local.valuemapid, row[0]);
 
@@ -339,11 +345,6 @@ static int	DBpatch_5030008(void)
 							valuemap->mappings.values[j].first,
 							valuemap->mappings.values[j].second);
 				}
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "empty valuemap with valuemapid:" ZBX_FS_UI64
-						" was removed", host->valuemapid);
 			}
 
 			valuemapid++;
