@@ -20,6 +20,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+
 #include "trapper_auth.h"
 #include "trapper_expressions_evaluate.h"
 

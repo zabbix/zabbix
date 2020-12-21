@@ -22,6 +22,7 @@
 #include "db.h"
 #include "log.h"
 #include "../scripts/scripts.h"
+
 #include "trapper_auth.h"
 #include "nodecommand.h"
 

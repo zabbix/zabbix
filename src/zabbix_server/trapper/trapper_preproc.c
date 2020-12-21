@@ -22,6 +22,7 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "../preprocessor/preproc_history.h"
+
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 

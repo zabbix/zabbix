@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <string.h>       // for NULL, strlen, size_t
-#include "common.h"       // for zbx_dsprintf, ZBX_SID_AUTH_TOKEN_LENGTH, FAIL
-#include "db.h"           // for DBget_user_by_active_session, DBget_user_by...
-#include "log.h"          // for LOG_LEVEL_DEBUG, zabbix_log
-#include "sha512crypt.h"  // for sha512_hash
-#include "zbxjson.h"      // for ZBX_PROTO_TAG_SID, zbx_json_value_by_name
+#include <string.h>
+#include "common.h"
+#include "db.h"
+#include "log.h"
+#include "sha512crypt.h"
+#include "zbxjson.h"
 
 #include "trapper_auth.h"
 
