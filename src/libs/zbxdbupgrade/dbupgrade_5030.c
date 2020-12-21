@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 5.4 development database patches
@@ -340,7 +341,10 @@ static int	DBpatch_5030008(void)
 				}
 			}
 			else
-				THIS_SHOULD_NEVER_HAPPEN;
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "empty valuemap with valuemapid:" ZBX_FS_UI64
+						" was removed", host->valuemapid);
+			}
 
 			valuemapid++;
 			i++;
@@ -366,11 +370,7 @@ static int	DBpatch_5030008(void)
 
 		host = (zbx_host_t *)hosts.values[i];
 
-		if (NULL == (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
-			THIS_SHOULD_NEVER_HAPPEN;
-
-		/* update valuemapid for top level items on a template/host */
-		if (NULL != valuemap)
+		if (NULL != zbx_hashset_search(&valuemaps, &host->valuemapid))
 		{
 			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where",
 					valuemapid_update);
@@ -378,6 +378,7 @@ static int	DBpatch_5030008(void)
 		else
 			zbx_strlcpy(buffer, "update items set valuemapid=null where", sizeof(buffer));
 
+		/* update valuemapid for top level items on a template/host */
 		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
