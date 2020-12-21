@@ -362,19 +362,21 @@ static int	DBpatch_5030008(void)
 	for(i = 0; i < hosts.values_num; i++, valuemapid_update++)
 	{
 		zbx_host_t	*host;
+		char		buffer[MAX_STRING_LEN];
 
 		host = (zbx_host_t *)hosts.values[i];
 
 		if (NULL == (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
-		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
 
 		/* update valuemapid for top level items on a template/host */
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
-				" where", valuemapid_update);
+		if (NULL == valuemap)
+			zbx_strlcpy(buffer, "update items set valuemapid=null where", sizeof(buffer));
+		else
+			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where");
+
 		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
 				host->itemids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -388,8 +390,7 @@ static int	DBpatch_5030008(void)
 
 		/* make sure if multiple hosts are linked to same not nested template then there is only */
 		/* update by templateid from template and no selection by numerous itemids               */
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
-				" where", valuemapid_update);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
 		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", host->itemids.values,
 				host->itemids.values_num);
@@ -398,8 +399,7 @@ static int	DBpatch_5030008(void)
 
 		if (0 != discovered_itemids.values_num)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid="
-					ZBX_FS_UI64 " where", valuemapid_update);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
 			zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
 					discovered_itemids.values_num);
