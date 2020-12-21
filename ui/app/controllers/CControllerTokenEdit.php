@@ -99,7 +99,7 @@ class CControllerTokenEdit extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Api tokens'));
+		$response->setTitle(_('API Tokens'));
 		$this->setResponse($response);
 	}
 }
