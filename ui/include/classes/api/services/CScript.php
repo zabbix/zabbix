@@ -332,6 +332,7 @@ class CScript extends CApiService {
 
 			if ($type != $db_type && $db_type == ZBX_SCRIPT_TYPE_WEBHOOK) {
 				$upd_script['timeout'] = DB::getDefault('scripts', 'timeout');
+				$scripts_params[$scriptid] = [];
 			}
 
 			if ($upd_script) {
@@ -724,20 +725,22 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ((!array_key_exists('hostid', $data) && !array_key_exists('eventid', $data))
-				|| (array_key_exists('hostid', $data) && array_key_exists('eventid', $data))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot execute script without hostid or eventid parameter.'));
+		if (!array_key_exists('hostid', $data) && !array_key_exists('eventid', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid parameter "%1$s": %2$s.', '/', _s('the parameter "%1$s" is missing', 'eventid'))
+			);
 		}
 
-		$hostids = $data['hostid'];
-		$is_event = false;
+		if (array_key_exists('hostid', $data) && array_key_exists('eventid', $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid parameter "%1$s": %2$s.', '/', _s('unexpected parameter "%1$s"', 'eventid'))
+			);
+		}
 
 		if (array_key_exists('eventid', $data)) {
 			$db_events = API::Event()->get([
 				'output' => [],
 				'selectHosts' => ['hostid'],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => $data['eventid']
 			]);
 			if (!$db_events) {
@@ -750,9 +753,12 @@ class CScript extends CApiService {
 			$is_event = true;
 		}
 		else {
+			$hostids = $data['hostid'];
+			$is_event = false;
+
 			$db_hosts = API::Host()->get([
 				'output' => [],
-				'hostids' => $data['hostid']
+				'hostids' => $hostids
 			]);
 			if (!$db_hosts) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,

@@ -154,7 +154,6 @@ class CZabbixServer {
 		$params = [
 			'request' => 'command',
 			'scriptid' => $scriptid,
-			'hostid' => $hostid,
 			'sid' => $sid,
 			'clientip' => CWebUser::getIp()
 		];
