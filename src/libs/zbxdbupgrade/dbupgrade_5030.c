@@ -380,7 +380,7 @@ static int	DBpatch_5030008(void)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
-		/* get discovered itemids for not templated items */
+		/* get discovered itemids for not templated item prototypes on a host */
 		get_discovered_itemids(&host->itemids, &discovered_itemids);
 
 		zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
