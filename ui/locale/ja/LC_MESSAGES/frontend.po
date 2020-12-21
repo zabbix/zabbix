@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-12-11 19:53+0200\n"
-"PO-Revision-Date: 2020-12-15 00:30+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2020-12-20 09:11+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1607985037.000000\n"
+"X-POOTLE-MTIME: 1608448315.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -298,11 +298,11 @@ msgstr "障害発生数上位100項目"
 
 #: tests/selenium/modules/module_number_1/Module.php:21
 msgid "1st Module"
-msgstr ""
+msgstr "1st Module"
 
 #: tests/selenium/modules/module_number_2/Module.php:21
 msgid "2nd Module"
-msgstr ""
+msgstr "2nd Module"
 
 #: queue.php:113 queue.php:168
 msgid "30 seconds"
@@ -314,7 +314,7 @@ msgstr "3D表示"
 
 #: tests/selenium/modules/module_number_4/Module.php:21
 msgid "4th Module"
-msgstr ""
+msgstr "4th Module"
 
 #: queue.php:115 queue.php:170
 msgid "5 minutes"
@@ -4021,7 +4021,7 @@ msgstr "ディスカバリルールの作成(先にホストを選択)"
 #: include/views/configuration.trigger.prototype.list.php:58
 #: include/views/configuration.trigger.prototype.list.php:181
 msgid "Create enabled"
-msgstr "自動生成有効"
+msgstr "自動生成時のステータス有効"
 
 #: include/views/configuration.graph.list.php:47
 msgid "Create graph"
@@ -5453,7 +5453,7 @@ msgstr "グラフの形式"
 
 #: tests/selenium/modules/module_number_3/Module.php:21
 msgid "Dummy module"
-msgstr ""
+msgstr "Dummy module"
 
 #: include/classes/api/services/CCorrelation.php:1169
 #: include/classes/api/services/CCorrelation.php:1321
@@ -11390,7 +11390,7 @@ msgstr "モジュール"
 #: tests/selenium/modules/module_number_5/Module.php:18
 #: tests/selenium/modules/module_number_5/Module.php:26
 msgid "Module 5 menu"
-msgstr ""
+msgstr "Module 5 menu"
 
 #: app/controllers/CControllerModuleScan.php:102
 #, c-format
