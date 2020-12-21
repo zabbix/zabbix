@@ -239,7 +239,7 @@ static int	DBpatch_5030008(void)
 	zbx_hashset_t		valuemaps;
 	zbx_hashset_iter_t	iter;
 	valuemap_t		valuemap_local, *valuemap;
-	zbx_uint64_t		valuemapid;
+	zbx_uint64_t		valuemapid, valuemapid_update;
 	zbx_vector_ptr_t	hosts;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -312,9 +312,7 @@ static int	DBpatch_5030008(void)
 	}
 	DBfree_result(result);
 
-	valuemapid = DBget_maxid_num("valuemap", hosts.values_num);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	valuemapid_update = valuemapid = DBget_maxid_num("valuemap", hosts.values_num);
 
 	for(i = 0; i < hosts.values_num;)
 	{
@@ -344,43 +342,6 @@ static int	DBpatch_5030008(void)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 
-			/* update valuemapid for top level items on a template/host */
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
-					" where", valuemapid);
-			zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
-					host->itemids.values_num);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-			/* get discovered itemids for not templated items */
-			get_discovered_itemids(&host->itemids, &discovered_itemids);
-
-			zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
-			get_template_itemids_by_templateids(&templateids, &host->itemids, &discovered_itemids);
-
-			/* make sure if multiple hosts are linked to same not nested template then there is only */
-			/* update by templateid from template and no selection by numerous itemids               */
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
-					" where", valuemapid);
-			zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", host->itemids.values,
-					host->itemids.values_num);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-			if (0 != discovered_itemids.values_num)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid="
-						ZBX_FS_UI64 " where", valuemapid);
-				zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
-						discovered_itemids.values_num);
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-				zbx_vector_uint64_clear(&discovered_itemids);
-			}
-
 			valuemapid++;
 			i++;
 
@@ -396,12 +357,66 @@ static int	DBpatch_5030008(void)
 		zbx_db_insert_clean(&db_insert_valuemap_mapping);
 	}
 
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for(i = 0; i < hosts.values_num; i++, valuemapid_update++)
+	{
+		host_t	*host;
+
+		host = (host_t *)hosts.values[i];
+
+		if (NULL == (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		/* update valuemapid for top level items on a template/host */
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
+				" where", valuemapid_update);
+		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", host->itemids.values,
+				host->itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		/* get discovered itemids for not templated items */
+		get_discovered_itemids(&host->itemids, &discovered_itemids);
+
+		zbx_vector_uint64_append_array(&templateids, host->itemids.values, host->itemids.values_num);
+		get_template_itemids_by_templateids(&templateids, &host->itemids, &discovered_itemids);
+
+		/* make sure if multiple hosts are linked to same not nested template then there is only */
+		/* update by templateid from template and no selection by numerous itemids               */
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid=" ZBX_FS_UI64
+				" where", valuemapid_update);
+		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", host->itemids.values,
+				host->itemids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		if (0 != discovered_itemids.values_num)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set valuemapid="
+					ZBX_FS_UI64 " where", valuemapid_update);
+			zbx_vector_uint64_sort(&discovered_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", discovered_itemids.values,
+					discovered_itemids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_vector_uint64_clear(&discovered_itemids);
+		}
+	}
+
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
+
+	// >>>
 
 	zbx_hashset_iter_reset(&valuemaps, &iter);
 	while (NULL != (valuemap = (valuemap_t *)zbx_hashset_iter_next(&iter)))
