@@ -915,7 +915,7 @@ void	DBcheck_capabilities(void)
 		exit(EXIT_FAILURE);
 	}
 clean:
-		DBfree_result(result);
+	DBfree_result(result);
 out:
 	DBclose();
 #endif
