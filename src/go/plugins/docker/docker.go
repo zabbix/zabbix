@@ -50,6 +50,11 @@ var impl Plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
 	var result []byte
 
+	_, err := metrics[key].EvalParams(params, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	queryPath := metricsMeta[key].path
 
 	switch key {
