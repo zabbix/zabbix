@@ -84,13 +84,15 @@ if ($data['tokenid'] == 0) {
 }
 else {
 	$update_button = (new CSubmitButton(_('Update')))->setId('update');
-	$regenerate_button = (new CSimpleButton(_('Regenerate')))->setId('regenerate');
+	$regenerate_button = (new CSimpleButton(_('Regenerate')))
+		->setAttribute('data-confirmation', _('Regenerate selected API token? Previously generated token will become invalid.'))
+		->setId('regenerate');
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgumentSID()
 			->setArgument('action', 'token.delete')
 			->setArgument('action_src', 'user.token.list')
 			->setArgument('tokenids', (array) $data['tokenid']),
-		_('Delete token?')
+		_('Delete API token?')
 	))->setId('delete');
 
 	$token_view->setFooter(makeFormFooter(

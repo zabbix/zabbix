@@ -1984,7 +1984,7 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'API token expired.');
+		$this->assertEquals($error, 'Auth token expired.');
 	}
 
 	public function testUsers_AuthTokenNotExpired() {

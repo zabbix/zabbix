@@ -35,11 +35,13 @@
 			})
 			.trigger('change');
 
-		$('#regenerate').on('click', () => {
-			$form = $(document.forms['token']);
-			$form.append($('<input />', {type: 'hidden', name: 'regenerate', value: '1'}));
-			$form.find('#action_dst').val('user.token.view');
-			$form.submit();
+		$('#regenerate').on('click', ({target}) => {
+			if (confirm($(target).data('confirmation'))) {
+				$form = $(document.forms['token']);
+				$form.append($('<input />', {type: 'hidden', name: 'regenerate', value: '1'}));
+				$form.find('#action_dst').val('user.token.view');
+				$form.submit();
+			}
 		});
 	});
 </script>

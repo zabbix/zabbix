@@ -108,7 +108,7 @@ class CControllerTokenUpdate extends CController {
 				$response->setFormData(['uncheck' => '1']);
 			}
 
-			CMessageHelper::setSuccessTitle(_('Token updated'));
+			CMessageHelper::setSuccessTitle(_('API token updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
