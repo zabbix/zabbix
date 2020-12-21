@@ -41,7 +41,7 @@ class CControllerTokenCreate extends CController {
 					$location = (new CUrl('zabbix.php'))->setArgument('action', $this->getInput('action_src'));
 					$response = new CControllerResponseRedirect($location);
 					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot create token'));
+					CMessageHelper::setErrorTitle(_('Cannot add API token'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -92,14 +92,14 @@ class CControllerTokenCreate extends CController {
 				'status' => $token['status']
 			]);
 
-			CMessageHelper::setSuccessTitle(_('Token created'));
+			CMessageHelper::setSuccessTitle(_('API token added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', $this->getInput('action_src'))
 			);
 			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot create token'));
+			CMessageHelper::setErrorTitle(_('Cannot add API token'));
 		}
 
 		$this->setResponse($response);

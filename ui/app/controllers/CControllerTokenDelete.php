@@ -54,10 +54,10 @@ class CControllerTokenDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Token deleted', 'Tokens deleted', $deleted));
+			CMessageHelper::setSuccessTitle(_n('API token deleted', 'API tokens deleted', $deleted));
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot delete token', 'Cannot delete tokens', $deleted));
+			CMessageHelper::setErrorTitle(_n('Cannot delete API token', 'Cannot delete API tokens', $deleted));
 		}
 
 		$this->setResponse($response);
