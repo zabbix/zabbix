@@ -65,6 +65,13 @@ $filter
 
 $widget = (new CWidget())
 	->setTitle(_('API Tokens'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CRedirectButton(_('Create API token'),
+				(new CUrl('zabbix.php'))->setArgument('action', 'user.token.edit'))
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($filter);
 
 $token_form = (new CForm('get'))
