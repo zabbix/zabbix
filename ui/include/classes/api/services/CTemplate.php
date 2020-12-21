@@ -382,10 +382,6 @@ class CTemplate extends CHostGeneral {
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
 			}
-
-			if (array_key_exists('valuemaps', $template)) {
-				$this->createValueMaps($templateId, $template['valuemaps']);
-			}
 		}
 
 		return ['templateids' => $templateIds];
@@ -400,13 +396,6 @@ class CTemplate extends CHostGeneral {
 	 */
 	protected function validateCreate(array $templates) {
 		$groupIds = [];
-		$valuemap_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-			'name'	=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-			'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
-				'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
-				'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
-			]]
-		]];
 
 		foreach ($templates as &$template) {
 			// check if hosts have at least 1 group
@@ -428,11 +417,6 @@ class CTemplate extends CHostGeneral {
 				}
 
 				$groupIds[$group['groupid']] = $group['groupid'];
-			}
-
-			if (array_key_exists('valuemaps', $template)
-					&& !CApiInputValidator::validate($valuemap_rules, $template['valuemaps'], '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 		unset($template);
@@ -551,10 +535,6 @@ class CTemplate extends CHostGeneral {
 
 				unset($template['macros']);
 			}
-
-			if (array_key_exists('valuemaps', $template)) {
-				$this->updateValueMaps($template['templateid'], $template['valuemaps']);
-			}
 		}
 		unset($template);
 
@@ -599,14 +579,6 @@ class CTemplate extends CHostGeneral {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-		$valuemap_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-			'valuemapid'	=> ['type' => API_ID],
-			'name'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-			'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
-				'key'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
-				'value'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
-			]]
-		]];
 
 		foreach ($templates as $template) {
 			if (!isset($dbTemplates[$template['templateid']])) {
@@ -621,11 +593,6 @@ class CTemplate extends CHostGeneral {
 			// Validate tags.
 			if (array_key_exists('tags', $template)) {
 				$this->validateTags($template);
-			}
-
-			if (array_key_exists('valuemaps', $template)
-					&& !CApiInputValidator::validate($valuemap_rules, $template['valuemaps'], '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 	}

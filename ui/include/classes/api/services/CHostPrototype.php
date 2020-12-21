@@ -246,14 +246,7 @@ class CHostPrototype extends CHostBase {
 				'type' =>				['type' => API_INT32, 'flag' => API_REQUIRED, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 				'description' => 		['type' => API_STRING_UTF8]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
-			'valuemaps' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name'	=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-				'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
-					'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
-					'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
-				]]
-			]]
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -326,12 +319,6 @@ class CHostPrototype extends CHostBase {
 		$host_prototypes = $this->createReal($host_prototypes);
 		$this->createInterfaces($host_prototypes);
 		$this->createMacros(array_column($host_prototypes, 'macros', 'hostid'));
-
-		foreach ($host_prototypes as $host_prototype) {
-			if (array_key_exists('valuemaps', $host_prototype)) {
-				$this->createValueMaps($host_prototype['hostprototypeid'], $host_prototype['valuemaps']);
-			}
-		}
 
 		$this->inherit($host_prototypes);
 
@@ -475,15 +462,7 @@ class CHostPrototype extends CHostBase {
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 				'description' => 		['type' => API_STRING_UTF8]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
-			'valuemaps' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'valuemapid'	=> ['type' => API_ID],
-				'name'	=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
-				'mappings'		=> ['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['key']], 'fields' => [
-					'key'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
-					'value'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
-				]]
-			]]
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -618,10 +597,6 @@ class CHostPrototype extends CHostBase {
 			$host_prototype['groupPrototypes'] =
 				array_merge($host_prototype['groupPrototypes'], $host_prototype['groupLinks']);
 			unset($host_prototype['groupLinks']);
-
-			if (array_key_exists('valuemaps', $host_prototype)) {
-				$this->updateValueMaps($host_prototype['hostprototypeid'], $host_prototype['valuemaps']);
-			}
 		}
 		unset($host_prototype);
 

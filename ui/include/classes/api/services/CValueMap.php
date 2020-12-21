@@ -31,7 +31,7 @@ class CValueMap extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	protected $tableName = 'valuemaps';
+	protected $tableName = 'valuemap';
 	protected $tableAlias = 'vm';
 	protected $sortColumns = ['valuemapid', 'name'];
 
@@ -46,8 +46,10 @@ class CValueMap extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'valuemapids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'valuemapid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
@@ -58,7 +60,7 @@ class CValueMap extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['valuemapid', 'name']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['valuemapid', 'name', 'hostid']), 'default' => API_OUTPUT_EXTEND],
 			'selectMappings' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['value', 'newvalue']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
@@ -73,13 +75,17 @@ class CValueMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return $options['countOutput'] ? 0 : [];
-		}
-
 		$db_valuemaps = [];
 
-		$result = DBselect($this->createSelectQuery($this->tableName(), $options), $options['limit']);
+		$sql_parts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
+
+		// hostids
+		if (array_key_exists('hostids', $options)) {
+			zbx_value2array($options['hostids']);
+			$sql_parts['where']['hostid'] = dbConditionInt('vm.hostid', $options['hostids']);
+		}
+
+		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
@@ -109,7 +115,7 @@ class CValueMap extends CApiService {
 	public function create(array $valuemaps) {
 		$this->validateCreate($valuemaps);
 
-		$valuemapids = DB::insertBatch('valuemaps', $valuemaps);
+		$valuemapids = DB::insertBatch('valuemap', $valuemaps);
 
 		$mappings = [];
 
@@ -126,7 +132,7 @@ class CValueMap extends CApiService {
 		}
 		unset($valuemap);
 
-		DB::insertBatch('mappings', $mappings);
+		DB::insertBatch('valuemap_mapping', $mappings);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemaps);
 
@@ -156,6 +162,13 @@ class CValueMap extends CApiService {
 				];
 			}
 
+			if (array_key_exists('hostid', $valuemap) && $valuemap['hostid'] !== $db_valuemap['hostid']) {
+				$upd_valuemaps[] = [
+					'values' => ['hostid' => $valuemap['hostid']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
+			}
+
 			if (array_key_exists('mappings', $valuemap)) {
 				$mappings[$valuemapid] = [];
 				foreach ($valuemap['mappings'] as $mapping) {
@@ -165,12 +178,12 @@ class CValueMap extends CApiService {
 		}
 
 		if ($upd_valuemaps) {
-			DB::update('valuemaps', $upd_valuemaps);
+			DB::update('valuemap', $upd_valuemaps);
 		}
 
 		if ($mappings) {
-			$db_mappings = DB::select('mappings', [
-				'output' => ['mappingid', 'valuemapid', 'value', 'newvalue'],
+			$db_mappings = DB::select('valuemap_mapping', [
+				'output' => ['valuemap_mappingid', 'valuemapid', 'value', 'newvalue'],
 				'filter' => ['valuemapid' => array_keys($mappings)]
 			]);
 
@@ -185,7 +198,7 @@ class CValueMap extends CApiService {
 					if ($mapping[$db_mapping['value']] !== $db_mapping['newvalue']) {
 						$upd_mapings[] = [
 							'values' => ['newvalue' => $mapping[$db_mapping['value']]],
-							'where' => ['mappingid' => $db_mapping['mappingid']]
+							'where' => ['value_mappingid' => $db_mapping['valuemap_mappingid']]
 						];
 					}
 					unset($mapping[$db_mapping['value']]);
@@ -203,15 +216,15 @@ class CValueMap extends CApiService {
 			}
 
 			if ($del_mapingids) {
-				DB::delete('mappings', ['mappingid' => $del_mapingids]);
+				DB::delete('valuemap_mapping', ['value_mappingid' => $del_mapingids]);
 			}
 
 			if ($upd_mapings) {
-				DB::update('mappings', $upd_mapings);
+				DB::update('valuemap_mapping', $upd_mapings);
 			}
 
 			if ($ins_mapings) {
-				DB::insertBatch('mappings', $ins_mapings);
+				DB::insertBatch('valuemap_mapping', $ins_mapings);
 			}
 		}
 
@@ -226,17 +239,13 @@ class CValueMap extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $valuemapids) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can delete value maps.'));
-		}
-
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $valuemapids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_valuemaps = DB::select('valuemaps', [
-			'output' => ['valuemapid', 'name'],
+		$db_valuemaps = DB::select('valuemap', [
+			'output' => ['valuemapid', 'name', 'hostid'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);
@@ -271,7 +280,7 @@ class CValueMap extends CApiService {
 	 * @throws APIException  if value map already exists.
 	 */
 	private function checkDuplicates(array $names) {
-		$db_valuemaps = DB::select('valuemaps', [
+		$db_valuemaps = DB::select('valuemap', [
 			'output' => ['name'],
 			'filter' => ['name' => $names],
 			'limit' => 1
@@ -290,15 +299,12 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$valuemaps) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create value maps.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemaps', 'name')],
+			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
-				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('mappings', 'value')],
-				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mappings', 'newvalue')]
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
+				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
@@ -315,16 +321,13 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can update value maps.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemaps', 'name')],
+			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
-				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('mappings', 'value')],
-				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mappings', 'newvalue')]
+				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
+				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
@@ -332,9 +335,9 @@ class CValueMap extends CApiService {
 		}
 
 		// Check value map names.
-		$db_valuemaps = DB::select('valuemaps', [
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => zbx_objectValues($valuemaps, 'valuemapid'),
+		$db_valuemaps = DB::select('valuemap', [
+			'output' => ['valuemapid', 'hostid', 'name'],
+			'valuemapids' => array_column($valuemaps, 'valuemapid'),
 			'preservekeys' => true
 		]);
 
@@ -374,7 +377,7 @@ class CValueMap extends CApiService {
 			if ($options['selectMappings'] == API_OUTPUT_COUNT) {
 				$db_mappings = DBselect(
 					'SELECT m.valuemapid,COUNT(*) AS cnt'.
-					' FROM mappings m'.
+					' FROM valuemap_mapping m'.
 					' WHERE '.dbConditionInt('m.valuemapid', array_keys($db_valuemaps)).
 					' GROUP BY m.valuemapid'
 				);
@@ -384,7 +387,7 @@ class CValueMap extends CApiService {
 				}
 			}
 			else {
-				$db_mappings = API::getApiService()->select('mappings', [
+				$db_mappings = API::getApiService()->select('valuemap_mapping', [
 					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
 					'filter' => ['valuemapid' => array_keys($db_valuemaps)]
 				]);

@@ -417,110 +417,12 @@ abstract class CHostBase extends CApiService {
 
 			while ($mapping = DBfetch($query)) {
 				$valuemaps[$mapping['valuemapid']]['mappings'][] = [
-					'key' => $mapping['value'],
-					'value' => $mapping['newvalue']
+					'value' => $mapping['value'],
+					'newvalue' => $mapping['newvalue']
 				];
 			}
 		}
 
 		return $valuemaps;
-	}
-
-	/**
-	 * Update host/template/hostprototype value mapping.
-	 *
-	 * @param string $hostid     Id of host/template/hostprototype.
-	 * @param array  $valuemaps  Array of new value maps data.
-	 */
-	protected function updateValueMaps($hostid, $valuemaps) {
-		$update = [];
-		$insert = [];
-		$db_valuemaps = $this->getValueMaps([$hostid], API_OUTPUT_EXTEND);
-
-		foreach ($valuemaps as $valuemap) {
-			if (array_key_exists('valuemapid', $valuemap) && array_key_exists($valuemap['valuemapid'], $db_valuemaps)) {
-				$update[$valuemap['valuemapid']] = $valuemap;
-			}
-			else {
-				$insert[] = $valuemap;
-			}
-		}
-
-		$delete = array_diff_key($db_valuemaps, $update);
-
-		if ($delete) {
-			DB::delete('valuemap', ['valuemapid' => array_keys($delete)]);
-		}
-
-		if ($insert) {
-			$this->createValueMaps($hostid, $insert);
-		}
-
-		if (!$update) {
-			return;
-		}
-
-		foreach ($update as $valuemap) {
-			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
-
-			if ($db_valuemap['name'] !== $valuemap['name']) {
-				DB::update('valuemap', [
-					'values' => ['name' => $valuemap['name']],
-					'where' => ['valuemapid' => $valuemap['valuemapid']]
-				]);
-			}
-
-			$mappings = CArrayHelper::unsetEqualValues($valuemap['mappings'], $db_valuemap['mappings']);
-
-			if ($mappings) {
-				$insert = [];
-
-				foreach ($valuemap['mappings'] as $mapping) {
-					$insert_rows[] = [
-						'valuemapid' => $valuemap['valuemapid'],
-						'value' => $mapping['key'],
-						'newvalue' => $mapping['value']
-					];
-				}
-
-				DB::delete('valuemap_mapping', ['valuemapid' => $valuemap['valuemapid']]);
-				DB::insert('valuemap_mapping', $insert_rows, true);
-			}
-		}
-	}
-
-	/**
-	 * Create value maps for host/template/hostprototype.
-	 *
-	 * @param string $hostid                   Id of host/template/hostprototype.
-	 * @param array  $valuemaps                Array of value maps to be created.
-	 * @param string $valuemaps[]['name']      Name of value mapping.
-	 * @param string $valuemaps[]['mappings']  Array with arrays of 'key' and 'value' pair for single mapping.
-	 */
-	protected function createValueMaps($hostid, array $valuemaps) {
-		$insert_rows = [];
-
-		foreach ($valuemaps as $valuemap) {
-			$insert_rows[] = [
-				'hostid' => $hostid,
-				'name' => $valuemap['name']
-			];
-		}
-
-		$valuemapids = DB::insert('valuemap', $insert_rows, true);
-		$valuemaps = array_combine($valuemapids, $valuemaps);
-		$insert_rows = [];
-
-		foreach ($valuemaps as $valuemapid => $valuemap) {
-			foreach ($valuemap['mappings'] as $mapping) {
-				$insert_rows[] = [
-					'valuemapid' => $valuemapid,
-					'value' => $mapping['key'],
-					'newvalue' => $mapping['value']
-				];
-			}
-		}
-
-		DB::insert('valuemap_mapping', $insert_rows, true);
 	}
 }
