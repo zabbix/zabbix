@@ -226,8 +226,7 @@ func getRaidJsons(name string, rtype string, timeout int) (map[string]string, er
 	}
 
 	for {
-		fullName := fmt.Sprintf("%s -d %s,%d", name, rtype, i)
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName), timeout)
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fmt.Sprintf("%s -d %s,%d", name, rtype, i)), timeout)
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -242,7 +241,7 @@ func getRaidJsons(name string, rtype string, timeout int) (map[string]string, er
 			return out, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error())
 		}
 
-		out[fullName] = deviceJSON
+		out[fmt.Sprintf("%s %s,%d", name, rtype, i)] = deviceJSON
 		i++
 	}
 }
@@ -257,8 +256,7 @@ func getRaidDisks(name string, rtype string, timeout int) ([]DeviceParser, error
 	}
 
 	for {
-		fullName := fmt.Sprintf("%s -d %s,%d", name, rtype, i)
-		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fullName), timeout)
+		deviceJSON, err := executeSmartctl(fmt.Sprintf("-a %s -j ", fmt.Sprintf("%s -d %s,%d", name, rtype, i)), timeout)
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -273,7 +271,7 @@ func getRaidDisks(name string, rtype string, timeout int) ([]DeviceParser, error
 			return out, fmt.Errorf("failed to get disk data from smartctl: %s", err.Error())
 		}
 
-		dp.Info.Name = fullName
+		dp.Info.Name = fmt.Sprintf("%s %s,%d", name, rtype, i)
 		out = append(out, dp)
 		i++
 	}
