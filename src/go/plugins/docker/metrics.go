@@ -61,23 +61,18 @@ var (
 
 var metrics = metric.MetricSet{
 	keyContainerInfo: metric.New("Return low-level information about a container.",
-		nil, false),
+		[]*metric.Param{paramContainer}, false),
 	keyContainerStats: metric.New("Returns near realtime stats for a given container.",
 		[]*metric.Param{paramContainer}, false),
-	keyContainers: metric.New("Returns a list of containers.",
-		[]*metric.Param{paramContainer}, false),
+	keyContainers: metric.New("Returns a list of containers.", nil, false),
 	keyContainersDiscovery: metric.New("Returns a list of containers, used for low-level discovery.",
 		[]*metric.Param{paramStatusAll}, false),
-	keyDataUsage: metric.New("Returns information about current data usage.",
-		nil, false),
-	keyImages: metric.New("Returns a list of images.",
-		nil, false),
+	keyDataUsage: metric.New("Returns information about current data usage.", nil, false),
+	keyImages:    metric.New("Returns a list of images.", nil, false),
 	keyImagesDiscovery: metric.New("Returns a list of images, used for low-level discovery.",
 		nil, false),
-	keyInfo: metric.New("Returns information about the docker server.",
-		nil, false),
-	keyPing: metric.New("Pings the server and returns 0 or 1.",
-		nil, false),
+	keyInfo: metric.New("Returns information about the docker server.", nil, false),
+	keyPing: metric.New("Pings the server and returns 0 or 1.", nil, false),
 }
 
 func init() {
