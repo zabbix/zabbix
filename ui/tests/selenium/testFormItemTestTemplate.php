@@ -27,7 +27,7 @@ class testFormItemTestTemplate extends testFormItemTest {
 
 	const TEMPLATE_ID	= 99137;	//'Test Item Template'
 	const IS_HOST		= false;
-	const LLD_ID			= 99349;	// 'Test discovery rule'
+	const LLD_ID		= 99349;	// 'Test discovery rule'
 
 	/**
 	 * Creation link forming function for items or LLD.
@@ -35,7 +35,7 @@ class testFormItemTestTemplate extends testFormItemTest {
 	 * @param string	$pointer  instance pointing string: items or host_discovery
 	 */
 	public function getCreateLink($pointer) {
-		return $pointer.'.php?form=create&hostid='.self::TEMPLATE_ID;
+		return $pointer.'.php?form=create&context=template&hostid='.self::TEMPLATE_ID;
 	}
 
 	/**
@@ -44,7 +44,7 @@ class testFormItemTestTemplate extends testFormItemTest {
 	 * @param string	$pointer  instance pointing string: items or host_discovery
 	 */
 	public function getSavedLink($pointer) {
-		return $pointer.'.php?form=update&hostid='.self::TEMPLATE_ID.'&itemid=';
+		return $pointer.'.php?form=update&context=template&hostid='.self::TEMPLATE_ID.'&itemid=';
 	}
 
 	/**
@@ -63,8 +63,8 @@ class testFormItemTestTemplate extends testFormItemTest {
 	 * Check Test item prototype Button enabled/disabled state depending on item type.
 	 */
 	public function testFormItemTestTemplate_CheckItemPrototypeTestButtonState() {
-		$prototype_create_link = 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLD_ID;
-		$prototype_saved_link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::LLD_ID.'&itemid=';
+		$prototype_create_link = 'disc_prototypes.php?form=create&context=template&parent_discoveryid='.self::LLD_ID;
+		$prototype_saved_link = 'disc_prototypes.php?form=update&context=template&parent_discoveryid='.self::LLD_ID.'&itemid=';
 
 		$this->checkTestButtonState($this->getItemTestButtonStateData(),
 			'Item prototype for Test Button check', $prototype_create_link,
@@ -102,7 +102,7 @@ class testFormItemTestTemplate extends testFormItemTest {
 	 * @depends testFormItemTestTemplate_CheckItemPrototypeTestButtonState
 	 */
 	public function testFormItemTestTemplate_TestItemPrototype($data) {
-		$prototype_create_link = 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLD_ID;
+		$prototype_create_link = 'disc_prototypes.php?form=create&context=template&parent_discoveryid='.self::LLD_ID;
 
 		$this->checkTestItem($prototype_create_link, $data, self::IS_HOST);
 	}

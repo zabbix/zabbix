@@ -272,7 +272,7 @@ class CUser extends CApiService {
 		}
 
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
-		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
@@ -402,7 +402,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
-		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
@@ -847,7 +847,7 @@ class CUser extends CApiService {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
 				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their role.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change own role.'));
 				}
 
 				if (array_key_exists('usrgrps', $user)) {
@@ -1358,7 +1358,7 @@ class CUser extends CApiService {
 
 			if ($sec_left > 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $sec_left)
+					_('Incorrect user name or password or account is temporarily blocked.')
 				);
 			}
 		}
@@ -1371,7 +1371,9 @@ class CUser extends CApiService {
 
 				case ZBX_AUTH_INTERNAL:
 					if (!self::verifyPassword($user['password'], $db_user)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('Incorrect user name or password or account is temporarily blocked.')
+						);
 					}
 					break;
 
@@ -1401,7 +1403,7 @@ class CUser extends CApiService {
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)))
+					_('Incorrect user name or password or account is temporarily blocked.')
 				);
 			}
 
@@ -1788,7 +1790,9 @@ class CUser extends CApiService {
 		}
 
 		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 		elseif (count($db_users) > 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,

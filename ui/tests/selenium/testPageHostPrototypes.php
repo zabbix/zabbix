@@ -32,7 +32,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	const HOST_PROTOTYPES_COUNT = 10;
 
 	public function testPageHostPrototypes_CheckLayout() {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 
@@ -46,7 +46,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 			$this->assertFalse($element->isEnabled());
 		}
 
-		$this->assertRowCount(self::HOST_PROTOTYPES_COUNT);
+		$this->assertTableStats(self::HOST_PROTOTYPES_COUNT);
 
 		// Check tags on the specific host prototype.
 		$tags = $table->findRow('Name', 'Host prototype {#1}')->getColumn('Tags')->query('class:tag')->all();
@@ -97,7 +97,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	 */
 	private function selectHostPrototype($data) {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid'].'&context=host');
 
 		if ($data['hosts'] === 'all') {
 			$this->zbxTestCheckboxSelect('all_hosts');
@@ -218,7 +218,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	 */
 	public function testPageHostPrototypes_SingleEnableDisable($data) {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid'].'&context=host');
 
 		$this->checkPageAction($data, 'Click on state', $data['status']);
 	}

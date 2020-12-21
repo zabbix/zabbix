@@ -58,7 +58,7 @@ abstract class testFormMacros extends CWebTest {
 	protected function checkCreate($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$this->page->login()->open(
 			$is_prototype
-			? 'host_prototypes.php?form=create&parent_discoveryid='.$lld_id
+			? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
 			: $host_type.'s.php?form=create'
 		);
 
@@ -88,7 +88,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->login()->open(
 			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -109,7 +109,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->login()->open(
 			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -138,7 +138,7 @@ abstract class testFormMacros extends CWebTest {
 	 */
 	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($is_prototype) {
-			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
+			$this->page->login()->open('host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id);
 			$form = $this->query('id:'.$form_type.'-form')->waitUntilPresent()->asForm()->one();
 
 			$name = 'Host prototype with edited global {#MACRO}';
@@ -185,7 +185,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->open(
 			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -201,7 +201,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->open(
 			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 
@@ -267,7 +267,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->page->open(
 			$is_prototype
-			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
 			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 		);
 

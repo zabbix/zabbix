@@ -121,7 +121,7 @@ class testMaintenance extends CAPITest {
 					'name' => 'M'.++$n,
 					'tags' => [
 						[
-							'tag' => 'tag',
+							'tag' => 'tag'
 						],
 						[
 							'tag' => 'tag',
@@ -368,7 +368,7 @@ class testMaintenance extends CAPITest {
 					]
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
-			],
+			]
 		];
 	}
 

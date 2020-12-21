@@ -103,7 +103,8 @@ $form_list = (new CFormList())
 	->addRow(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase'),
 		(new CTextBox('snmpv3_authpassphrase', $data['params']['snmpv3_authpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('maxlength', 64),
+			->setAttribute('maxlength', 64)
+			->disableAutocomplete(),
 		'row_dcheck_snmpv3_authpassphrase'
 	)
 	->addRow(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'),
@@ -117,7 +118,8 @@ $form_list = (new CFormList())
 		(new CTextBox('snmpv3_privpassphrase', $data['params']['snmpv3_privpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
-			->setAttribute('maxlength', 64),
+			->setAttribute('maxlength', 64)
+			->disableAutocomplete(),
 		'row_dcheck_snmpv3_privpassphrase'
 	);
 

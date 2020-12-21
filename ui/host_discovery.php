@@ -194,6 +194,7 @@ $fields = [
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -280,55 +281,57 @@ elseif ($hostid) {
 	}
 }
 
+$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+
 /**
  * Filter.
  */
-$sort_field = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-$sort_order = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+$sort_field = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
+$sort_order = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
 
-CProfile::update('web.'.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
-CProfile::update('web.'.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
+CProfile::update($prefix.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
+CProfile::update($prefix.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 if (hasRequest('filter_set')) {
-	CProfile::updateArray('web.host_discovery.filter.groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
-	CProfile::updateArray('web.host_discovery.filter.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
-	CProfile::update('web.host_discovery.filter.name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.host_discovery.filter.snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
-	CProfile::update('web.host_discovery.filter.state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
-	CProfile::update('web.host_discovery.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	CProfile::updateArray($prefix.'host_discovery.filter.groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'host_discovery.filter.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+	CProfile::update($prefix.'host_discovery.filter.name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'host_discovery.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
-	CProfile::deleteIdx('web.host_discovery.filter.groupids');
+	CProfile::deleteIdx($prefix.'host_discovery.filter.groupids');
 
-	if (count(CProfile::getArray('web.host_discovery.filter.hostids', [])) != 1) {
-		CProfile::deleteIdx('web.host_discovery.filter.hostids');
+	if (count(CProfile::getArray($prefix.'host_discovery.filter.hostids', [])) != 1) {
+		CProfile::deleteIdx($prefix.'host_discovery.filter.hostids');
 	}
 
-	CProfile::delete('web.host_discovery.filter.name');
-	CProfile::delete('web.host_discovery.filter.key');
-	CProfile::delete('web.host_discovery.filter.type');
-	CProfile::delete('web.host_discovery.filter.delay');
-	CProfile::delete('web.host_discovery.filter.lifetime');
-	CProfile::delete('web.host_discovery.filter.snmp_oid');
-	CProfile::delete('web.host_discovery.filter.state');
-	CProfile::delete('web.host_discovery.filter.status');
+	CProfile::delete($prefix.'host_discovery.filter.name');
+	CProfile::delete($prefix.'host_discovery.filter.key');
+	CProfile::delete($prefix.'host_discovery.filter.type');
+	CProfile::delete($prefix.'host_discovery.filter.delay');
+	CProfile::delete($prefix.'host_discovery.filter.lifetime');
+	CProfile::delete($prefix.'host_discovery.filter.snmp_oid');
+	CProfile::delete($prefix.'host_discovery.filter.state');
+	CProfile::delete($prefix.'host_discovery.filter.status');
 }
 
 $filter = [
-	'groups' => CProfile::getArray('web.host_discovery.filter.groupids', []),
-	'hosts' => CProfile::getArray('web.host_discovery.filter.hostids', []),
-	'name' => CProfile::get('web.host_discovery.filter.name', ''),
-	'key' => CProfile::get('web.host_discovery.filter.key', ''),
-	'type' => CProfile::get('web.host_discovery.filter.type', -1),
-	'delay' => CProfile::get('web.host_discovery.filter.delay', ''),
-	'lifetime' => CProfile::get('web.host_discovery.filter.lifetime', ''),
-	'snmp_oid' => CProfile::get('web.host_discovery.filter.snmp_oid', ''),
-	'state' => CProfile::get('web.host_discovery.filter.state', -1),
-	'status' => CProfile::get('web.host_discovery.filter.status', -1)
+	'groups' => CProfile::getArray($prefix.'host_discovery.filter.groupids', []),
+	'hosts' => CProfile::getArray($prefix.'host_discovery.filter.hostids', []),
+	'name' => CProfile::get($prefix.'host_discovery.filter.name', ''),
+	'key' => CProfile::get($prefix.'host_discovery.filter.key', ''),
+	'type' => CProfile::get($prefix.'host_discovery.filter.type', -1),
+	'delay' => CProfile::get($prefix.'host_discovery.filter.delay', ''),
+	'lifetime' => CProfile::get($prefix.'host_discovery.filter.lifetime', ''),
+	'snmp_oid' => CProfile::get($prefix.'host_discovery.filter.snmp_oid', ''),
+	'state' => CProfile::get($prefix.'host_discovery.filter.state', -1),
+	'status' => CProfile::get($prefix.'host_discovery.filter.status', -1)
 ];
 
 $filter_groupids = [];
@@ -348,13 +351,22 @@ if ($filter['groups']) {
 
 // Get hosts.
 if ($filter['hosts']) {
-	$filter['hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
-		'output' => ['hostid', 'name'],
-		'hostids' => $filter['hosts'],
-		'templated_hosts' => true,
-		'editable' => true,
-		'preservekeys' => true
-	]), ['hostid' => 'id']);
+	if (getRequest('context') === 'host') {
+		$filter['hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $filter['hosts'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['hostid' => 'id']);
+	}
+	else {
+		$filter['hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $filter['hosts'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['templateid' => 'id']);
+	}
 
 	$filter_hostids = array_keys($filter['hosts']);
 
@@ -788,9 +800,7 @@ if (hasRequest('form')) {
 		}
 	}
 
-	$data = getItemFormData($form_item, [
-		'is_discovery_rule' => true
-	]);
+	$data = getItemFormData($form_item, ['is_discovery_rule' => true]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
@@ -801,7 +811,8 @@ if (hasRequest('form')) {
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
 	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
-			|| $host['status'] == HOST_STATUS_NOT_MONITORED);
+		|| $host['status'] == HOST_STATUS_NOT_MONITORED
+	);
 
 	if (!hasRequest('form_refresh')) {
 		foreach ($data['preprocessing'] as &$step) {
@@ -854,10 +865,11 @@ else {
 		'hostid' => (count($filter_hostids) == 1) ? reset($filter_hostids) : 0,
 		'sort' => $sort_field,
 		'sortorder' => $sort_order,
-		'profileIdx' => 'web.host_discovery.filter',
-		'active_tab' => CProfile::get('web.host_discovery.filter.active', 1),
+		'profileIdx' => $prefix.'host_discovery.filter',
+		'active_tab' => CProfile::get($prefix.'host_discovery.filter.active', 1),
 		'checkbox_hash' => $checkbox_hash,
-		'is_template' => true
+		'is_template' => true,
+		'context' => getRequest('context')
 	];
 
 	// Select LLD rules.
@@ -869,6 +881,7 @@ else {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'editable' => true,
+		'templated' => ($data['context'] === 'template'),
 		'filter' => [],
 		'search' => [],
 		'sortfield' => $sort_field,
@@ -981,7 +994,7 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sort_order,
-		new CUrl('host_discovery.php')
+		(new CUrl('host_discovery.php'))->setArgument('context', $data['context'])
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);

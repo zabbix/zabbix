@@ -43,7 +43,8 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageTriggers_CheckLayout($data) {
-		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
+		$context = ($data['status'] === '3') ? '&context=template' : '&context=host';
+		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$data['hostid'].$context);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -61,9 +62,10 @@ class testPageTriggers extends CLegacyWebTest {
 			$this->assertEquals(['', 'Severity', 'Value', 'Name', 'Operational data', 'Expression', 'Status', 'Info', 'Tags'], $result);
 
 			// Check the filter options text.
-			foreach (['Severity', 'State', 'Status', 'Value', 'Tags'] as $label) {
-				$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
-			}
+			$labels = [
+				'Host groups', 'Hosts', 'Name', 'Severity', 'State', 'Status', 'Value', 'Tags', 'Inherited',
+				'Discovered', 'With dependencies'
+			];
 		}
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
@@ -72,9 +74,12 @@ class testPageTriggers extends CLegacyWebTest {
 			$this->assertEquals(['', 'Severity', 'Name', 'Operational data', 'Expression', 'Status', 'Tags'], $result);
 
 			// Check the filter options text.
-			foreach (['Severity', 'State', 'Status','Tags'] as $label) {
-				$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
-			}
+			$labels = [
+				'Host groups', 'Templates', 'Name', 'Severity', 'Status', 'Tags', 'Inherited', 'With dependencies'
+			];
+		}
+		foreach ($labels as $label) {
+			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
@@ -182,7 +187,7 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageTriggers_TagsFilter($data) {
-		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
 		$this->setTags($data['tag_options']['tags']);
@@ -200,7 +205,7 @@ class testPageTriggers extends CLegacyWebTest {
 			'Third trigger for tag filtering'
 		];
 
-		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
+		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
@@ -218,7 +223,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
@@ -232,7 +237,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Severity' => ['Average', 'Disaster'],
+						'Severity' => ['Average', 'Disaster']
 					],
 					'result' => [
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
@@ -260,7 +265,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Discovered' => 'Yes'
 					],
 					'result' => [
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -272,7 +277,7 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -284,7 +289,7 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -296,7 +301,7 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -309,7 +314,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -319,7 +324,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Status' => 'Disabled'
 					],
 					'result' => [
-						'Trigger disabled with tags',
+						'Trigger disabled with tags'
 					]
 				]
 			],
@@ -342,7 +347,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Problem'
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -357,7 +362,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' =>'Problem',
 						'Inherited' =>'Yes',
 						'Discovered' =>'No',
-						'With dependencies' =>'Yes',
+						'With dependencies' =>'Yes'
 					],
 					'tag_options' => [
 						'type' => 'Or',
@@ -367,7 +372,7 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
 					]
 				]
 			],
@@ -375,7 +380,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Host groups' => 'Zabbix servers',
+						'Host groups' => 'Zabbix servers'
 					]
 				]
 			],
@@ -427,7 +432,7 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageTriggers_Filter($data) {
-		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]=99062');
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		$form->fill($data['filter_options']);
@@ -541,7 +546,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
@@ -585,7 +590,7 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider getHostAndGroupData
 	 */
 	public function testPageTriggers_FilterHostAndGroups($data) {
-		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]=99062');
+		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Trigger create button enabled and breadcrumbs exist.

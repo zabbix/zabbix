@@ -43,17 +43,18 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashbrd.hostid':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
-				case 'web.graphs.filter.active':
 				case 'web.groups.filter.active':
-				case 'web.host_discovery.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
+				case 'web.hosts.graphs.filter.active':
+				case 'web.hosts.host_discovery.filter.active':
+				case 'web.hosts.httpconf.filter.active':
+				case 'web.hosts.items.filter.active':
+				case 'web.hosts.triggers.filter.active':
 				case 'web.hostsmon.filter.active':
-				case 'web.httpconf.filter.active':
 				case 'web.httpdetails.filter.active':
 				case 'web.item.graph.filter.active':
-				case 'web.items.filter.active':
 				case 'web.latest.filter.active':
 				case 'web.layout.mode':
 				case 'web.maintenance.filter.active':
@@ -73,10 +74,14 @@ class CControllerProfileUpdate extends CController {
 				case 'web.slides.filter.active':
 				case 'web.sysmapconf.filter.active':
 				case 'web.templates.filter.active':
+				case 'web.templates.graphs.filter.active':
+				case 'web.templates.host_discovery.filter.active':
+				case 'web.templates.httpconf.filter.active':
+				case 'web.templates.items.filter.active':
+				case 'web.templates.triggers.filter.active':
 				case 'web.toptriggers.filter.active':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
 				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
-				case 'web.triggers.filter.active':
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':

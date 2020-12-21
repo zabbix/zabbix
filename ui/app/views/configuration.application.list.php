@@ -108,7 +108,10 @@ foreach ($data['applications'] as $application) {
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {
 		$name = [(new CLink(CHtml::encode($application['discoveryRule']['name']),
-						'disc_prototypes.php?parent_discoveryid='.$application['discoveryRule']['itemid']))
+					(new CUrl('disc_prototypes.php'))
+						->setArgument('parent_discoveryid', $application['discoveryRule']['itemid'])
+						->setArgument('context', 'host')
+				))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_ORANGE)
 		];
@@ -132,6 +135,14 @@ foreach ($data['applications'] as $application) {
 	$checkBox = new CCheckBox('applicationids['.$application['applicationid'].']', $application['applicationid']);
 	$checkBox->setEnabled(!$application['discoveryRule']);
 
+	if ($application['host']['status'] == HOST_STATUS_MONITORED
+			|| $application['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+		$context = 'host';
+	}
+	elseif ($application['host']['status'] == HOST_STATUS_TEMPLATE) {
+		$context = 'template';
+	}
+
 	$application_table->addRow([
 		$checkBox,
 		($data['hostid'] > 0) ? null : $application['host']['name'],
@@ -143,6 +154,7 @@ foreach ($data['applications'] as $application) {
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$application['hostid']])
 					->setArgument('filter_application', $application['name'])
+					->setArgument('context', $context)
 			),
 			CViewHelper::showNum(count($application['items']))
 		],

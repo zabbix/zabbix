@@ -154,11 +154,13 @@ $mediatypes = API::Mediatype()->get([
 ]);
 
 $allowed = [
-	'ack' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-			|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
-	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
+	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION),
+	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+	'close' => ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+			&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+	)
 ];
 
 /*

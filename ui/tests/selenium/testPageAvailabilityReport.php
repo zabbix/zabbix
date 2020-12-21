@@ -81,7 +81,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 				['A trigger', '', '100.0000%'],
 				['B trigger', '25.0000%', '75.0000%'],
 				['C trigger', '50.0000%', '50.0000%']
-			]],
+			]]
 		];
 	}
 

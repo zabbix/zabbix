@@ -388,7 +388,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'items.php',
+				'url' => 'items.php?context=host',
 				'title' =>	'Configuration of items',
 				'header' => 'Items',
 				'users' => [
@@ -398,7 +398,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'triggers.php',
+				'url' => 'triggers.php?context=host',
 				'title' =>	'Configuration of triggers',
 				'header' => 'Triggers',
 				'users' => [
@@ -408,7 +408,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'graphs.php',
+				'url' => 'graphs.php?context=host',
 				'title' =>	'Configuration of graphs',
 				'header' => 'Graphs',
 				'users' => [
@@ -418,7 +418,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'host_discovery.php?hostid=10084',
+				'url' => 'host_discovery.php?context=host&hostid=10084',
 				'title' =>	'Configuration of discovery rules',
 				'no_permissions_to_object' => true,
 				'users' => [
@@ -428,7 +428,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'httpconf.php',
+				'url' => 'httpconf.php?context=host',
 				'title' =>	'Configuration of web monitoring',
 				'header' => 'Web monitoring',
 				'users' => [
@@ -498,7 +498,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'correlation.php',
+				'url' => 'zabbix.php?action=correlation.list',
 				'title' =>	'Event correlation rules',
 				'header' => 'Event correlation',
 				'users' => [
@@ -508,7 +508,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'correlation.php?form=Create+correlation',
+				'url' => 'zabbix.php?action=correlation.edit',
 				'title' =>	'Event correlation rules',
 				'users' => [
 					'guest' => false,
@@ -517,7 +517,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'discoveryconf.php',
+				'url' => 'zabbix.php?action=discovery.list',
 				'title' =>	'Configuration of discovery rules',
 				'header' => 'Discovery rules',
 				'users' => [
@@ -673,7 +673,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'queue.php',
+				'url' => 'zabbix.php?action=queue.overview',
 				'title' =>	'Queue [refreshed every 30 sec.]',
 				'users' => [
 					'guest' => false,
@@ -700,15 +700,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 					'guest' => false,
 					'user-zabbix' => true,
 					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'conf.import.php',
-				'title' =>	'Configuration import',
-				'no_permissions_to_object' => true,
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false
 				]
 			]]
 		];

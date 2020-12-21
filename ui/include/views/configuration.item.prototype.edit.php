@@ -29,7 +29,11 @@ if (!empty($data['hostid'])) {
 	$widget->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
 }
 
-$form = (new CForm())
+$url = (new CUrl('disc_prototypes.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
+$form = (new CForm('post', $url))
 	->setId('item-prototype-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -389,7 +393,8 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete(),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
@@ -406,14 +411,16 @@ $form_list
 	->addRow(
 		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_username_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
 	->addRow(
 		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
@@ -451,7 +458,9 @@ $form_list
 		new CLabel(_('SSL key password'), 'ssl_key_password'),
 		(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly,
 			DB::getFieldLength('items', 'ssl_key_password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'ssl_key_password_row'
 	);
 
@@ -557,7 +566,9 @@ $form_list
 		'row_jmx_endpoint'
 	)
 	->addRow(_('User name'),
-		(new CTextBox('username', $data['username'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('username', $data['username'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_username'
 	)
 	->addRow(
@@ -575,7 +586,9 @@ $form_list
 		'row_privatekey'
 	)
 	->addRow(_('Password'),
-		(new CTextBox('password', $data['password'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('password', $data['password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_password'
 	)
 	->addRow(
@@ -814,17 +827,17 @@ if ($data['itemid'] != 0) {
 			new CSubmit('clone', _('Clone')),
 			(new CSimpleButton(_('Test')))->setId('test_item'),
 			(new CButtonDelete(_('Delete item prototype?'),
-				url_params(['form', 'itemid', 'parent_discoveryid'])
+				url_params(['form', 'itemid', 'parent_discoveryid', 'context']), 'context'
 			))->setEnabled(!$readonly),
-			new CButtonCancel(url_params(['parent_discoveryid']))
+			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));
 }
 else {
-	$tab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['parent_discoveryid']))]
-	));
+	$tab->setFooter(makeFormFooter(new CSubmit('add', _('Add')), [
+		(new CSimpleButton(_('Test')))->setId('test_item'),
+		new CButtonCancel(url_params(['parent_discoveryid', 'context']))
+	]));
 }
 
 $form->addItem($tab);

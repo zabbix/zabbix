@@ -33,7 +33,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
-		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$hostId);
+		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$hostId);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
 		$this->zbxTestClickLinkTextWait('Zabbix agent is not available (for {$AGENT.TIMEOUT})');

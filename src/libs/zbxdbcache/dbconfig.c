@@ -214,19 +214,23 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 			ZBX_FALLTHROUGH;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMP:
-		case ITEM_TYPE_INTERNAL:
-		case ITEM_TYPE_AGGREGATE:
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_DB_MONITOR:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
-		case ITEM_TYPE_CALCULATED:
 		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 			if (0 == CONFIG_POLLER_FORKS)
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		case ITEM_TYPE_CALCULATED:
+		case ITEM_TYPE_AGGREGATE:
+		case ITEM_TYPE_INTERNAL:
+			if (0 == CONFIG_HISTORYPOLLER_FORKS)
+				break;
+
+			return ZBX_POLLER_TYPE_HISTORY;
 		case ITEM_TYPE_IPMI:
 			if (0 == CONFIG_IPMIPOLLER_FORKS)
 				break;
@@ -9045,7 +9049,7 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 {
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
@@ -9143,25 +9147,31 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			}
 		}
 
+		if (0 == num)
+		{
+			if (ZBX_POLLER_TYPE_NORMAL == poller_type && ITEM_TYPE_SNMP == dc_item->type &&
+					0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
+			{
+				ZBX_DC_SNMPITEM	*snmpitem;
+
+				snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
+
+				if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
+						ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
+				{
+					max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
+				}
+			}
+
+			if (1 < max_items)
+				*items = zbx_malloc(NULL, sizeof(DC_ITEM) * max_items);
+		}
+
 		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&items[num].host, dc_host);
-		DCget_item(&items[num], dc_item);
+		DCget_host(&(*items)[num].host, dc_host);
+		DCget_item(&(*items)[num], dc_item);
 		num++;
-
-		if (1 == num && ZBX_POLLER_TYPE_NORMAL == poller_type && ITEM_TYPE_SNMP == dc_item->type &&
-				0 == (ZBX_FLAG_DISCOVERY_RULE & dc_item->flags))
-		{
-			ZBX_DC_SNMPITEM	*snmpitem;
-
-			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
-
-			if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
-					ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
-			{
-				max_items = DCconfig_get_suggested_snmp_vars_nolock(dc_item->interfaceid, NULL);
-			}
-		}
 	}
 
 	UNLOCK_CACHE;

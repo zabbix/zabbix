@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:51Z'
   media_types:
     -
@@ -101,55 +101,55 @@ zabbix_export:
         
                 var response,
                     url = ServiceNow.params.url,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
-                request.AddHeader('Content-Type: application/json');
-                request.AddHeader('Authorization: Basic ' + btoa(ServiceNow.params.user + ':' + ServiceNow.params.password));
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Basic ' + btoa(ServiceNow.params.user + ':' + ServiceNow.params.password));
         
                 if (typeof ServiceNow.HTTPProxy !== 'undefined' && ServiceNow.HTTPProxy !== '') {
-                    request.SetProxy(ServiceNow.HTTPProxy);
+                    request.setProxy(ServiceNow.HTTPProxy);
                 }
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ ServiceNow Webhook ] Sending request: ' + url + ((typeof data === 'string')
+                Zabbix.log(4, '[ ServiceNow Webhook ] Sending request: ' + url + ((typeof data === 'string')
                     ? ('\n' + data)
                     : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ ServiceNow Webhook ] Received response with status code ' +
-                    request.Status() + '\n' + response);
+                Zabbix.log(4, '[ ServiceNow Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ ServiceNow Webhook ] Failed to parse response received from ServiceNow');
+                        Zabbix.log(4, '[ ServiceNow Webhook ] Failed to parse response received from ServiceNow');
                         response = null;
                     }
                 }
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     if (response !== null && typeof response.error.message !== 'undefined'
                         && Object.keys(response.error).length > 0) {
@@ -257,7 +257,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ ServiceNow Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ ServiceNow Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

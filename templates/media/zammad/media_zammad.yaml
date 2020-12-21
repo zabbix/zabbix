@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:53Z'
   media_types:
     -
@@ -81,53 +81,53 @@ zabbix_export:
         
                 var response,
                     url = Zammad.params.url + query,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
                 if (typeof Zammad.HTTPProxy === 'string' && Zammad.HTTPProxy.trim() !== '') {
-                    request.SetProxy(Zammad.HTTPProxy);
+                    request.setProxy(Zammad.HTTPProxy);
                 }
         
-                request.AddHeader('Content-Type: application/json');
-                request.AddHeader('Authorization: Token token=' + Zammad.params.access_token);
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Token token=' + Zammad.params.access_token);
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.Log(4, '[ Zammad Webhook ] Sending request: ' +
+                Zabbix.log(4, '[ Zammad Webhook ] Sending request: ' +
                     url + ((typeof data === 'string') ? (' ' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.Get(url, data);
+                        response = request.get(url, data);
                         break;
         
                     case 'post':
-                        response = request.Post(url, data);
+                        response = request.post(url, data);
                         break;
         
                     case 'put':
-                        response = request.Put(url, data);
+                        response = request.put(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.Log(4, '[ Zammad Webhook ] Received response with status code ' + request.Status() + ': ' + response);
+                Zabbix.log(4, '[ Zammad Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.Log(4, '[ Zammad Webhook ] Failed to parse response received from Zammad');
+                        Zabbix.log(4, '[ Zammad Webhook ] Failed to parse response received from Zammad');
                         response = null;
                     }
                 }
         
-                if (request.Status() < 200 || request.Status() >= 300) {
-                    var message = 'Request failed with status code ' + request.Status();
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
         
                     if (response !== null && typeof response.errors !== 'undefined'
                         && Object.keys(response.errors).length > 0) {
@@ -142,7 +142,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.Status(),
+                    status: request.getStatus(),
                     response: response
                 };
             },
@@ -159,12 +159,12 @@ zabbix_export:
         
                         if (typeof result.response !== 'object'
                             || result.status != 200) {
-                            Zabbix.Log(4, '[ Zammad Webhook ] Cannot add ticket tag:' + tags_json[i].tag);
+                            Zabbix.log(4, '[ Zammad Webhook ] Cannot add ticket tag:' + tags_json[i].tag);
                         }
                     }
                 }
                 catch (error) {
-                    Zabbix.Log(4, '[ Zammad Webhook ] Failed to add ticket tags:' + error);
+                    Zabbix.log(4, '[ Zammad Webhook ] Failed to add ticket tags:' + error);
                 }
         
                 return;
@@ -324,7 +324,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.Log(3, '[ Zammad Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ Zammad Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'

@@ -859,31 +859,31 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_FLOAT],
 				1.23E+11,
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'1.23E+11',
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'1.23e+11',
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'-1.23e+11',
 				'/1/float',
-				-1.23E+11,
+				-1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'.23E11',
 				'/1/float',
-				0.23E+11,
+				0.23E+11
 			],
 			[
 				['type' => API_FLOATS],
@@ -1529,7 +1529,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'tags' => ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-						'tag'	=> ['type' => API_STRING_UTF8],
+						'tag'	=> ['type' => API_STRING_UTF8]
 					]]
 				]],
 				[
@@ -1650,7 +1650,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
-					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host'],
+					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host']
 				]],
 				[
 					['host' => 'host 0'],
@@ -1926,13 +1926,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'.124',
 				'/1/numeric',
-				'0.124',
+				'0.124'
 			],
 			[
 				['type' => API_NUMERIC],
 				'-.124',
 				'/1/numeric',
-				'-0.124',
+				'-0.124'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3204,7 +3204,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_IP, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO1}',
 				'/1/ip',
-				'{#MACRO1}',
+				'{#MACRO1}'
 			],
 			[
 				['type' => API_IP, 'flags' => API_ALLOW_MACRO],
@@ -3499,7 +3499,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'9.99999999999999E+15',
 				'/1/numeric',
-				'9.99999999999999E+15',
+				'9.99999999999999E+15'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3511,7 +3511,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'-9.99999999999999E+15',
 				'/1/numeric',
-				'-9.99999999999999E+15',
+				'-9.99999999999999E+15'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3523,25 +3523,25 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'10000000000.0001',
 				'/1/numeric',
-				'10000000000.0001',
+				'10000000000.0001'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1.00001',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1E-4',
 				'/1/numeric',
-				'1E-4',
+				'1E-4'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1E-5',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			]
 		];
 	}

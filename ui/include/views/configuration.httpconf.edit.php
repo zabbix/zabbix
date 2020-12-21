@@ -30,8 +30,12 @@ if (!empty($this->data['hostid'])) {
 	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
+$url = (new CUrl('httpconf.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$http_form = (new CForm())
+$http_form = (new CForm('post', $url))
 	->setId('http-form')
 	->setName('httpForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -113,7 +117,9 @@ $http_form_list
 	->addRow(_('HTTP proxy'),
 		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'));
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete()
+	);
 
 $http_form_list->addRow(_('Variables'), (new CDiv(
 	(new CTable())
@@ -165,10 +171,14 @@ $http_authentication_form_list->addRow(_('HTTP authentication'),
 
 $http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
@@ -185,6 +195,7 @@ $http_authentication_form_list
 	->addRow(_('SSL key password'),
 		(new CTextBox('ssl_key_password', $this->data['ssl_key_password'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete()
 	);
 
 /*
@@ -250,16 +261,17 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid'])))
-		->setEnabled(!$data['templated']);
-	$buttons[] = new CButtonCancel();
+	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']),
+		'context'
+	))->setEnabled(!$data['templated']);
+	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$http_tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		[new CButtonCancel(url_param('context'))]
 	));
 }
 

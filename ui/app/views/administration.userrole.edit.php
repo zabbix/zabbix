@@ -50,12 +50,19 @@ $form_grid->addItem([
 	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 ]);
 
-if ($data['readonly']) {
+if ($data['readonly'] || $data['is_own_role']) {
 	$form_grid->addItem([
 		(new CLabel(_('User type'), 'type')),
-		(new CFormField(
-			(new CTextBox('type', user_type2str()[$data['type']]))->setAttribute('readonly', true)
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		(new CFormField([
+			(new CTextBox('type', user_type2str()[$data['type']]))
+				->setId('type_readonly')
+				->setAttribute('readonly', true),
+			new CVar('type', $data['type']),
+			' ',
+			$data['is_own_role']
+				? new CSpan(_('User cannot change the user type of own role.'))
+				: null
+		]))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
 }
 else {
@@ -262,6 +269,29 @@ $form_grid->addItem([
 	))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 ]);
 
+$cancel_button = (new CRedirectButton(_('Cancel'),
+	(new CUrl('zabbix.php'))
+		->setArgument('action', 'userrole.list')
+		->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
+))->setId('cancel');
+
+$buttons = [$cancel_button];
+
+if ($data['roleid'] != 0) {
+	$buttons = [
+		(new CSimpleButton(_('Clone')))->setId('clone'),
+		(new CRedirectButton(_('Delete'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'userrole.delete')
+				->setArgument('roleids', [$data['roleid']])
+				->setArgumentSID(),
+			_('Delete selected role?')
+		))
+			->setId('delete')
+			->setEnabled(!$data['readonly']),
+		$cancel_button
+	];
+}
+
 $form_grid->addItem(
 	(new CFormActions(
 		($data['roleid'] != 0)
@@ -269,13 +299,7 @@ $form_grid->addItem(
 				->setId('update')
 				->setEnabled(!$data['readonly'])
 			: (new CSubmitButton(_('Add'), 'action', 'userrole.create'))->setId('add'),
-		[
-			(new CRedirectButton(_('Cancel'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'userrole.list')
-					->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
-			))->setId('cancel')
-		]
+		$buttons
 	))
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)

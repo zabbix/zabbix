@@ -36,7 +36,8 @@
 #define	ZBX_POLLER_TYPE_IPMI		2
 #define	ZBX_POLLER_TYPE_PINGER		3
 #define	ZBX_POLLER_TYPE_JAVA		4
-#define	ZBX_POLLER_TYPE_COUNT		5	/* number of poller types */
+#define	ZBX_POLLER_TYPE_HISTORY		5
+#define	ZBX_POLLER_TYPE_COUNT		6	/* number of poller types */
 
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
@@ -68,6 +69,7 @@ extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
+extern int	CONFIG_HISTORYPOLLER_FORKS;
 
 typedef struct
 {
@@ -685,7 +687,7 @@ int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items);
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items);
 int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
