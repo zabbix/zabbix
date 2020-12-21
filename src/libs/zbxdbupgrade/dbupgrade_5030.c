@@ -416,8 +416,6 @@ static int	DBpatch_5030008(void)
 
 	zbx_free(sql);
 
-	// >>>
-
 	zbx_hashset_iter_reset(&valuemaps, &iter);
 	while (NULL != (valuemap = (valuemap_t *)zbx_hashset_iter_next(&iter)))
 	{
