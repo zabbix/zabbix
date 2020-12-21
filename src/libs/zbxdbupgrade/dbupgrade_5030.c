@@ -108,7 +108,7 @@ typedef struct
 	char			*name;
 	zbx_vector_ptr_pair_t	mappings;
 }
-valuemap_t;
+zbx_valuemap_t;
 
 typedef struct
 {
@@ -116,12 +116,12 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	zbx_vector_uint64_t	itemids;
 }
-host_t;
+zbx_host_t;
 
 static int	host_compare_func(const void *d1, const void *d2)
 {
-	const host_t	*h1 = *(const host_t **)d1;
-	const host_t	*h2 = *(const host_t **)d2;
+	const zbx_host_t	*h1 = *(const zbx_host_t **)d1;
+	const zbx_host_t	*h2 = *(const zbx_host_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(h1->hostid, h2->hostid);
 	ZBX_RETURN_IF_NOT_EQUAL(h1->valuemapid, h2->valuemapid);
@@ -225,7 +225,7 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 	get_template_itemids_by_templateids(templateids, itemids, discovered_itemids);
 }
 
-static void	host_free(host_t *host)
+static void	host_free(zbx_host_t *host)
 {
 	zbx_vector_uint64_destroy(&host->itemids);
 	zbx_free(host);
@@ -238,7 +238,7 @@ static int	DBpatch_5030008(void)
 	int			i, j;
 	zbx_hashset_t		valuemaps;
 	zbx_hashset_iter_t	iter;
-	valuemap_t		valuemap_local, *valuemap;
+	zbx_valuemap_t		valuemap_local, *valuemap;
 	zbx_uint64_t		valuemapid, valuemapid_update;
 	zbx_vector_ptr_t	hosts;
 	char			*sql = NULL;
@@ -267,7 +267,7 @@ static int	DBpatch_5030008(void)
 
 		ZBX_STR2UINT64(valuemap_local.valuemapid, row[0]);
 
-		if (NULL == (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &valuemap_local)))
+		if (NULL == (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &valuemap_local)))
 		{
 			valuemap = zbx_hashset_insert(&valuemaps, &valuemap_local, sizeof(valuemap_local));
 			valuemap->name = zbx_strdup(NULL, row[1]);
@@ -289,7 +289,7 @@ static int	DBpatch_5030008(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		host_t		host_local, *host;
+		zbx_host_t	host_local, *host;
 		zbx_uint64_t	itemid;
 
 		ZBX_STR2UINT64(host_local.hostid, row[0]);
@@ -298,7 +298,7 @@ static int	DBpatch_5030008(void)
 
 		if (FAIL == (i = zbx_vector_ptr_search(&hosts, &host_local, host_compare_func)))
 		{
-			host = zbx_malloc(NULL, sizeof(host_t));
+			host = zbx_malloc(NULL, sizeof(zbx_host_t));
 			host->hostid = host_local.hostid;
 			host->valuemapid = host_local.valuemapid;
 			zbx_vector_uint64_create(&host->itemids);
@@ -306,7 +306,7 @@ static int	DBpatch_5030008(void)
 			zbx_vector_ptr_append(&hosts, host);
 		}
 		else
-			host = (host_t *)hosts.values[i];
+			host = (zbx_host_t *)hosts.values[i];
 
 		zbx_vector_uint64_append(&host->itemids, itemid);
 	}
@@ -324,11 +324,11 @@ static int	DBpatch_5030008(void)
 
 		while(i < hosts.values_num)
 		{
-			host_t	*host;
+			zbx_host_t	*host;
 
-			host = (host_t *)hosts.values[i];
+			host = (zbx_host_t *)hosts.values[i];
 
-			if (NULL != (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
+			if (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
 			{
 				zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, host->hostid, valuemap->name);
 
@@ -361,11 +361,11 @@ static int	DBpatch_5030008(void)
 
 	for(i = 0; i < hosts.values_num; i++, valuemapid_update++)
 	{
-		host_t	*host;
+		zbx_host_t	*host;
 
-		host = (host_t *)hosts.values[i];
+		host = (zbx_host_t *)hosts.values[i];
 
-		if (NULL == (valuemap = (valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
+		if (NULL == (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -417,7 +417,7 @@ static int	DBpatch_5030008(void)
 	zbx_free(sql);
 
 	zbx_hashset_iter_reset(&valuemaps, &iter);
-	while (NULL != (valuemap = (valuemap_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_free(valuemap->name);
 
