@@ -113,7 +113,7 @@ else {
 			->setArgument('action', 'token.delete')
 			->setArgument('action_src', 'token.list')
 			->setArgument('tokenids', (array) $data['tokenid']),
-		_('Delete API token?')
+		_('Delete selected API token?')
 	))->setId('delete');
 
 	$token_view->setFooter(makeFormFooter(

@@ -44,7 +44,7 @@ class CControllerTokenUpdate extends CController {
 						->setArgument('action', $this->getInput('action_src'));
 					$response = new CControllerResponseRedirect($location);
 					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update token'));
+					CMessageHelper::setErrorTitle(_('Cannot update API token'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -116,7 +116,7 @@ class CControllerTokenUpdate extends CController {
 				->setArgument('tokenid', $this->getInput('tokenid'))
 			);
 			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update token'));
+			CMessageHelper::setErrorTitle(_('Cannot update API token'));
 		}
 
 		$this->setResponse($response);
