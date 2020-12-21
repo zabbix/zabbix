@@ -140,18 +140,17 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$host_form->selectTab('Tags');
 
 		$host_tags = [
-			['name'=>'host_tag', 'value'=>'host_tag_value'],
+			['name'=>'host_tag', 'value'=>'host_tag_value']
 		];
 
-		$host_tags_count = count($host_tags);
-		$this->fillTags($host_tags, $host_tags_count);
+		$this->fillTags($host_tags, count($host_tags));
 		$host_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go to Template form.
 		$this->page->login()->open('templates.php?groupid=1');
-		$this->query('link', $this->template)->one()->click();
+		$this->query('link', $this->template)->one()->waitUntilClickable()->click();
 
 		$template_form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		// Fill tags on template.
@@ -219,7 +218,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		];
 
 		$actual_triggers_tags = $trigger_tags_table->getRows()->slice(0, -1); // Remove Add button from cycle.
-		$this ->checkTags($actual_triggers_tags, $inherited_trigger_tags);
+		$this->checkTags($actual_triggers_tags, $inherited_trigger_tags);
 	}
 
 	private function fillTags($array, $i) {
