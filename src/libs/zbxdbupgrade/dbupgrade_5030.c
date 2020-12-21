@@ -370,10 +370,13 @@ static int	DBpatch_5030008(void)
 			THIS_SHOULD_NEVER_HAPPEN;
 
 		/* update valuemapid for top level items on a template/host */
-		if (NULL == valuemap)
-			zbx_strlcpy(buffer, "update items set valuemapid=null where", sizeof(buffer));
+		if (NULL != valuemap)
+		{
+			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where",
+					valuemapid_update);
+		}
 		else
-			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where");
+			zbx_strlcpy(buffer, "update items set valuemapid=null where", sizeof(buffer));
 
 		zbx_vector_uint64_sort(&host->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, buffer);
