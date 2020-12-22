@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef __SHA512CRYPT_H
-#define __SHA512CRYPT_H
+#ifndef ZABBIX_SHA512CRYPT_H
+#define ZABBIX_SHA512CRYPT_H
 
 void sha512_hash(const char *in, char *out);
 

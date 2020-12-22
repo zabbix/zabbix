@@ -738,7 +738,7 @@ zbx_host_availability_t;
 
 void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
-int	DBget_user_by_auth_token(const char *auth_token, zbx_user_t *user);
+int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
 
 typedef struct
 {

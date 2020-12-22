@@ -28,7 +28,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: trapper_parse_preproc_test                                       *
+ * Function: format_auth_token_hash                                           *
  *                                                                            *
  * Purpose: takes a string token, hashes it with sha-512 and then formats the *
  *          resulting binary into the printable hex string                    *
@@ -40,8 +40,8 @@
  ******************************************************************************/
 static void	format_auth_token_hash(const char *auth_token, char *hash_res_stringhexes)
 {
-	char		hash_res[ZBX_SID_AUTH_TOKEN_LENGTH];
-	int		i;
+	char	hash_res[ZBX_SID_AUTH_TOKEN_LENGTH];
+	int	i;
 
 	sha512_hash(auth_token, hash_res);
 
@@ -59,7 +59,7 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 
 /******************************************************************************
  *                                                                            *
- * Function: get_user                                                         *
+ * Function: zbx_get_user_from_json                                           *
  *                                                                            *
  * Purpose: authenticate and initialize user data from the supplied json      *
  *                                                                            *

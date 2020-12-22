@@ -35,7 +35,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 		char **preproc_error, char **error);
 
 int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
-int     __wrap_DBget_user_by_auth_token(const char *authtoken, zbx_user_t *user);
+int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
@@ -94,9 +94,9 @@ int	__wrap_DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	return SUCCEED;
 }
 
-int	__wrap_DBget_user_by_auth_token(const char *authtoken, zbx_user_t *user)
+int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
 {
-	ZBX_UNUSED(authtoken);
+	ZBX_UNUSED(formatted_auth_token_hash);
 
 	user->type = USER_TYPE_ZABBIX_ADMIN;
 	user->userid = 0;
