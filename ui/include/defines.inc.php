@@ -1717,7 +1717,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
-define('ZBX_STYLE_HEADER_COMBOBOX', 'header-combobox');
+define('ZBX_STYLE_HEADER_Z_SELECT', 'header-z-select');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');

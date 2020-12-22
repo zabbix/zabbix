@@ -45,7 +45,7 @@ function getUserTheme($userData) {
  *
  * @param int $userType
  *
- * @return string
+ * @return string|array
  */
 function user_type2str($userType = null) {
 	$userTypes = [

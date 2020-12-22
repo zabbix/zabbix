@@ -503,6 +503,7 @@ class CElement extends CBaseElement implements IWaitable {
 		$classes = explode(' ', parent::getAttribute('class'));
 
 		$is_enabled = parent::isEnabled()
+				&& (parent::getAttribute('disabled') === null)
 				&& (!array_intersect(['disabled', 'readonly'], $classes))
 				&& (parent::getAttribute('readonly') === null);
 

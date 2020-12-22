@@ -86,6 +86,10 @@
 			jQuery('#name').focus();
 		});
 
+		$('#evaltype').on('change', () => {
+			processTypeOfCalculation();
+		});
+
 		processTypeOfCalculation();
 
 		const $form = $(document.forms['correlation.edit']);
