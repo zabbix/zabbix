@@ -276,5 +276,6 @@ class testFormFilter extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->checkValue(['Name' => $filter_name]);
 		$this->query('button:Cancel')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 	}
 }
