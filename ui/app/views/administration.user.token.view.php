@@ -39,7 +39,7 @@ $token_from_list = (new CFormList())
 			_("Make shure to copy the auth token as you won't be able to view it after the page is closed.")
 		),
 		'&nbsp;',
-		(new CLinkAction(_('Copy to clipboard')))->onClick('navigator.clipboard.writetext("'.$data['auth_token'].'")')
+		(new CLinkAction(_('Copy to clipboard')))->onClick('navigator.clipboard.writeText("'.$data['auth_token'].'")')
 	])
 	->addRow(_('Expires at'), ($data['expires_at'] == 0) ? '-' : date(ZBX_DATE_TIME, (int) $data['expires_at']))
 	->addRow(_('Description').':', $data['description'])
