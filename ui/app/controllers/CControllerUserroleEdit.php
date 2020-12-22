@@ -77,6 +77,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_change_severity' => 'in 0,1',
 			'actions_add_problem_comments' => 'in 0,1',
 			'actions_execute_scripts' => 'in 0,1',
+			'actions_manage_api_tokens' => 'in 0,1',
 			'ui_default_access' => 'in 0,1',
 			'modules_default_access' => 'in 0,1',
 			'actions_default_access' => 'in 0,1',
