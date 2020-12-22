@@ -206,8 +206,7 @@ class CMenuHelper {
 						'autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
 						'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
 						'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
-						'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
-						'conf.import.php?rules_preset=valuemap'
+						'miscconfig.edit', 'module.list', 'module.edit', 'module.scan'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
@@ -238,7 +237,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)
 				? (new CMenuItem(_('Media types')))
 					->setAction('mediatype.list')
-					->setAliases(['mediatype.edit', 'conf.import.php?rules_preset=mediatype'])
+					->setAliases(['mediatype.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)
 				? (new CMenuItem(_('Scripts')))
