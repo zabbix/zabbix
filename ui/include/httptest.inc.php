@@ -249,6 +249,7 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $
 			(new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
+				->setArgument('context', 'template')
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
@@ -279,6 +280,7 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $p
 					->setArgument('form', 'update')
 					->setArgument('hostid', $template['hostid'])
 					->setArgument('httptestid', $parent_templates['links'][$httptestid]['httptestid'])
+					->setArgument('context', 'template')
 			);
 		}
 		else {

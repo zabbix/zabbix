@@ -25,11 +25,12 @@
 ?>
 
 <script type="text/javascript">
-	$(() => {
-		const $status = $('#filter_status');
-
-		$('#filter_state').on('change', (e) => {
-			$status.prop('disabled', e.target.value != -1);
-		}).trigger('change');
+	jQuery(function($) {
+		// Disable the status filter when using the state filter.
+		$('#filter_state')
+			.on('change', function() {
+				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
+			})
+			.trigger('change');
 	});
 </script>

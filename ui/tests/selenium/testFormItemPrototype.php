@@ -279,13 +279,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'key' => 'item-prototype-test1'
 				]
 			],
@@ -297,178 +297,178 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (float)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Character'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Log'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Text'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent (active)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Simple check'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Numeric (float)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Character'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Log'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Text'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP trap'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix internal'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix trapper'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix aggregate'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'External check'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Database monitor'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'IPMI agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Public key'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Password'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Password',
 					'value_type' => 'Character'
@@ -476,19 +476,19 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'TELNET agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'JMX agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Calculated'
 				]
 			],
@@ -507,7 +507,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormItemPrototype_CheckLayout($data) {
-		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($data['host']));
+		$context = array_key_exists('host', $data) ? 'host' : 'template';
+		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
+
+		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($host_name));
 		$dbRow = DBfetch($dbResult);
 
 		$this->assertNotEquals($dbRow, null);
@@ -558,7 +561,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin(
 			'disc_prototypes.php?form='.(isset($itemid) ? 'update' : 'Create+item+prototype').
-			'&parent_discoveryid='.$discoveryid.(isset($itemid) ? '&itemid='.$itemid : '')
+			'&parent_discoveryid='.$discoveryid.(isset($itemid) ? '&itemid='.$itemid : '').'&context='.$context
 		);
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
@@ -1059,7 +1062,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
@@ -2034,7 +2037,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=33800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];

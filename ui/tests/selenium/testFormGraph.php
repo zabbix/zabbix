@@ -600,7 +600,7 @@ class testFormGraph extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001&context=host');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
@@ -847,7 +847,7 @@ class testFormGraph extends CLegacyWebTest {
 	 */
 	public function testFormGraph_SimpleCreate($data) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
+		$this->zbxTestLogin('graphs.php?hostid=40001&context=host&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {

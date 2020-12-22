@@ -21,7 +21,7 @@
 
 class CButtonDelete extends CButtonQMessage {
 
-	public function __construct($msg = null, $vars = null) {
-		parent::__construct('delete', _('Delete'), $msg, $vars);
+	public function __construct($msg = null, $vars = null, $url_param_exclude = '') {
+		parent::__construct('delete', _('Delete'), $msg, $vars, $url_param_exclude);
 	}
 }

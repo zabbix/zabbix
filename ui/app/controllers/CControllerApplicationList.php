@@ -170,7 +170,7 @@ class CControllerApplicationList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$applications = API::Application()->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
-			'selectHost' => ['hostid', 'name'],
+			'selectHost' => ['hostid', 'name', 'status'],
 			'selectItems' => ['itemid'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectApplicationDiscovery' => ['ts_delete'],

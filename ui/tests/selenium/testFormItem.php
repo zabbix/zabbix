@@ -356,7 +356,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestLogin(
 			'items.php?form='.(isset($itemid) ? 'update' : 'create').
-			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '')
+			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '').'&context=host'
 		);
 
 		$this->zbxTestCheckTitle('Configuration of items');

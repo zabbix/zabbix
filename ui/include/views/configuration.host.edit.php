@@ -45,7 +45,8 @@ $frmHost = (new CForm())
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
 	->addItem((new CVar('tls_connect', $data['tls_connect']))->removeId())
-	->addVar('tls_accept', $data['tls_accept']);
+	->addVar('tls_accept', $data['tls_accept'])
+	->addVar('psk_edit_mode', $data['psk_edit_mode']);
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -64,6 +65,7 @@ if ($data['readonly']) {
 				->setArgument('form', 'update')
 				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
+				->setArgument('context', 'host')
 		)
 		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY)
 	);
@@ -200,7 +202,7 @@ $hostList->addRow(_('Enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
 );
 
-if ($data['clone_hostid'] != 0) {
+if ($data['form'] === 'full_clone' && $data['clone_hostid'] != 0) {
 	// host applications
 	$hostApps = API::Application()->get([
 		'output' => ['name'],
@@ -667,8 +669,13 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	if (array_key_exists($inventoryNo, $data['inventory_items'])) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
-		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
-			->setTitle(_s('This field is automatically populated by item "%1$s".', $name));
+		$link = (new CLink($name,
+			(new CUrl('items.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $data['inventory_items'][$inventoryNo]['itemid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))->setTitle(_s('This field is automatically populated by item "%1$s".', $name));
 
 		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
@@ -716,20 +723,38 @@ $encryption_form_list = (new CFormList('encryption'))
 				->setLabel(_('Certificate'))
 				->setEnabled(!$data['readonly'])
 			)
-	)
-	->addRow(
-		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['readonly'], 128))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(
-		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
-		(new CTextBox('tls_psk', $data['tls_psk'], $data['readonly'], 512))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired()
-			->disableAutocomplete()
-	)
+	);
+
+if ($data['psk_edit_mode']) {
+	$encryption_form_list
+		->addRow(
+			(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
+			(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAriaRequired()
+		)
+		->addRow(
+			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+			(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAriaRequired()
+				->disableAutocomplete()
+		);
+}
+else {
+	$encryption_form_list
+		->addRow(
+			(new CLabel(_('PSK')))->setAsteriskMark(),
+			(new CSimpleButton(_('Change PSK')))
+				->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "psk_edit_mode", "1");')
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->setEnabled(!$data['readonly']),
+			null,
+			'tls_psk'
+		);
+}
+
+$encryption_form_list
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['readonly'], 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)

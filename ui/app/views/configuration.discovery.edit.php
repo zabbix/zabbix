@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('class.cviewswitcher.js');
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Discovery rules'));
@@ -31,8 +32,8 @@ $widget = (new CWidget())->setTitle(_('Discovery rules'));
 $discoveryForm = (new CForm())
 	->setId('discoveryForm')
 	->setName('discoveryForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $this->data['form']);
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);
 }
@@ -127,31 +128,46 @@ $discoveryFormList->addRow(_('Visible name'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
-// Append status to form list.
-$status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
-	? true
-	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
-
-$discoveryFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
+$discoveryFormList->addRow(_('Enabled'), (new CCheckBox('status', DRULE_STATUS_ACTIVE))
+	->setUncheckedValue(DRULE_STATUS_DISABLED)
+	->setChecked($this->data['drule']['status'] == DRULE_STATUS_ACTIVE)
+);
 
 // Append tabs to form.
 $discoveryTabs = (new CTabView())->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
 
 // Append buttons to form.
-if (isset($this->data['druleid'])) {
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'discovery.list')
+	->setArgument('page', CPagerHelper::loadPage('discovery.list', null))
+))->setId('cancel');
+
+if ($data['druleid'] == 0) {
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'discovery.create'))->setId('add');
+
 	$discoveryTabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[
-			new CButton('clone', _('Clone')),
-			new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid')),
-			new CButtonCancel()
-		]
+		$addButton,
+		[$cancel_button]
 	));
 }
 else {
+	$update_button = (new CSubmitButton(_('Update'), 'action', 'discovery.update'))->setId('update');
+	$clone_button = (new CSimpleButton(_('Clone')))->setId('clone');
+	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'discovery.delete')
+			->setArgument('druleids', (array) $data['druleid'])
+			->setArgumentSID(),
+		_('Delete discovery rule?')
+	))
+		->setId('delete');
+
 	$discoveryTabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		$update_button,
+		[
+			$clone_button,
+			$delete_button,
+			$cancel_button
+		]
 	));
 }
 

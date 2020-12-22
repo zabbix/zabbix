@@ -41,7 +41,7 @@ type process struct {
 var ntResumeProcess *syscall.Proc
 
 func Execute(s string, timeout time.Duration, path string) (out string, err error) {
-	cmd := exec.Command("cmd", "/C", s)
+	cmd := exec.Command("cmd")
 	cmd.Dir = path
 
 	var b bytes.Buffer
@@ -56,6 +56,7 @@ func Execute(s string, timeout time.Duration, path string) (out string, err erro
 
 	cmd.SysProcAttr = &windows.SysProcAttr{
 		CreationFlags: windows.CREATE_SUSPENDED,
+		CmdLine:       fmt.Sprintf(`/C "%s"`, s),
 	}
 	if err = cmd.Start(); err != nil {
 		return "", fmt.Errorf("Cannot execute command: %s", err)

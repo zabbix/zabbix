@@ -31,8 +31,12 @@ if (!empty($data['hostid'])) {
 	$widget->addItem(get_header_host_table('items', $data['hostid']));
 }
 
+$url = (new CUrl('items.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -64,6 +68,7 @@ if ($discovered_item) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['item']['discoveryRule']['itemid'])
 			->setArgument('itemid', $data['item']['itemDiscovery']['parent_itemid'])
+			->setArgument('context', 'host')
 	));
 }
 
@@ -977,16 +982,16 @@ if ($data['itemid'] != 0) {
 			);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid'])))
+	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']), 'context'))
 		->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel(url_param('hostid'));
+	$buttons[] = new CButtonCancel(url_params(['hostid', 'context']));
 
 	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['hostid', 'context']))]
 	));
 }
 
