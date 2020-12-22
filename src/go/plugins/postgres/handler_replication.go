@@ -120,15 +120,16 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 	case keyReplicationCount:
 		query = `SELECT count(*) FROM pg_stat_replication`
 
-	case keyReplicationMasterDiscoveryAppName:
-		query = `SELECT '{"data":'|| coalesce(json_agg(T), '[]'::json)::text || '}'
+	case keyReplicationProcessInfo:
+		query = `SELECT json_object_agg(application_name, row_to_json(T))
 				   FROM (
 						SELECT
-							application_name AS "{#APPLICATION_NAME}",
-        					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), '0/00000000') AS master_current_wal,
-        					pg_catalog.pg_wal_lsn_diff (pg_current_wal_lsn (), sent_lsn) AS master_replication_lag
+						    CONCAT(application_name, ' ', pid) AS application_name,
+							EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) as flush_lag, 
+							EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) as replay_lag,
+							EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) as write_lag
 						FROM pg_stat_replication
-					) T`
+					) T; `
 		row, err := conn.QueryRow(ctx, query)
 
 		if err != nil {

@@ -25,35 +25,37 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
 	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/uri"
 )
 
 const (
-	keyArchiveSize                       = "pgsql.archive"
-	keyAutovacuum                        = "pgsql.autovacuum.count"
-	keyBgwriter                          = "pgsql.bgwriter"
-	keyCache                             = "pgsql.cache.hit"
-	keyConnections                       = "pgsql.connections"
-	keyCustomQuery                       = "pgsql.custom.query"
-	keyDBStat                            = "pgsql.dbstat"
-	keyDBStatSum                         = "pgsql.dbstat.sum"
-	keyDatabaseAge                       = "pgsql.db.age"
-	keyDatabasesBloating                 = "pgsql.db.bloating_tables"
-	keyDatabasesDiscovery                = "pgsql.db.discovery"
-	keyDatabaseSize                      = "pgsql.db.size"
-	keyLocks                             = "pgsql.locks"
-	keyOldestXid                         = "pgsql.oldest.xid"
-	keyPing                              = "pgsql.ping"
-	keyReplicationCount                  = "pgsql.replication.count"
-	keyReplicationLagB                   = "pgsql.replication.lag.b"
-	keyReplicationLagSec                 = "pgsql.replication.lag.sec"
-	keyReplicationMasterDiscoveryAppName = "pgsql.replication.master.discovery.application_name"
-	keyReplicationRecoveryRole           = "pgsql.replication.recovery_role"
-	keyReplicationStatus                 = "pgsql.replication.status"
-	keyUptime                            = "pgsql.uptime"
-	keyWal                               = "pgsql.wal.stat"
+	keyArchiveSize                     = "pgsql.archive"
+	keyAutovacuum                      = "pgsql.autovacuum.count"
+	keyBgwriter                        = "pgsql.bgwriter"
+	keyCache                           = "pgsql.cache.hit"
+	keyConnections                     = "pgsql.connections"
+	keyCustomQuery                     = "pgsql.custom.query"
+	keyDBStat                          = "pgsql.dbstat"
+	keyDBStatSum                       = "pgsql.dbstat.sum"
+	keyDatabaseAge                     = "pgsql.db.age"
+	keyDatabasesBloating               = "pgsql.db.bloating_tables"
+	keyDatabasesDiscovery              = "pgsql.db.discovery"
+	keyDatabaseSize                    = "pgsql.db.size"
+	keyLocks                           = "pgsql.locks"
+	keyOldestXid                       = "pgsql.oldest.xid"
+	keyPing                            = "pgsql.ping"
+	keyReplicationCount                = "pgsql.replication.count"
+	keyReplicationLagB                 = "pgsql.replication.lag.b"
+	keyReplicationLagSec               = "pgsql.replication.lag.sec"
+	keyReplicationProcessInfo          = "pgsql.replication.process"
+	keyReplicationProcessNameDiscovery = "pgsql.replication_process.discovery"
+	keyReplicationRecoveryRole         = "pgsql.replication.recovery_role"
+	keyReplicationStatus               = "pgsql.replication.status"
+	keyUptime                          = "pgsql.uptime"
+	keyWal                             = "pgsql.wal.stat"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
@@ -97,8 +99,10 @@ func getHandlerFunc(key string) handlerFunc {
 		keyReplicationLagSec,
 		keyReplicationRecoveryRole,
 		keyReplicationLagB,
-		keyReplicationMasterDiscoveryAppName:
+		keyReplicationProcessInfo:
 		return replicationHandler
+	case keyReplicationProcessNameDiscovery:
+		return processNameDiscoveryHandler
 	case keyLocks:
 		return locksHandler
 	case keyOldestXid:
@@ -226,7 +230,10 @@ var metrics = metric.MetricSet{
 	keyReplicationLagSec: metric.New("Returns replication lag with Master in seconds.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
 
-	keyReplicationMasterDiscoveryAppName: metric.New("Returns JSON discovery with application name from pg_stat_replication.",
+	keyReplicationProcessNameDiscovery: metric.New("Returns JSON with application name from pg_stat_replication.",
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
+
+	keyReplicationProcessInfo: metric.New("Returns flush lag, write lag and replay lag per each sender preocess.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
 
 	keyReplicationRecoveryRole: metric.New("Returns postgreSQL recovery role.",
