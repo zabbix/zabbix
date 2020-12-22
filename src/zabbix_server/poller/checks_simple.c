@@ -114,6 +114,8 @@ static zbx_vmcheck_t	vmchecks[] =
 
 	{"dc.discovery", VMCHECK_FUNC(check_vcenter_dc_discovery)},
 
+	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
+
 	{NULL, NULL}
 };
 
