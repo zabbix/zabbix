@@ -91,7 +91,9 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
 
 	keyReplicationSlaveStatus: metric.New("Returns replication status.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword,
+			metric.NewParam("Master", "Master host."),
+		}, false),
 
 	keyStatusVars: metric.New("Returns values of global status variables.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword}, false),
