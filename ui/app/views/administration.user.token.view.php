@@ -36,7 +36,7 @@ $token_from_list = (new CFormList())
 		$data['auth_token'],
 		'&nbsp;',
 		makeWarningIcon(
-			_("Make shure to copy the auth token as you won't be able to view it after the page is closed.")
+			_("Make sure to copy the auth token as you won't be able to view it after the page is closed.")
 		),
 		'&nbsp;',
 		(new CLinkAction(_('Copy to clipboard')))->onClick('navigator.clipboard.writeText("'.$data['auth_token'].'")')
