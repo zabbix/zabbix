@@ -39,57 +39,95 @@ class CApiTagHelper {
 	 * @return string
 	 */
 	public static function addWhereCondition(array $tags, $evaltype, $parent_alias, $table, $field) {
-		$values_by_tag = [];
-
+		/*
+		 * Tag grouping based on operator:
+		 * '0' for NOT EXISTS sub-queries;
+		 * '1' for EXISTS sub-queries.
+		 */
+		$values_by_tag = [
+			0 => [],
+			1 => []
+		];
 		foreach ($tags as $tag) {
 			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
 			$value = array_key_exists('value', $tag) ? $tag['value'] : '';
 
-			if (!array_key_exists($tag['tag'], $values_by_tag) || is_array($values_by_tag[$tag['tag']])) {
-				if ($operator == TAG_OPERATOR_EQUAL) {
-					$values_by_tag[$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
-				}
-				elseif ($value !== '') {
-					$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
-					$value = '%'.mb_strtoupper($value).'%';
+			if ($operator == TAG_OPERATOR_NOT_EXISTS
+					|| ($operator == TAG_OPERATOR_NOT_LIKE && $value === '')) {
+				$values_by_tag[0][$tag['tag']] = false;
+			}
+			elseif ($operator == TAG_OPERATOR_NOT_EQUAL && $value !== '') {
+				$values_by_tag[0][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+			}
+			elseif ($operator == TAG_OPERATOR_NOT_LIKE) {
+				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
+				$value = '%'.mb_strtoupper($value).'%';
 
-					$values_by_tag[$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
-				}
-				// ($value === '') - all other conditions can be omitted
-				else {
-					$values_by_tag[$tag['tag']] = false;
-				}
+				$values_by_tag[0][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+			}
+			elseif ($operator == TAG_OPERATOR_NOT_EQUAL) {
+				$values_by_tag[1][$tag['tag']][] = $table.'.value<>'.zbx_dbstr($value);
+			}
+			elseif ($operator == TAG_OPERATOR_EXISTS
+					|| ($operator == TAG_OPERATOR_LIKE && $value === '')) {
+				$values_by_tag[1][$tag['tag']] = true;
+			}
+			elseif ($operator == TAG_OPERATOR_LIKE) {
+				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
+				$value = '%'.mb_strtoupper($value).'%';
+
+				$values_by_tag[1][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+			}
+			elseif ($operator == TAG_OPERATOR_EQUAL) {
+				$values_by_tag[1][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
 			}
 		}
 
+		$evaltype_glue = ($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 		$sql_where = [];
+		foreach ($values_by_tag as $key => $filters) {
+			$statements = [];
+			foreach ($filters as $tag => $values) {
+				if (!is_array($values) || count($values) == 0) {
+					$values = '';
+				}
+				elseif (count($values) == 1) {
+					$values = ' AND '.$values[0];
+				}
+				else {
+					$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
+				}
 
-		foreach ($values_by_tag as $tag => $values) {
-			if (!is_array($values) || count($values) == 0) {
-				$values = '';
-			}
-			elseif (count($values) == 1) {
-				$values = ' AND '.$values[0];
-			}
-			else {
-				$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
+				if ($values === '') {
+					$statements[] = $table.'.tag='.zbx_dbstr($tag).$values;
+				}
+				else {
+					$statements[] = '('.$table.'.tag='.zbx_dbstr($tag).$values.')';
+				}
 			}
 
-			$sql_where[] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM '.$table.
-				' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
-					' AND '.$table.'.tag='.zbx_dbstr($tag).$values.
-			')';
+			if ($statements) {
+				$prefix = ($key == 0) ? 'NOT ' : '';
+				$sql_where[] = $prefix.'EXISTS ('.
+					'SELECT NULL'.
+					' FROM '.$table.
+					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
+						' AND ('.implode($evaltype_glue, $statements).')'.
+				')';
+			}
 		}
 
-		$sql_where = implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
+		if (!$sql_where) {
+			return '(1=0)';
+		}
+
+		$sql_where = implode($evaltype_glue, $sql_where);
 
 		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
 	}
 
 	/**
-	 * Checks, if host tag matches filter tag.
+	 * Function returns template tags matching filter tags based on given operator filter.
 	 *
 	 * @param array  $filter_tag
 	 * @param string $filter_tag['tag']
@@ -99,27 +137,51 @@ class CApiTagHelper {
 	 * @param string $host_tag['tag']
 	 * @param string $host_tag['value']
 	 *
-	 * @return boolean
+	 * @return array
 	 */
-	public static function checkTag(array $filter_tag, array $host_tag) {
+	public static function getMatchingTemplateTag(array $filter_tag, array $template_tags): array {
+		if ($filter_tag['operator'] == TAG_OPERATOR_NOT_EXISTS
+				|| $filter_tag['operator'] == TAG_OPERATOR_NOT_LIKE
+				|| ($filter_tag['operator'] == TAG_OPERATOR_NOT_EQUAL && $filter_tag['value'] !== '')) {
+			return [];
+		}
+
+		$_template_tags = [];
+		foreach ($template_tags as $tag) {
+			$_template_tags[$tag['tag']][] = $tag;
+		}
+
+		$return = [];
 		switch ($filter_tag['operator']) {
-			case TAG_OPERATOR_EQUAL:
-				if ($filter_tag['tag'] === $host_tag['tag']
-						&& $filter_tag['value'] === $host_tag['value']) {
-					return true;
+			case TAG_OPERATOR_EXISTS:
+			case TAG_OPERATOR_NOT_EXISTS:
+				if (array_key_exists($filter_tag['tag'], $_template_tags)) {
+					$return = $_template_tags[$filter_tag['tag']];
 				}
-
 				break;
-			case TAG_OPERATOR_LIKE:
-				if ($filter_tag['tag'] === $host_tag['tag']
-						&& ($filter_tag['value'] === ''
-							|| mb_strpos($host_tag['value'], $filter_tag['value']) !== false)) {
-					return true;
-				}
 
+			case TAG_OPERATOR_LIKE:
+			case TAG_OPERATOR_NOT_LIKE:
+				if (array_key_exists($filter_tag['tag'], $_template_tags)) {
+					$return = array_filter($_template_tags[$filter_tag['tag']], function($template_tag) use($filter_tag) {
+						$template_tag_value = mb_strtolower($template_tag['value']);
+						$filter_tag_value = mb_strtolower($filter_tag['value']);
+
+						return ($filter_tag_value === '' || mb_strpos($template_tag_value, $filter_tag_value) !== false);
+					});
+				}
+				break;
+
+			case TAG_OPERATOR_EQUAL:
+			case TAG_OPERATOR_NOT_EQUAL:
+				if (array_key_exists($filter_tag['tag'], $_template_tags)) {
+					$return = array_filter($_template_tags[$filter_tag['tag']], function($template_tag) use($filter_tag) {
+						return ($filter_tag['value'] === $template_tag['value']);
+					});
+				}
 				break;
 		}
 
-		return false;
+		return zbx_toHash($return, 'hostid');
 	}
 }

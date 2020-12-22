@@ -501,13 +501,6 @@ class CHost extends CHostGeneral {
 				));
 
 				foreach ($options['tags'] as $tag) {
-					$templateids = [];
-					foreach ($db_template_tags as $template_tag) {
-						if (CApiTagHelper::checkTag($tag, $template_tag)) {
-							$templateids[$template_tag['hostid']] = true;
-						}
-					}
-
 					if (!array_key_exists($tag['tag'], $tags)) {
 						$tags[$tag['tag']] = [
 							'templateids' => [],
@@ -520,15 +513,19 @@ class CHost extends CHostGeneral {
 						'operator' => $tag['operator']
 					];
 
-					while ($templateids) {
-						$tags[$tag['tag']]['templateids'] += $templateids;
+					if ($db_template_tags) {
+						$templateids = CApiTagHelper::getMatchingTemplateTag($tag, $db_template_tags);
 
-						$templateids = API::Template()->get([
-							'output' => [],
-							'parentTemplateids' => array_keys($templateids),
-							'preservekeys' => true,
-							'nopermissions' => true
-						]);
+						while ($templateids) {
+							$tags[$tag['tag']]['templateids'] += $templateids;
+
+							$templateids = API::Template()->get([
+								'output' => [],
+								'parentTemplateids' => array_keys($templateids),
+								'preservekeys' => true,
+								'nopermissions' => true
+							]);
+						}
 					}
 				}
 
@@ -543,10 +540,10 @@ class CHost extends CHostGeneral {
 						];
 					}
 
-					$where[] = '('.
-						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
-						' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids'])).
-					')';
+					$_where = CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid');
+					$where[] = $_tag['templateids']
+						? '('.$_where.' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids'])).')'
+						: $_where;
 				}
 
 				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
