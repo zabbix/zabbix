@@ -106,7 +106,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public function testPageLowLevelDiscovery_ResetButton() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check table contents before filtering.
@@ -137,7 +137,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 */
 	public function testPageLowLevelDiscovery_EnableDisableSingle() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 		$row = $table->findRow('Name', 'Discovery rule 2');
 
 		// Clicking Enabled/Disabled link
