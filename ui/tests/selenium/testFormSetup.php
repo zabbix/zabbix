@@ -57,12 +57,15 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals($hint_text, $this->query('class:hint-box')->one()->getText());
 		$this->checkButtons('first section');
 
+		$this->assertScreenshot($this->query('xpath://form')->one(), 'Welcome_En');
+
 		// Check that default language can be changed.
 		$language_field->fill('Russian (ru_RU)');
 		$this->page->refresh()->waitUntilReady();
 		$this->assertEquals("Добро пожаловать в\nZabbix 5.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
+		$this->assertScreenshot($this->query('xpath://form')->one(), 'Welcome_Rus');
 	}
 
 	public function testFormSetup_prerequisitesSectionLayout() {
@@ -105,26 +108,31 @@ class testFormSetup extends CWebTest {
 		$this->assertTableDataColumn($prerequisites, '');
 		$this->checkSections('Check of pre-requesties');
 		$this->checkButtons();
+
+		global $DB;
+		$screenshot = ($DB['TYPE'] === ZBX_DB_POSTGRESQL) ? 'Prerequisites_PostgreSQL' : 'Prerequisites_MySQL';
+		$this->assertScreenshot($this->query('xpath://form')->one(), $screenshot);
 	}
 
 	public function testFormSetup_dbConnectionSectionLayout() {
 		$this->openSpecifiedSection('Configure DB connection');
+		$db_parameters = $this->getDbParameters();
 
 		// Check Configure DB connection section.
 		$fields = [
-			'Database host' => 'localhost',
 			'Database port' => '0',
 			'Database name' => 'zabbix',
 			'User' => 'zabbix',
 			'Password' => ''
 		];
+		$fields['Database host'] = ($db_parameters['Database type'] === 'PostgreSQL') ?
+				'localhost' : $db_parameters['Database host'];
 		$text = 'Please create database manually, and set the configuration parameters for connection to this database. '.
 				'Press "Next step" button when done.';
 		$this->checkPageTextElements('Configure DB connection', $text);
 		$form = $this->query('xpath://form')->asForm()->one();
 
 		// Check input fieldsin Configure DB connection section for each DB type.
-		$db_parameters = $this->getDbParameters();
 		$db_types = $form->getField('Database type')->getOptions()->asText();
 		foreach ($db_types as $db_type) {
 			$form->getField('Database type')->select($db_type);
@@ -166,6 +174,14 @@ class testFormSetup extends CWebTest {
 				$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 
 			}
+			// Array of fields to be skipped by the screenshot check.
+			$skip_db_fields = [];
+			foreach(['Database host', 'Database name'] as $skip_field) {
+				array_push($skip_db_fields, $form->getField($skip_field));
+			}
+			// Check screenshot for "Store credentials in" = Plain text.
+			$screenshot = ($db_type === 'PostgreSQL') ? 'ConfigureDB_Postgres_plainText' : 'ConfigureDB_MySQL_plainText';
+			$this->assertScreenshotExcept($form, $skip_db_fields, $screenshot);
 
 			// Check 'Store credentials in' field, switch to Vault and check Vault rellated fields.
 			$credentials_field = $form->getField('Store credentials in');
@@ -198,6 +214,16 @@ class testFormSetup extends CWebTest {
 					$this->assertEquals('path/to/secret', $field->getAttribute('placeholder'));
 				}
 			}
+
+			// Array of fields to be skipped by the screenshot check.
+			$skip_fields_vault = [];
+			foreach(['Database host', 'Database name'] as $skip_field) {
+				array_push($skip_fields_vault, $form->getField($skip_field));
+			}
+			// Check screenshot for "Store credentials in" = Vault.
+			$screenshot_vault = ($db_type === 'PostgreSQL') ? 'ConfigureDB_Postgres_Vault' : 'ConfigureDB_MySQL_Vault';
+			$this->assertScreenshotExcept($form, $skip_fields_vault, $screenshot_vault);
+
 			$credentials_field->select('Plain text');
 		}
 	}
@@ -224,6 +250,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		$this->checkButtons();
+		$this->assertScreenshot($form, 'ZabbixServerDetails');
 	}
 
 	/**
@@ -236,6 +263,8 @@ class testFormSetup extends CWebTest {
 		$this->checkPageTextElements('GUI settings');
 		$this->checkButtons();
 		$form = $this->query('xpath://form')->asForm()->one();
+		// Check layout via screenshot for default theme.
+		$this->assertScreenshot($form, 'GUISettings_default');
 		// Check timezone field.
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
@@ -256,6 +285,8 @@ class testFormSetup extends CWebTest {
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 		$parts = explode('/', $stylesheet->getAttribute('href'));
 		$this->assertContains('dark-theme.css', explode('?', end($parts)));
+		// Check layout via screenshot for dark theme.
+		$this->assertScreenshot($form, 'GUISettings_Dark');
 
 		// Complite the setup and check in DB that the default timezone was applied.
 		$this->query('button:Next step')->one()->click();
@@ -304,6 +335,15 @@ class testFormSetup extends CWebTest {
 			}
 		}
 		$this->checkButtons();
+
+		// Check screenshot of the Pre-installation summary section.
+		$skip_fields = [];
+		foreach(['Database server', 'Database name'] as $skip_field) {
+			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
+			array_push($skip_fields, $this->query($xpath)->one());
+		}
+		$screenshot = ($db_parameters['Database type'] === 'PostgreSQL') ? 'PreInstall_Postgres' : 'PreInstall_MySQL';
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, $screenshot);
 	}
 
 	public function testFormSetup_installSection() {
@@ -312,6 +352,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
 				$this->query('class:green')->one()->getText());
 		$this->checkButtons('last section');
+		$this->assertScreenshot($this->query('xpath://form')->one(), 'Install');
 
 		// Check that Dashboard view is opened after completing the form.
 		$this->query('button:Finish')->one()->click();
