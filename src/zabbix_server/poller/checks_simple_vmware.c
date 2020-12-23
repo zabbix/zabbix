@@ -1878,7 +1878,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	if (NULL == (cluster = cluster_get(&service->data->clusters, clusterid)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cluster ID is not available."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cluster id."));
 		goto unlock;
 	}
 
