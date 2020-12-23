@@ -20,14 +20,12 @@
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
-
-#define ZBX_XML_HEADER_SIZE 22
+#define ZBX_XML_HEADER_SIZE	22
 
 void	zbx_mock_test_entry(void **state)
 {
-	char		*json, *expected_xml, *xml_content, *xml = NULL, *error = NULL;
-	int		actual_result, expected_result;
+	char	*json, *expected_xml, *xml_content, *xml = NULL, *error = NULL;
+	int	actual_result, expected_result;
 
 	ZBX_UNUSED(state);
 

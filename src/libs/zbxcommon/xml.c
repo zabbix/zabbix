@@ -512,14 +512,16 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
  * Parameters: node       - [IN] node structure                               *
  *                                                                            *
  * Return value: SUCCEED - node has text content                              *
- *               FAIL    - node has not content                               *
+ *               FAIL    - node has no content                                *
  *                                                                            *
  ******************************************************************************/
 static int	is_data(zbx_xml_node_t *node)
 {
 	if (0 == node->chnodes.values_num &&
 			(0 == strcmp(XML_TEXT_NAME, node->name) || 0 == strcmp(XML_CDATA_NAME, node->name)))
+	{
 		return SUCCEED;
+	}
 
 	return FAIL;
 }
