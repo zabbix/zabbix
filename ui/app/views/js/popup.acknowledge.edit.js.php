@@ -33,7 +33,7 @@ function submitAcknowledge(overlay) {
 		form_data;
 
 	$form.trimValues(['#message']);
-	form_data = jQuery('#message, input:visible, select:visible, input[type=hidden]', $form).serialize();
+	form_data = jQuery('#message, input:visible, input[type=hidden]', $form).serialize();
 	url.setArgument('action', 'popup.acknowledge.create');
 
 	overlay.xhr = sendAjaxData(url.getUrl(), {

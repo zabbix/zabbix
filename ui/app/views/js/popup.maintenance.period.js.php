@@ -43,6 +43,7 @@ jQuery('#month_date_type').change(function() {
 
 	jQuery('#row_timeperiod_day').toggle(value == 0);
 	jQuery('#row_timeperiod_week,#row_timeperiod_week_days').toggle(value == 1);
+	overlays_stack.end().centerDialog();
 });
 
 jQuery('#timeperiod_type').change(function() {
@@ -58,10 +59,12 @@ jQuery('#timeperiod_type').change(function() {
  */
 function submitMaintenancePeriod(overlay) {
 	var $container = overlay.$dialogue.find('form'),
-		elements;
+		elements = {};
 
 	$container.trimValues(['#start_date']);
-	elements = jQuery('input:visible,select:visible,input[type=hidden]', $container).serialize();
+	$('>input, >ul>li:visible input', $container)
+		.serializeArray()
+		.forEach(({name, value}) => elements[name] = value);
 
 	overlay.setLoading();
 	overlay.xhr = sendAjaxData('zabbix.php', {

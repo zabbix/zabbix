@@ -107,7 +107,9 @@ class CControllerPopupTestTriggerExpr extends CController {
 					}
 					else {
 						if ($info['values'] !== null) {
-							$control = new CComboBox($fname, $this->macros_data[$macro], null, $info['values']);
+							$control = (new CSelect($fname))
+								->addOptions(CSelect::createOptionsFromArray($info['values']))
+								->setValue($this->macros_data[$macro]);
 						}
 						else {
 							$control = (new CTextBox($fname, $this->macros_data[$macro]))
