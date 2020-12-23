@@ -60,7 +60,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	service := url.QueryEscape(params["Service"])
 
-	uri, err := uri.NewWithCreds(params["URI"]+"?dbname="+service, params["User"], params["Password"], uriDefaults)
+	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, params["User"], params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
 	}
