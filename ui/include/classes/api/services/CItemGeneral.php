@@ -1688,6 +1688,7 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$item_preprocs[$item['itemid']] = [];
 				$step = 1;
 
 				foreach ($item['preprocessing'] as $item_preproc) {
