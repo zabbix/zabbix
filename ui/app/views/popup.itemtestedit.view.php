@@ -278,6 +278,11 @@ $form_grid->addItem([
 			->setId('time')
 	),
 
+	($data['preproc_item'] instanceof CDiscoveryRule)
+		? null
+		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
+			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
+
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
 		(new CMultilineInput('prev_value', '', [
@@ -339,11 +344,8 @@ if (count($data['steps']) > 0) {
 		}
 
 		$result_table->addRow([
-			(new CCol($step['num'].':'))
-				->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? ZBX_STYLE_DISABLED : null),
-			(new CCol($step['name']))
-				->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? ZBX_STYLE_DISABLED : null)
-				->setId('preproc-test-step-'.$i.'-name'),
+			(new CCol($step['num'].':')),
+			(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
 			(new CCol())
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result')
