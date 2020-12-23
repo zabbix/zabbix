@@ -1715,8 +1715,8 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
-int	zbx_xml_to_json(char *data, char **jstr, char **errmsg);
-int	zbx_json_to_xml(char *data, char **xstr, char **errmsg);
+int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
+int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
