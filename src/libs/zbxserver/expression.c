@@ -17,16 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxserver.h"
 #include "evalfunc.h"
-#include "db.h"
 #include "log.h"
-#include "zbxalgo.h"
+#include "zbxregexp.h"
+
 #include "valuecache.h"
 #include "macrofunc.h"
-#include "zbxregexp.h"
-#include "dbcache.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
 #	include <libxml/xpath.h>

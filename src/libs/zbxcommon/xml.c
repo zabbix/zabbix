@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxalgo.h"
+#include "log.h"
 #include "zbxjson.h"
+
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
-#include "log.h"
-#include "zbxalgo.h"
+
 #include "../zbxalgo/vectorimpl.h"
 
 #define XML_TEXT_NAME	"text"
@@ -204,7 +205,7 @@ static size_t	xml_escape_xpath_stringsize(const char *string)
 	size_t		len = 0;
 	const char	*sptr;
 
-	if (NULL == string )
+	if (NULL == string)
 		return 0;
 
 	for (sptr = string; '\0' != *sptr; sptr++)
@@ -281,14 +282,14 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
+	int		i, ret = FAIL;
+	char		buffer[32], *ptr;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
 	xmlBufferPtr	xmlBufferLocal;
-	int		ret = FAIL, i;
-	char		buffer[32], *ptr;
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
 	{
@@ -319,6 +320,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 			{
 				nodeset = xpathObj->nodesetval;
+
 				for (i = 0; i < nodeset->nodeNr; i++)
 					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
 			}
@@ -342,7 +344,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 			zbx_variant_clear(value);
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, xpathObj->floatval);
 
-			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90    */
+			/* check for nan/inf values - isnan(), isinf() is not supported by c89/90 */
 			/* so simply check the result starts with digit (accounting for -inf) */
 			if ('-' == *(ptr = buffer))
 				ptr++;
@@ -421,6 +423,7 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 		zbx_xml_node_t	*node;
 
 		node = (zbx_xml_node_t *)zbx_malloc(NULL, sizeof(zbx_xml_node_t));
+
 		if (NULL != xml_node->name)
 			node->name = zbx_strdup(NULL, (char *)xml_node->name);
 		else
@@ -480,6 +483,7 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 	}
 
 	zbx_vector_xml_node_ptr_reserve(nodes, (size_t)nodes_local.values_num);
+
 	while (0 < nodes_local.values_num)
 	{
 		zbx_xml_node_t	*first_node, *next_node;
@@ -536,8 +540,6 @@ static int	is_data(zbx_xml_node_t *node)
  *             json    - [IN/OUT] JSON structure                              *
  *             text    - [OUT] text content for given node                    *
  *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
  ******************************************************************************/
 static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *json, char **text)
 {
@@ -546,6 +548,7 @@ static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *js
 	zbx_xml_node_t	*node;
 
 	*text = NULL;
+
 	for (i = 0; i < nodes->values_num; i++)
 	{
 		node = nodes->values[i];
@@ -570,15 +573,18 @@ static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *js
 		}
 
 		is_object = XML_JSON_FALSE;
+
 		if (0 != node->chnodes.values_num)
 		{
 			zbx_xml_node_t	*chnode;
 
 			/* if first child node is not data node that is enough to recognize current node as object */
 			chnode = node->chnodes.values[0];
+
 			if (FAIL == is_data(chnode))
 				is_object = XML_JSON_TRUE;
 		}
+
 		if (0 != node->attributes.values_num)
 			is_object = XML_JSON_TRUE;
 
@@ -609,6 +615,7 @@ static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *js
 		if (XML_JSON_TRUE == is_object && FAIL == zbx_json_close(json))
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
+
 	if (0 != arr_cnt && FAIL == zbx_json_close(json))
 		THIS_SHOULD_NEVER_HAPPEN;
 }
@@ -913,12 +920,12 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
-	struct zbx_json_parse	jp;
 	char			*attr = NULL, *attr_val = NULL, *text = NULL;
-	xmlDoc 			*doc = NULL;
+	int			size, ret = FAIL;
+	struct zbx_json_parse	jp;
+	xmlDoc			*doc = NULL;
 	xmlErrorPtr		pErr;
 	xmlChar			*xmem;
-	int			size, ret = FAIL;
 
 	if (NULL == (doc = xmlNewDoc(BAD_CAST XML_DEFAULT_VERSION)))
 	{

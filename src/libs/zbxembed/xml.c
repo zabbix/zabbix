@@ -19,8 +19,8 @@
 
 #include "common.h"
 #include "zbxembed.h"
+
 #include "embed.h"
-#include "duktape.h"
 #include "xml.h"
 
 /******************************************************************************
@@ -51,9 +51,9 @@ static duk_ret_t	es_xml_ctor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_xml_query(duk_context *ctx)
 {
-	zbx_variant_t		value;
-	int			err_index = -1;
-	char			*err = NULL;
+	int		err_index = -1;
+	char		*err = NULL;
+	zbx_variant_t	value;
 
 	zbx_variant_set_str(&value, zbx_strdup(NULL, duk_safe_to_string(ctx, 0)));
 
@@ -147,6 +147,7 @@ static int	es_xml_create_object(duk_context *ctx)
 		return FAIL;
 
 	duk_new(ctx, 0);
+
 	if (1 != duk_put_global_string(ctx, "XML"))
 		return FAIL;
 

@@ -17,8 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxregexp.h"
 #include "log.h"
+#include "zbxembed.h"
+#include "zbxprometheus.h"
 
 /* LIBXML2 is used */
 #ifdef HAVE_LIBXML2
@@ -27,10 +29,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "zbxregexp.h"
-#include "zbxjson.h"
-#include "zbxembed.h"
-#include "zbxprometheus.h"
 #include "preproc_history.h"
 
 #include "item_preproc.h"
@@ -1947,7 +1945,7 @@ out:
  ******************************************************************************/
 static int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg)
 {
-	char *json = NULL;
+	char	*json = NULL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
