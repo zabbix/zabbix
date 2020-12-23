@@ -35,7 +35,6 @@ $(document).ready(function() {
 			$logitems = $('<div/>', {class: 'logitems'}),
 			$footer = $('<div/>', {class: 'logtotalms'});
 
-		console.log(debug);
 		debug.logs.forEach(function (entry) {
 			$('<pre/>')
 				.text(entry.ms + ' ' + entry.level + ' ' + entry.message)
