@@ -1104,7 +1104,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
  *                                                                            *
  * Function: zbx_item_info_clean                                              *
  *                                                                            *
- * Purpose: frees resources allocated to store item applications and name     *
+ * Purpose: frees resources allocated to store item tags and name             *
  *                                                                            *
  * Parameters: item_info - [IN] item information                              *
  *                                                                            *
@@ -1125,7 +1125,7 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
  * Parameters: trends     - [IN] trends from cache                            *
  *             trends_num - [IN] number of trends                             *
  *             hosts_info - [IN] hosts groups names                           *
- *             items_info - [IN] item names and applications                  *
+ *             items_info - [IN] item names and tags                          *
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hashset_t *hosts_info,
@@ -1218,7 +1218,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
  * Parameters: history     - [IN/OUT] array of history data                   *
  *             history_num - [IN] number of history structures                *
  *             hosts_info  - [IN] hosts groups names                          *
- *             items_info  - [IN] item names and applications                 *
+ *             items_info  - [IN] item names and tags                         *
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts_info,

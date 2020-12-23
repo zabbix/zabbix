@@ -5150,7 +5150,8 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(itemtagid, row[0]);
 
-		item_tag = (zbx_dc_item_tag_t *)DCfind_id(&config->item_tags, itemtagid, sizeof(zbx_dc_item_tag_t), &found);
+		item_tag = (zbx_dc_item_tag_t *)DCfind_id(&config->item_tags, itemtagid, sizeof(zbx_dc_item_tag_t),
+				&found);
 		DCstrpool_replace(found, &item_tag->tag, row[2]);
 		DCstrpool_replace(found, &item_tag->value, row[3]);
 
@@ -5835,9 +5836,9 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, triggers_sync, tdep_sync, func_sync, expr_sync,
-			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, item_tag_sync, host_tag_sync,
-			correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync, itempp_sync,
-			itemscrp_sync, maintenance_sync, maintenance_period_sync, maintenance_tag_sync,
+			action_sync, action_op_sync, action_condition_sync, trigger_tag_sync, item_tag_sync,
+			host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync, hgroups_sync,
+			itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync, maintenance_tag_sync,
 			maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
 
 	double		autoreg_csec, autoreg_csec2;

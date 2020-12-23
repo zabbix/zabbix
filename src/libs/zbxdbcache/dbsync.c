@@ -3030,7 +3030,7 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 
 	if (NULL == (result = DBselect(
 			"select distinct it.itemtagid,it.itemid,it.tag,it.value"
-			" from item_tag it,items i,hosts h,items i"
+			" from item_tag it,items i,hosts h"
 			" where i.itemid=it.itemid"
 				" and i.flags in (%d,%d)"
 				" and h.hostid=i.hostid"
