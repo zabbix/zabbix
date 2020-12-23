@@ -100,10 +100,11 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_dbConnectionSectionLayout() {
 		$this->openSpecifiedSection('Configure DB connection');
+		$db_parameters = $this->getDbParameters();
 
 		// Check Configure DB connection section.
 		$fields = [
-			'Database host' => 'localhost',
+			'Database host' => $db_parameters['Database host'],
 			'Database port' => '0',
 			'Database name' => 'zabbix',
 			'User' => 'zabbix',
@@ -114,8 +115,7 @@ class testFormSetup extends CWebTest {
 		$this->checkPageTextElements('Configure DB connection', $text);
 		$form = $this->query('xpath://form')->asForm()->one();
 
-		// Check input fieldsin Configure DB connection section for each DB type.
-		$db_parameters = $this->getDbParameters();
+		// Check input fields in Configure DB connection section for each DB type.
 		$db_types = $form->getField('Database type')->getOptions()->asText();
 		foreach ($db_types as $db_type) {
 			$form->getField('Database type')->select($db_type);
