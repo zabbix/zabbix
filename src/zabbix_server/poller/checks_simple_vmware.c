@@ -1842,10 +1842,10 @@ out:
 int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *path, *clusterid;
+	char			*url, *path, *clusterid;
 	const char 		*instance;
 	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
+	zbx_vmware_cluster_t	*cluster;
 	zbx_uint64_t		counterid;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -1876,16 +1876,23 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
+	if (NULL == (cluster = cluster_get(&service->data->clusters, clusterid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cluster ID is not available."));
+		goto unlock;
+	}
+
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "ClusterComputeResource", clusterid, counterid, "*"))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "ClusterComputeResource", cluster->id,
+			counterid, "*"))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_get_counter_value_by_id(service, "ClusterComputeResource", clusterid, counterid, instance,
-			1, result);
+	ret = vmware_service_get_counter_value_by_id(service, "ClusterComputeResource", cluster->id, counterid,
+			instance, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
