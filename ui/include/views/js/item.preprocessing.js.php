@@ -376,7 +376,6 @@
 							.prop('checked', true)
 							.prop('disabled', true)
 							.trigger('change');
-						$row.find('[name*="[test]"]').prop('disabled', true);
 						break;
 
 					default:

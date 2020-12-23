@@ -1565,7 +1565,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('preprocessing-step-test')
-							->setEnabled($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)
 							->removeId(),
 						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
