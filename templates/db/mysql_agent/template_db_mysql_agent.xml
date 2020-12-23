@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-22T20:42:17Z</date>
+   <date>2020-12-23T13:03:24Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -126,6 +126,10 @@ Template tooling version used: 0.38</description>
                   <step>
                      <type>XMLPATH</type>
                      <params>/resultset/row[field/text()='Binlog_cache_disk_use']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -820,6 +824,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <type>XMLPATH</type>
                      <params>/resultset/row[field/text()='Innodb_buffer_pool_wait_free']/field[@name='Value']/text()</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
@@ -862,6 +870,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                   <step>
                      <type>XMLPATH</type>
                      <params>/resultset/row[field/text()='Innodb_num_open_files']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1022,6 +1034,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <type>XMLPATH</type>
                      <params>/resultset/row[field/text()='Open_table_definitions']/field[@name='Value']/text()</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
@@ -1044,6 +1060,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                   <step>
                      <type>XMLPATH</type>
                      <params>/resultset/row[field/text()='Open_tables']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1394,14 +1414,14 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
             <discovery_rule>
                <name>MariaDB discovery</name>
                <type>DEPENDENT</type>
-               <key>mysql.fork.discovery</key>
+               <key>mysql.extra_metric.discovery</key>
                <delay>0</delay>
                <description>Additional metrics if MariaDB is used.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MySQL: Binlog commits</name>
                      <type>DEPENDENT</type>
-                     <key>mysql.binlog_commits[{#SINGLETON}]</key>
+                     <key>mysql.binlog_commits.rate[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1415,6 +1435,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                         <step>
                            <type>XMLPATH</type>
                            <params>/resultset/row[field/text()='Binlog_commits']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1432,7 +1456,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                   <item_prototype>
                      <name>MySQL: Binlog group commits</name>
                      <type>DEPENDENT</type>
-                     <key>mysql.binlog_group_commits[{#SINGLETON}]</key>
+                     <key>mysql.binlog_group_commits.rate[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1446,6 +1470,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                         <step>
                            <type>XMLPATH</type>
                            <params>/resultset/row[field/text()='Binlog_group_commits']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1470,6 +1498,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                            <type>XMLPATH</type>
                            <params>/resultset/row[field/text()='Master_gtid_wait_count']/field[@name='Value']/text()</params>
                         </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
                      </preprocessing>
                      <master_item>
                         <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
@@ -1492,6 +1524,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                         <step>
                            <type>XMLPATH</type>
                            <params>/resultset/row[field/text()='Master_gtid_wait_time']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -1516,6 +1552,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                            <type>XMLPATH</type>
                            <params>/resultset/row[field/text()='Master_gtid_wait_timeouts']/field[@name='Value']/text()</params>
                         </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
                      </preprocessing>
                      <master_item>
                         <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
@@ -1528,13 +1568,8 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
                <preprocessing>
                   <step>
-                     <type>REGEX</type>
-                     <params>MariaDB
-\0</params>
-                  </step>
-                  <step>
                      <type>JAVASCRIPT</type>
-                     <params>return JSON.stringify(value === 'MariaDB' ? [{'{#SINGLETON}': ''}] : []);</params>
+                     <params>return JSON.stringify(value.search('MariaDB')&gt;-1 ? [{'{#SINGLETON}': ''}] : []);</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1657,7 +1692,7 @@ explicitly stopped it with STOP SLAVE.</description>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                           <params>1d</params>
+                           <params>6h</params>
                         </step>
                      </preprocessing>
                      <master_item>
