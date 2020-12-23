@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-16T13:24:35Z</date>
+   <date>2020-12-23T09:21:31Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -11,9 +11,9 @@
       <template>
          <template>Template Module SMART by Zabbix agent 2</template>
          <name>Template Module SMART by Zabbix agent 2</name>
-         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.4 and later with Smartmontools version 7.0 and later.&#13;
+         <description>The template for monitoring S.M.A.R.T. attributes of physical disk that works without any external scripts. It collects metrics by Zabbix agent 2 version 5.0 and later with Smartmontools version 7.1 and later. Disk discovery LLD rule finds all HDD, SSD, NVMe disks with S.M.A.R.T. enabled. Attribute discovery LLD rule finds all Vendor Specific Attributes for each disk. If you want to skip some attributes, please set regular expressions with disk names in {$SMART.DISK.NAME.MATCHES} and with attribute IDs in {$SMART.ATTRIBUTE.ID.MATCHES} macros on the host level.&#13;
 &#13;
-You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/415662-discussion-thread-for-official-zabbix-smart-disk-monitoring&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
@@ -28,8 +28,8 @@ Template tooling version used: 0.38</description>
          </applications>
          <items>
             <item>
-               <name>SMART: Get SMART attributes of all disks</name>
-               <key>smart.disk.get</key>
+               <name>SMART: Get attributes</name>
+               <key>smart.disk.get[{#NAME}]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -42,21 +42,21 @@ Template tooling version used: 0.38</description>
          </items>
          <discovery_rules>
             <discovery_rule>
-               <name>SMART attribute discovery</name>
+               <name>Attribute discovery</name>
                <type>ZABBIX_PASSIVE</type>
                <key>smart.attribute.discovery</key>
                <delay>1h</delay>
-               <description>Discovery SMART Vendor Specific Attributes of drives.</description>
+               <description>Discovery SMART Vendor Specific Attributes of disks.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>SMART: ID {#ID} {#ATTRNAME}</name>
+                     <name>SMART [{#NAME}]: ID {#ID} {#ATTRNAME}</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.error[{#NAME},{#ID}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -70,12 +70,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()} &lt;= {#THRESH}</expression>
-                           <name>SMART: Disk {#NAME} attribute {#ID} {#ATTRNAME} is failed</name>
+                           <name>SMART [{#NAME}]: Disk {#NAME} attribute {#ID} {#ATTRNAME} is failed</name>
                            <priority>WARNING</priority>
                            <description>The value should be greater than THRESH.</description>
                         </trigger_prototype>
@@ -113,14 +113,14 @@ Template tooling version used: 0.38</description>
                </overrides>
             </discovery_rule>
             <discovery_rule>
-               <name>SMART disk discovery</name>
+               <name>Disk discovery</name>
                <type>ZABBIX_PASSIVE</type>
                <key>smart.disk.discovery</key>
                <delay>1h</delay>
-               <description>Discovery SMART drives.</description>
+               <description>Discovery SMART disks.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>SMART: Critical warning</name>
+                     <name>SMART [{#NAME}]: Critical warning</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.critical_warning[{#NAME}]</key>
                      <delay>0</delay>
@@ -128,7 +128,7 @@ Template tooling version used: 0.38</description>
                      <description>This field indicates critical warnings for the state of the controller.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -142,11 +142,11 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Power on hours</name>
+                     <name>SMART [{#NAME}]: Power on hours</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.hours[{#NAME}]</key>
                      <delay>0</delay>
@@ -155,7 +155,7 @@ Template tooling version used: 0.38</description>
                      <description>Count of hours in power-on state. The raw value of this attribute shows total count of hours (or minutes, or seconds, depending on manufacturer) in power-on state. "By default, the total expected lifetime of a hard disk in perfect condition is defined as 5 years (running every day and night on all days). This is equal to 1825 days in 24/7 mode or 43800 hours." On some pre-2005 drives, this raw value may advance erratically and/or "wrap around" (reset to zero periodically). https://en.wikipedia.org/wiki/S.M.A.R.T.#Known_ATA_S.M.A.R.T._attributes</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -165,11 +165,11 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Media errors</name>
+                     <name>SMART [{#NAME}]: Media errors</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.media_errors[{#NAME}]</key>
                      <delay>0</delay>
@@ -177,7 +177,7 @@ Template tooling version used: 0.38</description>
                      <description>Contains the number of occurrences where the controller detected an unrecovered data integrity error. Errors such as uncorrectable ECC, CRC checksum failure, or LBA tag mismatch are included in this field.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -191,11 +191,11 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Device model</name>
+                     <name>SMART [{#NAME}]: Device model</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.model[{#NAME}]</key>
                      <delay>0</delay>
@@ -204,7 +204,7 @@ Template tooling version used: 0.38</description>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -218,11 +218,11 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Percentage used</name>
+                     <name>SMART [{#NAME}]: Percentage used</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.percentage_used[{#NAME}]</key>
                      <delay>0</delay>
@@ -231,7 +231,7 @@ Template tooling version used: 0.38</description>
                      <description>Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -245,18 +245,18 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;90</expression>
-                           <name>SMART: {#NAME}: NVMe disk percentage using is over 90% of estimated endurance</name>
+                           <name>SMART [{#NAME}]: {#NAME}: NVMe disk percentage using is over 90% of estimated endurance</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Serial number</name>
+                     <name>SMART [{#NAME}]: Serial number</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.sn[{#NAME}]</key>
                      <delay>0</delay>
@@ -265,7 +265,7 @@ Template tooling version used: 0.38</description>
                      <value_type>CHAR</value_type>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -279,12 +279,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                           <name>SMART: {#NAME}: Disk has been replaced (new serial number received)</name>
+                           <name>SMART [{#NAME}]: {#NAME}: Disk has been replaced (new serial number received)</name>
                            <priority>INFO</priority>
                            <description>Device serial number has changed. Ack to close.</description>
                            <manual_close>YES</manual_close>
@@ -292,7 +292,7 @@ Template tooling version used: 0.38</description>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Temperature</name>
+                     <name>SMART [{#NAME}]: Temperature</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.temperature[{#NAME}]</key>
                      <delay>0</delay>
@@ -301,7 +301,7 @@ Template tooling version used: 0.38</description>
                      <description>Current drive temperature.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -315,29 +315,29 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.WARN}</expression>
-                           <name>SMART: {#NAME}: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)</name>
+                           <name>SMART [{#NAME}]: {#NAME}: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)</name>
                            <priority>WARNING</priority>
                            <dependencies>
                               <dependency>
-                                 <name>SMART: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                                 <name>SMART [{#NAME}]: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
                                  <expression>{Template Module SMART by Zabbix agent 2:smart.disk.temperature[{#NAME}].avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
-                           <name>SMART: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                           <name>SMART [{#NAME}]: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>SMART: Self-test passed</name>
+                     <name>SMART [{#NAME}]: Self-test passed</name>
                      <type>DEPENDENT</type>
                      <key>smart.disk.test[{#NAME}]</key>
                      <delay>0</delay>
@@ -347,7 +347,7 @@ Template tooling version used: 0.38</description>
                      <description>The disk is passed the SMART self-test or not.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>{#DISKTYPE} drive {#NAME}</name>
+                           <name>{#DISKTYPE} {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -361,12 +361,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get</key>
+                        <key>smart.disk.get[{#NAME}]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}="false"</expression>
-                           <name>SMART: {#NAME}: Disk self-test is not passed</name>
+                           <name>SMART [{#NAME}]: {#NAME}: Disk self-test is not passed</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
