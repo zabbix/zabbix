@@ -34,8 +34,12 @@ void	zbx_mock_test_entry(void **state)
 
 	if (actual_result != expected_result || ( NULL != json && 0 != strcmp(expected_json, json)))
 	{
+#ifdef HAVE_LIBXML2
 		fail_msg("Actual: %d \"%s\" != expected: %d \"%s\"", actual_result, json, expected_result,
 				expected_json);
+#else
+		skip();
+#endif
 	}
 	zbx_free(json);
 	zbx_free(error);

@@ -42,8 +42,12 @@ void	zbx_mock_test_entry(void **state)
 
 	if (actual_result != expected_result || ( NULL != xml && 0 != strcmp(expected_xml, xml_content)))
 	{
+#ifdef HAVE_LIBXML2
 		fail_msg("Actual: %d \"%s\" != expected: %d \"%s\"", actual_result, xml_content, expected_result,
 				expected_xml);
+#else
+		skip();
+#endif
 	}
 	zbx_free(xml);
 	zbx_free(error);
