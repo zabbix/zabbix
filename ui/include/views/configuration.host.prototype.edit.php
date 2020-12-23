@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
-	->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
+	->setNavigation(getHostNavigation('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();
 

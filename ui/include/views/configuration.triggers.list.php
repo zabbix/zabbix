@@ -195,7 +195,7 @@ $widget = (new CWidget())
 	]));
 
 if ($data['single_selected_hostid'] != 0) {
-	$widget->addItem(get_header_host_table('triggers', $data['single_selected_hostid']));
+	$widget->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
 }
 
 $widget->addItem($filter);

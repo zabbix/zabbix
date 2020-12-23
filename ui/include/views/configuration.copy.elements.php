@@ -41,7 +41,7 @@ if ($data['hostid'] != 0) {
 			$host_table_element = '';
 	}
 
-	$widget->addItem(get_header_host_table($host_table_element, $data['hostid']));
+	$widget->setNavigation(getHostNavigation($host_table_element, $data['hostid']));
 }
 
 // create form

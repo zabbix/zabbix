@@ -20,26 +20,23 @@
 
 
 /**
- * @var CPartial $this
+ * Class for breadcrumbs-style navigation.
  */
+class CBreadcrumbs extends CList {
 
-$url_list = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+	private const ZBX_STYLE_BREADCRUMBS = 'breadcrumbs';
 
-(new CSpan())
-	->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
-	->show();
+	/**
+	 * Create a CBreadcrumbs instance for the specified item list.
+	 *
+	 * @param array $list  Breadcrumb list.
+	 */
+	public function __construct(array $list = []) {
+		parent::__construct($list);
 
-if ($data['dashboard']['dashboardid'] != 0) {
-	$url_view = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
-
-	echo '/';
-
-	(new CSpan())
-		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
-			->setId('dashboard-direct-link')
-		)
-		->addClass(ZBX_STYLE_SELECTED)
-		->show();
+		$this
+			->addClass(self::ZBX_STYLE_BREADCRUMBS)
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
+	}
 }
