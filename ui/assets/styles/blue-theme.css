@@ -5892,13 +5892,13 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
+.debug-modal.overlay-dialogue.modal .overlay-dialogue-body {
   overflow-x: auto; }
-  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
+  .debug-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
     height: 9px; }
-.mediatypetest-modal .logitems pre {
+.debug-modal .logitems pre {
   white-space: nowrap; }
-.mediatypetest-modal .logtotalms {
+.debug-modal .logtotalms {
   color: #768d99;
   float: left;
   line-height: 24px; }
@@ -5993,3 +5993,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-macros-table .table-col-value,
 .host-macros-table .table-col-template-value {
   width: 300px; }
+
+.active-readonly[readonly] {
+  color: #1f2c33;
+  background-color: #ffffff !important;
+  border-color: #acbbc2; }

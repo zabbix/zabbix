@@ -1680,7 +1680,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good, $messages, $title, $show_close_box)
+		? makeMessageBox($good, $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;

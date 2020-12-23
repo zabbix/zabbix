@@ -23,17 +23,38 @@
  * @var CView $this
  */
 
+$form_items = [$data['messages']];
+
+if ($data['success']) {
+	$row_decription = [
+		(new CTextArea('', $data['output']))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addClass('monospace-font')
+			->addClass('active-readonly')
+			->setReadonly(true)
+	];
+
+	if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+		$row_decription[] = new CVar('debug', json_encode($data['debug']));
+		$row_decription[] = new CDiv(
+			(new CLinkAction('Open log'))
+				->setId('script_execution_log')
+				->addClass($data['debug'] ? '' : ZBX_STYLE_DISABLED)
+		);
+	}
+
+	$form_items[] = (new CFormList())
+		->addRow(
+			new CLabel($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK ? _('Response') : _('Output')),
+			$row_decription
+		);
+}
+
 $output = [
 	'header' => $data['title'],
+	'script_inline' => $this->readJsFile('popup.scriptexec.js.php'),
 	'body' => (new CForm())
-		->addItem([
-			$data['errors'],
-			(new CTabView())->addTab('scriptTab', null,
-				(new CPre(
-					(new CList([bold($data['command']), SPACE, $data['message']]))
-				))
-			)
-		])
+		->addItem($form_items)
 		->toString(),
 	'buttons' => null
 ];

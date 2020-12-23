@@ -7329,8 +7329,8 @@ table.preprocessing-test-results {
 	}
 }
 
-// Media type test log popup
-.mediatypetest-modal {
+// Popup with debug data of request processing to Zabbix server.
+.debug-modal {
 	&.overlay-dialogue.modal {
 		.overlay-dialogue-body {
 			overflow-x: auto;
@@ -7475,5 +7475,13 @@ z-select,
 	.table-col-value,
 	.table-col-template-value {
 		width: 300px;
+	}
+}
+
+.active-readonly {
+	&[readonly] {
+		color: $font-color;
+		background-color: $form-bg-color !important;
+		border-color: $form-border-color;
 	}
 }
