@@ -85,6 +85,10 @@
 			jQuery('#name').focus();
 		});
 
+		$('#evaltype').on('change', () => {
+			processTypeOfCalculation();
+		});
+
 		processTypeOfCalculation();
 	});
 </script>

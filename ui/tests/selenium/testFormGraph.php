@@ -287,10 +287,10 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//select[@id='graphtype']", 'disabled');
+			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'disabled');
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath("//select[@id='graphtype'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='graphtype'][@disabled]");
 		}
 
 		if (isset($data['graphtype'])) {
@@ -402,10 +402,10 @@ class testFormGraph extends CLegacyWebTest {
 			]);
 
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//select[@id='ymin_type']", 'disabled');
+				$this->zbxTestAssertAttribute("//z-select[@id='ymin_type']", 'disabled');
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='ymin_type'][@disabled]");
+				$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='ymin_type'][@disabled]");
 			}
 
 			if (!isset($data['form'])) {
@@ -427,10 +427,10 @@ class testFormGraph extends CLegacyWebTest {
 			]);
 
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//select[@id='ymax_type']", 'disabled');
+				$this->zbxTestAssertAttribute("//z-select[@id='ymax_type']", 'disabled');
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='ymax_type'][@disabled]");
+				$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='ymax_type'][@disabled]");
 			}
 
 			if (!isset($data['form'])) {

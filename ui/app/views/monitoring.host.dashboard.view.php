@@ -57,11 +57,14 @@ $widget = (new CWidget())
 					->cleanItems()
 					->addVar('action', 'host.dashboard.view')
 					->addVar('hostid', $data['host']['hostid'])
-					->addItem((new CLabel(_('Dashboard'), 'dashboardid'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
+					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 					->addItem(
-						(new CComboBox('dashboardid', $data['dashboard']['dashboardid'], 'submit()',
-							$data['host_dashboards']
-						))->addClass(ZBX_STYLE_HEADER_COMBOBOX)
+						(new CSelect('dashboardid'))
+							->setId('dashboardid')
+							->setFocusableElementId('label-dashboard')
+							->setValue($data['dashboard']['dashboardid'])
+							->addOptions(CSelect::createOptionsFromArray($data['host_dashboards']))
+							->addClass(ZBX_STYLE_HEADER_Z_SELECT)
 					)
 			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
