@@ -104,12 +104,13 @@ class testFormSetup extends CWebTest {
 
 		// Check Configure DB connection section.
 		$fields = [
-			'Database host' => $db_parameters['Database host'],
 			'Database port' => '0',
 			'Database name' => 'zabbix',
 			'User' => 'zabbix',
 			'Password' => ''
 		];
+		$fields['Database host'] = ($db_parameters['Database type'] === 'PostgreSQL') ?
+				'localhost' : $db_parameters['Database host'];
 		$text = 'Please create database manually, and set the configuration parameters for connection to this database. '.
 				'Press "Next step" button when done.';
 		$this->checkPageTextElements('Configure DB connection', $text);
