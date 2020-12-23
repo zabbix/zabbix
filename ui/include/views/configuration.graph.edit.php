@@ -28,12 +28,12 @@ $widget = new CWidget();
 if ($data['parent_discoveryid'] === null) {
 	$widget
 		->setTitle(_('Graphs'))
-		->addItem(get_header_host_table('graphs', $data['hostid']));
+		->setNavigation(getHostNavigation('graphs', $data['hostid']));
 }
 else {
 	$widget
 		->setTitle(_('Graph prototypes'))
-		->addItem(get_header_host_table('graphs', $data['hostid'], $data['parent_discoveryid']));
+		->setNavigation(getHostNavigation('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
 // Create form.

@@ -404,3 +404,13 @@ $multiselect-selected-bg-color: #696969;
 		color: $font-color;
 	}
 }
+
+.breadcrumbs {
+	&>::after {
+		content: " /";
+	}
+
+	&>:last-child::after {
+		content: "";
+	}
+}

@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
-	->addItem(get_header_host_table('', $data['hostid']));
+	->setNavigation(getHostNavigation('', $data['hostid']));
 
 $divTabs = new CTabView();
 

@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 $widget = (new CWidget())->setTitle(_('Trigger prototypes'));
 
 // Append host summary to widget header.
-$widget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
+$widget->setNavigation(getHostNavigation('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
 // Create form.
 $form = (new CForm())

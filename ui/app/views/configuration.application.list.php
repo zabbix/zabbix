@@ -177,7 +177,7 @@ $form->addItem([
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('applications', $data['hostid']))
+	->setNavigation(getHostNavigation('applications', $data['hostid']))
 	->addItem($filter)
 	->addItem($form)
 	->show();

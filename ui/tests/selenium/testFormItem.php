@@ -945,7 +945,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -1873,7 +1873,7 @@ class testFormItem extends CLegacyWebTest {
 	public function testFormItem_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
@@ -2117,7 +2117,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
@@ -2136,7 +2136,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestClickWait('history_mode_hint');
@@ -2157,7 +2157,7 @@ class testFormItem extends CLegacyWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Items"]');
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');

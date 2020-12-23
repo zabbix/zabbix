@@ -70,9 +70,7 @@ $web_layout_mode = $this->getLayoutMode();
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))
-	->setBreadcrumbs(
-		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['severity_min'])
-	)
+	->setNavigation(getSysmapNavigation($data['map']['sysmapid'], $data['map']['name'], $data['severity_min']))
 	->addItem(
 		(new CDiv())
 			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)

@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Templates'));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
-	$widget->addItem(get_header_host_table('', $data['templateid']));
+	$widget->setNavigation(getHostNavigation('', $data['templateid']));
 }
 
 $divTabs = new CTabView();

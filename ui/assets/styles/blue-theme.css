@@ -1258,13 +1258,6 @@ pre, pre a, pre td, pre span {
   height: 24px;
   background: url("../img/icon-sprite.svg?20200407") no-repeat -540px -400px; }
 
-.object-group {
-  min-height: 24px;
-  line-height: 24px;
-  padding: 10px 0 6px;
-  position: relative;
-  vertical-align: top; }
-
 .dashbrd-edit {
   background-color: #ffffff;
   box-shadow: 0 0 0 4px #ffffff;
@@ -1288,78 +1281,62 @@ pre, pre a, pre td, pre span {
     .dashbrd-edit ul li .btn-dashbrd-conf {
       vertical-align: middle; }
 
-.object-group {
-  margin-bottom: -1px; }
-  .object-group > li {
-    float: left;
-    margin-right: 5px; }
-  .object-group li span {
-    display: inline-block;
-    padding: 0 7px; }
-  .object-group li .status-container,
-  .object-group li .rel-container {
-    margin: 0 5px 0 0; }
-    .object-group li .status-container span,
-    .object-group li .rel-container span {
-      padding: 2px 3px 1px; }
-  .object-group li .rel-container {
-    margin: 0; }
-  .object-group .selected {
-    background-color: #ffffff;
-    border-radius: 2px;
-    box-shadow: inset 0 0 0 1px #dfe4e7; }
-  .object-group .arrow-right {
-    border-left-color: #1f2c33; }
-  .object-group button {
-    line-height: 22px; }
-  .object-group .btn-link, .object-group .interface-container .interface-row .interface-cell .interface-btn-toggle, .interface-container .interface-row .interface-cell .object-group .interface-btn-toggle {
-    line-height: 14px; }
-
 .hor-list li {
   display: inline-block;
   margin: 0 6px 0 0; }
   .hor-list li:last-child {
     margin: 0; }
-.hor-list .object-group {
-  margin: 0; }
 
-.filter-breadcrumb {
+.header-navigation {
   display: inline-block;
-  padding-top: 0;
+  position: relative;
+  margin: 0 0 5px;
   z-index: 3;
-  max-width: calc(100vw - 200px); }
-  .filter-breadcrumb li {
-    line-height: 14px;
-    vertical-align: top;
-    float: none;
-    margin-right: 5px;
-    display: inline-block; }
-    .filter-breadcrumb li .status-container {
-      padding-top: 3px; }
-    .filter-breadcrumb li > span {
+  max-width: calc(100% - 200px);
+  min-height: 24px; }
+  .header-navigation > ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline; }
+    .header-navigation > ul > li {
+      margin-right: 5px;
+      line-height: 24px; }
+      .header-navigation > ul > li ul {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap; }
+        .header-navigation > ul > li ul li {
+          margin-right: 5px; }
+        .header-navigation > ul > li ul.breadcrumbs > li {
+          margin-right: 0; }
+          .header-navigation > ul > li ul.breadcrumbs > li::after {
+            content: "/"; }
+          .header-navigation > ul > li ul.breadcrumbs > li:last-child::after {
+            content: ""; }
+      .header-navigation > ul > li .status-container {
+        margin-right: 5px; }
+    .header-navigation > ul li > span {
       display: inline-block;
-      height: 18px;
-      padding: 4px 7px 0;
-      line-height: 14px; }
-      .filter-breadcrumb li > span a {
-        display: inline-block;
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      padding: 2px 7px;
+      line-height: 18px;
+      white-space: nowrap;
+      vertical-align: top;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 250px; }
+      .header-navigation > ul li > span a {
         vertical-align: top;
-        margin-bottom: -1px; }
-        .filter-breadcrumb li > span a:focus {
-          margin-bottom: -2px; }
-  .filter-breadcrumb > li {
-    padding: 1px 0;
-    line-height: 22px;
-    white-space: nowrap; }
-    .filter-breadcrumb > li .status-container {
-      line-height: 14px; }
-    .filter-breadcrumb > li > span a {
-      margin-top: 1px;
-      line-height: 13px; }
-  .filter-breadcrumb + .filter-space {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 200px;
+        display: inline-block;
+        margin-top: 2px;
+        line-height: 14px; }
+      .header-navigation > ul li > span.selected {
+        background-color: #ffffff;
+        border-radius: 2px;
+        box-shadow: inset 0 0 0 1px #dfe4e7; }
+  .header-navigation + .filter-space {
     margin-top: -29px; }
 
 form.is-loading {
@@ -4914,7 +4891,7 @@ svg {
   border: 10px solid #ffffff;
   background: #ffffff;
   display: block;
-  margin: 4px 0; }
+  margin-top: 4px; }
   .sysmap-scroll-container .map-container {
     display: table; }
   .sysmap-scroll-container .flickerfreescreen {
