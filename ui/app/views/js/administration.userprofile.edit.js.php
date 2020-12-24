@@ -31,7 +31,7 @@
 		});
 
 		$('#messages_enabled').on('change', function() {
-			$('input, button, select', $('#messagingTab'))
+			$('input, button, z-select', $('#messagingTab'))
 				.not('[name="messages[enabled]"]')
 				.prop('disabled', !this.checked);
 		}).trigger('change');

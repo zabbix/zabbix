@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Notification report');
 $page['file'] = 'report4.php';
+$page['scripts'] = ['report4.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -77,14 +78,12 @@ if ($media_types) {
 	$select_media_type = (new CSelect('media_type'))
 		->setValue($media_type)
 		->setFocusableElementId('media-type')
-		->onChange('$(this).closest("form").submit()')
 		->addOption(new CSelectOption(0, _('all')))
 		->addOptions(CSelect::createOptionsFromArray($media_types));
 
 	$select_period = (new CSelect('period'))
 		->setValue($period)
 		->setFocusableElementId('period')
-		->onChange('$(this).closest("form").submit()')
 		->addOptions(CSelect::createOptionsFromArray([
 			'daily' => _('Daily'),
 			'weekly' => _('Weekly'),
@@ -105,19 +104,18 @@ if ($media_types) {
 		]);
 
 	if ($period !== 'yearly') {
-		$cmb_year = (new CSelect('year'))
+		$year_select = (new CSelect('year'))
 			->setValue($year)
-			->setFocusableElementId('year')
-			->onChange('$(this).closest("form").submit()');
+			->setFocusableElementId('year');
 
 		for ($y = $min_year; $y <= date('Y'); $y++) {
-			$cmb_year->addOption(new CSelectOption($y, $y));
+			$year_select->addOption(new CSelectOption($y, $y));
 		}
 
 		$controls->addItem([
-			new CLabel(_('Year'), $cmb_year->getFocusableElementId()),
+			new CLabel(_('Year'), $year_select->getFocusableElementId()),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmb_year
+			$year_select
 		]);
 	}
 
@@ -125,6 +123,7 @@ if ($media_types) {
 		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls)
+		->setName('report4')
 	);
 
 	$header = [];

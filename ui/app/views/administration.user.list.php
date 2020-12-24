@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.user.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('user');
 }
@@ -32,13 +34,18 @@ $widget = (new CWidget())
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()
+			->setName('main_filter')
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CVar('action', 'user.list'))->removeId())
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('User group'), 'filter_usrgrpid'),
+					new CLabel(_('User group'), 'label-filter-usrgrpid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('filter_usrgrpid', $data['filter_usrgrpid'], 'submit()', $data['user_groups'])
+					(new CSelect('filter_usrgrpid'))
+						->setId('filter-usrgrpid')
+						->setValue($data['filter_usrgrpid'])
+						->setFocusableElementId('label-filter-usrgrpid')
+						->addOptions(CSelect::createOptionsFromArray($data['user_groups']))
 				])
 			),
 			(new CTag('nav', true,

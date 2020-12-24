@@ -172,9 +172,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_templates' => [
-						'Form test template',
-						'Template with tags for cloning',
-						'Template with tags for updating'
+						'A template with tags for cloning',
+						'A template with tags for updating',
+						'Form test template'
 					]
 				]
 			],
@@ -186,9 +186,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
-						'Form test template',
-						'Template with tags for cloning',
-						'Template with tags for updating'
+						'A template with tags for cloning',
+						'A template with tags for updating',
+						'Form test template'
 					]
 				]
 			],
@@ -210,9 +210,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Contains']
 					],
 					'expected_templates' => [
-						'Form test template',
-						'Template with tags for cloning',
-						'Template with tags for updating'
+						'A template with tags for cloning',
+						'A template with tags for updating',
+						'Form test template'
 					]
 				]
 			],

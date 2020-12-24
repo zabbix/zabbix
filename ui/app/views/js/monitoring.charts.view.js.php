@@ -381,5 +381,9 @@
 				$('#filter_graphids_, #filter_graph_patterns_').multiSelect('clean');
 			}
 		});
+
+		$('#view-as').change(() => {
+			document.forms['main_filter'].submit();
+		});
 	});
 </script>
