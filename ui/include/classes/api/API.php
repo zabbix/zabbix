@@ -116,13 +116,6 @@ class API {
 	}
 
 	/**
-	 * @return CApplication
-	 */
-	public static function Application() {
-		return self::getApi('application');
-	}
-
-	/**
 	 * @return CAuditLog
 	 */
 	public static function AuditLog() {

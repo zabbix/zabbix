@@ -68,7 +68,6 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectDiscoveries']                  Return a "discoveries" property with host low-level discovery rules.
 	 * @param string|array  $options['selectTriggers']                     Return a "triggers" property with host triggers.
 	 * @param string|array  $options['selectGraphs']                       Return a "graphs" property with host graphs.
-	 * @param string|array  $options['selectApplications']                 Return an "applications" property with host applications.
 	 * @param string|array  $options['selectMacros']                       Return a "macros" property with host macros.
 	 * @param string|array  $options['selectDashboards']                   Return a "dashboards" property with host dashboards.
 	 * @param string|array  $options['selectInterfaces']                   Return an "interfaces" property with host interfaces.
@@ -150,7 +149,6 @@ class CHost extends CHostGeneral {
 			'selectDiscoveries'					=> null,
 			'selectTriggers'					=> null,
 			'selectGraphs'						=> null,
-			'selectApplications'				=> null,
 			'selectMacros'						=> null,
 			'selectDashboards'					=> null,
 			'selectInterfaces'					=> null,

@@ -182,8 +182,6 @@ abstract class CHostGeneral extends CHostBase {
 		$hostsLinkageInserts = parent::link($templateIds, $targetIds);
 
 		foreach ($hostsLinkageInserts as $hostTplIds){
-			Manager::Application()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
-
 			// Fist link web items, so that later regular items can use web item as their master item.
 			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
 
@@ -803,45 +801,6 @@ abstract class CHostGeneral extends CHostBase {
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['httpTests'] = array_key_exists($hostid, $httpTests)
 						? $httpTests[$hostid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		// adding applications
-		if ($options['selectApplications'] !== null) {
-			if ($options['selectApplications'] != API_OUTPUT_COUNT) {
-				$applications = API::Application()->get([
-					'output' => $this->outputExtend($options['selectApplications'], ['hostid', 'applicationid']),
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($applications, 'name');
-				}
-
-				$relationMap = $this->createRelationMap($applications, 'hostid', 'applicationid');
-
-				$applications = $this->unsetExtraFields($applications, ['hostid', 'applicationid'],
-					$options['selectApplications']
-				);
-				$result = $relationMap->mapMany($result, $applications, 'applications', $options['limitSelects']);
-			}
-			else {
-				$applications = API::Application()->get([
-					'output' => $options['selectApplications'],
-					'hostids' => $hostids,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-
-				$applications = zbx_toHash($applications, 'hostid');
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = array_key_exists($hostid, $applications)
-						? $applications[$hostid]['rowscount']
 						: '0';
 				}
 			}

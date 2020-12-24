@@ -91,8 +91,6 @@ class CItemPrototype extends CItemGeneral {
 			// output
 			'output'						=> API_OUTPUT_EXTEND,
 			'selectHosts'					=> null,
-			'selectApplications'			=> null,
-			'selectApplicationPrototypes'	=> null,
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
@@ -609,16 +607,12 @@ class CItemPrototype extends CItemGeneral {
 
 		$tpl_items = $this->get([
 			'output' => $output,
-			'selectApplications' => ['applicationid'],
-			'selectApplicationPrototypes' => ['name'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {
-			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
-
 			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
 					$tpl_item['query_fields'] = $tpl_item['query_fields']
@@ -686,53 +680,6 @@ class CItemPrototype extends CItemGeneral {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$itemids = array_keys($result);
-
-		// adding applications
-		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
-			$applications = API::Application()->get([
-				'output' => $options['selectApplications'],
-				'applicationids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $applications, 'applications');
-		}
-
-		// adding application prototypes
-		if ($options['selectApplicationPrototypes'] !== null
-				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
-			$pkFieldId = $this->pk('application_prototype');
-			$outputFields = [
-				$pkFieldId => $this->fieldId($pkFieldId, 'ap')
-			];
-
-			if (is_array($options['selectApplicationPrototypes'])) {
-				foreach ($options['selectApplicationPrototypes'] as $field) {
-					if ($this->hasField($field, 'application_prototype')) {
-						$outputFields[$field] = $this->fieldId($field, 'ap');
-					}
-				}
-
-				$outputFields = implode(',', $outputFields);
-			}
-			else {
-				$outputFields = 'ap.*';
-			}
-
-			$relationMap = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
-				'item_application_prototype'
-			);
-
-			$application_prototypes = DBfetchArray(DBselect(
-				'SELECT '.$outputFields.
-				' FROM application_prototype ap'.
-				' WHERE '.dbConditionInt('ap.application_prototypeid', $relationMap->getRelatedIds())
-			));
-
-			$application_prototypes = zbx_toHash($application_prototypes, 'application_prototypeid');
-
-			$result = $relationMap->mapMany($result, $application_prototypes, 'applicationPrototypes');
-		}
 
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {

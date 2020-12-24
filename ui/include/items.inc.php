@@ -395,7 +395,6 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file',
 			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'parameters'
 		],
-		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'itemids' => $src_itemids,
 		'preservekeys' => true
@@ -508,10 +507,6 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			}
 			unset($item['itemid']);
 			$item['hostid'] = $dstHost['hostid'];
-			$item['applications'] = get_same_applications_for_host(
-				zbx_objectValues($item['applications'], 'applicationid'),
-				$dstHost['hostid']
-			);
 
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 				if (array_key_exists($item['master_itemid'], $items)) {
@@ -565,7 +560,6 @@ function copyItems($srcHostId, $dstHostId) {
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 			'allow_traps', 'parameters'
 		],
-		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'hostids' => $srcHostId,
 		'webitems' => true,
@@ -650,7 +644,6 @@ function copyItems($srcHostId, $dstHostId) {
 		unset($srcItem['itemid']);
 		unset($srcItem['templateid']);
 		$srcItem['hostid'] = $dstHostId;
-		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 
 		if (!$srcItem['preprocessing']) {
 			unset($srcItem['preprocessing']);
@@ -1269,57 +1262,6 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	return $col;
-}
-
-/**
- * Get same application IDs on destination host and return array with keys as source application IDs
- * and values as destination application IDs.
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- * @param array  $applicationIds
- * @param string $hostId
- *
- * @return array
- */
-// TODO miks: remove.
-function get_same_applications_for_host(array $applicationIds, $hostId) {
-	$applications = [];
-
-	$dbApplications = DBselect(
-		'SELECT a1.applicationid AS dstappid,a2.applicationid AS srcappid'.
-		' FROM applications a1,applications a2'.
-		' WHERE a1.name=a2.name'.
-			' AND a1.hostid='.zbx_dbstr($hostId).
-			' AND '.dbConditionInt('a2.applicationid', $applicationIds)
-	);
-
-	while ($dbApplication = DBfetch($dbApplications)) {
-		$applications[$dbApplication['srcappid']] = $dbApplication['dstappid'];
-	}
-
-	return $applications;
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function get_applications_by_itemid($itemids, $field = 'applicationid') {
-	zbx_value2array($itemids);
-	$result = [];
-	$db_applications = DBselect(
-		'SELECT DISTINCT app.'.$field.' AS result'.
-		' FROM applications app,items_applications ia'.
-		' WHERE app.applicationid=ia.applicationid'.
-			' AND '.dbConditionInt('ia.itemid', $itemids)
-	);
-	while ($db_application = DBfetch($db_applications)) {
-		array_push($result, $db_application['result']);
-	}
-
-	return $result;
 }
 
 /**

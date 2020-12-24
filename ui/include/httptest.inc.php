@@ -356,7 +356,7 @@ function resolveHttpTestMacros(array $httpTests, $resolveName = true, $resolveSt
  */
 function copyHttpTests($srcHostId, $dstHostId) {
 	$httpTests = API::HttpTest()->get([
-		'output' => ['name', 'applicationid', 'delay', 'status', 'variables', 'agent', 'authentication',
+		'output' => ['name', 'delay', 'status', 'variables', 'agent', 'authentication',
 			'http_user', 'http_password', 'http_proxy', 'retries', 'ssl_cert_file', 'ssl_key_file',
 			'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
 		],
@@ -371,27 +371,8 @@ function copyHttpTests($srcHostId, $dstHostId) {
 		return true;
 	}
 
-	// get destination application IDs
-	$srcApplicationIds = [];
-	foreach ($httpTests as $httpTest) {
-		if ($httpTest['applicationid'] != 0) {
-			$srcApplicationIds[] = $httpTest['applicationid'];
-		}
-	}
-
-	if ($srcApplicationIds) {
-		$dstApplicationIds = get_same_applications_for_host($srcApplicationIds, $dstHostId);
-	}
-
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['hostid'] = $dstHostId;
-
-		if (isset($dstApplicationIds[$httpTest['applicationid']])) {
-			$httpTest['applicationid'] = $dstApplicationIds[$httpTest['applicationid']];
-		}
-		else {
-			unset($httpTest['applicationid']);
-		}
 
 		unset($httpTest['httptestid']);
 	}

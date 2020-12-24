@@ -90,7 +90,6 @@ class CTemplate extends CHostGeneral {
 			'selectDiscoveries'			=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
-			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectDashboards'			=> null,
 			'selectHttpTests'			=> null,

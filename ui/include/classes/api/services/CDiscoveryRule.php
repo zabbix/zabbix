@@ -97,7 +97,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectTriggers'				=> null,
 			'selectGraphs'					=> null,
 			'selectHostPrototypes'			=> null,
-			'selectApplicationPrototypes'	=> null,
 			'selectFilter'					=> null,
 			'selectLLDMacroPaths'			=> null,
 			'selectPreprocessing'			=> null,
@@ -2197,8 +2196,6 @@ class CDiscoveryRule extends CItemGeneral {
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 				'allow_traps', 'discover', 'parameters'
 			],
-			'selectApplications' => ['applicationid'],
-			'selectApplicationPrototypes' => ['name'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
@@ -2308,12 +2305,6 @@ class CDiscoveryRule extends CItemGeneral {
 						));
 					}
 				}
-
-				// add new applications
-				$item_prototype['applications'] = get_same_applications_for_host(
-					zbx_objectValues($item_prototype['applications'], 'applicationid'),
-					$dstHost['hostid']
-				);
 
 				if (!$item_prototype['preprocessing']) {
 					unset($item_prototype['preprocessing']);
@@ -2709,24 +2700,6 @@ class CDiscoveryRule extends CItemGeneral {
 						: '0';
 				}
 			}
-		}
-
-		if ($options['selectApplicationPrototypes'] !== null
-				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
-			$relation_map = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
-				'application_prototype'
-			);
-
-			$application_prototypes = API::getApiService()->select('application_prototype', [
-				'output' => $options['selectApplicationPrototypes'],
-				'filter' => ['application_prototypeid' => $relation_map->getRelatedIds()],
-				'limit' => $options['limitSelects'],
-				'preservekeys' => true
-			]);
-
-			$result = $relation_map->mapMany($result, $application_prototypes, 'applicationPrototypes',
-				$options['limitSelects']
-			);
 		}
 
 		if ($options['selectFilter'] !== null) {

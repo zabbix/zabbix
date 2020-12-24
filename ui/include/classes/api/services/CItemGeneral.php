@@ -150,7 +150,6 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 		}
@@ -169,7 +168,6 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 
@@ -580,29 +578,6 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
 			}
 
-			if (isset($item['applications']) && $item['applications']) {
-				/*
-				 * 'flags' is available for update and item prototypes.
-				 * Don't allow discovered or any other application types for item prototypes in 'applications' option.
-				 */
-				if (array_key_exists('flags', $fullItem) && $fullItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					foreach ($host['applications'] as $num => $application) {
-						if ($application['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
-							unset($host['applications'][$num]);
-						}
-					}
-				}
-
-				// check that the given applications belong to the item's host
-				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
-				foreach ($item['applications'] as $appId) {
-					if (!in_array($appId, $dbApplicationIds)) {
-						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
-						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-					}
-				}
-			}
-
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 
 			$this->validateItemPreprocessing($fullItem);
@@ -835,10 +810,6 @@ abstract class CItemGeneral extends CApiService {
 	 * @param string     $tpl_items[<itemid>]['hostid']
 	 * @param string     $tpl_items[<itemid>]['key_']
 	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param array      $tpl_items[<itemid>]['applicationPrototypes']            (optional) Suitable for item
-	 *                                                                            prototypes.
-	 * @param string     $tpl_items[<itemid>]['applicationPrototypes'][]['name']
-	 * @param array      $tpl_items[<itemid>]['applications']                     (optional) Array of applicationids.
 	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional)
 	 * @param int        $tpl_items[<itemid>]['preprocessing'][]['type']
 	 * @param string     $tpl_items[<itemid>]['preprocessing'][]['params']
@@ -926,32 +897,6 @@ abstract class CItemGeneral extends CApiService {
 				unset($db_item['hostid']);
 
 				$chd_items_key[$hostid][$db_item['key_']] = $db_item;
-			}
-		}
-
-		// Preparing list of application prototypes.
-		if ($this instanceof CItemPrototype) {
-			$tpl_app_prototypes = [];
-			$item_prototypeids = [];
-
-			foreach ($tpl_items as $tpl_item) {
-				if (array_key_exists('applicationPrototypes', $tpl_item) && $tpl_item['applicationPrototypes']) {
-					$item_prototypeids[] = $tpl_item['itemid'];
-				}
-			}
-
-			if ($item_prototypeids) {
-				$db_tpl_app_prototypes = DBselect(
-					'SELECT iap.itemid,iap.application_prototypeid,ap.name'.
-					' FROM item_application_prototype iap,application_prototype ap'.
-					' WHERE iap.application_prototypeid=ap.application_prototypeid'.
-						' AND '.dbConditionInt('iap.itemid', $item_prototypeids)
-				);
-
-				while ($db_tpl_app_prototype = DBfetch($db_tpl_app_prototypes)) {
-					$tpl_app_prototypes[$db_tpl_app_prototype['itemid']][$db_tpl_app_prototype['name']] =
-						$db_tpl_app_prototype['application_prototypeid'];
-				}
 			}
 		}
 
@@ -1099,14 +1044,6 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 
-				if ($this instanceof CItemPrototype && array_key_exists('applicationPrototypes', $new_item)) {
-					foreach ($new_item['applicationPrototypes'] as &$application_prototype) {
-						$application_prototype['templateid'] =
-							$tpl_app_prototypes[$tpl_item['itemid']][$application_prototype['name']];
-					}
-					unset($application_prototype);
-				}
-
 				$new_items[] = $new_item;
 			}
 		}
@@ -1127,46 +1064,6 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _params($this->getErrorMsg(self::ERROR_EXISTS),
 					[$db_item['key_'], $chd_hosts[$db_item['hostid']]['host']]
 				));
-			}
-		}
-
-		// Setting item applications.
-		if ($this instanceof CItem || $this instanceof CItemPrototype) {
-			$tpl_applicationids = [];
-			foreach ($tpl_items as $tpl_item) {
-				if (array_key_exists('applications', $tpl_item)) {
-					foreach ($tpl_item['applications'] as $applicationid) {
-						$tpl_applicationids[$applicationid] = true;
-					}
-				}
-			}
-
-			if ($tpl_applicationids) {
-				$db_applications = DBselect('SELECT a.hostid,at.templateid,a.applicationid'.
-					' FROM application_template at,applications a'.
-					' WHERE at.applicationid=a.applicationid'.
-						' AND '.dbConditionInt('at.templateid', array_keys($tpl_applicationids)).
-						' AND '.dbConditionInt('a.hostid', array_keys($chd_hosts))
-				);
-
-				$app_links = [];
-				while ($db_application = DBfetch($db_applications)) {
-					$app_links[$db_application['hostid']][$db_application['templateid']] =
-						$db_application['applicationid'];
-				}
-
-				foreach ($new_items as &$new_item) {
-					if (array_key_exists('applications', $new_item)) {
-						$applicationids = [];
-						foreach ($new_item['applications'] as $applicationid) {
-							if (array_key_exists($applicationid, $app_links[$new_item['hostid']])) {
-								$applicationids[] =  $app_links[$new_item['hostid']][$applicationid];
-							}
-						}
-						$new_item['applications'] = $applicationids;
-					}
-				}
-				unset($new_item);
 			}
 		}
 
