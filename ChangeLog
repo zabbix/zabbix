@@ -337,8 +337,14 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.8rc1
 
 New features:
+..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+..F....... [ZBX-18625] fixed host level tags were not inherited in Trigger -> Tags configuration form (ozdancuka)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.7
