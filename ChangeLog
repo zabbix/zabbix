@@ -1,6 +1,10 @@
 Changes for 5.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
+..F....... [ZBXNEXT-6291] implemented breadcrumbs on host dashboards page (ozdancuka)
+A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
 ..F.I..... [ZBX-2594] separated host and template related objects: items, triggers, graphs, low-level discovery rules, web scenarios (dgoloscapov, Ivo)
 A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
 ...G...... [ZBXNEXT-6319] added systemd.unit.get item key to Zabbix agent 2 (esneiders)
@@ -35,6 +39,11 @@ A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from front
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)
+........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+..F....... [ZBX-18625] fixed host level tags were not inherited in Trigger -> Tags configuration form (ozdancuka)
 ..F....... [ZBX-18086] fixed missing data selection in data overview and trigger overview screens (miks)
 .......PS. [ZBX-18418] set trigger behavior of nodata() for proxy is the same as for server (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
