@@ -1894,9 +1894,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.28rc1
 
 New features:
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
 .......PS. [ZBX-18755] fixed possibility of out of memory error when replacing string in mail, calculated checks, actions and when linking template (vso)
 ..F....... [ZBX-18486] fixed screen inheritance from a linked template in the full clone case (ozdancuka)
