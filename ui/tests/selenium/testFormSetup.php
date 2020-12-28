@@ -65,6 +65,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals("Добро пожаловать в\nZabbix 5.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
+		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('xpath://form')->one(), 'Welcome_Rus');
 	}
 
@@ -221,6 +222,7 @@ class testFormSetup extends CWebTest {
 				array_push($skip_fields_vault, $form->getField($skip_field));
 			}
 			// Check screenshot for "Store credentials in" = Vault.
+			$this->page->removeFocus();
 			$screenshot_vault = ($db_type === 'PostgreSQL') ? 'ConfigureDB_Postgres_Vault' : 'ConfigureDB_MySQL_Vault';
 			$this->assertScreenshotExcept($form, $skip_fields_vault, $screenshot_vault);
 
