@@ -286,7 +286,7 @@ class testFormSetup extends CWebTest {
 		$parts = explode('/', $stylesheet->getAttribute('href'));
 		$this->assertContains('dark-theme.css', explode('?', end($parts)));
 		// Check layout via screenshot for dark theme.
-		$this->assertScreenshot($form, 'GUISettings_Dark');
+		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Dark');
 
 		// Complite the setup and check in DB that the default timezone was applied.
 		$this->query('button:Next step')->one()->click();
