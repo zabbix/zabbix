@@ -90,7 +90,7 @@ $widget = (new CWidget())
 	);
 
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
 $widget->addItem($filter);

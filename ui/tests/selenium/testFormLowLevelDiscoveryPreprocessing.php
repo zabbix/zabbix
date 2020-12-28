@@ -214,7 +214,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getCommonCustomOnFailData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFail($data) {
-		$this->checkCustomOnFail($data);
+		$this->checkCustomOnFail($data, true);
 	}
 
 	/**

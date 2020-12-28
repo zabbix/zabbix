@@ -179,7 +179,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getCreateTemplateMacrosData
+	 * @dataProvider getCreateMacrosTemplateData
 	 */
 	public function testFormMacrosTemplate_Create($data) {
 		$this->checkCreate($data, 'templates', 'template');
@@ -402,7 +402,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateTemplateMacrosData
+	 * @dataProvider getUpdateMacrosTemplateData
 	 */
 	public function testFormMacrosTemplate_Update($data) {
 		$this->checkUpdate($data, $this->template_name_update, 'templates', 'template');
