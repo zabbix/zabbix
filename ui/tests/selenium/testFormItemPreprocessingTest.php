@@ -492,7 +492,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 
 		// Assert right steps order after item saving.
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr(self::$key));
-		$this->page->open('items.php?form=update&hostid='.self::HOST_ID.'&itemid='.$id);
+		$this->page->open('items.php?form=update&context=host&hostid='.self::HOST_ID.'&itemid='.$id);
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($preprocessing);
 	}
