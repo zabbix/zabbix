@@ -99,7 +99,9 @@ foreach ($this->data['alerts'] as $alert) {
 			zbx_nl2br($alert['message'])
 		]
 		: [
-			bold(_('Command').':'),
+			($alert['subject'] === ALERT_SUBJECT_SCRIPT)
+				? bold(_('Script').':')
+				: bold(_('Command').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
 		];

@@ -1305,6 +1305,13 @@ class CControllerPopupGeneric extends CController {
 				if ((!$this->host_preselect_required && $this->hostids)
 						|| (!$this->group_preselect_required || $this->groupids)) {
 					$records = API::Script()->get($options);
+
+					foreach ($records as &$record) {
+						if ($record['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+							$record['command'] = '';
+						}
+					}
+					unset($record);
 				}
 				else {
 					$records = [];

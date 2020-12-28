@@ -1935,6 +1935,10 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 		elseif (($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_COMMAND)
 				|| $action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
 			$message = zbx_nl2br($action['message']);
+
+			if ($action['subject'] === ALERT_SUBJECT_SCRIPT) {
+				$message = [bold(_('Script').':'), BR(), $message];
+			}
 		}
 
 		$table->addRow([

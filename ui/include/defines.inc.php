@@ -682,6 +682,8 @@ define('ALERT_STATUS_NEW',		3);
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);
 
+define('ALERT_SUBJECT_SCRIPT', 'Script');
+
 define('MEDIA_STATUS_ACTIVE',	0);
 define('MEDIA_STATUS_DISABLED',	1);
 
