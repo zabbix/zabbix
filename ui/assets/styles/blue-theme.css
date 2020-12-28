@@ -1301,17 +1301,17 @@ pre, pre a, pre td, pre span {
     .header-navigation > ul > li {
       margin-right: 5px;
       line-height: 24px; }
-      .header-navigation > ul > li ul {
+      .header-navigation > ul > li > ul {
         display: flex;
         align-items: baseline;
         flex-wrap: wrap; }
-        .header-navigation > ul > li ul li {
+        .header-navigation > ul > li > ul li {
           margin-right: 5px; }
-        .header-navigation > ul > li ul.breadcrumbs > li {
+        .header-navigation > ul > li > ul.breadcrumbs > li {
           margin-right: 0; }
-          .header-navigation > ul > li ul.breadcrumbs > li::after {
+          .header-navigation > ul > li > ul.breadcrumbs > li::after {
             content: "/"; }
-          .header-navigation > ul > li ul.breadcrumbs > li:last-child::after {
+          .header-navigation > ul > li > ul.breadcrumbs > li:last-child::after {
             content: ""; }
       .header-navigation > ul > li .status-container {
         margin-right: 5px; }

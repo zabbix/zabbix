@@ -246,7 +246,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			margin-right: 5px;
 			line-height: 24px;
 
-			ul {
+			> ul {
 				display: flex;
 				align-items: baseline;
 				flex-wrap: wrap;
