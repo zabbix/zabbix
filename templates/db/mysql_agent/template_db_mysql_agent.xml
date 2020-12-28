@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-28T15:10:56Z</date>
+   <date>2020-12-28T17:38:35Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1465,7 +1465,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MySQL: Master gtid wait count</name>
+                     <name>MySQL: Master GTID wait count</name>
                      <type>DEPENDENT</type>
                      <key>mysql.master_gtid_wait_count[{#SINGLETON}]</key>
                      <delay>0</delay>
@@ -1492,7 +1492,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MySQL: Master gtid wait time</name>
+                     <name>MySQL: Master GTID wait time</name>
                      <type>DEPENDENT</type>
                      <key>mysql.master_gtid_wait_time[{#SINGLETON}]</key>
                      <delay>0</delay>
@@ -1519,7 +1519,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MySQL: Master gtid wait timeouts</name>
+                     <name>MySQL: Master GTID wait timeouts</name>
                      <type>DEPENDENT</type>
                      <key>mysql.master_gtid_wait_timeouts[{#SINGLETON}]</key>
                      <delay>0</delay>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-28T15:10:58Z</date>
+   <date>2020-12-28T17:38:38Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1666,7 +1666,7 @@ As with the I/O thread, this should normally be Yes.</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MySQL: Master gtid wait count</name>
+                     <name>MySQL: Master GTID wait count</name>
                      <type>DEPENDENT</type>
                      <key>mysql.master_gtid_wait_count[{#SINGLETON}]</key>
                      <delay>0</delay>
@@ -1693,7 +1693,7 @@ As with the I/O thread, this should normally be Yes.</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MySQL: Master gtid wait time</name>
+                     <name>MySQL: Master GTID wait time</name>
                      <type>DEPENDENT</type>
                      <key>mysql.master_gtid_wait_time[{#SINGLETON}]</key>
                      <delay>0</delay>
@@ -1720,7 +1720,7 @@ As with the I/O thread, this should normally be Yes.</description>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MySQL: Master gtid wait timeouts</name>
+                     <name>MySQL: Master GTID wait timeouts</name>
                      <type>DEPENDENT</type>
                      <key>mysql.master_gtid_wait_timeouts[{#SINGLETON}]</key>
                      <delay>0</delay>
