@@ -65,7 +65,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals("Добро пожаловать в\nZabbix 5.2", $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 
 		$this->checkButtons('russian');
-		$this->assertScreenshot($form, 'Welcome_Rus');
+		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
 	}
 
 	public function testFormSetup_prerequisitesSectionLayout() {
