@@ -323,6 +323,26 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->command_orig);
 }
 
+static void	zbx_free_event(DB_EVENT *event)
+{
+	zbx_free(event->name);
+
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_free(event->trigger.description);
+		zbx_free(event->trigger.expression);
+		zbx_free(event->trigger.recovery_expression);
+		zbx_free(event->trigger.correlation_tag);
+		zbx_free(event->trigger.opdata);
+		zbx_free(event->trigger.event_name);
+
+		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&event->tags);
+	}
+
+	zbx_free(event);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_script_prepare                                               *
@@ -393,7 +413,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 
 				zbx_db_get_events_by_eventids(&eventids, &events);
 
-				if (0 < eventids.values_num)
+				if (0 < events.values_num)
 				{
 					event = (DB_EVENT*)events.values[0];
 					macro_mask |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY);
@@ -416,7 +436,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			}
 
 			if (NULL != event)
-				zbx_clean_event(event);
+				zbx_free_event(event);
 
 			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
