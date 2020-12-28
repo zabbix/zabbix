@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-23T15:31:32Z</date>
+   <date>2020-12-28T15:10:58Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -12,7 +12,7 @@
          <template>Template DB MySQL by ODBC</template>
          <name>Template DB MySQL by ODBC</name>
          <description>Requirements for template operation:&#13;
-1.Create MySQL user for monitoring. For example:&#13;
+1. Create MySQL user for monitoring. For example:&#13;
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
 For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. &#13;
@@ -1619,28 +1619,6 @@ As with the I/O thread, this should normally be Yes.</description>
                <delay>0</delay>
                <description>Additional metrics if MariaDB is used.</description>
                <item_prototypes>
-                  <item_prototype>
-                     <name>MySQL: Binlog commits diff</name>
-                     <type>CALCULATED</type>
-                     <key>mysql.binlog_commits_diff[{#SINGLETON}]</key>
-                     <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <params>last(mysql.binlog_commits[{#SINGLETON}])-last(mysql.binlog_group_commits[{#SINGLETON}])</params>
-                     <description>Difference between binlog_commits and binlog_group_commits.</description>
-                     <applications>
-                        <application>
-                           <name>MySQL</name>
-                        </application>
-                     </applications>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{last()} &gt; 0</expression>
-                           <name>MySQL: SQL thread has read far ahead in the binlog</name>
-                           <priority>WARNING</priority>
-                           <description>SQL thread has read as far ahead in the binlog as the value of slave-parallel-max-queued allows. The worker threads are lagging behind, check Slave_SQL_Running_State for the error.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
-                  </item_prototype>
                   <item_prototype>
                      <name>MySQL: Binlog commits</name>
                      <type>DEPENDENT</type>

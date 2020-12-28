@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-23T15:31:15Z</date>
+   <date>2020-12-28T15:10:58Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1413,28 +1413,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <delay>0</delay>
                <description>Additional metrics if MariaDB is used.</description>
                <item_prototypes>
-                  <item_prototype>
-                     <name>MySQL: Binlog commits diff</name>
-                     <type>CALCULATED</type>
-                     <key>mysql.binlog_commits_diff[{#SINGLETON}]</key>
-                     <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <params>last(mysql.binlog_commits[{#SINGLETON}])-last(mysql.binlog_group_commits[{#SINGLETON}])</params>
-                     <description>Difference between binlog_commits and binlog_group_commits.</description>
-                     <applications>
-                        <application>
-                           <name>MySQL</name>
-                        </application>
-                     </applications>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{last()} &gt; 0</expression>
-                           <name>MySQL: SQL thread has read far ahead in the binlog</name>
-                           <priority>WARNING</priority>
-                           <description>SQL thread has read as far ahead in the binlog as the value of slave-parallel-max-queued allows. The worker threads are lagging behind, check Slave_SQL_Running_State for the error.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
-                  </item_prototype>
                   <item_prototype>
                      <name>MySQL: Binlog commits</name>
                      <type>DEPENDENT</type>
