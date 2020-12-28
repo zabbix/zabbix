@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-10T11:38:41Z</date>
+   <date>2020-12-28T06:34:01Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Apache ActiveMQ by JMX</template>
-         <name>Apache ActiveMQ by JMX</name>
+         <template>Template App Apache ActiveMQ by JMX</template>
+         <name>Template App Apache ActiveMQ by JMX</name>
          <description>The template to monitor Apache ActiveMQ by Zabbix that work without any external scripts.&#13;
 The metrics are collected by JMX.&#13;
 You can set macro values and add macros with context for specific brokers or destinations following macro description.&#13;
@@ -271,23 +271,23 @@ Template tooling version used: 0.38</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].max({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
+                     <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].max({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Template App Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].min({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
+                     <recovery_expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].min({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;={$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
                      <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count is too low (below {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})</name>
                      <priority>AVERAGE</priority>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},EnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},DequeueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}</expression>
+                     <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},EnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},DequeueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}</expression>
                      <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}</name>
                      <priority>AVERAGE</priority>
                      <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
+                     <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&lt;{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Template App Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}&gt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].min({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
+                     <recovery_expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].min({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}&gt;={$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"}</recovery_expression>
                      <name>{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count is too low (below {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})</name>
                      <priority>AVERAGE</priority>
                      <manual_close>YES</manual_close>
@@ -301,7 +301,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},MemoryPercentUsage]</key>
                            </item>
                         </graph_item>
@@ -314,7 +314,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},EnqueueCount]</key>
                            </item>
                         </graph_item>
@@ -323,7 +323,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},DequeueCount]</key>
                            </item>
                         </graph_item>
@@ -336,7 +336,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},ProducerCount]</key>
                            </item>
                         </graph_item>
@@ -345,7 +345,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},ConsumerCount]</key>
                            </item>
                         </graph_item>
@@ -457,7 +457,7 @@ Template tooling version used: 0.38</description>
                            <dependencies>
                               <dependency>
                                  <name>Broker {#JMXBROKERNAME}: Memory usage is too high (over {$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
-                                 <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ}, MemoryPercentUsage].min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
+                                 <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ}, MemoryPercentUsage].min({$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -513,7 +513,7 @@ Template tooling version used: 0.38</description>
                            <dependencies>
                               <dependency>
                                  <name>Broker {#JMXBROKERNAME}: Storage usage is too high (over {$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}%)</name>
-                                 <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},StorePercentUsage].min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
+                                 <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},StorePercentUsage].min({$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.STORE.MAX.HIGH:"{#JMXBROKERNAME}"}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -569,7 +569,7 @@ Template tooling version used: 0.38</description>
                            <dependencies>
                               <dependency>
                                  <name>Broker {#JMXBROKERNAME}: Temp usage is too high (over {$ACTIVEMQ.TEMP.MAX.WARN:"{#JMXBROKERNAME}"}%)</name>
-                                 <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TempPercentUsage].min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.TEMP.MAX.HIGH}</expression>
+                                 <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TempPercentUsage].min({$ACTIVEMQ.TEMP.TIME:"{#JMXBROKERNAME}"})}&gt;{$ACTIVEMQ.TEMP.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -663,7 +663,7 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{max({$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})}&lt;{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}</expression>
-                           <name>Broker {#JMXBROKERNAME}: Producers count is too low (below $ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})</name>
+                           <name>Broker {#JMXBROKERNAME}: Producers count is too low (below {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"} for {$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME:"{#JMXBROKERNAME}"})</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -703,7 +703,7 @@ Template tooling version used: 0.38</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}&gt;{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}</expression>
+                     <expression>{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}&gt;{Template App Apache ActiveMQ by JMX:jmx[{#JMXOBJ},TotalEnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}</expression>
                      <name>Broker {#JMXBROKERNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}</name>
                      <priority>AVERAGE</priority>
                      <description>Enqueue rate is higer than dequeue rate. It may indicate performance problems.</description>
@@ -717,7 +717,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},TotalEnqueueCount]</key>
                            </item>
                         </graph_item>
@@ -726,7 +726,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},TotalDequeueCount]</key>
                            </item>
                         </graph_item>
@@ -739,7 +739,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},TotalProducerCount]</key>
                            </item>
                         </graph_item>
@@ -748,7 +748,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},TotalConsumerCount]</key>
                            </item>
                         </graph_item>
@@ -761,7 +761,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ}, MemoryPercentUsage]</key>
                            </item>
                         </graph_item>
@@ -770,7 +770,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>2774A4</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},StorePercentUsage]</key>
                            </item>
                         </graph_item>
@@ -779,7 +779,7 @@ Template tooling version used: 0.38</description>
                            <drawtype>GRADIENT_LINE</drawtype>
                            <color>F63100</color>
                            <item>
-                              <host>Apache ActiveMQ by JMX</host>
+                              <host>Template App Apache ActiveMQ by JMX</host>
                               <key>jmx[{#JMXOBJ},TempPercentUsage]</key>
                            </item>
                         </graph_item>
@@ -792,7 +792,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}</macro>
                <value>1</value>
-               <description>Minimum amaunt of consumers for broker. Can be used with broker name as context.</description>
+               <description>Minimum amount of consumers for broker. Can be used with broker name as context.</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.TIME}</macro>
@@ -802,7 +802,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}</macro>
                <value>1</value>
-               <description>Minimum amaunt of producers for broker. Can be used with broker name as context.</description>
+               <description>Minimum amount of producers for broker. Can be used with broker name as context.</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.TIME}</macro>
@@ -812,7 +812,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH}</macro>
                <value>1</value>
-               <description>Minimum amaunt of consumers for destination. Can be used with destination name as context.</description>
+               <description>Minimum amount of consumers for destination. Can be used with destination name as context.</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME}</macro>
@@ -822,7 +822,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH}</macro>
                <value>1</value>
-               <description>Minimum amaunt of producers for destination. Can be used with destination name as context.</description>
+               <description>Minimum amount of producers for destination. Can be used with destination name as context.</description>
             </macro>
             <macro>
                <macro>{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME}</macro>
