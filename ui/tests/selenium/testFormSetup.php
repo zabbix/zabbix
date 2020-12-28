@@ -176,7 +176,7 @@ class testFormSetup extends CWebTest {
 			}
 			// Array of fields to be skipped by the screenshot check.
 			$skip_db_fields = [];
-			foreach(['Database host', 'Database name'] as $skip_field) {
+			foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
 				array_push($skip_db_fields, $form->getField($skip_field));
 			}
 			// Check screenshot for "Store credentials in" = Plain text.
