@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-11T20:10:17Z</date>
+   <date>2020-12-28T07:03:13Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Microsoft Exchange Server 2016 by Zabbix agent</template>
-         <name>Microsoft Exchange Server 2016 by Zabbix agent</name>
-         <description>The template to monitor Microsoft Exchange Server 2016 by Zabbix that work without any external scripts.&#13;
+         <template>Template App Microsoft Exchange Server 2016 by Zabbix agent</template>
+         <name>Template App Microsoft Exchange Server 2016 by Zabbix agent</name>
+         <description>The template to monitor Microsoft Exchange Server 2016 by Zabbix that works without any external scripts.&#13;
 The metrics are collected by Zabbix agent.&#13;
 Recommended to use it with "OS Windows by Zabbix agent" template.&#13;
 &#13;
@@ -226,7 +226,7 @@ Template tooling version used: 0.38</description>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Read Time", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -234,7 +234,7 @@ Template tooling version used: 0.38</description>
                            <sortorder>1</sortorder>
                            <color>2774A4</color>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -539,7 +539,7 @@ Template tooling version used: 0.38</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min({$MS.EXCHANGE.RPC.TIME})}&gt;{$MS.EXCHANGE.RPC.WARN}</expression>
-                           <name>Information Store [{#INSTANCE}]: RPC Requests latancy is too high (&gt;{$MS.EXCHANGE.RPC.WARN}s for {$MS.EXCHANGE.RPC.TIME})</name>
+                           <name>Information Store [{#INSTANCE}]: RPC Requests latency is too high (&gt;{$MS.EXCHANGE.RPC.WARN}s for {$MS.EXCHANGE.RPC.TIME})</name>
                            <priority>WARNING</priority>
                            <description>Should be less than 50ms at all times, with spikes less than 100ms.</description>
                         </trigger_prototype>
@@ -583,7 +583,7 @@ Template tooling version used: 0.38</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}&gt;{Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}</expression>
+                     <expression>{Template App Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}&gt;{Template App Microsoft Exchange Server 2016 by Zabbix agent:perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}].avg({$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME})}</expression>
                      <name>Database Counters [{#INSTANCE}]: Average write time latency is higher than read time latency for {$MS.EXCHANGE.DB.PASSIVE.WRITE.TIME}</name>
                      <priority>WARNING</priority>
                      <description>Should be less than the read latency for the same instance, as measured by the MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.</description>
@@ -597,7 +597,7 @@ Template tooling version used: 0.38</description>
                            <color>1A7C11</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached)/sec", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -606,7 +606,7 @@ Template tooling version used: 0.38</description>
                            <color>2774A4</color>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached)/sec", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -614,7 +614,7 @@ Template tooling version used: 0.38</description>
                            <sortorder>2</sortorder>
                            <color>F63100</color>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -622,7 +622,7 @@ Template tooling version used: 0.38</description>
                            <sortorder>3</sortorder>
                            <color>A54F10</color>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -630,7 +630,7 @@ Template tooling version used: 0.38</description>
                            <sortorder>4</sortorder>
                            <color>FC6EA3</color>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -638,7 +638,7 @@ Template tooling version used: 0.38</description>
                            <sortorder>5</sortorder>
                            <color>6C59DC</color>
                            <item>
-                              <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                              <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                               <key>perf_counter_en["\MSExchange Database ==&gt; Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                            </item>
                         </graph_item>
@@ -765,7 +765,7 @@ return JSON.stringify(data);</params>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                  <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                   <key>perf_counter_en["\MSExchange ActiveSync\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                </item>
             </graph_item>
@@ -773,7 +773,7 @@ return JSON.stringify(data);</params>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                  <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                   <key>perf_counter_en["\MSExchange Availability Service\Availability Requests (sec)", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                </item>
             </graph_item>
@@ -781,7 +781,7 @@ return JSON.stringify(data);</params>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                  <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                   <key>perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                </item>
             </graph_item>
@@ -789,7 +789,7 @@ return JSON.stringify(data);</params>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Microsoft Exchange Server 2016 by Zabbix agent</host>
+                  <host>Template App Microsoft Exchange Server 2016 by Zabbix agent</host>
                   <key>perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]</key>
                </item>
             </graph_item>
