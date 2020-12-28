@@ -3826,6 +3826,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	event->key = xml_event.id;
 	event->timestamp = timestamp;
 	event->message = evt_msg_strpool_strdup(message, &sz);
+	zbx_free(message);
 	zbx_vector_ptr_append(events, event);
 
 	if (0 < sz)

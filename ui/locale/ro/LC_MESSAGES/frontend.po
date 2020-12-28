@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-11 19:53+0200\n"
+"POT-Creation-Date: 2020-12-25 19:53+0200\n"
 "PO-Revision-Date: 2017-03-19 02:15+0300\n"
 "Last-Translator: Silviu <silviubv@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -330,14 +330,6 @@ msgstr "10 secunde"
 msgid "100 busiest triggers"
 msgstr ""
 
-#: tests/selenium/modules/module_number_1/Module.php:21
-msgid "1st Module"
-msgstr ""
-
-#: tests/selenium/modules/module_number_2/Module.php:21
-msgid "2nd Module"
-msgstr ""
-
 #: queue.php:113 queue.php:168
 msgid "30 seconds"
 msgstr "30 secunde"
@@ -345,10 +337,6 @@ msgstr "30 secunde"
 #: include/views/configuration.graph.edit.php:341
 msgid "3D view"
 msgstr "Vedere 3D"
-
-#: tests/selenium/modules/module_number_4/Module.php:21
-msgid "4th Module"
-msgstr ""
 
 #: queue.php:115 queue.php:170
 msgid "5 minutes"
@@ -471,7 +459,7 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:490
 #: include/views/configuration.host.discovery.edit.php:593
 #: include/views/configuration.host.discovery.edit.php:742
-#: include/views/configuration.host.edit.php:501
+#: include/views/configuration.host.edit.php:250
 #: include/views/configuration.host.massupdate.php:242
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.httpconf.edit.php:225
@@ -482,7 +470,7 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:81
 #: include/views/configuration.services.edit.php:125
 #: include/views/configuration.services.edit.php:178
-#: include/views/configuration.template.edit.php:346
+#: include/views/configuration.template.edit.php:126
 #: include/views/configuration.template.massupdate.php:150
 #: include/views/configuration.trigger.prototype.edit.php:187
 #: include/views/configuration.trigger.prototype.edit.php:382
@@ -651,7 +639,7 @@ msgstr "Activ până la"
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:95
 #: app/views/popup.triggerwizard.php:110 app/views/popup.triggerwizard.php:144
 #: include/classes/widgets/CWidgetHelper.php:502 include/forms.inc.php:1474
-#: include/forms.inc.php:1993 include/views/configuration.action.edit.php:130
+#: include/forms.inc.php:2006 include/views/configuration.action.edit.php:130
 #: include/views/configuration.action.edit.php:314
 #: include/views/configuration.action.edit.php:400
 #: include/views/configuration.action.edit.php:480
@@ -671,7 +659,7 @@ msgstr "Activ până la"
 #: include/views/configuration.host.discovery.edit.php:747
 #: include/views/configuration.host.discovery.edit.php:800
 #: include/views/configuration.host.edit.php:139
-#: include/views/configuration.host.edit.php:764
+#: include/views/configuration.host.edit.php:513
 #: include/views/configuration.hostgroups.edit.php:55
 #: include/views/configuration.host.list.php:83
 #: include/views/configuration.host.massupdate.php:61
@@ -703,7 +691,7 @@ msgstr "Activ până la"
 #: include/views/configuration.services.edit.php:163
 #: include/views/configuration.services.edit.php:338
 #: include/views/configuration.services.edit.php:375
-#: include/views/configuration.template.edit.php:458
+#: include/views/configuration.template.edit.php:238
 #: include/views/configuration.template.list.php:67
 #: include/views/configuration.template.massupdate.php:55
 #: include/views/configuration.template.massupdate.php:144
@@ -1102,7 +1090,6 @@ msgstr ""
 #: include/html.inc.php:346
 #: include/views/configuration.application.edit.php:27
 #: include/views/configuration.application.list.php:157
-#: include/views/configuration.host.edit.php:230
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:400
 #: include/views/configuration.item.edit.php:807
@@ -1111,7 +1098,6 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:694
 #: include/views/configuration.item.prototype.list.php:62
 #: include/views/configuration.item.prototype.massupdate.php:414
-#: include/views/configuration.template.edit.php:134
 #: include/views/configuration.template.list.php:151
 #: include/views/configuration.template.list.php:238
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:170
@@ -1306,7 +1292,7 @@ msgstr ""
 msgid "Authentication"
 msgstr "Autentificare"
 
-#: include/views/configuration.host.edit.php:593
+#: include/views/configuration.host.edit.php:342
 #: include/views/configuration.host.massupdate.php:175
 #: include/views/configuration.host.prototype.edit.php:283
 msgid "Authentication algorithm"
@@ -1371,7 +1357,7 @@ msgstr ""
 #: app/partials/popup.operations.php:367
 #: app/views/administration.miscconfig.edit.php:61
 #: app/views/popup.lldoperation.php:284 include/hosts.inc.php:1344
-#: include/views/configuration.host.edit.php:637
+#: include/views/configuration.host.edit.php:386
 #: include/views/configuration.host.massupdate.php:222
 #: include/views/configuration.host.prototype.edit.php:322
 msgid "Automatic"
@@ -3179,8 +3165,8 @@ msgstr ""
 
 #: app/views/administration.proxy.edit.php:95
 #: app/views/administration.proxy.edit.php:103
-#: include/views/configuration.host.edit.php:703
-#: include/views/configuration.host.edit.php:719
+#: include/views/configuration.host.edit.php:452
+#: include/views/configuration.host.edit.php:468
 #: include/views/configuration.host.massupdate.php:279
 #: include/views/configuration.host.massupdate.php:287
 #: include/views/configuration.host.prototype.edit.php:335
@@ -3415,14 +3401,14 @@ msgstr "Ceas"
 #: include/views/configuration.discovery.edit.php:144
 #: include/views/configuration.graph.edit.php:505
 #: include/views/configuration.host.discovery.edit.php:780
-#: include/views/configuration.host.edit.php:755
+#: include/views/configuration.host.edit.php:504
 #: include/views/configuration.hostgroups.edit.php:62
 #: include/views/configuration.host.prototype.edit.php:391
 #: include/views/configuration.httpconf.edit.php:260
 #: include/views/configuration.item.edit.php:870
 #: include/views/configuration.item.prototype.edit.php:744
 #: include/views/configuration.maintenance.edit.php:260
-#: include/views/configuration.template.edit.php:443
+#: include/views/configuration.template.edit.php:223
 #: include/views/configuration.trigger.prototype.edit.php:633
 #: include/views/configuration.triggers.edit.php:627
 #: include/views/monitoring.screen.edit.php:226
@@ -3870,7 +3856,7 @@ msgstr ""
 msgid "Connections"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:707
+#: include/views/configuration.host.edit.php:456
 #: include/views/configuration.host.massupdate.php:282
 #: include/views/configuration.host.prototype.edit.php:339
 msgid "Connections from host"
@@ -3880,7 +3866,7 @@ msgstr ""
 msgid "Connections from proxy"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:699
+#: include/views/configuration.host.edit.php:448
 #: include/views/configuration.host.massupdate.php:275
 #: include/views/configuration.host.prototype.edit.php:331
 msgid "Connections to host"
@@ -4401,7 +4387,7 @@ msgid "DNS name"
 msgstr "Nume DNS"
 
 #: app/views/popup.maintenance.period.php:76 app/views/report.services.php:44
-#: include/maintenances.inc.php:27 report4.php:99
+#: include/maintenances.inc.php:27 report4.php:88
 msgid "Daily"
 msgstr "Zilnic"
 
@@ -4597,7 +4583,7 @@ msgstr "Data de mentenanță HW expiră"
 msgid "Date HW purchased"
 msgstr "Data achiziției HW"
 
-#: app/views/report.services.php:83 report4.php:188
+#: app/views/report.services.php:83 report4.php:175
 msgid "Day"
 msgstr "Zi"
 
@@ -4741,7 +4727,7 @@ msgstr "Șterge"
 msgid "Delete all elements that are not present in the XML file?"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:448
+#: include/views/configuration.template.edit.php:228
 #: include/views/configuration.template.list.php:310
 msgid "Delete and clear"
 msgstr "Șterge și curăță"
@@ -4750,7 +4736,7 @@ msgstr "Șterge și curăță"
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Ștergere si curățare șabloane selectate? (Avertizare: toate serverele conectate vor fi șterse!)"
 
-#: include/views/configuration.template.edit.php:449
+#: include/views/configuration.template.edit.php:229
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "Ștergere si curățare șablon? (Avertizare: toate serverele conectate vor fi șterse!)"
 
@@ -4896,7 +4882,7 @@ msgstr "Ștergere prototipuri de servere selectați?"
 msgid "Delete selected host prototypes?"
 msgstr "Ștergere prototipuri de servere selectați?"
 
-#: include/views/configuration.host.edit.php:757
+#: include/views/configuration.host.edit.php:506
 msgid "Delete selected host?"
 msgstr "Ștergere server selectat?"
 
@@ -5005,7 +4991,7 @@ msgstr ""
 msgid "Delete slide show?"
 msgstr "Ștergere prezentare?"
 
-#: include/views/configuration.template.edit.php:445
+#: include/views/configuration.template.edit.php:225
 msgid "Delete template?"
 msgstr "Ștergere șablon?"
 
@@ -5258,7 +5244,7 @@ msgstr ""
 #: include/views/configuration.correlation.list.php:50
 #: include/views/configuration.correlation.list.php:100
 #: include/views/configuration.discovery.list.php:50
-#: include/views/configuration.host.edit.php:635
+#: include/views/configuration.host.edit.php:384
 #: include/views/configuration.host.list.php:262
 #: include/views/configuration.host.massupdate.php:120
 #: include/views/configuration.host.massupdate.php:220
@@ -5453,8 +5439,6 @@ msgstr "Regulă de detecție actualizată"
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.edit.php:27
 #: include/views/configuration.host.discovery.list.php:29
-#: include/views/configuration.host.edit.php:339
-#: include/views/configuration.template.edit.php:224
 #: include/views/conf.import.php:39
 msgid "Discovery rules"
 msgstr "Reguli de detecție"
@@ -5587,10 +5571,6 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:364
 msgid "Draw style"
 msgstr "Stil de desen"
-
-#: tests/selenium/modules/module_number_3/Module.php:21
-msgid "Dummy module"
-msgstr ""
 
 #: include/classes/api/services/CCorrelation.php:1169
 #: include/classes/api/services/CCorrelation.php:1321
@@ -6081,7 +6061,7 @@ msgstr ""
 
 #: app/views/administration.proxy.edit.php:124
 #: app/views/administration.proxy.list.php:74
-#: include/views/configuration.host.edit.php:745
+#: include/views/configuration.host.edit.php:494
 #: include/views/configuration.host.massupdate.php:333
 #: include/views/configuration.host.prototype.edit.php:376
 msgid "Encryption"
@@ -6364,8 +6344,8 @@ msgstr "Expresia nu poate fi vidă"
 msgid "Expression constructor"
 msgstr "Constructor de expresii"
 
-#: include/forms.inc.php:1826 include/forms.inc.php:1832
-#: include/forms.inc.php:1841
+#: include/forms.inc.php:1839 include/forms.inc.php:1845
+#: include/forms.inc.php:1854
 msgid "Expression syntax error."
 msgstr ""
 
@@ -6731,7 +6711,7 @@ msgstr "Vineri"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
 #: include/views/configuration.services.edit.php:257
 #: include/views/configuration.services.edit.php:305
-#: include/views/js/monitoring.sysmaps.js.php:732 report4.php:204
+#: include/views/js/monitoring.sysmaps.js.php:732 report4.php:191
 #: services.php:47 services.php:182
 msgid "From"
 msgstr "De la"
@@ -6752,8 +6732,8 @@ msgstr "Mesaje de interfață"
 msgid "Full"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:756
-#: include/views/configuration.template.edit.php:444
+#: include/views/configuration.host.edit.php:505
+#: include/views/configuration.template.edit.php:224
 #: include/views/monitoring.screen.edit.php:227
 #: include/views/monitoring.sysmap.edit.php:419
 msgid "Full clone"
@@ -7030,8 +7010,6 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:274
-#: include/views/configuration.host.edit.php:415
-#: include/views/configuration.template.edit.php:289
 msgid "Graph prototypes"
 msgstr "Prototipuri grafice"
 
@@ -7086,10 +7064,8 @@ msgstr "Există grafic cu același nume dar de alt tip."
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:43
 #: include/views/configuration.host.discovery.list.php:188
-#: include/views/configuration.host.edit.php:313
 #: include/views/configuration.host.list.php:187
 #: include/views/configuration.host.list.php:424
-#: include/views/configuration.template.edit.php:200
 #: include/views/configuration.template.list.php:154
 #: include/views/configuration.template.list.php:262
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
@@ -7446,7 +7422,7 @@ msgstr "Aliniere orizontală"
 #: include/triggers.inc.php:1184
 #: include/views/configuration.application.list.php:81
 #: include/views/configuration.host.discovery.list.php:184
-#: include/views/configuration.host.edit.php:461
+#: include/views/configuration.host.edit.php:210
 #: include/views/configuration.host.massupdate.php:321
 #: include/views/configuration.host.prototype.edit.php:130
 #: include/views/configuration.httpconf.list.php:111
@@ -7675,7 +7651,7 @@ msgstr "Probleme server"
 msgid "Host label type"
 msgstr "Tip eticheta server"
 
-#: include/views/configuration.host.edit.php:621
+#: include/views/configuration.host.edit.php:370
 msgid "Host macros"
 msgstr ""
 
@@ -7744,7 +7720,6 @@ msgstr "Server prototip cu nume vizibil \"%1$s\" există deja în regula de dete
 
 #: include/html.inc.php:496
 #: include/views/configuration.host.discovery.list.php:281
-#: include/views/configuration.host.edit.php:435
 #: include/views/configuration.host.prototype.edit.php:35
 #: include/views/configuration.host.prototype.list.php:27
 msgid "Host prototypes"
@@ -7923,7 +7898,7 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:30
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
 #: include/hosts.inc.php:471 include/hosts.inc.php:1410
-#: include/items.inc.php:348 include/views/configuration.host.edit.php:591
+#: include/items.inc.php:348 include/views/configuration.host.edit.php:340
 #: include/views/configuration.host.massupdate.php:323
 #: include/views/configuration.host.prototype.edit.php:298
 #: include/views/js/configuration.host.edit.js.php:181
@@ -9432,7 +9407,7 @@ msgstr ""
 msgid "Inherited"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:622
+#: include/views/configuration.host.edit.php:371
 msgid "Inherited and host macros"
 msgstr ""
 
@@ -9440,7 +9415,7 @@ msgstr ""
 msgid "Inherited and host prototype macros"
 msgstr ""
 
-#: include/views/configuration.template.edit.php:429
+#: include/views/configuration.template.edit.php:209
 msgid "Inherited and template macros"
 msgstr ""
 
@@ -9935,7 +9910,7 @@ msgstr ""
 msgid "Invalid user sessions data storage period: %1$s."
 msgstr ""
 
-#: include/menu.inc.php:59 include/views/configuration.host.edit.php:695
+#: include/menu.inc.php:59 include/views/configuration.host.edit.php:444
 #: include/views/configuration.host.massupdate.php:332
 #: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:299
 msgid "Inventory"
@@ -9964,7 +9939,7 @@ msgid "Issue"
 msgstr "Problemă"
 
 #: app/views/administration.proxy.edit.php:116
-#: include/views/configuration.host.edit.php:736
+#: include/views/configuration.host.edit.php:485
 #: include/views/configuration.host.massupdate.php:302
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Issuer"
@@ -10133,11 +10108,9 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:260
-#: include/views/configuration.host.edit.php:362
 #: include/views/configuration.item.prototype.edit.php:26
 #: include/views/configuration.item.prototype.list.php:27
 #: include/views/configuration.item.prototype.massupdate.php:27
-#: include/views/configuration.template.edit.php:247
 msgid "Item prototypes"
 msgstr "Prototipuri item"
 
@@ -10226,13 +10199,11 @@ msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\"."
 #: include/views/configuration.application.list.php:129
 #: include/views/configuration.graph.edit.php:458
 #: include/views/configuration.host.discovery.list.php:186
-#: include/views/configuration.host.edit.php:253
 #: include/views/configuration.host.list.php:185
 #: include/views/configuration.host.list.php:408
 #: include/views/configuration.item.edit.php:26
 #: include/views/configuration.item.list.php:29
 #: include/views/configuration.item.massupdate.php:26
-#: include/views/configuration.template.edit.php:158
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
@@ -10674,9 +10645,9 @@ msgstr "Legătură"
 msgid "Link indicators"
 msgstr "Indicatori de legătură"
 
-#: include/views/configuration.host.edit.php:560
+#: include/views/configuration.host.edit.php:309
 #: include/views/configuration.host.prototype.edit.php:267
-#: include/views/configuration.template.edit.php:406
+#: include/views/configuration.template.edit.php:186
 msgid "Link new templates"
 msgstr ""
 
@@ -10711,12 +10682,12 @@ msgstr "Legătură către șabloane"
 msgid "Linked map"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:489
-#: include/views/configuration.host.edit.php:555
+#: include/views/configuration.host.edit.php:238
+#: include/views/configuration.host.edit.php:304
 #: include/views/configuration.host.prototype.edit.php:206
 #: include/views/configuration.host.prototype.edit.php:262
-#: include/views/configuration.template.edit.php:401
-#: include/views/configuration.template.edit.php:414
+#: include/views/configuration.template.edit.php:181
+#: include/views/configuration.template.edit.php:194
 #: include/views/configuration.template.list.php:99
 #: include/views/configuration.template.list.php:158
 #: include/views/configuration.template.massupdate.php:158
@@ -10965,10 +10936,10 @@ msgstr "Nu există macro cu hostmacroid \"%1$s\"."
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
 #: app/views/popup.itemtestedit.view.php:185 include/html.inc.php:902
-#: include/views/configuration.host.edit.php:618
+#: include/views/configuration.host.edit.php:367
 #: include/views/configuration.host.massupdate.php:325
 #: include/views/configuration.host.prototype.edit.php:303
-#: include/views/configuration.template.edit.php:425
+#: include/views/configuration.template.edit.php:205
 #: include/views/configuration.template.massupdate.php:162
 msgid "Macros"
 msgstr "Macro-uri"
@@ -10984,7 +10955,7 @@ msgstr "Macro-uri actualizate"
 #: include/views/monitoring.hostscreen.php:62
 #: include/views/monitoring.overview.items.php:70
 #: include/views/monitoring.overview.triggers.php:106
-#: include/views/monitoring.slides.php:116 report2.php:200 report4.php:135
+#: include/views/monitoring.slides.php:116 report2.php:200 report4.php:124
 #: srv_status.php:161
 msgid "Main filter"
 msgstr ""
@@ -11065,7 +11036,7 @@ msgstr "Lipsește parametrul obligatoriu."
 #: app/partials/popup.operations.php:366
 #: app/views/administration.miscconfig.edit.php:60
 #: app/views/popup.lldoperation.php:283 include/hosts.inc.php:1343
-#: include/views/configuration.host.edit.php:636
+#: include/views/configuration.host.edit.php:385
 #: include/views/configuration.host.massupdate.php:221
 #: include/views/configuration.host.prototype.edit.php:321
 msgid "Manual"
@@ -11292,7 +11263,7 @@ msgid "Media"
 msgstr "Media"
 
 #: app/controllers/CControllerAuditLogList.php:187
-#: app/views/administration.mediatype.edit.php:270 report4.php:107
+#: app/views/administration.mediatype.edit.php:270 report4.php:96
 msgid "Media type"
 msgstr "Tipul media"
 
@@ -11574,11 +11545,6 @@ msgstr "Model"
 msgid "Module"
 msgstr ""
 
-#: tests/selenium/modules/module_number_5/Module.php:18
-#: tests/selenium/modules/module_number_5/Module.php:26
-msgid "Module 5 menu"
-msgstr ""
-
 #: app/controllers/CControllerModuleScan.php:102
 #, c-format
 msgid "Module added: %1$s."
@@ -11656,11 +11622,6 @@ msgstr "Server monitorizat"
 
 #: include/menu.inc.php:27 include/menu.inc.php:82
 #: include/views/inventory.host.view.php:133
-#: tests/selenium/modules/module_number_1/Module.php:18
-#: tests/selenium/modules/module_number_2/Module.php:18
-#: tests/selenium/modules/module_number_3/Module.php:18
-#: tests/selenium/modules/module_number_4/Module.php:18
-#: tests/selenium/modules/module_number_6/Module.php:20
 msgid "Monitoring"
 msgstr "Monitorizare"
 
@@ -11669,12 +11630,12 @@ msgid "Monospace"
 msgstr ""
 
 #: app/views/popup.maintenance.period.php:104 app/views/report.services.php:81
-#: report4.php:175
+#: report4.php:163
 msgid "Month"
 msgstr "Lună"
 
 #: app/views/popup.maintenance.period.php:78 app/views/report.services.php:46
-#: include/maintenances.inc.php:31 report4.php:101
+#: include/maintenances.inc.php:31 report4.php:90
 msgid "Monthly"
 msgstr "Lunar"
 
@@ -11813,8 +11774,8 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:740
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.discovery.list.php:185
-#: include/views/configuration.host.edit.php:469
-#: include/views/configuration.host.edit.php:501
+#: include/views/configuration.host.edit.php:218
+#: include/views/configuration.host.edit.php:250
 #: include/views/configuration.hostgroups.list.php:43
 #: include/views/configuration.hostgroups.list.php:61
 #: include/views/configuration.host.list.php:132
@@ -11843,7 +11804,7 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:57
 #: include/views/configuration.maintenance.list.php:82
 #: include/views/configuration.services.edit.php:47
-#: include/views/configuration.template.edit.php:346
+#: include/views/configuration.template.edit.php:126
 #: include/views/configuration.template.list.php:115
 #: include/views/configuration.template.list.php:147
 #: include/views/configuration.template.massupdate.php:150
@@ -12187,8 +12148,8 @@ msgstr "Nicio regulă de detecție IDs dată."
 #: app/views/administration.autoreg.edit.php:48
 #: app/views/administration.proxy.edit.php:93
 #: app/views/administration.proxy.edit.php:101
-#: include/views/configuration.host.edit.php:701
-#: include/views/configuration.host.edit.php:711
+#: include/views/configuration.host.edit.php:450
+#: include/views/configuration.host.edit.php:460
 #: include/views/configuration.host.massupdate.php:277
 #: include/views/configuration.host.massupdate.php:285
 #: include/views/configuration.host.prototype.edit.php:333
@@ -12685,7 +12646,7 @@ msgstr "Nimic de făcut."
 msgid "Notification report"
 msgstr "Raport de notificare"
 
-#: include/menu.inc.php:92 report4.php:70
+#: include/menu.inc.php:92 report4.php:64
 msgid "Notifications"
 msgstr "Notificări"
 
@@ -13565,9 +13526,9 @@ msgstr ""
 #: app/views/administration.proxy.edit.php:110
 #: app/views/administration.proxy.list.php:124
 #: app/views/administration.proxy.list.php:137
-#: include/views/configuration.host.edit.php:702
-#: include/views/configuration.host.edit.php:715
-#: include/views/configuration.host.edit.php:730
+#: include/views/configuration.host.edit.php:451
+#: include/views/configuration.host.edit.php:464
+#: include/views/configuration.host.edit.php:479
 #: include/views/configuration.host.list.php:362
 #: include/views/configuration.host.list.php:378
 #: include/views/configuration.host.list.php:381
@@ -13582,7 +13543,7 @@ msgstr ""
 
 #: app/views/administration.autoreg.edit.php:56
 #: app/views/administration.proxy.edit.php:105
-#: include/views/configuration.host.edit.php:724
+#: include/views/configuration.host.edit.php:473
 #: include/views/configuration.host.massupdate.php:290
 #: include/views/configuration.host.prototype.edit.php:355
 msgid "PSK identity"
@@ -13684,7 +13645,7 @@ msgstr "Pasiv"
 #: include/views/configuration.host.discovery.edit.php:303
 #: include/views/configuration.host.discovery.edit.php:428
 #: include/views/configuration.host.discovery.edit.php:458
-#: include/views/configuration.host.edit.php:600
+#: include/views/configuration.host.edit.php:349
 #: include/views/configuration.host.massupdate.php:204
 #: include/views/configuration.host.prototype.edit.php:294
 #: include/views/configuration.httpconf.edit.php:186
@@ -13759,7 +13720,7 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:255
 #: include/views/configuration.item.prototype.edit.php:563
 #: include/views/configuration.item.prototype.massupdate.php:253
-#: include/views/configuration.maintenance.edit.php:81 report4.php:112
+#: include/views/configuration.maintenance.edit.php:81 report4.php:101
 #: srv_status.php:164
 msgid "Period"
 msgstr "Perioadă"
@@ -14024,7 +13985,7 @@ msgstr ""
 msgid "Private key file"
 msgstr "Fișier cheie privată"
 
-#: include/views/configuration.host.edit.php:594
+#: include/views/configuration.host.edit.php:343
 #: include/views/configuration.host.massupdate.php:185
 #: include/views/configuration.host.prototype.edit.php:287
 msgid "Privilege level"
@@ -14406,8 +14367,8 @@ msgstr "Recuperare"
 msgid "Recovery expression"
 msgstr ""
 
-#: include/forms.inc.php:1874 include/forms.inc.php:1880
-#: include/forms.inc.php:1889
+#: include/forms.inc.php:1887 include/forms.inc.php:1893
+#: include/forms.inc.php:1902
 msgid "Recovery expression syntax error."
 msgstr ""
 
@@ -14548,7 +14509,7 @@ msgstr "Comandă de la distanță"
 #: app/views/popup.media.php:45 app/views/popup.media.php:110
 #: include/classes/widgets/CWidgetHelper.php:490
 #: include/classes/widgets/CWidgetHelper.php:534 include/forms.inc.php:1454
-#: include/forms.inc.php:1962 include/views/configuration.action.edit.php:94
+#: include/forms.inc.php:1975 include/views/configuration.action.edit.php:94
 #: include/views/configuration.action.edit.php:268
 #: include/views/configuration.action.edit.php:296
 #: include/views/configuration.action.edit.php:382
@@ -14714,7 +14675,6 @@ msgid "Replace dependencies"
 msgstr "Înlocuiește dependențele"
 
 #: include/menu.inc.php:68 include/menu.inc.php:90 include/menu.inc.php:128
-#: tests/selenium/modules/module_number_6/Module.php:17
 msgid "Reports"
 msgstr "Rapoarte"
 
@@ -15412,7 +15372,6 @@ msgstr "Ecran actualizat"
 #: app/partials/monitoring.host.view.html.php:139 app/views/search.php:36
 #: app/views/search.php:134 app/views/search.php:228 app/views/search.php:274
 #: app/views/search.php:275 include/html.inc.php:402 include/menu.inc.php:47
-#: include/views/configuration.template.edit.php:310
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:270
 #: include/views/conf.import.php:43 include/views/inventory.host.view.php:160
@@ -15425,7 +15384,6 @@ msgstr "Ecran actualizat"
 #: include/views/monitoring.screen.php:38
 #: include/views/monitoring.slideconf.list.php:31
 #: include/views/monitoring.slides.php:36 jsLoader.php:300
-#: tests/selenium/modules/module_number_6/Module.php:22
 msgid "Screens"
 msgstr "Ecrane"
 
@@ -16548,7 +16506,7 @@ msgid "Subject"
 msgstr "Subiect"
 
 #: app/views/administration.proxy.edit.php:119
-#: include/views/configuration.host.edit.php:740
+#: include/views/configuration.host.edit.php:489
 #: include/views/configuration.host.massupdate.php:305
 #: include/views/configuration.host.prototype.edit.php:370
 msgctxt "encryption certificate"
@@ -16754,13 +16712,13 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
 #: include/events.inc.php:234 include/events.inc.php:459
-#: include/views/configuration.host.edit.php:609
+#: include/views/configuration.host.edit.php:358
 #: include/views/configuration.host.list.php:170
 #: include/views/configuration.host.list.php:198
 #: include/views/configuration.host.massupdate.php:232
 #: include/views/configuration.host.massupdate.php:324
 #: include/views/configuration.maintenance.edit.php:240
-#: include/views/configuration.template.edit.php:417
+#: include/views/configuration.template.edit.php:197
 #: include/views/configuration.template.list.php:118
 #: include/views/configuration.template.list.php:160
 #: include/views/configuration.template.massupdate.php:140
@@ -16802,7 +16760,7 @@ msgstr "Telnet"
 #: app/views/administration.mediatype.edit.php:280 app/views/search.php:228
 #: include/actions.inc.php:49 include/forms.inc.php:300
 #: include/forms.inc.php:699 include/views/configuration.template.edit.php:46
-#: include/views/configuration.template.edit.php:338
+#: include/views/configuration.template.edit.php:118
 #: include/views/configuration.template.massupdate.php:157 report2.php:391
 msgid "Template"
 msgstr "Șablon"
@@ -16850,7 +16808,7 @@ msgstr "Grup șablon"
 msgid "Template linkage"
 msgstr "Legătură șablon"
 
-#: include/views/configuration.template.edit.php:428
+#: include/views/configuration.template.edit.php:208
 msgid "Template macros"
 msgstr ""
 
@@ -16901,7 +16859,7 @@ msgstr "Șablon cu același nume vizibil \"%1$s\" există deja."
 #: app/views/search.php:185 app/views/search.php:189 app/views/search.php:190
 #: app/views/search.php:306 include/menu.inc.php:103
 #: include/views/configuration.copy.elements.php:63
-#: include/views/configuration.host.edit.php:569
+#: include/views/configuration.host.edit.php:318
 #: include/views/configuration.hostgroups.list.php:65
 #: include/views/configuration.hostgroups.list.php:150
 #: include/views/configuration.host.list.php:116
@@ -17136,7 +17094,7 @@ msgstr "Temă"
 msgid "This day last week"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:674
+#: include/views/configuration.host.edit.php:423
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr ""
@@ -17195,7 +17153,7 @@ msgstr "Joi"
 
 #: app/views/report.services.php:82
 #: include/views/configuration.services.edit.php:264
-#: include/views/configuration.services.edit.php:319 report4.php:204
+#: include/views/configuration.services.edit.php:319 report4.php:191
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "Până când"
@@ -17604,8 +17562,6 @@ msgstr[2] "Prototip trigger actualizat"
 
 #: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:473
 #: include/views/configuration.host.discovery.list.php:267
-#: include/views/configuration.host.edit.php:390
-#: include/views/configuration.template.edit.php:268
 #: include/views/configuration.trigger.prototype.edit.php:29
 #: include/views/configuration.trigger.prototype.list.php:27
 #: include/views/configuration.trigger.prototype.massupdate.php:28
@@ -17657,12 +17613,10 @@ msgstr "Trigger actualizat"
 #: app/views/search.php:260 app/views/search.php:264 include/forms.inc.php:278
 #: include/html.inc.php:374
 #: include/views/configuration.host.discovery.list.php:187
-#: include/views/configuration.host.edit.php:281
 #: include/views/configuration.host.list.php:186
 #: include/views/configuration.host.list.php:416
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.list.php:191
-#: include/views/configuration.template.edit.php:179
 #: include/views/configuration.template.list.php:153
 #: include/views/configuration.template.list.php:254
 #: include/views/configuration.triggers.edit.php:28
@@ -18015,16 +17969,16 @@ msgstr "Tip valoare necunoscută"
 msgid "Unlimited"
 msgstr ""
 
-#: include/views/configuration.host.edit.php:519
+#: include/views/configuration.host.edit.php:268
 #: include/views/configuration.host.massupdate.php:132
 #: include/views/configuration.host.prototype.edit.php:234
-#: include/views/configuration.template.edit.php:364
+#: include/views/configuration.template.edit.php:144
 #: include/views/configuration.template.massupdate.php:96
 msgid "Unlink"
 msgstr "Dezleagă"
 
-#: include/views/configuration.host.edit.php:525
-#: include/views/configuration.template.edit.php:370
+#: include/views/configuration.host.edit.php:274
+#: include/views/configuration.template.edit.php:150
 msgid "Unlink and clear"
 msgstr "Dezleagă și curăță"
 
@@ -18157,7 +18111,7 @@ msgstr "Sus"
 #: include/views/configuration.discovery.edit.php:142
 #: include/views/configuration.graph.edit.php:489
 #: include/views/configuration.host.discovery.edit.php:796
-#: include/views/configuration.host.edit.php:753
+#: include/views/configuration.host.edit.php:502
 #: include/views/configuration.hostgroups.edit.php:61
 #: include/views/configuration.host.massupdate.php:342
 #: include/views/configuration.host.prototype.edit.php:389
@@ -18168,7 +18122,7 @@ msgstr "Sus"
 #: include/views/configuration.item.prototype.massupdate.php:543
 #: include/views/configuration.maintenance.edit.php:258
 #: include/views/configuration.services.edit.php:369
-#: include/views/configuration.template.edit.php:441
+#: include/views/configuration.template.edit.php:221
 #: include/views/configuration.template.massupdate.php:176
 #: include/views/configuration.trigger.prototype.edit.php:632
 #: include/views/configuration.trigger.prototype.massupdate.php:193
@@ -18528,7 +18482,7 @@ msgid "User/Recipient"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:94 disc_prototypes.php:224
-#: host_discovery.php:177 include/views/configuration.host.edit.php:595
+#: host_discovery.php:177 include/views/configuration.host.edit.php:344
 #: include/views/configuration.host.massupdate.php:195
 #: include/views/configuration.host.prototype.edit.php:291
 #: include/views/general.login.php:69 index.php:33 items.php:214
@@ -19114,9 +19068,7 @@ msgstr[2] "Scenariile web activate"
 msgid "Web scenario updated"
 msgstr ""
 
-#: include/html.inc.php:426 include/views/configuration.host.edit.php:457
-#: include/views/configuration.template.edit.php:332
-#: include/views/conf.import.php:42
+#: include/html.inc.php:426 include/views/conf.import.php:42
 msgid "Web scenarios"
 msgstr "Scenarii web"
 
@@ -19137,7 +19089,7 @@ msgid "Wednesday"
 msgstr "Miercuri"
 
 #: app/views/popup.maintenance.period.php:77 app/views/report.services.php:45
-#: include/maintenances.inc.php:29 report4.php:100
+#: include/maintenances.inc.php:29 report4.php:89
 msgid "Weekly"
 msgstr "Săptămânal"
 
@@ -19411,11 +19363,11 @@ msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr ""
 
 #: app/views/report.services.php:57 app/views/report.services.php:80
-#: report4.php:127 report4.php:163
+#: report4.php:116 report4.php:152
 msgid "Year"
 msgstr "An"
 
-#: app/views/report.services.php:47 report4.php:102
+#: app/views/report.services.php:47 report4.php:91
 msgid "Yearly"
 msgstr "Anual"
 
@@ -19777,8 +19729,7 @@ msgstr "agent"
 #: include/views/configuration.triggers.list.php:146
 #: include/views/configuration.triggers.list.php:153
 #: include/views/js/configuration.graph.edit.js.php:65 report2.php:253
-#: report2.php:296 report2.php:323 report2.php:379 report4.php:92
-#: report4.php:301
+#: report2.php:296 report2.php:323 report2.php:379 report4.php:81
 msgid "all"
 msgstr "toți"
 
@@ -20847,7 +20798,7 @@ msgstr ""
 #: app/views/monitoring.problem.view.php:252
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:475
-#: include/classes/widgets/CWidgetHelper.php:522 include/forms.inc.php:1955
+#: include/classes/widgets/CWidgetHelper.php:522 include/forms.inc.php:1968
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:176
 #: include/views/configuration.template.list.php:47
@@ -21047,7 +20998,7 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:530
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:1960
+#: include/forms.inc.php:1973
 #: include/views/configuration.host.discovery.edit.php:129
 #: include/views/configuration.host.discovery.edit.php:225
 #: include/views/configuration.host.list.php:70
