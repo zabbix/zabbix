@@ -1,0 +1,34 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: download sonar scanner
+        run: wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.5.0.2216-linux.zip
+      - name: unzip sonar scanner
+        run: unzip sonar-scanner-cli-4.5.0.2216-linux.zip
+      - name: download build wrapper
+        run: wget http://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+      - name: unzip build wrapper
+        run: unzip ./build-wrapper-linux-x86.zip
+      - name: run configure
+        run: ./configure
+      - name: run build wrapper
+        run: ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory make clean all
+      - name: run sonar scanner
+        run: ./sonar-scanner-4.5.0.2216-linux/bin/sonar-scanner   -Dsonar.organization=$SONAR_ORG   -Dsonar.projectKey=$SONAR_PROJECT_KEY   -Dsonar.sources=.   -Dsonar.host.url=https://sonarcloud.io
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_ORG: 167179
+          SONAR_PROJECT_KEY: 167179_zabbix
