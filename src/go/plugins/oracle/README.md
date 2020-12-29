@@ -114,7 +114,7 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
     oracle.ping[Oracle12]
     oracle.ping[Oracle19]
 
-*Note*: sessions names are case-sensitive, the first letter of a name must be upper-cased.
+*Note*: sessions names are case-sensitive.
 
 ## Supported keys
 **oracle.diskgroups.stats[\<commonParams\>]** — Returns ASM disk groups statistics.  

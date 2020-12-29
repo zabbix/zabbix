@@ -77,7 +77,7 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
     memcached.ping[Prod]
     memcached.ping[Test]
 
-*Note*: sessions names are case-sensitive, the first letter of a name must be upper-cased.
+*Note*: sessions names are case-sensitive.
 
 ## Supported keys
 **memcached.ping[\<commonParams\>]** — Tests if a connection is alive or not.  

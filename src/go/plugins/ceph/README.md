@@ -81,7 +81,7 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
     ceph.ping[Prod]
     ceph.ping[Test]
     
-*Note*: sessions names are case-sensitive, the first letter of a name must be upper-cased.
+*Note*: sessions names are case-sensitive.
     
 ## Supported keys
 **ceph.df.details[\<commonParams\>]** — Returns information about cluster’s data usage and distribution among pools.    

@@ -75,7 +75,7 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
     redis.ping[Prod]
     redis.ping[Test]
 
-*Note*: sessions names are case-sensitive, the first letter of a name must be upper-cased.
+*Note*: sessions names are case-sensitive.
 
 ## Supported keys
 **redis.config[\<commonParams\>[,pattern]]** — Gets a configuration parameters of a Redis instance matching pattern.  
