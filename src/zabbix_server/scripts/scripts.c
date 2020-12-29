@@ -393,7 +393,7 @@ static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
 
 	if (NULL != event)
 	{
-		result = DBselect("select distinct eventid from event_suppress where eventid=" ZBX_FS_UI64 
+		result = DBselect("select distinct eventid from event_suppress where eventid=" ZBX_FS_UI64
 				" order by eventid", eventid);
 
 		if (NULL != (row = DBfetch(result)))
