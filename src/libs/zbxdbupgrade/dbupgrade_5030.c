@@ -42,8 +42,8 @@ static int	DBpatch_5030000(void)
 
 static int	DBpatch_5030001(void)
 {
-	const ZBX_FIELD old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const ZBX_FIELD field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("scripts", &field, &old_field);
 }
@@ -57,8 +57,8 @@ static int	DBpatch_5030002(void)
 
 static int	DBpatch_5030003(void)
 {
-	const ZBX_FIELD old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const ZBX_FIELD field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("scripts", &field, &old_field);
 }
@@ -78,7 +78,6 @@ static int	DBpatch_5030004(void)
 			};
 
 	return DBcreate_table(&table);
-
 }
 
 static int	DBpatch_5030005(void)
