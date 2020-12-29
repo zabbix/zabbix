@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-23T06:55:36Z</date>
+   <date>2020-12-28T17:38:46Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -12,6 +12,9 @@
          <template>Template SAN NetApp FAS3220 SNMP</template>
          <name>Template SAN NetApp FAS3220 SNMP</name>
          <description>The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.&#13;
+&#13;
+MIBs used:&#13;
+IF-MIB&#13;
 &#13;
 You can discuss this template or leave feedback on our forum none&#13;
 &#13;
@@ -32,6 +35,9 @@ Template tooling version used: 0.38</description>
             </application>
             <application>
                <name>NetApp FAS3220</name>
+            </application>
+            <application>
+               <name>Network interfaces</name>
             </application>
          </applications>
          <items>
@@ -68,6 +74,12 @@ Template tooling version used: 0.38</description>
                      <name>NetApp FAS3220</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
             </item>
             <item>
                <name>NetApp FAS3220: Product firmware version</name>
@@ -117,7 +129,7 @@ Template tooling version used: 0.38</description>
                <name>Cluster metrics discovery</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>discovery[{#NODE.NAME},1.3.6.1.4.1.789.1.25.2.1.1]</snmp_oid>
-               <key>fas3220.discovery[cluster]</key>
+               <key>fas3220.cluster.discovery</key>
                <delay>1h</delay>
                <description>Discovery of Cluster metrics per node</description>
                <item_prototypes>
@@ -398,13 +410,13 @@ fullyCharged(9).</description>
                      <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyMessage].last()}={Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyMessage].last()}</expression>
                      <name>Node {#NODE.NAME}: Degraded power supplies count is over than zero</name>
                      <priority>AVERAGE</priority>
-                     <description>{ITEM.VALUE2}</description>
+                     <description>{{ITEM.VALUE2}.regsub("(.*)", \1)}</description>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedFanCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedFanMessage].last()}={Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedFanMessage].last()}</expression>
                      <name>Node {#NODE.NAME}: Failed FAN count is over than zero</name>
                      <priority>HIGH</priority>
-                     <description>{ITEM.VALUE2}</description>
+                     <description>{{ITEM.VALUE2}.regsub("(.*)", \1)}</description>
                   </trigger_prototype>
                </trigger_prototypes>
             </discovery_rule>
@@ -412,7 +424,7 @@ fullyCharged(9).</description>
                <name>CPU discovery</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>discovery[{#NODE.NAME},1.3.6.1.4.1.789.1.2.1.14.1.1]</snmp_oid>
-               <key>fas3220.discovery[cpu]</key>
+               <key>fas3220.cpu.discovery</key>
                <delay>1h</delay>
                <description>Discovery of CPU metrics per node</description>
                <item_prototypes>
@@ -461,10 +473,189 @@ fullyCharged(9).</description>
                </graph_prototypes>
             </discovery_rule>
             <discovery_rule>
+               <name>Filesystems discovery</name>
+               <type>SNMP_AGENT</type>
+               <snmp_oid>discovery[{#FSNAME},1.3.6.1.4.1.789.1.5.4.1.2,{#FSTYPE},1.3.6.1.4.1.789.1.5.4.1.23,{#VSERVER},1.3.6.1.4.1.789.1.5.4.1.34]</snmp_oid>
+               <key>fas3220.fs.discovery</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#FSTYPE}</macro>
+                        <value>{$FAS3220.FS.TYPE.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#FSTYPE}</macro>
+                        <value>{$FAS3220.FS.TYPE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#FSNAME}</macro>
+                        <value>{$FAS3220.FS.NAME.MATCHES}</value>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#FSNAME}</macro>
+                        <value>{$FAS3220.FS.NAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Filesystems discovery with filter.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Total space available</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.31.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#VSERVER}{#FSNAME}", df64AvailKBytes]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The total disk space that is free for use on {#FSNAME}.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#VSERVER}{#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                     </preprocessing>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min({$FAS3220.FS.TIME:"{#FSNAME}"})}&lt;{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0</expression>
+                           <name>{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Total space</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.29.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#VSERVER}{#FSNAME}", df64TotalKBytes]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The total capacity in Bytes for {#FSNAME}.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#VSERVER}{#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Total space used</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.30.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#VSERVER}{#FSNAME}", df64UsedKBytes]</key>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The total disk space that is in use on {#FSNAME}.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#VSERVER}{#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Saved by compression percents</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.38.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#VSERVER}{#FSNAME}", dfCompressSavedPercent]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <description>Provides the percentage of compression savings in a volume, which is ((compr_saved/(compr_saved + used)) * 100). This is only returned for volumes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#VSERVER}{#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Saved by deduplication percents</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.40.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#VSERVER}{#FSNAME}", dfDedupeSavedPercent]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <description>Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#VSERVER}{#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Used space percents</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#VSERVER}{#FSNAME}", dfPerCentKBytesCapacity]</key>
+                     <history>7d</history>
+                     <units>%</units>
+                     <description>The percentage of disk space currently in use on {#FSNAME}.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#VSERVER}{#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max({$FAS3220.FS.TIME:"{#FSNAME}"})}&gt;{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1</expression>
+                           <name>{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#VSERVER}{#FSNAME}: Free space</name>
+                     <type>STACKED</type>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>FILLED_REGION</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#VSERVER}{#FSNAME}", df64UsedKBytes]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>FILLED_REGION</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#VSERVER}{#FSNAME}", df64UsedKBytes]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
                <name>HA discovery</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>discovery[{#NODE.NAME},1.3.6.1.4.1.789.1.21.2.1.1,{#PARTNER.NAME},1.3.6.1.4.1.789.1.21.2.1.8]</snmp_oid>
-               <key>fas3220.discovery[ha]</key>
+               <key>fas3220.ha.discovery</key>
                <delay>1h</delay>
                <description>Discovery of high availability metrics per node</description>
                <item_prototypes>
@@ -576,214 +767,187 @@ Possible states:&#13;
                <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
-               <name>Filesystems discovery</name>
-               <type>SNMP_AGENT</type>
-               <snmp_oid>discovery[{#FSNAME},1.3.6.1.4.1.789.1.5.4.1.2,{#FSTYPE},1.3.6.1.4.1.789.1.5.4.1.23]</snmp_oid>
-               <key>vfs.fs.discovery[fs]</key>
-               <delay>1h</delay>
-               <filter>
-                  <evaltype>AND</evaltype>
-                  <conditions>
-                     <condition>
-                        <macro>{#FSTYPE}</macro>
-                        <value>{$FAS3220.FS.FSTYPE.MATCHES}</value>
-                        <formulaid>A</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#FSTYPE}</macro>
-                        <value>{$FAS3220.FS.FSTYPE.NOT_MATCHES}</value>
-                        <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>B</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#FSNAME}</macro>
-                        <value>{$FAS3220.FS.FSNAME.MATCHES}</value>
-                        <formulaid>C</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#FSNAME}</macro>
-                        <value>{$FAS3220.FS.FSNAME.NOT_MATCHES}</value>
-                        <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>D</formulaid>
-                     </condition>
-                  </conditions>
-               </filter>
-               <description>Filesystems discovery with filter.</description>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>{#FSNAME}: Total space available</name>
-                     <type>SNMP_AGENT</type>
-                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.5.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#FSNAME}", dfKBytesAvail]</key>
-                     <history>7d</history>
-                     <units>B</units>
-                     <description>The total disk space that is free for use on {#FSNAME}.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Filesystem {#FSNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>1024</params>
-                        </step>
-                     </preprocessing>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min({$FAS3220.FS.TIME:"{#FSNAME}"})}&lt;{$FAS3220.FS.AVAIL.MIN.HIGH:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0</expression>
-                           <name>{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.HIGH:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"})</name>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
-                     </trigger_prototypes>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#FSNAME}: Total space</name>
-                     <type>SNMP_AGENT</type>
-                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.3.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#FSNAME}", dfKBytesTotal]</key>
-                     <history>7d</history>
-                     <units>B</units>
-                     <description>The total capacity in Bytes for {#FSNAME}.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Filesystem {#FSNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>1024</params>
-                        </step>
-                     </preprocessing>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#FSNAME}: Total space used</name>
-                     <type>SNMP_AGENT</type>
-                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#FSNAME}", dfKBytesUsed]</key>
-                     <history>7d</history>
-                     <units>B</units>
-                     <description>The total disk space that is in use on {#FSNAME}.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Filesystem {#FSNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>1024</params>
-                        </step>
-                     </preprocessing>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#FSNAME}: Used space percents</name>
-                     <type>SNMP_AGENT</type>
-                     <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.6.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#FSNAME}", dfPerCentKBytesCapacity]</key>
-                     <history>7d</history>
-                     <units>%</units>
-                     <description>The percentage of disk space currently in use on {#FSNAME}.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Filesystem {#FSNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{max({$FAS3220.FS.TIME:"{#FSNAME}"})}&gt;{$FAS3220.FS.PUSED.MAX.HIGH:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1</expression>
-                           <name>{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.HIGH:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"})</name>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
-                     </trigger_prototypes>
-                  </item_prototype>
-               </item_prototypes>
-               <host_prototypes/>
-               <graph_prototypes>
-                  <graph_prototype>
-                     <name>{#FSNAME}: Free space</name>
-                     <type>STACKED</type>
-                     <graph_items>
-                        <graph_item>
-                           <drawtype>FILLED_REGION</drawtype>
-                           <color>1A7C11</color>
-                           <item>
-                              <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#FSNAME}", dfKBytesUsed]</key>
-                           </item>
-                        </graph_item>
-                        <graph_item>
-                           <sortorder>1</sortorder>
-                           <drawtype>FILLED_REGION</drawtype>
-                           <color>2774A4</color>
-                           <item>
-                              <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#FSNAME}", dfKBytesAvail]</key>
-                           </item>
-                        </graph_item>
-                     </graph_items>
-                  </graph_prototype>
-               </graph_prototypes>
-            </discovery_rule>
-            <discovery_rule>
                <name>Network ports discovery</name>
                <type>SNMP_AGENT</type>
-               <snmp_oid>discovery[{#NAME},1.3.6.1.4.1.789.1.22.2.1.2,{#NODE},1.3.6.1.4.1.789.1.22.2.1.1,{#TYPE},1.3.6.1.4.1.789.1.22.2.1.15,{#ROLE},1.3.6.1.4.1.789.1.22.2.1.3]</snmp_oid>
-               <key>vfs.fs.discovery[net]</key>
+               <snmp_oid>discovery[{#IFNAME},1.3.6.1.4.1.789.1.22.2.1.2,{#NODE},1.3.6.1.4.1.789.1.22.2.1.1,{#TYPE},1.3.6.1.4.1.789.1.22.2.1.15,{#ROLE},1.3.6.1.4.1.789.1.22.2.1.3,{#IFDESCR},1.3.6.1.4.1.789.1.22.1.2.1.2]</snmp_oid>
+               <key>fas3220.net.discovery</key>
                <delay>1h</delay>
                <filter>
                   <evaltype>AND</evaltype>
                   <conditions>
                      <condition>
                         <macro>{#TYPE}</macro>
-                        <value>{$FAS3220.NETPORT.TYPE.MATCHES}</value>
+                        <value>{$FAS3220.NET.PORT.TYPE.MATCHES}</value>
                         <formulaid>A</formulaid>
                      </condition>
                      <condition>
                         <macro>{#TYPE}</macro>
-                        <value>{$FAS3220.NETPORT.TYPE.NOT_MATCHES}</value>
+                        <value>{$FAS3220.NET.PORT.TYPE.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
                         <macro>{#ROLE}</macro>
-                        <value>{$FAS3220.NETPORT.ROLE.MATCHES}</value>
+                        <value>{$FAS3220.NET.PORT.ROLE.MATCHES}</value>
                         <formulaid>C</formulaid>
                      </condition>
                      <condition>
                         <macro>{#TYPE}</macro>
-                        <value>{$FAS3220.NETPORT.ROLE.NOT_MATCHES}</value>
+                        <value>{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>D</formulaid>
                      </condition>
                      <condition>
-                        <macro>{#NAME}</macro>
-                        <value>{$FAS3220.NETPORT.NAME.MATCHES}</value>
+                        <macro>{#IFNAME}</macro>
+                        <value>{$FAS3220.NET.PORT.NAME.MATCHES}</value>
                         <formulaid>E</formulaid>
                      </condition>
                      <condition>
-                        <macro>{#NAME}</macro>
-                        <value>{$FAS3220.NETPORT.NAME.NOT_MATCHES}</value>
+                        <macro>{#IFNAME}</macro>
+                        <value>{$FAS3220.NET.PORT.NAME.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>F</formulaid>
                      </condition>
                   </conditions>
                </filter>
-               <description>Filesystems discovery with filter.</description>
+               <description>Network interfaces discovery with filter.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Node {#NODE}: port {NAME}: Health degraded reason</name>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets discarded</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.28.{#IFSNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", if64InDiscards]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets with errors</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.29.{#IFSNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", if64InErrors]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits received</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.25.{#IFSNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", if64InOctets]</key>
+                     <history>7d</history>
+                     <units>bps</units>
+                     <description>The total number of octets received on the interface, including framing characters.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets discarded</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.34.{#IFSNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", if64OutDiscards]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets with errors</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.35.{#IFSNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", if64OutErrors]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets that could not be transmitted because of errors.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits sent</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.31.{#IFSNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", if64OutOctets]</key>
+                     <history>7d</history>
+                     <units>bps</units>
+                     <description>The total number of octets transmitted out of the interface, including framing characters.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Health degraded reason</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.32.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{NAME}", netportDegradedReason]</key>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", netportDegradedReason]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
                      <description>The list of reasons why the port is marked as degraded.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Node {#NODE} Ports</name>
+                           <name>{#IFDESCR}</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -794,15 +958,15 @@ Possible states:&#13;
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
-                     <name>Node {#NODE}: port {NAME}: Health</name>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Health</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.30.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{NAME}", netportHealthStatus]</key>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", netportHealthStatus]</key>
                      <history>7d</history>
                      <description>The health status of the port.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Node {#NODE} Ports</name>
+                           <name>{#IFDESCR}</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -816,15 +980,15 @@ Possible states:&#13;
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
-                     <name>Node {#NODE}: port {NAME}: State</name>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): State</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{NAME}", netportLinkState]</key>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", netportLinkState]</key>
                      <history>7d</history>
                      <description>The link-state of the port. Normally it is either UP(2) or DOWN(3).</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Node {#NODE} Ports</name>
+                           <name>{#IFDESCR}</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -838,17 +1002,64 @@ Possible states:&#13;
                      </preprocessing>
                   </item_prototype>
                   <item_prototype>
-                     <name>Node {#NODE}: port {NAME}: Up by an administrator</name>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Role</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", netportRole]</key>
+                     <history>7d</history>
+                     <description>Role of the port. A port must have one of the following roles: cluster(1), data(2), mgmt(3), intercluster(4), cluster-mgmt(5) or undef(0). The cluster port is used to communicate to other node(s) in the cluster. The data port services clients' requests. It is where all the file requests come in. The management port is used by administrator to manage resources within a node. The intercluster port is used to communicate to other cluster. The cluster-mgmt port is used to manage resources within the cluster. The undef role is for the port that has not yet been assigned a role.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>FAS3220 Port role</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Speed</name>
+                     <type>SNMP_AGENT</type>
+                     <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", netportSpeedOper]</key>
+                     <history>7d</history>
+                     <description>The speed appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>{#IFDESCR}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>FAS3220 Port speed</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Up by an administrator</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.14.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{NAME}", netportUpAdmin]</key>
+                     <key>fas3220["{#NODE}", "{#IFNAME}", netportUpAdmin]</key>
                      <history>7d</history>
                      <description>Indicates whether the port status is set 'UP' by an administrator.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Node {#NODE} Ports</name>
+                           <name>{#IFDESCR}</name>
                         </application_prototype>
                      </application_prototypes>
+                     <valuemap>
+                        <name>FAS3220 Port UP by administrator</name>
+                     </valuemap>
                      <preprocessing>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -860,19 +1071,139 @@ Possible states:&#13;
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{NAME}", netportLinkState].last()}&lt;&gt;2 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{NAME}", netportUpAdmin].last()}=1</expression>
-                     <name>Node {#NODE}: port {NAME}: Link down</name>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64InErrors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErrors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64InErrors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErrors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
+                     <priority>WARNING</priority>
+                     <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
+                     <manual_close>YES</manual_close>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportLinkState].last()}&lt;&gt;2 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportUpAdmin].last()}=1</expression>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down</name>
                      <priority>AVERAGE</priority>
                      <description>Link state is not UP and the port status is set 'UP' by an administrator.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{NAME}", netportHealthStatus].last()}&lt;&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{NAME}", netportDegradedReason].diff()}=1</expression>
-                     <name>Node {#NODE}: port {NAME}: Port is not healthy</name>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportHealthStatus].last()}&lt;&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportDegradedReason].strlen()}&gt;0</expression>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy</name>
                      <priority>INFO</priority>
-                     <description>{ITEM.LASTVALUE2}</description>
+                     <description>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</description>
                   </trigger_prototype>
                </trigger_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Network traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#NODE}", "{#IFNAME}", if64InOctets]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>BOLD_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#NODE}", "{#IFNAME}", if64OutOctets]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#NODE}", "{#IFNAME}", if64OutErrors]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#NODE}", "{#IFNAME}", if64InErrors]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>4</sortorder>
+                           <color>FC6EA3</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#NODE}", "{#IFNAME}", if64OutDiscards]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>5</sortorder>
+                           <color>6C59DC</color>
+                           <yaxisside>RIGHT</yaxisside>
+                           <item>
+                              <host>Template SAN NetApp FAS3220 SNMP</host>
+                              <key>fas3220["{#NODE}", "{#IFNAME}", if64InDiscards]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>var data = JSON.parse(value);
+var descriptions = {};
+var out = [];
+
+data.forEach(function(elem) {
+    if (elem["{#IFDESCR}"]) {
+        var parts = elem["{#IFDESCR}"].split(":");
+        var port = parts[parts.length-1].split(' ');
+        descriptions[parts[0] + ':' + port[port.length-1]] = {
+            "{#IFDESCR}": elem["{#IFDESCR}"],
+            "{#SNMPINDEX}": elem["{#SNMPINDEX}"]
+        }
+    }
+});
+
+data.forEach(function(elem) {
+    if (elem["{#IFNAME}"]) {
+        var port = descriptions[elem["{#NODE}"] + ':' + elem["{#IFNAME}"]];
+
+        elem["{#IFDESCR}"] = port["{#IFDESCR}"];
+        elem["{#IFSNMPINDEX}"] = port["{#SNMPINDEX}"];
+
+
+        switch(elem["{#TYPE}"]) {
+            case '0':
+                elem["{#TYPE}"] = 'physical';
+                break;
+            case '1':
+                elem["{#TYPE}"] = 'if-group';
+                break;
+            case '2':
+                elem["{#TYPE}"] = 'vlan';
+                break;
+            case '3':
+                elem["{#TYPE}"] = 'undef';
+                break;
+        };
+    
+        out.push(elem);
+    }
+});
+
+return JSON.stringify(out);</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -882,42 +1213,22 @@ Possible states:&#13;
                <description>The critical threshold of the CPU utilization in %.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.FS.AVAIL.MIN.HIGH}</macro>
+               <macro>{$FAS3220.FS.AVAIL.MIN.CRIT}</macro>
                <value>10G</value>
                <description>Minimum available space on disk. Can be used with {#FSNAME} as context.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.FS.FSNAME.MATCHES}</macro>
+               <macro>{$FAS3220.FS.NAME.MATCHES}</macro>
                <value>.*</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.FS.FSNAME.NOT_MATCHES}</macro>
+               <macro>{$FAS3220.FS.NAME.NOT_MATCHES}</macro>
                <value>snapshot</value>
                <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.FS.FSTYPE.MATCHES}</macro>
-               <value>.*</value>
-               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.&#13;
-Value should be integer:&#13;
-  2 - flexibleVolume,&#13;
-  3 - aggregate,&#13;
-  4 - stripedAggregate,&#13;
-  5 - stripedVolume.</description>
-            </macro>
-            <macro>
-               <macro>{$FAS3220.FS.FSTYPE.NOT_MATCHES}</macro>
-               <value>CHANGE_IF_NEEDED</value>
-               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.&#13;
-Value should be integer:&#13;
-  2 - flexibleVolume,&#13;
-  3 - aggregate,&#13;
-  4 - stripedAggregate,&#13;
-  5 - stripedVolume.</description>
-            </macro>
-            <macro>
-               <macro>{$FAS3220.FS.PUSED.MAX.HIGH}</macro>
+               <macro>{$FAS3220.FS.PUSED.MAX.CRIT}</macro>
                <value>90</value>
                <description>Maximum percentage of disk used. Can be used with {#FSNAME} as context.</description>
             </macro>
@@ -927,25 +1238,45 @@ Value should be integer:&#13;
                <description>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</description>
             </macro>
             <macro>
+               <macro>{$FAS3220.FS.TYPE.MATCHES}</macro>
+               <value>.*</value>
+               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.&#13;
+Value should be integer:&#13;
+  2 - flexibleVolume,&#13;
+  3 - aggregate,&#13;
+  4 - stripedAggregate,&#13;
+  5 - stripedVolume.</description>
+            </macro>
+            <macro>
+               <macro>{$FAS3220.FS.TYPE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.&#13;
+Value should be integer:&#13;
+  2 - flexibleVolume,&#13;
+  3 - aggregate,&#13;
+  4 - stripedAggregate,&#13;
+  5 - stripedVolume.</description>
+            </macro>
+            <macro>
                <macro>{$FAS3220.FS.USE.PCT}</macro>
                <value>1</value>
                <description>Macro define what threshold will be used for disk space trigger:&#13;
-  0 - use Bytes ({$FAS3220.FS.AVAIL.MIN.HIGH})&#13;
-  1 - use percents ({$FAS3220.FS.PUSED.MAX.HIGH})&#13;
+  0 - use Bytes ({$FAS3220.FS.AVAIL.MIN.CRIT})&#13;
+  1 - use percents ({$FAS3220.FS.PUSED.MAX.CRIT})&#13;
 Can be used with {#FSNAME} as context.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.NETPORT.NAME.MATCHES}</macro>
+               <macro>{$FAS3220.NET.PORT.NAME.MATCHES}</macro>
                <value>.*</value>
                <description>This macro is used in net ports discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.NETPORT.NAME.NOT_MATCHES}</macro>
+               <macro>{$FAS3220.NET.PORT.NAME.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
                <description>This macro is used in net ports discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.NETPORT.ROLE.MATCHES}</macro>
+               <macro>{$FAS3220.NET.PORT.ROLE.MATCHES}</macro>
                <value>.*</value>
                <description>This macro is used in net ports discovery. Can be overridden on the host or linked template level.&#13;
 {#ROLE} is integer. Possible values:&#13;
@@ -957,7 +1288,7 @@ Can be used with {#FSNAME} as context.</description>
   5 - cluster-mgmt</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.NETPORT.ROLE.NOT_MATCHES}</macro>
+               <macro>{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
                <description>This macro is used in net ports discovery. Can be overridden on the host or linked template level.&#13;
 {#ROLE} is integer. Possible values:&#13;
@@ -969,34 +1300,33 @@ Can be used with {#FSNAME} as context.</description>
   5 - cluster-mgmt</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.NETPORT.TYPE.MATCHES}</macro>
+               <macro>{$FAS3220.NET.PORT.TYPE.MATCHES}</macro>
                <value>.*</value>
                <description>This macro is used in net ports discovery. Can be overridden on the host or linked template level.&#13;
-{#TYPE} is integer. Possible values:&#13;
-  0 - physical&#13;
-  1 - if-group&#13;
-  2 - vlan&#13;
-  3 - undef</description>
+{#TYPE} is integer. Possible values: physical, if-group, vlan, undef.</description>
             </macro>
             <macro>
-               <macro>{$FAS3220.NETPORT.TYPE.NOT_MATCHES}</macro>
+               <macro>{$FAS3220.NET.PORT.TYPE.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
                <description>This macro is used in net ports discovery. Can be overridden on the host or linked template level.&#13;
-{#TYPE} is integer. Possible values:&#13;
-  0 - physical&#13;
-  1 - if-group&#13;
-  2 - vlan&#13;
-  3 - undef</description>
+{#TYPE} is integer. Possible values: physical, if-group, vlan, undef.</description>
+            </macro>
+            <macro>
+               <macro>{$IF.ERRORS.WARN}</macro>
+            </macro>
+            <macro>
+               <macro>{$IF.UTIL.MAX}</macro>
+               <value>95</value>
             </macro>
          </macros>
       </template>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template SAN NetApp FAS3220 SNMP:fas3220[diskFailedCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220[diskFailedMessage].diff()}=1</expression>
+         <expression>{Template SAN NetApp FAS3220 SNMP:fas3220[diskFailedCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220[diskFailedMessage].strlen()}&gt;0</expression>
          <name>NetApp FAS3220: Failed disks count is too high ({ITEM.LASTVALUE})</name>
          <priority>WARNING</priority>
-         <description>{ITEM.LASTVALUE2}</description>
+         <description>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</description>
       </trigger>
    </triggers>
    <value_maps>
@@ -1204,6 +1534,98 @@ Can be used with {#FSNAME} as context.</description>
             <mapping>
                <value>1</value>
                <newvalue>Degraded</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Port UP by administrator</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>False</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>True</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Port role</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Undef</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Cluster</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Data</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Node-MGMT</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Intercluster</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Cluster-MGMT</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Port type</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Physical</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>IF-group</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>VLAN</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Undef</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>FAS3220 Port speed</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Undef</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Auto</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>10 Mb/s</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>100 Mb/s</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>10 Gb/s</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>100 Gb/s</newvalue>
             </mapping>
          </mappings>
       </value_map>
