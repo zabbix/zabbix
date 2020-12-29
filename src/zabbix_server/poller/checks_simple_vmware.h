@@ -167,5 +167,8 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results);
 
+int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 #endif
