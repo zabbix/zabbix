@@ -21,6 +21,7 @@ package oracle
 
 import (
 	"context"
+	"strings"
 
 	"zabbix.com/pkg/zbxerr"
 )
@@ -62,6 +63,11 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params map[string]st
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
+
+	// Add leading zeros for floats: ".03" -> "0.03".
+	// Oracle JSON functions are not RFC 4627 compliant.
+	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
+	sysmetrics = strings.ReplaceAll(sysmetrics, "\":.", "\":0.")
 
 	return sysmetrics, nil
 }

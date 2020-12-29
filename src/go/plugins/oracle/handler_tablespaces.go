@@ -153,7 +153,8 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	// Add leading zeros for floats like ".03".
+	// Add leading zeros for floats: ".03" -> "0.03".
+	// Oracle JSON functions are not RFC 4627 compliant.
 	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
 	tablespaces = strings.ReplaceAll(tablespaces, "\":.", "\":0.")
 
