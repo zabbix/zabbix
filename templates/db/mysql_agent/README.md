@@ -11,7 +11,6 @@ This template was tested on:
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
 - MariaDB, version 10.4
-- Zabbix, version 5.0
 
 ## Setup
 
