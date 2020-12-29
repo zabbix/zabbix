@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:19Z'
+  date: '2020-12-29T13:24:49Z'
   groups:
     -
       name: Templates/Databases
@@ -12,7 +12,7 @@ zabbix_export:
         Requirements for template operation:
         1. Create MySQL user for monitoring. For example:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
-        GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
+        GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
         For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
         2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI.
         Examples: MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock
@@ -88,6 +88,28 @@ zabbix_export:
                 -
                   name: 'MySQL: Refused connections (max_connections limit reached)'
                   expression: '{MySQL by Zabbix agent 2:mysql.connection_errors_max_connections.rate.last()}>0'
+        -
+          name: 'MySQL: Binlog cache disk use'
+          type: DEPENDENT
+          key: mysql.binlog_cache_disk_use
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of transactions which used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Binlog_cache_disk_use
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
         -
           name: 'MySQL: Buffer pool efficiency'
           type: CALCULATED
@@ -632,6 +654,89 @@ zabbix_export:
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
         -
+          name: 'MySQL: Innodb buffer pool wait free'
+          type: DEPENDENT
+          key: mysql.innodb_buffer_pool_wait_free
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at increasing innodb_buffer_pool_size.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Innodb_buffer_pool_wait_free
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+        -
+          name: 'MySQL: Calculated value of innodb_log_file_size'
+          type: CALCULATED
+          key: mysql.innodb_log_file_size
+          history: 7d
+          value_type: FLOAT
+          params: '(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}'
+          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of innodb_log_file_size. Innodb_log_file_size is size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'MySQL: Innodb number open files'
+          type: DEPENDENT
+          key: mysql.innodb_num_open_files
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open files held by InnoDB. InnoDB only.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Innodb_num_open_files
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+        -
+          name: 'MySQL: Innodb log written'
+          type: DEPENDENT
+          key: mysql.innodb_os_log_written
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Number of bytes written to the InnoDB log.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Innodb_os_log_written
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+        -
           name: 'MySQL: InnoDB row lock time'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time
@@ -721,6 +826,50 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+          master_item:
+            key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+        -
+          name: 'MySQL: Open tables'
+          type: DEPENDENT
+          key: mysql.open_tables
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of tables that are open.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Open_tables
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+        -
+          name: 'MySQL: Open table definitions'
+          type: DEPENDENT
+          key: mysql.open_table_definitions
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of cached table definitions.'
+          applications:
+            -
+              name: MySQL
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Open_table_definitions
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
         -
@@ -934,7 +1083,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 6h
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -980,6 +1129,122 @@ zabbix_export:
               parameters:
                 - 1d
         -
+          name: 'MariaDB discovery'
+          type: DEPENDENT
+          key: mysql.extra_metric.discovery
+          delay: '0'
+          description: 'Additional metrics if MariaDB is used.'
+          item_prototypes:
+            -
+              name: 'MySQL: Binlog commits'
+              type: DEPENDENT
+              key: 'mysql.binlog_commits[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of transactions committed to the binary log.'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Binlog_commits
+              master_item:
+                key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+            -
+              name: 'MySQL: Binlog group commits'
+              type: DEPENDENT
+              key: 'mysql.binlog_group_commits[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of group commits done to the binary log.'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Binlog_group_commits
+              master_item:
+                key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+            -
+              name: 'MySQL: Master GTID wait count'
+              type: DEPENDENT
+              key: 'mysql.master_gtid_wait_count[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of times MASTER_GTID_WAIT called.'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Master_gtid_wait_count
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+            -
+              name: 'MySQL: Master GTID wait timeouts'
+              type: DEPENDENT
+              key: 'mysql.master_gtid_wait_timeouts[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of timeouts occurring in MASTER_GTID_WAIT.'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Master_gtid_wait_timeouts
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+            -
+              name: 'MySQL: Master GTID wait time'
+              type: DEPENDENT
+              key: 'mysql.master_gtid_wait_time[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of time spent in MASTER_GTID_WAIT.'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Master_gtid_wait_time
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+          master_item:
+            key: 'mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value.search(''MariaDB'')>-1 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
           name: 'Replication discovery'
           key: 'mysql.replication.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
           delay: 1h
@@ -988,7 +1253,7 @@ zabbix_export:
             -
               name: 'MySQL: Replication Slave status {#MASTER_HOST}'
               key: 'mysql.replication.get_slave_status["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#MASTER_HOST}"]'
-              history: 1h
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'The item gets status information on essential parameters of the slave threads.'
@@ -1106,6 +1371,29 @@ zabbix_export:
                     -
                       name: 'MySQL: The slave I/O thread is not running'
                       expression: '{MySQL by Zabbix agent 2:mysql.replication.slave_io_running["{#MASTER_HOST}"].count(#1,"No",eq)}=1'
+            -
+              name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.replication.slave_sql_running_state["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'This shows the state of the SQL driver threads.'
+              applications:
+                -
+                  name: MySQL
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Slave_SQL_Running_State
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'mysql.replication.get_slave_status["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#MASTER_HOST}"]'
           lld_macro_paths:
             -
               lld_macro: '{#MASTER_HOST}'
@@ -1139,7 +1427,11 @@ zabbix_export:
         -
           macro: '{$MYSQL.DSN}'
           value: '<Put your DSN>'
-          description: 'System data source name such as <protocol(host:port or /path/to/socket)/>.'
+          description: 'System data source name such as <tcp://host:port or unix:/path/to/socket)/>.'
+        -
+          macro: '{$MYSQL.INNODB_LOG_FILES}'
+          value: '2'
+          description: 'Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.'
         -
           macro: '{$MYSQL.PASSWORD}'
           description: 'MySQL user password.'
