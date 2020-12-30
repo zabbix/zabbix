@@ -69,7 +69,7 @@ class CControllerFavouriteDelete extends CController {
 		if ($result) {
 			$data['main_block'] =
 				'if (jQuery(\'#addrm_fav\').length) {'."\n".
-					'document.getElementById(\'addrm_fav\').title = \''._('Add to favourites').'\';'."\n".
+					'document.getElementById(\'addrm_fav\').title = \''._('Add to favorites').'\';'."\n".
 					'document.getElementById(\'addrm_fav\').onclick = function() { add2favorites(\''.$object.'\', \''.$objectid.'\'); }'."\n".
 					'switchElementClass(\'addrm_fav\', \'btn-remove-fav\', \'btn-add-fav\');'."\n".
 				'}'."\n".
