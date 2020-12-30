@@ -254,7 +254,7 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Alias'),
 					_x('Name', 'user first name'),
-					_('Surname')
+					_('Last name')
 				]
 			],
 			'items' => [
