@@ -43,7 +43,7 @@ if (isset($_GET['lang'])) {
 		textdomain('frontend');
 	}
 	// numeric Locale to default
-	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
+	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252']);
 }
 
 // available scripts 'scriptFileName' => 'path relative to js/'
