@@ -244,7 +244,7 @@ zabbix_export:
               name: 'Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m)'
               priority: WARNING
               description: |
-                Number of times a client connection was throttled is too hight.
+                Number of times a client connection was throttled is too high.
                 When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.
         -
           name: 'Memcached: CPU sys'

@@ -260,9 +260,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}>{avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"})}'
-                  name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}'
+                  name: 'Broker {#JMXBROKERNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXBROKERNAME}"}'
                   priority: AVERAGE
-                  description: 'Enqueue rate is higer than dequeue rate. It may indicate performance problems.'
+                  description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
             -
               name: 'Broker {#JMXBROKERNAME}: Producers count total'
               type: JMX
@@ -500,7 +500,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{last()}>{$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higer than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count higher than {$ACTIVEMQ.EXPIRIED.WARN:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
                   description: 'This metric represents the number of messages that expired before they could be delivered. If you expect all messages to be delivered and acknowledged within a certain amount of time, you can set an expiration for each message, and investigate if your ExpiredCount metric rises above zero.'
             -
@@ -552,9 +552,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   expression: '{min({$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"})}>{$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} and {$ACTIVEMQ.QUEUE.ENABLED:"{#JMXDESTINATIONNAME}"}=1'
-                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higer than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}'
+                  name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size higher than {$ACTIVEMQ.QUEUE.WARN:"{#JMXDESTINATIONNAME}"} for {$ACTIVEMQ.QUEUE.TIME:"{#JMXDESTINATIONNAME}"}'
                   priority: AVERAGE
-                  description: 'Queue size is higer than treshold. It may indicate performance problems.'
+                  description: 'Queue size is higher than threshold. It may indicate performance problems.'
           trigger_prototypes:
             -
               expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ConsumerCount].max({$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}<{$ACTIVEMQ.DESTINATION.CONSUMERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}>{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
@@ -565,9 +565,9 @@ zabbix_export:
               manual_close: 'YES'
             -
               expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},EnqueueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}>{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},DequeueCount].avg({$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"})}'
-              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higer than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}'
+              name: '{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Message enqueue rate is higher than dequeue rate for {$ACTIVEMQ.MSG.RATE.WARN.TIME:"{#JMXDESTINATIONNAME}"}'
               priority: AVERAGE
-              description: 'Enqueue rate is higer than dequeue rate. It may indicate performance problems.'
+              description: 'Enqueue rate is higher than dequeue rate. It may indicate performance problems.'
             -
               expression: '{Apache ActiveMQ by JMX:jmx[{#JMXOBJ},ProducerCount].max({$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.TIME:"{#JMXDESTINATIONNAME}"})}<{$ACTIVEMQ.DESTINATION.PRODUCERS.MIN.HIGH:"{#JMXDESTINATIONNAME}"} and {Apache ActiveMQ by JMX:jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}].last()}>{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH:"{#JMXBROKERNAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
