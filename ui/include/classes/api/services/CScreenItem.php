@@ -926,7 +926,7 @@ class CScreenItem extends CApiService {
 		foreach ($screen_items as $screen_item) {
 			if ($screen_item['resourcetype'] == SCREEN_RESOURCE_URL && array_key_exists('url', $screen_item)
 					&& !CHtmlUrlValidator::validate($screen_item['url'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 			}
 		}
 	}

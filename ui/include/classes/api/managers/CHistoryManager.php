@@ -1228,7 +1228,7 @@ class CHistoryManager {
 
 			if (!is_array($HISTORY) || !array_key_exists('url', $HISTORY)) {
 				$invalid[$value_name] = true;
-				error(_s('Elasticsearch url is not set for type: %1$s.', $value_name));
+				error(_s('Elasticsearch URL is not set for type: %1$s.', $value_name));
 
 				return null;
 			}
@@ -1237,7 +1237,7 @@ class CHistoryManager {
 			if (is_array($url)) {
 				if (!array_key_exists($value_name, $url)) {
 					$invalid[$value_name] = true;
-					error(_s('Elasticsearch url is not set for type: %1$s.', $value_name));
+					error(_s('Elasticsearch URL is not set for type: %1$s.', $value_name));
 
 					return null;
 				}

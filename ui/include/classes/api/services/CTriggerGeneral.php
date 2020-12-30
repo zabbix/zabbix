@@ -867,7 +867,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			if (array_key_exists('url', $trigger) && $trigger['url'] && !CHtmlUrlValidator::validate($trigger['url'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 			}
 
 			if (array_key_exists('event_name', $trigger) && !$eventname_validator->validate($trigger['event_name'])) {
@@ -1043,7 +1043,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			if (array_key_exists('url', $trigger) && $trigger['url'] && !CHtmlUrlValidator::validate($trigger['url'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for url field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 			}
 		}
 

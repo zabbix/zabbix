@@ -238,7 +238,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; string - with type as local')
+					'description' => _('System time. Returns integer with type as UTC; string - with type as local')
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
@@ -592,7 +592,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.localtime[<type>]',
-					'description' => _('System time. Returns integer with type as utc; string - with type as local')
+					'description' => _('System time. Returns integer with type as UTC; string - with type as local')
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
