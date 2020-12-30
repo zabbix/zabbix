@@ -1188,7 +1188,7 @@ class CCorrelation extends CApiService {
 
 		if (count($conditions) != count(array_unique($conditions, SORT_REGULAR))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Conditions duplicates for correlation "%1$s".', $correlation['name'])
+				_s('Duplicate conditions for correlation "%1$s".', $correlation['name'])
 			);
 		}
 

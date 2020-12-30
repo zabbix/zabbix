@@ -595,7 +595,7 @@ class testWebScenario extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Application with applicationid "123456" does not exist.'
+				'expected_error' => 'Application with "applicationid" "123456" does not exist.'
 			],
 			[
 				'httptest' => [
