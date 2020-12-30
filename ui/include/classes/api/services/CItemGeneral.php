@@ -1675,13 +1675,13 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item pre-processing data in DB. Delete old records and create new ones.
 	 *
-	 * @param array $items
-	 * @param array $items[]['itemid']
-	 * @param array $items[]['preprocessing']
-	 * @param array $items[]['preprocessing'][]['type']
-	 * @param array $items[]['preprocessing'][]['params']
-	 * @param array $items[]['preprocessing'][]['error_handler']
-	 * @param array $items[]['preprocessing'][]['error_handler_params']
+	 * @param array  $items
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['preprocessing']
+	 * @param int    $items[]['preprocessing'][]['type']
+	 * @param string $items[]['preprocessing'][]['params']
+	 * @param int    $items[]['preprocessing'][]['error_handler']
+	 * @param string $items[]['preprocessing'][]['error_handler_params']
 	 */
 	protected function updateItemPreprocessing(array $items) {
 		$item_preprocs = [];
