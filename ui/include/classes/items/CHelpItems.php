@@ -896,7 +896,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.hv.hw.uuid[<url>,<uuid>]',
-					'description' => _('VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+					'description' => _('VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
 					'key' => 'vmware.hv.hw.vendor[<url>,<uuid>]',
