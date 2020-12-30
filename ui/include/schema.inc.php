@@ -3013,7 +3013,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 5,
-				'default' => 'en_GB'
+				'default' => 'en_US'
 			],
 			'default_timezone' => [
 				'null' => false,
