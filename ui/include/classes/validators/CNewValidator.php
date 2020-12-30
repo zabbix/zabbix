@@ -310,7 +310,7 @@ class CNewValidator {
 					if (array_key_exists($field, $this->input) && !$this->isRgb($this->input[$field])) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field,
-								_('a hexadecimal colour code (6 symbols) is expected')
+								_('a hexadecimal color code (6 symbols) is expected')
 							)
 						);
 						return false;
