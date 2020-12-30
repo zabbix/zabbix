@@ -513,7 +513,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							],
 							'Filters' => [
 								'Type of calculation' => 'Custom expression',
-								'formula' => 'A and B',
+								'formula' => '(A and B) or (C and D)',
 								'filter_conditions' => [
 									[
 										'action' => USER_ACTION_UPDATE,
@@ -526,6 +526,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'macro' => '{#MACRO2}',
 										'operator' => 'matches',
 										'value' => 'expression_2'
+									],
+									[
+										'macro' => '{#MACRO3}',
+										'operator' => 'exists'
+									],
+									[
+										'macro' => '{#MACRO4}',
+										'operator' => 'does not exist'
 									]
 								]
 							],
@@ -1337,7 +1345,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'name' => 'Override for update 1',
 							'Filters' => [
-								'formula' => 'A and B and C',
+								'formula' => 'A and B and C and D and E',
 								'filter_conditions' => [
 									[
 										'action' => USER_ACTION_ADD,
@@ -1380,7 +1388,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							],
 							'Filters' => [
 								'Type of calculation' => 'Custom expression',
-								'formula' => 'A and B',
+								'formula' => 'A and B and C and D',
 								'filter_conditions' => [
 									[
 										'action' => USER_ACTION_UPDATE,
@@ -1395,6 +1403,18 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'macro' => '{#UPDATED_MACRO2}',
 										'operator' => 'matches',
 										'value' => 'UPDATED expression_2'
+									],
+									[
+										'action' => USER_ACTION_UPDATE,
+										'index' => 2,
+										'macro' => '{#UPDATED_MACRO3}',
+										'operator' => 'does not exist'
+									],
+									[
+										'action' => USER_ACTION_UPDATE,
+										'index' => 3,
+										'macro' => '{#UPDATED_MACRO4}',
+										'operator' => 'exists'
 									]
 								]
 							],
@@ -1539,7 +1559,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				],
 				'Filters' => [
 					'Type of calculation' => 'And',
-					'formula' => 'A and B',
+					'formula' => 'A and B and C and D',
 					'filter_conditions' => [
 						[
 							'macro' => '{#MACRO1}',
@@ -1550,6 +1570,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'macro' => '{#MACRO2}',
 							'operator' => 'does not match',
 							'value' => 'test expression_2'
+						],
+						[
+							'macro' => '{#MACRO3}',
+							'operator' => 'exists'
+						],
+						[
+							'macro' => '{#MACRO2}',
+							'operator' => 'does not exist'
 						]
 					]
 				],

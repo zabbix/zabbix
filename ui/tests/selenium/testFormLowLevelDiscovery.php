@@ -60,7 +60,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	public static function layout() {
 		return [
 			[
-				['type' => 'Zabbix agent', 'host' => 'Simple form test host']
+				['type' => 'Zabbix agent', 'host' => 'Simple form test host', 'filter_check' => true]
 			],
 			[
 				['host' => 'Simple form test host', 'form' => 'testFormDiscoveryRule1']
@@ -496,6 +496,15 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('conditions_0_value');
 		$this->zbxTestAssertAttribute("//input[@id='conditions_0_value']", 'maxlength', 255);
 		$this->zbxTestAssertAttribute("//input[@id='conditions_0_value']", 'size', 20);
+
+		if (CTestArrayHelper::get($data, 'filter_check', false)) {
+			$operation_dropdown = $this->query('name:conditions[0][operator]')->one()->asZDropdown();
+			foreach (['matches', 'does not match', 'exists', 'does not exist'] as $operation) {
+				$operation_dropdown->select($operation);
+				$value_exists = (in_array($operation, ['exists', 'does not exist'])) ? false : true;
+				$this->assertEquals($value_exists, $this->query('id:conditions_0_value')->one()->isVisible());
+			}
+		}
 	}
 
 	// Returns update data
@@ -565,6 +574,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'name' => 'discoveryRuleNo1',
 					'key' => 'discovery-key-no1',
+					'macro' => '{#TEST_MACRO}',
+					'operator' => 'exists',
 					'formCheck' =>true,
 					'dbCheck' => true
 				]
@@ -574,6 +585,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'name' => 'discoveryRuleNo2',
 					'key' => 'discovery-key-no2',
+					'macro' => '{#TEST_MACRO}',
+					'operator' => 'does not match',
+					'expression' => 'test expression',
 					'formCheck' =>true,
 					'dbCheck' => true,
 					'remove' => true
@@ -911,6 +925,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'name' =>'Discovery flex',
 					'key' =>'discovery-flex-test',
+					'macro' => '{#TEST_MACRO}',
+					'operator' => 'does not exist',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '2,00:00-24:00'],
@@ -1572,7 +1588,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Filters');
 			$this->zbxTestInputTypeWait('conditions_0_macro', $data['macro']);
 			$this->zbxTestDropdownSelectWait('conditions[0][operator]', $data['operator']);
-			$this->zbxTestInputType('conditions_0_value', $data['expression']);
+			if (in_array($data['operator'], ['matches', 'does not match'])) {
+				$this->zbxTestInputType('conditions_0_value', $data['expression']);
+			}
 		}
 
 		if ($itemFlexFlag == true) {
@@ -1703,6 +1721,15 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				],
 				[
 					[
+						'name' => 'Rule with macro exists',
+						'key' => 'macro-exists',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO}', 'operator' => 'exists']
+						]
+					]
+				],
+				[
+					[
 						'name' => 'Rule with two macros And/Or',
 						'key' => 'two-macros-and-or-key',
 						'calculation' => 'And/Or',
@@ -1719,7 +1746,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 						'calculation' => 'And',
 						'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'operator' => 'does not exist' ]
 						]
 					]
 				],
@@ -1729,7 +1756,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 						'key' => 'two-macros-or-key',
 						'calculation' => 'Or',
 						'macros'=> [
-							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
 							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
 						]
 					]
@@ -1741,8 +1768,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 						'calculation' => 'Custom expression',
 						'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
-							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'operator' => 'exists' ],
+							['macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist' ]
 						],
 						'formula' => 'not A or not (B and C)'
 					]
@@ -1756,18 +1783,24 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getFiltersTabData
 	 */
 	public function testFormLowLevelDiscovery_FiltersTab($data) {
-		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$this->hostid);
+		$this->query('button:Create discovery rule')->one()->click();
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestTabSwitch('Filters');
 
 		foreach ($data['macros'] as $i => $macro) {
-				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
+			$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
+			$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
+			if (in_array($macro['operator'], ['matches', 'does not match'])) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
-				$this->zbxTestClick('macro_add');
 			}
+			else {
+				$this->assertFalse($this->query('id:conditions_'.$i.'_value')->one()->isVisible());
+			}
+			$this->zbxTestClick('macro_add');
+		}
 
 		if (array_key_exists('calculation', $data)) {
 			$this->zbxTestDropdownSelectWait('evaltype', $data['calculation']);
@@ -1803,7 +1836,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-empty-formula-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'operator' => 'exists']
 					],
 					'calculation' => 'Custom expression',
 					'formula' => '',
@@ -1816,8 +1849,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-missing-argument-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
-							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match'],
+							['macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist']
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B',
@@ -1830,7 +1863,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-extra-argument-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match']
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B or C',
@@ -1842,8 +1875,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Rule with wrong formula',
 					'key' => 'macro-wrong-formula-key',
 					'macros'=> [
-							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match']
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'Wrong formula',
@@ -1856,7 +1889,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-not-in-formula-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match']
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'A and Not B',
@@ -1868,8 +1901,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'Check case sensitive of first operator in formula',
 					'key' => 'macro-wrong-operator-key',
 					'macros'=> [
-							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
+							['macro' => '{#TEST_MACRO2}', 'operator' => 'does not exist']
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'NOT A and not B',
@@ -1882,7 +1915,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'macro-not-formula',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
-							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match']
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'not A not B',
@@ -1903,11 +1936,13 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Filters');
 
 		foreach ($data['macros'] as $i => $macro) {
-				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
+			$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
+			$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
+			if (in_array($macro['operator'], ['matches', 'does not match'])) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
-				$this->zbxTestClick('macro_add');
 			}
+			$this->zbxTestClick('macro_add');
+		}
 
 		if (array_key_exists('calculation', $data)) {
 			$this->zbxTestDropdownSelectWait('evaltype', $data['calculation']);
