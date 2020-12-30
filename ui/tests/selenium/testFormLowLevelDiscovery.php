@@ -1571,7 +1571,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if (array_key_exists('macro', $data)) {
 			$this->zbxTestTabSwitch('Filters');
 			$this->zbxTestInputTypeWait('conditions_0_macro', $data['macro']);
-			$this->zbxTestDropdownSelectWait('conditions_0_operator', $data['operator']);
+			$this->zbxTestDropdownSelectWait('conditions[0][operator]', $data['operator']);
 			$this->zbxTestInputType('conditions_0_value', $data['expression']);
 		}
 
@@ -1764,7 +1764,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $macro) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}
@@ -1904,7 +1904,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $macro) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}

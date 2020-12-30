@@ -1776,8 +1776,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 		// Add Filters to override.
 		if (array_key_exists('Filters', $override)) {
-			$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
-					->fill($override['Filters']['filter_conditions']);
+			$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
+			$mapping = $this->setFiltersTableMapping($filters_table);
+			$filters_table->setFieldMapping($mapping)->fill($override['Filters']['filter_conditions']);
 
 			// Add Type of calculation if there are more then 2 filters.
 			if (array_key_exists('Type of calculation', $override['Filters'])) {
@@ -1962,8 +1963,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				unset($condition);
 
 				// Check that Fiters are filled correctly.
-				$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
-					->checkValue($override['Filters']['filter_conditions']);
+				$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
+				$mapping = $this->setFiltersTableMapping($filters_table);
+				$filters_table->setFieldMapping($mapping)->checkValue($override['Filters']['filter_conditions']);
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {
@@ -2022,5 +2024,20 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Close Override dialog.
 			COverlayDialogElement::find()->one()->close();
 		}
+	}
+
+	/**
+	 * Function for updating the mapping of the specified Filters multi-field table.
+	 *
+	 * @param CMultifieldTableElement	$filters_table	table which mapping needs to be updated
+	 *
+	 * @return array
+	 */
+	private function setFiltersTableMapping($filters_table) {
+		$mapping = $filters_table->detectFieldMapping();
+		$mapping['Regular expression']['name'] = 'value';
+		$mapping['Regular expression']['selector'] = 'xpath:./div/input';
+
+		return $mapping;
 	}
 }
