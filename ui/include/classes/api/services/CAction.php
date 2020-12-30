@@ -3180,7 +3180,7 @@ class CAction extends CApiService {
 						$operations_to_validate[] = $ack_operation;
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledgement action "operationid".'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect acknowledgment action "operationid".'));
 					}
 				}
 			}
