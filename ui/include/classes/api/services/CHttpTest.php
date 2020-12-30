@@ -696,7 +696,7 @@ class CHttpTest extends CApiService {
 						|| $httptest['applicationid'] != $db_httptests[$httptest['httptestid']]['applicationid'])) {
 				if (!array_key_exists($httptest['applicationid'], $db_applications)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Application with applicationid "%1$s" does not exist.', $httptest['applicationid'])
+						_s('Application with "applicationid" "%1$s" does not exist.', $httptest['applicationid'])
 					);
 				}
 

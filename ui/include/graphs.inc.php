@@ -150,7 +150,7 @@ function getGraphByGraphId($graphId) {
 		return $dbGraph;
 	}
 
-	error(_s('No graph item with graphid "%1$s".', $graphId));
+	error(_s('No graph item with graph ID "%1$s".', $graphId));
 
 	return false;
 }

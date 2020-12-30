@@ -818,7 +818,7 @@ class CUserMacro extends CApiService {
 		}
 
 		if (!is_numeric($hostmacro['hostid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid hostid for macro "%1$s".', $hostmacro['macro']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid "hostid" for macro "%1$s".', $hostmacro['macro']));
 		}
 	}
 
@@ -1037,7 +1037,7 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacroids as $hostmacroid) {
 			if (!array_key_exists($hostmacroid, $db_hostmacros)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Macro with hostmacroid "%1$s" does not exist.', $hostmacroid)
+					_s('Macro with "hostmacroid" "%1$s" does not exist.', $hostmacroid)
 				);
 			}
 		}

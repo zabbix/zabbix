@@ -612,7 +612,7 @@ class CScreen extends CApiService {
 
 					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Duplicate usrgrpid "%1$s" in user groups for screen "%2$s".',
+							'Duplicate "usrgrpid" "%1$s" in user groups for screen "%2$s".',
 							$share['usrgrpid'],
 							$screen['name']
 						));
@@ -941,7 +941,7 @@ class CScreen extends CApiService {
 
 					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Duplicate usrgrpid "%1$s" in user groups for screen "%2$s".',
+							'Duplicate "usrgrpid" "%1$s" in user groups for screen "%2$s".',
 							$share['usrgrpid'],
 							$screen['name']
 						));

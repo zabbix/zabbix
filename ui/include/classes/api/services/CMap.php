@@ -814,7 +814,7 @@ class CMap extends CMapElement {
 
 					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Duplicate usrgrpid "%1$s" in user groups for map "%2$s".',
+							'Duplicate "usrgrpid" "%1$s" in user groups for map "%2$s".',
 							$share['usrgrpid'],
 							$map['name']
 						));
@@ -998,7 +998,7 @@ class CMap extends CMapElement {
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid1'],
 							$map['name']
 						));
@@ -1006,7 +1006,7 @@ class CMap extends CMapElement {
 
 					if (!in_array($link['selementid2'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid2'],
 							$map['name']
 						));
@@ -1277,7 +1277,7 @@ class CMap extends CMapElement {
 
 					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Duplicate usrgrpid "%1$s" in user groups for map "%2$s".',
+							'Duplicate "usrgrpid" "%1$s" in user groups for map "%2$s".',
 							$share['usrgrpid'],
 							$map['name']
 						));
@@ -1462,7 +1462,7 @@ class CMap extends CMapElement {
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid1'],
 							$map['name']
 						));
@@ -1470,7 +1470,7 @@ class CMap extends CMapElement {
 
 					if (!in_array($link['selementid2'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid2'],
 							$map['name']
 						));
