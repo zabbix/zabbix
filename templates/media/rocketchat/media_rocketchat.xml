@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-12-30T09:08:04Z</date>
+    <date>2020-12-31T04:41:53Z</date>
     <media_types>
         <media_type>
             <name>Rocket.Chat</name>
@@ -150,23 +150,19 @@
                         Zabbix.Log(4, '[ RocketChat Webhook ] Field &quot;' + field +&#13;
                             '&quot; can\'t be empty. The field ignored.');&#13;
                     }&#13;
-                    else if (fields[field].startsWith('{') &amp;&amp; fields[field].endsWith('}')) {&#13;
-                        Zabbix.Log(4, '[ RocketChat Webhook ] Value of field &quot;' + field +&#13;
-                            '&quot; looks like a macro &quot;' + fields[field] + '&quot;. The field ignored.');&#13;
-                    }&#13;
                     else {&#13;
                         try {&#13;
                             var parts = field.split(':');&#13;
 &#13;
                             data.push({&#13;
-                                title: parts[1],&#13;
+                                title: field.substring(field.indexOf(':') + 1),&#13;
                                 value: fields[field],&#13;
                                 short: parts[0].split('_')[1] === 'short'&#13;
                             });&#13;
 &#13;
                         }&#13;
                         catch (error) {&#13;
-                            Zabbix.Log(4, '[ RocketChat Webhook ] Can not parse field &quot;' + field +&#13;
+                            Zabbix.Log(4, '[ RocketChat Webhook ] Can\'t parse field &quot;' + field +&#13;
                                 '&quot;. The field ignored.');&#13;
                         }&#13;
                     }&#13;
@@ -180,7 +176,7 @@
         ['url', 'api_url', 'user_id', 'user_token', 'send_to'].forEach(function (field) {&#13;
             if (typeof RocketChat.params !== 'object' || typeof RocketChat.params[field] === 'undefined'&#13;
                     || RocketChat.params[field] === '' ) {&#13;
-                throw 'Required RocketChat param is not set: &quot;' + field + '&quot;.';&#13;
+                throw 'Required parameter is not set: &quot;' + field + '&quot;.';&#13;
             }&#13;
         });&#13;
 &#13;
@@ -343,6 +339,7 @@
 &#13;
 try {&#13;
     var params = JSON.parse(value),&#13;
+        response,&#13;
         fields = {},&#13;
         rc = {},&#13;
         update = {},&#13;
@@ -379,7 +376,7 @@ try {&#13;
         throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
     }&#13;
 &#13;
-    // Set params to true for non trigger-based events.&#13;
+    // Forcing parameters for non trigger-based events.&#13;
     if (params.event_source !== '0') {&#13;
         params.use_default_message = 'true';&#13;
         params.event_nseverity = '0';&#13;
@@ -415,12 +412,14 @@ try {&#13;
 &#13;
     // Send default message if use_default_message === true.&#13;
     if (params.use_default_message.toLowerCase() === 'true') {&#13;
-        RocketChat.postMessage(true, params.alert_message);&#13;
+        response = RocketChat.postMessage(true, params.alert_message);&#13;
+        result.tags.__zbx_rc_id = response.id;&#13;
+        result.tags.__zbx_rc_rid = response.rid;&#13;
+        result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);&#13;
     }&#13;
     // Send message for trigger-based events.&#13;
-    else if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
-        var response = RocketChat.postMessage(false, params.alert_message, fields);&#13;
-&#13;
+    if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
+        response = RocketChat.postMessage(false, params.alert_message, fields);&#13;
         result.tags.__zbx_rc_id = response.id;&#13;
         result.tags.__zbx_rc_rid = response.rid;&#13;
         result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);&#13;
