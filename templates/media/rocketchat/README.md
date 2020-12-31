@@ -1,0 +1,42 @@
+# Rocket.Chat webhook
+
+This guide describes how to integrate Zabbix 5.0 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+Please note that recovery and update operations are supported only for trigger-based events.<br>
+By default all new alerts will be posted as message with attachmet card. Event updates and resolve message will be added in thread of the first message.
+
+## Setting up Rocket.Chat
+1\. Create a user for API or use an existing one. Make sure the user is able to post mesasges in the required channel.<br>
+
+2\. Grant to the user role with *create-personal-access-tokens* permission. See Rocket.Chat [documentation](https://docs.rocket.chat/api/rest-api/personal-access-tokens) for the information.<br>
+
+3\. Get the API access token. The tokens that will be generated are irrecoverable, once generated, you must save it in a safe place, if the token is lost or forgotten, you can regenerate or delete the token.
+
+
+## Setting up the webhook in Zabbix
+1\. In the *Administration > Media types* section, import [media_rocketchat.xml](media_rocketchat.xml).
+
+2\. Open the newly added **Rocket.Chat** media type and replace all *&lt;PLACEHOLDERS&gt;* with your values.<br>
+The following parameters should be filled:<br>
+**rc_url** - actual URL of your Rocket.Chat instance.<br>
+**rc_user_id** - Rocket.Chat API user id.<br>
+**rc_user_token** - user's API access token created early.<br>
+
+3\. The followinf parameters can help you to customize your alerts:<br>
+**rc_api_url** - API url. Can be usefull if the version will be changed.<br>
+**rc_send_to** - *#channel* or *@username*. Supports private and public channels and direct messages.<br>
+**use_default_message** - **false** (default) or **true**. If **true** all messages will be posted as text of *{ALERT.MESSAGE}.* For non trigger-based notifications always setted up as **true**.<br>
+**field_1_short:Host** - contains data for each field of the attachment. "Field" parameters with another format or empty value will be ignored.<br>
+Format explanation:<br>
+- *filed_* - prefix of the parameter with field info.
+- *1* - the position of the field. Fields with the same position will be added in alphabetical order.
+- *short* - is the field should be short or not. If *short*, there can be few fields on one line, else the field will be placed on a separate line.
+- *Host* - the title of the field. There can be any text including whitespaces or symbols.
+
+4\. Create a **Zabbix user** and add **Media** with the **Rocket.Chat** media type.
+"Send to" field shoud be like *#channel_name* or *@username*. If you specify channel in **rc_send_to** parameter, to comply with frontend requirements, you can put any symbol there.
+Make sure this user has access to all hosts, for which you would like problem notifications to be converted into Rocket.Chat tasks.
+
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Rocket.Chat](https://docs.rocket.chat/) documentations.
+
+## Supported versions
+Zabbix 5.0 and higher
