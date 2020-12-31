@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-28T17:38:46Z</date>
+   <date>2020-12-31T16:03:02Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -45,7 +45,7 @@ Template tooling version used: 0.38</description>
                <name>NetApp FAS3220: Failed disks count</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.789.1.6.4.7.0</snmp_oid>
-               <key>fas3220[diskFailedCount]</key>
+               <key>fas3220.disk[diskFailedCount]</key>
                <history>7d</history>
                <description>The number of disks which are currently broken.</description>
                <applications>
@@ -56,7 +56,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>6h</params>
+                     <params>10m</params>
                   </step>
                </preprocessing>
             </item>
@@ -64,7 +64,7 @@ Template tooling version used: 0.38</description>
                <name>NetApp FAS3220: Failed disks message</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.789.1.6.4.10.0</snmp_oid>
-               <key>fas3220[diskFailedMessage]</key>
+               <key>fas3220.disk[diskFailedMessage]</key>
                <history>7d</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -85,7 +85,7 @@ Template tooling version used: 0.38</description>
                <name>NetApp FAS3220: Product firmware version</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.789.1.1.6.0</snmp_oid>
-               <key>fas3220[productFirmwareVersion]</key>
+               <key>fas3220.inventory[productFirmwareVersion]</key>
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -106,7 +106,7 @@ Template tooling version used: 0.38</description>
                <name>NetApp FAS3220: Product version</name>
                <type>SNMP_AGENT</type>
                <snmp_oid>1.3.6.1.4.1.789.1.1.2.0</snmp_oid>
-               <key>fas3220[productVersion]</key>
+               <key>fas3220.inventory[productVersion]</key>
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
@@ -137,7 +137,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Failed FAN count</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.19.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeEnvFailedFanCount]</key>
+                     <key>fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>Count of the number of chassis fans which are not operating within the recommended RPM range.</description>
                      <application_prototypes>
@@ -156,7 +156,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Failed FAN messgae</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.20.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeEnvFailedFanMessage]</key>
+                     <key>fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -177,7 +177,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Degraded power supplies count</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.21.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyCount]</key>
+                     <key>fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>Count of the number of power supplies which are in degraded mode.</description>
                      <application_prototypes>
@@ -196,7 +196,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Degraded power supplies message</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.22.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyMessage]</key>
+                     <key>fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -217,7 +217,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Over-temperature</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.18.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeEnvOverTemperature]</key>
+                     <key>fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>An indication of whether the hardware is currently operating outside of its recommended temperature range. The hardware will shutdown if the temperature exceeds critical thresholds.</description>
                      <application_prototypes>
@@ -244,7 +244,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Health</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.11.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeHealth]</key>
+                     <key>fas3220.cluster[nodeHealth, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>Whether or not the node can communicate with the cluster.</description>
                      <application_prototypes>
@@ -274,7 +274,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Location</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.3.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeLocation]</key>
+                     <key>fas3220.cluster[nodeLocation, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
@@ -295,7 +295,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: Model</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeModel]</key>
+                     <key>fas3220.cluster[nodeModel, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
@@ -316,7 +316,7 @@ Template tooling version used: 0.38</description>
                      <name>Node {#NODE.NAME}: NVRAM battery status</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.17.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeNvramBatteryStatus]</key>
+                     <key>fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>An indication of the current status of the NVRAM battery or batteries.&#13;
 Batteries which are fully or partially discharged may not fully protect the system during a crash. The end-of-life status values are based on the manufacturer's recommended life for the batteries.&#13;
@@ -357,7 +357,7 @@ fullyCharged(9).</description>
                      <name>Node {#NODE.NAME}: Serial number</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.5.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeSerialNumber]</key>
+                     <key>fas3220.cluster[nodeSerialNumber, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>CHAR</value_type>
@@ -378,7 +378,7 @@ fullyCharged(9).</description>
                      <name>Node {#NODE.NAME}: Uptime</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.7.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", nodeUptime]</key>
+                     <key>fas3220.cluster[nodeUptime, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <units>s</units>
                      <description>Node uptime. Same as sysUpTime for a specific node.</description>
@@ -407,13 +407,13 @@ fullyCharged(9).</description>
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyMessage].last()}={Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedPowerSupplyMessage].last()}</expression>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}</expression>
                      <name>Node {#NODE.NAME}: Degraded power supplies count is over than zero</name>
                      <priority>AVERAGE</priority>
                      <description>{{ITEM.VALUE2}.regsub("(.*)", \1)}</description>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedFanCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedFanMessage].last()}={Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE.NAME}", nodeEnvFailedFanMessage].last()}</expression>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}={Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}</expression>
                      <name>Node {#NODE.NAME}: Failed FAN count is over than zero</name>
                      <priority>HIGH</priority>
                      <description>{{ITEM.VALUE2}.regsub("(.*)", \1)}</description>
@@ -432,7 +432,7 @@ fullyCharged(9).</description>
                      <name>Node {#NODE.NAME}: CPU utilization</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.2.1.14.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", cDOTCpuBusyTimePerCent]</key>
+                     <key>fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
@@ -465,7 +465,7 @@ fullyCharged(9).</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE.NAME}", cDOTCpuBusyTimePerCent]</key>
+                              <key>fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -511,7 +511,7 @@ fullyCharged(9).</description>
                      <name>{#VSERVER}{#FSNAME}: Total space available</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.31.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#VSERVER}{#FSNAME}", df64AvailKBytes]</key>
+                     <key>fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
                      <units>B</units>
                      <description>The total disk space that is free for use on {#FSNAME}.</description>
@@ -538,7 +538,7 @@ fullyCharged(9).</description>
                      <name>{#VSERVER}{#FSNAME}: Total space</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.29.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#VSERVER}{#FSNAME}", df64TotalKBytes]</key>
+                     <key>fas3220.fs[df64TotalKBytes, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
                      <units>B</units>
                      <description>The total capacity in Bytes for {#FSNAME}.</description>
@@ -558,7 +558,7 @@ fullyCharged(9).</description>
                      <name>{#VSERVER}{#FSNAME}: Total space used</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.30.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#VSERVER}{#FSNAME}", df64UsedKBytes]</key>
+                     <key>fas3220.fs[df64UsedKBytes, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
                      <units>B</units>
                      <description>The total disk space that is in use on {#FSNAME}.</description>
@@ -578,10 +578,11 @@ fullyCharged(9).</description>
                      <name>{#VSERVER}{#FSNAME}: Saved by compression percents</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.38.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#VSERVER}{#FSNAME}", dfCompressSavedPercent]</key>
+                     <key>fas3220.fs[dfCompressSavedPercent, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>Provides the percentage of compression savings in a volume, which is ((compr_saved/(compr_saved + used)) * 100). This is only returned for volumes.</description>
+                     <description>Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#VSERVER}{#FSNAME}</name>
@@ -592,8 +593,9 @@ fullyCharged(9).</description>
                      <name>{#VSERVER}{#FSNAME}: Saved by deduplication percents</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.40.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#VSERVER}{#FSNAME}", dfDedupeSavedPercent]</key>
+                     <key>fas3220.fs[dfDedupeSavedPercent, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
                      <description>Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.</description>
                      <application_prototypes>
@@ -606,7 +608,7 @@ fullyCharged(9).</description>
                      <name>{#VSERVER}{#FSNAME}: Used space percents</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.5.4.1.6.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#VSERVER}{#FSNAME}", dfPerCentKBytesCapacity]</key>
+                     <key>fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"]</key>
                      <history>7d</history>
                      <units>%</units>
                      <description>The percentage of disk space currently in use on {#FSNAME}.</description>
@@ -635,7 +637,7 @@ fullyCharged(9).</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#VSERVER}{#FSNAME}", df64UsedKBytes]</key>
+                              <key>fas3220.fs[df64UsedKBytes, "{#VSERVER}{#FSNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -644,12 +646,36 @@ fullyCharged(9).</description>
                            <color>2774A4</color>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#VSERVER}{#FSNAME}", df64UsedKBytes]</key>
+                              <key>fas3220.fs[df64UsedKBytes, "{#VSERVER}{#FSNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
+               <overrides>
+                  <override>
+                     <name>Do not discover aggregate metrics</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#FSTYPE}</macro>
+                              <value>3|4</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Saved</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
             </discovery_rule>
             <discovery_rule>
                <name>HA discovery</name>
@@ -663,7 +689,7 @@ fullyCharged(9).</description>
                      <name>Node {#NODE.NAME}: Cannot takeover cause</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.21.2.1.5.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", haCannotTakeoverCause]</key>
+                     <key>fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>The reason node cannot takeover it's HA partner {#PARTNER.NAME}.&#13;
 Possible states:&#13;
@@ -731,7 +757,7 @@ Possible states:&#13;
                      <name>Node {#NODE.NAME}: HA settings</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.21.2.1.3.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE.NAME}", haSettings]</key>
+                     <key>fas3220.ha[haSettings, "{#NODE.NAME}"]</key>
                      <history>7d</history>
                      <description>High Availability configuration settings. The value notConfigured(1) indicates that the HA is not licensed. The thisNodeDead(5) setting indicates that this node has been takenover.</description>
                      <application_prototypes>
@@ -816,7 +842,7 @@ Possible states:&#13;
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets discarded</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.28.{#IFSNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", if64InDiscards]</key>
+                     <key>fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>MIB: IF-MIB&#13;
@@ -837,7 +863,7 @@ The number of inbound packets which were chosen to be discarded even though no e
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Inbound packets with errors</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.29.{#IFSNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", if64InErrors]</key>
+                     <key>fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>MIB: IF-MIB&#13;
@@ -858,7 +884,7 @@ The number of inbound packets that contained errors preventing them from being d
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits received</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.25.{#IFSNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", if64InOctets]</key>
+                     <key>fas3220.net.if[if64InOctets, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <units>bps</units>
                      <description>The total number of octets received on the interface, including framing characters.</description>
@@ -869,6 +895,10 @@ The number of inbound packets that contained errors preventing them from being d
                      </application_prototypes>
                      <preprocessing>
                         <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
                            <type>CHANGE_PER_SECOND</type>
                            <params/>
                         </step>
@@ -878,7 +908,7 @@ The number of inbound packets that contained errors preventing them from being d
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets discarded</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.34.{#IFSNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", if64OutDiscards]</key>
+                     <key>fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>MIB: IF-MIB&#13;
@@ -899,7 +929,7 @@ The number of outbound packets which were chosen to be discarded even though no 
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Outbound packets with errors</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.35.{#IFSNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", if64OutErrors]</key>
+                     <key>fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
                      <description>MIB: IF-MIB&#13;
@@ -920,7 +950,7 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Bits sent</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.1.2.1.31.{#IFSNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", if64OutOctets]</key>
+                     <key>fas3220.net.if[if64OutOctets, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <units>bps</units>
                      <description>The total number of octets transmitted out of the interface, including framing characters.</description>
@@ -931,6 +961,10 @@ The number of outbound packets that could not be transmitted because of errors.<
                      </application_prototypes>
                      <preprocessing>
                         <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
                            <type>CHANGE_PER_SECOND</type>
                            <params/>
                         </step>
@@ -940,7 +974,7 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Health degraded reason</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.32.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", netportDegradedReason]</key>
+                     <key>fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -961,8 +995,9 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Health</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.30.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", netportHealthStatus]</key>
+                     <key>fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <description>The health status of the port.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -983,7 +1018,7 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): State</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", netportLinkState]</key>
+                     <key>fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <description>The link-state of the port. Normally it is either UP(2) or DOWN(3).</description>
                      <application_prototypes>
@@ -1005,7 +1040,7 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Role</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.3.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", netportRole]</key>
+                     <key>fas3220.net.port[netportRole, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <description>Role of the port. A port must have one of the following roles: cluster(1), data(2), mgmt(3), intercluster(4), cluster-mgmt(5) or undef(0). The cluster port is used to communicate to other node(s) in the cluster. The data port services clients' requests. It is where all the file requests come in. The management port is used by administrator to manage resources within a node. The intercluster port is used to communicate to other cluster. The cluster-mgmt port is used to manage resources within the cluster. The undef role is for the port that has not yet been assigned a role.</description>
                      <application_prototypes>
@@ -1027,7 +1062,7 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Speed</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.11.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", netportSpeedOper]</key>
+                     <key>fas3220.net.port[netportSpeedOper, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <description>The speed appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
                      <application_prototypes>
@@ -1049,7 +1084,7 @@ The number of outbound packets that could not be transmitted because of errors.<
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Up by an administrator</name>
                      <type>SNMP_AGENT</type>
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.14.{#SNMPINDEX}</snmp_oid>
-                     <key>fas3220["{#NODE}", "{#IFNAME}", netportUpAdmin]</key>
+                     <key>fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
                      <description>Indicates whether the port status is set 'UP' by an administrator.</description>
                      <application_prototypes>
@@ -1071,11 +1106,11 @@ The number of outbound packets that could not be transmitted because of errors.<
                <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64InErrors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
-or {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErrors].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                     <recovery_expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64InErrors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
-and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErrors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <recovery_expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Template SAN NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
@@ -1083,14 +1118,14 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportLinkState].last()}&lt;&gt;2 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportUpAdmin].last()}=1</expression>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"].last()}&lt;&gt;2 and {Template SAN NetApp FAS3220 SNMP:fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"].last()}=1</expression>
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down</name>
                      <priority>AVERAGE</priority>
                      <description>Link state is not UP and the port status is set 'UP' by an administrator.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportHealthStatus].last()}&lt;&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", netportDegradedReason].strlen()}&gt;0</expression>
+                     <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"].last()}&lt;&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"].strlen()}&gt;0</expression>
                      <name>Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy</name>
                      <priority>INFO</priority>
                      <description>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</description>
@@ -1105,7 +1140,7 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                            <color>1A7C11</color>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE}", "{#IFNAME}", if64InOctets]</key>
+                              <key>fas3220.net.if[if64InOctets, "{#NODE}", "{#IFNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1114,7 +1149,7 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                            <color>2774A4</color>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE}", "{#IFNAME}", if64OutOctets]</key>
+                              <key>fas3220.net.if[if64OutOctets, "{#NODE}", "{#IFNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1123,7 +1158,7 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE}", "{#IFNAME}", if64OutErrors]</key>
+                              <key>fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1132,7 +1167,7 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE}", "{#IFNAME}", if64InErrors]</key>
+                              <key>fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1141,7 +1176,7 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE}", "{#IFNAME}", if64OutDiscards]</key>
+                              <key>fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1150,7 +1185,7 @@ and {Template SAN NetApp FAS3220 SNMP:fas3220["{#NODE}", "{#IFNAME}", if64OutErr
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template SAN NetApp FAS3220 SNMP</host>
-                              <key>fas3220["{#NODE}", "{#IFNAME}", if64InDiscards]</key>
+                              <key>fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1323,9 +1358,13 @@ Can be used with {#FSNAME} as context.</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template SAN NetApp FAS3220 SNMP:fas3220[diskFailedCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220[diskFailedMessage].strlen()}&gt;0</expression>
-         <name>NetApp FAS3220: Failed disks count is too high ({ITEM.LASTVALUE})</name>
+         <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220.disk[diskFailedMessage].diff()}=1</expression>
+         <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+         <recovery_expression>{Template SAN NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}=0</recovery_expression>
+         <name>NetApp FAS3220: Number of failed disks has changed</name>
+         <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
          <priority>WARNING</priority>
+         <type>MULTIPLE</type>
          <description>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</description>
       </trigger>
    </triggers>
