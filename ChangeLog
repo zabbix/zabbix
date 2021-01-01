@@ -1,6 +1,11 @@
 Changes for 5.4.0alpha1
 
 New features:
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.......PS. [ZBXNEXT-6380] added new key vmware.cl.perfcounter (dgoloscapov, MVekslers)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6219] added "HashiCorp Vault" template (afayantsev)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
 ..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 ..F....... [ZBXNEXT-6291] implemented breadcrumbs on host dashboards page (ozdancuka)
@@ -39,6 +44,7 @@ A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from front
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)
 ........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
