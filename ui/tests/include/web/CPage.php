@@ -157,6 +157,13 @@ class CPage {
 	}
 
 	/**
+	 * Close the current window.
+	 */
+	public function close() {
+		$this->driver->close();
+	}
+
+	/**
 	 * Destroy web page.
 	 */
 	public function destroy() {
