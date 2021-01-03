@@ -39,6 +39,8 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 	tbl_line=${tbl_line#*|}
 	primary_key=${tbl_line%%|*}
 
+	total_count=`echo "select count(*) from ${table}" | eval ${mysql_cmd} | tail -1`
+
 	fields=''
 	delim=''
 
@@ -88,7 +90,10 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 			where="${where} "
 		fi
 
-		if [[ `echo "select count(*) from ${table}${where}" | eval ${mysql_cmd} | tail -1` -eq 0 ]]; then
+		count=`echo "select count(*) from ${table}${where}" | eval ${mysql_cmd} | tail -1`
+		(( total_count -= count ))
+
+		if [[ ${count} -eq 0 ]]; then
 			if [[ ${#refs[@]} -ne 0 ]]; then
 				inc=0
 
@@ -124,4 +129,9 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 			break
 		fi
 	done
+
+	if [[ ${total_count} -ne 0 ]]; then
+		echo "The total number of records in table \"${table}\" is not equal to the fetched records." >&2
+		exit 1
+	fi
 done
