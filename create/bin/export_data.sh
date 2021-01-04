@@ -47,7 +47,7 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 	refs=()
 	depth=()
 
-	for fld_line in `sed -n "/^TABLE|${table}|/,/^$/ p" "${schema}" | grep "^FIELD" | grep -v "ZBX_NODATA" | awk -F'|' '{gsub(/[ \t]+/, ""); print}'`; do
+	for fld_line in `sed -n "/^TABLE|${table}|/,/^$/ p" "${schema}" | grep "^FIELD" | grep -v "ZBX_NODATA" | sed 's/[ \t]//g'`; do
 		fld_line=${fld_line#*|}		# FIELD
 		field=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <field_name>
