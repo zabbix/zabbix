@@ -2908,3 +2908,15 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');
+
+-- interfaces availability test
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99452, 'Host with Orange interface', 'Host with Orange interface', 0, 'Host with Orange interface Host availability test');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100000, 99452, 4);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (100001, 99452, 1, '127.0.0.1', '1available.zabbix.com', '0', '10050', '1', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (100002, 99452, 1, '127.0.0.2', '2available.zabbix.com', '0', '10051', '0', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (100003, 99452, 2, '127.0.0.98', 'snmpv2zabbix.com', '1', '163', '1', 1);
+INSERT INTO interface_snmp (interfaceid, version, bulk, securityname) values (100003, 3, 1, 'zabbix');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (100004, 99452, 2, '127.0.0.99', 'snmpv3zabbix.com', '1', '162', '0', 2);
+INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (100004, 2, 1, '{$SNMP_COMMUNITY}');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (100005, 99452, 3, '127.0.0.1', '1unavail.IPMI.zabbix.com', '0', '623', '1', 2, '1 Error IPMI');
+INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (100006, 99452, 3, '127.0.0.1', '2unavail.IPMI.zabbix.com', '0', '624', '0', 2, '2 Error IPMI');
