@@ -909,7 +909,7 @@ class CMacrosResolverGeneral {
 				$value = UNRESOLVED_MACRO_STRING;
 
 				$history = Manager::History()->getLastValues([$function], 1,
-					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
 				);
 				if (!array_key_exists($function['itemid'], $history)) {
 					continue;
