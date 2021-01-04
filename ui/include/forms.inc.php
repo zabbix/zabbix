@@ -1236,27 +1236,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	// if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
-	// 		&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
-	// 	if ($data['valuemapid'] != 0) {
-	// 		$valuemaps = API::ValueMap()->get([
-	// 			'output' => ['name'],
-	// 			'valuemapids' => [$data['valuemapid']]
-	// 		]);
-
-	// 		if ($valuemaps) {
-	// 			$data['valuemaps'] = $valuemaps[0]['name'];
-	// 		}
-	// 	}
-	// }
-	// else {
-	// 	$data['valuemaps'] = API::ValueMap()->get([
-	// 		'output' => ['valuemapid', 'name']
-	// 	]);
-
-	// 	CArrayHelper::sort($data['valuemaps'], ['name']);
-	// }
-
 	// possible host inventories
 	if ($data['parent_discoveryid'] == 0) {
 		$data['possibleHostInventories'] = getHostInventories();

@@ -407,7 +407,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'valuemaps' => [
 				'title' => _('Value mapping'),
-				'min_user_type' => USER_TYPE_SUPER_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'valuemapid,name',
 				'form' => [
 					'name' => 'valuemapform',

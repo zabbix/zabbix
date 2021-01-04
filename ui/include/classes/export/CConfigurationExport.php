@@ -197,11 +197,6 @@ class CConfigurationExport {
 			$this->gatherGroups($options['groups']);
 		}
 
-		// // Gather value maps before items if possible.
-		// if ($options['valueMaps']) {
-		// 	$this->gatherValueMaps($options['valueMaps']);
-		// }
-
 		if ($options['templates']) {
 			$this->gatherTemplates($options['templates']);
 		}
@@ -1270,22 +1265,6 @@ class CConfigurationExport {
 
 		$this->prepareScreenExport($screens);
 		$this->data['screens'] = $screens;
-	}
-
-	/**
-	 * Get value maps for export builder from database.
-	 *
-	 * @param array $valuemapids
-	 *
-	 * return array
-	 */
-	protected function gatherValueMaps(array $valuemapids) {
-		$this->data['valueMaps'] = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'selectMappings' => ['value', 'newvalue'],
-			'valuemapids' => $valuemapids,
-			'preservekeys' => true
-		]);
 	}
 
 	/**

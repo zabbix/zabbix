@@ -549,24 +549,19 @@ switch ($data['method']) {
 			case 'valuemaps':
 				$result = [];
 
-				$hosts = API::Host()->get([
-					'output' => ['valuemaps'],
-					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
-					// 'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'hostids' => [$data['hostid']],
+				$db_valuemaps = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'hostids' => $data['hostids'],
 					'preservekeys' => true
 				]);
 
-				if ($hosts) {
-					foreach ($hosts as $host) {
-						$valuemaps = $host['valuemaps'];
-						foreach ($valuemaps as $valuemap) {
-							$result[$valuemap['valuemapid']] = [
-								'id' => $valuemap['valuemapid'],
-								'name' => $valuemap['name'],
-								'mappings' => $valuemap['mappings']
-							];
-						}
+				if ($db_valuemaps) {
+					foreach ($db_valuemaps as $valuemap) {
+						$result[$valuemap['valuemapid']] = [
+							'id' => $valuemap['valuemapid'],
+							'name' => $valuemap['name'],
+						];
 					}
 
 					CArrayHelper::sort($result, ['name']);
