@@ -468,7 +468,7 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Validate incompatible options ZBX_SCRIPT_TYPE_IPMI and ZBX_SCRIPT_EXECUTE_ON_AGENT.
+	 * Validate incompatible script types for execution on agent.
 	 *
 	 * @param array $scripts
 	 *
@@ -485,13 +485,7 @@ class CScript extends CApiService {
 			if (array_key_exists('type', $script) && $script['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 					&& array_key_exists('execute_on', $script)
 					&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-				$message = _('IPMI scripts can be executed only by server.');
-
-				if ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
-					$message = _('Webhook scripts can be executed only by server.');
-				}
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, $message);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only scripts of type "Script" can be executed by agent.'));
 			}
 		}
 		unset($script);

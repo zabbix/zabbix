@@ -377,8 +377,7 @@ class CControllerPopupGeneric extends CController {
 				],
 				'table_columns' => [
 					_('Name'),
-					_('Execute on'),
-					_('Commands')
+					_('Execute on')
 				]
 			],
 			'roles' => [
@@ -1298,20 +1297,13 @@ class CControllerPopupGeneric extends CController {
 
 			case 'scripts':
 				$options += [
-					'output' => ['scriptid', 'name', 'type', 'execute_on', 'command'],
+					'output' => ['scriptid', 'name', 'type', 'execute_on'],
 					'groupids' => (!$this->hostids && $this->groupids) ? $this->groupids : null
 				];
 
 				if ((!$this->host_preselect_required && $this->hostids)
 						|| (!$this->group_preselect_required || $this->groupids)) {
 					$records = API::Script()->get($options);
-
-					foreach ($records as &$record) {
-						if ($record['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
-							$record['command'] = '';
-						}
-					}
-					unset($record);
 				}
 				else {
 					$records = [];
