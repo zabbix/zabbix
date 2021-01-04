@@ -28,6 +28,10 @@
 	$(() => {
 		const $expires_row = $('#expires-at-row');
 		const $expires_at = $expires_row.find('#expires_at');
+		const $form = $(document.forms['token']);
+
+		$form.on('submit', () => $form.trimValues(['#name', '#description']));
+
 		$('#expires_state')
 			.on('change', ({target: {checked}}) => {
 				$expires_row.toggle(checked);
@@ -37,7 +41,6 @@
 
 		$('#regenerate').on('click', ({target}) => {
 			if (confirm($(target).data('confirmation'))) {
-				$form = $(document.forms['token']);
 				$form.append($('<input />', {type: 'hidden', name: 'regenerate', value: '1'}));
 				$form.find('#action_dst').val('user.token.view');
 				$form.submit();
