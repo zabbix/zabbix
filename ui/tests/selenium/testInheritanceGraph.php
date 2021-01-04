@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid']);
+		$this->zbxTestLogin('graphs.php?form=update&context=host&graphid='.$data['graphid']);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
@@ -99,7 +99,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->zbxTestLogin('graphs.php?form=Create+graph&hostid='.$this->templateid);
+		$this->zbxTestLogin('graphs.php?form=Create+graph&context=template&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));
@@ -120,7 +120,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 				$this->zbxTestTextNotPresent('Cannot add graph');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added');
 				$filter = $this->query('name:zbx_filter')->asForm()->one();
-				$filter->getField('Hosts')->clear()->fill($this->template);
+				$filter->getField('Templates')->clear()->fill($this->template);
 				$filter->submit();
 				$this->query('link', $data['name'])->one()->waitUntilVisible();
 				break;

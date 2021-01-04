@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,16 +22,18 @@
 /**
  * @var CView $this
  */
+$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
 
-$filter = (new CFilter(new CUrl('httpconf.php')))
+$filter = (new CFilter((new CUrl('httpconf.php'))->setArgument('context', $data['context'])))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
+	->addvar('context', $data['context'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(
 				(new CLabel(_('Host groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
-					'name' => 'filter_groups[]',
+					'name' => 'filter_groupids[]',
 					'object_name' => 'hostGroup',
 					'data' => $data['filter']['groups'],
 					'popup' => [
@@ -39,26 +41,26 @@ $filter = (new CFilter(new CUrl('httpconf.php')))
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_groups_',
+							'dstfld1' => 'filter_groupids_',
 							'with_hosts_and_templates' => 1,
 							'editable' => 1,
 							'enrich_parent_groups' => true
-						]
+						] + $hg_ms_params
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
-				(new CLabel(_('Hosts'), 'filter_hosts__ms')),
+				(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_hostids[]',
-					'object_name' => 'host_templates',
+					'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'data' => $data['filter']['hosts'],
 					'popup' => [
 						'filter_preselect_fields' => [
-							'hostgroups' => 'filter_groups_'
+							'hostgroups' => 'filter_groupids_'
 						],
 						'parameters' => [
-							'srctbl' => 'host_templates',
+							'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_hostids_',
@@ -83,32 +85,41 @@ $widget = (new CWidget())
 			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
 				->setArgument('form', 'create')
 				->setArgument('hostid', $data['hostid'])
+				->setArgument('context', $data['context'])
 				->getUrl()
 			)
-			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
+			: (new CButton('form',
+				($data['context'] === 'host')
+					? _('Create web scenario (select host first)')
+					: _('Create web scenario (select template first)')
+			))->setEnabled(false)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
 $widget->addItem($filter);
 
+$url = (new CUrl('httpconf.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // create form
-$httpForm = (new CForm())
+$httpForm = (new CForm('post', $url))
 	->setName('scenarios')
 	->addVar('hostid', $this->data['hostid']);
-
-$url = (new CUrl('httpconf.php'))->getUrl();
 
 $httpTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		($this->data['hostid'] == 0)
-			? make_sorting_header(_('Host'), 'hostname', $data['sort'], $data['sortorder'], $url)
+		($data['hostid'] == 0)
+			? make_sorting_header(($data['context'] === 'host') ? _('Host') : _('Template'), 'hostname', $data['sort'],
+				$data['sortorder'], $url
+			)
 			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Number of steps'),
@@ -118,7 +129,7 @@ $httpTable = (new CTableInfo())
 		_('HTTP proxy'),
 		_('Application'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		$this->data['showInfoColumn'] ? _('Info') : null
+		($data['context'] === 'host') ? _('Info') : null
 	]);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
@@ -132,9 +143,10 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->setArgument('form', 'update')
 			->setArgument('hostid', $httpTest['hostid'])
 			->setArgument('httptestid', $httpTestId)
+			->setArgument('context', $data['context'])
 	);
 
-	if ($this->data['showInfoColumn']) {
+	if ($data['context'] === 'host') {
 		$info_icons = [];
 		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
 			$lastData = $httpTestsLastData[$httpTestId];
@@ -167,38 +179,47 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
 		(new CLink(
 			httptest_status2str($httpTest['status']),
-			'?group_httptestid[]='.$httpTest['httptestid'].
-				'&hostid='.$httpTest['hostid'].
-				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
+			(new CUrl('httpconf.php'))
+				->setArgument('group_httptestid[]', $httpTest['httptestid'])
+				->setArgument('hostid', $httpTest['hostid'])
+				->setArgument('action', ($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
 				)
+				->setArgument('context', $data['context'])
+				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status']))
 			->addSID(),
-		$this->data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 
-// append table to form
-$httpForm->addItem([
-	$httpTable,
-	$this->data['paging'],
-	new CActionButtonList('action', 'group_httptestid',
-		[
-			'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
-			'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')],
-			'httptest.massclearhistory' => ['name' => _('Clear history'),
-				'confirm' => _('Delete history of selected web scenarios?')
-			],
-			'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
-		],
-		$this->data['hostid']
-	)
-]);
+$button_list = [
+	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
+	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')]
+];
 
-// append form to widget
+if ($data['context'] === 'host') {
+	$button_list += [
+		'httptest.massclearhistory' => [
+			'name' => _('Clear history'),
+			'confirm' => _('Delete history of selected web scenarios?')
+		]
+	];
+}
+
+$button_list += [
+	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+];
+
+// Append table to form.
+$httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action', 'group_httptestid', $button_list,
+	$data['hostid']
+)]);
+
+// Append form to widget.
 $widget->addItem($httpForm);
 
 $widget->show();

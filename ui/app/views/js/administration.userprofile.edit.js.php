@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 		});
 
 		$('#messages_enabled').on('change', function() {
-			$('input, button, select', $('#messagingTab'))
+			$('input, button, z-select', $('#messagingTab'))
 				.not('[name="messages[enabled]"]')
 				.prop('disabled', !this.checked);
 		}).trigger('change');

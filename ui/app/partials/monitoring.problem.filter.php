@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,7 +139,9 @@ $inventories = array_column(getHostInventories(), 'title', 'db_field');
 $i = 0;
 foreach ($data['inventory'] as $field) {
 	$filter_inventory_table->addRow([
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventories),
+		(new CSelect('inventory['.$i.'][field]'))
+			->setValue($field['field'])
+			->addOptions(CSelect::createOptionsFromArray($inventories)),
 		(new CTextBox('inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CCol(
 			(new CButton('inventory['.$i.'][remove]', _('Remove')))
@@ -329,7 +331,8 @@ if (array_key_exists('render_html', $data)) {
 (new CScriptTemplate('filter-inventory-row'))
 	->addItem(
 		(new CRow([
-			(new CComboBox('inventory[#{rowNum}][field]', null, null, $inventories))->removeId(),
+			(new CSelect('inventory[#{rowNum}][field]'))
+				->addOptions(CSelect::createOptionsFromArray($inventories)),
 			(new CTextBox('inventory[#{rowNum}][value]', '#{value}'))
 				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),

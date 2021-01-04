@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once dirname(__FILE__) . '/common/testFormMacros.php';
 /**
  * @backup hosts
  */
-class testFormTemplateMacros extends testFormMacros {
+class testFormMacrosTemplate extends testFormMacros {
 
 	use MacrosTrait;
 
@@ -41,7 +41,7 @@ class testFormTemplateMacros extends testFormMacros {
 	 */
 	protected $template_name_remove = 'Template to test graphs';
 
-	public static function getCreateTemplateMacrosData() {
+	public static function getCreateMacrosTemplateData() {
 		return [
 			[
 				[
@@ -179,13 +179,13 @@ class testFormTemplateMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getCreateTemplateMacrosData
+	 * @dataProvider getCreateMacrosTemplateData
 	 */
-	public function testFormTemplateMacros_Create($data) {
+	public function testFormMacrosTemplate_Create($data) {
 		$this->checkCreate($data, 'templates', 'template');
 	}
 
-	public static function getUpdateTemplateMacrosData() {
+	public static function getUpdateMacrosTemplateData() {
 		return [
 			[
 				[
@@ -402,17 +402,17 @@ class testFormTemplateMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateTemplateMacrosData
+	 * @dataProvider getUpdateMacrosTemplateData
 	 */
-	public function testFormTemplateMacros_Update($data) {
+	public function testFormMacrosTemplate_Update($data) {
 		$this->checkUpdate($data, $this->template_name_update, 'templates', 'template');
 	}
 
-	public function testFormTemplateMacros_Remove() {
+	public function testFormMacrosTemplate_Remove() {
 		$this->checkRemove($this->template_name_remove, 'templates', 'template');
 	}
 
-	public function testFormTemplateMacros_ChangeRemoveInheritedMacro() {
+	public function testFormMacrosTemplate_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('templates', 'template');
 	}
 
@@ -464,7 +464,7 @@ class testFormTemplateMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateSecretMacrosData
 	 */
-	public function testFormTemplateMacros_CreateSecretMacros($data) {
+	public function testFormMacrosTemplate_CreateSecretMacros($data) {
 		$this->createSecretMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
 	}
 
@@ -493,7 +493,7 @@ class testFormTemplateMacros extends testFormMacros {
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
-	public function testFormTemplateMacros_RevertSecretMacroChanges($data) {
+	public function testFormMacrosTemplate_RevertSecretMacroChanges($data) {
 		$this->revertSecretMacroChanges($data, 'templates.php?form=update&templateid=99137', 'templates');
 	}
 
@@ -537,11 +537,11 @@ class testFormTemplateMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
-	public function testFormTemplateMacros_UpdateSecretMacros($data) {
+	public function testFormMacrosTemplate_UpdateSecretMacros($data) {
 		$this->updateSecretMacros($data, 'templates.php?form=update&templateid=99137', 'templates');
 	}
 
-	public function testFormTemplateMacros_SecretMacroResolution() {
+	public function testFormMacrosTemplate_SecretMacroResolution() {
 		$macro = [
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
@@ -690,7 +690,7 @@ class testFormTemplateMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
-	public function testFormTemplateMacros_CreateVaultMacros($data) {
+	public function testFormMacrosTemplate_CreateVaultMacros($data) {
 		$this->createVaultMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
 	}
 
@@ -735,7 +735,7 @@ class testFormTemplateMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
-	public function testFormTemplateMacros_UpdateVaultMacros($data) {
+	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');
 	}
 }

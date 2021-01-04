@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ class testFormMap extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 
 		// checking if appropriate value for grid size is selected
-		$this->assertTrue($this->zbxTestGetValue("//select[@id='gridsize']//option[@selected]") == $db_map['grid_size']);
+		$this->assertTrue($this->zbxTestGetValue('//z-select[@id="gridsize"]') == $db_map['grid_size']);
 
 		// grid should be shown by default
 		if ($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON) {
@@ -121,9 +121,7 @@ class testFormMap extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Edit map');
 
 		// checking if all options remain as they were set
-		$this->assertTrue(
-			$this->zbxTestGetValue("//select[@id='gridsize']//option[@selected]") == substr($gridSize, 0, strpos($gridSize, 'x'))
-			);
+		$this->zbxTestDropdownAssertSelected('gridsize', $gridSize);
 
 		if ($showGrid) {
 			$this->zbxTestTextPresent('Shown');

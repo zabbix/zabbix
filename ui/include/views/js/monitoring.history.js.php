@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,26 +20,18 @@
 
 
 /**
- * @var CPartial $this
+ * @var CView $this
  */
+?>
 
-$url_list = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+<script type="text/javascript">
+	$(() => {
+		$('#filter-view-as').on('change', () => {
+			document.forms['filter_view_as'].submit();
+		});
 
-(new CSpan())
-	->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
-	->show();
-
-if ($data['dashboard']['dashboardid'] != 0) {
-	$url_view = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
-
-	echo '/';
-
-	(new CSpan())
-		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
-			->setId('dashboard-direct-link')
-		)
-		->addClass(ZBX_STYLE_SELECTED)
-		->show();
-}
+		$('#filter-task').on('change', () => {
+			document.forms['zbx_filter'].submit();
+		});
+	});
+</script>

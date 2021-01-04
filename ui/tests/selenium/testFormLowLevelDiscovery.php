@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1571,7 +1571,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if (array_key_exists('macro', $data)) {
 			$this->zbxTestTabSwitch('Filters');
 			$this->zbxTestInputTypeWait('conditions_0_macro', $data['macro']);
-			$this->zbxTestDropdownSelectWait('conditions_0_operator', $data['operator']);
+			$this->zbxTestDropdownSelectWait('conditions[0][operator]', $data['operator']);
 			$this->zbxTestInputType('conditions_0_value', $data['expression']);
 		}
 
@@ -1611,7 +1611,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
-			$this->zbxTestAssertElementPresentXpath("//select[@id='type']/option[text()='$type']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");
 			switch ($type) {
 				case 'Zabbix agent':
 				case 'Simple check':
@@ -1756,7 +1756,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getFiltersTabData
 	 */
 	public function testFormLowLevelDiscovery_FiltersTab($data) {
-		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?form=create&context=host&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
@@ -1764,7 +1764,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $macro) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}
@@ -1896,7 +1896,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getFiltersTabValidationData
 	 */
 	public function testFormLowLevelDiscovery_FiltersTabValidation($data) {
-		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?form=create&context=host&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
@@ -1904,7 +1904,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $macro) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}
@@ -2028,7 +2028,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$sql_items = "SELECT * FROM items ORDER BY itemid";
 		$old_hash = CDBHelper::getHash($sql_items);
 
-		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$this->hostid.'&context=host');
 		$this->query('button:Create discovery rule')->one()->click();
 
 		$form = $this->query('name:itemForm')->asForm()->one();
@@ -2085,7 +2085,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	private function checkLLDMacrosFormFields($data) {
 		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
-		$this->page->open('host_discovery.php?form=update&itemid='.$id);
+		$this->page->open('host_discovery.php?form=update&context=host&itemid='.$id);
 		$form = $this->query('name:itemForm')->asForm()->one();
 		$form->selectTab('LLD macros');
 		$table = $form->getField('LLD macros');

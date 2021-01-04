@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -924,17 +924,20 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
 			$url = (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']]);
+				->setArgument('filter_hostids', [$template['hostid']])
+				->setArgument('context', 'template');
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url = (new CUrl('disc_prototypes.php'))
-				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid']);
+				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+				->setArgument('context', 'template');
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
 			$url = (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']]);
+				->setArgument('filter_hostids', [$template['hostid']])
+				->setArgument('context', 'template');
 		}
 
 		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
@@ -967,19 +970,22 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
 				$url = (new CUrl('host_discovery.php'))
 					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setArgument('context', 'template');
 			}
 			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('disc_prototypes.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid']);
+					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('items.php'))
 					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setArgument('context', 'template');
 			}
 
 			$name = new CLink(CHtml::encode($template['name']), $url);
