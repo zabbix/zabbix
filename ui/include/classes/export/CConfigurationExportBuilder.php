@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -300,12 +300,6 @@ class CConfigurationExportBuilder {
 				'ipmi_privilege' => $host['ipmi_privilege'],
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
-				'tls_connect' => $host['tls_connect'],
-				'tls_accept' => $host['tls_accept'],
-				'tls_issuer' => $host['tls_issuer'],
-				'tls_subject' => $host['tls_subject'],
-				'tls_psk_identity' => $host['tls_psk_identity'],
-				'tls_psk' => $host['tls_psk'],
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),

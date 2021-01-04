@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ CViewSwitcher.prototype = {
 		// enable previously disabled dropdown items
 		if (this.disableDDItems && this.disableDDItems[this.lastValue]) {
 			for (var DDi in this.disableDDItems[this.lastValue]) {
-				jQuery('#' + DDi).find('option').prop('disabled', false);
+				jQuery('#' + DDi).get(0).getOptions().map((opt) => opt.disabled = false);
 			}
 		}
 
@@ -79,12 +79,18 @@ CViewSwitcher.prototype = {
 		if (this.disableDDItems && this.disableDDItems[myValue]) {
 			for (var DDi in this.disableDDItems[myValue]) {
 				var DD = jQuery('#' + DDi);
+
 				for (var Oi in this.disableDDItems[myValue][DDi]) {
-					DD.find('[value='+this.disableDDItems[myValue][DDi][Oi]+']').prop('disabled', true);
+					DD.get(0).getOptionByValue(this.disableDDItems[myValue][DDi][Oi]).disabled = true;
 				}
 				// if selected option unavailable set to first available
-				if (DD.find('option:selected').prop('disabled')) {
-					DD.find('option:not(:disabled):first').prop('selected', true);
+				if (DD.get(0).getOptionByValue(DD.val()).disabled) {
+					for (let opt of DD.get(0).getOptions()) {
+						if (!opt.disabled) {
+							DD.val(opt.value);
+							break;
+						}
+					}
 					DD.trigger(this.objAction);
 				}
 			}
@@ -187,6 +193,9 @@ CViewSwitcher.prototype = {
 			case 'li':
 				obj.style.display = '';
 				break;
+			case 'z-select':
+				obj.style.display = 'inline-grid';
+				break
 			default:
 				obj.style.display = 'inline';
 		}
@@ -288,6 +297,7 @@ ActionProcessor.prototype = {
 		for (elementId in elementsList) {
 			var elem = jQuery('#' + elementId);
 			switch (elem.get(0).nodeName.toLowerCase()) {
+				case 'z-select':
 				case 'select':
 					elem.change(handler);
 					break;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -181,7 +181,10 @@ class CSetupWizard extends CForm {
 		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix '.$version[0]]))->addClass(ZBX_STYLE_SETUP_TITLE);
 
 		$default_lang = $this->getConfig('default_lang');
-		$lang_combobox = (new CComboBox('default_lang', $default_lang, 'submit();'))
+		$lang_select = (new CSelect('default_lang'))
+			->setId('default-lang')
+			->setValue($default_lang)
+			->setFocusableElementId('label-default-lang')
 			->setAttribute('autofocus', 'autofocus');
 
 		$all_locales_available = 1;
@@ -199,7 +202,7 @@ class CSetupWizard extends CForm {
 					|| setlocale(LC_MONETARY, zbx_locale_variants($localeid))
 			);
 
-			$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
+			$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
 			$all_locales_available &= (int) $locale_available;
 		}
@@ -210,18 +213,20 @@ class CSetupWizard extends CForm {
 		$language_error = '';
 		if (!function_exists('bindtextdomain')) {
 			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
-			$lang_combobox->setEnabled(false);
+			$lang_select->setReadonly();
 		}
 		elseif ($all_locales_available == 0) {
 			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 		}
 
+		$language_error = ($language_error !== '')
+			? (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')
+			: null;
+
 		$language_select = (new CFormList())
-			->addRow(_('Default language'),
-				($language_error !== '')
-					? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
-					: $lang_combobox
-			);
+			->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [
+				$lang_select, $language_error
+			]);
 
 		return [(new CDiv([$setup_title, $language_select]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)];
 	}
@@ -286,8 +291,12 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_host', 0))->removeId()
 			]);
 
-		$table->addRow(_('Database type'),
-			new CComboBox('type', $DB['TYPE'], null, CFrontendSetup::getSupportedDatabases())
+		$table->addRow(new CLabel(_('Database type'), 'label-type'),
+			(new CSelect('type'))
+				->setId('type')
+				->setFocusableElementId('label-type')
+				->setValue($DB['TYPE'])
+				->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 		);
 
 		$table->addRow(_('Database host'),
@@ -456,14 +465,19 @@ class CSetupWizard extends CForm {
 		$timezones += (new CDateTimeZoneHelper())->getAllDateTimeZones();
 
 		$table = (new CFormList())
-			->addRow(new CLabel(_('Default time zone'), 'default-timezone-select'),
+			->addRow(new CLabel(_('Default time zone'), 'label-default-timezone'),
 				(new CSelect('default_timezone'))
 					->setValue($this->getConfig('default_timezone', ZBX_DEFAULT_TIMEZONE))
 					->addOptions(CSelect::createOptionsFromArray($timezones))
-					->setFocusableElementId('default-timezone-select')
+					->setFocusableElementId('label-default-timezone')
+					->setAttribute('autofocus', 'autofocus')
 			)
-			->addRow(_('Default theme'),
-				new CComboBox('default_theme', $this->getConfig('default_theme'), 'submit()', APP::getThemes())
+			->addRow(new CLabel(_('Default theme'), 'label-default-theme'),
+				(new CSelect('default_theme'))
+					->setId('default-theme')
+					->setFocusableElementId('label-default-theme')
+					->setValue($this->getConfig('default_theme'))
+					->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
 			);
 
 		return [

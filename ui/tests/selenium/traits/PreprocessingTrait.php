@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ trait PreprocessingTrait {
 		return [
 			[
 				'name'		=> 'type',
-				'selector'	=> 'xpath:.//select[contains(@id, "_type")]',
+				'selector'	=> 'xpath:.//z-select[contains(@id, "_type")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],

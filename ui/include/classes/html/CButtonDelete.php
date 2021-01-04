@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 class CButtonDelete extends CButtonQMessage {
 
-	public function __construct($msg = null, $vars = null) {
-		parent::__construct('delete', _('Delete'), $msg, $vars);
+	public function __construct($msg = null, $vars = null, $url_param_exclude = '') {
+		parent::__construct('delete', _('Delete'), $msg, $vars, $url_param_exclude);
 	}
 }

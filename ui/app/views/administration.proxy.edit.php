@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,12 +36,18 @@ if ($data['form_refresh'] == 0) {
 
 $proxyForm = (new CForm())
 	->setId('proxy-form')
+	->setName('proxy-form')
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept'])
+	->addVar('psk_edit_mode', $data['psk_edit_mode'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfaceid', $data)) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
+}
+
+if (array_key_exists('clone_proxyid', $data)) {
+	$proxyForm->addVar('clone_proxyid', $data['clone_proxyid']);
 }
 
 $interfaceTable = (new CTable())
@@ -102,18 +108,35 @@ $encryption_form_list = (new CFormList('encryption'))
 			->addItem((new CCheckBox('tls_in_none'))->setLabel(_('No encryption')))
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
-	)
-	->addRow((new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
-		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->disableAutocomplete()
-	)
+	);
+
+if ($data['psk_edit_mode']) {
+	$encryption_form_list
+		->addRow((new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
+			(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+		->addRow((new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+			(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->disableAutocomplete()
+		);
+}
+else {
+	$encryption_form_list
+		->addRow(
+			(new CLabel(_('PSK')))->setAsteriskMark(),
+			(new CSimpleButton(_('Change PSK')))
+				->setId('change_psk')
+				->addClass(ZBX_STYLE_BTN_GREY),
+			null,
+			'tls_psk'
+		);
+}
+
+$encryption_form_list
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)

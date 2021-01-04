@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * Check resolved trigger context menu on overview page, if trigger url without {EVENT.ID} macro.
 	 */
 	public function testPageTriggerUrl_OverviewPageTriggerWithoutEventId() {
-		$url = 'triggers.php?form=update&triggerid=100039';
+		$url = 'triggers.php?form=update&triggerid=100039&context=host';
 		$filter = [
 			'Show' => 'Any',
 			'Name' => '3_trigger_Disaster'

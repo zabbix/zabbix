@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,13 +96,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => '',
 				'name' => 'empty-host',
 				'inventory_mode' => '0',
-				'tags' => [],
-				'tls_connect' => '1',
-				'tls_accept' => '1',
-				'tls_issuer' => '',
-				'tls_subject' => '',
-				'tls_psk_identity' => '',
-				'tls_psk' => ''
+				'tags' => []
 			],
 			[
 				'inventory' => [
@@ -267,13 +261,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => 'impi password',
 				'name' => 'export-host',
 				'inventory_mode' => '0',
-				'tags' => [],
-				'tls_connect' => '1',
-				'tls_accept' => '1',
-				'tls_issuer' => '',
-				'tls_subject' => '',
-				'tls_psk_identity' => '',
-				'tls_psk' => ''
+				'tags' => []
 			]
 		]);
 	}
@@ -2036,13 +2024,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'name' => '0'
 					],
 					'description' => '',
-					'name' => 'host',
-					'tls_connect' => '1',
-					'tls_accept' => '1',
-					'tls_issuer' => '',
-					'tls_subject' => '',
-					'tls_psk_identity' => '',
-					'tls_psk' => ''
+					'name' => 'host'
 				]
 			]
 		);
@@ -2508,8 +2490,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					[
 						'name' => '0'
 					],
-					'tls_connect' => '1',
-					'tls_accept' => '1',
 					'inventory_mode' => '-1',
 					'description' => '',
 					'inventory' => [],
@@ -2517,11 +2497,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'ipmi_username' => '',
 					'macros' => [],
 					'tags' => [],
-					'templates' => [],
-					'tls_issuer' => '',
-					'tls_psk' => '',
-					'tls_psk_identity' => '',
-					'tls_subject' => ''
+					'templates' => []
 				]
 			]
 		);
@@ -3700,12 +3676,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'ipmi_password' => '',
 				'name' => 'SNMP host',
 				'inventory_mode' => '-1',
-				'tls_connect' => '1',
-				'tls_accept' => '1',
-				'tls_issuer' => '',
-				'tls_subject' => '',
-				'tls_psk_identity' => '',
-				'tls_psk' => '',
 				'tags' => []
 			]
 		]);

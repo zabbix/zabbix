@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -999,10 +999,17 @@ function openMassupdatePopup(elem, popup_name) {
 	switch (popup_name) {
 		case 'popup.massupdate.item':
 			data['hostid'] = form.querySelector('#hostid').value;
+			data['context'] = form.querySelector('#context').value;
 			break;
+
+		case 'popup.massupdate.trigger':
+			data['context'] = form.querySelector('#context').value;
+			break;
+
 		case 'popup.massupdate.itemprototype':
 		case 'popup.massupdate.triggerprototype':
 			data['parent_discoveryid'] = form.querySelector('#parent_discoveryid').value;
+			data['context'] = form.querySelector('#context').value;
 			data['prototype'] = 1;
 			break;
 	}

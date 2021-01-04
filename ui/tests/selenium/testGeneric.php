@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,11 +77,11 @@ class testGeneric extends CLegacyWebTest {
 			['actionconf.php?eventsource=2',	'Configuration of actions'],
 			['actionconf.php?eventsource=3',	'Configuration of actions'],
 
-			['screenconf.php',					'Configuration of screens'],
-			['slideconf.php',					'Configuration of slide shows'],
-			['sysmaps.php',					'Configuration of network maps'],
-			['discoveryconf.php',				'Configuration of discovery rules'],
-			['services.php',					'Configuration of services'],
+			['screenconf.php',						'Configuration of screens'],
+			['slideconf.php',						'Configuration of slide shows'],
+			['sysmaps.php',							'Configuration of network maps'],
+			['zabbix.php?action=discovery.list',	'Configuration of discovery rules'],
+			['services.php',						'Configuration of services'],
 
 			// Administration
 			['zabbix.php?action=gui.edit',	'Configuration of GUI'],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1728,7 +1728,7 @@ abstract class CItemGeneral extends CApiService {
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
-						'step' => $step++,
+						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],
 						'error_handler' => $preprocessing['error_handler'],
@@ -1761,7 +1761,7 @@ abstract class CItemGeneral extends CApiService {
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
-						'step' => $step++,
+						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],
 						'error_handler' => $preprocessing['error_handler'],

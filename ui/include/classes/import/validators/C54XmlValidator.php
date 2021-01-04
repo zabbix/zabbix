@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -391,14 +391,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 					'ipmi_privilege' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::USER, 'in' => [CXmlConstantValue::CALLBACK => CXmlConstantName::CALLBACK, CXmlConstantValue::USER => CXmlConstantName::USER, CXmlConstantValue::OPERATOR => CXmlConstantName::OPERATOR, CXmlConstantValue::ADMIN => CXmlConstantName::ADMIN, CXmlConstantValue::OEM => CXmlConstantName::OEM]],
 					'ipmi_username' =>			['type' => XML_STRING, 'default' => ''],
 					'ipmi_password' =>			['type' => XML_STRING, 'default' => ''],
-					'tls_connect' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
-					'tls_accept' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'option', 'default' => CXmlConstantValue::NO_ENCRYPTION, 'export' => [$this, 'hostTlsAcceptExport'], 'rules' => [
-						'option' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]]
-					]],
-					'tls_issuer' =>				['type' => XML_STRING, 'default' => ''],
-					'tls_subject' =>			['type' => XML_STRING, 'default' => ''],
-					'tls_psk_identity' =>		['type' => XML_STRING, 'default' => ''],
-					'tls_psk' =>				['type' => XML_STRING, 'default' => ''],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -2509,48 +2501,6 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		}
 
 		return $rules['in'][$data['authtype']];
-	}
-
-	/**
-	 * Export transformation for tls_accept tag.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception if the element is invalid.
-	 *
-	 * @return array
-	 */
-	public function hostTlsAcceptExport(array $data) {
-		$consts = [
-			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
-			CXmlConstantValue::TLS_PSK=> [CXmlConstantName::TLS_PSK],
-			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_PSK
-			],
-			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
-			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_CERTIFICATE => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_CERTIFICATE
-			],
-			CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
-				CXmlConstantName::TLS_PSK,
-				CXmlConstantName::TLS_CERTIFICATE
-			],
-			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_PSK,
-				CXmlConstantName::TLS_CERTIFICATE
-			]
-		];
-
-		if (!array_key_exists($data['tls_accept'], $consts)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'tls_accept', _s('unexpected constant "%1$s"', $data['tls_accept'])
-			));
-		}
-
-		return $consts[$data['tls_accept']];
 	}
 
 	/**

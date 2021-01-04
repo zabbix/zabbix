@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -306,7 +306,7 @@ abstract class CControllerPopupItemTest extends CController {
 			$hosts = API::Host()->get([
 				'output' => ['hostid', 'host', 'name', 'status', 'available', 'proxy_hostid', 'tls_subject',
 					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
-					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_psk_identity', 'tls_psk',
+					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 					'tls_issuer', 'tls_connect'
 				],
 				'hostids' => [$hostid],
@@ -375,11 +375,13 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Function returns array of item specific properties used for item testing.
 	 *
-	 * @param array $input  Stored user input used to overwrite values retrieved from database.
+	 * @param array $input       Stored user input used to overwrite values retrieved from database.
+	 * @param bool  $for_server  Whether need to add to result an additional properties used only for connection with
+	 *                           Zabbix server.
 	 *
 	 * @return array
 	 */
-	protected function getItemTestProperties(array $input) {
+	protected function getItemTestProperties(array $input, bool $for_server = false) {
 		$data = [
 			'value_type' => $input['value_type']
 		];
@@ -457,12 +459,22 @@ abstract class CControllerPopupItemTest extends CController {
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data['host'] = [
-						'tls_psk_identity' => $this->host['tls_psk_identity'],
-						'tls_psk' => $this->host['tls_psk'],
 						'tls_issuer' => $this->host['tls_issuer'],
 						'tls_connect' => $this->host['tls_connect'],
 						'tls_subject' => $this->host['tls_subject']
 					];
+
+					if ($for_server && $this->host['tls_connect'] == HOST_ENCRYPTION_PSK) {
+						$hosts = API::Host()->get([
+							'output' => ['tls_psk_identity', 'tls_psk'],
+							'hostids' => $this->host['hostid'],
+							'editable' => true
+						]);
+						$host = reset($hosts);
+
+						$data['host']['tls_psk_identity'] = $host['tls_psk_identity'];
+						$data['host']['tls_psk'] = $host['tls_psk'];
+					}
 				}
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],

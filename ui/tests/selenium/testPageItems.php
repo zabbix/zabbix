@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
@@ -86,7 +86,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
@@ -126,10 +126,13 @@ class testPageItems extends CLegacyWebTest {
 					'result' => [
 						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
 						['Host for triggers filtering' => 'Item for triggers filtering'],
-						['Test Item Template' => 'Macro value: Value 2 B resolved'],
 						['Host for trigger tags filtering' => 'Trapper'],
 						['ЗАББИКС Сервер' => 'Utilization of snmp trapper data collector processes, in %'],
 						['ЗАББИКС Сервер' => 'Utilization of trapper data collector processes, in %']
+					],
+					'not_displayed' => [
+						'Host' => 'Test Item Template',
+						'Name' => 'Macro value: Value 2 B resolved'
 					]
 				]
 			],
@@ -187,12 +190,12 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider getHostAndGroupData
 	 */
 	public function testPageItems_FilterHostAndGroupsFilter($data) {
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]=99062');
+		$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Item create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create item')->one()->isEnabled());
-		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		$this->assertFalse($this->query('class:breadcrumbs')->all()->isEmpty());
 		// Clear hosts in filter fields.
 		if (!array_key_exists('Hosts', $data['filter_options'])) {
 			$form->getField('Hosts')->asMultiselect()->clear();
@@ -213,6 +216,11 @@ class testPageItems extends CLegacyWebTest {
 			foreach ($data['result'][$i] as $group => $host) {
 				$this->assertEquals($host, $get_host);
 				$this->assertEquals($group, $get_group);
+			}
+		}
+		if (array_key_exists('not_displayed', $data)) {
+			foreach ($data['not_displayed'] as $column => $value) {
+				$this->assertNotContains($value, $table->getCells($column));
 			}
 		}
 		$this->assertEquals(count($data['result']), $table->getRows()->count());

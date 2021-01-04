@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,23 +80,28 @@ $hostFormList->addRow(
 );
 
 // append proxy to form list
-$proxyComboBox = new CComboBox('proxy_hostid', 0);
-$proxyComboBox->addItem(0, _('(no proxy)'));
+$proxy_select = (new CSelect('proxy_hostid'))
+	->setId('proxy_hostid')
+	->setValue(0)
+	->addOption(new CSelectOption(0, _('(no proxy)')));
 foreach ($data['proxies'] as $proxie) {
-	$proxyComboBox->addItem($proxie['proxyid'], $proxie['host']);
+	$proxy_select->addOption(new CSelectOption($proxie['proxyid'], $proxie['host']));
 }
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))->setLabel(_('Monitored by proxy')),
-	$proxyComboBox
+	$proxy_select
 );
 
 // append status to form list
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[status]', 'status', _('Original')))->setLabel(_('Status')),
-	new CComboBox('status', HOST_STATUS_MONITORED, null, [
-		HOST_STATUS_MONITORED => _('Enabled'),
-		HOST_STATUS_NOT_MONITORED => _('Disabled')
-	])
+	(new CSelect('status'))
+		->setValue(HOST_STATUS_MONITORED)
+		->setId('status')
+		->addOptions(CSelect::createOptionsFromArray([
+			HOST_STATUS_MONITORED => _('Enabled'),
+			HOST_STATUS_NOT_MONITORED => _('Disabled')
+		]))
 );
 
 $templatesFormList = new CFormList('templatesFormList');
@@ -145,12 +150,18 @@ $ipmiFormList = new CFormList('ipmiFormList');
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
 		->setLabel(_('Authentication algorithm')),
-	new CComboBox('ipmi_authtype', IPMI_AUTHTYPE_DEFAULT, null, ipmiAuthTypes())
+	(new CSelect('ipmi_authtype'))
+		->setId('ipmi_authtype')
+		->setValue(IPMI_AUTHTYPE_DEFAULT)
+		->addOptions(CSelect::createOptionsFromArray(ipmiAuthTypes()))
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))->setLabel(_('Privilege level')),
-	new CComboBox('ipmi_privilege', IPMI_PRIVILEGE_USER, null, ipmiPrivileges())
+	(new CSelect('ipmi_privilege'))
+		->setId('ipmi_privilege')
+		->addOptions(CSelect::createOptionsFromArray(ipmiPrivileges()))
+		->setValue(IPMI_PRIVILEGE_USER)
 );
 
 $ipmiFormList->addRow(

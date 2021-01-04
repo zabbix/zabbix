@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2416,6 +2416,7 @@
 					promiseScrollIntoView($obj, data, pos)
 						.then(function() {
 							methods.addWidget.call($obj, widget_data);
+							data['pos-action'] = '';
 
 							// New widget is last element in data['widgets'] array.
 							widget = data['widgets'].slice(-1)[0];
@@ -2561,7 +2562,10 @@
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'action': function() {}
+					'action': function() {
+						// Clear action.
+						data['pos-action'] = '';
+					}
 				}
 			],
 			'dialogueid': 'widgetConfg'
@@ -2772,9 +2776,6 @@
 		// Add new widget user interaction handlers.
 		$.subscribe('overlay.close', function(e, dialogue) {
 			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
-				data['pos-action'] = '';
-
-				resizeDashboardGrid($obj, data);
 				resetNewWidgetPlaceholderState(data);
 			}
 		});
@@ -2872,7 +2873,7 @@
 					return;
 				}
 
-				if (data['pos-action'] !== 'add' && !$target.is($obj)
+				if (data['pos-action'] !== 'add' && data['pos-action'] !== 'addmodal' && !$target.is($obj)
 						&& !$target.is(data.new_widget_placeholder.getObject())
 						&& !data.new_widget_placeholder.getObject().has($target).length) {
 					data.add_widget_dimension = {};
@@ -3797,6 +3798,8 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['pos-action'] = 'paste';
+
 				hideMessageExhausted(data);
 
 				var new_widget = getCopiedWidget(data);
@@ -3899,6 +3902,10 @@
 						deleteWidget($this, data, new_widget);
 					})
 					.always(function() {
+						// Mark dashboard as updated.
+						data['options']['updated'] = true;
+						data['pos-action'] = '';
+
 						clearDashboardBusy(data, 'pasteWidget', dashboard_busy_item);
 					});
 			});
@@ -4254,6 +4261,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
+				data['pos-action'] = 'addmodal';
 				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},

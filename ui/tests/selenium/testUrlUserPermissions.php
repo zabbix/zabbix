@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -388,7 +388,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'items.php',
+				'url' => 'items.php?context=host',
 				'title' =>	'Configuration of items',
 				'header' => 'Items',
 				'users' => [
@@ -398,7 +398,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'triggers.php',
+				'url' => 'triggers.php?context=host',
 				'title' =>	'Configuration of triggers',
 				'header' => 'Triggers',
 				'users' => [
@@ -408,7 +408,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'graphs.php',
+				'url' => 'graphs.php?context=host',
 				'title' =>	'Configuration of graphs',
 				'header' => 'Graphs',
 				'users' => [
@@ -418,7 +418,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'host_discovery.php?hostid=10084',
+				'url' => 'host_discovery.php?context=host&hostid=10084',
 				'title' =>	'Configuration of discovery rules',
 				'no_permissions_to_object' => true,
 				'users' => [
@@ -428,7 +428,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'httpconf.php',
+				'url' => 'httpconf.php?context=host',
 				'title' =>	'Configuration of web monitoring',
 				'header' => 'Web monitoring',
 				'users' => [
@@ -517,7 +517,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'discoveryconf.php',
+				'url' => 'zabbix.php?action=discovery.list',
 				'title' =>	'Configuration of discovery rules',
 				'header' => 'Discovery rules',
 				'users' => [

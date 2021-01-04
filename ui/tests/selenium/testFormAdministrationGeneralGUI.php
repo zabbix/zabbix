@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -404,7 +404,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' =>  [
 						'Max history display period' => '0s',
 						'Time filter default period' => '0s',
-						'Max period' => '0s'
+						'Max period for time selector' => '0s'
 					],
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800.',
@@ -448,7 +448,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Working time' => 'text',
 						'Max history display period' => 'text',
 						'Time filter default period' => 'text',
-						'Max period' => 'text'
+						'Max period for time selector' => 'text'
 					],
 					'details' => [
 						'Incorrect value for field "search_limit": value must be no less than "1".',
@@ -472,7 +472,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Working time' => '!@#$%^&*()_+',
 						'Max history display period' => '!@#$%^&*()_+',
 						'Time filter default period' => '!@#$%^&*()_+',
-						'Max period' => '!@#$%^&*()_+'
+						'Max period for time selector' => '!@#$%^&*()_+'
 					],
 					'details' => [
 						'Incorrect value for field "search_limit": value must be no less than "1".',
@@ -870,7 +870,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Working time' => '-1',
 						'Max history display period' => '-1',
 						'Time filter default period' => '-1',
-						'Max period' => '-1'
+						'Max period for time selector' => '-1'
 					],
 					'details' => [
 						'Incorrect value for field "search_limit": value must be no less than "1".',
@@ -964,7 +964,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			[
 				[
 					'field' =>  [
-						'Max period' => '1y'
+						'Max period for time selector' => '1y'
 					],
 					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2'
 				]
@@ -1009,7 +1009,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				$this->assertEquals('now-5h', $this->query('id:from')->one()->getValue());
 				break;
 
-			case 'Max period':
+			case 'Max period for time selector':
 				$this->query('id:from')->one()->fill('now-5y');
 				$this->query('button:Apply')->one()->click();
 				$this->assertEquals('Maximum time period to display is 366 days.',

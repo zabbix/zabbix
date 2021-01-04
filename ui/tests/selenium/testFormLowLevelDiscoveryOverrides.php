@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -632,7 +632,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	private function overridesCreate($data) {
-		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?form=create&context=host&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$key = 'lld_override'.time();
 		$form->fill([
@@ -1545,7 +1545,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::UPDATED_ID);
+		$this->page->login()->open('host_discovery.php?form=update&context=host&itemid='.self::UPDATED_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$form->invalidate();
@@ -1947,7 +1947,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 
 		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$created_id);
+		$this->page->login()->open('host_discovery.php?form=update&context=host&itemid='.self::$created_id);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$override_container = $form->getField('Overrides')->asTable();

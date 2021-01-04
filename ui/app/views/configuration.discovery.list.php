@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,18 +23,24 @@
  * @var CView $this
  */
 
+if ($data['uncheck']) {
+	uncheckTableRows('discovery');
+}
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(new CSubmit('form', _('Create discovery rule')))
+				->addItem(new CRedirectButton(_('Create discovery rule'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'discovery.edit'))
+				)
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter(new CUrl('discoveryconf.php')))
+	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'discovery.list')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -51,6 +57,7 @@ $widget = (new CWidget())
 					->setModern(true)
 			)
 		])
+		->addVar('action', 'discovery.list')
 	);
 
 // create form
@@ -60,9 +67,12 @@ $discoveryForm = (new CForm())->setName('druleForm');
 $discoveryTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
+			(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'druleids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'discoveryconf.php'),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'discovery.list')
+			->getUrl()
+		),
 		_('IP range'),
 		_('Proxy'),
 		_('Interval'),
@@ -74,8 +84,13 @@ foreach ($data['drules'] as $drule) {
 	$status = new CCol(
 		(new CLink(
 			discovery_status2str($drule['status']),
-			'?g_druleid[]='.$drule['druleid'].
-			'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable')
+			(new CUrl('zabbix.php'))
+				->setArgument('druleids', (array) $drule['druleid'])
+				->setArgument('action', $drule['status'] == DRULE_STATUS_ACTIVE
+					? 'discovery.disable'
+					: 'discovery.enable'
+				)
+				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(discovery_status2style($drule['status']))
@@ -83,8 +98,11 @@ foreach ($data['drules'] as $drule) {
 	);
 
 	$discoveryTable->addRow([
-		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
-		new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']),
+		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
+		new CLink($drule['name'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'discovery.edit')
+			->setArgument('druleid', $drule['druleid'])
+		),
 		$drule['iprange'],
 		$drule['proxy'],
 		$drule['delay'],
@@ -97,11 +115,11 @@ foreach ($data['drules'] as $drule) {
 $discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'g_druleid', [
-		'drule.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')],
-		'drule.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')],
-		'drule.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?')]
-	])
+	new CActionButtonList('action', 'druleids', [
+		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?')],
+		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?')],
+		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?')]
+	], 'discovery')
 ]);
 
 // append form to widget
