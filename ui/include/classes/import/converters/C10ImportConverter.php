@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -425,7 +425,7 @@ class C10ImportConverter extends CConverter {
 			'poc_1_phone_2' => 'poc_1_phone_b',
 			'poc_2_phone_1' => 'poc_2_phone_a',
 			'poc_2_phone_2' => 'poc_2_phone_b',
-			'device_notes' => 'notes',
+			'device_notes' => 'notes'
 		];
 
 		return array_key_exists($key, $map) ? $map[$key] : $key;

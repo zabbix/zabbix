@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,15 @@ $widget = (new CWidget())->setTitle(_('Items'));
 $host = $data['host'];
 
 if (!empty($data['hostid'])) {
-	$widget->addItem(get_header_host_table('items', $data['hostid']));
+	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 
+$url = (new CUrl('items.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Create form.
-$form = (new CForm())
+$form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -64,6 +68,7 @@ if ($discovered_item) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['item']['discoveryRule']['itemid'])
 			->setArgument('itemid', $data['item']['itemDiscovery']['parent_itemid'])
+			->setArgument('context', 'host')
 	));
 }
 
@@ -76,17 +81,14 @@ $form_list->addRow(
 );
 
 // Append type to form list.
-if ($readonly) {
-	$form->addVar('type', $data['type']);
-	$form_list->addRow((new CLabel(_('Type'), 'type_name')),
-		(new CTextBox('type_name', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow((new CLabel(_('Type'), 'type')),
-		(new CComboBox('type', $data['type'], null, $data['types']))
-	);
-}
+$form_list->addRow((new CLabel(_('Type'), 'label-type')),
+	(new CSelect('type'))
+		->setId('type')
+		->setFocusableElementId('label-type')
+		->setValue($data['type'])
+		->addOptions(CSelect::createOptionsFromArray($data['types']))
+		->setReadonly($readonly)
+);
 
 // Append key to form list.
 $key_controls = [(new CTextBox('key', $data['key'], $readonly, DB::getFieldLength('items', 'key_')))
@@ -105,7 +107,7 @@ if (!$readonly) {
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
 			]).
-				',{itemtype: jQuery("#type option:selected").val()}), null, this);'
+				',{itemtype: jQuery("#type").val()}), null, this);'
 		);
 }
 
@@ -276,16 +278,18 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
 	->addRow(
-		new CLabel(_('Request type'), 'request_method'),
-		[
-			$readonly ? new CVar('request_method', $data['request_method']) : null,
-			(new CComboBox($readonly ? '' : 'request_method', $data['request_method'], null, [
+		new CLabel(_('Request type'), 'label-request-method'),
+		(new CSelect('request_method'))
+			->setId('request_method')
+			->setFocusableElementId('label-request-method')
+			->setValue($data['request_method'])
+			->addOptions(CSelect::createOptionsFromArray([
 				HTTPCHECK_REQUEST_GET => 'GET',
 				HTTPCHECK_REQUEST_POST => 'POST',
 				HTTPCHECK_REQUEST_PUT => 'PUT',
 				HTTPCHECK_REQUEST_HEAD => 'HEAD'
-			]))->setEnabled(!$readonly)
-		],
+			]))
+			->setReadonly($readonly),
 		'request_method_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
@@ -407,31 +411,35 @@ $form_list
 		new CLabel(_('HTTP proxy'), 'http_proxy'),
 		(new CTextBox('http_proxy', $data['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
+			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->disableAutocomplete(),
 		'http_proxy_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
 	->addRow(
-		new CLabel(_('HTTP authentication'), 'http_authtype'),
-		[
-			$readonly ? new CVar('http_authtype', $data['http_authtype']) : null,
-			(new CComboBox($readonly ? '' : 'http_authtype', $data['http_authtype'], null, httptest_authentications()))
-				->setEnabled(!$readonly)
-		],
+		new CLabel(_('HTTP authentication'), 'label-http-authtype'),
+		(new CSelect('http_authtype'))
+			->setId('http_authtype')
+			->setFocusableElementId('label-http-authtype')
+			->setValue($data['http_authtype'])
+			->addOptions(CSelect::createOptionsFromArray(httptest_authentications()))
+			->setReadonly($readonly),
 		'http_authtype_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT User name to form list.
 	->addRow(
 		new CLabel(_('User name'), 'http_username'),
 		(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_username_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Password to form list.
 	->addRow(
 		new CLabel(_('Password'), 'http_password'),
 		(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'http_password_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
@@ -469,7 +477,9 @@ $form_list
 		new CLabel(_('SSL key password'), 'ssl_key_password'),
 		(new CTextBox('ssl_key_password', $data['ssl_key_password'], $readonly,
 			DB::getFieldLength('items', 'ssl_key_password')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableAutocomplete(),
 		'ssl_key_password_row'
 	)
 	// Append master item select to form list.
@@ -565,21 +575,19 @@ $form_list
 	'row_ipmi_sensor'
 );
 
-// Append authentication method to form list.
-$auth_types = [
-	ITEM_AUTHTYPE_PASSWORD => _('Password'),
-	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-];
-if ($discovered_item) {
-	$form->addVar('authtype', $data['authtype']);
-	$authTypeComboBox = new CTextBox('authtype_name', $auth_types[$data['authtype']], true);
-}
-else {
-	$authTypeComboBox = new CComboBox('authtype', $data['authtype'], null, $auth_types);
-}
-
 $form_list
-	->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype')
+	->addRow(new CLabel(_('Authentication method'), 'label-authtype'),
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue($data['authtype'])
+			->setFocusableElementId('label-authtype')
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
+			->setReadonly($discovered_item),
+		'row_authtype'
+	)
 	->addRow((new CLabel(_('JMX endpoint'), 'jmx_endpoint'))->setAsteriskMark(),
 		(new CTextBox('jmx_endpoint', $data['jmx_endpoint'], $discovered_item, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -587,7 +595,9 @@ $form_list
 		'row_jmx_endpoint'
 	)
 	->addRow(_('User name'),
-		(new CTextBox('username', $data['username'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('username', $data['username'], $discovered_item, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_username'
 	)
 	->addRow(
@@ -605,7 +615,9 @@ $form_list
 		'row_privatekey'
 	)
 	->addRow(_('Password'),
-		(new CTextBox('password', $data['password'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('password', $data['password'], $discovered_item, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->disableAutocomplete(),
 		'row_password'
 	)
 	->addRow(
@@ -636,27 +648,21 @@ $form_list
 		'label_formula'
 	);
 
-// Append value type to form list.
-if ($readonly) {
-	$form->addVar('value_type', $data['value_type']);
-	$form_list->addRow(new CLabel(_('Type of information'), 'value_type_name'),
-		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow(new CLabel(_('Type of information'), 'value_type'),
-		(new CComboBox('value_type', $data['value_type'], null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))
-	);
-}
-
 $form_list
+	->addRow(new CLabel(_('Type of information'), 'label-value-type'),
+		(new CSelect('value_type'))
+			->setFocusableElementId('label-value-type')
+			->setId('value_type')
+			->setValue($data['value_type'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
+			->setReadonly($readonly)
+	)
 	->addRow(_('Units'),
 		(new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_units'
@@ -810,24 +816,32 @@ $form_list
 		'row_logtimefmt'
 	);
 
-// Append valuemap to form list.
 if ($readonly) {
-	$form->addVar('valuemapid', $data['valuemapid']);
-	$valuemapComboBox = (new CTextBox('valuemap_name',
-		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
-		true
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	if ($data['valuemaps']) {
+		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
+	}
+	else {
+		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
+	}
 }
 else {
-	$valuemapComboBox = new CComboBox('valuemapid', $data['valuemapid']);
-	$valuemapComboBox->addItem(0, _('As is'));
-	foreach ($data['valuemaps'] as $valuemap) {
-		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
-	}
+	$valuemaps = $data['valuemaps'];
+	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
+}
+
+$valuemap_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->setFocusableElementId('label-valuemap')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setReadonly($readonly);
+
+foreach ($valuemaps as $valuemap) {
+	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
+	$valuemap_select = [$valuemap_select, '&nbsp;',
 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
 			->getUrl()
@@ -836,7 +850,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 }
 
 $form_list
-	->addRow(_('Show value'), $valuemapComboBox, 'row_valuemap')
+	->addRow(new CLabel(_('Show value'), 'label-valuemap'), $valuemap_select, 'row_valuemap')
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[
@@ -864,33 +878,35 @@ if ($discovered_item) {
 		}
 	}
 
-	$applicationComboBox = new CListBox('applications_names[]', $data['applications'], 6);
+	$application_list_box = new CListBox('applications_names[]', $data['applications'], 6);
 	foreach ($data['db_applications'] as $application) {
-		$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
+		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
 	}
-	$applicationComboBox->setEnabled(!$discovered_item);
+	$application_list_box->setEnabled(!$discovered_item);
 }
 else {
 	$form_list->addRow(new CLabel(_('New application'), 'new_application'), (new CSpan(
 		(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	))->addClass(ZBX_STYLE_FORM_NEW_GROUP));
 
-	$applicationComboBox = new CListBox('applications[]', $data['applications'], 6);
-	$applicationComboBox->addItem(0, '-'._('None').'-');
+	$application_list_box = new CListBox('applications[]', $data['applications'], 6);
+	$application_list_box->addItem(0, '-'._('None').'-');
 	foreach ($data['db_applications'] as $application) {
-		$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
+		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
 	}
 }
 
-$form_list->addRow(_('Applications'), $applicationComboBox);
+$form_list->addRow(_('Applications'), $application_list_box);
 
 // Append populate host to form list.
 if ($discovered_item) {
 	$form->addVar('inventory_link', 0);
 }
 else {
-	$hostInventoryFieldComboBox = new CComboBox('inventory_link');
-	$hostInventoryFieldComboBox->addItem(0, '-'._('None').'-', $data['inventory_link'] == '0' ? 'yes' : null);
+	$host_inventory_select = (new CSelect('inventory_link'))
+		->setFocusableElementId('label-host-inventory')
+		->setValue($data['inventory_link'])
+		->addOption(new CSelectOption(0, '-'._('None').'-'));
 
 	// A list of available host inventory fields.
 	foreach ($data['possibleHostInventories'] as $fieldNo => $fieldInfo) {
@@ -902,15 +918,16 @@ else {
 		else {
 			$enabled = true;
 		}
-		$hostInventoryFieldComboBox->addItem(
-			$fieldNo,
-			$fieldInfo['title'],
-			$data['inventory_link'] == $fieldNo && $enabled ? 'yes' : null,
-			$enabled
-		);
+
+		$host_inventory_select->addOption((new CSelectOption($fieldNo, $fieldInfo['title']))->setDisabled(!$enabled));
+		if ($data['inventory_link'] == $fieldNo && !$enabled) {
+			$host_inventory_select->setValue(0);
+		}
 	}
 
-	$form_list->addRow(_('Populates host inventory field'), $hostInventoryFieldComboBox, 'row_inventory_link');
+	$form_list->addRow(new CLabel(_('Populates host inventory field'), $host_inventory_select->getFocusableElementId()),
+		$host_inventory_select, 'row_inventory_link'
+	);
 }
 
 // Append description to form list.
@@ -965,16 +982,16 @@ if ($data['itemid'] != 0) {
 			);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid'])))
+	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']), 'context'))
 		->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel(url_param('hostid'));
+	$buttons[] = new CButtonCancel(url_params(['hostid', 'context']));
 
 	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['hostid', 'context']))]
 	));
 }
 

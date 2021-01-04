@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,10 @@ function submitPopup(overlay) {
 			form.querySelector('#import_file').value = '';
 		}
 		else {
-			postMessageOk(response['message']);
+			postMessageOk(response['title']);
+			if ('messages' in response) {
+				postMessageDetails('success', response.messages);
+			}
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location.href;
 		}

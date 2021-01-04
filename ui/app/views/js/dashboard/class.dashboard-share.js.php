@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@
 <?= (new CRow([
 	new CCol([
 		(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
-		'#{name}',
+		'#{name}'
 	]),
 	new CCol(
 		(new CRadioButtonList('users[#{id}][permission]', PERM_READ))

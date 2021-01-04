@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -466,6 +466,20 @@ class ZBase {
 		if (CCookieHelper::has('system-message-error')) {
 			CMessageHelper::setErrorTitle(CCookieHelper::get('system-message-error'));
 			CCookieHelper::unset('system-message-error');
+		}
+		if (CCookieHelper::has('system-message-details')) {
+			$details = json_decode(base64_decode(CCookieHelper::get('system-message-details')), true);
+			if ($details['type'] === 'success') {
+				foreach ($details['messages'] as $message) {
+					CMessageHelper::addSuccess($message);
+				}
+			}
+			else {
+				foreach ($details['messages'] as $message) {
+					CMessageHelper::addError($message);
+				}
+			}
+			CCookieHelper::unset('system-message-details');
 		}
 	}
 

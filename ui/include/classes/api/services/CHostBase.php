@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -221,14 +221,14 @@ abstract class CHostBase extends CApiService {
 			$hosts = API::Host()->get([
 				'hostids' => $targetids,
 				'output' => ['hostid', 'host'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 		}
 		else{
 			$hosts = API::Host()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 		}
 
@@ -236,7 +236,7 @@ abstract class CHostBase extends CApiService {
 			$templates = API::Template()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
-				'nopermissions' => true,
+				'nopermissions' => true
 			]);
 
 			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));

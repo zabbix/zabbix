@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -495,70 +495,70 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_sysUptime',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '1234567890',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'a?aa+',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '}aa]a{',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '-aaa=%',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa,;:',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa><.',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa*&_',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa#@!',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '([)$^',
-					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0'
 				]
 			],
 			[
@@ -570,7 +570,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'http://www.zabbix.com',
 					'severity' => 'High',
-					'status' => false,
+					'status' => false
 				]
 			],
 			[
@@ -578,7 +578,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_CheckUrl',
 					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<5',
-					'url' => 'index.php',
+					'url' => 'index.php'
 				]
 			],
 			[
@@ -674,7 +674,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'constructor' => [[
 						'errors' => [
 							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:item-prototype-reuse.last(0)}".'],
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:item-prototype-reuse.last(0)}".']
 						]
 					]
 				]
@@ -687,7 +687,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'constructor' => [[
 						'errors' => [
 							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'],
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".']
 						]
 					]
 				]
@@ -700,7 +700,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'constructor' => [[
 						'errors' => [
 							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'],
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".']
 						]
 					]
 				]
@@ -713,7 +713,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'constructor' => [[
 						'errors' => [
 							'Expression syntax error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:item-prototype-reuse.lastA(0)}".'],
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:item-prototype-reuse.lastA(0)}".']
 						]
 					]
 				]

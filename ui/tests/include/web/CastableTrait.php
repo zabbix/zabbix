@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -274,5 +274,27 @@ trait CastableTrait {
 	 */
 	public function asInputGroup($options = []) {
 		return $this->cast(CInputGroupElement::class, $options);
+	}
+
+	/**
+	 * Cast object to Interface element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CHostInterfaceElement
+	 */
+	public function asHostInterfaceElement($options = []) {
+		return $this->cast(CHostInterfaceElement::class, $options);
+	}
+
+	/**
+	 * Cast object to FilterTab element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFilterTabElement
+	 */
+	public function asFilterTab($options = []) {
+		return $this->cast(CFilterTabElement::class, $options);
 	}
 }

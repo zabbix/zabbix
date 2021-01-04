@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
-	public $userRole = 'Super Admin role';
+	public $userRole = 'Super admin role';
 
 	public static function allUsers() {
 		return CDBHelper::getDataProvider('select * from users');

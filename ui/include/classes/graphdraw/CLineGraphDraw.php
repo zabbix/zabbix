@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -730,7 +730,7 @@ class CLineGraphDraw extends CGraphDraw {
 				[
 					$this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
+					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
 				],
 				3,
 				$this->getColor('White')
@@ -773,7 +773,7 @@ class CLineGraphDraw extends CGraphDraw {
 				[
 					$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 					$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
+					$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
 				],
 				3,
 				$this->getColor('White')

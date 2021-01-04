@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,7 +213,7 @@ class testFormGraph extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Graphs']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Graphs"]');
 
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
@@ -287,10 +287,10 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//select[@id='graphtype']", 'disabled');
+			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'disabled');
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath("//select[@id='graphtype'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='graphtype'][@disabled]");
 		}
 
 		if (isset($data['graphtype'])) {
@@ -402,10 +402,10 @@ class testFormGraph extends CLegacyWebTest {
 			]);
 
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//select[@id='ymin_type']", 'disabled');
+				$this->zbxTestAssertAttribute("//z-select[@id='ymin_type']", 'disabled');
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='ymin_type'][@disabled]");
+				$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='ymin_type'][@disabled]");
 			}
 
 			if (!isset($data['form'])) {
@@ -427,10 +427,10 @@ class testFormGraph extends CLegacyWebTest {
 			]);
 
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//select[@id='ymax_type']", 'disabled');
+				$this->zbxTestAssertAttribute("//z-select[@id='ymax_type']", 'disabled');
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='ymax_type'][@disabled]");
+				$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='ymax_type'][@disabled]");
 			}
 
 			if (!isset($data['form'])) {
@@ -600,7 +600,7 @@ class testFormGraph extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001&context=host');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
@@ -847,7 +847,7 @@ class testFormGraph extends CLegacyWebTest {
 	 */
 	public function testFormGraph_SimpleCreate($data) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
+		$this->zbxTestLogin('graphs.php?hostid=40001&context=host&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {

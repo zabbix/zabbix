@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ if ($data['hostid'] != 0) {
 			$host_table_element = '';
 	}
 
-	$widget->addItem(get_header_host_table($host_table_element, $data['hostid']));
+	$widget->setNavigation(getHostNavigation($host_table_element, $data['hostid']));
 }
 
 // create form
-$form = (new CForm())
+$form = (new CForm('post', (new CUrl())->getUrl()))
 	->setName('elements_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
@@ -75,7 +75,7 @@ $tab_view = (new CTabView())->addTab('elements_tab', '', $form_list);
 // append buttons to form
 $tab_view->setFooter(makeFormFooter(
 	new CSubmit('copy', _('Copy')),
-	[new CButtonCancel(url_param('hostid'))]
+	[new CButtonCancel(url_params(['hostid', 'context']))]
 ));
 
 $form->addItem($tab_view);

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,15 +158,23 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				? (new CMenuItem(_('Templates')))
 					->setUrl(new CUrl('templates.php'), 'templates.php')
-					->setAliases(['template.dashboard.list', 'template.dashboard.edit'])
+					->setAliases([
+						'template.dashboard.list', 'template.dashboard.edit', 'items.php?context=template',
+						'triggers.php?context=template', 'graphs.php?context=template',
+						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
+						'trigger_prototypes.php?context=template', 'host_prototypes.php?context=template',
+						'httpconf.php?context=template', 'conf.import.php?rules_preset=template'
+					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
 					->setUrl(new CUrl('hosts.php'), 'hosts.php')
 					->setAliases([
-						'items.php', 'triggers.php', 'graphs.php', 'application.list', 'application.edit',
-						'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
-						'host_prototypes.php', 'httpconf.php'
+						'application.list', 'application.edit', 'items.php?context=host', 'triggers.php?context=host',
+						'graphs.php?context=host', 'host_discovery.php?context=host',
+						'disc_prototypes.php?context=host', 'trigger_prototypes.php?context=host',
+						'host_prototypes.php?context=host', 'httpconf.php?context=host',
+						'conf.import.php?rules_preset=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
@@ -198,10 +206,14 @@ class CMenuHelper {
 					]))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
-				? (new CMenuItem(_('Event correlation')))->setUrl(new CUrl('correlation.php'), 'correlation.php')
+				? (new CMenuItem(_('Event correlation')))
+					->setAction('correlation.list')
+					->setAliases(['correlation.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)
-				? (new CMenuItem(_('Discovery')))->setUrl(new CUrl('discoveryconf.php'), 'discoveryconf.php')
+				? (new CMenuItem(_('Discovery')))
+					->setAction('discovery.list')
+					->setAliases(['discovery.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICES)
 				? (new CMenuItem(_('Services')))->setUrl(new CUrl('services.php'), 'services.php')
@@ -293,21 +305,9 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
 				? (new CMenuItem(_('Queue')))
 					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Queue overview')))
-							->setUrl(
-								(new CUrl('queue.php'))->setArgument('config', QUEUE_OVERVIEW),
-								'queue.php?config='.QUEUE_OVERVIEW
-							),
-						(new CMenuItem(_('Queue overview by proxy')))
-							->setUrl(
-								(new CUrl('queue.php'))->setArgument('config', QUEUE_OVERVIEW_BY_PROXY),
-								'queue.php?config='.QUEUE_OVERVIEW_BY_PROXY
-							),
-						(new CMenuItem(_('Queue details')))
-							->setUrl(
-								(new CUrl('queue.php'))->setArgument('config', QUEUE_DETAILS),
-								'queue.php?config='.QUEUE_DETAILS
-							)
+						(new CMenuItem(_('Queue overview')))->setAction('queue.overview'),
+						(new CMenuItem(_('Queue overview by proxy')))->setAction('queue.overview.proxy'),
+						(new CMenuItem(_('Queue details')))->setAction('queue.details')
 					]))
 				: null
 		];

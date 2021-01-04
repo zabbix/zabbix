@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,13 @@ class CTableRowElement extends CElement {
 	public $parent;
 
 	/**
+	 * Table column selector.
+	 *
+	 * @var string
+	 */
+	protected $column_selector = 'xpath:./td';
+
+	/**
 	 * @inheritdoc
 	 */
 	public function normalize() {
@@ -51,7 +58,7 @@ class CTableRowElement extends CElement {
 		$headers = $this->parent->getHeadersText();
 		$columns = [];
 
-		foreach ($this->query('xpath:./td')->all() as $i => $column) {
+		foreach ($this->query($this->column_selector)->all() as $i => $column) {
 			$columns[CTestArrayHelper::get($headers, $i, $i)] = $column;
 		}
 
@@ -77,7 +84,7 @@ class CTableRowElement extends CElement {
 			$column = $index;
 		}
 
-		return $this->query('xpath:./td['.((int)$column + 1).']')->one();
+		return $this->query('xpath:./'.CXPathHelper::fromSelector($this->column_selector).'['.((int)$column + 1).']')->one();
 	}
 
 	/**

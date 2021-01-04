@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ import (
 
 func TestOSDDiscoveryHandler(t *testing.T) {
 	out := []osdEntity{
-		{"2", "default"},
-		{"1", "default"},
-		{"0", "newbucket"},
+		{"0", "hdd", "newbucket-host"},
+		{"1", "hdd", "node2"},
+		{"2", "hdd", "node3"},
 	}
 
 	success, err := json.Marshal(out)
@@ -49,8 +49,7 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 		{
 			"Must return correct LLD rules for OSDs",
 			args{map[command][]byte{
-				cmdOSDCrushRuleDump: fixtures[cmdOSDCrushRuleDump],
-				cmdOSDCrushTree:     fixtures[cmdOSDCrushTree],
+				cmdOSDCrushTree: fixtures[cmdOSDCrushTree],
 			}},
 			string(success),
 			false,
@@ -58,15 +57,8 @@ func TestOSDDiscoveryHandler(t *testing.T) {
 		{
 			"Must fail on malformed input",
 			args{map[command][]byte{
-				cmdOSDCrushRuleDump: {1, 2, 3, 4, 5},
-				cmdOSDCrushTree:     fixtures[cmdOSDCrushTree],
+				cmdOSDCrushTree: {1, 2, 3, 4, 5},
 			}},
-			nil,
-			true,
-		},
-		{
-			"Must fail if one of necessary commands is absent",
-			args{map[command][]byte{cmdOSDCrushRuleDump: fixtures[cmdBroken]}},
 			nil,
 			true,
 		},

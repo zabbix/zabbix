@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,19 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 * @var bool
 	 */
 	protected $allow_empty_password;
+
+
+	/**
+	 * @var array
+	 */
+	protected $timezones;
+
+	protected function init() {
+		parent::init();
+
+		$this->timezones = array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones());
+		$this->timezones[] = TIMEZONE_DEFAULT;
+	}
 
 	/**
 	 * Get groups gui access.

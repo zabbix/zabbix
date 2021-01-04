@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		$rules = [
 			CRoleHelper::UI_DEFAULT_ACCESS => $this->getInput('ui_default_access'),
 			CRoleHelper::ACTIONS_DEFAULT_ACCESS => $this->getInput('actions_default_access'),
-			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access'),
+			CRoleHelper::MODULES_DEFAULT_ACCESS => $this->getInput('modules_default_access')
 		];
 
 		$rules += $this->getUiSectionRules($user_type);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -448,7 +448,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => '+371 74661x'
 					],
-					'role' => 'Super Admin role',
+					'role' => 'Super admin role',
 					'expected_message' => 'User added'
 				]
 			],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,6 +124,22 @@ class CProxy extends CApiService {
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
+		}
+
+		/*
+		 * Cleaning the output from write-only properties.
+		 */
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
+				['tls_psk_identity', 'tls_psk']
+			);
+		}
+		/*
+		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
+		* Specify write-only fields in output only if they will not appear in debug mode.
+		*/
+		elseif (is_array($options['output']) && APP::getMode() === APP::EXEC_MODE_API) {
+			$options['output'] = array_diff($options['output'], ['tls_psk_identity', 'tls_psk']);
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -276,12 +292,23 @@ class CProxy extends CApiService {
 
 		$db_proxies = $this->get([
 			'output' => ['proxyid', 'hostid', 'host', 'status', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject', 'tls_psk_identity', 'tls_psk'
+				'tls_subject'
 			],
 			'proxyids' => $proxyids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		// Load existing values of PSK fields of proxies independently from APP mode.
+		$proxies_psk_fields = DB::select($this->tableName(), [
+			'output' => ['tls_psk_identity', 'tls_psk'],
+			'hostids' => array_keys($db_proxies),
+			'preservekeys' => true
+		]);
+
+		foreach ($proxies_psk_fields as $hostid => $psk_fields) {
+			$db_proxies[$hostid] += $psk_fields;
+		}
 
 		$this->validateUpdate($proxies, $db_proxies);
 

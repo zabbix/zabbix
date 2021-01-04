@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -676,55 +676,47 @@ function replace_template_dependencies($deps, $hostid) {
 }
 
 /**
+ * Prepare arrays containing only hosts and triggers that will be shown results table.
+ *
  * @param array $db_hosts
  * @param array $db_triggers
- * @param int   $limit
  *
  * @return array
  */
-function getTriggersOverviewTableData(array $db_hosts, array $db_triggers, int $limit): array {
+function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): array {
+	// Prepare triggers to show in results table.
 	$triggers_by_name = [];
-	$hosts_by_name = [];
-	$exceeded_hosts = false;
-	$exceeded_trigs = false;
-
 	foreach ($db_triggers as $trigger) {
-		$trigger_name = $trigger['description'];
-		$triggerid = $trigger['triggerid'];
-
-		CArrayHelper::sort($trigger['hosts'], ['name']);
-
 		foreach ($trigger['hosts'] as $host) {
-			$host_name = $host['name'];
-			$hostid = $host['hostid'];
-
-			if (!array_key_exists($hostid, $db_hosts)) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
 				continue;
 			}
 
-			if (!array_key_exists($trigger_name, $triggers_by_name)) {
-				$triggers_by_name[$trigger_name] = [];
-			}
-
-			if (!array_key_exists($host_name, $hosts_by_name)) {
-				$hosts_by_name[$host_name] = [];
-			}
-
-			$triggers_by_name[$trigger_name][$hostid] = $triggerid;
-			$hosts_by_name[$host_name] = $hostid;
-
-			$exceeded_trigs = (count($triggers_by_name) > $limit);
-			$exceeded_hosts = (count($hosts_by_name) > $limit);
-
-			if ($exceeded_hosts || $exceeded_trigs) {
-				$hosts_by_name = array_slice($hosts_by_name, 0, $limit, true);
-				$triggers_by_name = array_slice($triggers_by_name, 0, $limit, true);
-				break 2;
-			}
+			$triggers_by_name[$trigger['description']][$host['hostid']] = $trigger['triggerid'];
 		}
 	}
 
-	return [$triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs];
+	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+	$exceeded_trigs = (count($triggers_by_name) > $limit);
+	$triggers_by_name = array_slice($triggers_by_name, 0, $limit);
+	foreach ($triggers_by_name as $name => $triggers) {
+		$triggers_by_name[$name] = array_slice($triggers, 0, $limit, true);
+	}
+
+	// Prepare hosts to show in results table.
+	$exceeded_hosts = false;
+	$hosts_by_name = [];
+	foreach ($db_hosts as $host) {
+		if (count($hosts_by_name) >= $limit) {
+			$exceeded_hosts = true;
+			break;
+		}
+		else {
+			$hosts_by_name[$host['name']] = $host['hostid'];
+		}
+	}
+
+	return [$triggers_by_name, $hosts_by_name, ($exceeded_hosts || $exceeded_trigs)];
 }
 
 /**
@@ -742,95 +734,78 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers, int $
 function getTriggersOverviewData(array $groupids, string $application, array $host_options = [],
 		array $trigger_options = [], array $problem_options = []): array {
 
-	$exhausted_hosts = false;
-	$exhausted_triggers = false;
-	$exceeded_hosts = false;
-	$exceeded_trigs = false;
-
 	$host_options = [
 		'output' => ['hostid', 'name'],
 		'groupids' => $groupids ? $groupids : null,
-		'sortfield' => 'name',
-		'sortorder' => ZBX_SORT_UP,
+		'with_monitored_triggers' => true,
 		'preservekeys' => true
 	] + $host_options;
 
 	$trigger_options = [
-		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments'],
+		'output' => ['triggerid', 'expression', 'description', 'value', 'priority', 'lastchange', 'flags', 'comments',
+			'manual_close'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectDependencies' => ['triggerid'],
-		'monitored' => true,
-		'sortfield' => 'description',
-		'sortorder' => ZBX_SORT_UP,
-		'preservekeys' => true
+		'monitored' => true
 	] + $trigger_options;
 
 	$problem_options += [
-		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
-		'time_from' => null
+		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE
 	];
-
-	$db_triggers = [];
-	$db_hosts = [];
-	$applicationids = [];
-	$dependencies = [];
-
-	$triggers_by_name = [];
-	$hosts_by_name = [];
 
 	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-	$axis_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 
 	do {
-		if (!$exhausted_hosts) {
-			$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
-			$exhausted_hosts = (count($db_hosts) < $limit);
+		$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
+		$fetch_hosts = (count($db_hosts) > $limit);
 
-			if ($application !== '') {
-				$applications = API::Application()->get([
-					'output' => [],
-					'hostids' => array_keys($db_hosts),
-					'search' => ['name' => $application],
-					'preservekeys' => true
-				]);
-				$applicationids = array_keys($applications);
-			}
-		}
-
-		if (!$exhausted_triggers) {
-			$db_triggers = getTriggersWithActualSeverity([
-				'applicationids' => ($application !== '') ? $applicationids : null,
+		$applicationids = ($application !== '')
+			? array_keys(API::Application()->get([
+				'output' => [],
 				'hostids' => array_keys($db_hosts),
-				'limit' => $limit + 1
-			]+ $trigger_options, $problem_options);
+				'search' => ['name' => $application],
+				'preservekeys' => true
+			]))
+			: null;
 
-			$db_triggers = CMacrosResolverHelper::resolveTriggerNames($db_triggers, true);
+		$db_triggers = getTriggersWithActualSeverity([
+			'applicationids' => $applicationids,
+			'hostids' => array_keys($db_hosts)
+		] + $trigger_options, $problem_options);
 
-			if ($db_triggers) {
-				$dependencies = getTriggerDependencies($db_triggers);
-			}
-
-			$exhausted_triggers = (count($db_triggers) < $limit);
+		if (!$db_triggers) {
+			$db_hosts = [];
 		}
 
-		CArrayHelper::sort($db_triggers, ['description']);
-
-		list($triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs) = getTriggersOverviewTableData(
-			$db_hosts, $db_triggers, $axis_limit
-		);
-
-		if ($exceeded_hosts || $exceeded_trigs) {
-			break;
+		// Unset hosts without having matching triggers.
+		$represented_hosts = [];
+		foreach ($db_triggers as $trigger) {
+			$hostids = array_column($trigger['hosts'], 'hostid');
+			$represented_hosts += array_combine($hostids, $hostids);
 		}
 
-		$limit += $limit;
-	} while (!($exhausted_triggers && $exhausted_hosts));
+		$db_hosts = array_intersect_key($db_hosts, $represented_hosts);
 
-	CArrayHelper::sort($db_hosts, ['name']);
+		$fetch_hosts &= (count($db_hosts) < $limit);
+		$limit += (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 
-	return [$db_hosts, $db_triggers, $dependencies, $triggers_by_name, $hosts_by_name, $exceeded_hosts, $exceeded_trigs
-	];
+	} while ($fetch_hosts);
+
+	CArrayHelper::sort($db_hosts, [
+		['field' => 'name', 'order' => ZBX_SORT_UP]
+	]);
+
+	$db_triggers = CMacrosResolverHelper::resolveTriggerNames($db_triggers, true);
+	$dependencies = $db_triggers ? getTriggerDependencies($db_triggers) : [];
+
+	CArrayHelper::sort($db_triggers, [
+		['field' => 'description', 'order' => ZBX_SORT_UP]
+	]);
+
+	[$triggers_by_name, $hosts_by_name, $exceeded_limit] = getTriggersOverviewTableData($db_hosts, $db_triggers);
+
+	return [$db_hosts, $db_triggers, $dependencies, $triggers_by_name, $hosts_by_name, $exceeded_limit];
 }
 
 /**
@@ -2385,13 +2360,15 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('trigger_prototypes.php'))
-					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
+					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('triggers.php'))
 					->setArgument('filter_hostids', [$template['hostid']])
-					->setArgument('filter_set', 1);
+					->setArgument('filter_set', 1)
+					->setArgument('context', 'template');
 			}
 
 			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
@@ -2444,14 +2421,16 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 					$url = (new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
+						->setArgument('context', 'template');
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
 					$url = (new CUrl('triggers.php'))
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('hostid', $template['hostid']);
+						->setArgument('hostid', $template['hostid'])
+						->setArgument('context', 'template');
 				}
 
 				$name = new CLink(CHtml::encode($template['name']), $url);

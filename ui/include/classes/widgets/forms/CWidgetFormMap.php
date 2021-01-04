@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class CWidgetFormMap extends CWidgetForm {
 		// Select source type field.
 		$field_source_type = (new CWidgetFieldRadioButtonList('source_type', _('Source type'), [
 			WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
-			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree'),
+			WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree')
 		]))
 			->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
 			->setAction('updateWidgetConfigDialogue()')
@@ -53,7 +53,7 @@ class CWidgetFormMap extends CWidgetForm {
 
 		if ($field_source_type->getValue() === WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			// Select filter widget field.
-			$field_filter_widget = (new CWidgetFieldWidgetListComboBox('filter_widget_reference', _('Filter'),
+			$field_filter_widget = (new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'),
 				'type', 'navtree'
 			))
 				->setDefault('')

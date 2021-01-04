@@ -18,6 +18,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a
@@ -33,12 +34,11 @@ zbx_trends_parse_range_LDADD = \
 
 zbx_trends_parse_range_LDADD += @SERVER_LIBS@
 
-zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ 
-
-zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBfetch \
 	-Wl,--wrap=DBselect \
 	-Wl,--wrap=DBis_null
-	
+
+zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

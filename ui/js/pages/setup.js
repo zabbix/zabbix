@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,6 +115,12 @@ function updateElementsAvailability() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	// Stage 1, language selection.
+	const lang = document.getElementById('default-lang');
+	if (lang) {
+		lang.addEventListener('change', () => document.forms['setup-form'].submit());
+	}
+
 	// Stage 2, database configuration.
 	if (document.querySelector('[name=type]')) {
 		document.querySelectorAll('#type, #server, #tls_encryption, #verify_certificate, #creds_storage').forEach(
@@ -123,36 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		updateElementsAvailability();
 	}
-});
 
-// Function is required by 'Database port' input and is copy of validateNumericBox from functions.js file.
-function validateNumericBox(obj, allowempty, allownegative) {
-	if (obj != null) {
-		if (allowempty) {
-			if (obj.value.length == 0 || obj.value == null) {
-				obj.value = '';
-			}
-			else {
-				if (isNaN(parseInt(obj.value, 10))) {
-					obj.value = 0;
-				}
-				else {
-					obj.value = parseInt(obj.value, 10);
-				}
-			}
-		}
-		else {
-			if (isNaN(parseInt(obj.value, 10))) {
-				obj.value = 0;
-			}
-			else {
-				obj.value = parseInt(obj.value, 10);
-			}
-		}
+	// Stage 4, GUI settings.
+	const theme = document.getElementById('default-theme');
+	if (theme) {
+		theme.addEventListener('change', () => document.forms['setup-form'].submit());
 	}
-	if (!allownegative) {
-		if (obj.value < 0) {
-			obj.value = obj.value * -1;
-		}
-	}
-}
+});

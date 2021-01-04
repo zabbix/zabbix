@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -678,7 +678,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		DB::delete('optemplate', [
-			'templateid'=>$templateids,
+			'templateid'=>$templateids
 		]);
 
 		// delete empty operations
@@ -693,7 +693,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		DB::delete('operations', [
-			'operationid'=>$delOperationids,
+			'operationid'=>$delOperationids
 		]);
 
 		// http tests

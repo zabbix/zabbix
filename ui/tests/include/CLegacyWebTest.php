@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class CLegacyWebTest extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('server-name', $ZBX_SERVER_NAME);
 		}
 
-		$this->zbxTestTextNotPresent('Login name or password is incorrect');
+		$this->zbxTestTextNotPresent('Incorrect user name or password or account is temporarily blocked.');
 	}
 
 	public function zbxTestLogout() {

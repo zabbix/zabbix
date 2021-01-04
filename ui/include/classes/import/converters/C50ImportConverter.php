@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,9 +48,9 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert hosts.
 	 *
-	 * @param array $hosts
-	 *
 	 * @static
+	 *
+	 * @param array $hosts
 	 *
 	 * @return array
 	 */
@@ -72,9 +72,9 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert templates.
 	 *
-	 * @param array $templates
-	 *
 	 * @static
+	 *
+	 * @param array $templates
 	 *
 	 * @return array
 	 */
@@ -101,9 +101,9 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert items.
 	 *
-	 * @param array $items
-	 *
 	 * @static
+	 *
+	 * @param array $items
 	 *
 	 * @return array
 	 */
@@ -121,9 +121,9 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert discovery rules.
 	 *
-	 * @param array $items
-	 *
 	 * @static
+	 *
+	 * @param array $items
 	 *
 	 * @return array
 	 */
@@ -145,9 +145,9 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert item prototypes.
 	 *
-	 * @param array $item_prototypes
-	 *
 	 * @static
+	 *
+	 * @param array $item_prototypes
 	 *
 	 * @return array
 	 */
@@ -165,11 +165,13 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert preprocessing steps.
 	 *
+	 * @static
+	 *
 	 * @param array $preprocessing_steps
 	 *
 	 * @return array
 	 */
-	protected function convertPreprocessingSteps(array $preprocessing_steps): array {
+	protected static function convertPreprocessingSteps(array $preprocessing_steps): array {
 		foreach ($preprocessing_steps as &$preprocessing_step) {
 			$preprocessing_step['parameters'] = ($preprocessing_step['type'] == ZBX_PREPROC_SCRIPT)
 				? [$preprocessing_step['params']]
@@ -184,9 +186,9 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert template screens to template dashboards.
 	 *
-	 * @param array $screens
-	 *
 	 * @static
+	 *
+	 * @param array $screens
 	 *
 	 * @return array
 	 */

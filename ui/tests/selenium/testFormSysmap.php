@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 
 		$this->zbxTestDropdownAssertSelected('urls[0][elementtype]', 'Host');
-		$this->zbxTestDropdownHasOptions('urls_0_elementtype', ['Host', 'Host group', 'Image', 'Map', 'Trigger']);
+		$this->zbxTestDropdownHasOptions('urls[0][elementtype]', ['Host', 'Host group', 'Image', 'Map', 'Trigger']);
 
 		$this->zbxTestAssertElementPresentId('urls_0_name');
 		$this->zbxTestAssertElementPresentId('urls_0_url');
@@ -139,7 +139,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'name' => 'Test map 1',
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'Map "Test map 1" already exists.',
+						'Map "Test map 1" already exists.'
 					]
 
 				]
@@ -150,7 +150,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'name' => '',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "Name": cannot be empty.',
+						'Incorrect value for field "Name": cannot be empty.'
 					]
 				]
 			],
@@ -161,7 +161,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'remove_owner' => true,
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'Map owner cannot be empty.',
+						'Map owner cannot be empty.'
 					]
 				]
 			],
@@ -173,7 +173,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'height' => 1,
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'Incorrect "width" value for map "map value".',
+						'Incorrect "width" value for map "map value".'
 					]
 				]
 			],
@@ -185,7 +185,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'height' => 0,
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'Incorrect "height" value for map "map value".',
+						'Incorrect "height" value for map "map value".'
 					]
 				]
 			],
@@ -198,7 +198,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'url_name' => 'test url',
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'URL should have both "name" and "url" fields for map "map urls".',
+						'URL should have both "name" and "url" fields for map "map urls".'
 					]
 				]
 			],
@@ -211,7 +211,7 @@ class testFormSysmap extends CLegacyWebTest {
 					'url' => 'http://zabbix.com',
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'URL should have both "name" and "url" fields for map "map urls".',
+						'URL should have both "name" and "url" fields for map "map urls".'
 					]
 				]
 			]

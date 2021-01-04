@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -839,7 +839,7 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => ['itemid'],
-			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
+			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid')
 		]);
 		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
 			$childDiscoveryRule['hostPrototypes'] = [];

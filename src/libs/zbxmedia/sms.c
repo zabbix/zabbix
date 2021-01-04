@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	options.c_oflag = ONOCR;
 #endif
 	options.c_cflag = old_options.c_cflag | CRTSCTS | CS8 | CLOCAL | CREAD;
-	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	options.c_lflag &= (tcflag_t)~(ICANON | ECHO | ECHOE | ISIG);
 	options.c_cc[VMIN] = 0;
 	options.c_cc[VTIME] = 1;
 

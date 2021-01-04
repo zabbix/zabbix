@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ if ($http_user) {
 	}
 }
 else {
-	error(_('Login name or password is incorrect.'));
+	error(_('Incorrect user name or password or account is temporarily blocked.'));
 }
 
 echo (new CView('general.warning', [

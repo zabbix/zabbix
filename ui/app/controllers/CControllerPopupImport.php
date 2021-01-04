@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,12 +177,15 @@ class CControllerPopupImport extends CController {
 			$output = [];
 
 			if ($result) {
-				$output = ['message' => _('Imported successfully')];
+				$messages = CMessageHelper::getMessages();
+				$output = ['title' => _('Imported successfully')];
+				if (count($messages)) {
+					$output['messages'] = array_column($messages, 'message');
+				}
 			}
 			else {
-				if (($messages = getMessages()) !== null) {
-					$output['errors'] = $messages->toString();
-				}
+				CMessageHelper::setErrorTitle(_('Import failed'));
+				$output['errors'] = makeMessageBox(false, filter_messages(), CMessageHelper::getTitle())->toString();
 			}
 
 			$this->setResponse(

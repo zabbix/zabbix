@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ static unsigned char str2pollertype(const char *str)
 		_ZBX_MKMAP(ZBX_NO_POLLER),			_ZBX_MKMAP(ZBX_POLLER_TYPE_NORMAL),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_UNREACHABLE),	_ZBX_MKMAP(ZBX_POLLER_TYPE_IPMI),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_PINGER),		_ZBX_MKMAP(ZBX_POLLER_TYPE_JAVA),
+		_ZBX_MKMAP(ZBX_POLLER_TYPE_HISTORY),
 		{ 0 }
 	};
 

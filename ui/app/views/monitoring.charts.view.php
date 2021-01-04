@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,16 +42,19 @@ $widget = (new CWidget())
 		(new CTag('nav', true, (new CList())
 			->addItem((new CForm('get'))
 				->cleanItems()
+				->setName('main_filter')
 				->addVar('action', 'charts.view')
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem([
-						new CLabel(_('View as'), 'view_as'),
+						new CLabel(_('View as'), 'label-view-as'),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						new CComboBox('view_as', $data['view_as'], 'submit()', [
-							HISTORY_GRAPH => _('Graph'),
-							HISTORY_VALUES => _('Values')
-						])
+						(new CSelect('view_as'))
+							->setId('view-as')
+							->setFocusableElementId('label-view-as')
+							->setValue($data['view_as'])
+							->addOption(new CSelectOption(HISTORY_GRAPH, _('Graph')))
+							->addOption(new CSelectOption(HISTORY_VALUES, _('Values')))
 					])
 				)
 			)

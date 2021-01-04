@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -535,7 +535,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		foreach ([
 			'days' => SEC_PER_DAY,
 			'hours' => SEC_PER_HOUR,
-			'minutes' => SEC_PER_MIN,
+			'minutes' => SEC_PER_MIN
 		] as $part => $sec_per_part) {
 			$v = floor($value_abs_int / $sec_per_part);
 			if ($v > 0) {
@@ -1647,7 +1647,7 @@ function filter_messages(): array {
 	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$messages = CMessageHelper::getMessages();
-		CMessageHelper::clear();
+		CMessageHelper::clear(false);
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
@@ -1804,7 +1804,11 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages of the current request.
 
 	if ($options['with_current_messages']) {
-		show_messages();
+		show_messages(
+			CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
+			CMessageHelper::getTitle(),
+			CMessageHelper::getTitle()
+		);
 
 		$messages_current = $ZBX_MESSAGES_PREPARED;
 		$restore_messages = [];
@@ -1833,7 +1837,11 @@ function get_prepared_messages(array $options = []): ?string {
 			$failed_attempts
 		));
 
-		show_messages();
+		show_messages(
+			false, // Failed login can be only error message.
+			CMessageHelper::getTitle(),
+			CMessageHelper::getTitle()
+		);
 
 		CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 	}

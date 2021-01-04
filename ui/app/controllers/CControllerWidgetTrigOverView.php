@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,9 +61,9 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'hostids' => $fields['hostids'] ? $fields['hostids'] : null
 		];
 
-		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
-		) = getTriggersOverviewData(getSubGroups($fields['groupids']), $fields['application'], $host_options,
+		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
+			$data['hosts_by_name'], $data['exceeded_limit']
+		] = getTriggersOverviewData(getSubGroups($fields['groupids']), $fields['application'], $host_options,
 			$trigger_options, $problem_options
 		);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -793,9 +793,8 @@ function getConditionFormula(conditions, evalType) {
 			$row = $(template.evaluate($.extend(data, options.dataCallback(data))));
 
 			for (const name in data) {
-				// Set 'select' value.
-				$row.find('[name$="[' + counter + '][' + name + ']"] option[value="' + data[name] + '"]')
-					.attr('selected', 'selected');
+				// Set 'z-select' value.
+				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name])
 
 				// Set 'radio' value.
 				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"][value="' + data[name] + '"]')

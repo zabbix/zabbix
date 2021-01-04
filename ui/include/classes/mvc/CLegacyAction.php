@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,16 @@ class CLegacyAction extends CAction {
 		$denied = [];
 		$action = $this->getAction();
 
+		/*
+		 * Overwrite legacy action in case user is located in sub-section like items, triggers etc. That will make
+		 * sure to hide left menu and display error in case user has no access to templates or hosts.
+		 */
+		if (in_array(getRequest('context', ''), ['host', 'template']) && in_array($action, ['items.php', 'triggers.php',
+				'graphs.php', 'host_discovery.php', 'httpconf.php', 'disc_prototypes.php', 'trigger_prototypes.php',
+				'host_prototypes.php'])) {
+			$action = (getRequest('context') === 'host') ? 'hosts.php' : 'templates.php';
+		}
+
 		if ($user_type < USER_TYPE_ZABBIX_USER) {
 			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart4.php', 'chart5.php', 'chart6.php', 'chart7.php',
 				'history.php', 'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php',
@@ -63,14 +73,14 @@ class CLegacyAction extends CAction {
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['actionconf.php',
-				'disc_prototypes.php', 'discoveryconf.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php',
+				'disc_prototypes.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php',
 				'hostgroups.php', 'hosts.php', 'httpconf.php', 'items.php', 'maintenance.php', 'report4.php',
 				'services.php', 'templates.php', 'trigger_prototypes.php', 'triggers.php'
 			]);
 		}
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN) {
-			$denied = array_merge($denied, ['auditacts.php', 'correlation.php', 'queue.php']);
+			$denied = array_merge($denied, ['auditacts.php']);
 		}
 
 		if (in_array($action, $denied)) {
@@ -109,7 +119,6 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['hosts.php'],
 				CRoleHelper::UI_CONFIGURATION_MAINTENANCE => ['maintenance.php'],
 				CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php'],
-				CRoleHelper::UI_CONFIGURATION_DISCOVERY => ['discoveryconf.php'],
 				CRoleHelper::UI_CONFIGURATION_SERVICES => ['services.php']
 			];
 		}
@@ -117,8 +126,6 @@ class CLegacyAction extends CAction {
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
 				CRoleHelper::UI_REPORTS_ACTION_LOG => ['auditacts.php'],
-				CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION => ['correlation.php'],
-				CRoleHelper::UI_ADMINISTRATION_QUEUE => ['queue.php']
 			];
 		}
 

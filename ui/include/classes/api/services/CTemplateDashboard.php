@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -389,7 +389,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			ZBX_WIDGET_FIELD_TYPE_ITEM => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
 			ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
-			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
+			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid'
 		];
 	}
 }

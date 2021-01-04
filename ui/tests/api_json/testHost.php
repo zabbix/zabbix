@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class testHost extends CAPITest {
 		return [
 			[
 				'hostids' => [
-					'61001',
+					'61001'
 				],
 				'expected_error' => 'Cannot delete host because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
 			],
@@ -45,7 +45,7 @@ class testHost extends CAPITest {
 				'hostids' => [
 					'61003'
 				],
-				'expected_error' => null,
+				'expected_error' => null
 			],
 			[
 				'hostids' => [

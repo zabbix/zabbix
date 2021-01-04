@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2020 Zabbix SIA
+ ** Copyright (C) 2001-2021 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -87,27 +87,6 @@ jQuery(function($) {
 			}
 		});
 	}
-
-	/**
-	 * Change combobox color according selected option.
-	 */
-	$('select').each(function() {
-		var comboBox = $(this),
-			changeClass = function(obj) {
-				if (obj.find('option.red:selected').length > 0) {
-					obj.addClass('red');
-				}
-				else {
-					obj.removeClass('red');
-				}
-			};
-
-		comboBox.change(function() {
-			changeClass($(this));
-		});
-
-		changeClass(comboBox);
-	});
 
 	function uncheckedHandler($checkbox) {
 		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
@@ -325,7 +304,7 @@ jQuery(function($) {
 
 			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup($obj, resp.data, event, options);
+				showMenuPopup($obj, jQuery.extend({context: data.context}, resp.data), event, options);
 			});
 
 			$(document)

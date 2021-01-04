@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ var metrics = pluginMetrics{
 	},
 	keyOSDDiscovery: metric{
 		description: "Returns a list of discovered OSDs.",
-		commands:    []command{cmdOSDCrushRuleDump, cmdOSDCrushTree},
+		commands:    []command{cmdOSDCrushTree},
 		params:      nil,
 		handler:     osdDiscoveryHandler,
 	},

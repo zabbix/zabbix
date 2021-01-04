@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -416,7 +416,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'item_graph_url' => $unavailable_object ? null : $item_graph_url,
 			'widget' => [
 				'uniqueid' => $uniqueid,
-				'initial_load' => (int) $this->getInput('initial_load', 0),
+				'initial_load' => (int) $this->getInput('initial_load', 0)
 			],
 			'time_control_data' => $time_control_data,
 			'timeline' => $timeline,

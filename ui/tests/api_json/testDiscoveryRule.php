@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ class testDiscoveryRule extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
-			],
+			]
 		];
 
 		// TODO: add other properties, multiple rules, duplicates etc.
@@ -2106,7 +2106,7 @@ class testDiscoveryRule extends CAPITest {
 							}
 						}
 
-						// If "lld_macro_pathid" is not given, compare by "itemid" and "lld_macro" (unique combo).
+						// If "lld_macro_pathid" is not given, compare by "itemid" and "lld_macro" (unique combination).
 						if (!array_key_exists('lld_macro_pathid', $lld_macro_path)) {
 							// Keys "lld_macro" and "path" should exist at this point.
 							if ($old_lld_macro_paths) {
@@ -5361,7 +5361,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				]
-			],
+			]
 		];
 
 		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.

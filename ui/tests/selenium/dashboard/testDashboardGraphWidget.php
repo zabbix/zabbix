@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1167,7 +1167,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'item' => 'Agent ping'
 					],
 					'Overrides' => [
-						'item' => '*',
+						'item' => '*'
 					],
 					'error' => 'Invalid parameter "Overrides/1/hosts": cannot be empty.'
 				]
@@ -1245,7 +1245,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Widget name' => 'Test cases for update',
 					'Overrides' => [
-						'item' => '',
+						'item' => ''
 					],
 					'error' => 'Invalid parameter "Overrides/1/items": cannot be empty.'
 				]
@@ -1308,7 +1308,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => ',Zabbix, Server,',
 							'item' => 'Zabbix configuration cache, % used',
 							'Aggregation function' => 'count',
-							'Aggregation interval' => '24h',
+							'Aggregation interval' => '24h'
 						]
 					],
 					'Overrides' => [
@@ -1333,7 +1333,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'options' => [
 								['Draw', 'Bar']
 							]
-						],
+						]
 					],
 					'check_form' => true
 				]
@@ -1642,7 +1642,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Missing data' => 'Treat as 0',
 							'Time shift' => '-788400000',
 							'Aggregation function' => 'avg',
-							'Aggregation interval' => '788400000',
+							'Aggregation interval' => '788400000'
 						],
 						[
 							'host' => 'Two host',
@@ -1699,7 +1699,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => ',Zabbix, Server,',
 							'item' => 'Zabbix configuration cache, % used',
 							'Aggregation function' => 'count',
-							'Aggregation interval' => '24h',
+							'Aggregation interval' => '24h'
 						]
 					],
 					'Overrides' => [
@@ -1707,7 +1707,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Zabbix,Server',
 							'item' => 'Agent,Ping',
 							'options' => [
-								['Point size', '5'],
+								['Point size', '5']
 							]
 						],
 						[
@@ -1724,7 +1724,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'options' => [
 								['Draw', 'Bar']
 							]
-						],
+						]
 					],
 					'check_form' => true
 				]
@@ -2000,7 +2000,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'class' => CMultiselectElement::class
 					],
 					'color' => 'id:or_'.$i.'__color_',
-					'time_shift' => 'name:or['.$i.'][timeshift]',
+					'time_shift' => 'name:or['.$i.'][timeshift]'
 				];
 				foreach ($mapping as $field => $item) {
 					if (!array_key_exists($field, $override)) {
@@ -2089,7 +2089,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'host' => 'xpath://div[@id="or_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
 					'color' => 'id:or_'.$i.'__color_',
-					'time_shift' => 'name:or['.$i.'][timeshift]',
+					'time_shift' => 'name:or['.$i.'][timeshift]'
 				];
 				$inputs = [];
 				foreach ($mapping as $field => $selector) {
@@ -2187,7 +2187,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Data set' => [
 						'host' => 'Cancel create',
-						'item' => 'Cancel create',
+						'item' => 'Cancel create'
 					]
 				]
 			],
@@ -2200,7 +2200,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Data set' => [
 						'host' => 'Cancel update',
-						'item' => 'Cancel update',
+						'item' => 'Cancel update'
 					]
 				]
 			]

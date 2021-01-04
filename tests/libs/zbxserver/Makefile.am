@@ -2,7 +2,8 @@ if SERVER
 SERVER_tests = \
 	get_trigger_expression_constant \
 	evaluate_function \
-	substitute_lld_macros
+	substitute_lld_macros \
+	macro_fmttime
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -46,6 +47,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
+	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -105,6 +109,23 @@ substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@
 substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
+macro_fmttime_SOURCES = \
+	macro_fmttime.c \
+	$(COMMON_SRC_FILES)
+
+macro_fmttime_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+macro_fmttime_LDADD += $(COMMON_LIB_FILES)
+
+macro_fmttime_LDADD += @SERVER_LIBS@
+
+macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
+
+macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxserver
+
 evaluate_function_SOURCES = \
 	evaluate_function.c \
 	$(COMMON_SRC_FILES)
@@ -116,7 +137,7 @@ evaluate_function_LDADD += $(COMMON_LIB_FILES)
 
 evaluate_function_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@
+evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
 VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
@@ -138,7 +159,6 @@ VALUECACHE_WRAP_FUNCS = \
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
-	-I@top_srcdir@/src/libs/zbxhistory \
-	$(VALUECACHE_WRAP_FUNCS)
+	-I@top_srcdir@/src/libs/zbxhistory
 endif
 

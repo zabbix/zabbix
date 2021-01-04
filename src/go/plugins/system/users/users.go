@@ -1,8 +1,6 @@
-// +build windows
-
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,25 +21,42 @@ package users
 
 import (
 	"errors"
+	"fmt"
 
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/std"
 )
 
-// Plugin -
 type Plugin struct {
 	plugin.Base
+	options Options
+}
+
+type Options struct {
+	Timeout int `conf:"optional,range=1:30"`
 }
 
 var impl Plugin
-var stdOs std.Os
+
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	p.options.Timeout = global.Timeout
+}
+
+func (p *Plugin) Validate(options interface{}) error {
+	return nil
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
 		return nil, errors.New("Too many parameters.")
 	}
-	return getUsersNum()
+
+	result, err = p.getUsersNum()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get logged in user count: %s.", err.Error())
+	}
+
+	return
 }
 
 func init() {
