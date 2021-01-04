@@ -978,6 +978,9 @@ class CMediatype extends CApiService {
 
 				$this->validateEventMenu($mediatype, $db_mediatype);
 			}
+			else if ($db_type == MEDIA_TYPE_WEBHOOK) {
+				$webhooks_params[$mediatypeid] = [];
+			}
 
 			if (array_key_exists('message_templates', $mediatype)) {
 				$message_templates[$mediatypeid] = $mediatype['message_templates'];
