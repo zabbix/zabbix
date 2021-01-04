@@ -43,8 +43,11 @@ jQuery(document).ready(function($) {
 				$('#mediatype_send_to').show();
 				$('#mediatype_email_send_to').hide();
 			}
+
 		})
 		.trigger("change");
+
+	overlays_stack.end().centerDialog();
 });
 
 /**

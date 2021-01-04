@@ -595,7 +595,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
-		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		$this->assertFalse($this->query('class:breadcrumbs')->all()->isEmpty());
 		// Clear hosts in filter fields.
 		if (!array_key_exists('Hosts', $data['filter_options'])) {
 			$form->getField('Hosts')->asMultiselect()->clear();
@@ -607,7 +607,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		// Trigger create button disabled and breadcrumbs not exist.
 		$this->assertFalse($this->query('button:Create trigger (select host first)')->one()->isEnabled());
-		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		$this->assertTrue($this->query('class:breadcrumb')->all()->isEmpty());
 		// Check results in table.
 		$this->assertTableData(CTestArrayHelper::get($data, 'result', []));
 	}

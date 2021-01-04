@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,26 +20,14 @@
 
 
 /**
- * @var CPartial $this
+ * @var CView $this
  */
+?>
 
-$url_list = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
-
-(new CSpan())
-	->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))
-	->show();
-
-if ($data['dashboard']['dashboardid'] != 0) {
-	$url_view = (new CUrl('zabbix.php'))
-		->setArgument('action', 'dashboard.view')
-		->setArgument('dashboardid', $data['dashboard']['dashboardid']);
-
-	echo '/';
-
-	(new CSpan())
-		->addItem((new CLink($data['dashboard']['name'], $url_view->getUrl()))
-			->setId('dashboard-direct-link')
-		)
-		->addClass(ZBX_STYLE_SELECTED)
-		->show();
-}
+<script type="text/javascript">
+	$(() => {
+		$('#filter-usrgrpid').on('change', () => {
+			document.forms['main_filter'].submit();
+		});
+	});
+</script>

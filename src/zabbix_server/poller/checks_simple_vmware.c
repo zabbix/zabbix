@@ -1839,6 +1839,68 @@ out:
 	return ret;
 }
 
+int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *path, *clusterid;
+	const char 		*instance;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_cluster_t	*cluster;
+	zbx_uint64_t		counterid;
+	int			ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	clusterid = get_rparam(request, 1);
+	path = get_rparam(request, 2);
+	instance = get_rparam(request, 3);
+
+	if (NULL == instance)
+		instance = "";
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
+		goto unlock;
+	}
+
+	if (NULL == (cluster = cluster_get(&service->data->clusters, clusterid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid cluster id."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if counter already exists */
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "ClusterComputeResource", cluster->id,
+			counterid, "*"))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+
+	/* the performance counter is already being monitored, try to get the results from statistics */
+	ret = vmware_service_get_counter_value_by_id(service, "ClusterComputeResource", cluster->id, counterid,
+			instance, 1, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {

@@ -47,7 +47,7 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->addItem(get_header_host_table('items', $data['hostid']));
+	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 $widget->addItem($data['main_filter']);
 

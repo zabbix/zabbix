@@ -795,6 +795,10 @@ class CHelpItems {
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],
 				[
+					'key' => 'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
+					'description' => _('VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance')
+				],
+				[
 					'key' => 'vmware.datastore.discovery[<url>]',
 					'description' => _('Discovery of VMware datastores, <url> - VMware service URL. Returns JSON')
 				],

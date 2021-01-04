@@ -526,7 +526,7 @@ class testPageOverview extends CLegacyWebTest {
 			foreach ($data['inventories'] as $key => $value) {
 				switch ($key) {
 					case 'inventory_field':
-						$this->zbxTestDropdownSelect('inventory_0_field', $value);
+						$this->zbxTestDropdownSelect('inventory[0][field]', $value);
 						break;
 					case 'inventory_value':
 						$this->zbxTestInputType('inventory_0_value', $value);

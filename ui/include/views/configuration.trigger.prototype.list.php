@@ -35,7 +35,7 @@ $widget = (new CWidget())
 			))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
+	->setNavigation(getHostNavigation('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 $url = (new CUrl('trigger_prototypes.php'))
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
