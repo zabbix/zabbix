@@ -254,10 +254,6 @@ class CMenuHelper {
 						(new CMenuItem(_('Value mapping')))
 							->setAction('valuemap.list')
 							->setAliases(['valuemap.edit']),
-						(new CMenuItem(_('Working time')))
-							->setAction('workingtime.edit'),
-						(new CMenuItem(_('Trigger severities')))
-							->setAction('trigseverity.edit'),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Modules')))
@@ -305,9 +301,12 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
 				? (new CMenuItem(_('Queue')))
 					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Queue overview')))->setAction('queue.overview'),
-						(new CMenuItem(_('Queue overview by proxy')))->setAction('queue.overview.proxy'),
-						(new CMenuItem(_('Queue details')))->setAction('queue.details')
+						(new CMenuItem(_('Queue overview')))
+							->setAction('queue.overview'),
+						(new CMenuItem(_('Queue overview by proxy')))
+							->setAction('queue.overview.proxy'),
+						(new CMenuItem(_('Queue details')))
+							->setAction('queue.details')
 					]))
 				: null
 		];
@@ -408,6 +407,8 @@ class CMenuHelper {
 				return $menu[0];
 			}
 		}
+
+		return $menu->getMenuItems()[0];
 	}
 
 	public static function getFirstUrl(): string {
