@@ -8625,63 +8625,63 @@ return [
 			'tokenid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
+				'length' => 20
 			],
 			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
-				'default' => '',
+				'default' => ''
 			],
 			'description' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
+				'default' => ''
 			],
 			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
-				'ref_field' => 'userid',
+				'ref_field' => 'userid'
 			],
 			'token' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 128
 			],
 			'lastaccess' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '0'
 			],
 			'status' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '0'
 			],
 			'expires_at' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '0'
 			],
 			'created_at' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '0'
 			],
 			'creator_userid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
-				'ref_field' => 'userid',
-			],
-		],
+				'ref_field' => 'userid'
+			]
+		]
 	],
 	'dbversion' => [
 		'key' => '',
