@@ -1056,35 +1056,7 @@ class testToken extends CAPITest {
 					],
 					'expect_error' => 'API token "update-user-5" already exists for user "5".'
 				],
-			/* '#15 case "user can swap names between tokens"' => */
-			/* 	[ */
-			/* 		'request' => [ */
-			/* 			[ */
-			/* 				'tokenid' => '20', */
-			/* 				'name' => 'update-user-5' // This user has token (ID: 21) using this name. */
-			/* 			], */
-			/* 			[ */
-			/* 				'tokenid' => '21', */
-			/* 				'name' => 'update-user-4' // This user has token (ID: 20) using this name. */
-			/* 			] */
-			/* 		], */
-			/* 		'expect_error' => null */
-			/* 	], */
-			/* '#16 case "user can move name between tokens"' => */
-			/* 	[ */
-			/* 		'request' => [ */
-			/* 			[ */
-			/* 				'tokenid' => '21', */
-			/* 				'name' => 'update-user-6' // DB has (ID: 22) named "update-user-6" */
-			/* 			], */
-			/* 			[ */
-			/* 				'tokenid' => '22', */
-			/* 				'name' => 'update-user-6-backup' // DB has (ID: 22) named "update-user-6" */
-			/* 			] */
-			/* 		], */
-			/* 		'expect_error' => null */
-			/* 	], */
-			'#17 case "cannot update identical token names within request"' =>
+			'#15 case "cannot update identical token names within request"' =>
 				[
 					'request' => [
 						[
