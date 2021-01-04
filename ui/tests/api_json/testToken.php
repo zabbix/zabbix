@@ -759,7 +759,7 @@ class testToken extends CAPITest {
 						'name' => 'test-get'
 					],
 					'countOutput' => true,
-					'sortfield' => ['name', 'userid'] // Should not cause errors when used in conjunction with count.
+					'sortfield' => ['name', 'status'] // Should not cause errors when used in conjunction with count.
 				],
 				'expected' => [
 					'error' => null,
