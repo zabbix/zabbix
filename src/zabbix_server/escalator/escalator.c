@@ -840,13 +840,13 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	now = (int)time(NULL);
 
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type || ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type
-			|| ZBX_SCRIPT_TYPE_IPMI == script->type)
+	if (ZBX_SCRIPT_TYPE_IPMI == script->type || ZBX_SCRIPT_TYPE_SSH == script->type
+			|| ZBX_SCRIPT_TYPE_TELNET == script->type)
 	{
-		get_scriptname_by_scriptid(script->scriptid, &message);
+		message = ZBX_NULL2EMPTY_STR(script->command_orig);
 	}
 	else
-		message = ZBX_NULL2EMPTY_STR(script->command_orig);
+		get_scriptname_by_scriptid(script->scriptid, &message);
 
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, message);
 
