@@ -43,7 +43,12 @@ $token_from_list = (new CFormList())
 		'&nbsp;',
 		(new CLinkAction(_('Copy to clipboard')))->onClick('navigator.clipboard.writeText("'.$data['auth_token'].'")')
 	])
-	->addRow(_('Expires at').':', ($data['expires_at'] == 0) ? '-' : date(ZBX_DATE_TIME, (int) $data['expires_at']))
+	->addRow(_('Expires at').':', [
+		($data['expires_at'] == 0) ? '-' : date(ZBX_DATE_TIME, (int) $data['expires_at']),
+		($data['expires_at'] != 0 && time() > $data['expires_at'])
+			? ['&nbsp;', makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
+			: null
+	])
 	->addRow(_('Description').':', $data['description'])
 	->addRow(new CLabel(_('Enabled').':', 'enabled'),
 		(new CCheckBox('enabled'))
