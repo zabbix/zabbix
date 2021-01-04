@@ -203,7 +203,7 @@ class CLocalApiClient extends CApiClient {
 		[['expires_at' => $expires_at, 'userid' => $userid, 'tokenid' => $tokenid]] = $api_tokens;
 
 		if ($expires_at != 0 && $expires_at < time()) {
-			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('Auth token expired.'));
+			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
 		[['roleid' => $roleid]] = DB::select('users', [
