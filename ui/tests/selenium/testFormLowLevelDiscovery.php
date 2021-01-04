@@ -501,8 +501,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$operation_dropdown = $this->query('name:conditions[0][operator]')->one()->asZDropdown();
 			foreach (['matches', 'does not match', 'exists', 'does not exist'] as $operation) {
 				$operation_dropdown->select($operation);
-				$value_exists = (in_array($operation, ['exists', 'does not exist'])) ? false : true;
-				$this->assertEquals($value_exists, $this->query('id:conditions_0_value')->one()->isVisible());
+				$this->assertEquals(in_array($operation, ['matches', 'does not match']), $this->query('id:conditions_0_value')->one()->isVisible());
 			}
 		}
 	}
