@@ -197,10 +197,10 @@ class CConfigurationExport {
 			$this->gatherGroups($options['groups']);
 		}
 
-		// Gather value maps before items if possible.
-		if ($options['valueMaps']) {
-			$this->gatherValueMaps($options['valueMaps']);
-		}
+		// // Gather value maps before items if possible.
+		// if ($options['valueMaps']) {
+		// 	$this->gatherValueMaps($options['valueMaps']);
+		// }
 
 		if ($options['templates']) {
 			$this->gatherTemplates($options['templates']);
@@ -563,23 +563,9 @@ class CConfigurationExport {
 		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
-		if ($this->data['valueMaps']) {
-			/*
-			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
-			 * value map IDs that should not be selected again.
-			 */
-
-			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
-				if (array_key_exists($valuemapid, $valuemapids)) {
-					unset($valuemapids[$valuemapid]);
-				}
-			}
-		}
-
 		if ($valuemapids) {
-			$this->data['valueMaps'] += API::ValueMap()->get([
+			$db_valuemaps = API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
-				'selectMappings' => ['value', 'newvalue'],
 				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
@@ -589,7 +575,7 @@ class CConfigurationExport {
 			$item['valuemap'] = [];
 
 			if ($item['valuemapid'] != 0) {
-				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
+				$item['valuemap'] = ['name' => $db_valuemaps[$item['valuemapid']]['name']];
 			}
 		}
 		unset($item);

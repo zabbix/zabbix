@@ -96,7 +96,7 @@ class CImportDataAdapter {
 				$hosts[] = CArrayHelper::getByKeys($host, [
 					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
 					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
-					'inventory_mode', 'tags'
+					'inventory_mode', 'tags', 'valuemaps'
 				]);
 			}
 		}

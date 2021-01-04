@@ -788,8 +788,9 @@ class CImportReferencer {
 			$this->hostsRefs = [];
 			// fetch only normal hosts, discovered hosts must not be imported
 			$dbHosts = API::Host()->get([
-				'filter' => ['host' => $this->hosts],
 				'output' => ['hostid', 'host'],
+				'filter' => ['host' => $this->hosts],
+				'selectValueMaps' => ['name', 'mappings'],
 				'preservekeys' => true,
 				'templated_hosts' => true
 			]);

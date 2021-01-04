@@ -277,6 +277,34 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		.dispatchEvent(new CustomEvent('change', {}));
 })();
 
+// Value maps.
+(() => {
+	const valuemap = document.querySelector('#valuemap-div');
+	if (!valuemap) {
+		return false;
+	}
+
+	let obj = valuemap;
+	if (valuemap.tagName === 'SPAN') {
+		obj = valuemap.originalObject;
+	}
+
+	[...obj.querySelectorAll('[name=valuemap_massupdate]')].map((elem) => {
+		elem.addEventListener('click', (event) => {
+			const value = event.currentTarget.value;
+
+			if (value == <?= ZBX_ACTION_REMOVE ?>) {
+				obj.querySelector('.valuemap-remove').style.display = 'block';
+				obj.querySelector('#valuemap-table').style.display = 'none';
+			}
+			else {
+				obj.querySelector('.valuemap-remove').style.display = 'none';
+				obj.querySelector('#valuemap-table').style.display = 'table';
+			}
+		});
+	});
+})();
+
 function visibility_status_changeds(value, obj_id, replace_to) {
 	const obj = document.getElementById(obj_id);
 	if (obj === null) {

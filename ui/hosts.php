@@ -451,8 +451,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'inventory_mode' => getRequest('inventory_mode'),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? []
-					: getRequest('host_inventory', []),
-				'valuemaps' => getRequest('valuemap', [])
+					: getRequest('host_inventory', [])
 			];
 
 			if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || ($host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
@@ -506,6 +505,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (!API::Host()->update($host)) {
 				throw new Exception();
 			}
+		}
+
+		$valuemap = getRequest('valuemap', []);
+		if ($valuemap) {
+			$db_valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid'],
+				'hostids' => [$hostId],
+				'preservekeys' => true
+			]);
+
+			if ($db_valuemap) {
+				API::ValueMap()->delete(array_keys($db_valuemap));
+			}
+
+			API::ValueMap()->create(array_map(function (array $value) use ($hostId): array {
+				$value['hostid'] = $hostId;
+				unset($value['valuemapid']);
+
+				return $value;
+			}, $valuemap));
 		}
 
 		// full clone
@@ -720,6 +739,7 @@ if (hasRequest('form')) {
 		'tls_subject' => getRequest('tls_subject', ''),
 		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
 		'tls_psk' => getRequest('tls_psk', ''),
+		'psk_edit_mode' => getRequest('psk_edit_mode', 1),
 
 		// Valuemap
 		'valuemaps' => getRequest('valuemap', [])
@@ -739,7 +759,7 @@ if (hasRequest('form')) {
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
 				'selectTags' => ['tag', 'value'],
-				'selectValueMaps' => ['name', 'mappings'],
+				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
@@ -822,7 +842,7 @@ if (hasRequest('form')) {
 				'selectParentTemplates' => ['templateid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectHostDiscovery' => ['parent_hostid'],
-				'selectValueMaps' => ['name', 'mappings'],
+				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);

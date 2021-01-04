@@ -819,52 +819,21 @@ $form_list
 		'row_logtimefmt'
 	);
 
-// Append valuemap to form list.
-// if ($readonly) {
-// 	$form->addVar('valuemapid', $data['valuemapid']);
-// 	$valuemapComboBox = (new CTextBox('valuemap_name',
-// 		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
-// 		true
-// 	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-// }
-// else {
-// 	$valuemapComboBox = new CComboBox('valuemapid', $data['valuemapid']);
-// 	$valuemapComboBox->addItem(0, _('As is'));
-// 	foreach ($data['valuemaps'] as $valuemap) {
-// 		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
-// 	}
-// }
-
-// if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-// 	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
-// 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
-// 			->setArgument('action', 'valuemap.list')
-// 			->getUrl()
-// 		))->setAttribute('target', '_blank')
-// 	];
-// }
-
 $form_list->addRow(
 	new CLabel(_('Value mapping'), 'valuemapid_ms'),
 	(new CMultiSelect([
 		'name' => 'valuemapid',
 		'object_name' => 'valuemaps',
-		// 'disabled' => $data['readonly'],
+		'disabled' => $readonly,
 		'multiple' => false,
-		'data' => [
-			191 => [
-				'id' => 191,
-				'name' => 'test'
-			]
-		],
+		'data' => $data['valuemap'],
 		'popup' => [
 			'parameters' => [
-				// 'srctbl' => 'itemform',
 				'srctbl' => 'valuemaps',
 				'srcfld1' => 'valuemapid',
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'valuemapid',
-				'hostid' => [$data['hostid']],
+				'hostids' => [$data['hostid']],
 				'editable' => true
 			]
 		]
@@ -873,7 +842,6 @@ $form_list->addRow(
 );
 
 $form_list
-	// ->addRow(_('Show value'), $valuemapComboBox, 'row_valuemap')
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[

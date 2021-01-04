@@ -50,9 +50,9 @@ if (count($data['mappings'])) {
 	foreach ($data['mappings'] as $mapping) {
 		$table->addItem([
 			(new CRow([
-				(new CTextBox('mappings['.$i.'][key]', $mapping['key'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+				(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				'&rArr;',
-				(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))
+				(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAriaRequired(),
 				(new CButton('mappings['.$i.'][remove]', _('Remove')))
@@ -67,9 +67,9 @@ if (count($data['mappings'])) {
 else {
 	$table->addItem([
 		(new CRow([
-			(new CTextBox('mappings[0][key]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CTextBox('mappings[0][value]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			'&rArr;',
-			(new CTextBox('mappings[0][value]', '', false, 64))
+			(new CTextBox('mappings[0][newvalue]', '', false, 64))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
 			(new CButton('mappings[0][remove]', _('Remove')))

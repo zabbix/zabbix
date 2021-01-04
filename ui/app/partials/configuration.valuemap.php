@@ -46,7 +46,7 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 $table->addItem([
 	(new CTag('tfoot', true))->addItem([
 		new CCol(
-			(new CButton('tag_add', _('Add')))
+			(new CButton('valuemap_add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
 				->setEnabled(!$this->data['readonly'])

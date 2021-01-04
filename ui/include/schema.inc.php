@@ -1421,13 +1421,12 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid'
 			],
-			'valuemap' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
+			'valuemapid' => [
+				'null' => TRIGGER_VALUE_TRUE,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 				'ref_table' => 'valuemap',
-				'ref_field' => 'name'
+				'ref_field' => 'valuemapid'
 			],
 			'params' => [
 				'null' => false,

@@ -57,7 +57,6 @@ class CControllerPopupImport extends CController {
 			case 'host':
 			case 'template':
 			case 'mediatype':
-			case 'valuemap':
 				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
 
 			default:
@@ -82,7 +81,7 @@ class CControllerPopupImport extends CController {
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
 		// Adjust defaults for given rule preset, if specified.
@@ -99,7 +98,7 @@ class CControllerPopupImport extends CController {
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 
 			case 'template':
@@ -117,7 +116,7 @@ class CControllerPopupImport extends CController {
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
 
 			case 'mediatype':

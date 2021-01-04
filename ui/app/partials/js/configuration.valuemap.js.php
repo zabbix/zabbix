@@ -26,9 +26,9 @@
 
 <script type="text/x-jquery-tmpl" id="mapping-row-tmpl">
 	<?= (new CRow([
-			(new CTextBox('mappings[#{rowNum}][key]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CTextBox('mappings[#{rowNum}][value]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			'&rArr;',
-			(new CTextBox('mappings[#{rowNum}][value]', '', false, 64))
+			(new CTextBox('mappings[#{rowNum}][newvalue]', '', false, 64))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
 			(new CButton('mappings[#{rowNum}][remove]', _('Remove')))
@@ -41,8 +41,9 @@
 </script>
 
 <script type="text/javascript">
-let valuemap_number = 0;
-class AddValueMap {
+var valuemap_number = 0;
+
+var AddValueMap = class {
 
 	constructor(data, edit = null) {
 		this.data = data;
@@ -83,7 +84,7 @@ class AddValueMap {
 			() => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, this)
 		);
 
-		cell.appendChild(this.createHiddenInput('[name]', this.data.name))
+		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
 		cell.appendChild(link);
 
 		return cell;
@@ -106,10 +107,10 @@ class AddValueMap {
 		let i = 0;
 		const cell = document.createElement('td');
 		for (let value of this.data.mappings) {
-			cell.append(`${value.key} ⇒ ${value.value}`, document.createElement('br'));
+			cell.append(`${value.value} ⇒ ${value.newvalue}`, document.createElement('br'));
 
-			cell.appendChild(this.createHiddenInput(`[mappings][${i}][key]`, value.key));
 			cell.appendChild(this.createHiddenInput(`[mappings][${i}][value]`, value.value));
+			cell.appendChild(this.createHiddenInput(`[mappings][${i}][newvalue]`, value.newvalue));
 			i++;
 		}
 

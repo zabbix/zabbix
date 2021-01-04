@@ -33,59 +33,57 @@ function submitValueMap(overlay) {
 	const is_edit = !!form.querySelector('#edit');
 	const name = form.querySelector('#name').value;
 	const source_name = form.querySelector('#source-name').value;
-	// const id = form.querySelector('#name').value;
 	const names = [...document
 			.querySelector('#valuemap-table')
 			.querySelectorAll("input[name$='[name]'")
 		].map((elem) => elem.value);
+	const data = {name: name, mappings: []};
+	let mapping_value = [];
 
 	overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-	if (name !== source_name) {
-		if (names.includes(name)) {
-			document
-				.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}']`)
-				.querySelector('.overlay-dialogue-body')
-				.prepend(makeMessageBox('bad', 'name is not unique', 'test title', true, true)[0]); // FIXME: add error message
-			overlay.unsetLoading();
-			return false;
+	try {
+		if (name !== source_name && names.includes(name)) {
+			throw `<?= _('Value map already exists.') ?>`;
 		}
-	}
 
-	if (name === '') {
-		document
-			.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}']`)
-			.querySelector('.overlay-dialogue-body')
-			.prepend(makeMessageBox('bad', 'name is empty', 'test title', true, true)[0]); // FIXME: add error message
-		overlay.unsetLoading();
-		return false;
-	}
+		if (name === '') {
+			throw `<?= _('Invalid parameter "name": cannot be empty.') ?>`;
+		}
 
-	const data = {name: name, mappings: []};
+		if (form.querySelectorAll('[id$="_value"]').length === 0 || (form.querySelector('[id$="_value"]').value === ''
+					|| form.querySelector('[id$="_newvalue"]').value === '')) {
+			throw  `<?= _('The parameter "mappings" is missing.') ?>`;
+		}
 
-	if (form.querySelectorAll('[id$="_key"]').length === 0 || (form.querySelector('[id$="_key"]').value === ''
-				|| form.querySelector('[id$="_value"]').value === '')) {
-		document
-			.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}']`)
-			.querySelector('.overlay-dialogue-body')
-			.prepend(makeMessageBox('bad', 'need one mapping', 'test title', true, true)[0]); // FIXME: add error message
-		overlay.unsetLoading();
-		return false;
-	}
+		[...form.querySelectorAll('[id$="_value"]')].map(
+			(elem) => {
+				if (elem.value === '') {
+					return false;
+				}
 
-	[...form.querySelectorAll('[id$="_key"]')].map(
-		(elem) => {
-			if (elem.value === '') {
-				return false;
+				if (mapping_value.includes(elem.value)) {
+					throw  `<?= _('Some mapping not unique.') ?>`;
+				}
+
+				mapping_value.push(elem.value);
+
+				const key = elem.id.split('_')[1];
+				data.mappings.push({
+					value: elem.value,
+					newvalue: form.querySelector(`#mappings_${key}_newvalue`).value
+				});
 			}
-
-			const key = elem.id.split('_')[1];
-			data.mappings.push({
-				key: elem.value,
-				value: form.querySelector(`#mappings_${key}_value`).value
-			});
-		}
-	);
+		);
+	}
+	catch (error) {
+		document
+			.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}']`)
+			.querySelector('.overlay-dialogue-body')
+			.prepend(makeMessageBox('bad', error, null)[0]);
+		overlay.unsetLoading();
+		return false;
+	}
 
 	overlayDialogueDestroy(overlay.dialogueid);
 

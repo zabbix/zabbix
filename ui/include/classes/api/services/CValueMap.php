@@ -80,7 +80,7 @@ class CValueMap extends CApiService {
 		$sql_parts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
 
 		// hostids
-		if (array_key_exists('hostids', $options)) {
+		if (array_key_exists('hostids', $options) && $options['hostids']) {
 			zbx_value2array($options['hostids']);
 			$sql_parts['where']['hostid'] = dbConditionInt('vm.hostid', $options['hostids']);
 		}
@@ -114,6 +114,10 @@ class CValueMap extends CApiService {
 	 */
 	public function create(array $valuemaps) {
 		$this->validateCreate($valuemaps);
+
+		foreach ($valuemaps as$valuemap) {
+			$this->checkDuplicates([$valuemap['name']], $valuemap['hostid']);
+		}
 
 		$valuemapids = DB::insertBatch('valuemap', $valuemaps);
 
@@ -245,7 +249,7 @@ class CValueMap extends CApiService {
 		}
 
 		$db_valuemaps = DB::select('valuemap', [
-			'output' => ['valuemapid', 'name', 'hostid'],
+			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);
@@ -258,14 +262,12 @@ class CValueMap extends CApiService {
 			}
 		}
 
-		$result = DB::update('items', [[
+		DB::update('items', [[
 			'values' => ['valuemapid' => 0],
 			'where' => ['valuemapid' => $valuemapids]
 		]]);
 
-		if ($result) {
-			$this->deleteByIds($valuemapids);
-		}
+		$this->deleteByIds($valuemapids);
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemaps);
 
@@ -276,13 +278,14 @@ class CValueMap extends CApiService {
 	 * Check for duplicated value maps.
 	 *
 	 * @param array  $names
+	 * @param string $hostid
 	 *
 	 * @throws APIException  if value map already exists.
 	 */
-	private function checkDuplicates(array $names) {
+	private function checkDuplicates(array $names, $hostid) {
 		$db_valuemaps = DB::select('valuemap', [
 			'output' => ['name'],
-			'filter' => ['name' => $names],
+			'filter' => ['name' => $names, 'hostid' => $hostid],
 			'limit' => 1
 		]);
 
@@ -299,7 +302,7 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$valuemaps) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [], 'fields' => [
 			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
@@ -310,8 +313,6 @@ class CValueMap extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$this->checkDuplicates(zbx_objectValues($valuemaps, 'name'));
 	}
 
 	/**
@@ -321,9 +322,9 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'hostid' =>	['type' => API_ID, 'flags' => API_NOT_EMPTY],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
 				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
@@ -354,12 +355,12 @@ class CValueMap extends CApiService {
 			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
 
 			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
-				$names[] = $valuemap['name'];
+				$names[$db_valuemap['hostid']][] = $valuemap['name'];
 			}
 		}
 
-		if ($names) {
-			$this->checkDuplicates($names);
+		foreach ($names as $hostid => $value) {
+			$this->checkDuplicates($value, $hostid);
 		}
 	}
 

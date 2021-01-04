@@ -36,6 +36,7 @@ class CHostImporter extends CImporter {
 	public function import(array $hosts) {
 		$hostsToCreate = [];
 		$hostsToUpdate = [];
+		$valuemaps = [];
 		$templateLinkage = [];
 		$tmpls_to_clear = [];
 
@@ -69,6 +70,10 @@ class CHostImporter extends CImporter {
 
 				$hostsToCreate[] = $host;
 			}
+
+			if ($host['valuemaps']) {
+				$valuemaps = $host['valuemaps'];
+			}
 		}
 
 		// Get template linkages to unlink and clear.
@@ -77,19 +82,19 @@ class CHostImporter extends CImporter {
 			$db_template_links = API::Host()->get([
 				'output' => ['hostids'],
 				'selectParentTemplates' => ['hostid'],
-				'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
+				'hostids' => array_column($hostsToUpdate, 'hostid'),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_template_links as &$db_template_link) {
-				$db_template_link = zbx_objectValues($db_template_link['parentTemplates'], 'templateid');
+				$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
 			}
 			unset($db_template_link);
 
 			foreach ($hostsToUpdate as $host) {
 				if (array_key_exists($host['host'], $templateLinkage)) {
 					$tmpls_to_clear[$host['hostid']] = array_diff($db_template_links[$host['hostid']],
-						zbx_objectValues($templateLinkage[$host['host']], 'templateid')
+						array_column($templateLinkage[$host['host']], 'templateid')
 					);
 				}
 				else {
@@ -112,6 +117,14 @@ class CHostImporter extends CImporter {
 						'hosts' => ['hostid' => $hostId],
 						'templates' => $templateLinkage[$hostHost]
 					]);
+				}
+
+				if ($valuemaps) {
+					foreach ($valuemaps as $valuemap) {
+						$valuemap['hostid'] = $hostId;
+
+						API::ValueMap()->create($valuemap);
+					}
 				}
 			}
 		}
@@ -140,6 +153,40 @@ class CHostImporter extends CImporter {
 						'hosts' => $host,
 						'templates' => $templateLinkage[$host['host']]
 					]);
+				}
+
+				if ($valuemaps) {
+					$db_valuemaps = API::ValueMap()->get([
+						'output' => ['valuemapid', 'name'],
+						'selectMappings' => ['value', 'newvalue'],
+						'hostids' => [$host['hostid']],
+						'preservekeys' => true
+					]);
+
+					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
+						API::ValueMap()->delete(array_keys($db_valuemaps));
+					}
+
+					if ($this->options['valueMaps']['updateExisting']) {
+						$valuemaps_update = [];
+						foreach ($db_valuemaps as $db_valuemap) {
+							foreach ($valuemaps as $valuemap) {
+								if ($db_valuemap['name'] === $valuemap['name']) {
+									$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
+									$valuemaps_update[] = $valuemap;
+								}
+							}
+						}
+
+						API::ValueMap()->update($valuemaps_update);
+					}
+					else {
+						foreach ($valuemaps as $valuemap) {
+							$valuemap['hostid'] = $host['hostid'];
+
+							API::ValueMap()->create($valuemap);
+						}
+					}
 				}
 			}
 		}

@@ -36,11 +36,14 @@ class CControllerPopupMassupdateTemplate extends CController {
 			'tags' => 'array',
 			'macros' => 'array',
 			'linked_templates' => 'array',
+			'valuemap' => 'array',
+			'valuemap_checkbox' => 'in 0,1',
 			'mass_action_tpls' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_clear_tpls' => 'in 0,1',
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'description' => 'string',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
@@ -367,6 +370,74 @@ class CControllerPopupMassupdateTemplate extends CController {
 				if ($template_macros_update) {
 					if (!API::UserMacro()->update($template_macros_update)) {
 						throw new Exception();
+					}
+				}
+
+
+				// Value mapping.
+				if (array_key_exists('valuemaps', $visible)) {
+					$valuemaps = $this->getInput('valuemap', []);
+					if ($valuemaps) {
+						switch ($this->getInput('valuemap_massupdate')) {
+							case ZBX_ACTION_ADD:
+								$create_valuemaps = [];
+								foreach ($valuemaps as $value) {
+									foreach ($templateids as $id) {
+										$value['hostid'] = $id;
+										$create_valuemaps[] = $value;
+									}
+								}
+
+								if (!API::ValueMap()->create($create_valuemaps)) {
+									throw new Exception();
+								}
+								break;
+							case ZBX_ACTION_REPLACE:
+								$db_valuemaps = API::ValueMap()->get([
+									'output' => ['valuemapid'],
+									'hostids' => $templateids,
+									'preservekeys' => true
+								]);
+
+								if ($db_valuemaps) {
+									API::ValueMap()->delete(array_keys($db_valuemaps));
+								}
+
+								$update_valuemaps = [];
+								foreach ($valuemaps as $value) {
+									foreach ($templateids as $id) {
+										$value['hostid'] = $id;
+										$update_valuemaps[] = $value;
+									}
+								}
+
+								if (!API::ValueMap()->create($update_valuemaps)) {
+									throw new Exception();
+								}
+								break;
+							case ZBX_ACTION_REMOVE:
+								$vm_checkbox = $this->getInput('valuemap_checkbox', 0);
+								if ($vm_checkbox) {
+									$db_valuemaps = API::ValueMap()->get([
+										'output' => ['valuemapid'],
+										'hostids' => $templateids,
+										'preservekeys' => true
+									]);
+
+									$remove_valuemaps = [];
+									foreach ($db_valuemaps as $value) {
+										if (!in_array($value['valuemapid'], $valuemaps)) {
+											$remove_valuemaps[] = $value['valuemapid'];
+										}
+									}
+
+									$valuemaps = $remove_valuemaps;
+								}
+								if (!API::ValueMap()->delete($valuemaps)) {
+									throw new Exception();
+								}
+								break;
+						}
 					}
 				}
 			}

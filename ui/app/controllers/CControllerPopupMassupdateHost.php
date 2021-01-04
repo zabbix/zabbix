@@ -46,6 +46,8 @@ class CControllerPopupMassupdateHost extends CController {
 			'tls_subject' => 'string',
 			'tls_psk_identity' => 'string',
 			'tls_psk' => 'string',
+			'valuemap' => 'array',
+			'valuemap_checkbox' => 'in 0,1',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
 			'macros_remove' => 'in 0,1',
@@ -55,6 +57,7 @@ class CControllerPopupMassupdateHost extends CController {
 			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'inventory_mode' => 'in '.implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]),
 			'status' => 'in '.implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]),
 			'tls_connect' => 'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
@@ -433,6 +436,75 @@ class CControllerPopupMassupdateHost extends CController {
 				if ($host_macros_update) {
 					if (!API::UserMacro()->update($host_macros_update)) {
 						throw new Exception();
+					}
+				}
+
+				// Value mapping.
+				if (array_key_exists('valuemaps', $visible)) {
+					$valuemaps = $this->getInput('valuemap', []);
+					if ($valuemaps) {
+						switch ($this->getInput('valuemap_massupdate')) {
+							case ZBX_ACTION_ADD:
+								$create_valuemaps = [];
+								foreach ($valuemaps as $value) {
+									foreach ($hostids as $id) {
+										$value['hostid'] = $id;
+										$create_valuemaps[] = $value;
+									}
+								}
+
+								if (!API::ValueMap()->create($create_valuemaps)) {
+									throw new Exception();
+								}
+								break;
+
+							case ZBX_ACTION_REPLACE:
+								$db_valuemaps = API::ValueMap()->get([
+									'output' => ['valuemapid'],
+									'hostids' => $hostids,
+									'preservekeys' => true
+								]);
+
+								if ($db_valuemaps) {
+									API::ValueMap()->delete(array_keys($db_valuemaps));
+								}
+
+								$update_valuemaps = [];
+								foreach ($valuemaps as $value) {
+									foreach ($hostids as $id) {
+										$value['hostid'] = $id;
+										$update_valuemaps[] = $value;
+									}
+								}
+
+								if (!API::ValueMap()->create($update_valuemaps)) {
+									throw new Exception();
+								}
+								break;
+
+							case ZBX_ACTION_REMOVE:
+								$vm_checkbox = $this->getInput('valuemap_checkbox', 0);
+								if ($vm_checkbox) {
+									$db_valuemaps = API::ValueMap()->get([
+										'output' => ['valuemapid'],
+										'hostids' => $hostids,
+										'preservekeys' => true
+									]);
+
+									$remove_valuemaps = [];
+									foreach ($db_valuemaps as $value) {
+										if (!in_array($value['valuemapid'], $valuemaps)) {
+											$remove_valuemaps[] = $value['valuemapid'];
+										}
+									}
+
+									$valuemaps = $remove_valuemaps;
+								}
+								if (!API::ValueMap()->delete($valuemaps)) {
+									throw new Exception();
+								}
+								break;
+						}
 					}
 				}
 

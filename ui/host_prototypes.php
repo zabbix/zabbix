@@ -53,6 +53,7 @@ $fields = [
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
+	'valuemap' => 				[T_ZBX_STR, O_OPT, null,			null,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
@@ -78,9 +79,9 @@ $hostid = getRequest('hostid', 0);
 // permissions
 if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
-		'itemids' => getRequest('parent_discoveryid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['flags'],
+		'itemids' => getRequest('parent_discoveryid'),
 		'editable' => true
 	]);
 	$discoveryRule = reset($discoveryRule);
@@ -90,7 +91,6 @@ if (getRequest('parent_discoveryid')) {
 
 	if ($hostid != 0) {
 		$hostPrototype = API::HostPrototype()->get([
-			'hostids' => [$hostid],
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
@@ -99,6 +99,8 @@ if (getRequest('parent_discoveryid')) {
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+			'hostids' => [$hostid],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -299,7 +301,33 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = API::HostPrototype()->create($newHostPrototype);
 
+		if ($result) {
+			$hostid = reset($result['hostids']);
+		}
+
 		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
+	}
+
+	if ($result) {
+		$valuemap = getRequest('valuemap', []);
+		if ($valuemap) {
+			$db_valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid'],
+				'hostids' => [$hostid],
+				'preservekeys' => true
+			]);
+
+			if ($db_valuemap) {
+				API::ValueMap()->delete(array_keys($db_valuemap));
+			}
+
+			API::ValueMap()->create(array_map(function (array $value) use ($hostid): array {
+				$value['hostid'] = $hostid;
+				unset($value['valuemapid']);
+
+				return $value;
+			}, $valuemap));
+		}
 	}
 
 	$result = DBend($result);
@@ -394,6 +422,7 @@ if (hasRequest('form')) {
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,
+		'valuemaps' => getRequest('valuemap', []),
 		// Parent discovery rules.
 		'templates' => []
 	];
@@ -516,6 +545,16 @@ if (hasRequest('form')) {
 	}
 	else {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	}
+
+	// Valuemaps.
+	if (!$data['valuemaps']) {
+		$data['valuemaps'] = API::ValueMap()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'selectMappings' => API_OUTPUT_EXTEND,
+			'hostids' => [$hostid],
+			'preservekeys' => true
+		]);
 	}
 
 	$macros = $data['host_prototype']['macros'];

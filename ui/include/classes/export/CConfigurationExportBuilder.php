@@ -447,7 +447,7 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($valuemaps, ['name']);
 
 		foreach ($valuemaps as $valuemap) {
-			CArrayHelper::sort($valuemap['mappings'], ['key']);
+			CArrayHelper::sort($valuemap['mappings'], ['value']);
 			$result[] = $valuemap;
 		}
 

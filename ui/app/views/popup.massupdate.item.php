@@ -342,24 +342,30 @@ $item_form_list->addRow(
 	(new CTextBox('logtimefmt', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-// Append valuemap to form list.
-$valuemaps_combobox = (new CComboBox('valuemapid', 0))->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-$valuemaps_combobox->addItem(0, _('As is'));
-foreach ($data['valuemaps'] as $valuemap) {
-	$valuemaps_combobox->addItem($valuemap['valuemapid'], $valuemap['name']);
-}
+$item_form_list->addRow(
+	(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
+	(new CDiv([
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'multiple' => false,
+			'data' => [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => $data['prototype'] ? [$data['parent_discoveryid']] : [$data['hostid']],
+					'editable' => true
+				]
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]))->setId('valuemapid_div')
+);
 
-$item_form_list
-	->addRow(
-		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))->setLabel(_('Show value')),
-		(new CDiv([$valuemaps_combobox, ' ',
-			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'valuemap.list')
-				->getUrl()
-			))->setAttribute('target', '_blank')
-		]))->setId('valuemap')
-	)
-	->addRow(
+$item_form_list->addRow(
 		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))->setLabel(_('Enable trapping')),
 		(new CRadioButtonList('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF))
 			->addValue(_('Yes'), HTTPCHECK_ALLOW_TRAPS_ON)

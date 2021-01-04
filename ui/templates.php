@@ -124,7 +124,7 @@ $macros = array_filter($macros, function($macro) {
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
 
-$valuemaps = getRequest('valuemap', []);
+$valuemap = getRequest('valuemap', []);
 
 /*
  * Actions
@@ -258,8 +258,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'templates' => $templates,
 			'macros' => $macros,
 			'tags' => $tags,
-			'description' => getRequest('description', ''),
-			'valuemaps' => $valuemaps
+			'description' => getRequest('description', '')
 		];
 
 		if ($templateId == 0) {
@@ -282,6 +281,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 		}
+
+		if ($valuemap) {
+			$db_valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid'],
+				'hostids' => [$templateId],
+				'preservekeys' => true
+			]);
+
+			if ($db_valuemap) {
+				API::ValueMap()->delete(array_keys($db_valuemap));
+			}
+
+			API::ValueMap()->create(array_map(function (array $value) use ($templateId): array {
+				$value['hostid'] = $templateId;
+				unset($value['valuemapid']);
+
+				return $value;
+			}, $valuemap));
+		}
+
 
 		// full clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
@@ -462,7 +481,7 @@ if (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
 		'macros' => $macros,
-		'valuemaps' => $valuemaps
+		'valuemaps' => $valuemap
 	];
 
 	if ($data['templateid'] != 0) {

@@ -7477,3 +7477,11 @@ z-select,
 		width: 300px;
 	}
 }
+
+.valuemap-remove {
+	display: none;
+
+	.valuemap-checkbox {
+		margin-top: 10px;
+	}
+}

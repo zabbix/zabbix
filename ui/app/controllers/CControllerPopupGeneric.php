@@ -1364,23 +1364,20 @@ class CControllerPopupGeneric extends CController {
 			case 'valuemaps':
 				$records = [];
 				$options += [
-					'output' => ['valuemaps'],
-					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+					'output' => ['valuemapid', 'hostid', 'name'],
+					'selectMappings' => API_OUTPUT_EXTEND,
 					'hostids' => $this->getInput('hostids', []),
 					'preservekeys' => true
 				];
 
-				$hosts = API::Host()->get($options);
+				$valuemaps = API::ValueMap()->get($options);
 
-				foreach ($hosts as $host) {
-					$valuemaps = $host['valuemaps'];
-					foreach ($valuemaps as $valuemap) {
-						$records[$valuemap['valuemapid']] = [
-							'id' => $valuemap['valuemapid'],
-							'name' => $valuemap['name'],
-							'mappings' => $valuemap['mappings']
-						];
-					}
+				foreach ($valuemaps as $valuemap) {
+					$records[$valuemap['valuemapid']] = [
+						'id' => $valuemap['valuemapid'],
+						'name' => $valuemap['name'],
+						'mappings' => $valuemap['mappings']
+					];
 				}
 
 				CArrayHelper::sort($records, ['name']);

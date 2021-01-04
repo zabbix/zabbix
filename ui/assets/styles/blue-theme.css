@@ -5993,3 +5993,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-macros-table .table-col-value,
 .host-macros-table .table-col-template-value {
   width: 300px; }
+
+.valuemap-remove {
+  display: none; }
+  .valuemap-remove .valuemap-checkbox {
+    margin-top: 10px; }

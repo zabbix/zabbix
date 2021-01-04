@@ -290,15 +290,13 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 5
-	// FIXME: add API call.
-	// $valuemaps_filter = $filter_valuemaps
-	// 	? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-	// 		'output' => ['valuemapid', 'name'],
-	// 		'hostids' => $filter_valuemaps,
-	// 		'editable' => true
-	// 	]), ['valuemapid' => 'id'])
-	// 	: [];
-	$valuemaps_filter = [];
+	$valuemaps_filter = $filter_valuemaps
+		? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'valuemapids' => $filter_valuemaps,
+			'editable' => true
+		]), ['valuemapid' => 'id'])
+		: [];
 
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)

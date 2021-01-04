@@ -86,10 +86,7 @@ $fields = [
 										_('Trend storage period')
 									],
 	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
-										'(isset({add}) || isset({update})) && isset({value_type})'.
-											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
-									],
+	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
 									],
@@ -353,6 +350,7 @@ if (!empty($hosts)) {
 if (hasRequest('filter_set')) {
 	CProfile::updateArray('web.items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
 	CProfile::updateArray('web.items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.items.filter_valuemapids', getRequest('filter_valuemapids', []), PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
@@ -396,6 +394,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx('web.items.filter_with_triggers');
 	CProfile::deleteIdx('web.items.filter_ipmi_sensor');
 	CProfile::deleteIdx('web.items.filter_discovery');
+	CProfile::deleteIdx('web.items.filter_valuemapids');
 	DBend();
 }
 
@@ -416,6 +415,7 @@ $_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_
 $_REQUEST['filter_discovery'] = CProfile::get('web.items.filter_discovery', -1);
 $_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 $_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor', '');
+$_REQUEST['filter_valuemapids'] = CProfile::getArray('web.items.filter_valuemapids', []);
 
 // subfilters
 foreach ($subfiltersList as $name) {
@@ -439,11 +439,13 @@ if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
 			'output' => ['hostid'],
+			'selectValueMaps' => ['valuemapid', 'name'],
 			'hostids' => $filter_hostids
 		]);
 		if (!$host) {
 			$host = API::Template()->get([
 				'output' => ['templateid'],
+				'selectValueMaps' => ['valuemapid', 'name'],
 				'templateids' => $filter_hostids
 			]);
 		}
@@ -1239,6 +1241,19 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 	];
 
+	// Value map.
+	$data['valuemap'] = [];
+	if (array_key_exists('valuemapid', $item) && $item['valuemapid']) {
+		$db_valuemap = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'valuemapids' => [$item['valuemapid']],
+			'preservekeys' => true
+		]);
+		if ($db_valuemap) {
+			$data['valuemap'] = [CArrayHelper::renameKeys(current($db_valuemap), ['valuemapid' => 'id'])];
+		}
+	}
+
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();
@@ -1323,6 +1338,9 @@ else {
 	if (isset($_REQUEST['filter_value_type']) && !zbx_empty($_REQUEST['filter_value_type'])
 			&& $_REQUEST['filter_value_type'] != -1) {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
+	}
+	if ($_REQUEST['filter_valuemapids']) {
+		$options['filter']['valuemapid'] = $_REQUEST['filter_valuemapids'];
 	}
 
 	/*
