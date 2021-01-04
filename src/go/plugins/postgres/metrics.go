@@ -51,7 +51,7 @@ const (
 	keyReplicationLagB                 = "pgsql.replication.lag.b"
 	keyReplicationLagSec               = "pgsql.replication.lag.sec"
 	keyReplicationProcessInfo          = "pgsql.replication.process"
-	keyReplicationProcessNameDiscovery = "pgsql.replication_process.discovery"
+	keyReplicationProcessNameDiscovery = "pgsql.replication.process.discovery"
 	keyReplicationRecoveryRole         = "pgsql.replication.recovery_role"
 	keyReplicationStatus               = "pgsql.replication.status"
 	keyUptime                          = "pgsql.uptime"
@@ -233,7 +233,7 @@ var metrics = metric.MetricSet{
 	keyReplicationProcessNameDiscovery: metric.New("Returns JSON with application name from pg_stat_replication.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
 
-	keyReplicationProcessInfo: metric.New("Returns flush lag, write lag and replay lag per each sender preocess.",
+	keyReplicationProcessInfo: metric.New("Returns flush lag, write lag and replay lag per each sender process.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase}, false),
 
 	keyReplicationRecoveryRole: metric.New("Returns postgreSQL recovery role.",

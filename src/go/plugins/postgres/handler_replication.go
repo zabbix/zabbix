@@ -21,6 +21,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strconv"
 
@@ -32,10 +33,11 @@ import (
 func replicationHandler(ctx context.Context, conn PostgresClient,
 	key string, _ map[string]string, _ ...string) (interface{}, error) {
 	var (
-		replicationResult   int64
-		status              int
-		query, stringResult string
-		inRecovery          bool
+		replicationResult int64
+		status            int
+		query             string
+		stringResult      sql.NullString
+		inRecovery        bool
 	)
 
 	switch key {
@@ -145,7 +147,7 @@ func replicationHandler(ctx context.Context, conn PostgresClient,
 			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
-		return stringResult, nil
+		return stringResult.String, nil
 	}
 
 	row, err := conn.QueryRow(ctx, query)

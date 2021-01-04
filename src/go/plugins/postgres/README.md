@@ -471,6 +471,31 @@ END as lag
 - 1 — streaming is up
 - 2 — mastermode
 
+**pgsql.replication.process[uri,username,password]** — flush lag, write lag and replay lag per each sender process.
+*Returns:* Result of the
+```sql
+SELECT json_object_agg(application_name, row_to_json(T))
+FROM (
+	SELECT
+		CONCAT(application_name, ' ', pid) AS application_name,
+		EXTRACT(epoch FROM COALESCE(flush_lag,'0'::interval)) as flush_lag, 
+		EXTRACT(epoch FROM COALESCE(replay_lag,'0'::interval)) as replay_lag,
+		EXTRACT(epoch FROM COALESCE(write_lag, '0'::interval)) as write_lag
+		FROM pg_stat_replication
+	) T; 
+```
+
+**pgsql.replication.process.discovery[uri,username,password]** - replication procces name discovery. 
+*Returns:* Result of the
+```sql
+SELECT 
+json_build_object('data',
+json_agg(json_build_object('{#APPLICATION_NAME}',
+CONCAT(application_name, ' ', pid))))		
+FROM 
+pg_stat_replication
+```
+
 **pgsql.uptime[\<commonParams\>]** — PostgreSQL uptime, in milliseconds.  
 *Returns:* Result of the
 ```sql
