@@ -809,9 +809,22 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT
 	}
 }
 
+static void	get_scriptname_by_scriptid(zbx_uint64_t scriptid, char **script_name)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select name from scripts where scriptid=" ZBX_FS_UI64, scriptid);
+
+	if (NULL != (row = DBfetch(result)))
+		*script_name = zbx_strdup(*script_name, row[0]);
+
+	DBfree_result(result);
+}
+
 static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const DC_HOST *host,
 		const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		const char *command, zbx_alert_status_t status, const char *error)
+		const zbx_script_t *script, zbx_alert_status_t status, const char *error)
 {
 	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
 	char	*tmp = NULL;
@@ -826,7 +839,11 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	now = (int)time(NULL);
-	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(command));
+
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type)
+		get_scriptname_by_scriptid(script->scriptid, &tmp);
+	else
+		tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(script->command_orig));
 
 	if (NULL == r_event)
 	{
@@ -1213,7 +1230,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				script.command_orig, status, error);
+				&script, status, error);
 skip:
 		zbx_script_clean(&script);
 	}
