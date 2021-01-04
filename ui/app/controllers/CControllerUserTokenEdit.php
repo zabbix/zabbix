@@ -30,7 +30,6 @@ class CControllerUserTokenEdit extends CController {
 			'tokenid'       => 'db token.tokenid',
 			'name'          => 'db token.name',
 			'description'   => 'db token.description',
-			'userid'        => 'db users.userid',
 			'expires_state' => 'in 0,1',
 			'expires_at'    => 'string',
 			'status'        => 'db token.status|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED
@@ -52,7 +51,7 @@ class CControllerUserTokenEdit extends CController {
 	protected function doAction() {
 		if ($this->hasInput('tokenid')) {
 			$tokens = API::Token()->get([
-				'output' => ['tokenid', 'userid', 'name', 'description', 'expires_at', 'status'],
+				'output' => ['tokenid', 'name', 'description', 'expires_at', 'status'],
 				'tokenids' => $this->getInput('tokenid')
 			]);
 
@@ -74,7 +73,6 @@ class CControllerUserTokenEdit extends CController {
 		else {
 			$data = [
 				'tokenid' => 0,
-				'userid' => 0,
 				'name' => '',
 				'description' => '',
 				'expires_at' => date(ZBX_DATE_TIME, time()),
@@ -83,19 +81,7 @@ class CControllerUserTokenEdit extends CController {
 			];
 		}
 
-		$data['ms_user'] = [];
-		$this->getInputs($data, ['userid', 'name', 'description', 'expires_at', 'expires_state', 'status']);
-
-		if ($data['userid'] != 0) {
-			[$user] = CWebUser::$data['userid'] != $data['userid']
-				? API::User()->get([
-					'output' => ['alias', 'name', 'surname'],
-					'userids' => $data['userid']
-				])
-				: [CWebUser::$data];
-
-			$data['ms_user'] = [['id' => $user['userid'], 'name' => getUserFullname($user)]];
-		}
+		$this->getInputs($data, ['name', 'description', 'expires_at', 'expires_state', 'status']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));
