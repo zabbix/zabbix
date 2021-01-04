@@ -827,7 +827,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 		const zbx_script_t *script, zbx_alert_status_t status, const char *error)
 {
 	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
-	char	*tmp = NULL;
+	char	*tmp = NULL, *message = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -840,10 +840,15 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	now = (int)time(NULL);
 
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type)
-		get_scriptname_by_scriptid(script->scriptid, &tmp);
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type || ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type
+			|| ZBX_SCRIPT_TYPE_IPMI == script->type)
+	{
+		get_scriptname_by_scriptid(script->scriptid, &message);
+	}
 	else
-		tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(script->command_orig));
+		message = ZBX_NULL2EMPTY_STR(script->command_orig);
+
+	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, message);
 
 	if (NULL == r_event)
 	{
