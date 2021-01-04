@@ -39,14 +39,9 @@ class CApiTagHelper {
 	 * @return string
 	 */
 	public static function addWhereCondition(array $tags, $evaltype, $parent_alias, $table, $field) {
-		/*
-		 * Tag grouping based on operator:
-		 * '0' for NOT EXISTS sub-queries;
-		 * '1' for EXISTS sub-queries.
-		 */
 		$values_by_tag = [
-			0 => [],
-			1 => []
+			'NOT EXISTS' => [],
+			'EXISTS' => []
 		];
 		foreach ($tags as $tag) {
 			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
@@ -54,65 +49,50 @@ class CApiTagHelper {
 
 			if ($operator == TAG_OPERATOR_NOT_EXISTS
 					|| ($operator == TAG_OPERATOR_NOT_LIKE && $value === '')) {
-				$values_by_tag[0][$tag['tag']] = false;
+				$values_by_tag['NOT EXISTS'][$tag['tag']] = false;
 			}
 			elseif ($operator == TAG_OPERATOR_NOT_EQUAL && $value !== '') {
-				$values_by_tag[0][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+				$values_by_tag['NOT EXISTS'][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
 			}
 			elseif ($operator == TAG_OPERATOR_NOT_LIKE) {
 				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
 				$value = '%'.mb_strtoupper($value).'%';
 
-				$values_by_tag[0][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+				$values_by_tag['NOT EXISTS'][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 			}
 			elseif ($operator == TAG_OPERATOR_NOT_EQUAL) {
-				$values_by_tag[1][$tag['tag']][] = $table.'.value<>'.zbx_dbstr($value);
+				$values_by_tag['EXISTS'][$tag['tag']][] = $table.'.value<>'.zbx_dbstr($value);
 			}
 			elseif ($operator == TAG_OPERATOR_EXISTS
 					|| ($operator == TAG_OPERATOR_LIKE && $value === '')) {
-				$values_by_tag[1][$tag['tag']] = true;
+				$values_by_tag['EXISTS'][$tag['tag']] = true;
 			}
 			elseif ($operator == TAG_OPERATOR_LIKE) {
 				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
 				$value = '%'.mb_strtoupper($value).'%';
 
-				$values_by_tag[1][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+				$values_by_tag['EXISTS'][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 			}
 			elseif ($operator == TAG_OPERATOR_EQUAL) {
-				$values_by_tag[1][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+				$values_by_tag['EXISTS'][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
 			}
 		}
 
 		$evaltype_glue = ($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 		$sql_where = [];
-		foreach ($values_by_tag as $key => $filters) {
-			$statements = [];
+		foreach ($values_by_tag as $prefix => $filters) {
 			foreach ($filters as $tag => $values) {
-				if (!is_array($values) || count($values) == 0) {
-					$values = '';
-				}
-				elseif (count($values) == 1) {
-					$values = ' AND '.$values[0];
-				}
-				else {
-					$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
+				$values = array_filter($values);
+
+				$statement = $table.'.tag='.zbx_dbstr($tag);
+				if ($values) {
+					$statement .= ' AND ('.implode(' OR ', $values).')';
 				}
 
-				if ($values === '') {
-					$statements[] = $table.'.tag='.zbx_dbstr($tag).$values;
-				}
-				else {
-					$statements[] = '('.$table.'.tag='.zbx_dbstr($tag).$values.')';
-				}
-			}
-
-			if ($statements) {
-				$prefix = ($key == 0) ? 'NOT ' : '';
-				$sql_where[] = $prefix.'EXISTS ('.
+				$sql_where[] = $prefix.' ('.
 					'SELECT NULL'.
 					' FROM '.$table.
-					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
-						' AND ('.implode($evaltype_glue, $statements).')'.
+					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.' AND '.$statement.
 				')';
 			}
 		}
