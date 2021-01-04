@@ -313,14 +313,6 @@ class CMenuHelper {
 					->setAction('userprofile.edit')
 					->setTitle(getUserFullname($user))
 			);
-
-			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-				$menu->add(
-					(new CMenuItem(_('API tokens')))
-						->setIcon('icon-profile')
-						->setAction('user.token.list')
-				);
-			}
 		}
 
 		$menu->add(

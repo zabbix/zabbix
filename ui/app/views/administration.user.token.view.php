@@ -23,7 +23,9 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())->setTitle(_('API tokens'));
+$widget = (new CWidget())
+	->setTitle(_('API tokens'))
+	->setTitleSubmenu(getUserSettingsSubmenu());
 
 $token_form = (new CForm())
 	->setId('token_form')
