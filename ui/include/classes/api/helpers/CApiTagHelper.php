@@ -121,9 +121,10 @@ class CApiTagHelper {
 			return '(1=0)';
 		}
 
+		$sql_where_cnt = count($sql_where);
 		$sql_where = implode($evaltype_glue, $sql_where);
 
-		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
+		return ($sql_where_cnt > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
 	}
 
 	/**
