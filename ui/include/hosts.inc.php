@@ -481,11 +481,15 @@ function hostInterfaceTypeNumToName($type) {
  * Returns the host interface as a string of the host's IP address (or DNS name) and port number.
  *
  * @param array|null $interface
+ * @param int    $interface['useip']  Interface use IP or DNS. INTERFACE_USE_DNS or INTERFACE_USE_IP.
+ * @param string $interface['ip']     Interface IP.
+ * @param string $interface['dns']    Interface DNS.
+ * @param string $interface['port']   Interface port.
  *
  * @return string
  */
 function getHostInterface(?array $interface): string {
-	if (!$interface) {
+	if ($interface === null) {
 		return '';
 	}
 
