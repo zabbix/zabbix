@@ -36,9 +36,7 @@ class CToken extends CApiService {
 
 	protected $tableName = 'token';
 	protected $tableAlias = 't';
-	protected $sortColumns = ['tokenid', 'name', 'description', 'userid', 'lastaccess', 'status', 'expires_at',
-		'created_at', 'creator_userid'
-	];
+	protected $sortColumns = ['tokenid', 'name', 'lastaccess', 'status', 'expires_at', 'created_at'];
 
 	/**
 	 * @param array $tokens
@@ -192,6 +190,10 @@ class CToken extends CApiService {
 	 * @return array|int
 	 */
 	public function get(array $options = []) {
+		$token_fields = ['tokenid', 'name', 'description', 'userid', 'lastaccess', 'status', 'expires_at',
+			'created_at', 'creator_userid'
+		];
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'tokenids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -217,10 +219,10 @@ class CToken extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $this->sortColumns), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $token_fields), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $token_fields), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
