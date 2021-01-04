@@ -82,8 +82,8 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->checkDuplicateNames($tokens);
 		$this->checkUsers($tokens);
+		$this->checkDuplicateNames($tokens);
 	}
 
 	/**
