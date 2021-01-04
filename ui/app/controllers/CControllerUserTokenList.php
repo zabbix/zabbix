@@ -97,7 +97,9 @@ class CControllerUserTokenList extends CController {
 			'output' => ['tokenid', 'name', 'expires_at', 'created_at', 'lastaccess', 'status'],
 			'userids' => CWebUser::$data['userid'],
 			'valid_at' => $filter['expires_state'] ? time() : null,
-			'expired_at' => $filter['expires_state'] ? time() + $filter['expires_days'] * SEC_PER_DAY : null,
+			'expired_at' => $filter['expires_state']
+				? bcadd((string) time(), bcmul($filter['expires_days'], (string) SEC_PER_DAY, 0), 0)
+				: null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
@@ -107,6 +109,10 @@ class CControllerUserTokenList extends CController {
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
+
+		if ($data['tokens'] === false) {
+			$data['tokens'] = [];
+		}
 
 		$now = time();
 		array_walk($data['tokens'], function (array &$token) use ($now) {

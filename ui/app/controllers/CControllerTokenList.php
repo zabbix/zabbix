@@ -112,7 +112,9 @@ class CControllerTokenList extends CController {
 			],
 			'userids' => $filter['userids'] ? $filter['userids'] : null,
 			'valid_at' => $filter['expires_state'] ? time() : null,
-			'expired_at' => $filter['expires_state'] ? time() + $filter['expires_days'] * SEC_PER_DAY : null,
+			'expired_at' => $filter['expires_state']
+				? bcadd((string) time(), bcmul($filter['expires_days'], (string) SEC_PER_DAY, 0), 0)
+				: null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
@@ -123,6 +125,10 @@ class CControllerTokenList extends CController {
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
+
+		if ($data['tokens'] === false) {
+			$data['tokens'] = [];
+		}
 
 		$userids = array_column($data['tokens'], 'userid', 'userid');
 		$userids += array_column($data['tokens'], 'creator_userid', 'creator_userid');
