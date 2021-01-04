@@ -224,7 +224,6 @@ class CToken extends CApiService {
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
-			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
 			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 
