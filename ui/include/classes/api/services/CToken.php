@@ -407,11 +407,15 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		['type' => $type, 'userid' => $userid] = self::$userData;
+		$filter_userids = null;
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$filter_userids = [self::$userData['userid']];
+		}
+
 		$db_tokens = DB::select('token', [
 			'output' => ['tokenid', 'userid', 'name'],
 			'tokenids' => $tokenids,
-			'filter' => ['userid' => $type == USER_TYPE_SUPER_ADMIN ? null : [$userid]]
+			'filter' => ['userid' => $filter_userids]
 		]);
 
 		if (count($db_tokens) != count($tokenids)) {
