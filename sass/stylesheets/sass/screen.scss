@@ -4002,6 +4002,7 @@ $form-icon-btn: (
 
 			.table-forms {
 				.table-forms-td-right {
+					@extend %space-pre-wrap;
 					padding-right: 8px;
 				}
 
