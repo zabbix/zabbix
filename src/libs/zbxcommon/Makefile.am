@@ -17,5 +17,3 @@ libzbxcommon_a_SOURCES = \
 	time.c
 	
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS) $(LIBXML2_CFLAGS)
-	 
-
