@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -255,6 +255,7 @@ foreach ($data['rows'] as $row_index => $row) {
 			$item_key = (new CLink($item['key_expanded'], (new CUrl('items.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $item['itemid'])
+				->setArgument('context', 'host')
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREEN);

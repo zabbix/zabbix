@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,6 +229,7 @@ $fields = [
 										_('Password')
 									],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"itemprototype.massdelete","itemprototype.massdisable",'.
@@ -847,18 +848,21 @@ if (isset($_REQUEST['form'])) {
 	}
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	$sortField = getRequest('sort', CProfile::get($prefix.$page['file'].'.sort', 'name'));
+	$sortOrder = getRequest('sortorder', CProfile::get($prefix.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update($prefix.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
+	CProfile::update($prefix.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	$data = [
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => $discoveryRule['hostid'],
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'context' => getRequest('context')
 	];
 
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
@@ -904,7 +908,9 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sortOrder,
-		(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		(new CUrl('disc_prototypes.php'))
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('context', $data['context'])
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);

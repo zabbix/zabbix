@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,20 +31,23 @@ $widget = (new CWidget())
 				(new CUrl('disc_prototypes.php'))
 					->setArgument('form', 'create')
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('context', $data['context'])
 					->getUrl()
 			))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
-
-// create form
-$itemForm = (new CForm())
-	->setName('items')
-	->addVar('parent_discoveryid', $data['parent_discoveryid']);
+	->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 
 $url = (new CUrl('disc_prototypes.php'))
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->setArgument('context', $data['context'])
 	->getUrl();
+
+// create form
+$itemForm = (new CForm('post', $url))
+	->setName('items')
+	->addVar('parent_discoveryid', $data['parent_discoveryid'])
+	->addVar('context', $data['context']);
 
 // create table
 $itemTable = (new CTableInfo())
@@ -78,15 +81,19 @@ foreach ($data['items'] as $item) {
 		}
 		else {
 			$link = ($item['master_item']['source'] === 'itemprototypes')
-				? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				? (new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('context', $data['context'])
 				: (new CUrl('items.php'))
 					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$item['hostid']]);
+					->setArgument('filter_hostids', [$item['hostid']])
+					->setArgument('context', $data['context']);
 
 			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
 				$link
 					->setArgument('form', 'update')
 					->setArgument('itemid', $item['master_item']['itemid'])
+					->setArgument('context', $data['context'])
 					->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
@@ -102,6 +109,7 @@ foreach ($data['items'] as $item) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('itemid', $item['itemid'])
+			->setArgument('context', $data['context'])
 			->getUrl()
 	);
 
@@ -114,6 +122,7 @@ foreach ($data['items'] as $item) {
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
 			)
+			->setArgument('context', $data['context'])
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -147,7 +156,7 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototype($item['itemid'], $data['parent_discoveryid']);
+	$item_menu = CMenuPopupHelper::getItemPrototype(['itemid' => $item['itemid'], 'context' => $data['context']]);
 
 	$wizard = (new CSpan(
 		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)
@@ -162,7 +171,7 @@ foreach ($data['items'] as $item) {
 					? 'itemprototype.massdiscover.enable'
 					: 'itemprototype.massdiscover.disable'
 				)
-				->setArgumentSID()
+				->setArgument('context', $data['context'])
 				->getUrl()
 		))
 			->addSID()

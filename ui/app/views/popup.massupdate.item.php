@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ $form = (new CForm())
 	->addVar('action', $data['prototype'] ? 'popup.massupdate.itemprototype' : 'popup.massupdate.item')
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
+	->addVar('context', $data['context'])
 	->disablePasswordAutofill();
 
 if ($data['prototype']) {
@@ -53,7 +54,10 @@ $item_form_list = (new CFormList('item-form-list'))
 		(new CVisibilityBox('visible[type]', 'type', _('Original')))
 			->setLabel(_('Type'))
 			->setAttribute('autofocus', 'autofocus'),
-		new CComboBox('type', ITEM_TYPE_ZABBIX, null, $data['itemTypes'])
+		(new CSelect('type'))
+			->setId('type')
+			->setValue(ITEM_TYPE_ZABBIX)
+			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
 	);
 
 // Append hosts to item form list.
@@ -152,13 +156,16 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information')),
-		new CComboBox('value_type', ITEM_VALUE_TYPE_UINT64, null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+		(new CSelect('value_type'))
+			->setId('value_type')
+			->setValue(ITEM_VALUE_TYPE_UINT64)
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	)
 	// Append units to form list.
 	->addRow(
@@ -168,10 +175,13 @@ $item_form_list
 	// Append authtype to form list.
 	->addRow(
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))->setLabel(_('Authentication method')),
-		new CComboBox('authtype', ITEM_AUTHTYPE_PASSWORD, null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		])
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue(ITEM_AUTHTYPE_PASSWORD)
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
 	)
 	// Append username to form list.
 	->addRow(

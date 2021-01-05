@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,8 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 			'massupdate_app_action' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'preprocessing_test_type' => 'int32',
 			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
-			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM])
+			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'context' => 'required|string|in '.implode(',', ['host', 'template'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -574,6 +575,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'ids' => $this->getInput('ids', []),
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'hostid' => $this->getInput('hostid', 0),
+				'context' => $this->getInput('context'),
 				'delay_flex' => [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]],
 				'multiple_interface_types' => false,
 				'initial_item_type' => null,
@@ -582,7 +584,10 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'displayApplications' => true,
 				'display_interfaces' => true,
 				'displayMasteritems' => true,
-				'location_url' => 'disc_prototypes.php?parent_discoveryid='.$this->getInput('parent_discoveryid', 0)
+				'location_url' => (new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
+					->setArgument('context', $this->getInput('context'))
+					->getUrl()
 			];
 
 			// hosts

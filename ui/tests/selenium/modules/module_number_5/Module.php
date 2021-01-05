@@ -15,7 +15,7 @@ class Module extends CModule {
 		$menu = APP::Component()->get('menu.main');
 
 		$menu
-			->findOrAdd(_('Module 5 menu'))
+			->findOrAdd('Module 5 menu')
 			->setIcon('icon-share')
 			->getSubmenu()
 			->add(
@@ -23,7 +23,7 @@ class Module extends CModule {
 			);
 
 		$menu
-			->find(_('Module 5 menu'))
+			->find('Module 5 menu')
 			->getSubmenu()
 			->insertBefore('', (new \CMenuItem('Your profile'))->setAction('userprofile.edit'))
 			->insertAfter('', (new \CMenuItem('Module list'))->setAction('module.list'));

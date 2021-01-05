@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,6 +51,16 @@ class CLegacyAction extends CAction {
 		$user_type = $this->getUserType();
 		$denied = [];
 		$action = $this->getAction();
+
+		/*
+		 * Overwrite legacy action in case user is located in sub-section like items, triggers etc. That will make
+		 * sure to hide left menu and display error in case user has no access to templates or hosts.
+		 */
+		if (in_array(getRequest('context', ''), ['host', 'template']) && in_array($action, ['items.php', 'triggers.php',
+				'graphs.php', 'host_discovery.php', 'httpconf.php', 'disc_prototypes.php', 'trigger_prototypes.php',
+				'host_prototypes.php'])) {
+			$action = (getRequest('context') === 'host') ? 'hosts.php' : 'templates.php';
+		}
 
 		if ($user_type < USER_TYPE_ZABBIX_USER) {
 			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart4.php', 'chart5.php', 'chart6.php', 'chart7.php',

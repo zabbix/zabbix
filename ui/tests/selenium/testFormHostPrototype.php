@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	const HOST_PROTOTYPE_ID = 90012;
 
 	public function testFormHostPrototype_CheckLayout() {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$visible_name = 'Host prototype visible name';
 		$name = 'Host prototype {#33}';
 
@@ -241,7 +241,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCreateValidationData
 	 */
 	public function testFormHostPrototype_CreateValidation($data) {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&form=create');
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host&form=create');
 		$this->zbxTestCheckHeader('Host prototypes');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 
@@ -357,7 +357,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 
 		switch ($action) {
 			case 'update':
@@ -472,7 +472,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormHostPrototype_Create($data) {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&form=create');
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host&form=create');
 		$this->zbxTestInputTypeWait('host', $data['name']);
 
 		if (array_key_exists('visible_name', $data)) {
@@ -546,7 +546,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		foreach (CDBHelper::getAll($sql) as $host) {
 			$this->zbxTestClickLinkTextWait($host['name']);
 			$this->zbxTestWaitForPageToLoad();
@@ -587,7 +587,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormHostPrototype_Update($data) {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait(array_key_exists('old_visible_name', $data) ? $data['old_visible_name'] : $data['old_name']);
 
 		// Change name and visible name.
@@ -656,7 +656,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * Check IPMI tab before and after changes on parent host.
 	 */
 	public function testFormHostPrototype_CheckIPMIFromHost() {
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
 		$this->zbxTestWaitForPageToLoad();
 
 		// Check IPMI settings on prototype before changes on host.
@@ -696,7 +697,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClick('update');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
 		$this->zbxTestTabSwitch('IPMI');
 
 		foreach ($new_values as $new_value) {
@@ -739,7 +741,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCheckEncryptionFromHostData
 	 */
 	public function testFormHostPrototype_CheckEncryptionFromHost($data) {
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
 		$this->zbxTestWaitForPageToLoad();
 
 		// Check Encryption settings on prototype before changes on host.
@@ -760,7 +763,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change Encryption settings.
-		$this->zbxTestOpen('hosts.php?form=update&hostid='.self::HOST_ID);
+		$this->zbxTestOpen('hosts.php?form=update&hostid='.self::HOST_ID.'&context=host');
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -783,7 +786,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClick('update');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -854,7 +858,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	public function testFormHostPrototype_Clone($data) {
 		$hostname = 'Host prototype {#1}';
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($hostname);
 		$this->zbxTestClickWait('clone');
 
@@ -958,7 +962,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	public function testFormHostPrototype_Delete() {
 		$prototype_name = 'Host prototype {#3}';
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($prototype_name);
 
 		$this->zbxTestClickAndAcceptAlert('delete');
@@ -1007,7 +1011,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 
 		$sql = 'SELECT name'.
 				' FROM hosts'.
