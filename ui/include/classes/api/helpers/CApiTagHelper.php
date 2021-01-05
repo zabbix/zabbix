@@ -61,7 +61,7 @@ class CApiTagHelper {
 				$values_by_tag['NOT EXISTS'][$tag['tag']][] = 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 			}
 			elseif ($operator == TAG_OPERATOR_NOT_EQUAL) {
-				$values_by_tag['EXISTS'][$tag['tag']][] = $table.'.value<>'.zbx_dbstr($value);
+				$values_by_tag['NOT EXISTS'][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
 			}
 			elseif ($operator == TAG_OPERATOR_EXISTS
 					|| ($operator == TAG_OPERATOR_LIKE && $value === '')) {

@@ -166,6 +166,19 @@ class testTagFiltering extends CAPITest {
 					'inheritedTags' => false
 				],
 				'expected' => []
+			],
+			'test-not-equals-with-empty-value' => [
+				'filter' => [
+					'evaltype' => self::EVALTYPE_AND_OR,
+					'tags' => [
+						['tag' => 'OS', 'operator' => self::OP_NOT_EQUAL, 'value' => '']
+					]
+				],
+				'expected' => [
+					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE',
+					'Host OS - Android', 'Host OS - Linux', 'Host OS - Mac', 'Host OS - Windows', 'Host without tags',
+					'Host with very general tags only'
+				]
 			]
 		];
 	}
