@@ -2897,6 +2897,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			item->poller_type = ZBX_NO_POLLER;
 			item->queue_priority = ZBX_QUEUE_PRIORITY_NORMAL;
 			item->schedulable = 1;
+
+			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
+					__config_mem_free_func);
 		}
 		else
 		{
@@ -3542,6 +3545,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
+
+		zbx_vector_ptr_destroy(&item->tags);
 
 		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems, &item->itemid)))
 		{
@@ -5136,6 +5141,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 	zbx_dc_item_tag_t	*item_tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -6955,6 +6961,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->actions, 0);
 	CREATE_HASHSET(config->action_conditions, 0);
 	CREATE_HASHSET(config->trigger_tags, 0);
+	CREATE_HASHSET(config->item_tags, 0);
 	CREATE_HASHSET(config->host_tags, 0);
 	CREATE_HASHSET(config->host_tags_index, 0);
 	CREATE_HASHSET(config->correlations, 0);
