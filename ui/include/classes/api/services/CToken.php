@@ -39,150 +39,6 @@ class CToken extends CApiService {
 	protected $sortColumns = ['tokenid', 'name', 'lastaccess', 'status', 'expires_at', 'created_at'];
 
 	/**
-	 * @param array $tokens
-	 *
-	 * @return array
-	 */
-	public function create(array $tokens): array {
-		$this->validateCreate($tokens);
-
-		array_walk($tokens, function (&$token) {
-			$token['created_at'] = time();
-			$token['creator_userid'] = static::$userData['userid'];
-		});
-
-		$tokenids = DB::insert('token', $tokens);
-
-		array_walk($tokens, function (&$token, $index) use ($tokenids) {
-			$token['tokenid'] = $tokenids[$index];
-		});
-
-		$this->addAuditBulk(AUDIT_ACTION_ADD, static::AUDIT_RESOURCE, $tokens);
-
-		return ['tokenids' => $tokenids];
-	}
-
-	/**
-	 * @param array $tokens
-	 *
-	 * @throws APIException  if the input is invalid
-	 */
-	protected function validateCreate(array &$tokens): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name', 'userid']], 'fields' => [
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('token', 'name')],
-			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('token', 'description')],
-			'userid' =>			['type' => API_ID, 'default' => self::$userData['userid']],
-			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED])],
-			'expires_at' =>		['type' => API_INT32]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $tokens, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$this->checkUsers($tokens);
-		$this->checkDuplicateNames($tokens);
-	}
-
-	/**
-	 * Check if token objects contain correct userids.
-	 *
-	 * @param array  $tokens
-	 * @param string $tokens['userid']
-	 *
-	 * @throws APIException  if user is not valid.
-	 */
-	protected function checkUsers(array $tokens): void {
-		$userids = array_column($tokens, 'userid', 'userid');
-
-		if (array_key_exists(self::$userData['userid'], $userids)) {
-			unset($userids[self::$userData['userid']]);
-		}
-
-		if ($userids) {
-			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', key($userids)));
-			}
-
-			$db_users = API::User()->get([
-				'output' => [],
-				'userids' => $userids,
-				'preservekeys' => true
-			]);
-
-			foreach ($userids as $userid) {
-				if (!array_key_exists($userid, $db_users)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', $userid));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Check uniqueness of token name per user.
-	 *
-	 * @param array  $tokens
-	 * @param string $tokens['userid']  Token owner ID.
-	 * @param string $tokens['name']    Token name.
-	 *
-	 * @throws APIException  if token already exists.
-	 */
-	protected function checkDuplicateNames(array $tokens): void {
-		$user_token_names = [];
-
-		foreach ($tokens as $token) {
-			$user_token_names[$token['userid']][$token['name']] = true;
-		}
-
-		foreach ($user_token_names as $userid => $token_names) {
-			$db_tokens = DBfetchArray(DBselect(
-				'SELECT t.userid,t.name'.
-				' FROM token t'.
-				' WHERE '.dbConditionId('t.userid', (array) $userid).
-					' AND '.dbConditionString('t.name', array_keys($token_names))
-			));
-
-			if ($db_tokens) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('API token "%1$s" already exists for user "%2$s".',
-						$db_tokens[0]['name'], $db_tokens[0]['userid']
-				));
-			}
-		}
-	}
-
-	/**
-	 * @param array $tokenids
-	 *
-	 * @throws APIException if the input is invalid
-	 *
-	 * @return array
-	 */
-	public function delete(array $tokenids): array {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-
-		if (!CApiInputValidator::validate($api_input_rules, $tokenids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		['type' => $type, 'userid' => $userid] = self::$userData;
-		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'userid', 'name'],
-			'tokenids' => $tokenids,
-			'filter' => ['userid' => $type == USER_TYPE_SUPER_ADMIN ? null : [$userid]]
-		]);
-
-		if (count($db_tokens) != count($tokenids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		DB::delete('token', ['tokenid' => $tokenids]);
-
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_tokens);
-
-		return ['tokenids' => $tokenids];
-	}
-
-	/**
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -326,6 +182,118 @@ class CToken extends CApiService {
 	 *
 	 * @return array
 	 */
+	public function create(array $tokens): array {
+		$this->validateCreate($tokens);
+
+		array_walk($tokens, function (&$token) {
+			$token['created_at'] = time();
+			$token['creator_userid'] = static::$userData['userid'];
+		});
+
+		$tokenids = DB::insert('token', $tokens);
+
+		array_walk($tokens, function (&$token, $index) use ($tokenids) {
+			$token['tokenid'] = $tokenids[$index];
+		});
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, static::AUDIT_RESOURCE, $tokens);
+
+		return ['tokenids' => $tokenids];
+	}
+
+	/**
+	 * @param array $tokens
+	 *
+	 * @throws APIException  if the input is invalid
+	 */
+	protected function validateCreate(array &$tokens): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name', 'userid']], 'fields' => [
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('token', 'name')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('token', 'description')],
+			'userid' =>			['type' => API_ID, 'default' => self::$userData['userid']],
+			'status' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED])],
+			'expires_at' =>		['type' => API_INT32]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $tokens, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$this->checkUsers($tokens);
+		$this->checkDuplicateNames($tokens);
+	}
+
+	/**
+	 * Check if token objects contain correct userids.
+	 *
+	 * @param array  $tokens
+	 * @param string $tokens['userid']
+	 *
+	 * @throws APIException  if user is not valid.
+	 */
+	protected function checkUsers(array $tokens): void {
+		$userids = array_column($tokens, 'userid', 'userid');
+
+		if (array_key_exists(self::$userData['userid'], $userids)) {
+			unset($userids[self::$userData['userid']]);
+		}
+
+		if ($userids) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', key($userids)));
+			}
+
+			$db_users = API::User()->get([
+				'output' => [],
+				'userids' => $userids,
+				'preservekeys' => true
+			]);
+
+			foreach ($userids as $userid) {
+				if (!array_key_exists($userid, $db_users)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', $userid));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check uniqueness of token name per user.
+	 *
+	 * @param array  $tokens
+	 * @param string $tokens['userid']  Token owner ID.
+	 * @param string $tokens['name']    Token name.
+	 *
+	 * @throws APIException  if token already exists.
+	 */
+	protected function checkDuplicateNames(array $tokens): void {
+		$user_token_names = [];
+
+		foreach ($tokens as $token) {
+			$user_token_names[$token['userid']][$token['name']] = true;
+		}
+
+		foreach ($user_token_names as $userid => $token_names) {
+			$db_tokens = DBfetchArray(DBselect(
+				'SELECT t.userid,t.name'.
+				' FROM token t'.
+				' WHERE '.dbConditionId('t.userid', (array) $userid).
+					' AND '.dbConditionString('t.name', array_keys($token_names))
+			));
+
+			if ($db_tokens) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('API token "%1$s" already exists for user "%2$s".',
+						$db_tokens[0]['name'], $db_tokens[0]['userid']
+				));
+			}
+		}
+	}
+
+	/**
+	 * @param array $tokens
+	 *
+	 * @return array
+	 */
 	public function update(array $tokens): array {
 		$this->validateUpdate($tokens, $db_tokens);
 
@@ -423,6 +391,38 @@ class CToken extends CApiService {
 		}
 
 		$this->checkDuplicateNames($test_tokens);
+	}
+
+	/**
+	 * @param array $tokenids
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @return array
+	 */
+	public function delete(array $tokenids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $tokenids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		['type' => $type, 'userid' => $userid] = self::$userData;
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'userid', 'name'],
+			'tokenids' => $tokenids,
+			'filter' => ['userid' => $type == USER_TYPE_SUPER_ADMIN ? null : [$userid]]
+		]);
+
+		if (count($db_tokens) != count($tokenids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		DB::delete('token', ['tokenid' => $tokenids]);
+
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, static::AUDIT_RESOURCE, $db_tokens);
+
+		return ['tokenids' => $tokenids];
 	}
 
 	/**
