@@ -1782,7 +1782,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getFiltersTabData
 	 */
 	public function testFormLowLevelDiscovery_FiltersTab($data) {
-		$this->zbxTestLogin('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$this->hostid);
 		$this->query('button:Create discovery rule')->one()->click();
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
