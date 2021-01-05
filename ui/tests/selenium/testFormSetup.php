@@ -261,7 +261,7 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 		$form = $this->query('xpath://form')->asForm()->one();
 		// Check layout via screenshot for default theme.
-		$this->assertScreenshot($form, 'GUISettings_default');
+		$this->assertScreenshotExcept($form, $this->query('id:label-default-timezone')->one(), 'GUISettings_Default');
 		// Check timezone field.
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
