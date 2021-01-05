@@ -27,6 +27,12 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testPageHostInterfaces extends CWebTest {
 
+	const RED = 'rgba(214, 78, 78, 1)';
+	const GREEN = 'rgba(52, 175, 103, 1)';
+	const ORANGE = 'rgba(241, 165, 11, 1)';
+	const GREY = 'rgba(235, 235, 235, 1)';
+
+
 	public static function prepareInterfacesData() {
 		$interfaces = [
 			[
@@ -122,52 +128,52 @@ class testPageHostInterfaces extends CWebTest {
 					'host' => 'Not available host',
 					'interfaces' => [
 						'ZBX' => [
-							'color' => 'rgba(214, 78, 78, 1)', //red
+							'color' => self::RED,
 							'rows' => [
 								[
 									'Interface' => 'zabbixzabbixzabbix.com:10050',
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => 'ERROR Agent'
 								]
 							]
 						],
 						'SNMP' => [
-							'color' => 'rgba(214, 78, 78, 1)', //red
+							'color' => self::RED,
 							'rows' => [
 								[
 									'Interface' => "zabbixzabbixzabbix.com:10050\nSNMPv2, Community: {\$SNMP_COMMUNITY}",
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => 'ERROR SNMP'
 								]
 							]
 						],
 						'IPMI' => [
-							'color' => 'rgba(214, 78, 78, 1)', //red
+							'color' => self::RED,
 							'rows' => [
 								[
 									'Interface' => 'zabbixzabbixzabbix.com:10050',
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => 'ERROR IPMI'
 								]
 							]
 						],
 						'JMX' => [
-							'color' => 'rgba(214, 78, 78, 1)', //red
+							'color' => self::RED,
 							'rows' => [
 								[
 									'Interface' => 'zabbixzabbixzabbix.com:10050',
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => 'ERROR JMX'
 								]
@@ -181,13 +187,13 @@ class testPageHostInterfaces extends CWebTest {
 					'host' => 'Host with Orange interface',
 					'interfaces' => [
 						'ZBX' => [
-							'color' => 'rgba(52, 175, 103, 1)', //green
+							'color' => self::GREEN,
 							'rows' => [
 								[
 									'Interface' => '1available.zabbix.com:10050',
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								],
@@ -195,20 +201,20 @@ class testPageHostInterfaces extends CWebTest {
 									'Interface' => '2available.zabbix.com:10051',
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'SNMP' => [
-							'color' => 'rgba(241, 165, 11, 1)', //orange
+							'color' => self::ORANGE,
 							'rows' => [
 								[
 									'Interface' => "127.0.0.98:163\nSNMPv3, Context name:",
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								],
@@ -216,20 +222,20 @@ class testPageHostInterfaces extends CWebTest {
 									'Interface' => "127.0.0.99:162\nSNMPv2, Community: {\$SNMP_COMMUNITY}",
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'IPMI' => [
-							'color' => 'rgba(214, 78, 78, 1)', //red
+							'color' => self::RED,
 							'rows' => [
 								[
 									'Interface' => '1unavail.IPMI.zabbix.com:623',
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => '1 Error IPMI'
 								],
@@ -237,7 +243,7 @@ class testPageHostInterfaces extends CWebTest {
 									'Interface' => '2unavail.IPMI.zabbix.com:624',
 									'Status' => [
 										'text' => 'Not available',
-										'color' => 'rgba(214, 78, 78, 1)' //red
+										'color' => self::RED
 									],
 									'Error' => '2 Error IPMI'
 								]
@@ -251,13 +257,13 @@ class testPageHostInterfaces extends CWebTest {
 					'host' => 'Template inheritance test host',
 					'interfaces' => [
 						'ZBX' => [
-							'color' => 'rgba(235, 235, 235, 1)', //grey
+							'color' => self::GREY,
 							'rows' => [
 								[
 									'Interface' => '127.0.0.1:10051',
 									'Status' => [
 										'text' => 'Unknown',
-										'color' => 'rgba(235, 235, 235, 1)' //grey
+										'color' => self::GREY
 									],
 									'Error' => ''
 								],
@@ -265,46 +271,46 @@ class testPageHostInterfaces extends CWebTest {
 									'Interface' => '127.0.0.2:10052',
 									'Status' => [
 										'text' => 'Unknown',
-										'color' => 'rgba(235, 235, 235, 1)' //grey
+										'color' => self::GREY
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'SNMP' => [
-							'color' => 'rgba(235, 235, 235, 1)', //grey
+							'color' => self::GREY,
 							'rows' => [
 								[
 									'Interface' => "127.0.0.3:10053\nSNMPv2, Community: {\$SNMP_COMMUNITY}",
 									'Status' => [
 										'text' => 'Unknown',
-										'color' => 'rgba(235, 235, 235, 1)' //grey
+										'color' => self::GREY
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'IPMI' => [
-							'color' => 'rgba(235, 235, 235, 1)', //grey
+							'color' => self::GREY,
 							'rows' => [
 								[
 									'Interface' => '127.0.0.4:10054',
 									'Status' => [
 										'text' => 'Unknown',
-										'color' => 'rgba(235, 235, 235, 1)' //grey
+										'color' => self::GREY
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'JMX' => [
-							'color' => 'rgba(235, 235, 235, 1)', //grey
+							'color' => self::GREY,
 							'rows' => [
 								[
 									'Interface' => '127.0.0.5:10055',
 									'Status' => [
 										'text' => 'Unknown',
-										'color' => 'rgba(235, 235, 235, 1)' //grey
+										'color' => self::GREY
 									],
 									'Error' => ''
 								]
@@ -318,52 +324,52 @@ class testPageHostInterfaces extends CWebTest {
 					'host' => 'Available host',
 					'interfaces' => [
 						'ZBX' => [
-							'color' => 'rgba(52, 175, 103, 1)', //green
+							'color' => self::GREEN,
 							'rows' => [
 								[
 									'Interface' => '127.0.0.1:10050',
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'SNMP' => [
-							'color' => 'rgba(52, 175, 103, 1)', //green
+							'color' => self::GREEN,
 							'rows' => [
 								[
 									'Interface' => "zabbixzabbixzabbix.com:10050\nSNMPv2, Community: {\$SNMP_COMMUNITY}",
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN,
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'IPMI' => [
-							'color' => 'rgba(52, 175, 103, 1)', //green
+							'color' => self::GREEN,
 							'rows' => [
 								[
 									'Interface' => 'zabbixzabbixzabbix.com:10050',
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]
 							]
 						],
 						'JMX' => [
-							'color' => 'rgba(52, 175, 103, 1)', //green
+							'color' => self::GREEN,
 							'rows' => [
 								[
 									'Interface' => 'zabbixzabbixzabbix.com:10050',
 									'Status' => [
 										'text' => 'Available',
-										'color' => 'rgba(52, 175, 103, 1)' //green
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]
@@ -448,16 +454,15 @@ class testPageHostInterfaces extends CWebTest {
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.
 			$this->assertSame(['Interface', 'Status', 'Error'], $interface_table->getHeadersText());
+
 			// Check every interface row.
 			foreach ($interface_table->getRows() as $i => $row) {
-				$this->assertEquals($data['interfaces'][$interface_name]['rows'][$i]['Interface'],
-						$row->getColumn('Interface')->getText());
-				$this->assertEquals($data['interfaces'][$interface_name]['rows'][$i]['Status']['text'],
-						$row->getColumn('Status')->getText());
-				$this->assertEquals($data['interfaces'][$interface_name]['rows'][$i]['Status']['color'], $row->getColumn('Status')
+				$interface_details  = $data['interfaces'][$interface_name]['rows'][$i];
+				$this->assertEquals($interface_details['Interface'], $row->getColumn('Interface')->getText());
+				$this->assertEquals($interface_details['Status']['text'], $row->getColumn('Status')->getText());
+				$this->assertEquals($interface_details['Status']['color'], $row->getColumn('Status')
 						->query('xpath:.//span[contains(@class, "status")]')->one()->getCSSValue('background-color'));
-				$this->assertEquals($data['interfaces'][$interface_name]['rows'][$i]['Error'],
-						$row->getColumn('Error')->getText());
+				$this->assertEquals($interface_details['Error'], $row->getColumn('Error')->getText());
 			}
 
 			$overlay->close();
