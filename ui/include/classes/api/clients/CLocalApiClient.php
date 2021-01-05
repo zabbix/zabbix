@@ -230,7 +230,6 @@ class CLocalApiClient extends CApiClient {
 				$debug_mode = GROUP_DEBUG_MODE_ENABLED;
 				break;
 			}
-
 		}
 
 		CApiService::$userData = [
