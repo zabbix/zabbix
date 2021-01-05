@@ -283,13 +283,12 @@ class testPageHostInterfaces extends CWebTest {
 	}
 
 	/**
-	 * Test displaying host interfaces on Configuration->Hosts page.
+	 * Test displaying host interfaces on Monitoring->Hosts page.
 	 *
 	 * @dataProvider getCheckInterfacesData
 	 */
 	public function testPageHostInterfaces_MonitoringHosts($data) {
-		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-		$this->checkInterfaces($data, 'host_view');
+		$this->checkInterfaces($data, 'zabbix.php?action=host.view', 'host_view');
 	}
 
 	/**
@@ -298,8 +297,7 @@ class testPageHostInterfaces extends CWebTest {
 	 * @dataProvider getCheckInterfacesData
 	 */
 	public function testPageHostInterfaces_ConfigurationHosts($data) {
-		$this->page->login()->open('hosts.php')->waitUntilReady();
-		$this->checkInterfaces($data, 'hosts');
+		$this->checkInterfaces($data, 'hosts.php', 'hosts');
 	}
 
 	/**
@@ -309,33 +307,36 @@ class testPageHostInterfaces extends CWebTest {
 	 */
 	public function testPageHostInterfaces_HostForm($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host ='.zbx_dbstr($data['host']));
-		$this->page->login()->open('hosts.php?form=update&hostid='.$id)->waitUntilReady();
-		$this->checkInterfaces($data, $selector = null, true);
+		$link = 'hosts.php?form=update&hostid='.$id;
+		$this->checkInterfaces($data, $link, $selector = null, true);
 	}
 
 	/**
-	 * Test displaying host interfaces on Host form page.
+	 * Test displaying host interfaces on Discovery rules page.
 	 *
 	 * @dataProvider getCheckInterfacesData
 	 */
 	public function testPageHostInterfaces_DiscoveryPage($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host ='.zbx_dbstr($data['host']));
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$id.'&context=host')->waitUntilReady();
-		$this->checkInterfaces($data, $selector = null, true);
+		$link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$id.'&context=host';
+		$this->checkInterfaces($data, $link, $selector = null, true);
 	}
 
 	/**
 	 * Function for checking interfaces.
 	 *
 	 * @param array     $data          data from data provider
+	 * @param string    $link          checked page link
 	 * @param string    $selector      table selector on page
-	 * @param boolean   $navigation    is it configuration form or not
+	 * @param boolean   $navigation    is it upper navigation block or not
 	 */
-	private function checkInterfaces($data, $selector = null, $navigation = false) {
+	private function checkInterfaces($data, $link, $selector = null, $navigation = false) {
 		if ($navigation) {
+			$this->page->login()->open($link)->waitUntilReady();
 			$availability = $this->query('xpath://div[@class="status-container"]')->waitUntilPresent()->one();
 		}
 		else {
+			$this->page->login()->open($link)->waitUntilReady();
 			$table = $this->query('xpath://form[@name='.zbx_dbstr($selector).']/table[@class="list-table"]')
 					->waitUntilReady()->asTable()->one();
 			$availability = $table->findRow('Name', $data['host'])->getColumn('Availability');
