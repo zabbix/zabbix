@@ -82,7 +82,7 @@ class CApiTagHelper {
 		$sql_where = [];
 		foreach ($values_by_tag as $prefix => $filters) {
 			foreach ($filters as $tag => $values) {
-				$values = array_filter($values);
+				$values = $values ? array_filter($values) : false;
 
 				$statement = $table.'.tag='.zbx_dbstr($tag);
 				if ($values) {
