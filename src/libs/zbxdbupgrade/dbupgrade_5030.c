@@ -179,6 +179,48 @@ static int	DBpatch_5030012(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
+	zbx_uint64_t	itemid, itemtagid;
+	int		ret = SUCCEED, res;
+	char		*value;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	itemtagid = DBget_maxid("item_tag");
+
+	result = DBselect(
+			"select i.itemid,ap.name from items i"
+			" join item_application_prototype ip on i.itemid=ip.itemid"
+			" join application_prototype ap on ip.application_prototypeid=ap.application_prototypeid;");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+
+		res = DBexecute(
+				"insert into item_tag"
+				" (itemtagid,itemid,tag,value)"
+				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')",
+				itemtagid++, itemid, "Application", value);
+
+		zbx_free(value);
+
+		if (ZBX_DB_OK > res)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030013(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
 	zbx_uint64_t	selementid, selementtagid = 1;
 	int		ret = SUCCEED, res;
 	char		*value;
@@ -214,29 +256,36 @@ static int	DBpatch_5030012(void)
 	return ret;
 }
 
-static int	DBpatch_5030013(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=27 where conditiontype=15"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 static int	DBpatch_5030014(void)
 {
+#define CONDITION_TYPE_APPLICATION	15
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from auditlog where resourcetype=12"))
+	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d where conditiontype=%d",
+			CONDITION_TYPE_ITEM_TAG, CONDITION_TYPE_APPLICATION))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
+#undef CONDITION_TYPE_APPLICATION
 }
 
 static int	DBpatch_5030015(void)
+{
+#define AUDIT_RESOURCE_APPLICATION	12
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
+		return FAIL;
+
+	return SUCCEED;
+#undef AUDIT_RESOURCE_APPLICATION
+}
+
+static int	DBpatch_5030016(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -251,47 +300,52 @@ static int	DBpatch_5030015(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030016(void)
+static int	DBpatch_5030017(void)
 {
 	return DBdrop_foreign_key("httptest", 1);
 }
 
-static int	DBpatch_5030017(void)
-{
-	return DBdrop_field("httptest", "applicationid");
-}
-
 static int	DBpatch_5030018(void)
 {
-	return DBdrop_field("sysmaps_elements", "application");
+	return DBdrop_index("httptest", "httptest_1");
 }
 
 static int	DBpatch_5030019(void)
 {
-	return DBdrop_table("application_discovery");
+	return DBdrop_field("httptest", "applicationid");
 }
 
 static int	DBpatch_5030020(void)
 {
-	return DBdrop_table("item_application_prototype");
+	return DBdrop_field("sysmaps_elements", "application");
 }
 
 static int	DBpatch_5030021(void)
 {
-	return DBdrop_table("application_prototype");
+	return DBdrop_table("application_discovery");
 }
 
 static int	DBpatch_5030022(void)
 {
-	return DBdrop_table("application_template");
+	return DBdrop_table("item_application_prototype");
 }
 
 static int	DBpatch_5030023(void)
 {
-	return DBdrop_table("items_applications");
+	return DBdrop_table("application_prototype");
 }
 
 static int	DBpatch_5030024(void)
+{
+	return DBdrop_table("application_template");
+}
+
+static int	DBpatch_5030025(void)
+{
+	return DBdrop_table("items_applications");
+}
+
+static int	DBpatch_5030026(void)
 {
 	return DBdrop_table("applications");
 }
@@ -327,5 +381,7 @@ DBPATCH_ADD(5030021, 0, 1)
 DBPATCH_ADD(5030022, 0, 1)
 DBPATCH_ADD(5030023, 0, 1)
 DBPATCH_ADD(5030024, 0, 1)
+DBPATCH_ADD(5030025, 0, 1)
+DBPATCH_ADD(5030026, 0, 1)
 
 DBPATCH_END()

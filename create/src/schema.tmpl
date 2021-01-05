@@ -257,7 +257,6 @@ FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-INDEX		|1		|applicationid
 UNIQUE		|2		|hostid,name
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -913,7 +912,7 @@ FIELD		|width		|t_integer	|'200'	|NOT NULL	|0
 FIELD		|height		|t_integer	|'200'	|NOT NULL	|0
 FIELD		|viewtype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|use_iconmap	|t_integer	|'1'	|NOT NULL	|0
-FIELD		|operator	|t_integer		|'0'|NOT NULL	|0
+FIELD		|evaltype	|t_integer		|'0'|NOT NULL	|0
 INDEX		|1		|sysmapid
 INDEX		|2		|iconid_off
 INDEX		|3		|iconid_on
@@ -1858,4 +1857,4 @@ INDEX		|1		|selementid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030024	|5030024
+ROW		|5030026	|5030026

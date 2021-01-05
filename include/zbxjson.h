@@ -88,7 +88,6 @@
 #define ZBX_PROTO_TAG_NAME			"name"
 #define ZBX_PROTO_TAG_HOSTS			"hosts"
 #define ZBX_PROTO_TAG_GROUPS			"groups"
-#define ZBX_PROTO_TAG_APPLICATIONS		"applications"
 #define ZBX_PROTO_TAG_TAGS			"tags"
 #define ZBX_PROTO_TAG_TAG			"tag"
 #define ZBX_PROTO_TAG_PROBLEM_EVENTID		"p_eventid"
