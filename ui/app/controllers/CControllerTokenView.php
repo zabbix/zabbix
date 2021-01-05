@@ -41,8 +41,8 @@ class CControllerTokenView extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		return ($this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL));
 	}
 
 	protected function doAction() {
