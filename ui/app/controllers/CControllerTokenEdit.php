@@ -64,11 +64,11 @@ class CControllerTokenEdit extends CController {
 			$data = $tokens[0];
 
 			if ($data['expires_at'] != 0) {
-				$data['expires_at'] = date(ZBX_DATE_TIME, (int) $data['expires_at']);
+				$data['expires_at'] = date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']);
 				$data['expires_state'] = '1';
 			}
 			else {
-				$data['expires_at'] = date(ZBX_DATE_TIME, time());
+				$data['expires_at'] = date(DATE_TIME_FORMAT_SECONDS, time());
 				$data['expires_state'] = '0';
 			}
 		}
@@ -78,7 +78,7 @@ class CControllerTokenEdit extends CController {
 				'userid' => 0,
 				'name' => '',
 				'description' => '',
-				'expires_at' => date(ZBX_DATE_TIME, time()),
+				'expires_at' => date(DATE_TIME_FORMAT_SECONDS, time()),
 				'expires_state' => '1',
 				'status' => ZBX_AUTH_TOKEN_ENABLED
 			];
