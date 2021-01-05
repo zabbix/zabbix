@@ -83,7 +83,7 @@ class CControllerTokenUpdate extends CController {
 					->setArgument('action', $this->getInput('action_dst'))
 				);
 
-				[$user] = CWebUser::$data['userid'] != $userid
+				[$user] = (CWebUser::$data['userid'] != $userid)
 					? API::User()->get([
 						'output' => ['alias', 'name', 'surname'],
 						'userids' => $userid

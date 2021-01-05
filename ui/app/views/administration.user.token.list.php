@@ -122,7 +122,7 @@ foreach ($data['tokens'] as $token) {
 		),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['created_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['lastaccess']),
-		$token['status'] == ZBX_AUTH_TOKEN_ENABLED
+		($token['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
 					->setArgument('action_src', 'user.token.list')
 					->setArgument('action', 'token.disable')
