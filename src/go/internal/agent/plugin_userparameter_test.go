@@ -133,7 +133,7 @@ var resultsCmd = []Result{
 	},
 	Result{data: []string{"a[*],$1$1$2$3$2$4$5$6$5$7$8$9"},
 		input: []Input{
-			Input{key: "a", params: []string{"foo"}, cmd: "foofoo$2$3$2$4$5$6$5$7$8$9"},
+			Input{key: "a", params: []string{"foo"}, cmd: "foofoo"},
 		},
 	},
 	Result{data: []string{"a[*],$1$1$2$3$2$4$5$6$5$7$8$9"},
@@ -148,12 +148,12 @@ var resultsCmd = []Result{
 	},
 	Result{data: []string{"a[*],echo $1"},
 		input: []Input{
-			Input{key: "a", params: []string{}, cmd: "echo $1"},
+			Input{key: "a", params: []string{}, cmd: "echo "},
 		},
 	},
 	Result{data: []string{"a[*],echo $1 foo"},
 		input: []Input{
-			Input{key: "a", params: []string{}, cmd: "echo $1 foo"},
+			Input{key: "a", params: []string{}, cmd: "echo  foo"},
 		},
 	},
 	Result{data: []string{"a[*],echo foo"},
@@ -190,6 +190,16 @@ var resultsCmd = []Result{
 	Result{data: []string{"a[*],echo $1"}, unsafeUserParameters: 1,
 		input: []Input{
 			Input{key: "a", params: []string{"\\'\"`*?[]{}~$!&;()<>|#@\n"}, cmd: "echo \\'\"`*?[]{}~$!&;()<>|#@\n"},
+		},
+	},
+	Result{data: []string{"a[*],echo $0"},
+		input: []Input{
+			Input{key: "a", params: []string{}, cmd: "echo echo $0"},
+		},
+	},
+	Result{data: []string{"a[*],echo $$$1"},
+		input: []Input{
+			Input{key: "a", params: []string{}, cmd: "echo $"},
 		},
 	},
 }
