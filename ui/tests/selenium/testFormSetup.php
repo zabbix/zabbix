@@ -110,8 +110,7 @@ class testFormSetup extends CWebTest {
 		$this->checkButtons();
 
 		global $DB;
-		$screenshot = ($DB['TYPE'] === ZBX_DB_POSTGRESQL) ? 'Prerequisites_PostgreSQL' : 'Prerequisites_MySQL';
-		$this->assertScreenshot($this->query('xpath://form')->one(), $screenshot);
+		$this->assertScreenshot($this->query('xpath://form')->one(), 'Prerequisites_'.$DB['TYPE']);
 	}
 
 	public function testFormSetup_dbConnectionSectionLayout() {
@@ -177,11 +176,10 @@ class testFormSetup extends CWebTest {
 			// Array of fields to be skipped by the screenshot check.
 			$skip_db_fields = [];
 			foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
-				array_push($skip_db_fields, $form->getField($skip_field));
+				$skip_db_fields[] = $form->getField($skip_field);
 			}
 			// Check screenshot for "Store credentials in" = Plain text.
-			$screenshot = ($db_type === 'PostgreSQL') ? 'ConfigureDB_Postgres_plainText' : 'ConfigureDB_MySQL_plainText';
-			$this->assertScreenshotExcept($form, $skip_db_fields, $screenshot);
+			$this->assertScreenshotExcept($form, $skip_db_fields, 'ConfigureDB_plainText_'.$db_type);
 
 			// Check 'Store credentials in' field, switch to Vault and check Vault rellated fields.
 			$credentials_field = $form->getField('Store credentials in');
@@ -218,11 +216,10 @@ class testFormSetup extends CWebTest {
 			// Array of fields to be skipped by the screenshot check.
 			$skip_fields_vault = [];
 			foreach(['Database host', 'Database name', 'Store credentials in'] as $skip_field) {
-				array_push($skip_fields_vault, $form->getField($skip_field));
+				$skip_fields_vault[] = $form->getField($skip_field);
 			}
 			// Check screenshot for "Store credentials in" = Vault.
-			$screenshot_vault = ($db_type === 'PostgreSQL') ? 'ConfigureDB_Postgres_Vault' : 'ConfigureDB_MySQL_Vault';
-			$this->assertScreenshotExcept($form, $skip_fields_vault, $screenshot_vault);
+			$this->assertScreenshotExcept($form, $skip_fields_vault, 'ConfigureDB_Vault_'.$db_type);
 
 			$credentials_field->select('Plain text');
 		}
@@ -340,10 +337,9 @@ class testFormSetup extends CWebTest {
 		$skip_fields = [];
 		foreach(['Database server', 'Database name'] as $skip_field) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
-			array_push($skip_fields, $this->query($xpath)->one());
+			$skip_fields[] = $this->query($xpath)->one();
 		}
-		$screenshot = ($db_parameters['Database type'] === 'PostgreSQL') ? 'PreInstall_Postgres' : 'PreInstall_MySQL';
-		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, $screenshot);
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
 	public function testFormSetup_installSection() {
