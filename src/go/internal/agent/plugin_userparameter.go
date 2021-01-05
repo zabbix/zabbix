@@ -79,12 +79,8 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 			} else {
 				b.WriteString(s[:i+1])
 
-				if len(s) >= 2 {
-					if len(s[i+1:]) > 0 && s[i+1] == '$' {
-						s = s[i+2:]
-					} else {
-						s = s[i+1:]
-					}
+				if len(s[i+1:]) > 0 && s[i+1] == '$' {
+					s = s[i+2:]
 				} else {
 					s = s[i+1:]
 				}
