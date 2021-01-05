@@ -19,8 +19,101 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
+/**
+ * @backup hosts
+ * @on-before prepareInterfacesData
+ */
 class testPageHostInterfaces extends CWebTest {
+
+	public static function prepareInterfacesData() {
+		$interfaces = [
+			[
+				'type' => 1,
+				'main' => 1,
+				'useip' => 0,
+				'ip' => '127.1.1.1',
+				'dns' => '1available.zabbix.com',
+				'port' => '10050',
+				'available' => 1
+			],
+			[
+				'type' => 1,
+				'main' => 0,
+				'useip' => 0,
+				'ip' => '127.1.1.2',
+				'dns' => '2available.zabbix.com',
+				'port' => '10051',
+				'available' => 1
+			],
+			[
+				'type' => 2,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '127.0.0.98',
+				'dns' => 'snmpv2zabbix.com',
+				'port' => '163',
+				'details' => [
+					'version' => '3',
+					'bulk' => '1',
+					'securityname' => 'zabbix'
+				],
+				'available' => 1
+			],
+			[
+				'type' => 2,
+				'main' => 0,
+				'useip' => 1,
+				'ip' => '127.0.0.99',
+				'dns' => 'snmpv3zabbix.com',
+				'port' => '162',
+				'details' => [
+					'version' => '2',
+					'bulk' => '1',
+					'community' => '{$SNMP_COMMUNITY}'
+				],
+				'available' => 2
+			],
+			[
+				'type' => 3,
+				'main' => 1,
+				'useip' => 0,
+				'ip' => '127.0.0.1',
+				'dns' => '1unavail.IPMI.zabbix.com',
+				'port' => '623',
+				'available' => 2,
+				'error' => '1 Error IPMI'
+			],
+			[
+				'type' => 3,
+				'main' => 0,
+				'useip' => 0,
+				'ip' => '127.0.0.1',
+				'dns' => '2unavail.IPMI.zabbix.com',
+				'port' => '624',
+				'available' => 2,
+				'error' => '2 Error IPMI'
+			]
+		];
+
+		$groups = [
+			[
+				'groupid' => 4
+			]
+		];
+
+		CDataHelper::createHosts([
+			[
+				'host' => 'Host with Orange interface',
+				'name' => 'Host with Orange interface',
+				'description' => 'API Created Host with Orange interface for Host availability test',
+				'interfaces' => $interfaces,
+				'groups' => $groups,
+				'status' => HOST_STATUS_MONITORED
+			]
+		]);
+	}
 
 	public function getCheckInterfacesData() {
 		return [
