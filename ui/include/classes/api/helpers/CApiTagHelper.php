@@ -65,7 +65,7 @@ class CApiTagHelper {
 			}
 			elseif ($operator == TAG_OPERATOR_EXISTS
 					|| ($operator == TAG_OPERATOR_LIKE && $value === '')) {
-				$values_by_tag['EXISTS'][$tag['tag']] = true;
+				$values_by_tag['EXISTS'][$tag['tag']] = false;
 			}
 			elseif ($operator == TAG_OPERATOR_LIKE) {
 				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
