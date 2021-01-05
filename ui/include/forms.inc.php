@@ -1711,21 +1711,24 @@ function getTriggerFormData(array $data) {
 			foreach ($item_parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						$add_new_tag = true;
-						foreach ($inherited_tags as $inherited_tag) {
-							if ($inherited_tag['tag'] == $tag['tag'] && $inherited_tag['value'] == $tag['value']) {
-								$add_new_tag = false;
+						if (!array_key_exists($tag['tag'], $inherited_tags)){
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+									'parent_templates' => [$templateid => $template],
+									'type' => ZBX_PROPERTY_INHERITED
+								];
+						}
+						else {
+							if (!array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+								$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+									'parent_templates' => [$templateid => $template],
+									'type' => ZBX_PROPERTY_INHERITED
+									];
 							}
-						}
-						if ($add_new_tag) {
-							$inherited_tags[] = $tag + ['parent_templates' => [$templateid => $template]];
-						} else {
-							$key = array_search($tag, $inherited_tags);
-							$inherited_tags[$key]['parent_templates'] = [$templateid => $template];
-						}
-					}
-				}
-			}
+							else {
+								$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+									$templateid => $template
+								];
+			}}}}}
 
 			$db_hosts = API::Host()->get([
 				'output' => [],
@@ -1735,35 +1738,23 @@ function getTriggerFormData(array $data) {
 
 			if ($db_hosts) {
 				foreach ($db_hosts[0]['tags'] as $tag) {
-					$inherited_tags[] = $tag;
-				}
-			}
-
-			$trigger_tags = [];
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+			}}
 
 			foreach ($data['tags'] as $tag) {
-				$type = ZBX_PROPERTY_OWN;
-				foreach ($inherited_tags as $inherited_tag) {
-					if ($inherited_tag['tag'] == $tag['tag'] && $inherited_tag['value'] == $tag['value']) {
-						$type = ZBX_PROPERTY_BOTH;
+				if (!array_key_exists($tag['tag'], $inherited_tags)) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+				else {
+					if (!array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 					}
-				}
-				$trigger_tags[] = $tag + ['type' => $type];
-			}
+					else {
+						$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_OWN;
+			}}}
 
-			foreach ($inherited_tags as $tag) {
-				$type = ZBX_PROPERTY_INHERITED;
-				foreach ($trigger_tags as $trigger_tag) {
-					if ($trigger_tag['tag'] == $tag['tag'] && $trigger_tag['value'] == $tag['value']) {
-						$type = ZBX_PROPERTY_BOTH;
-					}
-				}
-				if ($type != ZBX_PROPERTY_BOTH) {
-					$trigger_tags[] = $tag + ['type' => $type];
-				}
-			}
-
-			$data['tags'] = array_values($trigger_tags);
+			$data['tags'] = array_values(call_user_func_array('array_merge', $inherited_tags));
 		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);
@@ -1773,8 +1764,7 @@ function getTriggerFormData(array $data) {
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
-		}
-	}
+	}}
 
 	// tags
 	if (!$data['tags']) {
