@@ -98,7 +98,7 @@ class CMessageHelper {
 	 * @param string $message
 	 */
 	public static function addSuccess(string $message): void {
-		self::$type = self::MESSAGE_TYPE_SUCCESS;
+		// self::$type = self::MESSAGE_TYPE_SUCCESS;
 		self::$messages[] = [
 			'type' => self::MESSAGE_TYPE_SUCCESS,
 			'message' => $message
