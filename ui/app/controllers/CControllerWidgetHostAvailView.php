@@ -58,18 +58,22 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
 				: ['status' => HOST_STATUS_MONITORED]
 		]);
+		$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
 
 		foreach ($db_hosts as $host) {
-			$ignore_types = [];
+			$host_interfaces = array_fill_keys($interface_types, []);
 
 			foreach ($host['interfaces'] as $interface) {
-				if (array_key_exists($interface['type'], $ignore_types)) {
-					continue;
-				}
+				$host_interfaces[$interface['type']][] = $interface['available'];
+			}
 
-				$ignore_types[$interface['type']] = 1;
-				$hosts_count[$interface['type']][$interface['available']]++;
-				$hosts_total[$interface['type']]++;
+			$host_interfaces = array_filter($host_interfaces);
+
+			foreach ($host_interfaces as $type => $interfaces) {
+				$interfaces_availability = array_intersect($availability_priority, $interfaces);
+				$available = reset($interfaces_availability);
+				$hosts_count[$type][$available]++;
+				$hosts_total[$type]++;
 			}
 		}
 
