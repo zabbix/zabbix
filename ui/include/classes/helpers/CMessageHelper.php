@@ -139,7 +139,7 @@ class CMessageHelper {
 	 *
 	 * @return string
 	 */
-	public static function getType(): string {
+	public static function getType(): ?string {
 		return self::$type;
 	}
 
