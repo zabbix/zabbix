@@ -348,7 +348,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals('Congratulations! You have successfully installed Zabbix frontend.',
 				$this->query('class:green')->one()->getText());
 		$this->checkButtons('last section');
-		$this->assertScreenshot($this->query('xpath://form')->one(), 'Install');
+		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $this->query('xpath://p')->one(), 'Install');
 
 		// Check that Dashboard view is opened after completing the form.
 		$this->query('button:Finish')->one()->click();
