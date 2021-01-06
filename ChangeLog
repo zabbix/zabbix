@@ -1,10 +1,14 @@
 Changes for 5.0.8rc1
 
 New features:
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
 ..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
 .......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,6 +101,13 @@ class CElementQuery implements IWaitable {
 	 * @var array
 	 */
 	protected $options = [];
+
+	/**
+	 * Element reverse order flag.
+	 *
+	 * @var boolean
+	 */
+	protected $reverse_order = false;
 
 	/**
 	 * Shared web page instance.
@@ -244,6 +251,19 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * Set reversed element order flag.
+	 *
+	 * @param boolean $order    order to set
+	 *
+	 * @return $this
+	 */
+	public function setReversedOrder($order = true) {
+		$this->reverse_order = $order;
+
+		return $this;
+	}
+
+	/**
 	 * Get web page instance.
 	 *
 	 * @return CPage
@@ -261,9 +281,25 @@ class CElementQuery implements IWaitable {
 	 * @return $this
 	 */
 	public function query($type, $locator = null) {
-		$prefix = CXPathHelper::fromWebDriverBy($this->by);
-		$suffix = CXPathHelper::fromSelector($type, $locator);
-		$this->by = static::getSelector('xpath', './'.$prefix.'/'.$suffix);
+		$prefix = ($this->by->getMechanism() !== 'xpath')
+			? './/'.CXPathHelper::fromWebDriverBy($this->by)
+			: $this->by->getValue();
+
+		if ($this->reverse_order) {
+			$prefix .= '[1]';
+			$this->reverse_order = false;
+		}
+
+		$by = self::getSelector($type, $locator);
+		$suffix = ($by->getMechanism() !== 'xpath')
+				? '//'.CXPathHelper::fromWebDriverBy($by)
+				: $by->getValue();
+
+		if (substr($suffix, 0, 1) !== '/') {
+			$suffix = '/'.$suffix;
+		}
+
+		$this->by = static::getSelector('xpath', $prefix.$suffix);
 
 		return $this;
 	}
@@ -306,7 +342,17 @@ class CElementQuery implements IWaitable {
 		$parent = ($this->context !== static::getDriver()) ? $this->context : null;
 
 		try {
-			$element = $this->context->findElement($this->by);
+			if (!$this->reverse_order) {
+				$element = $this->context->findElement($this->by);
+			}
+			else {
+				$elements = $this->context->findElements($this->by);
+				if (!$elements) {
+					throw new NoSuchElementException(null);
+				}
+
+				$element = end($elements);
+			}
 		}
 		catch (NoSuchElementException $exception) {
 			if (!$should_exist) {
@@ -331,6 +377,9 @@ class CElementQuery implements IWaitable {
 		$class = $this->class;
 
 		$elements = $this->context->findElements($this->by);
+		if ($this->reverse_order) {
+			$elements = array_reverse($elements);
+		}
 
 		if ($this->class !== 'RemoteWebElement') {
 			foreach ($elements as &$element) {

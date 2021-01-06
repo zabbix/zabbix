@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ function make_event_details(array $event) {
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
-			$event['name']
+			(new CCol($event['name']))->addClass(ZBX_STYLE_WORDWRAP)
 		])
 		->addRow([
 			_('Operational data'),

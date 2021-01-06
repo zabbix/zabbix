@@ -12,7 +12,7 @@ This template was tested on:
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
 - MariaDB, version 10.4
-- Zabbix, version 4.4.0
+- Zabbix, version 5.0
 
 ## Setup
 
@@ -22,7 +22,7 @@ This template was tested on:
 
 ```text
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
-GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
+GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
 
 For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
@@ -44,6 +44,7 @@ No specific Zabbix configuration is required.
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum number of created tmp files on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables in memory per second for trigger expressions.</p> |`30` |
 |{$MYSQL.DSN} |<p>System data source name.</p> |`<Put your DSN here>` |
+|{$MYSQL.INNODB_LOG_FILES} |<p>Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.</p> |`2` |
 |{$MYSQL.PASSWORD} |<p>MySQL user password.</p> |`<Put your password here>` |
 |{$MYSQL.REPL_LAG.MAX.WARN} |<p>The lag of slave from master for trigger expression.</p> |`30m` |
 |{$MYSQL.SLOW_QUERIES.MAX.WARN} |<p>The number of slow queries for trigger expression.</p> |`3` |
@@ -59,13 +60,14 @@ There are no template links in this template.
 |----|-----------|----|----|
 |Databases discovery |<p>Scanning databases in DBMS.</p> |ODBC |db.odbc.discovery[databases,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND_OR <p>- A: {#DATABASE} NOT_MATCHES_REGEX `information_schema`</p> |
 |Replication discovery |<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p> |ODBC |db.odbc.discovery[replication,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|MariaDB discovery |<p>Additional metrics if MariaDB is used.</p> |DEPENDENT |mysql.extra_metric.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.search('MariaDB')>-1 ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |MySQL |MySQL: Status | |ODBC |db.odbc.select[ping,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p><p>**Expression**:</p>`select "1"` |
-|MySQL |MySQL: Version | |ODBC |db.odbc.select[version,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Expression**:</p>`select version()` |
+|MySQL |MySQL: Version | |ODBC |db.odbc.select[version,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Expression**:</p>`select version()` |
 |MySQL |MySQL: Uptime |<p>The number of seconds that the server has been up.</p> |DEPENDENT |mysql.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Uptime')].Value.first()`</p> |
 |MySQL |MySQL: Aborted clients per second |<p>The number of connections that were aborted because the client died without closing the connection properly.</p> |DEPENDENT |mysql.aborted_clients.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Aborted_clients')].Value.first()`</p><p>- CHANGE_PER_SECOND |
 |MySQL |MySQL: Aborted connections per second |<p>The number of failed attempts to connect to the MySQL server.</p> |DEPENDENT |mysql.aborted_connects.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Aborted_connects')].Value.first()`</p><p>- CHANGE_PER_SECOND |
@@ -102,10 +104,23 @@ There are no template links in this template.
 |MySQL |MySQL: Command Update per second |<p>The Com_update counter variable indicates the number of times the update statement has been executed.</p> |DEPENDENT |mysql.com_update.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Com_update')].Value.first()`</p><p>- CHANGE_PER_SECOND |
 |MySQL |MySQL: Queries per second |<p>The number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.</p> |DEPENDENT |mysql.queries.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Queries')].Value.first()`</p><p>- CHANGE_PER_SECOND |
 |MySQL |MySQL: Questions per second |<p>The number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.</p> |DEPENDENT |mysql.questions.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Questions')].Value.first()`</p><p>- CHANGE_PER_SECOND |
+|MySQL |MySQL: Binlog cache disk use |<p>Number of transactions which used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.</p> |DEPENDENT |mysql.binlog_cache_disk_use<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Binlog_cache_disk_use')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Innodb buffer pool wait free |<p>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at increasing innodb_buffer_pool_size.</p> |DEPENDENT |mysql.innodb_buffer_pool_wait_free<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Innodb_buffer_pool_wait_free')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Innodb number open files |<p>Number of open files held by InnoDB. InnoDB only.</p> |DEPENDENT |mysql.innodb_num_open_files<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Innodb_num_open_files')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Open table definitions |<p>The number of cached table definitions.</p> |DEPENDENT |mysql.open_table_definitions<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Open_table_definitions')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Open tables |<p>The number of tables that are open.</p> |DEPENDENT |mysql.open_tables<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Open_tables')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Innodb log written |<p>Number of bytes written to the InnoDB log.</p> |DEPENDENT |mysql.innodb_os_log_written<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Innodb_os_log_written')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Calculated value of innodb_log_file_size |<p>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of innodb_log_file_size. Innodb_log_file_size is size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p> |CALCULATED |mysql.innodb_log_file_size<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Expression**:</p>`(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}` |
 |MySQL |MySQL: Size of database {#DATABASE} |<p>-</p> |ODBC |db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`Text is too long. Please see the template.` |
+|MySQL |MySQL: Replication Slave SQL Running State {#MASTER_HOST} |<p>This shows the state of the SQL driver threads.</p> |DEPENDENT |mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Slave_SQL_Running_State'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Replication Seconds Behind Master {#MASTER_HOST} |<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p> |DEPENDENT |mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Seconds_Behind_Master'].first()`</p><p>- MATCHES_REGEX: `\d+`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> Replication is not performed.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MySQL |MySQL: Replication Slave IO Running {#MASTER_HOST} |<p>Whether the I/O thread for reading the master's binary log is running. </p><p>Normally, you want this to be Yes unless you have not yet started replication or have </p><p>explicitly stopped it with STOP SLAVE.</p> |DEPENDENT |mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Slave_IO_Running'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MySQL |MySQL: Replication Slave SQL Running {#MASTER_HOST} |<p>Whether the SQL thread for executing events in the relay log is running. </p><p>As with the I/O thread, this should normally be Yes.</p> |DEPENDENT |mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.Master_Host=='{#MASTER_HOST}')]['Slave_SQL_Running'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|MySQL |MySQL: Binlog commits |<p>Total number of transactions committed to the binary log.</p> |DEPENDENT |mysql.binlog_commits[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Binlog_commits')].Value.first()`</p> |
+|MySQL |MySQL: Binlog group commits |<p>Total number of group commits done to the binary log.</p> |DEPENDENT |mysql.binlog_group_commits[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Binlog_group_commits')].Value.first()`</p> |
+|MySQL |MySQL: Master GTID wait count |<p>Number of times MASTER_GTID_WAIT called.</p> |DEPENDENT |mysql.master_gtid_wait_count[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Master_gtid_wait_count')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Master GTID wait time |<p>Total number of time spent in MASTER_GTID_WAIT.</p> |DEPENDENT |mysql.master_gtid_wait_time[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Master_gtid_wait_time')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|MySQL |MySQL: Master GTID wait timeouts |<p>Number of timeouts occurring in MASTER_GTID_WAIT.</p> |DEPENDENT |mysql.master_gtid_wait_timeouts[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Master_gtid_wait_timeouts')].Value.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |MySQL: Get status variables |<p>The item gets server global status information.</p> |ODBC |db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]<p>**Expression**:</p>`show global status` |
 |Zabbix_raw_items |MySQL: InnoDB buffer pool read requests |<p>The number of logical read requests.</p> |DEPENDENT |mysql.innodb_buffer_pool_read_requests<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Innodb_buffer_pool_read_requests')].Value.first()`</p> |
 |Zabbix_raw_items |MySQL: InnoDB buffer pool reads |<p>The number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from disk.</p> |DEPENDENT |mysql.innodb_buffer_pool_reads<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Variable_name=='Innodb_buffer_pool_reads')].Value.first()`</p> |
