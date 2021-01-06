@@ -67,9 +67,9 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 				i++
 			}
 
-			if len(s) > i && s[i] == '0' {
+			if s[i] == '0' {
 				b.WriteString(parameter.cmd)
-			} else if len(s) > i && s[i] >= '1' && s[i] <= '9' {
+			} else if s[i] >= '1' && s[i] <= '9' {
 				if int(s[i]-'0') <= len(params) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
