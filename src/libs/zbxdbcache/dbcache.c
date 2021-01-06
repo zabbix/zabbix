@@ -1029,7 +1029,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			*name;
 	DC_ITEM			*item;
-	zbx_vector_ptr_t	item_tags;
+	zbx_vector_str_t	item_tags;
 }
 zbx_item_info_t;
 
@@ -1095,7 +1095,7 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 			continue;
 		}
 
-		zbx_vector_ptr_append(&item_info->item_tags, zbx_strdup(NULL, row[1]));
+		zbx_vector_str_append(&item_info->item_tags, zbx_strdup(NULL, row[1]));
 	}
 	DBfree_result(result);
 }
@@ -1111,8 +1111,8 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
  ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_vector_ptr_clear_ext(&item_info->item_tags, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&item_info->item_tags);
+	zbx_vector_str_clear_ext(&item_info->item_tags, zbx_str_free);
+	zbx_vector_str_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
 }
 
@@ -1375,7 +1375,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 		item_info.itemid = item->itemid;
 		item_info.name = NULL;
 		item_info.item = item;
-		zbx_vector_ptr_create(&item_info.item_tags);
+		zbx_vector_str_create(&item_info.item_tags);
 		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
@@ -1403,7 +1403,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 			item_info.itemid = item->itemid;
 			item_info.name = NULL;
 			item_info.item = item;
-			zbx_vector_ptr_create(&item_info.item_tags);
+			zbx_vector_str_create(&item_info.item_tags);
 			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}
