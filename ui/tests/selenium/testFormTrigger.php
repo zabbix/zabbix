@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($data['host']);
 		}
 
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -389,7 +389,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestClickLinkTextWait($data['description']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
@@ -761,7 +761,7 @@ class testFormTrigger extends CLegacyWebTest {
 	public function testFormTrigger_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
+		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 

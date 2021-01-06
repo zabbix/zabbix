@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		// Check graph prototype number in breadcrumb.
 		$graphs = CDBHelper::getAll($this->sql_graph_prototypes);
 		$count = count($graphs);
-		$xpath = '//ul[contains(@class, "filter-breadcrumb")]//a[text()="Graph prototypes"]/..//sup';
+		$xpath = '//div[@class="header-navigation"]//a[text()="Graph prototypes"]/..//sup';
 		$get_number = $this->zbxTestGetText($xpath);
 		$this->assertEquals($get_number, $count);
 

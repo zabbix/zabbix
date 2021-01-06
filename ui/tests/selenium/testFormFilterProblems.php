@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,7 +197,7 @@ class testFormFilterProblems extends testFormFilter {
 	public function testFormFilterProblems_TimePeriod($data) {
 		$this->createFilter($data, 'Admin');
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
-		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->one()->getAttribute('data-target');
+		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->waitUntilVisible()->one()->getAttribute('data-target');
 		$form = $this->query('id:'.$formid)->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,17 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  * @backup triggers
  */
 class testInheritanceTrigger extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
@@ -130,6 +141,22 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	 */
 	public function testInheritanceTrigger_Tags() {
 		$inherited_trigger = 'testInheritanceTrigger1';
+
+		// Go to Host form.
+		$this->page->login()->open('hosts.php?form=update&hostid='.$this->hostid);
+		$host_form = $this->query('name:hostsForm')->waitUntilPresent()->asForm()->one();
+		// Fill tags on host.
+		$host_form->selectTab('Tags');
+
+		$host_tags = [
+			['name'=>'host_tag', 'value'=>'host_tag_value']
+		];
+
+		$this->fillTags($host_tags, count($host_tags));
+		$host_form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Host updated');
+
 		// Go to Template form.
 		$this->page->login()->open('templates.php?groupid=1');
 		$this->query('link', $this->template)->one()->click();
@@ -188,7 +215,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$triggers_form->selectTab('Tags');
 		$trigger_tags_table = $this->query('id:tags-table')->asTable()->one();
 		// Check trigger tags.
-		$triggers_tags_slice_1 = $trigger_tags_table->getRows()->slice(0, -1); // Remove Add button form cycle.
+		$triggers_tags_slice_1 = $trigger_tags_table->getRows()->slice(0, -1); // Remove Add button from cycle.
 		$this->checkTags($triggers_tags_slice_1, $templated_trigger_tags);
 
 		// Click on inherited and trigger tags radio.
@@ -197,11 +224,17 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$triggers_tags_slice_2 = $trigger_tags_table->getRows()->slice(0, -($template_tags_count+1)); // Remove templated tags and Add button from cycle.
 		$template_tags_slice = $trigger_tags_table->getRows()->slice($templated_trigger_tags_count, -1); // Remove trigger tags and Add button from cycle.
 
-		// Check inherited and trigger tags: trigger tags.
-		$this ->checkTags($triggers_tags_slice_2, $templated_trigger_tags);
+		// All expected trigger tags including host and template tags.
+		$inherited_trigger_tags = [
+			['name'=>'host_tag', 'value'=>'host_tag_value'],
+			['name'=>'tag1', 'value'=>'trigger'],
+			['name'=>'tag2', 'value'=>'templated'],
+			['name'=>'template', 'value'=>'template'],
+			['name'=>'test', 'value'=>'inheritance']
+		];
 
-		// Check inherited and trigger tags: inherited tags.
-		$this ->checkTags($template_tags_slice, $template_tags);
+		$actual_triggers_tags = $trigger_tags_table->getRows()->slice(0, -1); // Remove Add button from cycle.
+		$this->checkTags($actual_triggers_tags, $inherited_trigger_tags);
 	}
 
 	private function fillTags($array, $i) {

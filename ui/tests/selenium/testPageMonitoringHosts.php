@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -552,7 +552,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'link_name' => 'Dashboards',
-					'page_header' => 'Network interfaces on ЗАББИКС Сервер'
+					'page_header' => 'Network interfaces'
 				]
 			],
 			[
@@ -795,6 +795,9 @@ class testPageMonitoringHosts extends CWebTest {
 		if ($host_name === 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
 				' and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
+		}
+		if ($host_name === 'ЗАББИКС Сервер' && $column === 'Dashboards') {
+			$this->assertEquals('ЗАББИКС Сервер', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
 		}
 	}
 }
