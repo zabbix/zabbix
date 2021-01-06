@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ $widget = (new CWidget())
 	]));
 
 if ($data['single_selected_hostid'] != 0) {
-	$widget->addItem(get_header_host_table('triggers', $data['single_selected_hostid']));
+	$widget->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
 }
 
 $widget->addItem($filter);
@@ -260,13 +260,13 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(
+	$description[] = (new CLink(
 		CHtml::encode($trigger['description']),
 		(new CUrl('triggers.php'))
 			->setArgument('form', 'update')
 			->setArgument('triggerid', $triggerid)
 			->setArgument('context', $data['context'])
-	);
+	))->addClass(ZBX_STYLE_WORDWRAP);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];

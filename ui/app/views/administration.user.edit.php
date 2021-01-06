@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -135,20 +135,32 @@ else {
 }
 
 // Append languages, timezones & themes to form list.
-$lang_combobox = (new CComboBox('lang', $data['lang']))->addItem(LANG_DEFAULT, _('System default'));
-$timezone_combobox = new CSelect('timezone');
-$theme_combobox = (new CComboBox('theme', $data['theme']))->addItem(THEME_DEFAULT, _('System default'));
+$lang_select = (new CSelect('lang'))
+	->setFocusableElementId('label-lang')
+	->setValue($data['lang'])
+	->addOption(new CSelectOption(LANG_DEFAULT, _('System default')));
 
+$timezone_select = (new CSelect('timezone'))->setFocusableElementId('label-timezone');
+$theme_select = (new CSelect('theme'))
+	->setFocusableElementId('label-theme')
+	->setValue($data['theme'])
+	->addOption(new CSelectOption(THEME_DEFAULT, _('System default')));
+
+$language_error = null;
 if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
-	$lang_combobox->setEnabled(false);
-	$timezone_combobox
-		->addOptions(CSelect::createOptionsFromArray([TIMEZONE_DEFAULT => $data['timezones'][TIMEZONE_DEFAULT]]))
+	$lang_select
+		->setName(null)
+		->setReadonly();
+	$theme_select
+		->setName(null)
+		->setReadonly();
+	$timezone_select
+		->addOption(new CSelectOption(TIMEZONE_DEFAULT, $data['timezones'][TIMEZONE_DEFAULT]))
 		->setValue(TIMEZONE_DEFAULT)
-		->setDisabled();
-	$theme_combobox->setEnabled(false);
+		->setReadonly();
 }
 else {
-	$all_locales_available = 1;
+	$has_unavailable_locale = false;
 
 	foreach (getLocales() as $localeid => $locale) {
 		if (!$locale['display']) {
@@ -161,38 +173,36 @@ else {
 		 */
 		$locale_available = setlocale(LC_MONETARY, zbx_locale_variants($localeid));
 
-		$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
+		$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-		$all_locales_available &= (int) $locale_available;
+		$has_unavailable_locale |= !$locale_available;
 	}
 
 	// Restoring original locale.
 	setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 
-	$language_error = '';
 	if (!function_exists('bindtextdomain')) {
 		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
-		$lang_combobox->setEnabled(false);
+		$lang_select->setReadonly();
 	}
-	elseif ($all_locales_available == 0) {
+	elseif ($has_unavailable_locale) {
 		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 	}
 
-	if ($language_error !== '') {
-		$lang_combobox = [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')];
+	if ($language_error) {
+		$language_error = (makeErrorIcon($language_error))->addStyle('margin-left: 5px;');
 	}
 
-	$timezone_combobox
+	$timezone_select
 		->addOptions(CSelect::createOptionsFromArray($data['timezones']))
-		->setValue($data['timezone'])
-		->setFocusableElementId('timezone-select');
-	$theme_combobox->addItems(APP::getThemes());
+		->setValue($data['timezone']);
+	$theme_select->addOptions(CSelect::createOptionsFromArray(APP::getThemes()));
 }
 
 $user_form_list
-	->addRow(_('Language'), $lang_combobox)
-	->addRow(new CLabel(_('Time zone'), 'timezone-select'), $timezone_combobox)
-	->addRow(_('Theme'), $theme_combobox);
+	->addRow(new CLabel(_('Language'), $lang_select->getFocusableElementId()), [$lang_select, $language_error])
+	->addRow(new CLabel(_('Time zone'), $timezone_select->getFocusableElementId()), $timezone_select)
+	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
 if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {
@@ -498,12 +508,16 @@ if ($data['action'] !== 'user.edit') {
 			(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
 			'timeout_row'
 		)
-		->addRow(_('Play sound'),
-			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], null, [
-				1 => _('Once'),
-				10 => _n('%1$s second', '%1$s seconds', 10),
-				-1 => _('Message timeout')
-			]),
+		->addRow(new CLabel(_('Play sound'), 'label-sounds'),
+			(new CSelect('messages[sounds.repeat]'))
+				->setId('messages_sounds.repeat')
+				->setFocusableElementId('label-sounds')
+				->setValue($data['messages']['sounds.repeat'])
+				->addOptions(CSelect::createOptionsFromArray([
+					1 => _('Once'),
+					10 => _n('%1$s second', '%1$s seconds', 10),
+					-1 => _('Message timeout')
+				])),
 			'repeat_row'
 		);
 
@@ -516,7 +530,10 @@ if ($data['action'] !== 'user.edit') {
 				->setChecked($data['messages']['triggers.recovery'] == 1)
 				->setUncheckedValue(0),
 			[
-				new CComboBox('messages[sounds.recovery]', $data['messages']['sounds.recovery'], null, $zbx_sounds),
+				(new CSelect('messages[sounds.recovery]'))
+					->setId('messages_sounds.recovery')
+					->setValue($data['messages']['sounds.recovery'])
+					->addOptions(CSelect::createOptionsFromArray($zbx_sounds)),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
@@ -548,7 +565,10 @@ if ($data['action'] !== 'user.edit') {
 				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[
-				new CComboBox('messages[sounds.'.$severity.']', $data['messages']['sounds.'.$severity], null, $zbx_sounds),
+				(new CSelect('messages[sounds.'.$severity.']'))
+					->setId('messages_sounds.'.$severity)
+					->setValue($data['messages']['sounds.'.$severity])
+					->addOptions(CSelect::createOptionsFromArray($zbx_sounds)),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)

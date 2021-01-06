@@ -1,13 +1,19 @@
 z-select,
 .z-select {
-	display: inline-block;
+	display: inline-grid;
 
-	button {
+	&:focus {
+		outline: none;
+	}
+
+	button.focusable {
 		position: relative;
+		width: 100%;
 		height: 24px;
 		padding: 3px 18px 3px 4px;
 		overflow: hidden;
 		font-size: $font-form-size;
+		line-height: initial;
 		text-align: left;
 		text-overflow: ellipsis;
 		word-break: break-all;
@@ -54,11 +60,13 @@ z-select,
 		li {
 			display: block;
 			height: inherit;
+			box-sizing: border-box;
+			min-height: 24px;
 			padding: 5px;
 			line-height: normal;
 			color: $font-color;
 			text-overflow: ellipsis;
-			word-break: break-all;
+			word-break: break-word;
 			white-space: pre-wrap;
 			user-select: none;
 
@@ -105,8 +113,7 @@ z-select,
 		}
 	}
 
-	&[disabled],
-	&[readonly] {
+	&[disabled] {
 		button {
 			pointer-events: none;
 			@extend %form-disabled;
@@ -115,7 +122,12 @@ z-select,
 
 	&[readonly] {
 		button {
+			@extend %form-disabled;
 			color: $font-color !important;
+
+			&:focus {
+				border-color: $form-border-focus-color;
+			}
 		}
 	}
 }

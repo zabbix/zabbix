@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,9 +226,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -240,7 +240,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Average', 'Disaster']
 					],
 					'result' => [
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -252,8 +252,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Inherited' =>'No'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -265,7 +265,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Discovered' => 'Yes'
 					],
 					'result' => [
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -276,8 +276,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'With dependencies' => 'Yes'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -288,8 +288,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Name' => 'One'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -300,8 +300,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'State' => 'Normal'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -312,9 +312,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Status' => 'Enabled'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -335,8 +335,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Ok'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]'],
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -347,7 +347,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Problem'
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -372,7 +372,7 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -458,15 +458,15 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]']
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
@@ -546,11 +546,11 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[not(@class)]']
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[not(@class)]']
+							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
 							'Host' => 'Host for trigger tags filtering',
@@ -566,7 +566,7 @@ class testPageTriggers extends CLegacyWebTest {
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[not(@class)]']
+							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
 							'Host' => 'Host for trigger tags filtering',
@@ -595,7 +595,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
-		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		$this->assertFalse($this->query('class:breadcrumbs')->all()->isEmpty());
 		// Clear hosts in filter fields.
 		if (!array_key_exists('Hosts', $data['filter_options'])) {
 			$form->getField('Hosts')->asMultiselect()->clear();
@@ -607,7 +607,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		// Trigger create button disabled and breadcrumbs not exist.
 		$this->assertFalse($this->query('button:Create trigger (select host first)')->one()->isEnabled());
-		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		$this->assertTrue($this->query('class:breadcrumb')->all()->isEmpty());
 		// Check results in table.
 		$this->assertTableData(CTestArrayHelper::get($data, 'result', []));
 	}
