@@ -22,7 +22,6 @@ package docker
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -52,17 +51,7 @@ func newClient(socketPath string, timeout int) *client {
 	return &client
 }
 
-func (cli *client) Query(params []string, queryPath string) ([]byte, error) {
-	if len(params) > 0 {
-		iSlice := make([]interface{}, len(params))
-
-		for i, p := range params {
-			iSlice[i] = p
-		}
-
-		queryPath = fmt.Sprintf(queryPath, iSlice...)
-	}
-
+func (cli *client) Query(queryPath string) ([]byte, error) {
 	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)

@@ -56,7 +56,8 @@ var (
 	paramContainer = metric.NewParam("Container", "Container name for which the information is needed.").
 			SetRequired()
 	paramStatusAll = metric.NewParam("All", "Return all containers (true) or only running (false).").
-			SetRequired().WithValidator(metric.SetValidator{Set: []string{"true", "false"}, CaseInsensitive: true})
+			WithDefault("false").
+			WithValidator(metric.SetValidator{Set: []string{"true", "false"}, CaseInsensitive: true})
 )
 
 var metrics = metric.MetricSet{

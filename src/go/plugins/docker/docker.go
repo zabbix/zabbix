@@ -21,6 +21,7 @@ package docker
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"zabbix.com/pkg/zbxerr"
 
@@ -47,10 +48,10 @@ type Plugin struct {
 var impl Plugin
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (interface{}, error) {
 	var result []byte
 
-	_, err := metrics[key].EvalParams(params, nil)
+	params, err := metrics[key].EvalParams(rawParams, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyInfo:
 		var data Info
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +79,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyContainers:
 		var data []Container
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
@@ -95,7 +96,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyContainersDiscovery:
 		var data []Container
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(fmt.Sprintf(queryPath, params["All"]))
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +113,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyImages:
 		var data []Image
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
@@ -129,7 +130,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyImagesDiscovery:
 		var data []Image
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
@@ -146,7 +147,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyDataUsage:
 		var data DiskUsage
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
@@ -163,7 +164,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyContainerInfo:
 		var data ContainerInfo
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(fmt.Sprintf(queryPath, params["Container"]))
 		if err != nil {
 			return nil, err
 		}
@@ -180,7 +181,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyContainerStats:
 		var data ContainerStats
 
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(fmt.Sprintf(queryPath, params["Container"]))
 		if err != nil {
 			return nil, err
 		}
@@ -195,7 +196,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 	case keyPing:
-		body, err := p.client.Query(params, queryPath)
+		body, err := p.client.Query(queryPath)
 		if err != nil || string(body) != "OK" {
 			return pingFailed, nil
 		}
