@@ -80,6 +80,7 @@ class testFormFilter extends CWebTest {
 
 				// Checking that dropdown/popup tab works.
 				$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
+				sleep(2);
 				$this->query('xpath://a[@aria-label="Home" and @role="menuitem"]')->waitUntilPresent();
 				$this->query('xpath://a[@aria-label="'.$data['filter']['Name'].'"]')->one()->click();
 				$this->assertEquals($data['filter']['Name'], $filter_container->getSelectedTabName());
