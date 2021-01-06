@@ -29,5 +29,12 @@ import (
 )
 
 func executeSmartctl(args string, timeout int) (string, error) {
-	return zbxcmd.Execute(fmt.Sprintf("smartctl %s", args), time.Second*time.Duration(timeout))
+	path := "smartctl"
+	if p.options.Path != "" {
+		path = p.options.Path
+	}
+
+	out, err := zbxcmd.Execute(fmt.Sprintf("smartctl %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+	return []byte(out), err
+
 }
