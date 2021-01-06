@@ -28,17 +28,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testInheritanceTrigger extends CLegacyWebTest {
 
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
-	}
-
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
