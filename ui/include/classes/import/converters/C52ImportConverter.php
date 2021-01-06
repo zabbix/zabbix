@@ -38,6 +38,10 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
+		if (array_key_exists('value_maps', $data['zabbix_export'])) {
+			$data['zabbix_export'] = self::convertValueMaps($data['zabbix_export']);
+		}
+
 		return $data;
 	}
 
@@ -57,6 +61,48 @@ class C52ImportConverter extends CConverter {
 
 		foreach ($hosts as &$host) {
 			$host = array_diff_key($host, $tls_fields);
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	private static function convertValueMaps(array $import): array {
+		$valuemaps = self::transformValueMaps($import['value_maps']);
+		unset($import['value_maps']);
+
+		if (array_key_exists('hosts', $import)) {
+			$import['hosts'] = self::moveValueMaps($import['hosts'], $valuemaps);
+		}
+
+		if (array_key_exists('templates', $import)) {
+			$import['templates'] = self::moveValueMaps($import['templates'], $valuemaps);
+		}
+
+		return $import;
+	}
+
+	private static function transformValueMaps(array $valuemaps): array {
+		$arr = [];
+		foreach ($valuemaps as $valuemap) {
+			$arr[$valuemap['name']] = $valuemap;
+		}
+
+		return $arr;
+	}
+
+	private static function moveValueMaps(array $hosts, array $valuemaps) {
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('items', $host)) {
+				continue;
+			}
+
+			foreach ($host['items'] as &$item) {
+				if (array_key_exists('valuemap', $item)) {
+					$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
+				}
+			}
+			unset($item);
 		}
 		unset($host);
 
