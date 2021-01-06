@@ -171,7 +171,7 @@ class CPage {
 	}
 
 	/**
-	 * Web driver reconnection.
+	 * Reconnect web driver.
 	 */
 	public function reset() {
 		$this->destroy();
