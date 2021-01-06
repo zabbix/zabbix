@@ -306,15 +306,17 @@ if (array_key_exists('render_html', $data)) {
 		}
 
 		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-		$('#tags_' + data.uniqid + ' z-select').on('change', function() {
-			var num = this.id.match(/tags_(\d+)_operator/);
+		$('#tags_' + data.uniqid + ' z-select')
+			.on('change', function() {
+				var num = this.id.match(/tags_(\d+)_operator/);
 
-			if (num !== null) {
-				$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-						&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-				);
-			}
-		}).trigger('change');
+				if (num !== null) {
+					$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
+					);
+				}
+			})
+			.trigger('change');
 
 		// Initialize src_url.
 		this.resetUnsavedState();

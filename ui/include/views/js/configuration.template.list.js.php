@@ -76,14 +76,16 @@
 			});
 
 		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-		$('#filter-tags z-select').on('change', function() {
-			var num = this.id.match(/filter_tags_(\d+)_operator/);
+		$('#filter-tags z-select')
+			.on('change', function() {
+				var num = this.id.match(/filter_tags_(\d+)_operator/);
 
-			if (num !== null) {
-				$('#filter_tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-						&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-				);
-			}
-		}).trigger('change');
+				if (num !== null) {
+					$('#filter_tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
+					);
+				}
+			})
+			.trigger('change');
 	});
 </script>

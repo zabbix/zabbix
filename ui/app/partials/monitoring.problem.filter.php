@@ -508,15 +508,17 @@ if (array_key_exists('render_html', $data)) {
 					});
 			});
 
-		$('#filter-tags_' + data.uniqid + ' z-select').on('change', function() {
-			var num = this.id.match(/tags_(\d+)_operator/);
+		$('#filter-tags_' + data.uniqid + ' z-select')
+			.on('change', function() {
+				var num = this.id.match(/tags_(\d+)_operator/);
 
-			if (num !== null) {
-				$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-						&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-				);
-			}
-		}).trigger('change');
+				if (num !== null) {
+					$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
+					);
+				}
+			})
+			.trigger('change');
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({

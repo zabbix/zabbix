@@ -91,15 +91,17 @@ class CWidgetFieldTags extends CWidgetField {
 			'tags_table.parent().addClass("has-before");'.
 
 			// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-			'$("z-select", tags_table).on("change", function() {'.
-				'var num = this.id.match(/'.$this->getName().'_(\d+)_operator/);'.
+			'$("z-select", tags_table)'.
+				'.on("change", function() {'.
+					'var num = this.id.match(/'.$this->getName().'_(\d+)_operator/);'.
 
-				'if (num !== null) {'.
-					'$("#'.$this->getName().'_" + num[1] + "_value").toggle($(this).val() != '.TAG_OPERATOR_EXISTS.
-							'&& $(this).val() != '.TAG_OPERATOR_NOT_EXISTS.
-					');'.
-				'}'.
-			'}).trigger("change");';
+					'if (num !== null) {'.
+						'$("#'.$this->getName().'_" + num[1] + "_value").toggle($(this).val() != '.TAG_OPERATOR_EXISTS.
+								'&& $(this).val() != '.TAG_OPERATOR_NOT_EXISTS.
+						');'.
+					'}'.
+				'})'.
+				'.trigger("change");';
 	}
 
 	/**
