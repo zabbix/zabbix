@@ -56,6 +56,7 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+		<chmod file="ui/conf/zabbix.conf.php" perm="go+w"/>
 	</target>
 
 	<target name="create-saml-configs">
@@ -85,7 +86,9 @@
 
 	<target name="init-frontend-modules">
 		<!-- Copy modules directory for selenium tests -->
-		<copydir forceoverwrite="true" src="ui/tests/selenium/modules" dest="ui/modules"/>
+		<copy todir="ui/modules" overwrite="true">
+			<fileset dir="ui/tests/selenium/modules"/>
+		</copy>
 	</target>
 
 	<target name="make-dbschema">
