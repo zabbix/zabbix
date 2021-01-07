@@ -1750,13 +1750,12 @@ function getTriggerFormData(array $data) {
 				}
 			}
 
-			$result = [];
+			$data['tags'] = [];
 			foreach ($inherited_tags as $tag) {
 				foreach ($tag as $value) {
-					$result[] = $value;
+					$data['tags'][] = $value;
 				}
 			}
-			$data['tags'] = $result;
 		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);
