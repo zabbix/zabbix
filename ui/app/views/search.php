@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $app_count]
-		: [_('Applications'), $app_count];
+		: _('Applications');
 
 	$item_count = CViewHelper::showNum($host['items']);
 	$items_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -127,7 +127,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $item_count]
-		: [_('Items'), $item_count];
+		: _('Items');
 
 	$trigger_count = CViewHelper::showNum($host['triggers']);
 	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -135,7 +135,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $trigger_count]
-		: [_('Triggers'), $trigger_count];
+		: _('Triggers');
 
 	$graph_count = CViewHelper::showNum($host['graphs']);
 	$graphs_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -143,7 +143,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $graph_count]
-		: [_('Graphs'), $graph_count];
+		: _('Graphs');
 
 	$discovery_count = CViewHelper::showNum($host['discoveries']);
 	$discovery_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -151,7 +151,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $discovery_count]
-		: [_('Discovery'), $discovery_count];
+		: _('Discovery');
 
 	$httptest_count = CViewHelper::showNum($host['httpTests']);
 	$httptests_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
@@ -159,7 +159,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $httptest_count]
-		: [_('Web'), $httptest_count];
+		: _('Web');
 
 	$table->addRow([
 		$name_link,
@@ -288,28 +288,28 @@ if ($data['admin']) {
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $app_count]
-			: [_('Applications'), $app_count];
+			: _('Applications');
 
 		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Items'), (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $item_count]
-			: [_('Items'), $item_count];
+			: _('Items');
 
 		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $trigger_count]
-			: [_('Triggers'), $trigger_count];
+			: _('Triggers');
 
 		$graphs_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $graph_count]
-			: [_('Graphs'), $graph_count];
+			: _('Graphs');
 
 		$dashboards_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [
@@ -320,21 +320,21 @@ if ($data['admin']) {
 				),
 				$dashboard_count
 			]
-			: [_('Dashboards'), $dashboard_count];
+			: _('Dashboards');
 
 		$discovery_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $discovery_count]
-			: [_('Discovery'), $discovery_count];
+			: _('Discovery');
 
 		$httptests_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $httptest_count]
-			: [_('Web'), $httptest_count];
+			: _('Web');
 
 		if ($template['host'] !== $template['name'] && strpos($template['host'], $data['search']) !== false) {
 			$template_cell[] = BR();

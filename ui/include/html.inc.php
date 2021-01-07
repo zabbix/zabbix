@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,15 +188,15 @@ function get_icon($type, $params = []) {
 }
 
 /**
- * Create CDiv with host/template information and references to it's elements
+ * Get host/template configuration navigation.
  *
- * @param string $currentElement
- * @param int $hostid
- * @param int $lld_ruleid
+ * @param string  $current_element
+ * @param int     $hostid
+ * @param int     $lld_ruleid
  *
- * @return object
+ * @return CList|null
  */
-function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
+function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
@@ -263,16 +263,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$db_discovery_rule = reset($db_discovery_rule);
 	}
 
-	/*
-	 * list and host (template) name
-	 */
-	$list = (new CList())
-		->addClass(ZBX_STYLE_OBJECT_GROUP)
-		->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
-
-	$breadcrumbs = (new CListItem(null))
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
+	$list = new CList();
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -283,14 +274,12 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$template->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$breadcrumbs->addItem([
+		$list->addItem(new CBreadcrumbs([
 			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
-			'/',
 			$template
-		]);
+		]));
 
 		$db_host['hostid'] = $db_host['templateid'];
-		$list->addItem($breadcrumbs);
 	}
 	else {
 		switch ($db_host['status']) {
@@ -306,7 +295,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 				break;
 			default:
-				$status = _('Unknown');
+				$status = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_GREY);
 				break;
 		}
 
@@ -318,14 +307,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$host->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$breadcrumbs->addItem([
-			new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))),
-			'/',
-			$host
-		]);
-		$list->addItem($breadcrumbs);
-		$list->addItem($status);
-		$list->addItem(getHostAvailabilityTable($db_host));
+		$list
+			->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))), $host]))
+			->addItem($status)
+			->addItem(getHostAvailabilityTable($db_host));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
@@ -452,16 +437,14 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
 		}
 
-		$list->addItem([
-			(new CSpan())->addItem(
-				new CLink(_('Discovery list'), (new CUrl('host_discovery.php'))
+		$list->addItem(new CBreadcrumbs([
+			(new CSpan())->addItem(new CLink(_('Discovery list'),
+				(new CUrl('host_discovery.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
-				)
-			),
-			'/',
+			)),
 			$discovery_rule
-		]);
+		]));
 
 		// item prototypes
 		$item_prototypes = new CSpan([
@@ -514,55 +497,44 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 }
 
 /**
- * Create breadcrumbs header object with sysmap parents information.
+ * Get map navigation.
  *
  * @param int    $sysmapid      Used as value for sysmaid in map link generation.
  * @param string $name          Used as label for map link generation.
  * @param int    $severity_min  Used as value for severity_min in map link generation.
  *
- * @return object
+ * @return CList
  */
-function get_header_sysmap_table($sysmapid, $name, $severity_min) {
-	$list = (new CList())
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-		->addClass(ZBX_STYLE_OBJECT_GROUP)
-		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-		->addItem([
-			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
-			'/',
-			(new CSpan())
-				->addClass(ZBX_STYLE_SELECTED)
-				->addItem(
-					new CLink($name, (new CUrl('zabbix.php'))
-						->setArgument('action', 'map.view')
-						->setArgument('sysmapid', $sysmapid)
-						->setArgument('severity_min', $severity_min)
-					)
-				)
-		]);
+function getSysmapNavigation($sysmapid, $name, $severity_min) {
+	$list = (new CList())->addItem(new CBreadcrumbs([
+		(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
+		(new CSpan())
+			->addClass(ZBX_STYLE_SELECTED)
+			->addItem(new CLink($name,
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'map.view')
+					->setArgument('sysmapid', $sysmapid)
+					->setArgument('severity_min', $severity_min)
+			))
+	]));
 
 	// get map parent maps
 	$parent_sysmaps = get_parent_sysmaps($sysmapid);
 	if ($parent_sysmaps) {
 		$parent_maps = (new CList())
-			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _('Upper level maps'))
-			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
 			->addItem((new CSpan())->addItem(_('Upper level maps').':'));
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
-			$parent_maps->addItem((new CSpan())->addItem(
-				new CLink($parent_sysmap['name'], (new CUrl('zabbix.php'))
+			$parent_maps->addItem((new CSpan())->addItem(new CLink($parent_sysmap['name'],
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
-				))
-			);
+			)));
 		}
 
-		return new CHorList([$list, $parent_maps]);
+		$list->addItem($parent_maps);
 	}
 
 	return $list;

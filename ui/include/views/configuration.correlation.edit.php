@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,13 +102,17 @@ $condition_table->addRow([
 ]);
 
 $correlation_tab
-	->addRow(_('Type of calculation'), [
-		new CComboBox('evaltype', $data['correlation']['filter']['evaltype'], 'processTypeOfCalculation()', [
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or'),
-			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-		]),
+	->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
+		(new CSelect('evaltype'))
+			->setId('evaltype')
+			->setValue($data['correlation']['filter']['evaltype'])
+			->setFocusableElementId('label-evaltype')
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+				CONDITION_EVAL_TYPE_AND => _('And'),
+				CONDITION_EVAL_TYPE_OR => _('Or'),
+				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+			])),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('condition_label'),
 		(new CTextBox('formula', $data['correlation']['filter']['formula']))

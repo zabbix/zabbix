@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,10 +53,11 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
 				->setAttribute('data-formulaid', '#{formulaId}'),
-			(new CComboBox('conditions[#{rowNum}][operator]', CONDITION_OPERATOR_REGEXP, null, [
-				CONDITION_OPERATOR_REGEXP => _('matches'),
-				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-			]))->addClass('operator'),
+			(new CSelect('conditions[#{rowNum}][operator]'))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
+				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
+				->setValue(CONDITION_OPERATOR_REGEXP)
+				->addClass('operator'),
 			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setAttribute('placeholder', _('regular expression')),

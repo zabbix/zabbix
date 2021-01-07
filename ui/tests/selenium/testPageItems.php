@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ class testPageItems extends CLegacyWebTest {
 
 		// Item create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create item')->one()->isEnabled());
-		$this->assertFalse($this->query('class:filter-breadcrumb')->all()->isEmpty());
+		$this->assertFalse($this->query('class:breadcrumbs')->all()->isEmpty());
 		// Clear hosts in filter fields.
 		if (!array_key_exists('Hosts', $data['filter_options'])) {
 			$form->getField('Hosts')->asMultiselect()->clear();

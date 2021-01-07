@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,16 +128,20 @@ $widget = (new CWidget())
 					->setAttribute('aria-label', _('Content controls'))
 					->addClass(ZBX_STYLE_DASHBRD_EDIT)
 			]))->addStyle('display: none'))
-	)->setBreadcrumbs(
-		(new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addItem(new CPartial('monitoring.dashboard.breadcrumbs', [
-				'dashboard' => $data['dashboard']
-			]))
-				->addClass(ZBX_STYLE_OBJECT_GROUP)
-				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-	);
+	)
+	->setNavigation((new CList())->addItem(new CBreadcrumbs([
+		(new CSpan())->addItem(new CLink(_('All dashboards'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')
+		)),
+		(new CSpan())
+			->addItem((new CLink($data['dashboard']['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('dashboardid', $data['dashboard']['dashboardid'])))
+					->setId('dashboard-direct-link')
+			)
+			->addClass(ZBX_STYLE_SELECTED)
+	])));
 
 if ($data['time_selector'] !== null) {
 	$widget->addItem(
