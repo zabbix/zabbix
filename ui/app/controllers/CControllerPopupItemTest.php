@@ -735,27 +735,22 @@ abstract class CControllerPopupItemTest extends CController {
 				$output[] = 'details';
 			}
 
-			if ($this->item_type == ITEM_TYPE_SCRIPT) {
+			if (itemTypeInterface($this->item_type) === false) {
 				$output[] = 'main';
 				$host_interfaces = API::HostInterface()->get([
 					'output' => $output,
-					'hostids' => $this->host['hostid']
+					'hostids' => $this->host['hostid'],
+					'filter' => ['main' => INTERFACE_PRIMARY]
 				]);
 
-				$interfaces_by_type = [];
-				foreach ($host_interfaces as $interface) {
-					if ($interface['main'] == INTERFACE_PRIMARY) {
-						$interfaces_by_type[$interface['type']] = $interface;
-					}
-				}
-
+				$host_interfaces_types = array_flip(array_column($host_interfaces, 'type'));
 				$ordered_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX,
 					INTERFACE_TYPE_IPMI
 				];
 
 				foreach ($ordered_interface_types as $interface_type) {
-					if (array_key_exists($interface_type, $interfaces_by_type)) {
-						$interfaces[] = $interfaces_by_type[$interface_type];
+					if (array_key_exists($interface_type, $host_interfaces_types)) {
+						$interfaces[] = $host_interfaces[$host_interfaces_types[$interface_type]];
 						break;
 					}
 				}
