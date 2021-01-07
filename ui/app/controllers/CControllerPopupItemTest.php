@@ -728,12 +728,45 @@ abstract class CControllerPopupItemTest extends CController {
 		// Get values from database; resolve macros.
 		if (($this->host['status'] == HOST_STATUS_MONITORED || $this->host['status'] == HOST_STATUS_NOT_MONITORED)
 				&& array_key_exists('interfaceid', $inputs)) {
-			$output_details = ($this->item_type == ITEM_TYPE_SNMP) ? ['details'] : [];
-			$interfaces = API::HostInterface()->get([
-				'output' => array_merge(['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'], $output_details),
-				'interfaceids' => $inputs['interfaceid'],
-				'hostids' => $this->host['hostid']
-			]);
+			$output = ['hostid', 'type', 'dns', 'ip', 'port', 'main', 'useip'];
+			$interfaces = [];
+
+			if ($this->item_type == ITEM_TYPE_SNMP) {
+				$output[] = 'details';
+			}
+
+			if ($this->item_type == ITEM_TYPE_SCRIPT) {
+				$output[] = 'main';
+				$host_interfaces = API::HostInterface()->get([
+					'output' => $output,
+					'hostids' => $this->host['hostid']
+				]);
+
+				$interfaces_by_type = [];
+				foreach ($host_interfaces as $interface) {
+					if ($interface['main'] == INTERFACE_PRIMARY) {
+						$interfaces_by_type[$interface['type']] = $interface;
+					}
+				}
+
+				$ordered_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX,
+					INTERFACE_TYPE_IPMI
+				];
+
+				foreach ($ordered_interface_types as $interface_type) {
+					if (array_key_exists($interface_type, $interfaces_by_type)) {
+						$interfaces[] = $interfaces_by_type[$interface_type];
+						break;
+					}
+				}
+			}
+			else {
+				$interfaces = API::HostInterface()->get([
+					'output' => $output,
+					'interfaceids' => $inputs['interfaceid'],
+					'hostids' => $this->host['hostid']
+				]);
+			}
 
 			if (count($interfaces) != 0) {
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
@@ -753,6 +786,10 @@ abstract class CControllerPopupItemTest extends CController {
 					'interfaceid' => $interfaces[0]['interfaceid']
 				];
 			}
+		}
+
+		if ($this->item_type == ITEM_TYPE_SCRIPT) {
+			return $interface_data;
 		}
 
 		// Apply client side cache.
