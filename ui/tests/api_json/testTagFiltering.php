@@ -23,23 +23,13 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testTagFiltering extends CAPITest {
 
-	const EVALTYPE_AND_OR = 0;
-	const EVALTYPE_OR = 2;
-
-	const OP_LIKE = 0;
-	const OP_EQUAL = 1;
-	const OP_NOT_LIKE = 2;
-	const OP_NOT_EQUAL = 3;
-	const OP_EXISTS = 4;
-	const OP_NOT_EXISTS = 5;
-
-	public static function filterHostsByTagsData() {
+	public static function host_get_data() {
 		return [
 			'test-equals-with-single-tag' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Windows']
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Windows']
 					]
 				],
 				'expected' => [
@@ -48,10 +38,10 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-equals-with-two-tags' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Windows'],
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Linux']
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Windows'],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Linux']
 					]
 				],
 				'expected' => [
@@ -60,9 +50,9 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-not-equals-with-single-tag' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'Browser', 'operator' => self::OP_NOT_EQUAL, 'value' => 'Chrome']
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Chrome']
 					]
 				],
 				'expected' => [
@@ -73,10 +63,10 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-not-equals-with-two-tags' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'Browser', 'operator' => self::OP_NOT_EQUAL, 'value' => 'Chrome'],
-						['tag' => 'Browser', 'operator' => self::OP_NOT_EQUAL, 'value' => 'Firefox']
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Chrome'],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Firefox']
 					]
 				],
 				'expected' => [
@@ -86,9 +76,9 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-exists-with-single-tag' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'Browser', 'operator' => self::OP_EXISTS]
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_EXISTS]
 					]
 				],
 				'expected' => [
@@ -97,9 +87,9 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-contains-with-single-tag' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'Browser', 'operator' => self::OP_LIKE, 'value' => '']
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']
 					]
 				],
 				'expected' => [
@@ -108,10 +98,10 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-contains-or-equals' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_OR,
+					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_LIKE, 'value' => 'Win'],
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Linux']
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Win'],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Linux']
 					]
 				],
 				'expected' => [
@@ -120,10 +110,10 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-not-exists-with-exception' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_OR,
+					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_NOT_EXISTS],
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Android']
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Android']
 					]
 				],
 				'expected' => [
@@ -133,45 +123,37 @@ class testTagFiltering extends CAPITest {
 			],
 			'test-two-not-exists-with-exception' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_OR,
+					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_NOT_EXISTS],
-						['tag' => 'Browser', 'operator' => self::OP_NOT_EXISTS],
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Android']
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Android']
 					]
 				],
 				'expected' => [
-					'Host OS - Android', 'Host without tags', 'Host with very general tags only'
+					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE', 'Host OS',
+					'Host OS - Android', 'Host OS - Linux', 'Host OS - Mac', 'Host OS - Windows', 'Host without tags',
+					'Host with very general tags only'
 				]
 			],
 			'test-not-exists-with-two-exceptions' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'Browser', 'operator' => self::OP_EXISTS],
-						['tag' => 'Browser', 'operator' => self::OP_NOT_EQUAL, 'value' => 'Chrome'],
-						['tag' => 'Browser', 'operator' => self::OP_NOT_EQUAL, 'value' => 'Firefox']
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_EXISTS],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Chrome'],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Firefox']
 					]
 				],
 				'expected' => [
 					'Host Browser', 'Host Browser - IE'
 				]
 			],
-			'tets-tag-inheritance-off' => [
-				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
-					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_EQUAL, 'value' => 'Win7']
-					],
-					'inheritedTags' => false
-				],
-				'expected' => []
-			],
 			'test-not-equals-with-empty-value' => [
 				'filter' => [
-					'evaltype' => self::EVALTYPE_AND_OR,
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
-						['tag' => 'OS', 'operator' => self::OP_NOT_EQUAL, 'value' => '']
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => '']
 					]
 				],
 				'expected' => [
@@ -179,20 +161,41 @@ class testTagFiltering extends CAPITest {
 					'Host OS - Android', 'Host OS - Linux', 'Host OS - Mac', 'Host OS - Windows', 'Host without tags',
 					'Host with very general tags only'
 				]
+			],
+			'tets-tag-inheritance-on' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Win7']
+					],
+					'inheritedTags' => true
+				],
+				'expected' => ['Host OS - Windows']
+			],
+			'tets-tag-inheritance-off' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Win7']
+					],
+					'inheritedTags' => false
+				],
+				'expected' => []
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider filterHostsByTags
+	 * @dataProvider host_get_data
 	 */
-	public function filterHostsByTags($filter, $expected) {
+	public function testHost_Get($filter, $expected) {
 		$request = [
 			'output' => ['host'],
 			'groupids' => '50027'
 		] + $filter;
 
-		$result = $this->call('host.get', $request);
+		['result' => $result] = $this->call('host.get', $request);
+
 		$result = array_column($result, 'host');
 
 		sort($result);
