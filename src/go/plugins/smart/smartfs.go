@@ -107,7 +107,7 @@ func (p *Plugin) getParsedDevices() ([]deviceParser, error) {
 	}
 
 	for _, dev := range basicDev {
-		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
+		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name), false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 		}
@@ -159,7 +159,7 @@ func (p *Plugin) getDeviceJsons() (map[string]string, error) {
 	}
 
 	for _, dev := range basicDev {
-		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
+		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name), false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 		}
@@ -191,7 +191,7 @@ func (p *Plugin) getDeviceJsons() (map[string]string, error) {
 func (p *Plugin) checkVersion() error {
 	var smartctl smartctl
 
-	info, err := p.executeSmartctl("-j")
+	info, err := p.executeSmartctl("-j -V", true)
 	if err != nil {
 		return fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 	}
@@ -247,7 +247,7 @@ func (p *Plugin) getRaidJsons(name, rtype string) (map[string]string, error) {
 	}
 
 	for {
-		device, err := p.executeSmartctl(fmt.Sprintf("-a %s -j ", fmt.Sprintf("%s -d %s,%d", name, rtype, i)))
+		device, err := p.executeSmartctl(fmt.Sprintf("-a %s -j ", fmt.Sprintf("%s -d %s,%d", name, rtype, i)), false)
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -282,7 +282,7 @@ func (p *Plugin) getRaidDisks(name, rtype string) ([]deviceParser, error) {
 	}
 
 	for {
-		device, err := p.executeSmartctl(fmt.Sprintf("-a %s -j ", fmt.Sprintf("%s -d %s,%d", name, rtype, i)))
+		device, err := p.executeSmartctl(fmt.Sprintf("-a %s -j ", fmt.Sprintf("%s -d %s,%d", name, rtype, i)), false)
 		if err != nil {
 			return out, fmt.Errorf("failed to get RAID disk data from smartctl: %s", err.Error())
 		}
@@ -358,7 +358,7 @@ raid:
 func (p *Plugin) scanDevices(args string) ([]deviceInfo, error) {
 	var d devices
 
-	devices, err := p.executeSmartctl(args)
+	devices, err := p.executeSmartctl(args, false)
 	if err != nil {
 		return nil, err
 	}

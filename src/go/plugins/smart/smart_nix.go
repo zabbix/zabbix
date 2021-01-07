@@ -22,27 +22,26 @@
 package smart
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"zabbix.com/pkg/zbxcmd"
 )
 
-func (p *Plugin) executeSmartctl(args string) ([]byte, error) {
+func (p *Plugin) executeSmartctl(args string, checkExit bool) ([]byte, error) {
 	path := "smartctl"
 
 	if p.options.Path != "" {
 		path = p.options.Path
 	}
 
-	out, err := zbxcmd.Execute(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+	out, err, exitErr := zbxcmd.Execute(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
 	if err != nil {
 		return nil, err
 	}
 
-	if out == fmt.Sprintf("sudo: %s: command not found", path) {
-		return nil, errors.New("command not found")
+	if checkExit && exitErr != nil {
+		return nil, exitErr
 	}
 
 	return []byte(out), nil
