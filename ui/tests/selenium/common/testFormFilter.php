@@ -74,8 +74,8 @@ class testFormFilter extends CWebTest {
 
 				// Checking that dropdown/popup tab works.
 				$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
-				sleep(2);
-				$this->query('xpath://a[@aria-label="Home" and @role="menuitem"]')->waitUntilPresent();
+//				sleep(2);
+//				$this->query('xpath://a[@aria-label="Home" and @role="menuitem"]')->waitUntilPresent();
 
 				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
