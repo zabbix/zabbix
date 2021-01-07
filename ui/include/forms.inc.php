@@ -1711,8 +1711,8 @@ function getTriggerFormData(array $data) {
 			foreach ($item_parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if ((!array_key_exists($tag['tag'], $inherited_tags)) ||
-							(!array_key_exists($tag['value'], $inherited_tags[$tag['tag']]))) {
+						if (!array_key_exists($tag['tag'], $inherited_tags)
+							|| !array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
 							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
 								'parent_templates' => [$templateid => $template],
 								'type' => ZBX_PROPERTY_INHERITED
@@ -1741,8 +1741,8 @@ function getTriggerFormData(array $data) {
 			}
 
 			foreach ($data['tags'] as $tag) {
-				if ((!array_key_exists($tag['tag'], $inherited_tags)) ||
-					(!array_key_exists($tag['value'], $inherited_tags[$tag['tag']]))) {
+				if (!array_key_exists($tag['tag'], $inherited_tags)
+					|| !array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
 					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 				}
 				else {
