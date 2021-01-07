@@ -30,7 +30,7 @@ static void	mock_accept(zbx_socket_t *s)
 {
 	const char	*peer;
 
-	if (AF_INET != zbx_mock_str_to_family(zbx_mock_get_parameter_string("in.family")))
+	if (AF_INET != (s->peer_info.sin_family = zbx_mock_str_to_family(zbx_mock_get_parameter_string("in.family"))))
 		fail_msg("Unexpected family");
 
 	if (1 != inet_pton(AF_INET, (peer = zbx_mock_get_parameter_string("in.peer")),
