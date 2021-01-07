@@ -140,12 +140,14 @@ static int	DBpatch_5030011(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	itemid, itemtagid = 1;
-	int		ret = SUCCEED, res;
+	int		ret = SUCCEED;
 	char		*value;
+	zbx_db_insert_t	db_insert;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
 	result = DBselect(
 			"select i.itemid,a.name from items i"
 			" join items_applications ip on i.itemid=ip.itemid"
@@ -155,22 +157,13 @@ static int	DBpatch_5030011(void)
 	{
 		ZBX_DBROW2UINT64(itemid, row[0]);
 		value = DBdyn_escape_string(row[1]);
-
-		res = DBexecute(
-				"insert into item_tag"
-				" (itemtagid,itemid,tag,value)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')",
-				itemtagid++, itemid, "Application", value);
-
+		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
 		zbx_free(value);
-
-		if (ZBX_DB_OK > res)
-		{
-			ret = FAIL;
-			break;
-		}
 	}
 	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	return ret;
 }
@@ -180,12 +173,14 @@ static int	DBpatch_5030012(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	itemid, itemtagid;
-	int		ret = SUCCEED, res;
+	int		ret = SUCCEED;
 	char		*value;
+	zbx_db_insert_t	db_insert;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
 	itemtagid = DBget_maxid("item_tag");
 
 	result = DBselect(
@@ -197,22 +192,13 @@ static int	DBpatch_5030012(void)
 	{
 		ZBX_DBROW2UINT64(itemid, row[0]);
 		value = DBdyn_escape_string(row[1]);
-
-		res = DBexecute(
-				"insert into item_tag"
-				" (itemtagid,itemid,tag,value)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')",
-				itemtagid++, itemid, "Application", value);
-
+		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
 		zbx_free(value);
-
-		if (ZBX_DB_OK > res)
-		{
-			ret = FAIL;
-			break;
-		}
 	}
 	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	return ret;
 }
@@ -222,12 +208,14 @@ static int	DBpatch_5030013(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	selementid, selementtagid = 1;
-	int		ret = SUCCEED, res;
+	int		ret = SUCCEED;
 	char		*value;
+	zbx_db_insert_t	db_insert;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
 	result = DBselect(
 			"select selementid,application from sysmaps_elements"
 			" where elementtype in (0,3) and application<>'';");
@@ -236,22 +224,13 @@ static int	DBpatch_5030013(void)
 	{
 		ZBX_DBROW2UINT64(selementid, row[0]);
 		value = DBdyn_escape_string(row[1]);
-
-		res = DBexecute(
-				"insert into sysmaps_element_tag"
-				" (selementtagid,selementid,tag,value)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')",
-				selementtagid++, selementid, "Application", value);
-
+		zbx_db_insert_add_values(&db_insert, selementtagid++, selementid, "Application", value);
 		zbx_free(value);
-
-		if (ZBX_DB_OK > res)
-		{
-			ret = FAIL;
-			break;
-		}
 	}
 	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
 
 	return ret;
 }
