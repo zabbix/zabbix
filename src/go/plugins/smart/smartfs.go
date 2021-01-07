@@ -109,7 +109,7 @@ func (p *Plugin) getParsedDevices() ([]deviceParser, error) {
 	for _, dev := range basicDev {
 		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
 		if err != nil {
-			return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
+			return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 		}
 
 		var dp deviceParser
@@ -118,7 +118,7 @@ func (p *Plugin) getParsedDevices() ([]deviceParser, error) {
 		}
 
 		if err = dp.checkErr(); err != nil {
-			return nil, fmt.Errorf("Smartctl failed to get device data: %s", err.Error())
+			return nil, fmt.Errorf("Smartctl failed to get device data: %s.", err.Error())
 		}
 
 		if dp.SmartStatus != nil {
@@ -161,7 +161,7 @@ func (p *Plugin) getDeviceJsons() (map[string]string, error) {
 	for _, dev := range basicDev {
 		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name))
 		if err != nil {
-			return nil, fmt.Errorf("Failed to execute smartctl: %s", err.Error())
+			return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 		}
 
 		out[dev.Name] = string(devices)
@@ -193,7 +193,7 @@ func (p *Plugin) checkVersion() error {
 
 	info, err := p.executeSmartctl("-j")
 	if err != nil {
-		return fmt.Errorf("Failed to execute smartctl: %s", err.Error())
+		return fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 	}
 
 	if err = json.Unmarshal(info, &smartctl); err != nil {
@@ -217,7 +217,7 @@ func evaluateVersion(versionDigits []int) error {
 
 	v, err := strconv.ParseFloat(version, 64)
 	if err != nil {
-		return fmt.Errorf("Failed to parse smartctl version: %s", err.Error())
+		return zbxerr.ErrorCannotParseResult.Wrap(err)
 	}
 
 	if v < supportedSmartctl {
@@ -330,12 +330,12 @@ func (dp *deviceParser) checkErr() (err error) {
 func (p *Plugin) getDevices() (basic, raid []deviceInfo, err error) {
 	basic, err = p.scanDevices("--scan -j")
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to scan for devices: %s", err)
+		return nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err)
 	}
 
 	raidTmp, err := p.scanDevices("--scan -d sat -j")
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to scan for sat devices: %s", err)
+		return nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err)
 	}
 
 raid:

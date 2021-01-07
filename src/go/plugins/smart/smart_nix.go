@@ -42,7 +42,7 @@ func (p *Plugin) executeSmartctl(args string) ([]byte, error) {
 	}
 
 	if out == fmt.Sprintf("sudo: %s: command not found", path) {
-		return nil, errors.New("Command not found.")
+		return nil, errors.New("command not found")
 	}
 
 	return []byte(out), nil
