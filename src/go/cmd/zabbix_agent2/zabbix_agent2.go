@@ -48,6 +48,8 @@ import (
 	"zabbix.com/pkg/zbxlib"
 )
 
+const remoteCommandSendingTimeout = time.Second
+
 var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
@@ -132,8 +134,8 @@ func run() (err error) {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	var control *remotecontrol.Conn
-	if control, err = remotecontrol.New(agent.Options.ControlSocket, time.Duration(agent.Options.Timeout) * time.Second);
-			err != nil {
+	var testConnectionTimeout = time.Duration(agent.Options.Timeout) * time.Second
+	if control, err = remotecontrol.New(agent.Options.ControlSocket, testConnectionTimeout); err != nil {
 		return
 	}
 	control.Start()
@@ -210,10 +212,9 @@ func main() {
 	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
 	var remoteCommand string
-	const (
-		remoteDefault     = ""
-		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
-	)
+	const remoteDefault = ""
+	var remoteDescription = "Perform administrative functions (send 'help' for available commands) " +
+		"(" + remoteCommandSendingTimeout.String() + " timeout)"
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
 	flag.Parse()
@@ -308,7 +309,7 @@ func main() {
 		}
 
 		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
-				time.Duration(agent.Options.Timeout) * time.Second); err != nil {
+			remoteCommandSendingTimeout); err != nil {
 			log.Errf("Cannot send remote command: %s", err)
 		} else {
 			log.Infof(reply)

@@ -323,7 +323,7 @@ func (p *Plugin) httpsExpect(ip string, port string) int {
 
 	// does NOT return an error on >=400 status codes same as C agent
 	_, err = web.Get(fmt.Sprintf("%s://%s:%s%s", u.Scheme, u.Hostname(), port, u.Path),
-		time.Second * p.options.Timeout, false)
+		time.Second*p.options.Timeout, false)
 	if err != nil {
 		log.Debugf("https network error: cannot connect to [%s]: %s", u, err.Error())
 		return 0
@@ -357,7 +357,7 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
 
-	if conn, err = net.DialTimeout("tcp", address, time.Second * p.options.Timeout); err != nil {
+	if conn, err = net.DialTimeout("tcp", address, time.Second*p.options.Timeout); err != nil {
 		log.Debugf("TCP expect network error: cannot connect to [%s]: %s", address, err.Error())
 		return
 	}

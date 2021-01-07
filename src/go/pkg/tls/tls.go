@@ -983,8 +983,8 @@ func (c *tlsConn) ready() bool {
 	return C.tls_ready((*C.tls_t)(c.tls)) == 1
 }
 
-// Note, don't use WriteTLS() and ReadTLS() concurrently
-func (c *tlsConn) WriteTLS() (err error) {
+// Note, don't use flushTLS() and recvTLS() concurrently
+func (c *tlsConn) flushTLS() (err error) {
 	for {
 		if cn := C.tls_recv((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
 
@@ -1001,8 +1001,8 @@ func (c *tlsConn) WriteTLS() (err error) {
 	}
 }
 
-// Note, don't use WriteTLS() and ReadTLS() concurrently
-func (c *tlsConn) ReadTLS() (err error) {
+// Note, don't use flushTLS() and recvTLS() concurrently
+func (c *tlsConn) recvTLS() (err error) {
 	var n int
 	if err = c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
 		return
@@ -1086,14 +1086,14 @@ func (c *Client) checkConnection() (err error) {
 		if cRet < 0 {
 			return c.Error()
 		}
-		if err = c.WriteTLS(); err != nil {
+		if err = c.flushTLS(); err != nil {
 			return
 		}
-		if err = c.ReadTLS(); err != nil {
+		if err = c.recvTLS(); err != nil {
 			return
 		}
 	}
-	err = c.WriteTLS()
+	err = c.flushTLS()
 	return
 }
 
@@ -1105,7 +1105,7 @@ func (c *Client) Write(b []byte) (n int, err error) {
 	if cRet <= 0 {
 		return 0, c.Error()
 	}
-	if err = c.WriteTLS(); err != nil {
+	if err = c.flushTLS(); err != nil {
 		return
 	}
 	return len(b), nil
@@ -1123,7 +1123,7 @@ func (c *Client) Read(b []byte) (n int, err error) {
 		if cRet < 0 {
 			return 0, c.Error()
 		}
-		if err = c.ReadTLS(); err != nil {
+		if err = c.recvTLS(); err != nil {
 			return
 		}
 	}
@@ -1195,14 +1195,14 @@ func (s *Server) checkConnection() (err error) {
 		if cRet < 0 {
 			return s.Error()
 		}
-		if err = s.WriteTLS(); err != nil {
+		if err = s.flushTLS(); err != nil {
 			return
 		}
-		if err = s.ReadTLS(); err != nil {
+		if err = s.recvTLS(); err != nil {
 			return
 		}
 	}
-	err = s.WriteTLS()
+	err = s.flushTLS()
 	return
 }
 
@@ -1214,7 +1214,7 @@ func (s *Server) Write(b []byte) (n int, err error) {
 	if cRet <= 0 {
 		return 0, s.Error()
 	}
-	return len(b), s.WriteTLS()
+	return len(b), s.flushTLS()
 }
 
 func (s *Server) Read(b []byte) (n int, err error) {
@@ -1229,7 +1229,7 @@ func (s *Server) Read(b []byte) (n int, err error) {
 		if cRet < 0 {
 			return 0, s.Error()
 		}
-		if err = s.ReadTLS(); err != nil {
+		if err = s.recvTLS(); err != nil {
 			return
 		}
 	}

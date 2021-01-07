@@ -135,7 +135,7 @@ func (p *Plugin) udpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
 
-	if conn, err = net.DialTimeout("udp", address, time.Second * p.options.Timeout); err != nil {
+	if conn, err = net.DialTimeout("udp", address, time.Second*p.options.Timeout); err != nil {
 		log.Debugf("UDP expect network error: cannot connect to [%s]: %s", address, err.Error())
 		return
 	}

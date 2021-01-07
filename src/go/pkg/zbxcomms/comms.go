@@ -109,9 +109,9 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 
 func (c *Connection) Write(data []byte) error {
 	err := c.conn.SetWriteDeadline(time.Now().Add(c.Timeout))
-		if nil != err {
-			return err
-		}
+	if nil != err {
+		return err
+	}
 
 	return c.write(c.conn, data)
 }
