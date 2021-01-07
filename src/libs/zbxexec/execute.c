@@ -145,11 +145,14 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __func__, command);
 
-	if (NULL == (test_dir = opendir(dir)))
-		return -1;
+	if (NULL != dir)
+	{
+		if (NULL == (test_dir = opendir(dir)))
+			return -1;
 
-	if (-1 == closedir(test_dir))
-		return -1;
+		if (-1 == closedir(test_dir))
+			return -1;
+	}
 
 	if (-1 == pipe(fd))
 		return -1;
