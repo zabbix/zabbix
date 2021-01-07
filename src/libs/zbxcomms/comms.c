@@ -640,7 +640,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	zbx_socket_clean(s);
 
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
+	hints.ai_family = AF_INET;
 	hints.ai_socktype = type;
 
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
