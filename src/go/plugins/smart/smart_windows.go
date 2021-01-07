@@ -28,13 +28,16 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
-func executeSmartctl(args string, timeout int) (string, error) {
+func (p *Plugin) executeSmartctl(args string, checkExit bool) ([]byte, error) {
 	path := "smartctl"
 	if p.options.Path != "" {
 		path = p.options.Path
 	}
 
-	out, err := zbxcmd.Execute(fmt.Sprintf("smartctl %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
-	return []byte(out), err
+	out, err, exitErr := zbxcmd.Execute(fmt.Sprintf("%s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+	if checkExit && exitErr != nil {
+		return nil, exitErr
+	}
 
+	return []byte(out), err
 }

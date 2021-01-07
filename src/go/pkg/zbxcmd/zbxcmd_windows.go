@@ -40,7 +40,7 @@ type process struct {
 
 var ntResumeProcess *syscall.Proc
 
-func Execute(s string, timeout time.Duration) (out string, err error) {
+func Execute(s string, timeout time.Duration) (out string, err error, waitErr error) {
 	cmd := exec.Command("cmd", "/C", s)
 
 	var b bytes.Buffer
@@ -49,7 +49,7 @@ func Execute(s string, timeout time.Duration) (out string, err error) {
 
 	var job windows.Handle
 	if job, err = windows.CreateJobObject(nil, nil); err != nil {
-		return
+		return "", err, nil
 	}
 	defer windows.CloseHandle(job)
 
@@ -57,7 +57,7 @@ func Execute(s string, timeout time.Duration) (out string, err error) {
 		CreationFlags: windows.CREATE_SUSPENDED,
 	}
 	if err = cmd.Start(); err != nil {
-		return "", fmt.Errorf("Cannot execute command: %s", err)
+		return "", fmt.Errorf("Cannot execute command: %s", err), nil
 	}
 
 	processHandle := windows.Handle((*process)(unsafe.Pointer(cmd.Process)).Handle)
@@ -72,7 +72,7 @@ func Execute(s string, timeout time.Duration) (out string, err error) {
 
 	if err = windows.AssignProcessToJobObject(job, processHandle); err != nil {
 		log.Warningf("cannot assign process to a job: %s", err)
-		return
+		return "", err, nil
 	}
 
 	t := time.AfterFunc(timeout, func() {
@@ -84,20 +84,20 @@ func Execute(s string, timeout time.Duration) (out string, err error) {
 	var rc uintptr
 	if rc, _, err = ntResumeProcess.Call(uintptr(processHandle)); int32(rc) < 0 {
 		log.Warningf("cannot resume process: %s", err)
-		return
+		return "", err, nil
 	}
 
-	_ = cmd.Wait()
+	waitErr = cmd.Wait()
 
 	if !t.Stop() {
-		return "", fmt.Errorf("Timeout while executing a shell script.")
+		return "", fmt.Errorf("Timeout while executing a shell script."), nil
 	}
 
 	if maxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
+		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024), nil
 	}
 
-	return strings.TrimRight(b.String(), " \t\r\n"), nil
+	return strings.TrimRight(b.String(), " \t\r\n"), nil, waitErr
 }
 
 func ExecuteBackground(s string) error {

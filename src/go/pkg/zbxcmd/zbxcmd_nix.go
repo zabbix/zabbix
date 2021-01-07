@@ -54,7 +54,7 @@ func Execute(s string, timeout time.Duration) (string, error, error) {
 		}
 	})
 
-	exitErr := cmd.Wait()
+	err = cmd.Wait()
 
 	if !t.Stop() {
 		return "", fmt.Errorf("Timeout while executing a shell script."), nil
@@ -64,7 +64,7 @@ func Execute(s string, timeout time.Duration) (string, error, error) {
 		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024), nil
 	}
 
-	return strings.TrimRight(b.String(), " \t\r\n"), nil, exitErr
+	return strings.TrimRight(b.String(), " \t\r\n"), nil, err
 }
 
 func ExecuteBackground(s string) error {
