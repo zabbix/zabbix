@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []strin
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
 					'{#DEST_NAME}' VALUE d.DEST_NAME
-				)
+				) RETURNING CLOB 
 			) LLD
 		FROM
 			V$ARCHIVE_DEST d,

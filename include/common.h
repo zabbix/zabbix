@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -377,6 +377,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_NOT_REGEXP		9
 #define CONDITION_OPERATOR_YES			10
 #define CONDITION_OPERATOR_NO			11
+#define CONDITION_OPERATOR_EXIST		12
+#define CONDITION_OPERATOR_NOT_EXIST		13
 
 /* maintenance tag operators */
 #define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
@@ -557,7 +559,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_LLDMANAGER	28
 #define ZBX_PROCESS_TYPE_LLDWORKER	29
 #define ZBX_PROCESS_TYPE_ALERTSYNCER	30
-#define ZBX_PROCESS_TYPE_COUNT		31	/* number of process types */
+#define ZBX_PROCESS_TYPE_HISTORYPOLLER	31
+#define ZBX_PROCESS_TYPE_AVAILMAN	32
+#define ZBX_PROCESS_TYPE_COUNT		33	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);

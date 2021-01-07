@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2604,7 +2604,9 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 				continue;
 			}
 
-			if (0 == strcmp(item->key, buffer))
+			if (0 == strcmp(item->key, buffer) &&
+					SUCCEED == lld_validate_item_override_no_discover(&lld_row->overrides,
+					item->name))
 			{
 				item_index_local.parent_itemid = item->parent_itemid;
 				item_index_local.lld_row = lld_row;

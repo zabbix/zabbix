@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []s
 				JSON_OBJECT(
 					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
 					'{#CONTENTS}'   VALUE CONTENTS
-				)
+				) RETURNING CLOB 
 			) LLD
 		FROM
 			DBA_TABLESPACES

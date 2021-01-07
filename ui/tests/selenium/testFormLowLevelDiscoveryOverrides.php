@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -513,7 +513,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							],
 							'Filters' => [
 								'Type of calculation' => 'Custom expression',
-								'formula' => 'A and B',
+								'formula' => '(A and B) or (C and D)',
 								'filter_conditions' => [
 									[
 										'action' => USER_ACTION_UPDATE,
@@ -526,6 +526,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'macro' => '{#MACRO2}',
 										'operator' => 'matches',
 										'value' => 'expression_2'
+									],
+									[
+										'macro' => '{#MACRO3}',
+										'operator' => 'exists'
+									],
+									[
+										'macro' => '{#MACRO4}',
+										'operator' => 'does not exist'
 									]
 								]
 							],
@@ -624,7 +632,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	private function overridesCreate($data) {
-		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?form=create&context=host&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$key = 'lld_override'.time();
 		$form->fill([
@@ -1174,7 +1182,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 0,
-												'delay' => '',
+												'delay' => ''
 											]
 										]
 									]
@@ -1337,7 +1345,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'name' => 'Override for update 1',
 							'Filters' => [
-								'formula' => 'A and B and C',
+								'formula' => 'A and B and C and D and E',
 								'filter_conditions' => [
 									[
 										'action' => USER_ACTION_ADD,
@@ -1380,7 +1388,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							],
 							'Filters' => [
 								'Type of calculation' => 'Custom expression',
-								'formula' => 'A and B',
+								'formula' => 'A and B and C and D',
 								'filter_conditions' => [
 									[
 										'action' => USER_ACTION_UPDATE,
@@ -1395,6 +1403,18 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'macro' => '{#UPDATED_MACRO2}',
 										'operator' => 'matches',
 										'value' => 'UPDATED expression_2'
+									],
+									[
+										'action' => USER_ACTION_UPDATE,
+										'index' => 2,
+										'macro' => '{#UPDATED_MACRO3}',
+										'operator' => 'does not exist'
+									],
+									[
+										'action' => USER_ACTION_UPDATE,
+										'index' => 3,
+										'macro' => '{#UPDATED_MACRO4}',
+										'operator' => 'exists'
 									]
 								]
 							],
@@ -1453,7 +1473,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
 									'fields' => [
-										'Discover' => 'No',
+										'Discover' => 'No'
 									]
 								],
 								[
@@ -1525,7 +1545,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::UPDATED_ID);
+		$this->page->login()->open('host_discovery.php?form=update&context=host&itemid='.self::UPDATED_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$form->invalidate();
@@ -1539,7 +1559,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				],
 				'Filters' => [
 					'Type of calculation' => 'And',
-					'formula' => 'A and B',
+					'formula' => 'A and B and C and D',
 					'filter_conditions' => [
 						[
 							'macro' => '{#MACRO1}',
@@ -1550,6 +1570,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'macro' => '{#MACRO2}',
 							'operator' => 'does not match',
 							'value' => 'test expression_2'
+						],
+						[
+							'macro' => '{#MACRO3}',
+							'operator' => 'exists'
+						],
+						[
+							'macro' => '{#MACRO2}',
+							'operator' => 'does not exist'
 						]
 					]
 				],
@@ -1577,7 +1605,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Discover' => null,
 						'Severity' => 'Warning',
 						'Tags' => [
-							['tag' => 'tag1', 'value' => 'value1'],
+							['tag' => 'tag1', 'value' => 'value1']
 						]
 					]
 				]
@@ -1776,8 +1804,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 		// Add Filters to override.
 		if (array_key_exists('Filters', $override)) {
-			$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
-					->fill($override['Filters']['filter_conditions']);
+			$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
+			$mapping = $this->setFiltersTableMapping($filters_table);
+			$filters_table->setFieldMapping($mapping)->fill($override['Filters']['filter_conditions']);
 
 			// Add Type of calculation if there are more then 2 filters.
 			if (array_key_exists('Type of calculation', $override['Filters'])) {
@@ -1918,7 +1947,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 
 		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$created_id);
+		$this->page->login()->open('host_discovery.php?form=update&context=host&itemid='.self::$created_id);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$override_container = $form->getField('Overrides')->asTable();
@@ -1962,8 +1991,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				unset($condition);
 
 				// Check that Fiters are filled correctly.
-				$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
-					->checkValue($override['Filters']['filter_conditions']);
+				$filters_table = $override_overlay->query('id:overrides_filters')->asMultifieldTable()->one();
+				$mapping = $this->setFiltersTableMapping($filters_table);
+				$filters_table->setFieldMapping($mapping)->checkValue($override['Filters']['filter_conditions']);
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {
@@ -2022,5 +2052,20 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Close Override dialog.
 			COverlayDialogElement::find()->one()->close();
 		}
+	}
+
+	/**
+	 * Function for updating the mapping of the specified Filters multi-field table.
+	 *
+	 * @param CMultifieldTableElement	$filters_table	table which mapping needs to be updated
+	 *
+	 * @return array
+	 */
+	private function setFiltersTableMapping($filters_table) {
+		$mapping = $filters_table->detectFieldMapping();
+		$mapping['Regular expression']['name'] = 'value';
+		$mapping['Regular expression']['selector'] = 'xpath:./div/input';
+
+		return $mapping;
 	}
 }

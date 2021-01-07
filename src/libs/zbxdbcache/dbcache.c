@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 #include "zbxjson.h"
 #include "zbxhistory.h"
 #include "daemon.h"
+#include "zbxavailability.h"
+#include "zbxtrends.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -54,7 +56,7 @@ static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
-static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
+static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 extern int		CONFIG_DOUBLE_PRECISION;
@@ -3036,6 +3038,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				DCconfig_items_apply_changes(&item_diff);
 				DCmass_update_trends(history, history_num, &trends, &trends_num, compression_age);
 
+				if (0 != trends_num)
+					zbx_tfc_invalidate_trends(trends, trends_num);
+
 				do
 				{
 					DBbegin();
@@ -4558,9 +4563,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 void	DCupdate_hosts_availability(void)
 {
 	zbx_vector_ptr_t	hosts;
-	char			*sql_buf = NULL;
-	size_t			sql_buf_alloc = 0, sql_buf_offset = 0;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4569,29 +4571,7 @@ void	DCupdate_hosts_availability(void)
 	if (SUCCEED != DCreset_hosts_availability(&hosts))
 		goto out;
 
-	DBbegin();
-	DBbegin_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-
-	for (i = 0; i < hosts.values_num; i++)
-	{
-		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
-				(zbx_host_availability_t *)hosts.values[i]))
-		{
-			continue;
-		}
-
-		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
-		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-	}
-
-	DBend_multiple_update(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
-
-	if (16 < sql_buf_offset)
-		DBexecute("%s", sql_buf);
-
-	DBcommit();
-
-	zbx_free(sql_buf);
+	zbx_availabilities_flush(&hosts);
 out:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
 	zbx_vector_ptr_destroy(&hosts);

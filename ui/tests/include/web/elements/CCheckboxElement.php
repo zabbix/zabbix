@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,13 @@ class CCheckboxElement extends CElement {
 	 */
 	public function isChecked($checked = true) {
 		return $this->isSelected($checked);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isVisible($visible = true) {
+		return $this->parents()->query('tag:label')->one(false)->isVisible($visible);
 	}
 
 	/**

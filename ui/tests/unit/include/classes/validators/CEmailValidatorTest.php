@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class CEmailValidatorTest extends PHPUnit_Framework_TestCase {
 			['"(),:;<>[\]@example.com', false, 'Invalid email address ""(),:;<>[\]@example.com".'],
 			['just"not"right@example.com', false, 'Invalid email address "just"not"right@example.com".'],
 			['this\ is"really"not\allowed@example.com', false, 'Invalid email address "this\ is"really"not\allowed@example.com".'],
-			['Administrator <admin@example.com>, a, b, c', false, 'Invalid email address "Administrator <admin@example.com>, a, b, c".'],
+			['Administrator <admin@example.com>, a, b, c', false, 'Invalid email address "Administrator <admin@example.com>, a, b, c".']
 		];
 	}
 

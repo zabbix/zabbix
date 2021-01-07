@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,30 +38,30 @@ class testHostGroup extends CAPITest {
 			// Check hostgroup name.
 			[
 				'hostgroup' => [
-					'name' => '',
+					'name' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'hostgroup' => [
-					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			// Check for duplicated host groups names.
 			[
 				'hostgroup' => [
-					'name' => 'Templates',
+					'name' => 'Templates'
 				],
 				'expected_error' => 'Host group "Templates" already exists.'
 			],
 			[
 				'hostgroup' => [
 					[
-						'name' => 'One host group with existing name',
+						'name' => 'One host group with existing name'
 					],
 					[
-						'name' => 'Templates',
+						'name' => 'Templates'
 					]
 				],
 				'expected_error' => 'Host group "Templates" already exists.'
@@ -69,10 +69,10 @@ class testHostGroup extends CAPITest {
 			[
 				'hostgroup' => [
 					[
-						'name' => 'Host groups with two identical name',
+						'name' => 'Host groups with two identical name'
 					],
 					[
-						'name' => 'Host groups with two identical name',
+						'name' => 'Host groups with two identical name'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical name) already exists.'
@@ -81,7 +81,7 @@ class testHostGroup extends CAPITest {
 			[
 				'hostgroup' => [
 					[
-						'name' => 'API host group create',
+						'name' => 'API host group create'
 					]
 				],
 				'expected_error' => null
@@ -89,10 +89,10 @@ class testHostGroup extends CAPITest {
 			[
 				'hostgroup' => [
 					[
-						'name' => '☺',
+						'name' => '☺'
 					],
 					[
-						'name' => 'æų',
+						'name' => 'æų'
 					]
 				],
 				'expected_error' => null
@@ -112,7 +112,7 @@ class testHostGroup extends CAPITest {
 					],
 					[
 						'name' => 'API/Nested'
-					],
+					]
 				],
 				'expected_error' => null
 			]
@@ -207,7 +207,7 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
+					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
@@ -275,7 +275,7 @@ class testHostGroup extends CAPITest {
 					[
 					'groupid' => '50005',
 					'name' => 'Апи УТФ-8 обновлённый'
-					],
+					]
 				],
 				'expected_error' => null
 			]
@@ -415,7 +415,7 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					'62003'
 				],
-				'expected_error' => null,
+				'expected_error' => null
 			],
 			[
 				'hostgroup' => [
@@ -428,7 +428,7 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					'62004'
 				],
-				'expected_error' => null,
+				'expected_error' => null
 			]
 		];
 	}

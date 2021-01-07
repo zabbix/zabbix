@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class CWidgetFormGraph extends CWidgetForm {
 		// Select graph type field.
 		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [
 			ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
-			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
+			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph')
 		]))
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
 			->setAction('updateWidgetConfigDialogue()')

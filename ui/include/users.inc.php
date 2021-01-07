@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ function getUserTheme($userData) {
  *
  * @param int $userType
  *
- * @return string
+ * @return string|array
  */
 function user_type2str($userType = null) {
 	$userTypes = [

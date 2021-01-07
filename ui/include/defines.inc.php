@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@
 
 define('ZABBIX_VERSION',		'5.4.0alpha1');
 define('ZABBIX_API_VERSION',	'5.4.0');
-define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5020000);
+define('ZABBIX_EXPORT_VERSION',	'5.4');
+define('ZABBIX_DB_VERSION',		5030003);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2020');
+define('ZABBIX_COPYRIGHT_TO',	'2021');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -292,6 +292,8 @@ define('CONDITION_OPERATOR_REGEXP',		8);
 define('CONDITION_OPERATOR_NOT_REGEXP',	9);
 define('CONDITION_OPERATOR_YES',		10);
 define('CONDITION_OPERATOR_NO',			11);
+define('CONDITION_OPERATOR_EXISTS',		12);
+define('CONDITION_OPERATOR_NOT_EXISTS',	13);
 
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
@@ -1687,12 +1689,12 @@ define('ZBX_STYLE_OVERRIDES_OPTIONS_LIST', 'overrides-options-list');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
+define('ZBX_STYLE_TABLE_LEFT_BORDER', 'border-left');
 define('ZBX_STYLE_TIME_INPUT', 'time-input');
 define('ZBX_STYLE_TIME_INPUT_ERROR', 'time-input-error');
 define('ZBX_STYLE_TIME_QUICK', 'time-quick');
 define('ZBX_STYLE_TIME_QUICK_RANGE', 'time-quick-range');
 define('ZBX_STYLE_TIME_SELECTION_CONTAINER', 'time-selection-container');
-define('ZBX_STYLE_FILTER_BREADCRUMB', 'filter-breadcrumb');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
@@ -1716,7 +1718,7 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
 define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
-define('ZBX_STYLE_HEADER_COMBOBOX', 'header-combobox');
+define('ZBX_STYLE_HEADER_Z_SELECT', 'header-z-select');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
@@ -1792,7 +1794,6 @@ define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
 define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
-define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
 define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');

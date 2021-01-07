@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
 	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
 
-	public $link = 'items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID;
-	public $ready_link = 'items.php?form=update&hostid='.self::HOST_ID.'&itemid=';
+	public $link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::HOST_ID;
+	public $ready_link = 'items.php?form=update&context=host&hostid='.self::HOST_ID.'&itemid=';
 	public $button = 'Create item';
 	public $success_message = 'Item added';
 	public $fail_message = 'Cannot add item';
@@ -94,6 +94,13 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	}
 
 	/**
+	 * Check that adding two 'Check for not supported value'
+	 * preprocessing steps is impossible.
+	 */
+	public function testFormItemPreprocessing_RepeatedNotSupported() {
+		$this->checkRepeatedNotSupported();
+	}
+	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
 	public function testFormItemPreprocessing_TrailingSpaces($data) {
@@ -110,7 +117,7 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 		$original_host_id = 15001;											// Template inheritance test host
 		$target_hostname = 'Simple form test host';
 
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]='.$original_host_id);
+		$this->page->login()->open('items.php?filter_set=1&context=host&filter_hostids[0]='.$original_host_id);
 		$table = $this->query('xpath://form[@name="items"]/table')->asTable()->one();
 		$table->findRow('Key', $preprocessing_item_key)->select();
 		$this->query('button:Copy')->one()->click();
@@ -127,12 +134,12 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 		$this->assertEquals('Item copied', $message->getTitle());
 
 		// Open original item form and get steps text.
-		$this->page->open('items.php?form=update&hostid='.$original_host_id.'&itemid='.$preprocessing_item_id);
+		$this->page->open('items.php?form=update&context=host&hostid='.$original_host_id.'&itemid='.$preprocessing_item_id);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
 		// Open copied item form, get steps text and compare to original.
-		$this->page->open('items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID);
+		$this->page->open('items.php?filter_set=1&context=host&filter_hostids[0]='.self::HOST_ID);
 		$this->query('link', $preprocessing_item_name)->one()->click();
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals($preprocessing_item_name, $form->getField('Name')->getValue());
@@ -158,8 +165,8 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
 	public function testFormItemPreprocessing_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATE_ID;
-		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
+		$this->link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_TEMPLATE_ID;
+		$host_link = 'items.php?filter_set=1&context=host&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

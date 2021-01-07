@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ $settings = [
 			'url' => $baseurl.'?acs'
 		],
 		'singleLogoutService' => [
-			'url' => $baseurl.'?sls',
+			'url' => $baseurl.'?sls'
 		],
 		'NameIDFormat' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_NAMEID_FORMAT),
 		'x509cert' => $sp_cert,
@@ -105,10 +105,10 @@ $settings = [
 	'idp' => [
 		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
 		'singleSignOnService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL),
+			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL)
 		],
 		'singleLogoutService' => [
-			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL),
+			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL)
 		],
 		'x509cert' => $idp_cert
 	],

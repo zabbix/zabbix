@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,12 +63,12 @@ void	zbx_mock_test_entry(void **state)
 		zbx_uint32_t	num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("func_pos", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
+				ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'func_pos' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint32(tmp, &num))
+		else if (SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("func_pos parameter \"%s\" is not numeric.", tmp);
 		}
@@ -76,12 +76,12 @@ void	zbx_mock_test_entry(void **state)
 		func_pos_exp = num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_l", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
+				ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'par_l' parameter from test case data: %s",
-				zbx_mock_error_string(error));
+					zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint32(tmp, &num))
+		else if (SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("par_l parameter \"%s\" is not numeric.", tmp);
 		}
@@ -89,12 +89,12 @@ void	zbx_mock_test_entry(void **state)
 		par_l_exp = num;
 
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("par_r", &param_handle)) ||
-			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
+				ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
 			fail_msg("Cannot get expected 'par_r' parameter from test case data: %s",
-				zbx_mock_error_string(error));
+					zbx_mock_error_string(error));
 		}
-		else if(SUCCEED != is_uint32(tmp, &num))
+		else if (SUCCEED != is_uint32(tmp, &num))
 		{
 			fail_msg("par_r parameter \"%s\" is not numeric.", tmp);
 		}
@@ -103,7 +103,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (FAIL == expected_result && (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("error", &param_handle)) ||
-		ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expected_param_value_string))))
+			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expected_param_value_string))))
 	{
 		fail_msg("Cannot get expected 'error' parameters from test case data: %s",
 				zbx_mock_error_string(error));
@@ -113,7 +113,7 @@ void	zbx_mock_test_entry(void **state)
 			max_error_len)))
 	{
 		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_result_string(actual_result),
-			zbx_result_string(expected_result), error_text);
+				zbx_result_string(expected_result), error_text);
 	}
 
 	if (SUCCEED == expected_result)
@@ -121,26 +121,26 @@ void	zbx_mock_test_entry(void **state)
 		if (func_pos != func_pos_exp)
 		{
 			fail_msg("Position "ZBX_FS_SIZE_T" of 'function' not equal expected "ZBX_FS_SIZE_T". Error:%s",
-				(zbx_fs_size_t)func_pos, (zbx_fs_size_t)func_pos_exp, error_text);
+					(zbx_fs_size_t)func_pos, (zbx_fs_size_t)func_pos_exp, error_text);
 		}
 
 		if (par_l != par_l_exp)
 		{
 			fail_msg("Position "ZBX_FS_SIZE_T" of left '(' not equal expected "ZBX_FS_SIZE_T". Error:%s",
-				(zbx_fs_size_t)par_l, (zbx_fs_size_t)par_l_exp, error_text);
+					(zbx_fs_size_t)par_l, (zbx_fs_size_t)par_l_exp, error_text);
 		}
 
 		if (par_r != par_r_exp)
 		{
 			fail_msg("Position "ZBX_FS_SIZE_T" of right ')' not equal expected "ZBX_FS_SIZE_T". Error:%s",
-				(zbx_fs_size_t)par_r, (zbx_fs_size_t)par_r_exp, error_text);
+					(zbx_fs_size_t)par_r, (zbx_fs_size_t)par_r_exp, error_text);
 		}
 	}
 	else /* FAIL == expected_result */
 	{
 		if (0 != strcmp(expected_param_value_string, error_text))
 		{
-				fail_msg("Got\n'%s' instead of\n'%s' as a value.", error_text,
+			fail_msg("Got\n'%s' instead of\n'%s' as a value.", error_text,
 					expected_param_value_string);
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -318,8 +318,7 @@ class CConfigurationExport {
 		$hosts = API::Host()->get([
 			'output' => [
 				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-				'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk', 'inventory_mode'
+				'name', 'description', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
@@ -1239,7 +1238,7 @@ class CConfigurationExport {
 			$image = [
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
-				'encodedImage' => $image['image'],
+				'encodedImage' => $image['image']
 			];
 		}
 		unset($image);

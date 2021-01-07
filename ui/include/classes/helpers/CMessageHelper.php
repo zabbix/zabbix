@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,10 @@ class CMessageHelper {
 	/**
 	 * Clear messages.
 	 */
-	public static function clear(): void {
+	public static function clear(bool $clear_title = true): void {
+		if ($clear_title) {
+			self::$title = null;
+		}
 		self::$messages = [];
 	}
 

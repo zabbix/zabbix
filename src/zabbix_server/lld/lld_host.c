@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3682,6 +3682,7 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 				snmp->authprotocol = interface->data.snmp->authprotocol;
 				snmp->privprotocol = interface->data.snmp->privprotocol;
 				snmp->contextname = zbx_strdup(NULL, interface->data.snmp->contextname);
+				snmp->flags = 0x00;
 				new_interface->flags = ZBX_FLAG_LLD_INTERFACE_SNMP_DATA_EXISTS;
 				new_interface->data.snmp = snmp;
 

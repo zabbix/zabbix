@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,9 @@ $widget = (new CWidget())
 			))
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('redirect("conf.import.php?rules_preset=host")')
+					->onClick('return PopUp("popup.import", jQuery.extend('.
+						json_encode(['rules_preset' => 'host']).', null), null, this);'
+					)
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -229,7 +231,9 @@ foreach ($data['hosts'] as $host) {
 
 	if ($host['discoveryRule']) {
 		$description[] = (new CLink(CHtml::encode($host['discoveryRule']['name']),
-			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
+			(new CUrl('host_prototypes.php'))
+				->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
+				->setArgument('context', 'host')
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -421,6 +425,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('items.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['items'])
 		],
@@ -429,6 +434,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('triggers.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['triggers'])
 		],
@@ -437,6 +443,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('graphs.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['graphs'])
 		],
@@ -445,6 +452,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('host_discovery.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['discoveries'])
 		],
@@ -453,6 +461,7 @@ foreach ($data['hosts'] as $host) {
 				(new CUrl('httpconf.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
+					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
@@ -486,7 +495,12 @@ $form->addItem([
 						->getUrl()
 				)
 			],
-			'host.massupdateform' => ['name' => _('Mass update')],
+			'popup.massupdate.host' => [
+				'content' => (new CButton('', _('Mass update')))
+					->onClick("return openMassupdatePopup(this, 'popup.massupdate.host');")
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->removeAttribute('id')
+			],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 		]
 	)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ class testFormItemTest extends CWebTest {
 				['Type' => 'Zabbix agent (active)'],
 				['Type' => 'Simple check'],
 				['Type' => 'SNMP agent','SNMP OID' => '[IF-MIB::]ifInOctets.1'],
-				['Type' => 'SNMP agent'],
 				['Type' => 'Zabbix internal'],
 				['Type' => 'Zabbix trapper'],
 				['Type' => 'External check'],
@@ -92,8 +91,7 @@ class testFormItemTest extends CWebTest {
 		// Check Test item button.
 		$this->checkTestButtonInPreprocessing($item_type);
 		$this->saveFormAndCheckMessage($item_type.$success_text);
-		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='
-			.zbx_dbstr($item_name));
+		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($item_name));
 
 		// Open created item and change type.
 		foreach ($data as $update) {
@@ -103,7 +101,7 @@ class testFormItemTest extends CWebTest {
 
 			for ($i = 0; $i < 2; $i++) {
 
-				if (($type === 'IPMI agent' || $type === 'SNMP agent') && $is_host === false) {
+				if ($type === 'IPMI agent' && $is_host === false) {
 					$enabled = false;
 				}
 				else {
@@ -120,7 +118,7 @@ class testFormItemTest extends CWebTest {
 				if ($i === 0) {
 					if ($check_now) {
 						$execute_button = $this->query('id:check_now')
-							->waitUntilVisible()->one();
+								->waitUntilVisible()->one();
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
@@ -130,7 +128,7 @@ class testFormItemTest extends CWebTest {
 						&& array_key_exists('Master item', $update)) {
 							sleep(2);
 							$item_form->getFieldContainer('Master item')
-								->asMultiselect()->select($update['Master item']);
+									->asMultiselect()->select($update['Master item']);
 					}
 
 					$type = $update['Type'];
@@ -230,6 +228,9 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'test.item.no.host.value'
 					],
+					'snmp_fields' => [
+						'version' => 'SNMPv2'
+					],
 					'host_value' => false
 				]
 			],
@@ -238,7 +239,46 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'SNMP agent',
-						'Key' => 'test.snmp'
+						'Key' => 'snmp.v2'
+					],
+					'host_interface' => '127.0.0.2 : 161',
+					'snmp_fields' => [
+						'version' => 'SNMPv2',
+						'comunity' => 'public'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.v1'
+					],
+					'host_interface' => '127.0.0.5 : 161',
+					'snmp_fields' => [
+						'version' => 'SNMPv1',
+						'comunity' => 'public'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'SNMP agent',
+						'Key' => 'snmp.v3'
+					],
+					'host_interface' => '127.0.0.6 : 161',
+					'snmp_fields' => [
+						'version' => 'SNMPv3',
+						'context' => 'test_context',
+						'security' => 'test_security_name',
+						'security_level' => 'authPriv',
+						'authentication_protocol' => 'SHA',
+						'authentication_passphrase' => '{$TEST}',
+						'privacy_protocol' => 'AES',
+						'privacy_passphrase' => 'test_privpassphrase'
 					]
 				]
 			],
@@ -442,9 +482,22 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.discard.unchanged.with.heartbeat'
+					],
+					'host_value' => false,
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.interface.trailing.spaces'
 					],
-					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    '],
+					'interface' => ['address' => '  127.0.0.1   ', 'port' => '   10050    ']
 				]
 			]
 		];
@@ -460,8 +513,18 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix aggregate',
-						'Key' => 'test.zabbix.aggregate'
+						'Key' => 'grpsum["MySQL Servers","vfs.fs.size[/,total]",last]'
 					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Zabbix aggregate',
+						'Key' => 'key'
+					],
+					'error' => 'Key "key" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"].'
 				]
 			],
 			[
@@ -485,7 +548,20 @@ class testFormItemTest extends CWebTest {
 					]
 				]
 			],
-						[
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.discard.unchanged'
+					],
+					'host_value' => false,
+					'preprocessing' => [
+						['type' => 'Discard unchanged']
+					]
+				]
+			],
+			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
@@ -502,8 +578,34 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.simple.change'
+					],
+					'host_value' => false,
+					'preprocessing' => [
+						['type' => 'Simple change']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.preproc.change.per.second'
 					],
+					'preprocessing' => [
+						['type' => 'Change per second']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'test.item.preproc.change.per.second'
+					],
+					'host_value' => false,
 					'preprocessing' => [
 						['type' => 'Change per second']
 					]
@@ -549,9 +651,10 @@ class testFormItemTest extends CWebTest {
 	 * @param string	$create_link	url for creating new item
 	 * @param arary		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
+	 * @param boolean   $lld            true if lld, false if item or item prototype
 	 */
-	public function checkTestItem($create_link, $data, $is_host) {
-		if (!$is_host && ($data['fields']['Type'] === 'IPMI agent' || $data['fields']['Type'] === 'SNMP agent')) {
+	public function checkTestItem($create_link, $data, $is_host, $lld = false) {
+		if (!$is_host && $data['fields']['Type'] === 'IPMI agent') {
 			return;
 		}
 
@@ -559,10 +662,14 @@ class testFormItemTest extends CWebTest {
 		$item_form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 
 		$item_form->fill($data['fields']);
-		// Get interface ip and port separately.
+
 		if ($is_host) {
-			$host_interface = explode(' : ', $item_form->getField('Host interface')
-				->getText(), 2);
+			// If host fill interface.
+			if (CTestArrayHelper::get($data, 'host_interface')) {
+				$item_form->getField('Host interface')->fill($data['host_interface']);
+			}
+			// Get ip and port separately.
+			$host_interface = explode(' : ', $item_form->getField('Host interface')->getText(), 2);
 		}
 
 		if (CTestArrayHelper::get($data, 'preprocessing')){
@@ -572,40 +679,158 @@ class testFormItemTest extends CWebTest {
 
 		// Open Test item dialog form.
 		$this->query('id:test_item')->waitUntilVisible()->one()->click();
-		$dialog = $this->query('xpath://div[@data-dialogueid="item-test" and @role="dialog"]')
-			->waitUntilPresent()->asOverlayDialog()->one()->waitUntilReady();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->assertEquals('Test item', $dialog->getTitle());
-				$test_form = $this->query('id:preprocessing-test-form')
-					->waitUntilPresent()->asForm()->one()->waitUntilReady();
+				$this->assertEquals('Test item', $overlay->getTitle());
+				$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->one()->waitUntilReady();
 				// Check "Get value from host" checkbox.
-				$get_host_value = $test_form->getField('Get value from host');
+				$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 				$this->assertTrue($get_host_value->isEnabled());
 				$this->assertTrue($get_host_value->isChecked());
 
-				$elements = [
-					'address' => 'id:interface_address',
-					'port' => 'id:interface_port',
-					'proxy' => 'id:proxy_hostid'
-				];
+				if ($lld === false) {
+					$not_supported = $test_form->query('id:not_supported')->asCheckbox()->one();
+					$this->assertFalse($not_supported->isEnabled());
+				}
+				else {
+					$not_supported = null;
+				}
+
+				if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
+					$elements = [
+						'address' => 'id:interface_address',
+						'port' => 'id:interface_port',
+						'proxy' => 'id:proxy_hostid',
+						'version' => 'id:interface_details_version',
+						'context' => 'id:interface_details_contextname',
+						'security' => 'id:interface_details_securityname',
+						'security_level' => 'id:interface_details_securitylevel',
+						'authentication_protocol' => 'id:interface_details_authprotocol',
+						'authentication_passphrase' => 'id:interface_details_authpassphrase',
+						'privacy_protocol' => 'id:interface_details_privprotocol',
+						'privacy_passphrase' => 'id:interface_details_privpassphrase'
+					];
+				}
+				elseif (in_array(CTestArrayHelper::get($data, 'snmp_fields.version'), ['SNMPv1', 'SNMPv2'])) {
+					$elements = [
+						'address' => 'id:interface_address',
+						'port' => 'id:interface_port',
+						'proxy' => 'id:proxy_hostid',
+						'version' => 'id:interface_details_version',
+						'comunity' => 'id:interface_details_community'
+					];
+				}
+				else {
+					$elements = [
+						'address' => 'id:interface_address',
+						'port' => 'id:interface_port',
+						'proxy' => 'id:proxy_hostid'
+					];
+				}
+
 				foreach ($elements as $name => $selector) {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
-				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN "
-					. "(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
-				// Check interface and proxy fields.
+				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
+						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
+				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {
 					case 'Zabbix agent':
-					case 'SNMP agent':
 					case 'IPMI agent':
-						$fields_value = [
-							'address' => $is_host ? $host_interface[0] : '',
-							'port' => $is_host ? $host_interface[1] : '',
-							'proxy' => $is_host ? $proxy : '(no proxy)'
-						];
+						if ($is_host) {
+							$fields_value = [
+								'address' => $host_interface[0],
+								'port' => $host_interface[1],
+								'proxy' => $proxy
+							];
+						}
+						else {
+							$fields_value = [
+								'address' => '',
+								'port' => '',
+								'proxy' => '(no proxy)'
+							];
+						}
 						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
+						break;
+
+					case 'SNMP agent':
+						if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
+							if ($is_host) {
+								$fields_value = [
+									'address' => $host_interface[0],
+									'port' => $host_interface[1],
+									'proxy' => $proxy,
+									'version' => 'SNMPv3',
+									'context' => $data['snmp_fields']['context'],
+									'security' => $data['snmp_fields']['security'],
+									'security_level' => $data['snmp_fields']['security_level'],
+									'authentication_protocol' => $data['snmp_fields']['authentication_protocol'],
+									'authentication_passphrase' => $data['snmp_fields']['authentication_passphrase'],
+									'privacy_protocol' => $data['snmp_fields']['privacy_protocol'],
+									'privacy_passphrase' => $data['snmp_fields']['privacy_passphrase']
+								];
+							}
+							else {
+								$fields_value = [
+									'address' => '',
+									'port' => '',
+									'proxy' => '(no proxy)',
+									'version' => 'SNMPv2',
+									'context' => '',
+									'security' => '',
+									'security_level' => 'noAuthNoPriv',
+									'authentication_protocol' => 'MD5',
+									'authentication_passphrase' => '',
+									'privacy_protocol' => 'DES',
+									'privacy_passphrase' => ''
+								];
+							}
+
+							$fields_state = [
+								'address' => true,
+								'port' => true,
+								'proxy' => true,
+								'version' => true,
+								'context' => true,
+								'security' => true,
+								'security_level' => true,
+								'authentication_protocol' => true,
+								'authentication_passphrase' => true,
+								'privacy_protocol' => true,
+								'privacy_passphrase' => true
+							];
+						}
+						else {
+							if ($is_host) {
+								$fields_value = [
+									'address' => $host_interface[0],
+									'port' => $host_interface[1],
+									'proxy' => $proxy,
+									'version' => CTestArrayHelper::get($data, 'snmp_fields.version', 'SNMPv2'),
+									'comunity' => CTestArrayHelper::get($data, 'snmp_fields.comunity', 'public')
+								];
+							}
+							else {
+								$fields_value = [
+									'address' => '',
+									'port' => '',
+									'proxy' => '(no proxy)',
+									'version' => 'SNMPv2',
+									'comunity' => ''
+								];
+							}
+
+							$fields_state = [
+								'address' => true,
+								'port' => true,
+								'proxy' => true,
+								'version' => true,
+								'comunity' => true
+							];
+						}
 						break;
 
 					case 'SSH agent':
@@ -647,7 +872,7 @@ class testFormItemTest extends CWebTest {
 				}
 
 				// Check value fields.
-				$this->checkValueFields($data);
+				$this->checkValueFields($data, $not_supported, $lld);
 
 				// Change interface fields in testing form.
 				if (CTestArrayHelper::get($data, 'interface')) {
@@ -661,7 +886,7 @@ class testFormItemTest extends CWebTest {
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Click Test button in test form.
-				$test_form->submit();
+				$overlay->query('button:Get value and test')->one()->waitUntilVisible()->click();
 				$this->checkServerMessage(['Connection to Zabbix server "localhost" refused. Possible reasons:']);
 
 				// Check empty interface fields.
@@ -670,7 +895,7 @@ class testFormItemTest extends CWebTest {
 					$elements['port']->clear();
 					$button->click();
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.',
-						'Incorrect value for field "Port": cannot be empty.']);
+							'Incorrect value for field "Port": cannot be empty.']);
 				}
 				if ($data['fields']['Type'] === 'Simple check') {
 					$elements['address']->clear();
@@ -678,8 +903,6 @@ class testFormItemTest extends CWebTest {
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
 				}
 
-				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-				$value_test_button = $overlay->query('button:Get value and test')->waitUntilVisible()->one();
 				// Uncheck "Get value from host" checkbox.
 				if (CTestArrayHelper::get($data, 'host_value', true) === false) {
 					$get_host_value->uncheck();
@@ -692,11 +915,16 @@ class testFormItemTest extends CWebTest {
 					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
 					$overlay->query('button:Test')->waitUntilVisible()->one();
 
+					if ($lld === false) {
+						$this->assertTrue($not_supported->isEnabled());
+						$this->assertFalse($not_supported->isChecked());
+					}
+
 					/*
 					 * Check that value fields still present after "Get value
 					 * from host" checkbox is unset.
 					 */
-					$this->checkValueFields($data);
+					$this->checkValueFields($data, $not_supported, $lld);
 				}
 
 				// Compare data macros with macros from test table.
@@ -717,7 +945,7 @@ class testFormItemTest extends CWebTest {
 				}
 
 				if ($macros['expected']){
-					foreach ($test_form->getField('Macros')->asTable()->getRows() as $row) {
+					foreach ($test_form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
 						 * Macro columns are represented in following way:
@@ -740,21 +968,18 @@ class testFormItemTest extends CWebTest {
 
 				// Compare preprocessing from data with steps from test table.
 				if (CTestArrayHelper::get($data, 'preprocessing')) {
-					$preprocessing_table = $test_form->getField('Preprocessing steps')
-						->asTable();
+					$preprocessing_table = $test_form->query('id:preprocessing-steps')->asTable()->one();
 
 					foreach ($data['preprocessing'] as $i => $step) {
-						$this->assertEquals(($i+1).': '.$step['type'],
-							$preprocessing_table->getRow($i)->getText());
+						$this->assertEquals(($i+1).': '.$step['type'], $preprocessing_table->getRow($i)->getText());
 					}
 				}
 				break;
 			case TEST_BAD:
-				$message = $dialog->query('tag:output')->waitUntilPresent()
-					->asMessage()->one();
+				$message = $overlay->query('tag:output')->waitUntilPresent()->asMessage()->one();
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine($data['error']));
-				$dialog->close();
+				$overlay->close();
 				break;
 		}
 	}
@@ -765,13 +990,15 @@ class testFormItemTest extends CWebTest {
 	 *
 	 * @param array $data data provider
 	 */
-	private function checkValueFields($data) {
+	private function checkValueFields($data, $not_supported, $lld = false) {
 		$test_form = $this->query('id:preprocessing-test-form')
-			->waitUntilPresent()->asForm()->one()->waitUntilReady();
-		$get_host_value = $test_form->getField('Get value from host');
+				->waitUntilPresent()->one()->waitUntilReady();
+		$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 
 		$checked = $get_host_value->isChecked();
 		$prev_enabled = false;
+
+		$value = $test_form->query('id:value')->asMultiline()->one();
 
 		if (!$checked) {
 			/*
@@ -782,24 +1009,28 @@ class testFormItemTest extends CWebTest {
 				$prev_enabled = false;
 				foreach ($data['preprocessing'] as $step) {
 					if (in_array($step['type'], ['Discard unchanged with heartbeat',
-						'Simple change', 'Change per second', 'Discard unchanged'
-					])) {
+							'Simple change', 'Change per second', 'Discard unchanged'])
+					) {
 						$prev_enabled = true;
 						break;
 					}
 				}
 			}
+			if ($lld === false){
+				$not_supported->check();
+				$this->assertFalse($value->isEnabled());
+			}
+		}
+		else {
+			$this->assertTrue($value->isEnabled(!$checked));
 		}
 
-		$this->assertTrue($test_form->query('id:value')->asMultiline()
-				->one()->isEnabled(!$checked));
 		$this->assertTrue($test_form->query('id:prev_value')->asMultiline()
 				->one()->isEnabled($checked && $prev_enabled));
 		$this->assertTrue($test_form->query('id:prev_time')
-				->one()->isEnabled($checked && $prev_enabled));
-
+				->one()->isEnabled($prev_enabled));
 		$this->assertFalse($test_form->query('id:time')->one()->isEnabled());
-		$this->assertTrue($test_form->getField('End of line sequence')->isEnabled());
+		$this->assertTrue($test_form->query('id:eol')->one()->isEnabled());
 	}
 
 	private function checkServerMessage($message) {

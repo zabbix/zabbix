@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -279,13 +279,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'key' => 'item-prototype-test1'
 				]
 			],
@@ -297,178 +297,178 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (float)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Character'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Log'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent',
 					'value_type' => 'Text'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent (active)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Simple check'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Numeric (float)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Character'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Log'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP agent',
 					'value_type' => 'Text'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SNMP trap'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix internal'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix internal',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix trapper'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Zabbix aggregate'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'External check'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Database monitor'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'IPMI agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Public key'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Password'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'value_type' => 'Numeric (unsigned)'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'SSH agent',
 					'authtype' => 'Password',
 					'value_type' => 'Character'
@@ -476,19 +476,19 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'TELNET agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'JMX agent'
 				]
 			],
 			[
 				[
-					'host' => 'Inheritance test template',
+					'template' => 'Inheritance test template',
 					'type' => 'Calculated'
 				]
 			],
@@ -507,7 +507,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormItemPrototype_CheckLayout($data) {
-		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($data['host']));
+		$context = array_key_exists('host', $data) ? 'host' : 'template';
+		$host_name = array_key_exists('host', $data) ? $data['host'] : $data['template'];
+
+		$dbResult = DBselect('SELECT hostid,status FROM hosts WHERE host='.zbx_dbstr($host_name));
 		$dbRow = DBfetch($dbResult);
 
 		$this->assertNotEquals($dbRow, null);
@@ -558,7 +561,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin(
 			'disc_prototypes.php?form='.(isset($itemid) ? 'update' : 'Create+item+prototype').
-			'&parent_discoveryid='.$discoveryid.(isset($itemid) ? '&itemid='.$itemid : '')
+			'&parent_discoveryid='.$discoveryid.(isset($itemid) ? '&itemid='.$itemid : '').'&context='.$context
 		);
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
@@ -609,12 +612,9 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertVisibleId('typename');
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'size', 20);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'readonly');
-
-			$type = $this->zbxTestGetValue("//input[@id='typename']");
+			$this->zbxTestAssertVisibleId('type');
+			$this->zbxTestAssertAttribute("//z-select[@id='type']", 'readonly');
+			$type = $this->zbxTestGetSelectedLabel('type');
 		}
 
 		$this->zbxTestTextPresent('Key');
@@ -683,7 +683,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($templateid)) {
-			$value_type = $this->zbxTestGetValue("//input[@id='value_type_name']");
+			$value_type = $this->zbxTestGetSelectedLabel('value_type');
 		}
 		elseif (isset($data['value_type'])) {
 			$this->zbxTestDropdownSelect('value_type', $data['value_type']);
@@ -853,21 +853,21 @@ class testFormItemPrototype extends CLegacyWebTest {
 			]);
 
 			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
-				$this->zbxTestAssertAttribute("//*[@id='value_type']/option[text()='Character']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']/option[text()='Log']", 'disabled');
-				$this->zbxTestAssertAttribute("//*[@id='value_type']/option[text()='Text']", 'disabled');
+				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Character']", 'disabled');
+				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Log']", 'disabled');
+				$this->zbxTestAssertAttribute("//*[@id='value_type']//li[text()='Text']", 'disabled');
 			}
 			else {
-				$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Character']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Log']");
-				$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Text']");
+				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Character']");
+				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Log']");
+				$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Text']");
 			}
 		}
 
 		if (!isset($templateid)) {
 			$this->zbxTestDropdownAssertSelected('value_type', $value_type);
-			$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Numeric (unsigned)']");
-			$this->zbxTestIsEnabled("//*[@id='value_type']/option[text()='Numeric (float)']");
+			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (unsigned)']");
+			$this->zbxTestIsEnabled("//*[@id='value_type']//li[text()='Numeric (float)']");
 		}
 
 		if ($value_type === 'Numeric (float)' || ($value_type == 'Numeric (unsigned)')) {
@@ -937,7 +937,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Show value', 'show value mappings']);
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
 			if (!isset($templateid)) {
-				$this->zbxTestAssertVisibleId('valuemapid');
 				$this->zbxTestDropdownAssertSelected('valuemapid', 'As is');
 
 				$options = ['As is'];
@@ -948,14 +947,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestDropdownHasOptions('valuemapid', $options);
 			}
 			else {
-				$this->zbxTestAssertVisibleId('valuemap_name');
-				$this->zbxTestAssertAttribute("//input[@id='valuemap_name']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='valuemap_name']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='valuemap_name']", 'readonly');
+				$this->zbxTestAssertVisibleId('valuemapid');
+				$this->zbxTestAssertAttribute("//z-select[@id='valuemapid']", 'readonly');
 			}
 		}
 		else {
-			$this->zbxTestAssertNotVisibleId('valuemapid');
+			$this->zbxTestAssertNotVisibleXpath('//z-select[@name="valuemapid"]');
 		}
 
 		if ($type == 'Zabbix trapper') {
@@ -1032,7 +1029,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$preprocessing_type = get_preprocessing_types($itemPreproc['type'], false,
 					CItemPrototype::$supported_preprocessing_types
 				);
-				$this->zbxTestAssertAttribute("//select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
+				$this->zbxTestAssertAttribute("//z-select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
 				$this->zbxTestDropdownAssertSelected("preprocessing_".($itemPreproc['step']-1)."_type", $preprocessing_type);
 				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
 					$this->zbxTestAssertAttribute("//input[@id='preprocessing_".($itemPreproc['step']-1)."_params_0']", 'readonly');
@@ -1065,7 +1062,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?form=update&context=host&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
@@ -2040,7 +2037,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&context=host&parent_discoveryid=33800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];
@@ -2053,7 +2050,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
-			$type_value = $this->zbxTestGetValue("//select[@id='type']//option[text()='".$type."']");
+			$type_value = $this->zbxTestGetValue("//z-select[@id='type']//li[text()='".$type."']");
 			$this->zbxTestDropdownSelect('type', $type);
 			$this->zbxTestAssertElementValue('type', $type_value);
 		}
@@ -2214,7 +2211,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $itemName);
 			$this->zbxTestAssertElementValue('key', $keyName);
-			$this->zbxTestAssertElementPresentXpath("//select[@id='type']/option[text()='$type']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");
 			switch ($type) {
 				case 'Zabbix agent':
 				case 'Simple check':
@@ -2246,7 +2243,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				default:
 					$this->zbxTestAssertNotVisibleId('interface-select');
 			}
-			$this->zbxTestAssertElementPresentXpath("//select[@id='value_type']/option[text()='$value_type']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='value_type']//li[text()='$value_type']");
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");

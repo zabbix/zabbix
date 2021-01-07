@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,11 +261,11 @@ class CTabFilter extends CDiv {
 			$this->getNavigation(),
 			(new CDiv([
 				(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
-				$this->buttons,
+				$this->buttons
 			]))
 				->addClass('tabfilter-content-container')
 				->addClass($this->options['expanded'] ? null : ZBX_STYLE_DISPLAY_NONE),
-			$templates,
+			$templates
 		]);
 	}
 

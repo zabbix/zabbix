@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,8 +73,17 @@
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
-				->addRow(new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'),
-					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]),
+				->addRow((new CLabel(_('SNMP version'), 'label_interfaces_#{iface.interfaceid}_details_version'))
+						->setAsteriskMark(),
+					(new CSelect('interfaces[#{iface.interfaceid}][details][version]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							SNMP_V1 => _('SNMPv1'),
+							SNMP_V2C => _('SNMPv2'),
+							SNMP_V3 => _('SNMPv3')
+						]))
+						->setValue(SNMP_V2C)
+						->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_version')
+						->setId('interfaces_#{iface.interfaceid}_details_version'),
 					'row_snmp_version_#{iface.interfaceid}'
 				)
 				->addRow((new CLabel(_('SNMP community'), 'interfaces[#{iface.interfaceid}][details][community]'))->setAsteriskMark(),
@@ -94,11 +103,15 @@
 					'row_snmpv3_securityname_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Security level'), 'interfaces[#{iface.interfaceid}][details][securitylevel]'),
-					new CComboBox('interfaces[#{iface.interfaceid}][details][securitylevel]', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, null, [
-						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-					]),
+					(new CSelect('interfaces[#{iface.interfaceid}][details][securitylevel]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+						]))
+						->setValue(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+						->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_securitylevel')
+						->setId('interfaces_#{iface.interfaceid}_details_securitylevel'),
 					'row_snmpv3_securitylevel_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Authentication protocol'), 'interfaces[#{iface.interfaceid}][details][authprotocol]'),
@@ -110,7 +123,8 @@
 				)
 				->addRow(new CLabel(_('Authentication passphrase'), 'interfaces[#{iface.interfaceid}][details][authpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][authpassphrase]', '#{iface.details.authpassphrase}', false, DB::getFieldLength('interface_snmp', 'authpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete(),
 					'row_snmpv3_authpassphrase_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Privacy protocol'), 'interfaces[#{iface.interfaceid}][details][privprotocol]'),
@@ -122,7 +136,8 @@
 				)
 				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
 					(new CTextBox('interfaces[#{iface.interfaceid}][details][privpassphrase]', '#{iface.details.privpassphrase}', false, DB::getFieldLength('interface_snmp', 'privpassphrase')))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete(),
 					'row_snmpv3_privpassphrase_#{iface.interfaceid}'
 				)
 				->addRow('', (new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))->setLabel(_('Use bulk requests'), 'interfaces[#{iface.interfaceid}][details][bulk]'),
@@ -575,15 +590,14 @@
 						break;
 				}
 			}
-			else if (tag_name === 'SELECT') {
-				el.setAttribute('readonly', 'readonly');
-				el.setAttribute('tabindex', -1);
+			else if (tag_name === 'Z-SELECT') {
+				el.readOnly = true;
 			}
 		}
 
 		static makeReadonly() {
 			[...document.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_ROW ?>')].map((row) => {
-				[...row.querySelectorAll('input, select')].map((el) => {
+				[...row.querySelectorAll('input, z-select')].map((el) => {
 					this.setReadonly(el);
 				});
 
@@ -610,10 +624,10 @@
 			// If PSK is selected or checked.
 			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
 					|| jQuery('#tls_in_psk').is(':checked')) {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
+				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').show();
 			}
 			else {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
+				jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').hide();
 			}
 		});
 

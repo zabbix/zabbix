@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,22 +26,20 @@
 $widgets = [];
 
 $table = (new CTableInfo())
-	->setHeader([
-		_('Host'),
-		_('IP'),
-		_('DNS'),
-		_('Latest data'),
-		_('Problems'),
-		_('Graphs'),
-		_('Dashboards'),
-		_('Web'),
-		_('Applications'),
-		_('Items'),
-		_('Triggers'),
-		_('Graphs'),
-		_('Discovery'),
-		_('Web')
-	])
+	->setHeader((new CRowHeader())
+		->addItem(new CColHeader(_('Host')))
+		->addItem(new CColHeader(_('IP')))
+		->addItem(new CColHeader(_('DNS')))
+		->addItem((new CColHeader(_('Monitoring')))
+			->setColSpan($data['hosts'] ? 5 : 1)
+			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+		)
+		->addItem((new CColHeader(_('Configuration')))
+			->setColSpan($data['hosts'] ? 6 : 1)
+			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+		)
+	)
+
 	->removeId();
 
 foreach ($data['hosts'] as $hostid => $host) {
@@ -75,6 +73,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 				->setArgument('filter_set', '1')
 		)
 		: _('Latest data');
+
+	$latest_data_link = (new CCol($latest_data_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 	$problems_link = $data['allowed_ui_problems']
 		? new CLink(_('Problems'),
@@ -119,47 +119,54 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $app_count]
-		: [_('Applications'), $app_count];
+		: _('Applications');
+
+	$applications_link = (new CCol($applications_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 	$item_count = CViewHelper::showNum($host['items']);
 	$items_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Items'), (new CUrl('items.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $item_count]
-		: [_('Items'), $item_count];
+		: _('Items');
 
 	$trigger_count = CViewHelper::showNum($host['triggers']);
 	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $trigger_count]
-		: [_('Triggers'), $trigger_count];
+		: _('Triggers');
 
 	$graph_count = CViewHelper::showNum($host['graphs']);
 	$graphs_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $graph_count]
-		: [_('Graphs'), $graph_count];
+		: _('Graphs');
 
 	$discovery_count = CViewHelper::showNum($host['discoveries']);
 	$discovery_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $discovery_count]
-		: [_('Discovery'), $discovery_count];
+		: _('Discovery');
 
 	$httptest_count = CViewHelper::showNum($host['httpTests']);
 	$httptests_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
+			->setArgument('context', 'host')
 		), $httptest_count]
-		: [_('Web'), $httptest_count];
+		: _('Web');
 
 	$table->addRow([
 		$name_link,
@@ -188,14 +195,19 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
 	]));
 
 $table = (new CTableInfo())
-	->setHeader([
-		_('Host group'),
-		_('Latest data'),
-		_('Problems'),
-		_('Web'),
-		$data['admin'] ? _('Hosts') : null,
-		$data['admin'] ? _('Templates') : null
-	]);
+	->setHeader((new CRowHeader())
+		->addItem(new CColHeader(_('Host group')))
+		->addItem((new CColHeader(_('Monitoring')))
+			->setColSpan($data['groups'] ? 3 : 1)
+			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+		)
+		->addItem($data['admin']
+			? (new CColHeader(_('Configuration')))
+				->setColSpan($data['groups'] ? 2 : 1)
+				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+			: null
+		)
+	);
 
 foreach ($data['groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
@@ -211,6 +223,8 @@ foreach ($data['groups'] as $groupid => $group) {
 			), CViewHelper::showNum($group['hosts'])]
 			: _('Hosts');
 
+		$hosts_link = (new CCol($hosts_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
+
 		$templates_link = ($group['editable'] && $data['allowed_ui_conf_templates'] && $group['templates'])
 			? [new CLink(_('Templates'), (new CUrl('templates.php'))
 				->setArgument('filter_set', '1')
@@ -219,18 +233,22 @@ foreach ($data['groups'] as $groupid => $group) {
 			: _('Templates');
 	}
 
+	$latest_data_link = $data['allowed_ui_latest_data']
+		? new CLink(_('Latest data'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('filter_groupids[]', $groupid)
+				->setArgument('filter_set', '1')
+		)
+		: _('Latest data');
+
+	$latest_data_link = (new CCol($latest_data_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
+
 	$table->addRow([
 		$group['editable'] && $data['allowed_ui_conf_host_groups']
 			? new CLink($caption, 'hostgroups.php?form=update&'.$link)
 			: new CSpan($caption),
-		$data['allowed_ui_latest_data']
-			? new CLink(_('Latest data'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'latest.view')
-					->setArgument('filter_groupids[]', $groupid)
-					->setArgument('filter_set', '1')
-			)
-			: _('Latest data'),
+		$latest_data_link,
 		$data['allowed_ui_problems']
 			? new CLink(_('Problems'),
 				(new CUrl('zabbix.php'))
@@ -261,9 +279,14 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	]));
 
 if ($data['admin']) {
-	$table = (new CTableInfo())->setHeader([_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'),
-		_('Dashboards'), _('Discovery'), _('Web')
-	]);
+	$table = (new CTableInfo())
+		->setHeader((new CRowHeader())
+			->addItem(new CColHeader(_('Template')))
+			->addItem((new CColHeader(_('Configuration')))
+				->setColSpan($data['templates'] ? 7 : 1)
+				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+			)
+		);
 
 	foreach ($data['templates'] as $templateid => $template) {
 		$visible_name = make_decoration($template['name'], $data['search']);
@@ -288,28 +311,33 @@ if ($data['admin']) {
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $app_count]
-			: [_('Applications'), $app_count];
+			: _('Applications');
+
+		$applications_link = (new CCol($applications_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Items'), (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $item_count]
-			: [_('Items'), $item_count];
+			: _('Items');
 
 		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $trigger_count]
-			: [_('Triggers'), $trigger_count];
+			: _('Triggers');
 
 		$graphs_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $graph_count]
-			: [_('Graphs'), $graph_count];
+			: _('Graphs');
 
 		$dashboards_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [
@@ -320,21 +348,23 @@ if ($data['admin']) {
 				),
 				$dashboard_count
 			]
-			: [_('Dashboards'), $dashboard_count];
+			: _('Dashboards');
 
 		$discovery_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $discovery_count]
-			: [_('Discovery'), $discovery_count];
+			: _('Discovery');
 
 		$httptests_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
+				->setArgument('context', 'template')
 			), $httptest_count]
-			: [_('Web'), $httptest_count];
+			: _('Web');
 
 		if ($template['host'] !== $template['name'] && strpos($template['host'], $data['search']) !== false) {
 			$template_cell[] = BR();

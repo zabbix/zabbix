@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,6 @@ class CControllerPopupTestTriggerExpr extends CController {
 		$this->disableSIDvalidation();
 
 		define('ZBX_PAGE_NO_MENU', true);
-		define('COMBO_PATTERN', 'str_in_array({},array(');
-		define('COMBO_PATTERN_LENGTH', strlen(COMBO_PATTERN));
 		define('NO_LINK_IN_TESTING', true);
 
 		$this->defined_error_phrases = [
@@ -109,7 +107,9 @@ class CControllerPopupTestTriggerExpr extends CController {
 					}
 					else {
 						if ($info['values'] !== null) {
-							$control = new CComboBox($fname, $this->macros_data[$macro], null, $info['values']);
+							$control = (new CSelect($fname))
+								->addOptions(CSelect::createOptionsFromArray($info['values']))
+								->setValue($this->macros_data[$macro]);
 						}
 						else {
 							$control = (new CTextBox($fname, $this->macros_data[$macro]))

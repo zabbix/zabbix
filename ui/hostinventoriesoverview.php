@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ $grouping_column = ($filter['groupby'] === '') ? _('Field') : $inventories[$filt
 
 $table = (new CTableInfo())->setHeader([
 	make_sorting_header($grouping_column, 'inventory_field', $sortField, $sortOrder),
-	make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder),
+	make_sorting_header(_('Host count'), 'host_count', $sortField, $sortOrder)
 ]);
 
 // To show a report, we will need a host group and a field to aggregate.

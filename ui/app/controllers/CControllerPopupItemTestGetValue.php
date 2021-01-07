@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		// Get post data for particular item type.
-		$data = $this->getItemTestProperties($this->getInputAll());
+		$data = $this->getItemTestProperties($this->getInputAll(), true);
 
 		// Apply effective macros values to properties.
 		$data = $this->resolveItemPropertyMacros($data);

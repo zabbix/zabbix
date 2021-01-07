@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ class CCookieSession implements SessionHandlerInterface {
 		session_decode($session_data);
 		$session_data = $this->prepareData(CSessionHelper::getAll());
 
-		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
+		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, $this->isAutologinEnabled() ? time() + SEC_PER_MONTH : 0)) {
 			throw new \Exception(_('Cannot set session cookie.'));
 		}
 
@@ -190,5 +190,9 @@ class CCookieSession implements SessionHandlerInterface {
 		}
 
 		return '';
+	}
+
+	protected function isAutologinEnabled(): bool {
+		return (CWebUser::$data['autologin'] === '1');
 	}
 }

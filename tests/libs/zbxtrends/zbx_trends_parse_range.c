@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@
 #include "zbxtrends.h"
 #include "log.h"
 #include "db.h"
+
+int	__wrap_DBis_null(const char *field);
+DB_ROW	__wrap_DBfetch(DB_RESULT result);
+DB_RESULT	__wrap_DBselect(const char *fmt, ...);
 
 int	__wrap_DBis_null(const char *field)
 {

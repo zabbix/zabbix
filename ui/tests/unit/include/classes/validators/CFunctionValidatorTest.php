@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -720,7 +720,7 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 					[$function, ['1y', 'now/M'], $value_type, [], false],
 					[$function, ['1M', 'now/w-1w+1d/M'], $value_type, [], false],
 					[$function, ['1M', 'now/M-1w+1d/w'], $value_type, [], false],
-					[$function, ['${MACRO}1y', '{$MACRO}now/y'], $value_type, [], false],
+					[$function, ['${MACRO}1y', '{$MACRO}now/y'], $value_type, [], false]
 				]);
 			}
 		}

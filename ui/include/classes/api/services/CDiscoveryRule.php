@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1536,7 +1536,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'formula' =>		['type' => API_STRING_UTF8],
 				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
-					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_condition', 'operator')],
+					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('lld_override_condition', 'operator')],
 					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
 					'formulaid' =>		['type' => API_STRING_UTF8]
 				]]
@@ -1546,10 +1546,10 @@ class CDiscoveryRule extends CItemGeneral {
 				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_operation', 'operator')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
 				'opstatus' =>			['type' => API_OBJECT, 'fields' => [
-					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])],
+					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])]
 				]],
 				'opdiscover' =>			['type' => API_OBJECT, 'fields' => [
-					'discover' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])],
+					'discover' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])]
 				]],
 				'opperiod' =>			['type' => API_OBJECT, 'fields' => [
 					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
@@ -1820,7 +1820,9 @@ class CDiscoveryRule extends CItemGeneral {
 					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
 				]),
 				'operator' => new CLimitedSetValidator([
-					'values' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP],
+					'values' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS,
+						CONDITION_OPERATOR_NOT_EXISTS
+					],
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
 				])
 			],
@@ -2802,7 +2804,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
 			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
 				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
-				'filter' => ['itemid' => $itemIds],
+				'filter' => ['itemid' => $itemIds]
 			]);
 
 			foreach ($result as &$lld_macro_path) {

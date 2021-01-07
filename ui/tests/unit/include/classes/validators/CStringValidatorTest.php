@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class CStringValidatorTest extends CValidatorTest {
 
 			[['regex' => '/^\d+$/'], 1],
 			[['regex' => '/^\d+$/'], '3'],
-			[['regex' => '/^\d+$/', 'empty' => true], ''],
+			[['regex' => '/^\d+$/', 'empty' => true], '']
 		];
 	}
 
@@ -97,7 +97,7 @@ class CStringValidatorTest extends CValidatorTest {
 				['regex' => '/^\d+$/', 'messageEmpty' => 'Empty string'],
 				'',
 				'Empty string'
-			],
+			]
 		];
 	}
 
@@ -144,7 +144,7 @@ class CStringValidatorTest extends CValidatorTest {
 				['regex' => '/^$/', 'messageEmpty' => 'Empty string'],
 				'',
 				'Empty string'
-			],
+			]
 		];
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ typedef enum
 	ZBX_MUTEX_KSTAT,
 #endif
 	ZBX_MUTEX_MODBUS,
+	ZBX_MUTEX_TREND_FUNC,
 	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }

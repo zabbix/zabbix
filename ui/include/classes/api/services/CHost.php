@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -567,6 +567,22 @@ class CHost extends CHostGeneral {
 			$options['limit'] = null;
 		}
 
+		/*
+		 * Cleaning the output from write-only properties.
+		 */
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
+				['tls_psk_identity', 'tls_psk']
+			);
+		}
+		/*
+		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
+		* Specify write-only fields in output only if they will not appear in debug mode.
+		*/
+		elseif (is_array($options['output']) && APP::getMode() === APP::EXEC_MODE_API) {
+			$options['output'] = array_diff($options['output'], ['tls_psk_identity', 'tls_psk']);
+		}
+
 		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -813,13 +829,22 @@ class CHost extends CHostGeneral {
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-				'tls_psk_identity', 'tls_psk'
-			],
+			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		// Load existing values of PSK fields of hosts independently from APP mode.
+		$hosts_psk_fields = DB::select($this->tableName(), [
+			'output' => ['tls_psk_identity', 'tls_psk'],
+			'hostids' => array_keys($db_hosts),
+			'preservekeys' => true
+		]);
+
+		foreach ($hosts_psk_fields as $hostid => $psk_fields) {
+			$db_hosts[$hostid] += $psk_fields;
+		}
 
 		$hosts = $this->validateUpdate($hosts, $db_hosts);
 
@@ -1525,7 +1550,7 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::delete('opcommand_hst', [
-			'hostid' => $hostIds,
+			'hostid' => $hostIds
 		]);
 
 		// delete empty operations
@@ -1540,7 +1565,7 @@ class CHost extends CHostGeneral {
 		}
 
 		DB::delete('operations', [
-			'operationid' => $delOperationids,
+			'operationid' => $delOperationids
 		]);
 
 		$hosts = API::Host()->get([

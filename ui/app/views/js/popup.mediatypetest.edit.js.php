@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,23 +93,23 @@ function openLogPopup(opener) {
 	}
 
 	var debug = JSON.parse(sessionStorage.getItem('mediatypetest')||'null'),
-		$content = $('<div id="mediatype_testlog"/>'),
-		$logitems = $('<div class="logitems"/>'),
-		$footer = $('<pre/>');
+		$content = $('<div/>'),
+		$logitems = $('<div/>', {class: 'logitems'}),
+		$footer = $('<div/>', {class: 'logtotalms'});
 
 	if (debug) {
 		debug.log.forEach(function (entry) {
 			$('<pre/>').text(entry.ms + ' ' + entry.level + ' ' + entry.message).appendTo($logitems);
 		});
 		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
-		$content.append($logitems).append($footer);
+		$content.append($logitems);
 	}
 
 	overlayDialogue({
-		'dialogueid': '',
 		'title': <?= json_encode(_('Media type test log')) ?>,
-		'content': $content.wrap('<p/>').parent().html(),
-		'class': 'modal-popup modal-popup-generic',
+		'content': $content,
+		'class': 'modal-popup modal-popup-generic mediatypetest-modal',
+		'footer': $footer,
 		'buttons': [
 			{
 				'title': <?= json_encode(_('Ok')) ?>,
@@ -117,10 +117,8 @@ function openLogPopup(opener) {
 				'focused': true,
 				'action': () => {}
 			}
-		],
-		'element': opener,
-		'type': 'popup'
-	});
+		]
+	}, opener);
 }
 
 sessionStorage.removeItem('mediatypetest');

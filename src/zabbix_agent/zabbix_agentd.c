@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -292,6 +292,8 @@ int	CONFIG_PREPROCESSOR_FORKS	= 0;
 int	CONFIG_LLDMANAGER_FORKS		= 0;
 int	CONFIG_LLDWORKER_FORKS		= 0;
 int	CONFIG_ALERTDB_FORKS		= 0;
+int	CONFIG_HISTORYPOLLER_FORKS	= 0;
+int	CONFIG_AVAILMAN_FORKS		= 0;
 
 char	*opt = NULL;
 

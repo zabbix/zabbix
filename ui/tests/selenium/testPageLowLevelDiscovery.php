@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check all field names.
@@ -70,14 +70,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->assertEquals($form->getField($name)->getValue(), $value);
 				switch ($value) {
 					case 'SNMP agent':
-						$this->assertTrue($form->query('id:filter_snmp_oid')->one()->isVisible());
+						$this->assertTrue($form->getField('SNMP OID')->isVisible());
 						break;
 					case 'Zabbix trapper':
-						$this->assertFalse($form->query('id:filter_delay_row')->one()->isVisible());
+						$this->assertFalse($form->getField('Update interval')->isVisible());
 						break;
 					case 'Normal':
 					case 'Not supported':
-						$this->assertFalse($form->query('id:filter_status')->one()->isEnabled());
+						$this->assertFalse($form->getField('Status')->isEnabled());
+						$this->assertEquals('all', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -103,13 +104,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	public function testPageLowLevelDiscovery_ResetButton() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertRowCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$start_contents = $this->getTableData();
 
 		// Filling fields with needed discovery rule info.
@@ -118,7 +119,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertRowCount(1);
+		$this->assertTableStats(1);
 
 		// Checking that filtered discovery rule matches expected.
 		$this->assertEquals(['Discovery rule 3'], $this->getTableData());
@@ -126,7 +127,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
-		$this->assertRowCount($table->getRows()->count());
+		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, $this->getTableData());
 	}
 
@@ -134,7 +135,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @backup items
 	 */
 	public function testPageLowLevelDiscovery_EnableDisableSingle() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', 'Discovery rule 2');
 
@@ -154,7 +155,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public function testPageLowLevelDiscovery_EnableDisableAll() {
 		$lld_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
 
 		// Press Enable or Disable buttons and check the result.
 		foreach (['Disable', 'Enable'] as $action) {
@@ -234,7 +235,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getCheckNowData
 	 */
 	public function testPageLowLevelDiscovery_CheckNow($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid']);
+		$context = array_key_exists('template', $data) ? '&context=template' : '&context=host';
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
 		$this->selectTableRows($data['names']);
@@ -246,7 +248,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'template', false)) {
-			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
 		}
 		else {
 			$this->query('button:Execute now')->one()->click();
@@ -276,6 +278,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Host groups' => 'Templates/Server hardware'
 					],
+					'context' => 'template',
 					'rows' => 39
 				]
 			],
@@ -285,6 +288,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Name' => 'Containers discovery'
 					],
+					'context' => 'template',
 					'expected' => [
 						'Containers discovery'
 					]
@@ -309,7 +313,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'testFormDiscoveryRule2',
+						'Name' => 'testFormDiscoveryRule2'
 					],
 					'expected' => [
 						'testFormDiscoveryRule2'
@@ -319,10 +323,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Update interval' => '0',
+						'Update interval' => '0'
 					],
 					'expected' => [
-						'Test discovery rule',
 						'Test discovery rule'
 					]
 				]
@@ -361,10 +364,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => [
 							'Inheritance test'
 						],
-						'Hosts' => [
+						'Templates' => [
 							'Inheritance test template with host prototype'
 						]
 					],
+					'context' => 'template',
 					'expected' => [
 						'Discovery rule for host prototype test'
 					]
@@ -389,6 +393,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Key' => 'array.cache.discovery'
 					],
+					'context' => 'template',
 					'expected' => [
 						'Array Controller Cache Discovery',
 						'Array Controller Cache Discovery',
@@ -425,6 +430,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Operating systems',
 						'Type' => 'Dependent item'
 					],
+					'context' => 'template',
 					'rows' => 6
 				]
 			],
@@ -435,6 +441,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Update interval' => '1h',
 						'Name'=> 'Databases'
 					],
+					'context' => 'template',
 					'expected' => [
 						'Databases discovery'
 					]
@@ -445,6 +452,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
+					'context' => 'template',
 					'expected' => [
 						'Discovery-rule-layout-test-001'
 					]
@@ -466,6 +474,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Keep lost resources period' => '50d'
 					],
+					'context' => 'template',
 					'expected' => [
 						'Discovery-rule-layout-test-001'
 					]
@@ -504,9 +513,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageLowLevelDiscovery_Filter($data) {
+		$context = CTestArrayHelper::get($data, 'context', 'host');
 		$this->page->login()->open('host_discovery.php?filter_name=&filter_key='.
 				'&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='.
-				'&filter_state=-1&filter_status=-1&filter_set=1');
+				'&filter_state=-1&filter_status=-1&filter_set=1&context='.$context);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
 		$form->submit();
@@ -573,7 +583,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getDeleteAllButtonData
 	 */
 	public function testPageLowLevelDiscovery_DeleteAllButton($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid']);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].'&context=host');
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);

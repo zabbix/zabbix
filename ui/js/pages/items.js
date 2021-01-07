@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		interface_select_node = $interface_select.get(0),
 		selected_interfaceid = +$('#selectedInterfaceId').val();
 
+	if (!interface_select_node) {
+		return;
+	}
+
 	if ($('#visible_interfaceid').data('multipleInterfaceTypes') && !$('#visible_type').is(':checked')) {
 		$('#interface_not_defined').html(t('To set a host interface select a single item type for all items')).show();
 		interface_select_node.disabled = true;
@@ -36,9 +40,6 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		return;
 	}
 
-	if (!interface_select_node) {
-		return;
-	}
 
 	const iterface_type = item_interface_types[item_type],
 		available_interfaceids = interface_ids_by_types[iterface_type]

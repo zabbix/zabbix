@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1895,7 +1895,7 @@ class CMap extends CMapElement {
 		foreach ($maps as $index => $map) {
 			$update_maps[] = [
 				'values' => $map,
-				'where' => ['sysmapid' => $map['sysmapid']],
+				'where' => ['sysmapid' => $map['sysmapid']]
 			];
 
 			$db_map = $db_maps[$map['sysmapid']];

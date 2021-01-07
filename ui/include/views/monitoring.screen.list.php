@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,9 @@ $widget->setTitleSubmenu([
 $content_control->addItem(
 	(new CButton('form', _('Import')))
 		->setEnabled($data['allowed_edit'])
-		->onClick('redirect("screen.import.php?rules_preset=screen")')
+		->onClick('return PopUp("popup.import", jQuery.extend('.
+			json_encode(['rules_preset' => 'screen']).', null), null, this);'
+		)
 		->removeId()
 );
 

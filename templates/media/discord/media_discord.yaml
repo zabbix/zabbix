@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.2'
+  version: '5.4'
   date: '2020-10-16T09:33:47Z'
   media_types:
     -
@@ -103,7 +103,7 @@ zabbix_export:
         }
         
         try {
-            Zabbix.Log(4, '[ Discord Webhook ] Executed with params: ' + value);
+            Zabbix.log(4, '[ Discord Webhook ] Executed with params: ' + value);
         
             var params = JSON.parse(value);
         
@@ -258,19 +258,19 @@ zabbix_export:
                 body.embeds[0].fields = fields;
             }
         
-            var req = new CurlHttpRequest();
+            var req = new HttpRequest();
         
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                req.SetProxy(params.HTTPProxy);
+                req.setProxy(params.HTTPProxy);
             }
         
-            req.AddHeader('Content-Type: application/json');
+            req.addHeader('Content-Type: application/json');
         
-            var resp = req.Post(params.discord_endpoint, JSON.stringify(body)),
+            var resp = req.post(params.discord_endpoint, JSON.stringify(body)),
                 data = JSON.parse(resp);
         
-            Zabbix.Log(4, '[ Discord Webhook ] JSON: ' + JSON.stringify(body));
-            Zabbix.Log(4, '[ Discord Webhook ] Response: ' + resp);
+            Zabbix.log(4, '[ Discord Webhook ] JSON: ' + JSON.stringify(body));
+            Zabbix.log(4, '[ Discord Webhook ] Response: ' + resp);
         
             if (data.id) {
                 return resp;
@@ -278,12 +278,12 @@ zabbix_export:
             else {
                 var message = ((typeof data.message === 'string') ? data.message : 'Unknown error');
         
-                Zabbix.Log(3, '[ Discord Webhook ] FAILED with response: ' + resp);
+                Zabbix.log(3, '[ Discord Webhook ] FAILED with response: ' + resp);
                 throw message + '. For more details check zabbix server log.';
             }
         }
         catch (error) {
-            Zabbix.Log(3, '[ Discord Webhook ] ERROR: ' + error);
+            Zabbix.log(3, '[ Discord Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       message_templates:

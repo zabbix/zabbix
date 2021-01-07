@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1178,7 +1178,7 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 {
 	char			*procname = NULL, *cmdline = NULL, *name_arg0 = NULL;
-	uid_t			uid = -1;
+	uid_t			uid = (uid_t)-1;
 	zbx_sysinfo_proc_t	*proc = NULL;
 	int			ret = FAIL;
 	size_t			cmdline_nbytes;

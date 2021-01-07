@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,18 +90,21 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => [
-				'fields' => ['passwd' => true]
-			],
 			'config' => [
+				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			],
+			'globalmacro' => [
+				'fields' => ['value' => true],
+				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+			],
+			'hosts' => [
 				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
 			],
 			'media_type' => [
 				'fields' => ['passwd' => true]
 			],
-			'globalmacro' => [
-				'fields' => ['value' => true],
-				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+			'users' => [
+				'fields' => ['passwd' => true]
 			]
 		];
 

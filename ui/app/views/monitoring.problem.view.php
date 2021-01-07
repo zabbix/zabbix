@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,9 +53,8 @@ $options = [
 			'details' => $data['filter']['details'],
 			'highlight_row' => $data['filter']['highlight_row'],
 			'show_opdata' => $data['filter']['show_opdata']
-		],
-		'allowed_ack' => (int) $data['allowed_ack']
-	],
+		]
+	]
 ];
 
 switch ($data['filter']['show']) {

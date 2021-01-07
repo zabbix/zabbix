@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Encryption level' => ['No encryption', 'PSK'],
+						'Encryption level' => ['No encryption', 'PSK']
 					],
 					'audit' => [
 						'User' => 'Admin',
@@ -113,7 +113,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Encryption level' => ['No encryption'],
+						'Encryption level' => ['No encryption']
 					],
 					'audit' => [
 						'User' => 'Admin',
@@ -450,7 +450,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Encryption level' => ['No encryption', 'PSK'],
+						'Encryption level' => ['No encryption', 'PSK']
 					]
 				]
 			],

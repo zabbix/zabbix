@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ $fields = [
 	// ajax
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
-	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"'],
+	'source' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action}) && {action} == "expand"']
 ];
 check_fields($fields);
 

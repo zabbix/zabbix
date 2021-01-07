@@ -65,6 +65,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		&:nth-child(3) {
 			> ul > li {
 				vertical-align: top;
+				height: 24px;
 			}
 		}
 
@@ -82,7 +83,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			display: inline-block;
 			height: 22px;
 			line-height: 22px;
-			vertical-align: middle;
+			vertical-align: top;
 
 			button {
 				vertical-align: middle;

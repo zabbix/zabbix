@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ else {
 	$inherited_width = $is_hostprototype ? ZBX_TEXTAREA_MACRO_INHERITED_WIDTH : ZBX_TEXTAREA_MACRO_VALUE_WIDTH;
 	$table = (new CTable())
 		->setId('tbl_macros')
-		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
+		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
+		->addClass('inherited-macros-table');
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		$link = (new CLink(_('configure'), (new CUrl('zabbix.php'))
@@ -43,16 +44,16 @@ else {
 		$link = [' (', $link, ')'];
 	}
 
-	$table->setHeader([
-		_('Macro'),
-		_('Effective value'),
-		$data['readonly'] ? null : '',
-		$is_hostprototype ? '' : null,
-		$is_hostprototype ? _('Parent host value') : null,
-		'',
-		_('Template value'),
-		'',
-		[_('Global value'), $link]
+	$table->setColumns([
+		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
+		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
+		(new CTableColumn($data['readonly'] ? null : ''))->addClass('table-col-action'),
+		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
+		$is_hostprototype ? (new CTableColumn())->addClass('table-col-parent-value') : null,
+		(new CTableColumn())->addClass('table-col-arrow'),
+		(new CTableColumn(_('Template value')))->addClass('table-col-template-value'),
+		(new CTableColumn())->addClass('table-col-arrow'),
+		(new CTableColumn([_('Global value'), $link]))->addClass('table-col-global-value')
 	]);
 
 	foreach ($data['macros'] as $i => $macro) {
@@ -125,7 +126,7 @@ else {
 		if ($is_hostprototype) {
 			$row[] = array_key_exists('parent_host', $macro) ? '&lArr;' : '';
 			$row[] = (new CDiv(array_key_exists('parent_host', $macro) ? '"'.$macro['parent_host']['value'].'"' : null))
-				->setWidth($inherited_width)
+				->setAdaptiveWidth($inherited_width)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 		}
 
@@ -149,13 +150,13 @@ else {
 
 		$row[] = array_key_exists('template', $macro) ? '&lArr;' : '';
 		$row[] = (new CDiv(array_key_exists('template', $macro) ? $template_macro : null))
-			->setWidth($inherited_width)
+			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 		// Global macro value.
 		$row[] = array_key_exists('global', $macro) ? '&lArr;' : '';
 		$row[] = (new CDiv(array_key_exists('global', $macro) ? '"'.$macro['global']['value'].'"' : null))
-			->setWidth($inherited_width)
+			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 		$table
@@ -164,7 +165,7 @@ else {
 				(new CCol(
 					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 						->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
 						->setReadonly($readonly)
 				))

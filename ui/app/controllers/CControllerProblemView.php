@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,11 +149,7 @@ class CControllerProblemView extends CControllerProblem {
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('filter_reset'),
-			'page' => $this->getInput('page', 1),
-			'allowed_ack' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-					|| $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			'page' => $this->getInput('page', 1)
 		];
 
 		$response = new CControllerResponseData($data);

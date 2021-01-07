@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,13 @@ $widget = (new CWidget())
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([_('Macro'), _('Value'), _('Description'), '']);
+	->addClass('global-macro-table')
+	->setColumns([
+		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
+		(new CTableColumn(_('Value')))->addClass('table-col-value'),
+		(new CTableColumn(_('Description')))->addClass('table-col-description'),
+		(new CTableColumn())->addClass('table-col-action')
+	]);
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))

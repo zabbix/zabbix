@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 				'host.host2:{HOST.HOST2} | host.name:Host for trigger description macros | '.
 				'item.value:5 | item.value1:5 | item.lastvalue:5 | host.ip:127.0.0.1 | '.
 				'host.dns: | host.conn:127.0.0.1'
-			],
+			]
 		];
 	}
 
@@ -65,7 +65,7 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 			[
 				'expression' => '{1}=123&{2}>{$MACRO}',
 				'text' => 'd $1 $2 $3'
-			],
+			]
 		];
 	}
 

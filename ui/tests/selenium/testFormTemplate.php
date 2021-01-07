@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => 'Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template "Test Template" already exists.',
+						'Template "Test Template" already exists.'
 					]
 
 				]
@@ -72,7 +72,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'visible_name' => 'Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Test template with visible name" already exists.',
+						'Template with the same visible name "Test template with visible name" already exists.'
 					]
 
 				]
@@ -83,7 +83,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => '',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "Template name": cannot be empty.',
+						'Incorrect value for field "Template name": cannot be empty.'
 					]
 
 				]
@@ -95,7 +95,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'remove_group' => 'Templates',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Field "groups" is mandatory.',
+						'Field "groups" is mandatory.'
 					]
 
 				]

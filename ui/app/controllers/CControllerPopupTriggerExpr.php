@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -668,7 +668,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'itemValueType' => $item_value_type,
 			'selectedFunction' => null,
 			'groupid' => $this->getInput('groupid', 0),
-			'hostid' => $this->getInput('hostid', 0),
+			'hostid' => $this->getInput('hostid', 0)
 		];
 
 		// Check if submitted function is usable with selected item.

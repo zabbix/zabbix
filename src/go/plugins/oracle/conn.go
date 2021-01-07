@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interfa
 	return
 }
 
-// Query executes a query from queryStorage by its name and returns a singe row.
+// Query executes a query from queryStorage by its name and returns a single row.
 func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSql := strings.TrimRight(strings.TrimSpace(sql), ";")

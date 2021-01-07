@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "zbxlld.h"
 #include "events.h"
 #include "zbxvault.h"
+#include "zbxavailability.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
@@ -2250,36 +2251,7 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 	}
 
 	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		for (i = 0; i < hosts.values_num; i++)
-		{
-			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
-					(zbx_host_availability_t *)hosts.values[i]))
-			{
-				continue;
-			}
-
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		DBcommit();
-
-		zbx_free(sql);
-	}
+		zbx_availabilities_flush(&hosts);
 
 	ret = SUCCEED;
 out:
@@ -3850,7 +3822,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		for (i = 0; i < values_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve key \"%s\" on host \"%s\" from "
+						"configuration cache", hostkeys[i].key, hostkeys[i].host);
 				continue;
+			}
 
 			if (last_hostid != items[i].host.hostid)
 			{
@@ -3874,6 +3850,11 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					zbx_free(error);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "unknown validation error for item \"%s\"",
+							(NULL == items[i].key) ? items[i].key_orig : items[i].key);
 				}
 
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// watch package provides utlity functionality for easier Watcher plugin implementation.
+// watch package provides utility functionality for easier Watcher plugin implementation.
 // Watcher plugin listens for events specified by the item requests and comnverts those
 // events to item values. This package handles event source initialization/deinitialization,
 // event filtering and conversion to item values/errors.
@@ -55,7 +55,7 @@ type EventFilter interface {
 	// Process processes data from event source and returns:
 	//   value - data is valid and matches filter
 	//   error - invalid data
-	//   nothing - data is valid, but does not match the fileter
+	//   nothing - data is valid, but does not match the filter
 	Process(data interface{}) (value *string, err error)
 }
 
@@ -181,7 +181,7 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 	}
 }
 
-// Notify method notifies manger about a new event from an event source.
+// Notify method notifies manager about a new event from an event source.
 // Manager checks subscriptions, runs filters and writes the results to the corresponding
 // output sinks.
 func (m *Manager) Notify(es EventSource, data interface{}) {

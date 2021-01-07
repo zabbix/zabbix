@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,7 +173,7 @@ class CElement extends CBaseElement implements IWaitable {
 			$selector .= '::*';
 		}
 
-		return $this->query($selector);
+		return $this->query($selector)->setReversedOrder();
 	}
 
 	/**
@@ -418,6 +418,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getSelectedCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isSelected();
+		};
+	}
+
+	/**
 	 * Check if text is present.
 	 *
 	 * @param string $text    text to be present
@@ -492,6 +503,7 @@ class CElement extends CBaseElement implements IWaitable {
 		$classes = explode(' ', parent::getAttribute('class'));
 
 		$is_enabled = parent::isEnabled()
+				&& (parent::getAttribute('disabled') === null)
 				&& (!array_intersect(['disabled', 'readonly'], $classes))
 				&& (parent::getAttribute('readonly') === null);
 

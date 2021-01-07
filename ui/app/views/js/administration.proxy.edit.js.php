@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,10 +56,22 @@
 			url.setArgument('tls_connect', $('input[name=tls_connect]:checked').val());
 			url.setArgument('tls_psk_identity', $('#tls_psk_identity').val());
 			url.setArgument('tls_psk', $('#tls_psk').val());
+			url.setArgument('psk_edit_mode', $('#psk_edit_mode').val());
 			url.setArgument('tls_issuer', $('#tls_issuer').val());
 			url.setArgument('tls_subject', $('#tls_subject').val());
 			url.setArgument('tls_accept', getTlsAccept());
+			url.setArgument('clone_proxyid', $('#proxyid').val());
 			redirect(url.getUrl(), 'post', 'action');
+		});
+
+		$('#change_psk').click(function() {
+			let input = document.createElement('input');
+			input.setAttribute('type', 'hidden');
+			input.setAttribute('name', 'action');
+			input.setAttribute('value', 'proxy.edit');
+			document.forms['proxy-form'].appendChild(input);
+
+			submitFormWithParam('proxy-form', 'psk_edit_mode', '1');
 		});
 
 		// Refresh field visibility on document load.
@@ -144,20 +156,20 @@
 			// If PSK is selected or checked.
 			if ($('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
 					|| $('#tls_in_psk').is(':checked')) {
-				$('#tls_psk, #tls_psk_identity').closest('li').show();
+				$('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').show();
 			}
 			else {
-				$('#tls_psk, #tls_psk_identity').closest('li').hide();
+				$('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').hide();
 			}
 
 			if (($('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
 					&& $('input[name=status]:checked').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
 					|| ($('#tls_in_psk').is(':checked')
 					&& $('input[name=status]:checked').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>)) {
-				$('#tls_psk, #tls_psk_identity').prop('disabled', false);
+				$('#tls_psk, #tls_psk_identity, #change_psk').prop('disabled', false);
 			}
 			else {
-				$('#tls_psk, #tls_psk_identity').prop('disabled', true);
+				$('#tls_psk, #tls_psk_identity, #change_psk').prop('disabled', true);
 			}
 		}
 

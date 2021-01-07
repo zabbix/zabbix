@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 						['tag' => 'Tag2', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value5'],
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value1'],
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
-						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value3'],
+						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value3']
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
@@ -71,7 +71,7 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 						['tag' => 'Tag2', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value5'],
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Value1'],
 						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
-						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value3'],
+						['tag' => 'Tag3', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Value3']
 					],
 					TAG_EVAL_TYPE_OR
 				] + $sql_args,
@@ -115,7 +115,7 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
 				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\')'
-			],
+			]
 		];
 	}
 

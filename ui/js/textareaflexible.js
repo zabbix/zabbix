@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,14 @@
 **/
 
 
+/**
+ * @event resize - Event fired on textarea size change.
+ */
 (function($) {
 	'use strict';
 
 	function update(e) {
-		var $textarea = $(this);
+		const $textarea = $(this);
 
 		if (e.which === 13) {
 			// Simulate input behavior by submitting form on enter key.
@@ -61,6 +64,9 @@
 		$textarea
 			.height(0)
 			.innerHeight($textarea[0].scrollHeight);
+
+		// Fire event.
+		$textarea.trigger('resize');
 
 		$(window).scrollTop(scroll_pos);
 	}

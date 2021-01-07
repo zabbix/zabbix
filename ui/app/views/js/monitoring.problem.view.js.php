@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,11 +147,16 @@ if (array_key_exists('filter_options', $data)) { ?>
 						filter.updateCounters(response.filter_counters);
 					}
 
-					refresh_timer = setTimeout(refreshCounters, refresh_interval);
+					if (refresh_interval > 0) {
+						refresh_timer = setTimeout(refreshCounters, refresh_interval);
+					}
 				})
 				.catch(() => {
-					// On error restart refresh timer.
-					refresh_timer = setTimeout(refreshCounters, refresh_interval);
+					/**
+					 * On error restart refresh timer.
+					 * If refresh interval is set to 0 (no refresh) schedule initialization request after 5 sec.
+					 */
+					refresh_timer = setTimeout(refreshCounters, refresh_interval > 0 ? refresh_interval : 5000);
 				});
 		}
 

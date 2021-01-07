@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -795,6 +795,10 @@ class CHelpItems {
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],
 				[
+					'key' => 'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
+					'description' => _('VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance')
+				],
+				[
 					'key' => 'vmware.datastore.discovery[<url>]',
 					'description' => _('Discovery of VMware datastores, <url> - VMware service URL. Returns JSON')
 				],
@@ -1169,6 +1173,10 @@ class CHelpItems {
 				[
 					'key' => 'zabbix[stats,<ip>,<port>,queue,<from>,<to>]',
 					'description' => _('Number of items in the queue which are delayed in Zabbix server or proxy by "from" till "to" seconds, inclusive.')
+				],
+				[
+					'key' => 'zabbix[tcache, cache, <parameter>]',
+					'description' => _('Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests.')
 				],
 				[
 					'key' => 'zabbix[trends]',

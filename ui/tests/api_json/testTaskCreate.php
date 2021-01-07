@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -273,7 +273,7 @@ class testTaskCreate extends CAPITest {
 				'item' => [
 					'itemid' => '90004',
 					'type' => '18',
-					'master_itemid' => '23287',
+					'master_itemid' => '23287'
 				],
 				'expected_error' => 'Cannot send request: wrong item type.'
 			],
