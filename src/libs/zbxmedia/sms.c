@@ -244,7 +244,18 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 			zbx_snprintf(error, max_error_len, "error in open(%s): %s", device, zbx_strerror(errno));
 		return FAIL;
 	}
-	fcntl(f, F_SETFL, 0);	/* set the status flag to 0 */
+
+	if (-1 == fcntl(f, F_SETFL, 0))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "error in setting the status flag to 0 (for %s): %s", device,
+				zbx_strerror(errno));
+
+		if (NULL != error)
+		{
+			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
+					zbx_strerror(errno));
+		}
+	}
 
 	/* set ta parameters */
 	tcgetattr(f, &old_options);
