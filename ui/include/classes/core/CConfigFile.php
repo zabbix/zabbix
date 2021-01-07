@@ -187,7 +187,14 @@ class CConfigFile {
 
 			$this->check();
 
-			if (!file_put_contents($this->configFile, $this->getString())) {
+			if (file_put_contents($this->configFile, $this->getString()))
+			{
+				if(!chmod($this->configFile, 0600))
+				{
+					self::exception(_('Unable to change configuration file permissions to 0600.'));
+				}
+			}
+			else {
 				if (file_exists($this->configFile)) {
 					if (file_get_contents($this->configFile) !== $this->getString()) {
 						self::exception(_('Unable to overwrite the existing configuration file.'));
