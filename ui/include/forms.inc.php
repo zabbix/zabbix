@@ -1766,7 +1766,8 @@ function getTriggerFormData(array $data) {
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
-	}}
+		}
+	}
 
 	// tags
 	if (!$data['tags']) {
