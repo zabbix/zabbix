@@ -742,15 +742,15 @@ abstract class CControllerPopupItemTest extends CController {
 					'hostids' => $this->host['hostid'],
 					'filter' => ['main' => INTERFACE_PRIMARY]
 				]);
+				$host_interfaces = zbx_toHash($host_interfaces, 'type');
 
-				$host_interfaces_types = array_flip(array_column($host_interfaces, 'type'));
 				$ordered_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX,
 					INTERFACE_TYPE_IPMI
 				];
 
 				foreach ($ordered_interface_types as $interface_type) {
-					if (array_key_exists($interface_type, $host_interfaces_types)) {
-						$interfaces[] = $host_interfaces[$host_interfaces_types[$interface_type]];
+					if (array_key_exists($interface_type, $host_interfaces)) {
+						$interfaces[] = $host_interfaces[$interface_type];
 						break;
 					}
 				}
