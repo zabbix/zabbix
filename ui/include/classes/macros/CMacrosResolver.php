@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -858,6 +858,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param bool   $options['resolve_macros']		  Resolve macros in item keys and functions. Default: false.
 	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
 	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
+	 * @param string $options['context']              Additional parameter in URL to identify main section.
 	 *
 	 * @return string|array
 	 */
@@ -1042,8 +1043,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 										? (new CLink($function['host'].':'.$function['key_'],
-											'disc_prototypes.php?form=update&itemid='.$function['itemid'].
-											'&parent_discoveryid='.$function['parent_itemid']
+											(new CUrl('disc_prototypes.php'))
+												->setArgument('form', 'update')
+												->setArgument('itemid', $function['itemid'])
+												->setArgument('parent_discoveryid', $function['parent_itemid'])
+												->setArgument('context', array_key_exists('context', $options)
+													? $options['context']
+													: 'host'
+												)
 										))
 											->addClass(ZBX_STYLE_LINK_ALT)
 											->addClass($style)
@@ -1053,7 +1060,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 									? (new CLink($function['host'].':'.$function['key_'],
-										'items.php?form=update&itemid='.$function['itemid']
+										(new CUrl('items.php'))
+											->setArgument('form', 'update')
+											->setArgument('itemid', $function['itemid'])
+											->setArgument('context', array_key_exists('context', $options)
+												? $options['context']
+												: 'host'
+											)
 									))
 										->addClass(ZBX_STYLE_LINK_ALT)
 										->setAttribute('data-itemid', $function['itemid'])

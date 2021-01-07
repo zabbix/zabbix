@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,9 @@ foreach ($this->data['groups'] as $group) {
 	if ($group['discoveryRule']) {
 		if ($data['allowed_ui_conf_hosts']) {
 			$lld_name = (new CLink($group['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+					->setArgument('context', 'host')
 			));
 		}
 		else {

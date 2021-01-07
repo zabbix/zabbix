@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,11 @@ class CSelectOption {
 	protected $extra = [];
 
 	/**
+	 * @var array
+	 */
+	protected $class_names = [];
+
+	/**
 	 * @var bool
 	 */
 	protected $disabled = false;
@@ -70,10 +75,25 @@ class CSelectOption {
 	}
 
 	/**
+	 * @param bool $value
+	 *
 	 * @return self
 	 */
-	public function setDisabled(): self {
-		$this->disabled = true;
+	public function setDisabled(bool $value = true): self {
+		$this->disabled = $value;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $class_name
+	 *
+	 * @return self
+	 */
+	public function addClass(?string $class_name): self {
+		if ($class_name) {
+			$this->class_names[] = $class_name;
+		}
 
 		return $this;
 	}
@@ -91,6 +111,10 @@ class CSelectOption {
 
 		if ($this->extra) {
 			$option['extra'] = $this->extra;
+		}
+
+		if ($this->class_names) {
+			$option['class_name'] = implode(' ', $this->class_names);
 		}
 
 		if ($this->disabled) {

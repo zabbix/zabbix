@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,36 +43,34 @@ $vertical_align_types = [
 ];
 
 /**
- * Get font selection for Combobox.
+ * Get font select element.
  *
- * @param string $name				Combobox name.
+ * @param string $name
  *
- * @return CComboBox
+ * @return CSelect
  */
-function getFontComboBox($name) {
-	return (new CComboBox($name))
-		->addItem(
-			(new COptGroup(_('Serif')))
-				->addItem(new CComboItem(0, 'Georgia'))
-				->addItem(new CComboItem(1, 'Palatino'))
-				->addItem(new CComboItem(2, 'Times New Roman'))
-		)
-		->addItem(
-			(new COptGroup(_('Sans-Serif')))
-				->addItem(new CComboItem(3, 'Arial'))
-				->addItem(new CComboItem(4, 'Arial Black'))
-				->addItem(new CComboItem(5, 'Comic Sans'))
-				->addItem(new CComboItem(6, 'Impact'))
-				->addItem(new CComboItem(7, 'Lucida Sans'))
-				->addItem(new CComboItem(8, 'Tahoma'))
-				->addItem(new CComboItem(9, 'Helvetica'))
-				->addItem(new CComboItem(10, 'Verdana'))
-		)
-		->addItem(
-			(new COptGroup(_('Monospace')))
-				->addItem(new CComboItem(11, 'Courier New'))
-				->addItem(new CComboItem(12, 'Lucida Console'))
-		);
+function createFontSelect(string $name): CSelect {
+	return (new CSelect($name))
+		->setId($name)
+		->addOptionGroup((new CSelectOptionGroup(_('Serif')))->addOptions(CSelect::createOptionsFromArray([
+			0 => 'Georgia',
+			1 => 'Palatino',
+			2 => 'Times New Roman'
+		])))
+		->addOptionGroup((new CSelectOptionGroup(_('Sans-Serif')))->addOptions(CSelect::createOptionsFromArray([
+			3 => 'Arial',
+			4 => 'Arial Black',
+			5 => 'Comic Sans',
+			6 => 'Impact',
+			7 => 'Lucida Sans',
+			8 => 'Tahoma',
+			9 => 'Helvetica',
+			10 => 'Verdana'
+		])))
+		->addOptionGroup((new CSelectOptionGroup(_('Monospace')))->addOptions(CSelect::createOptionsFromArray([
+			11 => 'Courier New',
+			12 => 'Lucida Console'
+		])));
 }
 ?>
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
@@ -87,14 +85,17 @@ function getFontComboBox($name) {
 			->setId('selementForm')
 			->addItem(
 				(new CFormList())
-					->addRow(_('Type'),
-						(new CComboBox('elementtype', null, null, [
-							SYSMAP_ELEMENT_TYPE_HOST => _('Host'),
-							SYSMAP_ELEMENT_TYPE_MAP => _('Map'),
-							SYSMAP_ELEMENT_TYPE_TRIGGER => _('Trigger'),
-							SYSMAP_ELEMENT_TYPE_HOST_GROUP => _('Host group'),
-							SYSMAP_ELEMENT_TYPE_IMAGE => _('Image')
-						]))->setId('elementType')
+					->addRow(new CLabel(_('Type'), 'label-elementtype'),
+						(new CSelect('elementtype'))
+							->setFocusableElementId('label-elementtype')
+							->addOptions(CSelect::createOptionsFromArray([
+								SYSMAP_ELEMENT_TYPE_HOST => _('Host'),
+								SYSMAP_ELEMENT_TYPE_MAP => _('Map'),
+								SYSMAP_ELEMENT_TYPE_TRIGGER => _('Trigger'),
+								SYSMAP_ELEMENT_TYPE_HOST_GROUP => _('Host group'),
+								SYSMAP_ELEMENT_TYPE_IMAGE => _('Image')
+							]))
+							->setId('elementType')
 					)
 					->addRow(_('Show'),
 						(new CRadioButtonList('elementsubtype', SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP))
@@ -137,14 +138,16 @@ function getFontComboBox($name) {
 							->setRows(2)
 							->setId('elementLabel')
 					)
-					->addRow(_('Label location'),
-						new CComboBox('label_location', null, null, [
-							MAP_LABEL_LOC_DEFAULT => _('Default'),
-							MAP_LABEL_LOC_BOTTOM => _('Bottom'),
-							MAP_LABEL_LOC_LEFT => _('Left'),
-							MAP_LABEL_LOC_RIGHT => _('Right'),
-							MAP_LABEL_LOC_TOP => _('Top')
-						])
+					->addRow(new CLabel(_('Label location'), 'label-label-location'),
+						(new CSelect('label_location'))
+							->setFocusableElementId('label-label-location')
+							->addOptions(CSelect::createOptionsFromArray([
+								MAP_LABEL_LOC_DEFAULT => _('Default'),
+								MAP_LABEL_LOC_BOTTOM => _('Bottom'),
+								MAP_LABEL_LOC_LEFT => _('Left'),
+								MAP_LABEL_LOC_RIGHT => _('Right'),
+								MAP_LABEL_LOC_TOP => _('Top')
+							]))
 					)
 					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
@@ -240,21 +243,39 @@ function getFontComboBox($name) {
 					->addRow(_('Icons'),
 						(new CDiv(
 							(new CTable())
-								->addRow([new CLabel(_('Default'), 'iconid_off'), new CComboBox('iconid_off')])
+								->addRow([
+									new CLabel(_('Default'), 'label-iconid-off'),
+									(new CSelect('iconid_off'))
+										->setId('iconid_off')
+										->setFocusableElementId('label-iconid-off')
+										->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+								])
 								->addRow(
-									(new CRow([new CLabel(_('Problem'), 'iconid_on'), new CComboBox('iconid_on')]))
+									(new CRow([
+										new CLabel(_('Problem'), 'label-iconid-on'),
+										(new CSelect('iconid_on'))
+											->setId('iconid_on')
+											->setFocusableElementId('label-iconid-on')
+											->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									]))
 										->setId('iconProblemRow')
 								)
 								->addRow(
 									(new CRow([
-										new CLabel(_('Maintenance'), 'iconid_maintenance'),
-										new CComboBox('iconid_maintenance')
+										new CLabel(_('Maintenance'), 'label-iconid-maintenance'),
+										(new CSelect('iconid_maintenance'))
+											->setId('iconid_maintenance')
+											->setFocusableElementId('label-iconid-maintenance')
+											->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									]))->setId('iconMainetnanceRow')
 								)
 								->addRow(
 									(new CRow([
-										new CLabel(_('Disabled'), 'iconid_disabled'),
-										new CComboBox('iconid_disabled')
+										new CLabel(_('Disabled'), 'label-iconid-disabled'),
+										(new CSelect('iconid_disabled'))
+											->setId('iconid_disabled')
+											->setFocusableElementId('label-iconid-disabled')
+											->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									]))->setId('iconDisabledRow')
 								)
 								->setAttribute('style', 'width: 100%;')
@@ -335,7 +356,7 @@ function getFontComboBox($name) {
 							BR(),
 							_('Font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							getFontComboBox('font'),
+							createFontSelect('font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Font size'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -347,16 +368,16 @@ function getFontComboBox($name) {
 							BR(),
 							_('Horizontal align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
-								$horizontal_align_types
-							))
+							(new CSelect('text_halign'))
+								->setValue(SYSMAP_SHAPE_LABEL_HALIGN_CENTER)
+								->addOptions(CSelect::createOptionsFromArray($horizontal_align_types))
 								->setAttribute('style', 'margin-top: 4px'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Vertical align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
-								$vertical_align_types
-							))
+							(new CSelect('text_valign'))
+								->setValue(SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE)
+								->addOptions(CSelect::createOptionsFromArray($vertical_align_types))
 						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 						'shape-text-row'
 					)
@@ -375,7 +396,8 @@ function getFontComboBox($name) {
 						(new CDiv([
 							_('Type'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CComboBox('border_type', null, null, $shape_border_types)),
+							(new CSelect('border_type'))
+								->addOptions(CSelect::createOptionsFromArray($shape_border_types)),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Width'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -489,7 +511,7 @@ function getFontComboBox($name) {
 					->addRow((new CCheckBox('chkbox_font'))
 							->setId('chkboxFont')
 							->setLabel(_('Font')),
-						getFontComboBox('mass_font'),
+						createFontSelect('mass_font'),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font_size'))
@@ -507,17 +529,19 @@ function getFontComboBox($name) {
 					->addRow((new CCheckBox('chkbox_text_halign'))
 							->setId('chkboxTextHalign')
 							->setLabel(_('Horizontal align')),
-						new CComboBox('mass_text_halign', SYSMAP_SHAPE_LABEL_HALIGN_CENTER, null,
-							$horizontal_align_types
-						),
+						(new CSelect('mass_text_halign'))
+							->setId('mass_text_halign')
+							->setValue(SYSMAP_SHAPE_LABEL_HALIGN_CENTER)
+							->addOptions(CSelect::createOptionsFromArray($horizontal_align_types)),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_text_valign'))
 							->setId('chkboxTextValign')
 							->setLabel(_('Vertical align')),
-						new CComboBox('mass_text_valign', SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE, null,
-							$vertical_align_types
-						),
+						(new CSelect('mass_text_valign'))
+							->setId('mass_text_valign')
+							->setValue(SYSMAP_SHAPE_LABEL_VALIGN_MIDDLE)
+							->addOptions(CSelect::createOptionsFromArray($vertical_align_types)),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_background'))
@@ -534,7 +558,9 @@ function getFontComboBox($name) {
 								->setAttribute('data-value', _('Border type'))
 								->setAttribute('data-value-2', _('Line type'))
 							),
-						new CComboBox('mass_border_type', null, null, $shape_border_types)
+						(new CSelect('mass_border_type'))
+							->setId('mass_border_type')
+							->addOptions(CSelect::createOptionsFromArray($shape_border_types))
 					)
 					->addRow((new CCheckBox('chkbox_border_width'))
 							->setId('chkboxBorderWidth')
@@ -612,13 +638,15 @@ function getFontComboBox($name) {
 						(new CCheckBox('chkbox_label_location'))
 							->setId('chkboxLabelLocation')
 							->setLabel(_('Label location')),
-						(new CComboBox('label_location', null, null, [
-							MAP_LABEL_LOC_DEFAULT => _('Default'),
-							MAP_LABEL_LOC_BOTTOM => _('Bottom'),
-							MAP_LABEL_LOC_LEFT => _('Left'),
-							MAP_LABEL_LOC_RIGHT => _('Right'),
-							MAP_LABEL_LOC_TOP => _('Top')
-						]))->setId('massLabelLocation')
+						(new CSelect('label_location'))
+							->addOptions(CSelect::createOptionsFromArray([
+								MAP_LABEL_LOC_DEFAULT => _('Default'),
+								MAP_LABEL_LOC_BOTTOM => _('Bottom'),
+								MAP_LABEL_LOC_LEFT => _('Left'),
+								MAP_LABEL_LOC_RIGHT => _('Right'),
+								MAP_LABEL_LOC_TOP => _('Top')
+							]))
+							->setId('massLabelLocation')
 					)
 					->addRow(
 						(new CCheckBox('chkbox_use_iconmap'))
@@ -631,25 +659,33 @@ function getFontComboBox($name) {
 						(new CCheckBox('chkbox_iconid_off'))
 							->setId('chkboxMassIconidOff')
 							->setLabel(_('Icon (default)')),
-						(new CComboBox('iconid_off'))->setId('massIconidOff')
+						(new CSelect('iconid_off'))
+							->setId('massIconidOff')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
 						(new CCheckBox('chkbox_iconid_on'))
 							->setId('chkboxMassIconidOn')
 							->setLabel(_('Icon (problem)')),
-						(new CComboBox('iconid_on'))->setId('massIconidOn')
+						(new CSelect('iconid_on'))
+							->setId('massIconidOn')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
 						(new CCheckBox('chkbox_iconid_maintenance'))
 							->setId('chkboxMassIconidMaintenance')
 							->setLabel(_('Icon (maintenance)')),
-						(new CComboBox('iconid_maintenance'))->setId('massIconidMaintenance')
+						(new CSelect('iconid_maintenance'))
+							->setId('massIconidMaintenance')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
 						(new CCheckBox('chkbox_iconid_disabled'))
 							->setId('chkboxMassIconidDisabled')
 							->setLabel(_('Icon (disabled)')),
-						(new CComboBox('iconid_disabled'))->setId('massIconidDisabled')
+						(new CSelect('iconid_disabled'))
+							->setId('massIconidDisabled')
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -716,14 +752,20 @@ function getFontComboBox($name) {
 							->setRows(2)
 							->setId('linklabel')
 					)
-					->addRow(_('Connect to'), (new CComboBox('selementid2')), 'link-connect-to')
-					->addRow(_('Type (OK)'),
-						(new CComboBox('drawtype', null, null, [
-							GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-							GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-							GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-							GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
-						]))
+					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))
+							->setFocusableElementId('label-selementid2')
+							->setId('selementid2'),
+						'link-connect-to'
+					)
+					->addRow(new CLabel(_('Type (OK)'), 'label-drawtype'),
+						(new CSelect('drawtype'))
+							->setFocusableElementId('label-drawtype')
+							->addOptions(CSelect::createOptionsFromArray([
+								GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+								GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+								GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+								GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+							]))
 					)
 					->addRow(_('Colour (OK)'),
 						(new CColor('color', '#{color}'))->appendColorPickerJs(false)
@@ -806,12 +848,14 @@ function getFontComboBox($name) {
 				new CVar('linktrigger_#{linktriggerid}_desc_exp', '#{desc_exp}'),
 				new CVar('linktrigger_#{linktriggerid}_triggerid', '#{triggerid}'),
 				new CVar('linktrigger_#{linktriggerid}_linktriggerid', '#{linktriggerid}'),
-				(new CComboBox('linktrigger_#{linktriggerid}_drawtype', null, null, [
-					GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-					GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-					GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-					GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
-				]))
+				(new CSelect('linktrigger_#{linktriggerid}_drawtype'))
+					->setId('linktrigger_#{linktriggerid}_drawtype')
+					->addOptions(CSelect::createOptionsFromArray([
+						GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+						GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+						GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+						GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+					]))
 			],
 			(new CColor('linktrigger_#{linktriggerid}_color', '#{color}'))->appendColorPickerJs(false),
 			(new CCol(

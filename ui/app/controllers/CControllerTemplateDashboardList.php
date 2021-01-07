@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,11 +52,11 @@ class CControllerTemplateDashboardList extends CController {
 	}
 
 	protected function doAction() {
-		$sort_field = $this->getInput('sort', CProfile::get('web.dashbrd.list.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashbrd.list.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.templates.dashbrd.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.dashbrd.list.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 

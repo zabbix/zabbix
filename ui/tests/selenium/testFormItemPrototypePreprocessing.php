@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	const TEMPL_DISCOVERY_RULE_ID = 15011;	// 'testInheritanceDiscoveryRule'
 	const HOST_DISCOVERY_RULE_ID	 = 15016;	// 'Template inheritance test host -> testInheritanceDiscoveryRule'
 
-	public $link = 'disc_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID;
-	public $ready_link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&itemid=';
+	public $link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::DISCOVERY_RULE_ID;
+	public $ready_link = 'disc_prototypes.php?context=host&form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&itemid=';
 	public $button = 'Create item prototype';
 	public $success_message = 'Item prototype added';
 	public $fail_message = 'Cannot add item prototype';
@@ -126,8 +126,8 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
 	public function testFormItemPrototypePreprocessing_PreprocessingInheritanceFromTemplate($data) {
-		$this->link = 'disc_prototypes.php?parent_discoveryid='.self::TEMPL_DISCOVERY_RULE_ID;
-		$host_link = 'disc_prototypes.php?parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID;
+		$this->link = 'disc_prototypes.php?context=template&parent_discoveryid='.self::TEMPL_DISCOVERY_RULE_ID;
+		$host_link = 'disc_prototypes.php?context=host&parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID;
 
 		$this->checkPreprocessingInheritance($data, $host_link);
 	}

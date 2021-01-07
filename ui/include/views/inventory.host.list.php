@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,12 @@
 $widget = (new CWidget())->setTitle(_('Host inventory'));
 
 // Make an inventory field dropdown.
-$inventoryFieldsComboBox = new CComboBox('filter_field', $data['filter']['field']);
+$inventory_field_select = (new CSelect('filter_field'))
+	->setValue($data['filter']['field'])
+	->setFocusableElementId('label-field');
+
 foreach ($data['host_inventories'] as $inventoryField) {
-	$inventoryFieldsComboBox->addItem($inventoryField['db_field'], $inventoryField['title']);
+	$inventory_field_select->addOption(new CSelectOption($inventoryField['db_field'], $inventoryField['title']));
 }
 
 // filter
@@ -56,13 +59,15 @@ $widget->addItem(
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
-				->addRow(_('Field'), [
-					$inventoryFieldsComboBox,
+				->addRow(new CLabel(_('Field'), 'label-field'), [
+					$inventory_field_select,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('filter_exact', $data['filter']['exact'], null, [
-						0 => _('contains'),
-						1 => _('equals')
-					]),
+					(new CSelect('filter_exact'))
+						->setValue($data['filter']['exact'])
+						->addOptions(CSelect::createOptionsFromArray([
+							0 => _('contains'),
+							1 => _('equals')
+						])),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CTextBox('filter_field_value', $data['filter']['fieldValue']))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

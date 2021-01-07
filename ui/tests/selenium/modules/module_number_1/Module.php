@@ -15,10 +15,10 @@ class Module extends CModule {
 		$menu = APP::Component()->get('menu.main');
 
 		$menu
-			->find(_('Monitoring'))
+			->find('Monitoring')
 			->getSubMenu()
 			->add(
-				(new \CMenuItem(_('1st Module')))->setAction('first.module')
+				(new \CMenuItem('1st Module'))->setAction('first.module')
 			);
 	}
 }

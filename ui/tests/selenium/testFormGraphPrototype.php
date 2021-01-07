@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -409,10 +409,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//select[@id='graphtype']", 'disabled');
+			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'disabled');
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath("//select[@id='graphtype'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='graphtype'][@disabled]");
 		}
 
 		if (isset($data['graphtype'])) {
@@ -528,10 +528,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			]);
 
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//select[@id='ymin_type']", 'disabled');
+				$this->zbxTestAssertAttribute("//z-select[@id='ymin_type']", 'disabled');
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='ymin_type'][@disabled]");
+				$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='ymin_type'][@disabled]");
 			}
 
 			if (!isset($data['form'])) {
@@ -553,10 +553,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			]);
 
 			if (isset($data['templatedHost'])) {
-				$this->zbxTestAssertAttribute("//select[@id='ymax_type']", 'disabled');
+				$this->zbxTestAssertAttribute("//z-select[@id='ymax_type']", 'disabled');
 			}
 			else {
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='ymax_type'][@disabled]");
+				$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='ymax_type'][@disabled]");
 			}
 
 			if (!isset($data['form'])) {
@@ -754,7 +754,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001&context=host');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
@@ -1064,7 +1064,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	public function testFormGraphPrototype_SimpleCreate($data) {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$itemName = $this->item;
-		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
+		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&context=host&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');

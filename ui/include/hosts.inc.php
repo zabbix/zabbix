@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -834,6 +834,7 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 		$name = (new CLink(CHtml::encode($template['name']),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
+				->setArgument('context', 'template')
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
@@ -864,6 +865,7 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
+					->setArgument('context', 'template')
 			);
 		}
 		else {

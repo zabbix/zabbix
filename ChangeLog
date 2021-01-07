@@ -1,6 +1,16 @@
 Changes for 5.4.0alpha1
 
 New features:
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.......PS. [ZBXNEXT-6380] added new key vmware.cl.perfcounter (dgoloscapov, MVekslers)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6219] added "HashiCorp Vault" template (afayantsev)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
+..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
+..F....... [ZBXNEXT-6291] implemented breadcrumbs on host dashboards page (ozdancuka)
+A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
+..F.I..... [ZBX-2594] separated host and template related objects: items, triggers, graphs, low-level discovery rules, web scenarios (dgoloscapov, Ivo)
 A.F....... [ZBXNEXT-6324] moved Configuration -> Discovery to MVC (talbergs)
 ...G...... [ZBXNEXT-6319] added systemd.unit.get item key to Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-6345] added substitution of SID to account name and domain name in eventlog message (vso)
@@ -34,6 +44,12 @@ A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from front
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)
+........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+..F....... [ZBX-18625] fixed host level tags were not inherited in Trigger -> Tags configuration form (ozdancuka)
 ..F....... [ZBX-18086] fixed missing data selection in data overview and trigger overview screens (miks)
 .......PS. [ZBX-18418] set trigger behavior of nodata() for proxy is the same as for server (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
@@ -103,6 +119,32 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 .........T [ZBX-18531] fixed template "Ceph by Zabbix Agent2" pool discovery (ychukina)
 .........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
 .........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.4rc1
+
+New features:
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6219] added "HashiCorp Vault" template (afayantsev)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
+..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
+..F....... [ZBXNEXT-6291] implemented breadcrumbs on host dashboards page (ozdancuka)
+A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
+
+Bug fixes:
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)
+........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+..F....... [ZBX-18625] fixed host level tags were not inherited in Trigger -> Tags configuration form (ozdancuka)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.3
+
+5.2.3rc1 was released as 5.2.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.2.3rc1
@@ -427,6 +469,28 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.8rc1
+
+New features:
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
+..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
+
+Bug fixes:
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+..F....... [ZBX-18625] fixed host level tags were not inherited in Trigger -> Tags configuration form (ozdancuka)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.7
+
+5.0.7rc1 was released as 5.0.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.7rc1
@@ -2313,9 +2377,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.28rc1
 
 New features:
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
 .......PS. [ZBX-18755] fixed possibility of out of memory error when replacing string in mail, calculated checks, actions and when linking template (vso)
 ..F....... [ZBX-18486] fixed screen inheritance from a linked template in the full clone case (ozdancuka)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
 /**
  * @backup hosts
  */
-class testFormHostMacros extends testFormMacros {
+class testFormMacrosHost extends testFormMacros {
 
 	use MacrosTrait;
 
@@ -41,7 +41,7 @@ class testFormHostMacros extends testFormMacros {
 	 */
 	protected $host_name_remove = 'Host for macros remove';
 
-	public static function getCreateHostMacrosData() {
+	public static function getCreateMacrosHostData() {
 		return [
 			[
 				[
@@ -179,13 +179,13 @@ class testFormHostMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getCreateHostMacrosData
+	 * @dataProvider getCreateMacrosHostData
 	 */
-	public function testFormHostMacros_Create($data) {
+	public function testFormMacrosHost_Create($data) {
 		$this->checkCreate($data, 'hosts', 'host');
 	}
 
-	public static function getUpdateHostMacrosData() {
+	public static function getUpdateMacrosHostData() {
 		return [
 			[
 				[
@@ -402,17 +402,17 @@ class testFormHostMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateHostMacrosData
+	 * @dataProvider getUpdateMacrosHostData
 	 */
-	public function testFormHostMacros_Update($data) {
+	public function testFormMacrosHost_Update($data) {
 		$this->checkUpdate($data, $this->host_name_update, 'hosts', 'host');
 	}
 
-	public function testFormHostMacros_Remove() {
+	public function testFormMacrosHost_Remove() {
 		$this->checkRemove($this->host_name_remove, 'hosts', 'host');
 	}
 
-	public function testFormHostMacros_ChangeRemoveInheritedMacro() {
+	public function testFormMacrosHost_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('hosts', 'host');
 	}
 
@@ -457,7 +457,7 @@ class testFormHostMacros extends testFormMacros {
 	/**
 	 * @dataProvider getSecretMacrosLayoutData
 	 */
-	public function testFormHostMacros_CheckSecretMacrosLayout($data) {
+	public function testFormMacrosHost_CheckSecretMacrosLayout($data) {
 		$this->checkSecretMacrosLayout($data, 'hosts.php?form=update&hostid=99011', 'hosts');
 	}
 
@@ -509,7 +509,7 @@ class testFormHostMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateSecretMacrosData
 	 */
-	public function testFormHostMacros_CreateSecretMacros($data) {
+	public function testFormMacrosHost_CreateSecretMacros($data) {
 		$this->createSecretMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
 	}
 
@@ -538,7 +538,7 @@ class testFormHostMacros extends testFormMacros {
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
-	public function testFormHostMacros_RevertSecretMacroChanges($data) {
+	public function testFormMacrosHost_RevertSecretMacroChanges($data) {
 		$this->revertSecretMacroChanges($data, 'hosts.php?form=update&hostid=99135', 'hosts');
 	}
 
@@ -582,11 +582,11 @@ class testFormHostMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
-	public function testFormHostMacros_UpdateSecretMacros($data) {
+	public function testFormMacrosHost_UpdateSecretMacros($data) {
 		$this->updateSecretMacros($data, 'hosts.php?form=update&hostid=99135', 'hosts');
 	}
 
-	public function testFormHostMacros_ResolveSecretMacro() {
+	public function testFormMacrosHost_ResolveSecretMacro() {
 		$macro = [
 			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'
@@ -735,7 +735,7 @@ class testFormHostMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 */
-	public function testFormHostMacros_CreateVaultMacros($data) {
+	public function testFormMacrosHost_CreateVaultMacros($data) {
 		$this->createVaultMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
 	}
 
@@ -780,7 +780,7 @@ class testFormHostMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateVaultMacrosData
 	 */
-	public function testFormHostMacros_UpdateVaultMacros($data) {
+	public function testFormMacrosHost_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'hosts.php?form=update&hostid=99011', 'hosts');
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-class CComboItem extends CTag {
+class CListBoxItem extends CTag {
 
 	public function __construct($value, $caption = null, $selected = false, $enabled = null) {
 		parent::__construct('option', true);
@@ -46,7 +46,7 @@ class CComboItem extends CTag {
 	 *
 	 * @param bool $value
 	 *
-	 * @return CComboItem
+	 * @return self
 	 */
 	public function setSelected($value) {
 		if ($value) {
@@ -64,7 +64,7 @@ class CComboItem extends CTag {
 	 *
 	 * @param bool $value
 	 *
-	 * @return CComboItem
+	 * @return self
 	 */
 	public function setEnabled($value) {
 		if ($value) {

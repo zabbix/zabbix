@@ -558,7 +558,7 @@ $icon-widget-btn: (
 	}
 }
 
-.filter-breadcrumb {
+.header-navigation {
 	li,
 	> li:first-child {
 		> span a:focus {
@@ -1457,5 +1457,15 @@ td.inactive-bg {
 		&.focused {
 			box-shadow: 0 0 0 2px $blue;
 		}
+	}
+}
+
+.breadcrumbs {
+	&>::after {
+		content: " /";
+	}
+
+	&>:last-child::after {
+		content: "";
 	}
 }

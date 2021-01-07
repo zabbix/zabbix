@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class testInheritanceItem extends CLegacyWebTest {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('items.php?form=update&itemid='.$data['itemid']);
+		$this->zbxTestLogin('items.php?form=update&context=host&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestTextPresent('Item updated');
@@ -86,7 +86,7 @@ class testInheritanceItem extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItem_SimpleCreate($data) {
-		$this->zbxTestLogin('items.php?form=create&hostid='.$this->templateid);
+		$this->zbxTestLogin('items.php?form=create&context=host&hostid='.$this->templateid);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1180,6 +1180,7 @@ function make_trigger_details($trigger, $eventid) {
 		->addRow([
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->addClass(ZBX_STYLE_WORDWRAP)
 				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
 			)
 		])
@@ -2360,13 +2361,15 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('trigger_prototypes.php'))
-					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
+					->setArgument('context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl('triggers.php'))
 					->setArgument('filter_hostids', [$template['hostid']])
-					->setArgument('filter_set', 1);
+					->setArgument('filter_set', 1)
+					->setArgument('context', 'template');
 			}
 
 			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
@@ -2419,14 +2422,16 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 					$url = (new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
+						->setArgument('context', 'template');
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
 					$url = (new CUrl('triggers.php'))
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('hostid', $template['hostid']);
+						->setArgument('hostid', $template['hostid'])
+						->setArgument('context', 'template');
 				}
 
 				$name = new CLink(CHtml::encode($template['name']), $url);

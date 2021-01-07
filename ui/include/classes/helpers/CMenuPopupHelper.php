@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,30 +175,38 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for item popup menu.
 	 *
-	 * @param string $itemid
+	 * @param array  $data
+	 * @param string $data['itemid']   Item ID.
+	 * @param string $data['context']  Additional parameter in URL to identify main section.
 	 *
 	 * @return array
 	 */
-	public static function getItem($itemid) {
+	public static function getItem(array $data): array {
 		return [
 			'type' => 'item',
 			'data' => [
-				'itemid' => $itemid
-			]
+				'itemid' => $data['itemid']
+			],
+			'context' => $data['context']
 		];
 	}
 
 	/**
 	 * Prepare data for item prototype popup menu.
 	 *
-	 * @param string $itemid
+	 * @param array  $data
+	 * @param string $data['itemid']   Item ID.
+	 * @param string $data['context']  Additional parameter in URL to identify main section.
+	 *
+	 * @return array
 	 */
-	public static function getItemPrototype($itemid) {
+	public static function getItemPrototype(array $data): array {
 		return [
 			'type' => 'item_prototype',
 			'data' => [
-				'itemid' => $itemid
-			]
+				'itemid' => $data['itemid']
+			],
+			'context' => $data['context']
 		];
 	}
 }
