@@ -294,7 +294,7 @@ static int	DBpatch_5030007(void)
 
 static int	DBpatch_5030008(void)
 {
-	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid", 0);
+	return DBcreate_index("valuemap_mapping", "valuemap_mapping_1", "valuemapid,value", 1);
 }
 
 static int	DBpatch_5030009(void)
