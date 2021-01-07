@@ -68,7 +68,7 @@ class testFormFilter extends CWebTest {
 					$data['filter']['Name'] = 'Untitled';
 				}
 
-				$this->checkName($data['filter']['Name']);	
+				$this->checkName($data['filter']['Name']);
 				$this->query('xpath://a[@class="icon-home tabfilter-item-link"]')->one()->click();
 				$this->query('xpath://li[@data-target="tabfilter_0" and contains(@class, "selected")]')->waitUntilPresent();
 
@@ -76,15 +76,15 @@ class testFormFilter extends CWebTest {
 				$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 				sleep(2);
 				$this->query('xpath://a[@aria-label="Home" and @role="menuitem"]')->waitUntilPresent();
-				
-				// Checking that hosts/problems amount displayed near name in filter tab.	
+
+				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
 					$this->assertEquals($filtered_rows_count, $this->query('xpath://li[@data-target="tabfilter_'.
 							$data['tab_id'].'"]/a')->one()->getAttribute('data-counter'));
 					$this->assertEquals($filtered_rows_count, $this->query('xpath://a[@role="menuitem" and @aria-label="'.
 							$data['filter']['Name'].'"]')->one()->getAttribute('data-counter'));
 				}
-				
+
 				$this->query('xpath://a[@aria-label="'.$data['filter']['Name'].'"]')->one()->click();
 				$this->assertEquals($data['filter']['Name'], $filter_container->getSelectedTabName());
 				break;
