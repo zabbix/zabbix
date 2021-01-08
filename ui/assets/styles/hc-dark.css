@@ -716,7 +716,7 @@ footer {
   .menu-main .submenu .has-submenu:not(.is-expanded) a::after {
     transform: rotate(-90deg); }
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
-    display: none; }
+    left: -9999px !important; }
 
 .icon-support::before, .icon-share::before, .icon-help::before, .icon-guest::before, .icon-profile::before, .icon-signout::before {
   content: '';

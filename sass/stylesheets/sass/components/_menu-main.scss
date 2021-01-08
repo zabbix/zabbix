@@ -293,7 +293,7 @@ $menu-main-icons: (
 				}
 
 				.submenu {
-					display: none;
+					left: -9999px !important;
 				}
 			}
 		}

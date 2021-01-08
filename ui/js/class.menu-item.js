@@ -108,6 +108,12 @@ class CMenuItem extends CBaseComponent {
 				this.fire(MENUITEM_EVENT_FOCUS);
 			},
 
+			blur: () => {
+				if (this.hasSubmenu() && this._is_expanded) {
+					this.collapseSubmenu(1);
+				}
+			},
+
 			expand: () => {
 				if (this.hasSubmenu() && this._is_expanded) {
 					this.fire(MENUITEM_EVENT_EXPAND);
@@ -120,6 +126,7 @@ class CMenuItem extends CBaseComponent {
 			this._toggle.addEventListener('focus', this._events.focus);
 
 			this._submenu.on(MENU_EVENT_FOCUS, this._events.focus);
+			this._submenu.on(MENU_EVENT_BLUR, this._events.blur);
 			this._submenu.on(MENU_EVENT_EXPAND, this._events.expand);
 		}
 	}
