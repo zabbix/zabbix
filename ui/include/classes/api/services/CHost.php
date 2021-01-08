@@ -524,7 +524,7 @@ class CHost extends CHostGeneral {
 					}
 
 					$tags[$tag['tag']]['pairs'][] = [
-						'value' => $tag['value'],
+						'value' => array_key_exists('value', $tag) ? $tag['value'] : '',
 						'operator' => $tag['operator']
 					];
 
