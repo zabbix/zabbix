@@ -17,40 +17,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package oracle
+package mysql
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 
 	"zabbix.com/pkg/zbxerr"
 )
 
-func pdbDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
+func replicationSlaveStatusHandler(ctx context.Context, conn MyClient, _ map[string]string,
 	_ ...string) (interface{}, error) {
-	var lld string
-
-	row, err := conn.QueryRow(ctx, `
-		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(
-					'{#DBNAME}' VALUE NAME
-				)
-			) LLD
-		FROM
-			V$PDBS
-	`)
+	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	err = row.Scan(&lld)
+	data, err := rows2data(rows)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	if lld == "" {
-		lld = "[]"
+	if len(data) == 0 {
+		return nil, zbxerr.ErrorEmptyResult.Wrap(errors.New("replication is not configured"))
 	}
 
-	return lld, nil
+	jsonRes, err := json.Marshal(data[0])
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonRes), nil
 }

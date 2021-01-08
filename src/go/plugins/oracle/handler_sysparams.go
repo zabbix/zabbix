@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keySysParams = "oracle.sys.params"
-
-const sysParamsMaxParams = 0
-
-func sysParamsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func sysParamsHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var sysparams string
-
-	if len(params) > sysParamsMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
