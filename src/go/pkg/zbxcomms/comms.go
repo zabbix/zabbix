@@ -65,7 +65,9 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMod
 	if nil != err {
 		return
 	}
-
+	if err = c.conn.SetDeadline(time.Now().Add(timeout)); err != nil {
+		return
+	}
 	var tlsconfig *tls.Config
 	if len(args) > 0 {
 		var ok bool
@@ -110,8 +112,7 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 
 func (c *Connection) Write(data []byte) error {
 	if c.TimeoutMode == tls.MoveConnectionTimeoutOnEachReadOrWrite {
-		err := c.conn.SetWriteDeadline(time.Now().Add(c.Timeout))
-		if nil != err {
+		if err := c.conn.SetWriteDeadline(time.Now().Add(c.Timeout)); err != nil {
 			return err
 		}
 	}
