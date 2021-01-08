@@ -2069,6 +2069,15 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 	return SUCCEED;
 }
 
+#ifndef HAVE_IPV6
+static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+{
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
+
+	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
+}
+#else
 static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
@@ -2082,14 +2091,10 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
 				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
 
-#ifdef HAVE_IPV6
-#	ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
+#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
 	if (current_ai->ai_family == name.ss_family)
-#	else
-	if (current_ai->ai_family == name.__ss_family)
-#	endif
 #else
-	if (current_ai->ai_family == name.sin_family)
+	if (current_ai->ai_family == name.__ss_family)
 #endif
 	{
 		switch (current_ai->ai_family)
@@ -2144,9 +2149,9 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				break;
 		}
 	}
-
 	return FAIL;
 }
+#endif
 
 static int	validate_cidr(const char *ip, const char *cidr, void *value)
 {
