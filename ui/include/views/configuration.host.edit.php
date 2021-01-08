@@ -152,8 +152,6 @@ else {
 	zbx_add_post_js('hostInterfaceManager.render();');
 	zbx_add_post_js('HostInterfaceManager.makeReadonly();');
 
-	$hostList->addVar('interfaces', $data['interfaces']);
-
 	$interface_header = renderInterfaceHeaders();
 
 	$agent_interfaces = (new CDiv())
