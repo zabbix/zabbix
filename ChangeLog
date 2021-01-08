@@ -2258,6 +2258,10 @@ New features:
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update() and itemprototype.update() methods (Sasha)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 .......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
