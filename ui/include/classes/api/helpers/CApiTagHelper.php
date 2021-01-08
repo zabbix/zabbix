@@ -47,36 +47,40 @@ class CApiTagHelper {
 			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
 			$value = array_key_exists('value', $tag) ? $tag['value'] : '';
 
-			if ($operator == TAG_OPERATOR_NOT_EXISTS
-					|| ($operator == TAG_OPERATOR_NOT_LIKE && $value === '')) {
-				$values_by_tag['NOT EXISTS'][$tag['tag']] = false;
+			if ($operator == TAG_OPERATOR_NOT_LIKE && $value === '') {
+				$operator = TAG_OPERATOR_NOT_EXISTS;
 			}
-			elseif ($operator == TAG_OPERATOR_NOT_EQUAL && $value !== '') {
-				$values_by_tag['NOT EXISTS'][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+			elseif ($operator == TAG_OPERATOR_LIKE && $value === '') {
+				$operator = TAG_OPERATOR_EXISTS;
 			}
-			elseif ($operator == TAG_OPERATOR_NOT_LIKE) {
-				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
-				$value = '%'.mb_strtoupper($value).'%';
 
-				$values_by_tag['NOT EXISTS'][$tag['tag']][]
-						= 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
-			}
-			elseif ($operator == TAG_OPERATOR_NOT_EQUAL) {
-				$values_by_tag['NOT EXISTS'][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
-			}
-			elseif ($operator == TAG_OPERATOR_EXISTS
-					|| ($operator == TAG_OPERATOR_LIKE && $value === '')) {
-				$values_by_tag['EXISTS'][$tag['tag']] = false;
-			}
-			elseif ($operator == TAG_OPERATOR_LIKE) {
-				$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
-				$value = '%'.mb_strtoupper($value).'%';
+			$slot = in_array($operator, [TAG_OPERATOR_EXISTS, TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])
+				? 'EXISTS'
+				: 'NOT EXISTS';
 
-				$values_by_tag['EXISTS'][$tag['tag']][]
-						= 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+			if (array_key_exists($tag['tag'], $values_by_tag[$slot]) && !is_array($values_by_tag[$slot][$tag['tag']])) {
+				continue;
 			}
-			elseif ($operator == TAG_OPERATOR_EQUAL) {
-				$values_by_tag['EXISTS'][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+
+			switch ($operator) {
+				case TAG_OPERATOR_LIKE:
+				case TAG_OPERATOR_NOT_LIKE:
+					$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
+					$value = '%'.mb_strtoupper($value).'%';
+
+					$values_by_tag[$slot][$tag['tag']][]
+						= 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+					break;
+
+				case TAG_OPERATOR_EXISTS:
+				case TAG_OPERATOR_NOT_EXISTS:
+					$values_by_tag[$slot][$tag['tag']] = false;
+					break;
+
+				case TAG_OPERATOR_EQUAL:
+				case TAG_OPERATOR_NOT_EQUAL:
+					$values_by_tag[$slot][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+					break;
 			}
 		}
 
