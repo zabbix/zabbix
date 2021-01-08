@@ -188,6 +188,8 @@ class CLocalApiClient extends CApiClient {
 	 * Authenticates user based on token.
 	 *
 	 * @param string $auth_token
+	 *
+	 * @throws APIException
 	 */
 	protected function tokenAuthentication(string $auth_token) {
 		$api_tokens = DB::select('token', [
