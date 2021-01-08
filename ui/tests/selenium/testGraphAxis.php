@@ -28,91 +28,112 @@ class testGraphAxis extends CWebTest {
 				[
 					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-10-25 00:00:00',
-					'end_period' => '2020-10-25 08:00:00'
+					'end_period' => '2020-10-25 08:00:00',
+					'name' => 'Riga, Winter, big zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-03-29 00:00:00',
-					'end_period' => '2020-03-29 08:00:00'
+					'end_period' => '2020-03-29 08:00:00',
+					'name' => 'Riga, Summer, big zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-10-25 03:00:00',
-					'end_period' => '2020-10-25 05:00:00'
+					'end_period' => '2020-10-25 05:00:00',
+					'name' => 'Riga, Winter, small zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+02:00) Europe/Riga'],
 					'start_period' => '2020-03-29 02:00:00',
-					'end_period' => '2020-03-29 04:00:00'
+					'end_period' => '2020-03-29 04:00:00',
+					'name' => 'Riga, Summer, small zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+11:00) Australia/Lord_Howe'],
 					'start_period' => '2020-10-04 00:00:00',
-					'end_period' => '2020-10-04 08:00:00'
+					'end_period' => '2020-10-04 08:00:00',
+					'name' => 'Lord_Howe, Winter, big zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+11:00) Australia/Lord_Howe'],
 					'start_period' => '2020-04-05 00:00:00',
-					'end_period' => '2020-04-05 08:00:00'
+					'end_period' => '2020-04-05 08:00:00',
+					'name' => 'Lord_Howe, Summer, big zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+11:00) Australia/Lord_Howe'],
 					'start_period' => '2020-10-04 01:00:00',
-					'end_period' => '2020-10-04 03:00:00'
+					'end_period' => '2020-10-04 03:00:00',
+					'name' => 'Lord_Howe, Winter, small zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+11:00) Australia/Lord_Howe'],
 					'start_period' => '2020-04-05 01:00:00',
-					'end_period' => '2020-04-05 03:00:00'
+					'end_period' => '2020-04-05 03:00:00',
+					'name' => 'Lord_Howe, Summer, small zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+08:45) Australia/Eucla'],
 					'start_period' => '2020-03-25 02:00:00',
-					'end_period' => '2020-03-25 04:00:00'
+					'end_period' => '2020-03-25 04:00:00',
+					'name' => 'Eucla, Summer, small zoom'
+				]
+			],
+			[
+				[
+					'settings' => ['Time zone' => '(UTC+08:45) Australia/Eucla'],
+					'start_period' => '2020-03-25 00:00:00',
+					'end_period' => '2020-03-25 08:00:00',
+					'name' => 'Eucla, Summer, big zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+13:45) Pacific/Chatham'],
 					'start_period' => '2020-04-05 02:00:00',
-					'end_period' => '2020-04-05 04:00:00'
+					'end_period' => '2020-04-05 04:00:00',
+					'name' => 'Chatham, Summer, small zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+13:45) Pacific/Chatham'],
 					'start_period' => '2020-04-05 01:00:00',
-					'end_period' => '2020-04-05 08:00:00'
+					'end_period' => '2020-04-05 08:00:00',
+					'name' => 'Chatham, Summer, big zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+13:45) Pacific/Chatham'],
 					'start_period' => '2020-09-27 02:00:00',
-					'end_period' => '2020-09-27 04:00:00'
+					'end_period' => '2020-09-27 04:00:00',
+					'name' => 'Chatham, Winter, small zoom'
 				]
 			],
 			[
 				[
 					'settings' => ['Time zone' => '(UTC+13:45) Pacific/Chatham'],
 					'start_period' => '2020-09-27 00:00:00',
-					'end_period' => '2020-09-27 08:00:00'
+					'end_period' => '2020-09-27 08:00:00',
+					'name' => 'Chatham, Winter, big zoom'
 				]
 			]
 		];
@@ -139,6 +160,6 @@ class testGraphAxis extends CWebTest {
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
-		$this->assertScreenshot($this->query('xpath://div/img')->one());
+		$this->assertScreenshot($this->query('xpath://div/img')->one(), $data['name']);
 	}
 }
