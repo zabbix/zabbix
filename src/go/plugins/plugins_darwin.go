@@ -21,8 +21,10 @@ package plugins
 
 import (
 	_ "zabbix.com/plugins/ceph"
+	_ "zabbix.com/plugins/docker"
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/memcached"
+	_ "zabbix.com/plugins/mysql"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/oracle"
 	_ "zabbix.com/plugins/postgres"
