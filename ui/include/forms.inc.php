@@ -1719,8 +1719,8 @@ function getTriggerFormData(array $data) {
 						}
 						else {
 							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-									'parent_templates' => [$templateid => $template],
-									'type' => ZBX_PROPERTY_INHERITED
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
 							];
 						}
 					}
@@ -1751,6 +1751,7 @@ function getTriggerFormData(array $data) {
 			}
 
 			$data['tags'] = [];
+
 			foreach ($inherited_tags as $tag) {
 				foreach ($tag as $value) {
 					$data['tags'][] = $value;
