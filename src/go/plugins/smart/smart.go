@@ -100,13 +100,21 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, err
 		}
 
+		if fields == nil {
+			jsonArray, err = json.Marshal([]string{})
+			if err != nil {
+				return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			}
+			break
+		}
+
 		jsonArray, err = json.Marshal(fields)
 		if err != nil {
 			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
 	case "smart.attribute.discovery":
-		var out []attribute
+		out := []attribute{}
 
 		parsedDevices, err := p.getParsedDevices()
 		if err != nil {

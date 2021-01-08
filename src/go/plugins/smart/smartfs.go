@@ -107,7 +107,7 @@ func (p *Plugin) getParsedDevices() ([]deviceParser, error) {
 	}
 
 	for _, dev := range basicDev {
-		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name), false)
+		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -j", dev.Name), false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 		}
@@ -159,12 +159,23 @@ func (p *Plugin) getDeviceJsons() (map[string]string, error) {
 	}
 
 	for _, dev := range basicDev {
-		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -json", dev.Name), false)
+		devices, err := p.executeSmartctl(fmt.Sprintf("-a %s -j", dev.Name), false)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
 		}
 
-		out[dev.Name] = string(devices)
+		var dp deviceParser
+		if err = json.Unmarshal(devices, &dp); err != nil {
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		}
+
+		if err = dp.checkErr(); err != nil {
+			return nil, fmt.Errorf("Smartctl failed to get device data: %s.", err.Error())
+		}
+
+		if dp.SmartStatus != nil {
+			out[dev.Name] = string(devices)
+		}
 	}
 
 	raidTypes := []string{"3ware", "areca", "cciss", "megaraid"}
