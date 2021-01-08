@@ -137,7 +137,8 @@ class testGraphAxis extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
-		$this->query('button:Apply')->one()->click();
-		$this->assertScreenshot($this->query('xpath://div/img')->waitUntilVisible()->one());
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
+		$this->assertScreenshot($this->query('xpath://div/img')->one());
 	}
 }
