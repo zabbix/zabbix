@@ -17,17 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package docker
+package mysql
 
-const (
-	errorCannotFetchData         = "Cannot fetch data."
-	errorCannotReadResponse      = "Cannot read response."
-	errorCannotUnmarshalJSON     = "Cannot unmarshal JSON."
-	errorCannotUnmarshalAPIError = "Cannot unmarshal API error."
-	errorCannotMarshalJSON       = "Cannot marshal JSON."
-	errorTooManyParams           = "Too many parameters."
-	errorUnsupportedMetric       = "Unsupported metric."
-	errorParametersNotAllowed    = "Item does not allow parameters."
-	errorInvalidEndpoint         = "Invalid endpoint format."
-	errorQueryErrorMessage       = "Docker returned an error."
+import (
+	"context"
+	"encoding/json"
+
+	"zabbix.com/pkg/zbxerr"
 )
+
+func databasesDiscoveryHandler(ctx context.Context, conn MyClient, _ map[string]string,
+	_ ...string) (interface{}, error) {
+	rows, err := conn.Query(ctx, `SHOW DATABASES`)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	res, err := rows2data(rows)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	jsonRes, err := json.Marshal(res)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonRes), nil
+}

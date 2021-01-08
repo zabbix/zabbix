@@ -1,0 +1,1 @@
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)

@@ -23,20 +23,14 @@ import (
 	"github.com/mediocregopher/radix/v3"
 )
 
-const pingMaxParams = 0
-
 const (
 	pingFailed = 0
 	pingOk     = 1
 )
 
 // pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(conn redisClient, params []string) (interface{}, error) {
+func pingHandler(conn redisClient, _ map[string]string) (interface{}, error) {
 	var res string
-
-	if len(params) > pingMaxParams {
-		return nil, errorInvalidParams
-	}
 
 	if _ = conn.Query(radix.Cmd(&res, "PING")); res != "PONG" {
 		return pingFailed, nil
