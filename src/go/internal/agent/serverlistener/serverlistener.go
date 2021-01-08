@@ -68,7 +68,8 @@ func (sl *ServerListener) run() {
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
-		conn, err := sl.listener.Accept(time.Second * time.Duration(sl.options.Timeout))
+		conn, err := sl.listener.Accept(time.Second*time.Duration(sl.options.Timeout),
+			tls.MoveConnectionTimeoutOnEachReadOrWrite)
 
 		if err == nil {
 			if !sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {

@@ -30,6 +30,7 @@ import (
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxcomms"
 )
 
@@ -155,7 +156,8 @@ func main() {
 	defer listener.Close()
 
 	for {
-		c, err := listener.Accept(time.Second * time.Duration(options.Timeout))
+		c, err := listener.Accept(time.Second*time.Duration(options.Timeout),
+			tls.MoveConnectionTimeoutOnEachReadOrWrite)
 		if err != nil {
 			log.Critf("Accept failed: %s\n", err)
 			return

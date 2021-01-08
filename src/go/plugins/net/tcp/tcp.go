@@ -124,10 +124,6 @@ func (p *Plugin) validateSsh(buf []byte, conn net.Conn) int {
 		sendBuf = fmt.Sprintf("0\n")
 	}
 
-	if err := conn.SetWriteDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
-		log.Debugf("SSH set deadline check error: %s\n", err.Error())
-	}
-
 	if _, err := conn.Write([]byte(sendBuf)); err != nil {
 		log.Debugf("SSH check error: %s\n", err.Error())
 	}
@@ -367,6 +363,10 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 		return 1
 	}
 
+	if err = conn.SetReadDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
+		return
+	}
+
 	if service == "ldap" {
 		l := ldap.NewConn(conn, false)
 		l.Start()
@@ -388,11 +388,6 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var checkResult int
 	buf := make([]byte, 2048)
 	for {
-
-		if err = conn.SetReadDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
-			return
-		}
-
 		if _, err = conn.Read(buf); err == nil {
 			switch service {
 			case "ssh":
@@ -425,11 +420,6 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	if checkResult == tcpExpectOk {
 		if sendToClose != "" {
-
-			if err = conn.SetWriteDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
-				return
-			}
-
 			conn.Write([]byte(sendToClose))
 		}
 		result = 1
