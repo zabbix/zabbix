@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ import (
 	"context"
 	"sync"
 	"time"
+
+	"zabbix.com/pkg/uri"
+	"zabbix.com/pkg/zbxerr"
 
 	"github.com/memcachier/mc/v3"
 	"zabbix.com/pkg/log"
@@ -62,7 +65,7 @@ func (conn *MCConn) Stats(key string) (stats mc.McStats, err error) {
 	}
 
 	if len(res) == 0 {
-		return nil, errorEmptyResult
+		return nil, zbxerr.ErrorEmptyResult
 	}
 
 	if len(res) > 1 {
@@ -87,11 +90,11 @@ func (conn *MCConn) updateAccessTime() {
 	conn.lastTimeAccess = time.Now()
 }
 
-// Thread-safe structure for manage connections.
+// ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
 	sync.Mutex
 	connMutex   sync.Mutex
-	connections map[URI]*MCConn
+	connections map[uri.URI]*MCConn
 	keepAlive   time.Duration
 	timeout     time.Duration
 	Destroy     context.CancelFunc
@@ -102,7 +105,7 @@ func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections: make(map[URI]*MCConn),
+		connections: make(map[uri.URI]*MCConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -154,8 +157,8 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 	}
 }
 
-// create creates a new connection with a given URI and password.
-func (c *ConnManager) create(uri URI) *MCConn {
+// create creates a new connection with given credentials.
+func (c *ConnManager) create(uri uri.URI) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -165,7 +168,7 @@ func (c *ConnManager) create(uri URI) *MCConn {
 	}
 
 	client := mc.NewMCwithConfig(
-		uri.URI(),
+		uri.String(),
 		uri.User(),
 		uri.Password(),
 		&mc.Config{
@@ -193,7 +196,7 @@ func (c *ConnManager) create(uri URI) *MCConn {
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri URI) *MCConn {
+func (c *ConnManager) get(uri uri.URI) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -206,7 +209,7 @@ func (c *ConnManager) get(uri URI) *MCConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri URI) (conn *MCConn) {
+func (c *ConnManager) GetConnection(uri uri.URI) (conn *MCConn) {
 	c.Lock()
 	defer c.Unlock()
 

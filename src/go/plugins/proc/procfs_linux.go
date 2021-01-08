@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,20 @@ package proc
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"syscall"
+)
+
+const (
+	kB = 1024
+	mB = kB * 1024
+	gB = mB * 1024
+	tB = gB * 1024
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -66,7 +75,7 @@ func readAll(filename string) (data []byte, err error) {
 	}
 }
 
-func (p *Plugin) getProcessName(pid string) (name string, err error) {
+func getProcessName(pid string) (name string, err error) {
 	var data []byte
 	if data, err = read2k("/proc/" + pid + "/stat"); err != nil {
 		return
@@ -81,7 +90,7 @@ func (p *Plugin) getProcessName(pid string) (name string, err error) {
 	return string(data[left+1 : right]), nil
 }
 
-func (p *Plugin) getProcessUserID(pid string) (userid int64, err error) {
+func getProcessUserID(pid string) (userid int64, err error) {
 	var fi os.FileInfo
 	if fi, err = os.Stat("/proc/" + pid); err != nil {
 		return
@@ -89,7 +98,7 @@ func (p *Plugin) getProcessUserID(pid string) (userid int64, err error) {
 	return int64(fi.Sys().(*syscall.Stat_t).Uid), nil
 }
 
-func (p *Plugin) getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
+func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
 	var data []byte
 	if data, err = readAll("/proc/" + pid + "/cmdline"); err != nil {
 		return
@@ -146,7 +155,7 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 	}
 }
 
-func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
+func getProcesses(flags int) (processes []*procInfo, err error) {
 	var entries []os.FileInfo
 	f, err := os.Open("/proc")
 	if err != nil {
@@ -169,20 +178,20 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 		}
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
-			if info.name, tmperr = p.getProcessName(entries[0].Name()); tmperr != nil {
-				p.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
+			if info.name, tmperr = getProcessName(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = p.getProcessUserID(entries[0].Name()); tmperr != nil {
-				p.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
+			if info.userid, tmperr = getProcessUserID(entries[0].Name()); tmperr != nil {
+				impl.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
-				p.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
+			if info.arg0, info.cmdline, tmperr = getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
+				impl.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
@@ -190,4 +199,58 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	}
 
 	return processes, nil
+}
+
+func getMemory() (mem float64, err error) {
+	meminfo, err := readAll("/proc/meminfo")
+	if err != nil {
+		return mem, fmt.Errorf("cannot read meminfo file: %s", err.Error())
+	}
+
+	var found bool
+	mem, found, err = byteFromProcFileData(meminfo, "MemTotal")
+	if err != nil {
+		return mem, fmt.Errorf("cannot get the amount of total memory: %s", err.Error())
+	}
+
+	if !found {
+		return mem, fmt.Errorf("cannot get the amount of total memory")
+	}
+
+	return
+}
+
+func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
+	for _, line := range strings.Split(string(data), "\n") {
+		i := strings.Index(line, ":")
+		if i < 0 || valueName != line[:i] {
+			continue
+		}
+
+		line = line[i+1:]
+		if len(line) < 3 {
+			continue
+		}
+
+		v, err := strconv.Atoi(strings.TrimSpace(line[:len(line)-2]))
+		if err != nil {
+			return 0, false, err
+		}
+
+		switch line[len(line)-2:] {
+		case "kB":
+			v *= kB
+		case "mB":
+			v *= mB
+		case "GB":
+			v *= gB
+		case "TB":
+			v *= tB
+		default:
+			return 0, false, errors.New("cannot resolve value type")
+		}
+		return float64(v), true, nil
+	}
+
+	return 0, false, nil
 }

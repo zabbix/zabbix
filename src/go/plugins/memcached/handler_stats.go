@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,9 @@ package memcached
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
-)
 
-const statsMaxParams = 1
+	"zabbix.com/pkg/zbxerr"
+)
 
 const (
 	statsTypeGeneral  = ""
@@ -36,39 +34,15 @@ const (
 )
 
 // statsHandler gets an output of 'stats <type>' command, parses it and returns it in the JSON format.
-func statsHandler(conn MCClient, params []string) (interface{}, error) {
-	statsType := statsTypeGeneral
-
-	if len(params) > statsMaxParams {
-		return nil, errorTooManyParameters
-	}
-
-	if len(params) > 0 {
-		switch strings.ToLower(params[0]) {
-		case statsTypeItems:
-			fallthrough
-		case statsTypeSizes:
-			fallthrough
-		case statsTypeSlabs:
-			fallthrough
-		case statsTypeSettings:
-			fallthrough
-		case statsTypeGeneral:
-			statsType = strings.ToLower(params[0])
-
-		default:
-			return nil, zabbixError{"unknown stats type"}
-		}
-	}
-
-	stats, err := conn.Stats(statsType)
+func statsHandler(conn MCClient, params map[string]string) (interface{}, error) {
+	stats, err := conn.Stats(params["Type"])
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	jsonRes, err := json.Marshal(stats)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotMarshalJSON, err.Error())
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonRes), nil

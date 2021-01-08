@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-25 19:53+0200\n"
+"POT-Creation-Date: 2021-01-08 19:53+0200\n"
 "PO-Revision-Date: 2020-12-20 09:11+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -110,7 +110,7 @@ msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$sアイテム"
 
-#: include/classes/api/services/CItemGeneral.php:2268
+#: include/classes/api/services/CItemGeneral.php:2328
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -280,7 +280,7 @@ msgstr "(プロキシなし)"
 msgid "0 - use default port"
 msgstr "0 - デフォルトのポート番号を使用"
 
-#: include/triggers.inc.php:1829
+#: include/triggers.inc.php:1830
 msgid "0 or 1"
 msgstr "0または1"
 
@@ -371,7 +371,7 @@ msgstr "アクセスは拒否されました！"
 #: include/classes/screens/CScreenHostTriggers.php:230
 #: include/classes/screens/CScreenProblem.php:897
 #: include/classes/screens/CScreenProblem.php:922
-#: include/classes/screens/CScreenProblem.php:1170 include/events.inc.php:250
+#: include/classes/screens/CScreenProblem.php:1171 include/events.inc.php:250
 #: include/events.inc.php:458
 msgid "Ack"
 msgstr "確認済"
@@ -518,8 +518,8 @@ msgstr "アクションを更新しました"
 #: include/classes/screens/CScreenHostTriggers.php:230
 #: include/classes/screens/CScreenProblem.php:898
 #: include/classes/screens/CScreenProblem.php:923
-#: include/classes/screens/CScreenProblem.php:1171
-#: include/classes/screens/CScreenProblem.php:1232 include/events.inc.php:251
+#: include/classes/screens/CScreenProblem.php:1172
+#: include/classes/screens/CScreenProblem.php:1233 include/events.inc.php:251
 #: include/forms.inc.php:1224 include/menu.inc.php:116
 #: include/menu.inc.php:146 include/views/configuration.action.edit.php:28
 #: include/views/configuration.discovery.edit.php:77
@@ -914,7 +914,7 @@ msgstr "すべてのタグ"
 msgid "All templates"
 msgstr "すべてのテンプレート"
 
-#: include/triggers.inc.php:1221
+#: include/triggers.inc.php:1222
 #: include/views/configuration.trigger.prototype.edit.php:503
 #: include/views/configuration.trigger.prototype.massupdate.php:62
 #: include/views/configuration.triggers.edit.php:529
@@ -935,7 +935,7 @@ msgid "Alternatively, you can install it manually:"
 msgstr "代わりに、手動でインストールすることができます:"
 
 #: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
-#: include/triggers.inc.php:1289
+#: include/triggers.inc.php:1290
 #: include/views/configuration.action.edit.php:120
 #: include/views/configuration.correlation.edit.php:112
 #: include/views/configuration.host.discovery.edit.php:574
@@ -971,7 +971,7 @@ msgstr "And/Or"
 #: app/views/administration.user.list.php:74
 #: app/views/monitoring.host.view.php:141
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:34
-#: include/triggers.inc.php:1828
+#: include/triggers.inc.php:1829
 #: include/views/configuration.action.list.php:70
 #: include/views/configuration.correlation.list.php:48
 #: include/views/configuration.discovery.list.php:48
@@ -1518,7 +1518,7 @@ msgstr "証明書"
 #: include/classes/graph/CSvgGraph.php:1077
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:992
-#: include/classes/screens/CScreenProblem.php:1193 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:1194 include/events.inc.php:340
 #: include/events.inc.php:538
 msgid "CLOSING"
 msgstr "クローズ処理中"
@@ -4909,7 +4909,7 @@ msgstr "拒否"
 msgid "Dependencies"
 msgstr "依存関係"
 
-#: include/triggers.inc.php:2553
+#: include/triggers.inc.php:2554
 msgid "Dependent"
 msgstr "依存先"
 
@@ -4917,7 +4917,7 @@ msgstr "依存先"
 msgid "Dependent item"
 msgstr "依存アイテム"
 
-#: app/views/popup.generic.php:313 include/triggers.inc.php:2553
+#: app/views/popup.generic.php:313 include/triggers.inc.php:2554
 #: include/views/configuration.services.edit.php:160
 #: include/views/configuration.trigger.prototype.list.php:87
 #: include/views/configuration.triggers.list.php:241
@@ -5105,7 +5105,7 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: include/html.inc.php:306 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:185 include/maps.inc.php:320
-#: include/triggers.inc.php:2032 include/users.inc.php:86
+#: include/triggers.inc.php:2033 include/users.inc.php:86
 #: include/views/configuration.action.list.php:72
 #: include/views/configuration.action.list.php:118
 #: include/views/configuration.correlation.list.php:50
@@ -5528,7 +5528,7 @@ msgstr "スクリーン\"%2$s\"のためのユーザーグループ内のusrgrpi
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:767
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:921
-#: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:249
+#: include/classes/screens/CScreenProblem.php:1170 include/events.inc.php:249
 #: include/events.inc.php:457 include/views/configuration.action.edit.php:169
 msgid "Duration"
 msgstr "継続期間"
@@ -5898,8 +5898,8 @@ msgstr "トラッピングの有効化"
 #: app/views/popup.triggerwizard.php:134 include/discovery.inc.php:107
 #: include/html.inc.php:302 include/httptest.inc.php:46
 #: include/items.inc.php:138 include/items.inc.php:141
-#: include/items.inc.php:182 include/triggers.inc.php:1226
-#: include/triggers.inc.php:2029
+#: include/items.inc.php:182 include/triggers.inc.php:1227
+#: include/triggers.inc.php:2030
 #: include/views/configuration.action.edit.php:144
 #: include/views/configuration.action.list.php:71
 #: include/views/configuration.action.list.php:126
@@ -6011,7 +6011,7 @@ msgstr "イベント相関関係ルール"
 msgid "Event details"
 msgstr "イベント詳細"
 
-#: include/triggers.inc.php:1216
+#: include/triggers.inc.php:1217
 msgid "Event generation"
 msgstr "イベント生成"
 
@@ -6662,7 +6662,7 @@ msgid "Get value from host"
 msgstr "ホストから値を取得"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
-#: include/triggers.inc.php:1372
+#: include/triggers.inc.php:1373
 msgid "Given expression is not a macro"
 msgstr "設定した条件式はマクロではありません"
 
@@ -6737,7 +6737,7 @@ msgstr "グラデーションライン"
 #: app/partials/monitoring.latest.view.html.php:241
 #: app/views/monitoring.charts.view.php:56
 #: include/classes/macros/CMacrosResolverGeneral.php:847
-#: include/classes/screens/CScreenProblem.php:1310
+#: include/classes/screens/CScreenProblem.php:1311
 #: include/classes/widgets/CWidgetConfig.php:49
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -7186,7 +7186,7 @@ msgstr "行を強調表示"
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:42 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:852
-#: include/classes/screens/CScreenProblem.php:1315
+#: include/classes/screens/CScreenProblem.php:1316
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:275 include/forms.inc.php:714
@@ -7268,7 +7268,7 @@ msgstr "横位置"
 #: include/classes/screens/CScreenHttpTest.php:107
 #: include/classes/screens/CScreenProblem.php:892
 #: include/classes/screens/CScreenProblem.php:916
-#: include/classes/screens/CScreenProblem.php:1166
+#: include/classes/screens/CScreenProblem.php:1167
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:340
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
@@ -8004,7 +8004,7 @@ msgstr "アクセスできないアイテムのプロトタイプ"
 
 #: app/partials/monitoring.host.view.html.php:92
 #: include/classes/screens/CScreenProblem.php:412
-#: include/hostgroups.inc.php:289 include/triggers.inc.php:2184
+#: include/hostgroups.inc.php:289 include/triggers.inc.php:2185
 #: include/views/configuration.host.list.php:250
 #: include/views/inventory.host.view.php:40
 msgid "Inaccessible maintenance"
@@ -8017,11 +8017,11 @@ msgstr "アクセスできないマップ"
 
 #: include/graphs.inc.php:274 include/hosts.inc.php:631
 #: include/hosts.inc.php:802 include/httptest.inc.php:217
-#: include/items.inc.php:889 include/triggers.inc.php:2323
+#: include/items.inc.php:889 include/triggers.inc.php:2324
 msgid "Inaccessible template"
 msgstr "アクセスできないテンプレート"
 
-#: include/triggers.inc.php:2523 include/triggers.inc.php:2531
+#: include/triggers.inc.php:2524 include/triggers.inc.php:2532
 msgid "Inaccessible trigger"
 msgstr "アクセスできないトリガー"
 
@@ -8490,7 +8490,7 @@ msgstr "アクション\"%1$s\"のフィルター条件タイプが正しくあ�
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1373
+#: include/triggers.inc.php:1374
 msgid "Incorrect function is used"
 msgstr "間違った関数が使用されています"
 
@@ -8581,7 +8581,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "スクリーンの要素のアイテムのプロトタイプID\"%1$s\"が正しくありません。"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
-#: include/triggers.inc.php:1374
+#: include/triggers.inc.php:1375
 msgid "Incorrect item value type"
 msgstr "アイテムのデータ型が正しくありません"
 
@@ -8856,7 +8856,7 @@ msgstr "不正なユーザー名やパスワードまたはアカウントは一
 #: include/classes/api/services/CDRule.php:587
 #: include/classes/api/services/CDRule.php:600
 #: include/classes/api/services/CItemGeneral.php:484
-#: include/classes/api/services/CItemGeneral.php:2245
+#: include/classes/api/services/CItemGeneral.php:2305
 #: include/classes/validators/CNewValidator.php:122
 #: include/classes/validators/CNewValidator.php:135
 #: include/classes/validators/CNewValidator.php:148
@@ -9067,13 +9067,13 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/api/services/CItemGeneral.php:1590
 #: include/classes/api/services/CItemGeneral.php:1605
 #: include/classes/api/services/CItemGeneral.php:1615
-#: include/classes/api/services/CItemGeneral.php:1893
-#: include/classes/api/services/CItemGeneral.php:1913
-#: include/classes/api/services/CItemGeneral.php:1920
-#: include/classes/api/services/CItemGeneral.php:1930
-#: include/classes/api/services/CItemGeneral.php:2010
-#: include/classes/api/services/CItemGeneral.php:2024
-#: include/classes/api/services/CItemGeneral.php:2188
+#: include/classes/api/services/CItemGeneral.php:1953
+#: include/classes/api/services/CItemGeneral.php:1973
+#: include/classes/api/services/CItemGeneral.php:1980
+#: include/classes/api/services/CItemGeneral.php:1990
+#: include/classes/api/services/CItemGeneral.php:2070
+#: include/classes/api/services/CItemGeneral.php:2084
+#: include/classes/api/services/CItemGeneral.php:2248
 #: include/classes/api/services/CItem.php:819
 #: include/classes/api/services/CItem.php:827
 #: include/classes/api/services/CItemPrototype.php:979
@@ -9575,15 +9575,15 @@ msgstr "パラメータの数が正しくありません。"
 #: include/classes/api/services/CDiscoveryRule.php:1930
 #: include/classes/api/services/CDiscoveryRule.php:1948
 #: include/classes/api/services/CDiscoveryRule.php:1956
-#: include/classes/api/services/CItemGeneral.php:2202
-#: include/classes/api/services/CItemGeneral.php:2209
-#: include/classes/api/services/CItemGeneral.php:2215
-#: include/classes/api/services/CItemGeneral.php:2224
-#: include/classes/api/services/CItemGeneral.php:2231
 #: include/classes/api/services/CItemGeneral.php:2262
-#: include/classes/api/services/CItemGeneral.php:2267
-#: include/classes/api/services/CItemGeneral.php:2277
-#: include/classes/api/services/CItemGeneral.php:2306
+#: include/classes/api/services/CItemGeneral.php:2269
+#: include/classes/api/services/CItemGeneral.php:2275
+#: include/classes/api/services/CItemGeneral.php:2284
+#: include/classes/api/services/CItemGeneral.php:2291
+#: include/classes/api/services/CItemGeneral.php:2322
+#: include/classes/api/services/CItemGeneral.php:2327
+#: include/classes/api/services/CItemGeneral.php:2337
+#: include/classes/api/services/CItemGeneral.php:2366
 #: include/classes/api/services/CModule.php:291
 #: include/classes/api/services/CUser.php:663
 #: include/classes/api/services/CUser.php:674
@@ -9845,7 +9845,7 @@ msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:2206
-#: include/classes/api/services/CItemGeneral.php:1894
+#: include/classes/api/services/CItemGeneral.php:1954
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "アイテム\"%1$s\"が存在しないかアクセス権限がありません"
@@ -10020,7 +10020,7 @@ msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にす�
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不明なアイテムとしてすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:1751
+#: include/classes/api/services/CItemGeneral.php:1811
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
@@ -10095,8 +10095,8 @@ msgstr "JMXインターフェース"
 msgid "JSON data"
 msgstr "JSONデータ"
 
-#: include/classes/api/services/CItemGeneral.php:2277
-#: include/classes/api/services/CItemGeneral.php:2306
+#: include/classes/api/services/CItemGeneral.php:2337
+#: include/classes/api/services/CItemGeneral.php:2366
 msgid "JSON is expected"
 msgstr "JSONで指定してください"
 
@@ -10991,7 +10991,7 @@ msgstr "選択をマーク"
 msgid "Mask"
 msgstr "マスク"
 
-#: include/classes/screens/CScreenProblem.php:1147
+#: include/classes/screens/CScreenProblem.php:1148
 #: include/views/configuration.host.list.php:478
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:195
@@ -11221,7 +11221,7 @@ msgid "Message/Command"
 msgstr "メッセージ/コマンド"
 
 #: app/views/administration.authentication.edit.php:200
-#: include/classes/screens/CScreenProblem.php:1225
+#: include/classes/screens/CScreenProblem.php:1226
 msgid "Messages"
 msgstr "メッセージ"
 
@@ -11472,7 +11472,7 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr "複数"
 
-#: include/triggers.inc.php:1217
+#: include/triggers.inc.php:1218
 msgid "Multiple PROBLEM events"
 msgstr "障害イベントを継続して生成"
 
@@ -11772,10 +11772,10 @@ msgstr "次のステップ"
 #: include/actions.inc.php:33 include/blocks.inc.php:624
 #: include/blocks.inc.php:702 include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:271
-#: include/classes/screens/CScreenProblem.php:1113
-#: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
+#: include/classes/screens/CScreenProblem.php:1114
+#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:173
 #: include/events.inc.php:359 include/events.inc.php:591
-#: include/triggers.inc.php:1223 include/triggers.inc.php:1228
+#: include/triggers.inc.php:1224 include/triggers.inc.php:1229
 #: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
@@ -12255,7 +12255,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CTriggerPrototype.php:704
 #: include/classes/api/services/CTriggerPrototype.php:722
 #: include/classes/api/services/CUserGroup.php:329
-#: include/classes/api/services/CUserGroup.php:876
+#: include/classes/api/services/CUserGroup.php:877
 #: include/classes/api/services/CUserMacro.php:377
 #: include/classes/api/services/CUserMacro.php:464
 #: include/classes/api/services/CUserMacro.php:812
@@ -12371,7 +12371,7 @@ msgid "None"
 msgstr "なし"
 
 #: app/views/popup.generic.php:530 include/graphs.inc.php:24
-#: include/items.inc.php:156 include/triggers.inc.php:1216
+#: include/items.inc.php:156 include/triggers.inc.php:1217
 #: include/views/configuration.triggers.list.php:71
 #: include/views/monitoring.history.php:253
 msgid "Normal"
@@ -12621,14 +12621,14 @@ msgid "Numeral systems"
 msgstr "数値変換"
 
 #: include/forms.inc.php:191 include/items.inc.php:125
-#: include/triggers.inc.php:1825 include/views/configuration.item.edit.php:567
+#: include/triggers.inc.php:1826 include/views/configuration.item.edit.php:567
 #: include/views/configuration.item.massupdate.php:173
 #: include/views/configuration.item.prototype.edit.php:540
 #: include/views/configuration.item.prototype.massupdate.php:169
 msgid "Numeric (float)"
 msgstr "数値 (浮動小数)"
 
-#: include/triggers.inc.php:1826
+#: include/triggers.inc.php:1827
 msgid "Numeric (integer)"
 msgstr "数値 (整数)"
 
@@ -12787,7 +12787,7 @@ msgstr "特権管理者のみがユーザーグループを作成できます。
 msgid "Only Super Admins can delete media types."
 msgstr "特権管理者のみがメディアタイプを削除できます。"
 
-#: include/classes/api/services/CUserGroup.php:856
+#: include/classes/api/services/CUserGroup.php:857
 msgid "Only Super Admins can delete user groups."
 msgstr "特権管理者のみがユーザーグループを削除できます。"
 
@@ -12912,7 +12912,7 @@ msgstr "実行内容のタイプ"
 
 #: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:766
 #: include/classes/screens/CScreenProblem.php:919
-#: include/classes/screens/CScreenProblem.php:1168 include/events.inc.php:160
+#: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:160
 #: include/views/configuration.trigger.prototype.edit.php:72
 #: include/views/configuration.trigger.prototype.list.php:56
 #: include/views/configuration.triggers.edit.php:93
@@ -12970,7 +12970,7 @@ msgstr "オプション"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
-#: include/triggers.inc.php:1289
+#: include/triggers.inc.php:1290
 #: include/views/configuration.action.edit.php:121
 #: include/views/configuration.correlation.edit.php:113
 #: include/views/configuration.host.discovery.edit.php:575
@@ -13309,7 +13309,7 @@ msgstr "POP"
 #: include/classes/graph/CSvgGraph.php:1072
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:992
-#: include/classes/screens/CScreenProblem.php:1193 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:1194 include/events.inc.php:340
 #: include/events.inc.php:538 include/triggers.inc.php:257
 #: include/views/monitoring.overview.items.php:36
 #: include/views/monitoring.overview.triggers.php:45
@@ -13801,8 +13801,8 @@ msgstr "特権レベル"
 #: include/classes/helpers/CMediatypeHelper.php:45
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
-#: include/classes/screens/CScreenProblem.php:1082
-#: include/classes/screens/CScreenProblem.php:1167
+#: include/classes/screens/CScreenProblem.php:1083
+#: include/classes/screens/CScreenProblem.php:1168
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:61
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:61
 #: include/classes/widgets/forms/CWidgetFormProblems.php:76
@@ -13827,7 +13827,7 @@ msgstr "障害発生"
 msgid "Problem display"
 msgstr "障害の表示"
 
-#: include/triggers.inc.php:1209
+#: include/triggers.inc.php:1210
 #: include/views/js/configuration.triggers.edit.js.php:46
 msgid "Problem expression"
 msgstr "障害の条件式"
@@ -14058,7 +14058,7 @@ msgstr "プロキシごとのキュー概要"
 #: include/classes/graph/CSvgGraph.php:1068
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:978
-#: include/classes/screens/CScreenProblem.php:1181 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:1182 include/events.inc.php:345
 #: include/events.inc.php:524
 msgid "RESOLVED"
 msgstr "解決済"
@@ -14151,14 +14151,14 @@ msgid "Recipients"
 msgstr "受信者"
 
 #: app/views/administration.user.edit.php:398
-#: include/classes/screens/CScreenProblem.php:1083
+#: include/classes/screens/CScreenProblem.php:1084
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:153
 #: include/views/configuration.triggers.list.php:304
 msgid "Recovery"
 msgstr "復旧"
 
-#: include/triggers.inc.php:1213
+#: include/triggers.inc.php:1214
 #: include/views/configuration.trigger.prototype.edit.php:286
 #: include/views/configuration.trigger.prototype.edit.php:369
 #: include/views/configuration.triggers.edit.php:310
@@ -14180,7 +14180,7 @@ msgstr "復旧時の実行内容"
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:889
 #: include/classes/screens/CScreenProblem.php:912
-#: include/classes/screens/CScreenProblem.php:1164 include/events.inc.php:246
+#: include/classes/screens/CScreenProblem.php:1165 include/events.inc.php:246
 #: include/events.inc.php:455
 msgid "Recovery time"
 msgstr "復旧時刻"
@@ -15614,14 +15614,14 @@ msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 #: include/classes/screens/CScreenHistory.php:275
 #: include/classes/screens/CScreenProblem.php:886
 #: include/classes/screens/CScreenProblem.php:908
-#: include/classes/screens/CScreenProblem.php:1162
+#: include/classes/screens/CScreenProblem.php:1163
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:70
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:70
 #: include/classes/widgets/forms/CWidgetFormProblems.php:85
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormProblems.php:203
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:164 include/triggers.inc.php:1194
+#: include/events.inc.php:164 include/triggers.inc.php:1195
 #: include/views/configuration.item.list.php:144
 #: include/views/configuration.trigger.prototype.edit.php:76
 #: include/views/configuration.trigger.prototype.list.php:54
@@ -15645,7 +15645,7 @@ msgid "Severity changed"
 msgstr "深刻度を変更しました"
 
 #: include/actions.inc.php:1757
-#: include/classes/screens/CScreenProblem.php:1229
+#: include/classes/screens/CScreenProblem.php:1230
 msgid "Severity changes"
 msgstr "深刻度変更"
 
@@ -16144,7 +16144,7 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 #: include/classes/screens/CScreenHttpTest.php:111
 #: include/classes/screens/CScreenProblem.php:890
 #: include/classes/screens/CScreenProblem.php:914
-#: include/classes/screens/CScreenProblem.php:1165
+#: include/classes/screens/CScreenProblem.php:1166
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/events.inc.php:456
@@ -16276,7 +16276,7 @@ msgstr "Straight"
 msgid "Strict"
 msgstr "限定"
 
-#: include/triggers.inc.php:1827
+#: include/triggers.inc.php:1828
 msgid "String"
 msgstr "文字列"
 
@@ -16501,7 +16501,7 @@ msgstr "タグの値"
 #: app/views/popup.lldoperation.php:240 include/blocks.inc.php:770
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:924
-#: include/classes/screens/CScreenProblem.php:1172
+#: include/classes/screens/CScreenProblem.php:1173
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:79
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:79
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
@@ -16961,7 +16961,7 @@ msgstr "終了"
 #: include/blocks.inc.php:745 include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:845
-#: include/classes/screens/CScreenProblem.php:1163
+#: include/classes/screens/CScreenProblem.php:1164
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -17695,7 +17695,7 @@ msgstr "単位"
 #: include/items.inc.php:167 include/maintenances.inc.php:33
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:56 include/triggers.inc.php:120
-#: include/triggers.inc.php:267 include/triggers.inc.php:2029
+#: include/triggers.inc.php:267 include/triggers.inc.php:2030
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:245
 #: include/views/configuration.triggers.list.php:72
@@ -17720,12 +17720,12 @@ msgstr "不明な関数。"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
 #: app/controllers/CControllerPopupTriggerExpr.php:561
-#: include/triggers.inc.php:1371
+#: include/triggers.inc.php:1372
 msgid "Unknown host item, no such item in selected host"
 msgstr "不明なアイテム。選択したホストにそのようなアイテムは存在しません"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:46
-#: include/triggers.inc.php:1370
+#: include/triggers.inc.php:1371
 msgid "Unknown host, no such host present in system"
 msgstr "不明なホスト。そのようなホストは存在しません"
 
@@ -18017,7 +18017,7 @@ msgstr "アイテムで使用"
 msgid "User"
 msgstr "ユーザー"
 
-#: include/classes/api/services/CUserGroup.php:610
+#: include/classes/api/services/CUserGroup.php:611
 #, c-format
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "ユーザー\"%1$s\"にユーザーグループを設定してください。"
@@ -18063,7 +18063,7 @@ msgstr "ユーザーエージェント文字列"
 msgid "User can't change type for himself"
 msgstr "ユーザーは自身のユーザータイプを変更できません"
 
-#: include/classes/api/services/CUserGroup.php:535
+#: include/classes/api/services/CUserGroup.php:536
 #: include/classes/api/services/CUser.php:734
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
@@ -18091,17 +18091,17 @@ msgstr "ユーザーグループ"
 msgid "User group \"%1$s\" already exists."
 msgstr "ユーザーグループ\"%1$s\"はすでに存在します。"
 
-#: include/classes/api/services/CUserGroup.php:897
+#: include/classes/api/services/CUserGroup.php:898
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
 msgstr "ユーザーグループ\"%1$s\"は\"%2$s\"アクション内で使用されています。"
 
-#: include/classes/api/services/CUserGroup.php:920
+#: include/classes/api/services/CUserGroup.php:921
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
 msgstr "ユーザーグループ\"%1$s\"はデータベース停止メッセージの設定に利用されています。"
 
-#: include/classes/api/services/CUserGroup.php:910
+#: include/classes/api/services/CUserGroup.php:911
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
 msgstr "ユーザーグループ\"%1$s\"はスクリプト\"%2$s\"に利用されています。"
@@ -19045,7 +19045,7 @@ msgstr "XMLデータ"
 msgid "XML is empty"
 msgstr "XMLが空です"
 
-#: include/classes/api/services/CItemGeneral.php:2262
+#: include/classes/api/services/CItemGeneral.php:2322
 msgid "XML is expected"
 msgstr "XMLで指定してください"
 
@@ -19144,10 +19144,10 @@ msgstr "毎年"
 #: include/actions.inc.php:32 include/blocks.inc.php:624
 #: include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:271
-#: include/classes/screens/CScreenProblem.php:1113
-#: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
+#: include/classes/screens/CScreenProblem.php:1114
+#: include/classes/screens/CScreenProblem.php:1254 include/events.inc.php:173
 #: include/events.inc.php:359 include/events.inc.php:591
-#: include/triggers.inc.php:1222 include/triggers.inc.php:1227
+#: include/triggers.inc.php:1223 include/triggers.inc.php:1228
 #: include/views/configuration.graph.list.php:192
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.host.prototype.list.php:144
@@ -19507,8 +19507,8 @@ msgstr "すべてのメディア"
 
 #: include/classes/api/services/CDRule.php:467
 #: include/classes/api/services/CDRule.php:474
-#: include/classes/api/services/CItemGeneral.php:2202
-#: include/classes/api/services/CItemGeneral.php:2224
+#: include/classes/api/services/CItemGeneral.php:2262
+#: include/classes/api/services/CItemGeneral.php:2284
 #: include/classes/api/services/CModule.php:291
 #: include/classes/import/validators/C44XmlValidator.php:2133
 #: include/classes/import/validators/C44XmlValidator.php:2153
@@ -19738,7 +19738,7 @@ msgstr "変更できません"
 msgid "cannot be empty"
 msgstr "空白は指定できません"
 
-#: include/classes/api/services/CItemGeneral.php:2216
+#: include/classes/api/services/CItemGeneral.php:2276
 msgid "cannot convert to JSON, result value too long"
 msgstr "JSONに変換できません、結果の値が長すぎます"
 
@@ -19763,7 +19763,7 @@ msgstr "\"%1$s\"から始まる条件式を確認してください"
 msgid "circular dependency is not allowed"
 msgstr "循環する依存関係は許可されていません"
 
-#: include/classes/api/services/CItemGeneral.php:1931
+#: include/classes/api/services/CItemGeneral.php:1991
 #: include/classes/import/CConfigurationImport.php:2848
 msgid "circular item dependency is not allowed"
 msgstr "循環するアイテムの依存関係は許可されていません"
@@ -19996,7 +19996,7 @@ msgstr "ホストが無効"
 msgid "host pattern"
 msgstr "ホストパターン"
 
-#: include/classes/api/services/CItemGeneral.php:1914
+#: include/classes/api/services/CItemGeneral.php:1974
 msgid "hostid of dependent item and master item should match"
 msgstr "依存アイテムとマスターアイテムのhostidを一致させてください"
 
@@ -20221,11 +20221,11 @@ msgstr "最大"
 msgid "max() - Maximum value for period T"
 msgstr "max() - 期間Tでの最大値"
 
-#: include/classes/api/services/CItemGeneral.php:2025
+#: include/classes/api/services/CItemGeneral.php:2085
 msgid "maximum dependent items count reached"
 msgstr "依存アイテムの数が最大数に達しました"
 
-#: include/classes/api/services/CItemGeneral.php:2011
+#: include/classes/api/services/CItemGeneral.php:2071
 #: include/classes/import/CConfigurationImport.php:2796
 #: include/classes/import/CConfigurationImport.php:2863
 msgid "maximum number of dependency levels reached"
@@ -20320,8 +20320,8 @@ msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし
 msgid "none"
 msgstr "なし"
 
-#: include/classes/api/services/CItemGeneral.php:2209
-#: include/classes/api/services/CItemGeneral.php:2231
+#: include/classes/api/services/CItemGeneral.php:2269
+#: include/classes/api/services/CItemGeneral.php:2291
 msgid "nonempty key and value pair expected"
 msgstr "空ではないキーと値のペアを指定してください"
 
@@ -20456,7 +20456,7 @@ msgstr "右"
 msgid "root"
 msgstr "ルート"
 
-#: include/classes/api/services/CItemGeneral.php:1921
+#: include/classes/api/services/CItemGeneral.php:1981
 msgid "ruleid of dependent item and master item should match"
 msgstr "依存アイテムとマスターアイテムのruleidを一致させてください"
 
@@ -20509,7 +20509,7 @@ msgstr "説明"
 #: include/classes/api/services/CItemGeneral.php:1406
 #: include/classes/api/services/CItemGeneral.php:1578
 #: include/classes/api/services/CItemGeneral.php:1606
-#: include/classes/api/services/CItemGeneral.php:2188
+#: include/classes/api/services/CItemGeneral.php:2248
 #: include/classes/api/services/CMaintenance.php:493
 #: include/classes/api/services/CMaintenance.php:715
 #: include/classes/api/services/CMediatype.php:786
