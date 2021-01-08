@@ -1,1 +1,0 @@
-...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)

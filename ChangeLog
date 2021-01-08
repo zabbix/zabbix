@@ -1,6 +1,9 @@
 Changes for 5.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
+...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
+..F.....S. [ZBXNEXT-6252] added support of LLD rule filter condition operators "exists" and "does not exist" (agriscenko, asestakovs)
 .........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
 .......PS. [ZBXNEXT-6380] added new key vmware.cl.perfcounter (dgoloscapov, MVekslers)
 .........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
@@ -44,6 +47,13 @@ A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from front
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+...G...... [ZBX-17716] fixed 'UserParameter' parsing and possible buffer overrun (viktors)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update(), itemprototype.update() and discoveryrule.update() methods (Sasha)
 .........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)

@@ -1,1 +1,0 @@
-...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
