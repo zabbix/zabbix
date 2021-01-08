@@ -646,7 +646,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
 					? ITEM_NO_STORAGE_VALUE
 					: getRequest('trends', DB::getDefault('items', 'trends')),
-				'valuemapid' => getRequest('valuemapid', 0),
+				'valuemapid' => getRequest('valuemapid'),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
 				'applications' => $applications,
@@ -703,6 +703,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item = prepareScriptItemFormData($script_item) + $item;
 			}
 
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG && $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				unset($item['valuemapid']);
+			}
+
 			$result = (bool) API::Item()->create($item);
 		}
 		else {
@@ -746,8 +750,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['units'] !== getRequest('units', '')) {
 						$item['units'] = getRequest('units', '');
 					}
-					if (bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
-						$item['valuemapid'] = getRequest('valuemapid', 0);
+					if ($db_item['value_type'] != ITEM_VALUE_TYPE_LOG && $db_item['value_type'] != ITEM_VALUE_TYPE_TEXT
+							&& bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
+						$item['valuemapid'] = getRequest('valuemapid');
 					}
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
@@ -1252,19 +1257,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 	];
-
-	// Value map.
-	$data['valuemap'] = [];
-	if (array_key_exists('valuemapid', $item) && $item['valuemapid']) {
-		$db_valuemap = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => [$item['valuemapid']],
-			'preservekeys' => true
-		]);
-		if ($db_valuemap) {
-			$data['valuemap'] = [CArrayHelper::renameKeys(current($db_valuemap), ['valuemapid' => 'id'])];
-		}
-	}
 
 	// render view
 	if (!$has_errors) {

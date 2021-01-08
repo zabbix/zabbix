@@ -915,6 +915,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
+		'valuemapid' => getRequest('valuemapid'),
 		'params' => getRequest('params', ''),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'new_application' => getRequest('new_application', ''),
@@ -1117,6 +1118,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['value_type'] = $data['item']['value_type'];
 		$data['trapper_hosts'] = $data['item']['trapper_hosts'];
 		$data['units'] = $data['item']['units'];
+		$data['valuemapid'] = $data['item']['valuemapid'];
 		$data['hostid'] = $data['item']['hostid'];
 		$data['params'] = $data['item']['params'];
 		$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
@@ -1279,6 +1281,16 @@ function getItemFormData(array $item = [], array $options = []) {
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	]);
+
+	if ($data['valuemapid']) {
+		$data['valuemap'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'valuemapids' => $data['valuemapid']
+		]), ['valuemapid' => 'id']);
+	}
+	else {
+		$data['valuemap'] = [];
+	}
 
 	// possible host inventories
 	if ($data['parent_discoveryid'] == 0) {

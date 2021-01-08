@@ -835,7 +835,8 @@ $form_list->addRow(
 			]
 		]
 	]))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'row_valuemap'
 );
 
 $form_list
