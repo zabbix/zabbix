@@ -1080,7 +1080,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
 								'mapping' =>				['type' => XML_ARRAY, 'rules' => [
 									'value' =>					['type' => XML_STRING | XML_REQUIRED],
-									'newvalue' =>					['type' => XML_STRING | XML_REQUIRED]
+									'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
 						]]

@@ -42,7 +42,6 @@ static int	DBpatch_5030000(void)
 	return SUCCEED;
 }
 
-
 typedef struct
 {
 	zbx_uint64_t	id;
