@@ -117,17 +117,21 @@ class CSidebar extends CBaseComponent {
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.collapseExpanded();
+				ZABBIX.UserMain.collapseExpanded();
 				this._sidebar_scrollable.scrollTop = 0;
 			}
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
 				ZABBIX.MenuMain.collapseExpanded(1);
+				ZABBIX.UserMain.collapseExpanded(1);
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
-				const active_parent = document.activeElement.parentElement;
-				if (active_parent !== null && active_parent.classList.contains('has-submenu')) {
-					active_parent.blur();
+				const active_item = document.activeElement;
+
+				if (active_item != null && active_item.parentElement != null
+					&& active_item.parentElement.classList.contains('has-submenu')) {
+						active_item.blur();
 				}
 
 				this._opened_timer = setTimeout(() => {
@@ -267,6 +271,7 @@ class CSidebar extends CBaseComponent {
 			expandSelected: () => {
 				this._expand_timer = setTimeout(() => {
 					ZABBIX.MenuMain.expandSelected();
+					ZABBIX.UserMain.expandSelected();
 				}, MENU_EXPAND_SELECTED_DELAY);
 			},
 
@@ -308,14 +313,18 @@ class CSidebar extends CBaseComponent {
 			viewmodeChange: (e) => {
 				if (e.target.classList.contains('button-compact')) {
 					ZABBIX.MenuMain.collapseExpanded();
+					ZABBIX.UserMain.collapseExpanded();
 					clearTimeout(this._expand_timer);
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
 				}
 				else if (e.target.classList.contains('button-hide')) {
 					ZABBIX.MenuMain.collapseExpanded(1);
+					ZABBIX.UserMain.collapseExpanded(1);
 					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
 				}
 				else {
+					ZABBIX.MenuMain.expandSelected(1);
+					ZABBIX.UserMain.expandSelected(1);
 					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
 				}
 
@@ -339,12 +348,20 @@ class CSidebar extends CBaseComponent {
 					for (const item of ZABBIX.MenuMain.getItems()) {
 						item.hasSubmenu() && item.on('mouseenter', () => this._events.expandOver(item));
 					}
+
+					for (const item of ZABBIX.UserMain.getItems()) {
+						item.hasSubmenu() && item.on('mouseenter', () => this._events.expandOver(item));
+					}
 				}
 				else {
 					this.off('mouseenter', this._events.mouseenter);
 					this.off('mouseleave', this._events.mouseleave);
 
 					for (const item of ZABBIX.MenuMain.getItems()) {
+						item.hasSubmenu() && item.off('mouseenter', () => this._events.expandOver(item));
+					}
+
+					for (const item of ZABBIX.UserMain.getItems()) {
 						item.hasSubmenu() && item.off('mouseenter', () => this._events.expandOver(item));
 					}
 				}

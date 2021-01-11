@@ -137,7 +137,7 @@ class CMenu extends CBaseComponent {
 				this._expanded_item !== e.detail.target && this.collapseExpanded();
 				this._expanded_item = e.detail.target;
 
-				this.fire(MENU_EVENT_EXPAND, {menu_item: e.detail.target});
+				this.fire(MENU_EVENT_EXPAND, {menu_item: this._expanded_item});
 			},
 
 			collapse: () => {

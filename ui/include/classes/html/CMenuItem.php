@@ -333,7 +333,6 @@ class CMenuItem extends CTag {
 			$this->addItem([
 				(new CLink($this->label, $this->sub_menu !== null ? '#' : $this->url->getUrl()))
 					->addClass($this->icon_class)
-					->setAttribute('tabindex', $this->sub_menu !== null ? '-1' : null)
 					->setTitle($this->title)
 					->setTarget($this->target),
 				$this->sub_menu
