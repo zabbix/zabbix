@@ -239,8 +239,10 @@ class testFormTags extends CWebTest {
 	 */
 	public function checkTagScreenshot($object) {
 		$this->page->login()->open($this->link);
-		$this->query('xpath://a[contains(@href, "'.$object.'") and contains(text(), "Long tag name and value")]')->waitUntilPresent()->one()->click();
-		$form = $this->query('xpath://form[@aria-labeledby="page-title-general" and contains(@id, "-form")]')->waitUntilPresent()->asForm()->one();
+		$this->query('xpath://a[contains(@href, "'.$object.'") and contains(text(), "Long tag name and value")]')
+				->waitUntilPresent()->one()->click();
+		$form = $this->query('xpath://form[@aria-labeledby="page-title-general" and contains(@id, "-form")]')
+				->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
 		$screenshot_area = $this->query('id:tags-table')->one();
