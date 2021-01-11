@@ -40,6 +40,9 @@ class testFormTagsHostPrototype extends testFormTags {
 		$this->checkTagsCreate($data, 'host prototype');
 	}
 
+	/**
+	 * Check tag fields.
+	 */
 	public function testFormTagsHostPrototype_Screenshot() {
 		$this->checkTagScreenshot('host_prototype');
 	}
