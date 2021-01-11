@@ -1973,6 +1973,10 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'Prometheus to JSON',
 						'parameter_1' => 'metric',
 						'on_fail' => true
+					],
+					[
+						'type' => 'XML to JSON',
+						'on_fail' => true
 					]
 				],
 				'label' => $label,
@@ -2285,6 +2289,12 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_1' => 'path',
 							'on_fail' => true,
 							'error_handler' => 'Set value to',
+							'error_handler_params' => 'Custom_text'
+						],
+						[
+							'type' => 'XML to JSON',
+							'on_fail' => true,
+							'error_handler' => 'Set error to',
 							'error_handler_params' => 'Custom_text'
 						],
 						[

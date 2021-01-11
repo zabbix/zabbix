@@ -306,7 +306,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
 						['type' => 'Change per second'],
-						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false]
+						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false],
+						['type' => 'XML to JSON']
 					],
 					'action' => 'Test'
 				]
