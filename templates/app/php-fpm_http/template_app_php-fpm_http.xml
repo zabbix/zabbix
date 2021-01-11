@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-11T15:12:53Z</date>
+   <date>2021-01-11T15:54:08Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template App PHP-FPM by HTTP</template>
          <name>Template App PHP-FPM by HTTP</name>
-         <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
+         <description>Get PHP-FPM metrics using the Zabbix HTTP agent.&#13;
 &#13;
 Template tooling version used: 0.38</description>
          <groups>
