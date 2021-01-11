@@ -120,4 +120,11 @@ in:
 out:
   return: SUCCEED
   json: '{"xml":{"CDATA":"BAR","cdata":"BAZ"}}'
+---
+test case: 'Test 18: comment'
+in:
+  xml: '<xml foo="FOO"><!--COMMENT HERE!!!! PLEASE!!! SEE ME!!!--><bar><baz>BAZ</baz></bar></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"@foo":"FOO","bar":{"baz":"BAZ"}}}'
 ...

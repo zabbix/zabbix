@@ -476,10 +476,16 @@ static void	xml_to_vector(xmlNode *xml_node, zbx_vector_xml_node_ptr_t *nodes)
 			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "Unsupported XML node type %d, ignored",
 						(int)xml_node->type);
+				zbx_xml_node_free(node);
+				node = NULL;
 				break;
 		}
-		xml_to_vector(xml_node->children, &node->chnodes);
-		zbx_vector_xml_node_ptr_append(&nodes_local, node);
+
+		if (NULL != node)
+		{
+			xml_to_vector(xml_node->children, &node->chnodes);
+			zbx_vector_xml_node_ptr_append(&nodes_local, node);
+		}
 	}
 
 	zbx_vector_xml_node_ptr_reserve(nodes, (size_t)nodes_local.values_num);
