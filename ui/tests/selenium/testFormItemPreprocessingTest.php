@@ -53,6 +53,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 						['type' => 'XML XPath', 'parameter_1' => 'path'],
 						['type' => 'JSONPath', 'parameter_1' => 'path'],
 						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Simple change'],
 						['type' => 'Change per second'],
