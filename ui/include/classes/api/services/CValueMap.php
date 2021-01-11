@@ -26,9 +26,9 @@ class CValueMap extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'valuemap';
@@ -69,19 +69,36 @@ class CValueMap extends CApiService {
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_valuemaps = [];
-
 		$sql_parts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
 
+		// editable + PERMISSION CHECK
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+
+			$sql_parts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE vm.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.zbx_dbstr($permission).
+				')';
+		}
+
 		// hostids
-		if (array_key_exists('hostids', $options) && $options['hostids']) {
-			zbx_value2array($options['hostids']);
+		if ($options['hostids'] !== null) {
 			$sql_parts['where']['hostid'] = dbConditionInt('vm.hostid', $options['hostids']);
 		}
 
@@ -114,10 +131,6 @@ class CValueMap extends CApiService {
 	 */
 	public function create(array $valuemaps) {
 		$this->validateCreate($valuemaps);
-
-		foreach ($valuemaps as$valuemap) {
-			$this->checkDuplicates([$valuemap['name']], $valuemap['hostid']);
-		}
 
 		$valuemapids = DB::insertBatch('valuemap', $valuemaps);
 
@@ -166,13 +179,6 @@ class CValueMap extends CApiService {
 				];
 			}
 
-			if (array_key_exists('hostid', $valuemap) && $valuemap['hostid'] !== $db_valuemap['hostid']) {
-				$upd_valuemaps[] = [
-					'values' => ['hostid' => $valuemap['hostid']],
-					'where' => ['valuemapid' => $valuemap['valuemapid']]
-				];
-			}
-
 			if (array_key_exists('mappings', $valuemap)) {
 				$mappings[$valuemapid] = [];
 				foreach ($valuemap['mappings'] as $mapping) {
@@ -202,7 +208,7 @@ class CValueMap extends CApiService {
 					if ($mapping[$db_mapping['value']] !== $db_mapping['newvalue']) {
 						$upd_mapings[] = [
 							'values' => ['newvalue' => $mapping[$db_mapping['value']]],
-							'where' => ['value_mappingid' => $db_mapping['valuemap_mappingid']]
+							'where' => ['valuemap_mappingid' => $db_mapping['valuemap_mappingid']]
 						];
 					}
 					unset($mapping[$db_mapping['value']]);
@@ -234,7 +240,7 @@ class CValueMap extends CApiService {
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $valuemaps, $db_valuemaps);
 
-		return ['valuemapids' => zbx_objectValues($valuemaps, 'valuemapid')];
+		return ['valuemapids' => array_column($valuemaps, 'valuemapid')];
 	}
 
 	/**
@@ -249,13 +255,29 @@ class CValueMap extends CApiService {
 		}
 
 		$db_valuemaps = DB::select('valuemap', [
-			'output' => ['valuemapid', 'name'],
+			'output' => ['valuemapid', 'hostid'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);
 
 		foreach ($valuemapids as $valuemapid) {
 			if (!array_key_exists($valuemapid, $db_valuemaps)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'hostids' => array_column($db_valuemaps, 'hostid'),
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($db_valuemaps as $valuemap) {
+			if (!array_key_exists($valuemap['hostid'], $db_hosts)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
@@ -277,17 +299,19 @@ class CValueMap extends CApiService {
 	/**
 	 * Check for duplicated value maps.
 	 *
-	 * @param array  $names
-	 * @param string $hostid
+	 * @param array $names_by_hostid
 	 *
 	 * @throws APIException  if value map already exists.
 	 */
-	private function checkDuplicates(array $names, $hostid) {
-		$db_valuemaps = DB::select('valuemap', [
-			'output' => ['name'],
-			'filter' => ['name' => $names, 'hostid' => $hostid],
-			'limit' => 1
-		]);
+	private function checkDuplicates(array $names_by_hostid) {
+		$sql_where = [];
+		foreach ($names_by_hostid as $hostid => $names) {
+			$sql_where[] = '(v.hostid='.$hostid.' AND '.dbConditionString('v.name', $names).')';
+		}
+
+		$db_valuemaps = DBfetchArray(
+			DBselect('SELECT v.name FROM valuemap v WHERE '.implode(' OR ', $sql_where), 1)
+		);
 
 		if ($db_valuemaps) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -296,13 +320,14 @@ class CValueMap extends CApiService {
 		}
 	}
 
+
 	/**
 	 * @param array $valuemaps
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$valuemaps) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
@@ -313,6 +338,29 @@ class CValueMap extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'hostids' => array_column($valuemaps, 'hostid'),
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$names_by_hostid = [];
+
+		foreach ($valuemaps as $valuemap) {
+			// check permissions by hostid
+			if (!array_key_exists($valuemap['hostid'], $db_hosts)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$names_by_hostid[$valuemap['hostid']][] = $valuemap['name'];
+		}
+
+		$this->checkDuplicates($names_by_hostid);
 	}
 
 	/**
@@ -324,7 +372,6 @@ class CValueMap extends CApiService {
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'hostid' =>	['type' => API_ID, 'flags' => API_NOT_EMPTY],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['value']], 'fields' => [
 				'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('valuemap_mapping', 'value')],
@@ -342,26 +389,38 @@ class CValueMap extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$names = [];
+		$valuemaps = $this->extendObjectsByKey($valuemaps, $db_valuemaps, 'valuemapid', ['hostid']);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'name']]];
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $valuemaps, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'hostids' => array_column($valuemaps, 'hostid'),
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$names_by_hostid = [];
 
 		foreach ($valuemaps as $valuemap) {
 			// Check if this value map exists.
-			if (!array_key_exists($valuemap['valuemapid'], $db_valuemaps)) {
+			if (!array_key_exists($valuemap['valuemapid'], $db_valuemaps)
+					|| !array_key_exists($valuemap['hostid'], $db_hosts)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 
-			$db_valuemap = $db_valuemaps[$valuemap['valuemapid']];
-
-			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
-				$names[$db_valuemap['hostid']][] = $valuemap['name'];
+			if ($valuemap['name'] !== $db_valuemaps[$valuemap['valuemapid']]['name']) {
+				$names_by_hostid[$valuemap['hostid']][] = $valuemap['name'];
 			}
 		}
 
-		foreach ($names as $hostid => $value) {
-			$this->checkDuplicates($value, $hostid);
-		}
+		$this->checkDuplicates($names_by_hostid);
 	}
 
 	protected function addRelatedObjects(array $options, array $db_valuemaps) {
@@ -395,7 +454,7 @@ class CValueMap extends CApiService {
 
 				foreach ($db_mappings as $db_mapping) {
 					$valuemapid = $db_mapping['valuemapid'];
-					unset($db_mapping['mappingid'], $db_mapping['valuemapid']);
+					unset($db_mapping['valuemap_mappingid'], $db_mapping['valuemapid']);
 
 					$db_valuemaps[$valuemapid]['mappings'][] = $db_mapping;
 				}
