@@ -32,37 +32,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 */
 	const HOSTID = 50010;
 
-	/**
-	 * Fill in input, textarea, change checkbox state or choose option from select.
-	 */
-	private function fillFields($rows) {
-		foreach ($rows as $field_name => $value) {
-			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@name]';
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath($field_xpath));
-
-			$tag = $this->webDriver->findElement(WebDriverBy::xpath($field_xpath))->getTagName();
-
-			if ($tag === 'input') {
-				$type = $this->zbxTestGetAttributeValue($field_xpath, 'type');
-
-				if ($type === 'checkbox') {
-					$id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
-					$this->zbxTestCheckboxSelect($id, $value);
-				}
-				else {
-					$this->zbxTestInputClearAndTypeByXpath($field_xpath, $value);
-				}
-			}
-			elseif ($tag === 'z-select') {
-				$name = $this->zbxTestGetAttributeValue($field_xpath, 'name');
-				$this->zbxTestDropdownSelectWait($name, $value);
-			}
-			elseif ($tag === 'textarea') {
-				$this->zbxTestInputClearAndTypeByXpath($field_xpath, $value);
-			}
-		}
-	}
-
 	/*
 	 * Check form fields after create or update item.
 	 */
@@ -71,7 +40,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 
 		foreach ($rows as $field_name => $value) {
-			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@name]';
+			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@id]';
 			$tag = $this->webDriver->findElement(WebDriverBy::xpath($field_xpath))->getTagName();
 			$field_id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
 
@@ -348,7 +317,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		// Fill in fields.
 		if (array_key_exists('fields', $data)) {
-			$this->fillFields($data['fields']);
+			$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
 		}
 		if (array_key_exists('request_type', $data)) {
 			$this->zbxTestClickXpathWait("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
@@ -895,7 +864,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Request type' => 'PUT',
 						'HTTP authentication' => 'Basic',
 						'Type of information' => 'Character',
-						'Show value' => 'APC Battery Status',
+						'Value mapping' => 'Service state',
 						// inputs
 						'Timeout' => '1m',
 						'Required status codes' => '0, 100-500',
@@ -995,8 +964,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
 
-		$this->fillFields($data['fields']);
-
+		$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
 		if (array_key_exists('HTTP authentication', $data['fields']) && $data['fields']['HTTP authentication'] != 'None') {
 			$this->zbxTestAssertVisibleId('http_username');
 			$this->zbxTestAssertVisibleId('http_password');
@@ -1050,7 +1018,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'SSL verify host' => false,
 				'Type of information' => 'Numeric (unsigned)',
 				'Update interval' => '1m',
-				'Show value' => 'As is',
+				'Value mapping' => '',
 				'Enable trapping' => false,
 				'Populates host inventory field' => '-None-',
 				'Enabled' => true
@@ -1156,7 +1124,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Request type' => 'PUT',
 						'HTTP authentication' => 'Basic',
 						'Type of information' => 'Character',
-						'Show value' => 'APC Battery Status',
+						'Value mapping' => 'Service state',
 						// inputs
 						'Timeout' => '1m',
 						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
@@ -1204,7 +1172,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestClickLinkTextWait($update_item);
 
-		$this->fillFields($data['fields']);
+		$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
 		if (array_key_exists('request_type', $data)) {
 			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
@@ -1273,8 +1241,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($clone_item);
 		$this->zbxTestClickWait('clone');
 
-
-		$this->fillFields($data['fields']);
+		$this->query('id:item-form')->asForm()->one()->fill($data['fields']);
 		if (array_key_exists('request_type', $data)) {
 			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
@@ -1337,7 +1304,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 
-		$this->fillFields($data);
+		$this->query('id:item-form')->asForm()->one()->fill($data);
 		$this->zbxTestClick('cancel');
 
 		// Check the results in frontend.
