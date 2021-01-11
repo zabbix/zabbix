@@ -788,21 +788,8 @@ class CConfigurationExport {
 		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
-		if ($this->data['valueMaps']) {
-			/*
-			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
-			 * value map IDs that should not be selected again.
-			 */
-
-			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
-				if (array_key_exists($valuemapid, $valuemapids)) {
-					unset($valuemapids[$valuemapid]);
-				}
-			}
-		}
-
 		if ($valuemapids) {
-			$this->data['valueMaps'] += API::ValueMap()->get([
+			$db_valuemaps = API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'selectMappings' => ['value', 'newvalue'],
 				'valuemapids' => array_keys($valuemapids),
@@ -814,7 +801,7 @@ class CConfigurationExport {
 			$item_prototype['valuemap'] = [];
 
 			if ($item_prototype['valuemapid'] != 0) {
-				$item_prototype['valuemap']['name'] = $this->data['valueMaps'][$item_prototype['valuemapid']]['name'];
+				$item_prototype['valuemap']['name'] = $db_valuemaps[$item_prototype['valuemapid']]['name'];
 			}
 
 			$items[$item_prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $item_prototype;
