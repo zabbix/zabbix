@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,16 +26,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyTablespaces = "oracle.ts.stats"
-
-const tablespacesMaxParams = 0
-
-func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var tablespaces string
-
-	if len(params) > tablespacesMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
@@ -149,7 +142,6 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 					dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
 			GROUP BY
 				Y.NAME, Y.CONTENTS, Y.TBS_STATUS
-
 			)
 	`)
 	if err != nil {
@@ -161,7 +153,8 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	// Add leading zeros for floats like ".03".
+	// Add leading zeros for floats: ".03" -> "0.03".
+	// Oracle JSON functions are not RFC 4627 compliant.
 	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
 	tablespaces = strings.ReplaceAll(tablespaces, "\":.", "\":0.")
 

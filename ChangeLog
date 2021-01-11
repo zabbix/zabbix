@@ -1,9 +1,52 @@
+Changes for 5.0.8rc1
+
+New features:
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
+...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
+..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
+
+Bug fixes:
+A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+...G...... [ZBX-17716] fixed 'UserParameter' parsing and possible buffer overrun (viktors)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update(), itemprototype.update() and discoveryrule.update() methods (Sasha)
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+..F....... [ZBX-18625] fixed host level tags were not inherited in Trigger -> Tags configuration form (ozdancuka)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.7
+
+5.0.7rc1 was released as 5.0.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.7rc1
 
 New features:
+...G...... [ZBXNEXT-6319] added systemd.unit.get item key to Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6345] added substitution of SID to account name and domain name in eventlog message (vso)
+.....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 .........T [ZBXNEXT-6234] added "Disk read/write request avg waiting time" items in Template Module Windows physical disks (mchudinov)
 
 Bug fixes:
+..F....... [ZBX-18086] fixed missing data selection in data overview and trigger overview screens (miks)
+.......PS. [ZBX-18418] set trigger behavior of nodata() for proxy is the same as for server (MVekslers)
+.......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
+........S. [ZBX-18736] added missing idle statistics from lld manager process title (wiper)
+...G...... [ZBX-18583] changed system command execution to avoid parameter quoting issues (wiper)
+..F....... [ZBX-17583] fixed dashboard scroll to position where new widget is added (rlataria)
+..F....... [ZBX-18148] fixed inability to edit action operation when using special characters in custom message (agriscenko)
+..F....... [ZBX-18486] fixed screen inheritance from a linked template in the full clone case (ozdancuka)
+........S. [ZBX-18116] fixed identical tags in webhook (arimdjonoks)
+.........T [ZBX-18706] reworked Template "Ceph by Zabbix Agent2" OSD discovery (ychukina)
 ........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
 ...G...... [ZBX-18187] fixed agent2 wmi.get returning the wrong result (arimdjonoks)
 ...G...... [ZBX-18543] reworked ceph.osd.discovery metric (vadimipatov)
@@ -1869,8 +1912,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.28rc1
 
 New features:
+..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
+.....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update() and itemprototype.update() methods (Sasha)
+..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
+.......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
+.......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)
+.......PS. [ZBX-18755] fixed possibility of out of memory error when replacing string in mail, calculated checks, actions and when linking template (vso)
+..F....... [ZBX-18486] fixed screen inheritance from a linked template in the full clone case (ozdancuka)
 ........S. [ZBX-18660] fixed SNMP index returning as a number instead of string if there is a backslash (arimdjonoks)
 ........S. [ZBX-17703] fixed problem negative duration for timed triggers in case of database disconnect (asestakovs)
 .......PS. [ZBX-18694] fixed crash when PSK connection is configured but PSK or PSK identity is empty (vso)

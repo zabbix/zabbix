@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -530,6 +530,7 @@ class CUserGroup extends CApiService {
 
 		foreach ($usrgrps as $usrgrp) {
 			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+					&& array_key_exists('userids', $usrgrp)
 					&& uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_('User cannot add himself to a disabled group or a group with disabled GUI access.')

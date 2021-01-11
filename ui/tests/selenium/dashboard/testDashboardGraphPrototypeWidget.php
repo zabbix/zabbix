@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -350,6 +350,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$this->page->removeFocus();
 		sleep(1);
 		$screenshot_area = $this->query('class:dashbrd-grid-container')->one();
+		$screenshot_area->query('xpath:.//div[contains(@class, "dashbrd-grid-iterator-head")]')->waitUntilNotVisible();
 		$screenshot_area->query('xpath:.//div[contains(@class, "dashbrd-grid-iterator-focus")]')->waitUntilNotVisible();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}

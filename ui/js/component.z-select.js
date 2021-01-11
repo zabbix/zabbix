@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,15 @@ class ZSelect extends HTMLElement {
 				break;
 
 			case 'width':
-				this.style.width = (new_value === 'auto') ? '100%' : (new_value !== null) ? `${new_value}px` : '';
+				if (new_value === 'auto') {
+					this.style.width = '100%';
+				}
+				else if (new_value !== null) {
+					this.style.width = `${new_value}px`;
+				}
+				else {
+					this.style.width = '';
+				}
 				break;
 		}
 	}

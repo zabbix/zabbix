@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ type process struct {
 var ntResumeProcess *syscall.Proc
 
 func Execute(s string, timeout time.Duration) (out string, err error) {
-	cmd := exec.Command("cmd", "/C", s)
+	cmd := exec.Command("cmd")
 
 	var b bytes.Buffer
 	cmd.Stdout = &b
@@ -55,6 +55,7 @@ func Execute(s string, timeout time.Duration) (out string, err error) {
 
 	cmd.SysProcAttr = &windows.SysProcAttr{
 		CreationFlags: windows.CREATE_SUSPENDED,
+		CmdLine:       fmt.Sprintf(`/C "%s"`, s),
 	}
 	if err = cmd.Start(); err != nil {
 		return "", fmt.Errorf("Cannot execute command: %s", err)

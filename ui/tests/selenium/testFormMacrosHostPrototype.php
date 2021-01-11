@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
 /**
  * @backup hosts
  */
-class testFormHostPrototypeMacros extends testFormMacros {
+class testFormMacrosHostPrototype extends testFormMacros {
 
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID			= 90001;
@@ -45,7 +45,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 */
 	protected $host_name_remove = 'Host prototype for macros {#DELETE}';
 
-	public static function getCreateHostPrototypeMacrosData() {
+	public static function getCreateMacrosHostPrototypeData() {
 		return [
 			[
 				[
@@ -183,13 +183,13 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getCreateHostPrototypeMacrosData
+	 * @dataProvider getCreateMacrosHostPrototypeData
 	 */
-	public function testFormHostPrototypeMacros_Create($data) {
+	public function testFormMacrosHostPrototype_Create($data) {
 		$this->checkCreate($data, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public static function getUpdateHostPrototypeMacrosData() {
+	public static function getUpdateMacrosHostPrototypeData() {
 		return [
 			[
 				[
@@ -406,17 +406,17 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateHostPrototypeMacrosData
+	 * @dataProvider getUpdateMacrosHostPrototypeData
 	 */
-	public function testFormHostPrototypeMacros_Update($data) {
+	public function testFormMacrosHostPrototype_Update($data) {
 		$this->checkUpdate($data, $this->host_name_update, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function testFormHostPrototypeMacros_Remove() {
+	public function testFormMacrosHostPrototype_Remove() {
 		$this->checkRemove($this->host_name_remove, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function testFormHostPrototypeMacros_ChangeRemoveInheritedMacro() {
+	public function testFormMacrosHostPrototype_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
@@ -466,7 +466,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getCreateSecretMacrosData
 	 */
-	public function testFormHostPrototypeMacros_CreateSecretMacros($data) {
+	public function testFormMacrosHostPrototype_CreateSecretMacros($data) {
 		$this->createSecretMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99205', 'hostPrototype');
 	}
 
@@ -510,7 +510,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
-	public function testFormHostPrototypeMacros_UpdateSecretMacros($data) {
+	public function testFormMacrosHostPrototype_UpdateSecretMacros($data) {
 		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'hostPrototype');
 	}
 
@@ -539,7 +539,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	/**
 	 * @dataProvider getRevertSecretMacrosData
 	 */
-	public function testFormHostPrototypeMacros_RevertSecretMacroChanges($data) {
+	public function testFormMacrosHostPrototype_RevertSecretMacroChanges($data) {
 		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'hostPrototype');
 	}
 }

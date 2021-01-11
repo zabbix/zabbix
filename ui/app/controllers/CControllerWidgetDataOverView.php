@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,18 +37,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 		$hostids = $fields['hostids'] ? $fields['hostids'] : null;
 
-		if ($fields['style'] == STYLE_TOP) {
-			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids,
-				$fields['application']
-			);
-		}
-		else {
-			list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, $hostids,
-				$fields['application']
-			);
-		}
-
-		$visible_items = getDataOverviewCellData($db_hosts, $db_items, $items_by_name, $fields['show_suppressed']);
+		[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $fields);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
@@ -56,9 +45,8 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'application' => $fields['application'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
-			'visible_items' => $visible_items,
-			'db_hosts' => $db_hosts,
-			'items_by_name' => $items_by_name,
+			'items' => $items,
+			'hosts' => $hosts,
 			'has_hidden_data' => $has_hidden_data,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

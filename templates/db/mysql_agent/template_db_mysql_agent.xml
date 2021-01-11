@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-17T12:31:10Z</date>
+   <date>2020-12-28T17:38:35Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -16,7 +16,7 @@
 2.Copy template_db_mysql.conf into folder with Zabbix agent configuration (/etc/zabbix/zabbix_agentd.d/ by default). Don't forget restart zabbix-agent. &#13;
 3.Create MySQL user for monitoring. For example:&#13;
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
-GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
+GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
 For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. &#13;
 4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default ) or my.cnf in c:\ for Windows. For example:&#13;
 [client]&#13;
@@ -26,7 +26,7 @@ password='&lt;password&gt;'&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql&#13;
 &#13;
-Template tooling version used: 0.37</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -108,6 +108,33 @@ Template tooling version used: 0.37</description>
                      </dependencies>
                   </trigger>
                </triggers>
+            </item>
+            <item>
+               <name>MySQL: Binlog cache disk use</name>
+               <type>DEPENDENT</type>
+               <key>mysql.binlog_cache_disk_use</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of transactions which used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>XMLPATH</type>
+                     <params>/resultset/row[field/text()='Binlog_cache_disk_use']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
             </item>
             <item>
                <name>MySQL: Buffer pool efficiency</name>
@@ -780,6 +807,104 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
+               <name>MySQL: Innodb buffer pool wait free</name>
+               <type>DEPENDENT</type>
+               <key>mysql.innodb_buffer_pool_wait_free</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at increasing innodb_buffer_pool_size.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>XMLPATH</type>
+                     <params>/resultset/row[field/text()='Innodb_buffer_pool_wait_free']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Calculated value of innodb_log_file_size</name>
+               <type>CALCULATED</type>
+               <key>mysql.innodb_log_file_size</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <params>(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}</params>
+               <description>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of innodb_log_file_size. Innodb_log_file_size is size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>MySQL: Innodb number open files</name>
+               <type>DEPENDENT</type>
+               <key>mysql.innodb_num_open_files</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of open files held by InnoDB. InnoDB only.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>XMLPATH</type>
+                     <params>/resultset/row[field/text()='Innodb_num_open_files']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Innodb log written</name>
+               <type>DEPENDENT</type>
+               <key>mysql.innodb_os_log_written</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Number of bytes written to the InnoDB log.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>XMLPATH</type>
+                     <params>/resultset/row[field/text()='Innodb_os_log_written']/field[@name='Value']/text()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
+            </item>
+            <item>
                <name>MySQL: InnoDB row lock time</name>
                <type>DEPENDENT</type>
                <key>mysql.innodb_row_lock_time</key>
@@ -885,6 +1010,60 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Open table definitions</name>
+               <type>DEPENDENT</type>
+               <key>mysql.open_table_definitions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of cached table definitions.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>XMLPATH</type>
+                     <params>/resultset/row[field/text()='Open_table_definitions']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Open tables</name>
+               <type>DEPENDENT</type>
+               <key>mysql.open_tables</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of tables that are open.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>XMLPATH</type>
+                     <params>/resultset/row[field/text()='Open_tables']/field[@name='Value']/text()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1218,6 +1397,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1228,6 +1408,152 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1d</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>MariaDB discovery</name>
+               <type>DEPENDENT</type>
+               <key>mysql.extra_metric.discovery</key>
+               <delay>0</delay>
+               <description>Additional metrics if MariaDB is used.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>MySQL: Binlog commits</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.binlog_commits[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of transactions committed to the binary log.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>XMLPATH</type>
+                           <params>/resultset/row[field/text()='Binlog_commits']/field[@name='Value']/text()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Binlog group commits</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.binlog_group_commits[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of group commits done to the binary log.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>XMLPATH</type>
+                           <params>/resultset/row[field/text()='Binlog_group_commits']/field[@name='Value']/text()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Master GTID wait count</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.master_gtid_wait_count[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of times MASTER_GTID_WAIT called.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>XMLPATH</type>
+                           <params>/resultset/row[field/text()='Master_gtid_wait_count']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Master GTID wait time</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.master_gtid_wait_time[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of time spent in MASTER_GTID_WAIT.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>XMLPATH</type>
+                           <params>/resultset/row[field/text()='Master_gtid_wait_time']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Master GTID wait timeouts</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.master_gtid_wait_timeouts[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of timeouts occurring in MASTER_GTID_WAIT.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>XMLPATH</type>
+                           <params>/resultset/row[field/text()='Master_gtid_wait_timeouts']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(value.search('MariaDB')&gt;-1 ? [{'{#SINGLETON}': ''}] : []);</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1330,6 +1656,34 @@ explicitly stopped it with STOP SLAVE.</description>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
+                     <name>MySQL: Replication Slave SQL Running State {#MASTER_HOST}</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.slave_sql_running_state["{#MASTER_HOST}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>This shows the state of the SQL driver threads.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>XMLPATH</type>
+                           <params>/resultset/row[field/text()='Slave_SQL_Running_State']/field[@name='Value']/text()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>MySQL: Replication Slave SQL Running {#MASTERHOST}</name>
                      <type>DEPENDENT</type>
                      <key>mysql.slave_sql_running["{#MASTERHOST}"]</key>
@@ -1375,7 +1729,7 @@ As with the I/O thread, this should normally be Yes.</description>
                   <item_prototype>
                      <name>MySQL: Replication Slave status {#MASTERHOST}</name>
                      <key>mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTERHOST}"]</key>
-                     <history>1h</history>
+                     <history>0</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
                      <description>The item gets status information on essential parameters of the slave threads.</description>
@@ -1386,6 +1740,7 @@ As with the I/O thread, this should normally be Yes.</description>
                      </applications>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1433,6 +1788,11 @@ return '[]';</params>
                <macro>{$MYSQL.HOST}</macro>
                <value>localhost</value>
                <description>Hostname or IP of MySQL host or container.</description>
+            </macro>
+            <macro>
+               <macro>{$MYSQL.INNODB_LOG_FILES}</macro>
+               <value>2</value>
+               <description>Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.PORT}</macro>

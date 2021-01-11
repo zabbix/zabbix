@@ -883,6 +883,7 @@ z-select,
   z-select button.focusable,
   .z-select button.focusable {
     position: relative;
+    width: 100%;
     height: 24px;
     padding: 3px 18px 3px 4px;
     overflow: hidden;
@@ -1023,7 +1024,7 @@ z-select,
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
-pre, pre a, pre td, pre span {
+pre, pre a, pre td, pre span, .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word; }

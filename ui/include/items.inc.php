@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -996,30 +996,25 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 }
 
 /**
- * @param array $db_hosts
+ * Collect latest value and actual severity value for each item of Data overview table.
+ *
  * @param array $db_items
- * @param array $items_by_name
+ * @param array $data
  * @param int   $show_suppressed
  *
  * @return array
  */
-function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$items_by_name, int $show_suppressed): array {
-	$visible_items = [];
-	foreach ($items_by_name as $hostid_to_itemids) {
-		foreach ($hostid_to_itemids as $itemid) {
-			$visible_items[$itemid] = $db_items[$itemid];
-		}
-	}
-
-	$history = Manager::History()->getLastValues($visible_items, 1, ZBX_HISTORY_PERIOD);
+function getDataOverviewCellData(array $db_items, array $data, int $show_suppressed): array {
+	$history = Manager::History()->getLastValues($db_items, 1, ZBX_HISTORY_PERIOD);
 
 	$db_triggers = getTriggersWithActualSeverity([
 		'output' => ['triggerid', 'priority', 'value'],
 		'selectItems' => ['itemid'],
-		'itemids' => array_keys($visible_items),
+		'itemids' => array_keys($db_items),
 		'monitored' => true,
 		'preservekeys' => true
 	], ['show_suppressed' => $show_suppressed]);
+
 	$itemid_to_triggerids = [];
 	foreach ($db_triggers as $triggerid => $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {
@@ -1030,38 +1025,41 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	foreach ($items_by_name as $hostid_to_itemids) {
-		foreach ($db_hosts as $host) {
-			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
-				continue;
-			}
+	// Apply values and trigger severity to each $data cell.
+	foreach ($data as &$data_clusters) {
+		foreach ($data_clusters as &$data_cluster) {
+			foreach ($data_cluster as &$item) {
+				$itemid = $item['itemid'];
 
-			$itemid = $hostid_to_itemids[$host['hostid']];
-			$visible_items[$itemid]['value'] = array_key_exists($itemid, $history)
-				? $history[$itemid][0]['value']
-				: null;
-			$trigger = null;
+				if (array_key_exists($itemid, $itemid_to_triggerids)) {
+					$max_priority = -1;
+					$max_priority_triggerid = -1;
+					foreach ($itemid_to_triggerids[$itemid] as $triggerid) {
+						$trigger = $db_triggers[$triggerid];
 
-			if (array_key_exists($itemid, $itemid_to_triggerids)) {
-				$max_priority = -1;
-				$max_priority_triggerid = -1;
-				foreach ($itemid_to_triggerids[$itemid] as $triggerid) {
-					$trigger = $db_triggers[$triggerid];
-
-					// Bump lower priority triggers of value "true" ahead of triggers with value "false".
-					$multiplier = ($trigger['value'] == TRIGGER_VALUE_TRUE) ? TRIGGER_SEVERITY_COUNT : 0;
-					if ($trigger['priority'] + $multiplier > $max_priority) {
-						$max_priority_triggerid = $triggerid;
-						$max_priority = $trigger['priority'] + $multiplier;
+						// Bump lower priority triggers of value "true" ahead of triggers with value "false".
+						$multiplier = ($trigger['value'] == TRIGGER_VALUE_TRUE) ? TRIGGER_SEVERITY_COUNT : 0;
+						if ($trigger['priority'] + $multiplier > $max_priority) {
+							$max_priority_triggerid = $triggerid;
+							$max_priority = $trigger['priority'] + $multiplier;
+						}
 					}
+					$trigger = $db_triggers[$max_priority_triggerid];
 				}
-				$trigger = $db_triggers[$max_priority_triggerid];
+				else {
+					$trigger = null;
+				}
+
+				$item += [
+					'value' => array_key_exists($itemid, $history) ? $history[$itemid][0]['value'] : null,
+					'trigger' => $trigger
+				];
 			}
-			$visible_items[$itemid]['trigger'] = $trigger;
 		}
 	}
+	unset($data_clusters, $data_cluster, $item);
 
-	return $visible_items;
+	return $data;
 }
 
 /**
@@ -1072,34 +1070,53 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  * @return array
  */
 function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	$config = select_config();
-
 	if ($application !== '') {
-		$applicationids = array_keys(API::Application()->get([
-			'output' => [],
+		$db_applications = API::Application()->get([
+			'output' => ['hostid'],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'search' => ['name' => $application],
 			'preservekeys' => true
-		]));
+		]);
 
+		$applicationids = array_keys($db_applications);
+		$hostids = array_keys(array_flip(array_column($db_applications, 'hostid')));
+	}
+	else {
+		$applicationids = null;
+	}
+
+	if ($hostids === null) {
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'applicationids' => $applicationids,
+			'monitored_hosts' => true,
+			'with_monitored_items' => true,
+			'preservekeys' => true,
+			'limit' => ZBX_MAX_TABLE_COLUMNS + 1
+		]);
+		$hostids = array_keys($db_hosts);
+	}
+
+	if ($application !== '') {
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'selectHosts' => ['name'],
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
 			'preservekeys' => true
 		]);
 	}
 	else {
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'selectHosts' => ['name'],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
 			'preservekeys' => true
 		]);
 	}
@@ -1111,122 +1128,100 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	return $db_items;
+	return [$db_items, $hostids];
 }
 
 /**
- * @param array  $groupids
- * @param array  $hostids
- * @param array  $itemids
- * @param string $application
+ * @param array   $groupids
+ * @param array   $hostids
+ * @param array   $filter
+ * @param string  $filter['application']
+ * @param int     $filter['show_suppressed']
  *
  * @return array
  */
-function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
-	$config = select_config();
-	if ($application !== '') {
-		$applicationids = array_keys(API::Application()->get([
-			'output' => [],
-			'hostids' => $hostids ? $hostids : null,
-			'groupids' => $groupids ? $groupids : null,
-			'search' => ['name' => $application],
-			'preservekeys' => true
-		]));
+function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
+	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
 
-		$db_hosts = API::Host()->get([
-			'output' => ['name', 'hostid'],
-			'groupids' => $groupids,
-			'applicationids' => $applicationids,
-			'monitored_hosts' => true,
-			'with_monitored_items' => true,
-			'preservekeys' => true,
-			'limit' => $config['search_limit']
-		]);
-	}
-	else {
-		$db_hosts = API::Host()->get([
-			'output' => ['name', 'hostid'],
-			'monitored_hosts' => true,
-			'hostids' => $hostids,
-			'itemids' => $itemids,
-			'groupids' => $groupids,
-			'with_monitored_items' => true,
-			'preservekeys' => true,
-			'limit' => $config['search_limit']
-		]);
+	$data = [];
+	$item_counter = [];
+	$db_hosts = [];
+
+	foreach ($db_items as $db_item) {
+		$item_name = $db_item['name_expanded'];
+		$host_name = $db_item['hosts'][0]['name'];
+		$db_hosts[$db_item['hostid']] = $db_item['hosts'][0];
+
+		if (!array_key_exists($host_name, $item_counter)) {
+			$item_counter[$host_name] = [];
+		}
+
+		if (!array_key_exists($item_name, $item_counter[$host_name])) {
+			$item_counter[$host_name][$item_name] = 0;
+		}
+
+		$item_place = $item_counter[$host_name][$item_name];
+		$item_counter[$host_name][$item_name]++;
+
+		$item = [
+			'itemid' => $db_item['itemid'],
+			'value_type' => $db_item['value_type'],
+			'units' => $db_item['units'],
+			'valuemapid' => $db_item['valuemapid'],
+			'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
+		];
+
+		if (array_key_exists('triggerid', $db_item)) {
+			$item += [
+				'triggerid' => $db_item['triggerid'],
+				'severity' => $db_item['priority'],
+				'tr_value' => $db_item['value']
+			];
+		}
+		else {
+			$item += [
+				'triggerid' => null,
+				'severity' => null,
+				'tr_value' => null
+			];
+		}
+
+		$data[$item_name][$item_place][$host_name] = $item;
 	}
 
 	CArrayHelper::sort($db_hosts, [
-		['field' => 'name', 'order' => ZBX_SORT_UP]
+		['field' => 'name', 'order' => ZBX_SORT_UP],
 	]);
 
-	return $db_hosts;
-}
-
-/**
- * @param array  $groupids
- * @param array  $hostids
- * @param string $application
- *
- * @return array
- */
-function getDataOverviewLeft(?array $groupids, ?array $hostids, string $application = ''): array {
-	$db_items = getDataOverviewItems($groupids, $hostids, $application);
-	$items_by_name = [];
-	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
-			$items_by_name[$db_item['name_expanded']] = [];
-		}
-		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
-	}
-
-	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
-
-	$itemids = [];
-	foreach ($items_by_name as $hostid_to_itemid) {
-		foreach ($hostid_to_itemid as $itemid) {
-			$itemids[] = $itemid;
-		}
-	}
-	$db_items = array_intersect_key($db_items, array_flip($itemids));
-
-	$db_hosts = getDataOverviewHosts(null, null, $itemids);
-	$db_hosts_ctn = count($db_hosts);
+	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
 
-	$has_hidden_data = ($hidden_items_cnt || ($db_hosts_ctn > count($db_hosts)));
-
-	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
-}
-
-/**
- * @param array  $groupids
- * @param array  $hostids
- * @param string $application
- *
- * @return array
- */
-function getDataOverviewTop(?array $groupids, ?array $hostids, string $application = ''): array {
-	$db_hosts = getDataOverviewHosts($groupids, $hostids, null, $application);
-	$hostids = array_keys($db_hosts);
-	$hidden_db_hosts_cnt = count(array_splice($hostids, ZBX_MAX_TABLE_COLUMNS));
-	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));
-
-	$db_items = getDataOverviewItems(null, $hostids, $application);
-	$items_by_name = [];
-	foreach ($db_items as $itemid => $db_item) {
-		if (!array_key_exists($db_item['name_expanded'], $items_by_name)) {
-			$items_by_name[$db_item['name_expanded']] = [];
+	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS);
+	$items_left = ZBX_MAX_TABLE_COLUMNS;
+	$itemids = [];
+	array_walk($data, function (array &$item_columns) use (&$itemids, &$items_left) {
+		if ($items_left != 0) {
+			$item_columns = array_slice($item_columns, 0, min(ZBX_MAX_TABLE_COLUMNS, $items_left));
+			$items_left -= count($item_columns);
 		}
-		$items_by_name[$db_item['name_expanded']][$db_item['hostid']] = $itemid;
-	}
+		else {
+			$item_columns = null;
+			return;
+		}
 
-	$items_by_name_ctn = count($items_by_name);
-	$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
+		array_walk($item_columns, function (array &$item_column) use (&$itemids) {
+			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS);
+			$itemids += array_column($item_column, 'itemid', 'itemid');
+		});
+	});
+	$data = array_filter($data);
 
-	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
+	$has_hidden_items = (count($db_items) != count($itemids));
 
-	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+	$db_items = array_intersect_key($db_items, $itemids);
+	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
+
+	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
 }
 
 /**
