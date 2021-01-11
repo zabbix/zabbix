@@ -25,7 +25,7 @@
 ?>
 
 $(document).ready(function() {
-	$('#script_execution_log').click(function() {
+	$('#script_execution_log').on('click', function() {
 		if ($(this).hasClass('<?= ZBX_STYLE_DISABLED ?>')) {
 			return;
 		}

@@ -348,9 +348,9 @@ class CScript extends CApiService {
 		}
 
 		if ($scripts_params) {
-			$ins_script_param = [];
-			$del_script_param = [];
-			$upd_script_param = [];
+			$insert_script_param = [];
+			$delete_script_param = [];
+			$update_script_param = [];
 			$db_scripts_params = DB::select('script_param', [
 				'output' => ['script_paramid', 'scriptid', 'name', 'value'],
 				'filter' => ['scriptid' => array_keys($scripts_params)]
@@ -359,14 +359,11 @@ class CScript extends CApiService {
 			foreach ($db_scripts_params as $param) {
 				$scriptid = $param['scriptid'];
 
-				if (!array_key_exists($scriptid, $scripts_params)) {
-					$del_script_param[] = $param['script_paramid'];
-				}
-				elseif (!array_key_exists($param['name'], $scripts_params[$scriptid])) {
-					$del_script_param[] = $param['script_paramid'];
+				if (!array_key_exists($param['name'], $scripts_params[$scriptid])) {
+					$delete_script_param[] = $param['script_paramid'];
 				}
 				elseif ($scripts_params[$scriptid][$param['name']] !== $param['value']) {
-					$upd_script_param[] = [
+					$update_script_param[] = [
 						'values' => ['value' => $scripts_params[$scriptid][$param['name']]],
 						'where' => ['script_paramid' => $param['script_paramid']]
 					];
@@ -381,20 +378,20 @@ class CScript extends CApiService {
 
 			foreach ($scripts_params as $scriptid => $params) {
 				foreach ($params as $name => $value) {
-					$ins_script_param[] = compact('scriptid', 'name', 'value');
+					$insert_script_param[] = compact('scriptid', 'name', 'value');
 				}
 			}
 
-			if ($del_script_param) {
-				DB::delete('script_param', ['script_paramid' => array_keys(array_flip($del_script_param))]);
+			if ($delete_script_param) {
+				DB::delete('script_param', ['script_paramid' => array_keys(array_flip($delete_script_param))]);
 			}
 
-			if ($upd_script_param) {
-				DB::update('script_param', $upd_script_param);
+			if ($update_script_param) {
+				DB::update('script_param', $update_script_param);
 			}
 
-			if ($ins_script_param) {
-				DB::insert('script_param', $ins_script_param);
+			if ($insert_script_param) {
+				DB::insert('script_param', $insert_script_param);
 			}
 		}
 

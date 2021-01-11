@@ -1139,7 +1139,7 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 				scriptid: script.scriptid,
 				confirmation: script.confirmation,
 				hostid: hostid,
-				eventid: eventid,
+				eventid: eventid
 			});
 		}
 	}
@@ -1158,7 +1158,9 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.menu-popup-top').menuPopup('close', trigger_elm, false);
+						jQuery(this)
+							.closest('.menu-popup-top')
+							.menuPopup('close', trigger_elm, false);
 						executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
 							data.params.eventid
 						);

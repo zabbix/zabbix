@@ -143,14 +143,14 @@ class CZabbixServer {
 	/**
 	 * Executes a script on the given host or event and returns the result.
 	 *
-	 * @param $scriptid
-	 * @param $sid
-	 * @param $hostid
-	 * @param $eventid
+	 * @param string      $scriptid
+	 * @param string      $sid
+	 * @param null|string $hostid
+	 * @param null|string $eventid
 	 *
 	 * @return bool|array
 	 */
-	public function executeScript(string $scriptid, string $sid, string $hostid = null, string $eventid = null) {
+	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null) {
 		$params = [
 			'request' => 'command',
 			'scriptid' => $scriptid,

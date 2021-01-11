@@ -24,20 +24,20 @@ class CControllerScriptCreate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>					'db scripts.name',
-			'type' =>					'db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI.','.ZBX_SCRIPT_TYPE_WEBHOOK,
-			'execute_on' =>				'db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
-			'command' =>				'db scripts.command     |flags '.P_CRLF,
-			'commandipmi' =>			'db scripts.command     |flags '.P_CRLF,
+			'type' =>					'db scripts.type|in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI.','.ZBX_SCRIPT_TYPE_WEBHOOK,
+			'execute_on' =>				'db scripts.execute_on|in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
+			'command' =>				'db scripts.command|flags '.P_CRLF,
+			'commandipmi' =>			'db scripts.command|flags '.P_CRLF,
 			'parameters' =>				'array',
-			'script' => 				'db scripts.command     |flags '.P_CRLF,
-			'timeout' => 				'db scripts.timeout     |time_unit '.implode(':', [1, 60]),
+			'script' => 				'db scripts.command|flags '.P_CRLF,
+			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, 60]),
 			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access |in '.PERM_READ.','.PERM_READ_WRITE,
+			'host_access' =>			'db scripts.host_access|in '.PERM_READ.','.PERM_READ_WRITE,
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
-			'hgstype' =>				'                        in 0,1',
+			'hgstype' =>				'in 0,1',
 			'confirmation' =>			'db scripts.confirmation|not_empty',
-			'enable_confirmation' =>	'                        in 1',
+			'enable_confirmation' =>	'in 1',
 			'form_refresh' =>			'int32'
 		];
 
@@ -87,9 +87,7 @@ class CControllerScriptCreate extends CController {
 			if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
 				$script['parameters'] = array_map(function ($name, $value) {
 						return compact('name', 'value');
-					},
-					$parameters['name'],
-					$parameters['value']
+					}, $parameters['name'], $parameters['value']
 				);
 			}
 		}
@@ -109,9 +107,7 @@ class CControllerScriptCreate extends CController {
 			CMessageHelper::setSuccessTitle(_('Script added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'script.edit')
-			);
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'script.edit'));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add script'));
 		}

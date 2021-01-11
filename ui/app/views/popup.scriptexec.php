@@ -43,19 +43,18 @@ if ($data['success']) {
 		);
 	}
 
-	$form_items[] = (new CFormList())
-		->addRow(
-			new CLabel($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK ? _('Response') : _('Output')),
-			$row_decription
-		);
+	$form_items[] = (new CFormList())->addRow(
+		new CLabel($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK ? _('Response') : _('Output')),
+		$row_decription
+	);
 }
+
+$form = (new CForm())->addItem($form_items);
 
 $output = [
 	'header' => $data['title'],
 	'script_inline' => $this->readJsFile('popup.scriptexec.js.php'),
-	'body' => (new CForm())
-		->addItem($form_items)
-		->toString(),
+	'body' => $form->toString(),
 	'buttons' => null
 ];
 

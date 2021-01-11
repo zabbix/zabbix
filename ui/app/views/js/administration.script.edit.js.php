@@ -30,59 +30,59 @@
 		$('#type')
 			.change(function() {
 				let type = $('input[name=type]:checked').val(),
-					execute_on = $('#execute_on');
-					command_ipmi = $('#commandipmi'),
-					command = $('#command');
-					parameters = $('#row_webhook_parameters'),
-					script = $('#script'),
-					timeout = $('#timeout');
+					$execute_on = $('#execute_on');
+					$command_ipmi = $('#commandipmi'),
+					$command = $('#command');
+					$parameters = $('#row_webhook_parameters'),
+					$script = $('#script'),
+					$timeout = $('#timeout');
 
 				if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
-					if (command.val() !== '') {
-						command_ipmi.val(command.val());
-						command.val('');
+					if ($command.val() !== '') {
+						$command_ipmi.val($command.val());
+						$command.val('');
 					}
 
-					execute_on
-						.add(command)
-						.add(parameters)
-						.add(script)
-						.add(timeout)
+					$execute_on
+						.add($command)
+						.add($parameters)
+						.add($script)
+						.add($timeout)
 						.closest('li')
 						.hide();
 
-					command_ipmi
+					$command_ipmi
 						.closest('li')
 						.show();
 				}
 				else if (type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>) {
-					if (command_ipmi.val() !== '') {
-						command.val(command_ipmi.val());
-						command_ipmi.val('');
+					if ($command_ipmi.val() !== '') {
+						$command.val($command_ipmi.val());
+						$command_ipmi.val('');
 					}
 
-					command_ipmi
-						.add(parameters)
-						.add(script)
-						.add(timeout)
+					$command_ipmi
+						.add($parameters)
+						.add($script)
+						.add($timeout)
 						.closest('li')
 						.hide();
 
-					execute_on
-						.add(command)
+					$execute_on
+						.add($command)
 						.closest('li')
 						.show();
 				}
 				else if (type == <?= ZBX_SCRIPT_TYPE_WEBHOOK ?>) {
-					execute_on
-						.add(command)
-						.add(command_ipmi)
+					$execute_on
+						.add($command)
+						.add($command_ipmi)
 						.closest('li')
 						.hide();
 
-					parameters
-						.add(script)
-						.add(timeout)
+					$parameters
+						.add($script)
+						.add($timeout)
 						.closest('li')
 						.show();
 				}
@@ -139,7 +139,7 @@
 
 		// trim spaces on sumbit
 		$('#scriptForm').submit(function() {
-			$(this).trimValues(['#name', '#command', '#description']);
+			$(this).trimValues(['#name', '#command', '#commandipmi', '#description']);
 		});
 
 		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
