@@ -20,9 +20,8 @@
 package memory
 
 import (
-	"errors"
-
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -35,7 +34,7 @@ var impl Plugin
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	switch key {
@@ -48,7 +47,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-
 }
 
 func init() {

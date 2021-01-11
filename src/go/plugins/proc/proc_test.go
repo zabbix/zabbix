@@ -32,12 +32,6 @@ func BenchmarkRead2k(b *testing.B) {
 	}
 }
 
-func BenchmarkReadAll(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = readAll("/proc/self/stat")
-	}
-}
-
 func BenchmarkSyscallRead(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		buffer := make([]byte, 2048)

@@ -20,32 +20,21 @@
 package memory
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
-	"strconv"
-	"strings"
-	"syscall"
 
 	"zabbix.com/pkg/plugin"
-)
-
-const (
-	kB = 1024
-	mB = kB * 1024
-	gB = mB * 1024
-	tB = gB * 1024
+	"zabbix.com/pkg/procfs"
 )
 
 func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error) {
 	var mem float64
 	switch mode {
 	case "total", "":
-		mem, err = getMemory("MemTotal")
+		mem, err = procfs.GetMemory("MemTotal")
 	case "free":
-		mem, err = getMemory("MemFree")
+		mem, err = procfs.GetMemory("MemFree")
 	case "buffers":
-		mem, err = getMemory("Buffers")
+		mem, err = procfs.GetMemory("Buffers")
 	case "used":
 		mem, err = getUsed(false)
 	case "pused":
@@ -57,15 +46,15 @@ func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error)
 	case "shared":
 		return nil, plugin.UnsupportedMetricError
 	case "cached":
-		mem, err = getMemory("Cached")
+		mem, err = procfs.GetMemory("Cached")
 	case "active":
-		mem, err = getMemory("Active")
+		mem, err = procfs.GetMemory("Active")
 	case "anon":
-		mem, err = getMemory("AnonPages")
+		mem, err = procfs.GetMemory("AnonPages")
 	case "inactive":
-		mem, err = getMemory("Inactive")
+		mem, err = procfs.GetMemory("Inactive")
 	case "slab":
-		mem, err = getMemory("Slab")
+		mem, err = procfs.GetMemory("Slab")
 	default:
 		return nil, errors.New("Invalid first parameter.")
 	}
@@ -80,11 +69,11 @@ func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error)
 }
 
 func getUsed(percent bool) (float64, error) {
-	total, err := getMemory("MemTotal")
+	total, err := procfs.GetMemory("MemTotal")
 	if err != nil {
 		return 0, err
 	}
-	free, err := getMemory("MemFree")
+	free, err := procfs.GetMemory("MemFree")
 	if err != nil {
 		return 0, err
 	}
@@ -98,17 +87,17 @@ func getUsed(percent bool) (float64, error) {
 }
 
 func getAvailable(percent bool) (float64, error) {
-	mem, err := getMemory("MemAvailable")
+	mem, err := procfs.GetMemory("MemAvailable")
 	if err != nil {
-		cached, err := getMemory("Cached")
+		cached, err := procfs.GetMemory("Cached")
 		if err != nil {
 			return 0, err
 		}
-		free, err := getMemory("MemFree")
+		free, err := procfs.GetMemory("MemFree")
 		if err != nil {
 			return 0, err
 		}
-		buff, err := getMemory("Buffers")
+		buff, err := procfs.GetMemory("Buffers")
 		if err != nil {
 			return 0, err
 		}
@@ -116,7 +105,7 @@ func getAvailable(percent bool) (float64, error) {
 	}
 
 	if percent {
-		total, err := getMemory("MemTotal")
+		total, err := procfs.GetMemory("MemTotal")
 		if err != nil {
 			return 0, err
 		}
@@ -124,80 +113,4 @@ func getAvailable(percent bool) (float64, error) {
 	}
 
 	return mem, nil
-}
-
-func getMemory(memType string) (mem float64, err error) {
-	meminfo, err := readAll("/proc/meminfo")
-	if err != nil {
-		return mem, fmt.Errorf("cannot read meminfo file: %s", err.Error())
-	}
-
-	var found bool
-	mem, found, err = byteFromProcFileData(meminfo, memType)
-	if err != nil {
-		return mem, fmt.Errorf("cannot get the memory amount for %s: %s", memType, err.Error())
-	}
-
-	if !found {
-		return mem, fmt.Errorf("cannot get the memory amount for %s", memType)
-	}
-
-	return
-}
-
-func readAll(filename string) (data []byte, err error) {
-	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
-	if err != nil {
-		return
-	}
-	defer syscall.Close(fd)
-	var buf bytes.Buffer
-	b := make([]byte, 2048)
-	for {
-		var n int
-		if n, err = syscall.Read(fd, b); err != nil {
-			return
-		}
-		if n == 0 {
-			return buf.Bytes(), nil
-		}
-		if _, err = buf.Write(b[:n]); err != nil {
-			return
-		}
-	}
-}
-
-func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
-	for _, line := range strings.Split(string(data), "\n") {
-		i := strings.Index(line, ":")
-		if i < 0 || valueName != line[:i] {
-			continue
-		}
-
-		line = line[i+1:]
-		if len(line) < 3 {
-			continue
-		}
-
-		v, err := strconv.Atoi(strings.TrimSpace(line[:len(line)-2]))
-		if err != nil {
-			return 0, false, err
-		}
-
-		switch line[len(line)-2:] {
-		case "kB":
-			v *= kB
-		case "mB":
-			v *= mB
-		case "GB":
-			v *= gB
-		case "TB":
-			v *= tB
-		default:
-			return 0, false, errors.New("cannot resolve value type")
-		}
-		return float64(v), true, nil
-	}
-
-	return 0, false, nil
 }

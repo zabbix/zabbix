@@ -38,6 +38,7 @@ import (
 
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/procfs"
 )
 
 const (
@@ -453,7 +454,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 
 	var mem float64
 	if memtype == "pmem" {
-		mem, err = getMemory()
+		mem, err = procfs.GetMemory("MemTotal")
 		if err != nil {
 			p.Debugf("cannot obtain memory: %s", err.Error())
 			return 0, nil
@@ -504,14 +505,14 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 			continue
 		}
 
-		data, err := readAll("/proc/" + strconv.FormatInt(proc.pid, 10) + "/status")
+		data, err := procfs.ReadAll("/proc/" + strconv.FormatInt(proc.pid, 10) + "/status")
 		if err != nil {
 			return nil, fmt.Errorf("Failed to read status file for pid '%d': %s", proc.pid, err.Error())
 		}
 
 		switch memtype {
 		case "pmem":
-			vmRSS, found, err := byteFromProcFileData(data, "VmRSS")
+			vmRSS, found, err := procfs.ByteFromProcFileData(data, "VmRSS")
 			if err != nil {
 				return nil, fmt.Errorf("Cannot obtain amount of VmRSS: %s", err.Error())
 			}
@@ -522,7 +523,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 
 			value = vmRSS / mem * 100.00
 		case "size":
-			vmData, found, err := byteFromProcFileData(data, "VmData")
+			vmData, found, err := procfs.ByteFromProcFileData(data, "VmData")
 			if err != nil {
 				return nil, fmt.Errorf("Cannot obtain amount of VmData: %s", err.Error())
 			}
@@ -531,7 +532,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 				continue
 			}
 
-			vmStk, found, err := byteFromProcFileData(data, "VmStk")
+			vmStk, found, err := procfs.ByteFromProcFileData(data, "VmStk")
 			if err != nil {
 				return nil, fmt.Errorf("Cannot obtain amount of VmStk: %s", err.Error())
 			}
@@ -540,7 +541,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 				continue
 			}
 
-			vmExe, found, err := byteFromProcFileData(data, "VmExe")
+			vmExe, found, err := procfs.ByteFromProcFileData(data, "VmExe")
 			if err != nil {
 				return nil, fmt.Errorf("Cannot obtain amount of VmExe: %s", err.Error())
 			}
@@ -550,7 +551,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 			}
 			value = float64(vmData + vmStk + vmExe)
 		default:
-			value, found, err = byteFromProcFileData(data, typeStr)
+			value, found, err = procfs.ByteFromProcFileData(data, typeStr)
 			if err != nil {
 				return nil, fmt.Errorf("Cannot obtain amount of %s: %s", typeStr, err.Error())
 			}
