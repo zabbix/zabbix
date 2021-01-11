@@ -41,6 +41,10 @@ class testFormTagsTrigger extends testFormTags {
 		$this->checkTagsCreate($data, 'trigger', $expression);
 	}
 
+	public function testFormTagsTrigger_Screenshot() {
+		$this->checkTagScreenshot('trigger');
+	}
+
 	/**
 	 * Test update of Trigger with tags.
 	 *

@@ -41,6 +41,10 @@ class testFormTagsTemplate extends testFormTags {
 		$this->checkTagsCreate($data, 'template');
 	}
 
+	public function testFormTagsTemplate_Screenshot() {
+		$this->checkTagScreenshot('template');
+	}
+
 	/**
 	 * Test update of Template with tags
 	 *
