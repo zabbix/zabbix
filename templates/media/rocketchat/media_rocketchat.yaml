@@ -160,7 +160,7 @@ zabbix_export:
         
                 var response,
                     url = RocketChat.params.url + query,
-                    request = new CurlHttpRequest();
+                    request = new HttpRequest();
         
                 request.addHeader('Content-Type: application/json');
                 request.addHeader('X-Auth-Token:' + RocketChat.params.user_token);
