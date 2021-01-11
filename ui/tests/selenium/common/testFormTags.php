@@ -232,6 +232,11 @@ class testFormTags extends CWebTest {
 		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
 	}
 
+	/**
+	 * Check tag fields size.
+	 *
+	 * @param string   $object       host, template, trigger or prototype
+	 */
 	public function checkTagScreenshot($object) {
 		$this->page->login()->open($this->link);
 		$this->query('xpath://a[contains(@href, "'.$object.'") and contains(text(), "Long tag name and value")]')->waitUntilPresent()->one()->click();
