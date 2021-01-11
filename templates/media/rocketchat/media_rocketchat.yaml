@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-12-31T14:56:31Z'
+  date: '2021-01-11T14:01:55Z'
   media_types:
     -
       name: Rocket.Chat
@@ -46,16 +46,16 @@ zabbix_export:
           name: 'field_3_short:Event time'
           value: '{EVENT.DATE} {EVENT.TIME}'
         -
-          name: 'field_3_short:Recovery time'
+          name: 'field_3_short_r:Recovery time'
           value: '{EVENT.RECOVERY.DATE} {EVENT.RECOVERY.TIME}'
         -
-          name: 'field_4_short:Event duration'
+          name: 'field_4_short_r:Event duration'
           value: '{EVENT.DURATION}'
         -
           name: 'field_5_short:Operational data'
           value: '{EVENT.OPDATA}'
         -
-          name: 'field_999_full:Trigger description'
+          name: 'field_999_full_p:Trigger description'
           value: '{TRIGGER.DESCRIPTION}'
         -
           name: rc_api_url
@@ -77,7 +77,7 @@ zabbix_export:
           value: '<PLACE YOUR INSTANCE URL HERE>'
         -
           name: rc_user_id
-          value: '<PLACE LOGIN HERE>'
+          value: '<PLACE USER ID HERE>'
         -
           name: rc_user_token
           value: '<PLACE TOKEN HERE>'
@@ -125,14 +125,19 @@ zabbix_export:
                             }
                             else {
                                 try {
-                                    var parts = field.split(':');
+                                    var parts = field.split(':'),
+                                        prefix = parts[0].split('_');
         
-                                    data.push({
-                                        title: field.substring(field.indexOf(':') + 1),
-                                        value: fields[field],
-                                        short: parts[0].split('_')[1] === 'short'
-                                    });
-        
+                                    if (typeof prefix[2] === 'undefined'
+                                            || (prefix[2] === 'p' && params.event_value === '0')
+                                            || (prefix[2] === 'r' && params.event_recovery_value === '0')
+                                            || (prefix[2] === 'u' && params.event_update_status === '1')) {
+                                        data.push({
+                                            title: field.substring(field.indexOf(':') + 1),
+                                            value: fields[field],
+                                            short: prefix[1] === 'short'
+                                        });
+                                    }
                                 }
                                 catch (error) {
                                     Zabbix.log(4, '[ RocketChat Webhook ] Can\'t parse field "' + field +
@@ -291,11 +296,11 @@ zabbix_export:
         
                 switch (room.response.room.t) {
                     case 'c':
-                        link += 'channel/' + rid + '?msg=' + id;
+                        link += 'channel/' + room.response.room.name + '?msg=' + id;
                         break;
         
                     case 'p':
-                        link += 'group/' + rid + '?msg=' + id;
+                        link += 'group/' + room.response.room.name + '?msg=' + id;
                         break;
         
                     case 'd':
@@ -391,7 +396,7 @@ zabbix_export:
                 result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);
             }
             // Send message for trigger-based events.
-            if (params.event_value === '1' && update.status === '0') {
+            else if (params.event_value === '1' && update.status === '0') {
                 response = RocketChat.postMessage(false, params.alert_message, fields);
                 result.tags.__zbx_rc_id = response.id;
                 result.tags.__zbx_rc_rid = response.rid;
