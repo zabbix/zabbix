@@ -110,11 +110,7 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-// overview type
-if (hasRequest('type')) {
-	CProfile::update('web.overview.type', getRequest('type'), PROFILE_TYPE_INT);
-}
-$type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
+$type = getRequest('type', SHOW_TRIGGERS);
 
 // overview style
 if (hasRequest('view_style')) {
