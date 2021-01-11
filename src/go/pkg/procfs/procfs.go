@@ -37,6 +37,9 @@ const (
 	tB = gB * 1024
 )
 
+// GetMemory reads /proc/meminfo file and returns and returns the value in bytes for the
+// specific memory type. Returns an error if the value was not found, or if theres is an issue
+// with reading the file or parsing the value.
 func GetMemory(memType string) (mem float64, err error) {
 	meminfo, err := ReadAll("/proc/meminfo")
 	if err != nil {
@@ -56,7 +59,8 @@ func GetMemory(memType string) (mem float64, err error) {
 	return
 }
 
-// ReadAll +.
+// ReadAll reads all data from a file. Returns an error if there is an issue with reading the file or
+// writing the output.
 func ReadAll(filename string) (data []byte, err error) {
 	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
 	if err != nil {
@@ -79,7 +83,9 @@ func ReadAll(filename string) (data []byte, err error) {
 	}
 }
 
-// ByteFromProcFileData +
+// ByteFromProcFileData returns the value in bytes of the provided value name from the provided
+// process file data. Returns true if the value is found, and false if it is not or if there is an
+// error. Returns an error if the theres is an issue with parsing values.
 func ByteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
 	for _, line := range strings.Split(string(data), "\n") {
 		i := strings.Index(line, ":")
