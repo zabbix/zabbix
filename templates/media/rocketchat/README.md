@@ -2,7 +2,7 @@
 
 This guide describes how to integrate Zabbix 5.0 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations are supported only for trigger-based events.<br>
-By default, all new alerts will be posted as messages with attachment card. Event updates and resolve messages will be added in thread of the first message.
+By default, all new alerts will be posted as messages with an attachment card. Event updates and resolve messages will be added in the thread of the first message.
 
 ## Setting up Rocket.Chat
 1\. Create a user for API or use an existing one. Make sure the user is able to post messages in the required channel.<br>
@@ -27,13 +27,17 @@ The following parameters should be filled:<br>
 **use_default_message** - **false** (default) or **true**. If **true** all messages will be posted as text of *{ALERT.MESSAGE}.* For non trigger-based notifications always setted up as **true**.<br>
 **field_1_short:Host** - contains data for each field of the attachment. "Field" parameters with another format or empty value will be ignored.<br>
 Format explanation:<br>
-- *filed_* - prefix of the parameter with field info.
+- *filed* - prefix of the parameter with field info.
 - *1* - the position of the field. Fields with the same position will be added in alphabetical order.
 - *short* - is the field should be short or not. If *short*, there can be few fields on one line, else the field will be placed on a separate line.
+- *p* - used if the field should be sent only on problem/recovery/update operation. Possible values:
+    - *p* - problem
+    - *r* - recovery
+    - *u* - update
 - *Host* - the title of the field. There can be any text including whitespaces or symbols.
 
 4\. Create a **Zabbix user** and add **Media** with the **Rocket.Chat** media type.
-"Send to" field should be like *#channel_name* or *@username*. If you specify the channel in the **rc_send_to** parameter, to comply with frontend requirements, you can put any symbol there.
+"Send to" field should be like `#channel_name` or `@username`. If you specify the channel in the **rc_send_to** parameter, to comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into Rocket.Chat tasks.
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Rocket.Chat](https://docs.rocket.chat/) documentations.

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-12-31T04:41:53Z</date>
+    <date>2021-01-11T14:14:16Z</date>
     <media_types>
         <media_type>
             <name>Rocket.Chat</name>
@@ -60,11 +60,11 @@
                     <value>{EVENT.DATE} {EVENT.TIME}</value>
                 </parameter>
                 <parameter>
-                    <name>field_3_short:Recovery time</name>
+                    <name>field_3_short_r:Recovery time</name>
                     <value>{EVENT.RECOVERY.DATE} {EVENT.RECOVERY.TIME}</value>
                 </parameter>
                 <parameter>
-                    <name>field_4_short:Event duration</name>
+                    <name>field_4_short_r:Event duration</name>
                     <value>{EVENT.DURATION}</value>
                 </parameter>
                 <parameter>
@@ -72,7 +72,7 @@
                     <value>{EVENT.OPDATA}</value>
                 </parameter>
                 <parameter>
-                    <name>field_999_full:Trigger description</name>
+                    <name>field_999_full_p:Trigger description</name>
                     <value>{TRIGGER.DESCRIPTION}</value>
                 </parameter>
                 <parameter>
@@ -152,14 +152,19 @@
                     }&#13;
                     else {&#13;
                         try {&#13;
-                            var parts = field.split(':');&#13;
+                            var parts = field.split(':'),&#13;
+                                prefix = parts[0].split('_');&#13;
 &#13;
-                            data.push({&#13;
-                                title: field.substring(field.indexOf(':') + 1),&#13;
-                                value: fields[field],&#13;
-                                short: parts[0].split('_')[1] === 'short'&#13;
-                            });&#13;
-&#13;
+                            if (typeof prefix[2] === 'undefined'&#13;
+                                    || (prefix[2] === 'p' &amp;&amp; params.event_value === '0')&#13;
+                                    || (prefix[2] === 'r' &amp;&amp; params.event_recovery_value === '0')&#13;
+                                    || (prefix[2] === 'u' &amp;&amp; params.event_update_status === '1')) {&#13;
+                                data.push({&#13;
+                                    title: field.substring(field.indexOf(':') + 1),&#13;
+                                    value: fields[field],&#13;
+                                    short: prefix[1] === 'short'&#13;
+                                });&#13;
+                            }&#13;
                         }&#13;
                         catch (error) {&#13;
                             Zabbix.Log(4, '[ RocketChat Webhook ] Can\'t parse field &quot;' + field +&#13;
