@@ -146,6 +146,7 @@ static char	*read_file(const char *filename, char **error)
 	return data;
 }
 
+/*
 static char	*execute_script(const char *script, const char *param, int timeout, char **error)
 {
 	zbx_es_t	es;
@@ -189,6 +190,7 @@ out:
 
 	return result;
 }
+*/
 
 int	main(int argc, char **argv)
 {
@@ -289,7 +291,7 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (NULL == (result = execute_script(script, param, timeout, &error)))
+	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, &error, NULL))
 	{
 		zbx_error("error executing script:\n%s", error);
 		goto close;

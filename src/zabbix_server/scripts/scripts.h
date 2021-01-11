@@ -23,11 +23,17 @@
 #include "common.h"
 #include "dbcache.h"
 
+typedef enum
+{
+	ZBX_SCRIPT_CTX_HOST,
+	ZBX_SCRIPT_CTX_EVENT
+} zbx_script_exec_context;
+
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
-		size_t max_error_len, char **debug);
-int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
-		size_t max_error_len, zbx_uint64_t eventid);
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, size_t max_error_len,
+		char *error, char **debug);
+int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, size_t max_error_len,
+		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error);
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now);
 #endif

@@ -30,17 +30,9 @@
 #include "scripts.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
-#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
-
-typedef struct
-{
-	char	*name;
-	char	*value;
-}
-zbx_webhook_param_t;
 
 static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)
@@ -321,164 +313,29 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->command_orig);
 }
 
-static void	zbx_free_event(DB_EVENT *event)
-{
-	zbx_free(event->name);
+void	zbx_db_free_event(DB_EVENT *event);
 
-	if (EVENT_SOURCE_TRIGGERS == event->source)
-	{
-		zbx_free(event->trigger.description);
-		zbx_free(event->trigger.expression);
-		zbx_free(event->trigger.recovery_expression);
-		zbx_free(event->trigger.correlation_tag);
-		zbx_free(event->trigger.opdata);
-		zbx_free(event->trigger.event_name);
-
-		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
-		zbx_vector_ptr_destroy(&event->tags);
-	}
-
-	zbx_free(event);
-}
+void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
 
 static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			i, index;
-	zbx_vector_uint64_t	trigger_eventids, triggerids;
-	DB_RESULT		result;
-	DB_ROW			row;
-	DB_EVENT		*event = NULL;
+	zbx_vector_ptr_t	events;
+	zbx_vector_uint64_t	eventids;
+	DB_EVENT		*evt = NULL;
 
-	zbx_vector_uint64_create(&trigger_eventids);
-	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_ptr_create(&events);
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_append(&eventids, eventid);
 
-	/* read event data */
-	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns,name,severity"
-			" from events"
-			" where eventid=" ZBX_FS_UI64
-			" order by eventid", eventid);
+	zbx_db_get_events_by_eventids(&eventids, &events);
 
-	if (NULL != (row = DBfetch(result)))
-	{
-		event = (DB_EVENT *)zbx_malloc(event, sizeof(DB_EVENT));
-		ZBX_STR2UINT64(event->eventid, row[0]);
-		event->source = atoi(row[1]);
-		event->object = atoi(row[2]);
-		ZBX_STR2UINT64(event->objectid, row[3]);
-		event->clock = atoi(row[4]);
-		event->value = atoi(row[5]);
-		event->acknowledged = atoi(row[6]);
-		event->ns = atoi(row[7]);
-		event->name = zbx_strdup(NULL, row[8]);
-		event->severity = atoi(row[9]);
-		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+	if (0 < events.values_num)
+		evt = (DB_EVENT*)events.values[0];
 
-		event->trigger.triggerid = 0;
+	zbx_vector_ptr_destroy(&events);
+	zbx_vector_uint64_destroy(&eventids);
 
-		if (EVENT_SOURCE_TRIGGERS == event->source)
-		{
-			zbx_vector_ptr_create(&event->tags);
-			zbx_vector_uint64_append(&trigger_eventids, event->eventid);
-		}
-
-		if (EVENT_OBJECT_TRIGGER == event->object)
-			zbx_vector_uint64_append(&triggerids, event->objectid);
-	}
-
-	DBfree_result(result);
-
-	/* read event_suppress data */
-
-	if (NULL != event)
-	{
-		result = DBselect("select distinct eventid from event_suppress where eventid=" ZBX_FS_UI64
-				" order by eventid", eventid);
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			zbx_uint64_t	eventid;
-
-			ZBX_STR2UINT64(eventid, row[0]);
-			event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
-		}
-		DBfree_result(result);
-
-		if (0 != trigger_eventids.values_num)	/* EVENT_SOURCE_TRIGGERS */
-		{
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", trigger_eventids.values,
-					trigger_eventids.values_num);
-
-			result = DBselect("select eventid,tag,value from event_tag where %s order by eventid", sql);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				zbx_uint64_t	eventid;
-				zbx_tag_t	*tag;
-
-				ZBX_STR2UINT64(eventid, row[0]);
-
-				tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-				tag->tag = zbx_strdup(NULL, row[1]);
-				tag->value = zbx_strdup(NULL, row[2]);
-				zbx_vector_ptr_append(&event->tags, tag);
-			}
-			DBfree_result(result);
-		}
-
-		if (0 != triggerids.values_num)	/* EVENT_OBJECT_TRIGGER */
-		{
-			zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-			sql_offset = 0;
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values,
-					triggerids.values_num);
-
-			result = DBselect(
-					"select triggerid,description,expression,priority,comments,url,"
-						"recovery_expression,"
-						"recovery_mode,value,opdata,event_name"
-						" from triggers"
-						" where%s",
-						sql);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				zbx_uint64_t	triggerid;
-
-				ZBX_STR2UINT64(triggerid, row[0]);
-
-				if (EVENT_OBJECT_TRIGGER != event->object)
-					continue;
-
-				if (triggerid == event->objectid)
-				{
-					event->trigger.triggerid = triggerid;
-					event->trigger.description = zbx_strdup(NULL, row[1]);
-					event->trigger.expression = zbx_strdup(NULL, row[2]);
-					ZBX_STR2UCHAR(event->trigger.priority, row[3]);
-					event->trigger.comments = zbx_strdup(NULL, row[4]);
-					event->trigger.url = zbx_strdup(NULL, row[5]);
-					event->trigger.recovery_expression = zbx_strdup(NULL, row[6]);
-					ZBX_STR2UCHAR(event->trigger.recovery_mode, row[7]);
-					ZBX_STR2UCHAR(event->trigger.value, row[8]);
-					event->trigger.opdata = zbx_strdup(NULL, row[9]);
-					event->trigger.event_name = ('\0' != *row[10] ? zbx_strdup(NULL, row[10]) :
-							NULL);
-				}
-			}
-			DBfree_result(result);
-		}
-	}
-
-	zbx_free(sql);
-
-	zbx_vector_uint64_destroy(&trigger_eventids);
-	zbx_vector_uint64_destroy(&triggerids);
-
-	return event;
+	return evt;
 }
 
 /******************************************************************************
@@ -488,10 +345,12 @@ static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
  * Purpose: prepares user script                                              *
  *                                                                            *
  * Parameters: host          - [IN] the host the script will be executed on   *
- *             script        - [IN/OUT] the script to prepare                 *
+ *             script        - [IN] the script to prepare                     *
  *             user          - [IN] the user executing script (can be NULL)   *
- *             error         - [OUT] the error message output buffer          *
- *             mas_error_len - [IN] the size of error message output buffer   *
+ *             max_error_len - [IN] the size of error message output buffer   *
+ *             ctx           - [IN] the execution context of a script         *
+ *             eventid       - [IN] the eventid for macro resolving           *
+ *             error         - [OUT] the error message buffer                 *
  *                                                                            *
  * Return value:  SUCCEED - the script has been prepared successfully         *
  *                FAIL    - otherwise, error contains error message           *
@@ -502,14 +361,12 @@ static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, char *error,
-		size_t max_error_len, zbx_uint64_t eventid)
+int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, size_t max_error_len,
+		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error)
 {
-	int			ret = FAIL, macro_mask;
+	int			macro_mask, ret = FAIL;
 	zbx_uint64_t		groupid, userid, *p_userid = NULL;
 	DB_EVENT		*event = NULL;
-	zbx_vector_ptr_t	events;
-	zbx_vector_uint64_t	eventids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -542,12 +399,10 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 			macro_mask = MACRO_TYPE_SCRIPT;
 
-			if (ZBX_MAX_UINT64 != eventid) {
-				if (NULL != (event = zbx_get_event_by_eventid(eventid)))
-				{
-					macro_mask |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL |
-							MACRO_TYPE_MESSAGE_RECOVERY);
-				}
+			if (ZBX_SCRIPT_CTX_EVENT == ctx && NULL != (event = zbx_get_event_by_eventid(eventid)))
+			{
+				macro_mask |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL |
+						MACRO_TYPE_MESSAGE_RECOVERY);
 			}
 
 			if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
@@ -563,7 +418,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			}
 
 			if (NULL != event)
-				zbx_free_event(event);
+				zbx_db_free_event(event);
 
 			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
@@ -573,14 +428,14 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (0 == host->hostid && groupid > 0 &&
+			if (ZBX_SCRIPT_CTX_HOST == ctx && groupid > 0 &&
 					SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
 				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
 						max_error_len);
 				goto out;
 			}
-			if (0 == host->hostid && user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
+			if (ZBX_SCRIPT_CTX_HOST == ctx && user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
 					SUCCEED != check_user_permissions(user->userid, host, script))
 			{
 				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
@@ -597,7 +452,8 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				p_userid = &userid;
 			}
 
-			if (ZBX_SCRIPT_TYPE_WEBHOOK != script->type) {
+			if (ZBX_SCRIPT_TYPE_WEBHOOK != script->type)
+			{
 				if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host,
 						NULL, NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error,
 						max_error_len))
@@ -618,12 +474,12 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			else if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
 			{
 				/* DBget_script_by_scriptid() may overwrite type with anything but global script */
+				/* ... therefore this recursion is no more than two layers deep */
 				THIS_SHOULD_NEVER_HAPPEN;
 				goto out;
 			}
 
-			/* ...therefore this recursion is no more than two layers deep */
-			if (FAIL == zbx_script_prepare(script, host, user, error, max_error_len, eventid))
+			if (FAIL == zbx_script_prepare(script, host, user, max_error_len, ctx, eventid, error))
 				goto out;
 
 			break;
@@ -640,7 +496,7 @@ out:
 	return ret;
 }
 
-static int	DBfetch_webhook_timeout(zbx_uint64_t scriptid, int *timeout)
+static int	DBfetch_script_timeout(zbx_uint64_t scriptid, int *timeout)
 {
 	int		ret = SUCCEED;
 	char		*tm = NULL;
@@ -672,7 +528,7 @@ out:
 
 static int	DBfetch_webhook_params(zbx_uint64_t scriptid, struct zbx_json *json_data)
 {
-	int		ret = FAIL;
+	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -689,13 +545,13 @@ static int	DBfetch_webhook_params(zbx_uint64_t scriptid, struct zbx_json *json_d
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_webhook_param_t param;
+		char *name, *value;
 
-		param.name = zbx_strdup(param.name, row[0]);
-		param.value = zbx_strdup(param.value, row[1]);
-		zbx_json_addstring(json_data, param.name, param.value, ZBX_JSON_TYPE_STRING);
-		zbx_free(param.name);
-		zbx_free(param.value);
+		name = zbx_strdup(NULL, row[0]);
+		value = zbx_strdup(NULL, row[1]);
+		zbx_json_addstring(json_data, name, value, ZBX_JSON_TYPE_STRING);
+		zbx_free(name);
+		zbx_free(value);
 	}
 
 	zbx_json_close(json_data);
@@ -705,58 +561,28 @@ out:
 	return ret;
 }
 
-static int	zbx_global_webhook_execute(zbx_uint64_t scriptid, const char *command, char **error, char **result,
+static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, char **error, char **result,
 		char **debug)
 {
-	int			size, ret = SUCCEED, timeout;
-	char			*bytecode = NULL, *errmsg = NULL;
-	zbx_es_t		es;
+	int			timeout, ret = SUCCEED;
+	char			*params = NULL;
 	struct zbx_json		json_data;
 
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	DBfetch_webhook_params(scriptid, &json_data);
-	zbx_es_init(&es);
 
-	if (FAIL == zbx_es_init_env(&es, &errmsg))
+	if (FAIL == DBfetch_webhook_params(scriptid, &json_data))
+		zabbix_log(LOG_LEVEL_WARNING, "failed to fetch script parameters");
+	else
+		params = json_data.buffer;
+
+	if (FAIL == DBfetch_script_timeout(scriptid, &timeout))
 	{
-		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
-		zbx_free(errmsg);
-		return FAIL;
-	}
-
-	if (NULL != debug)
-		zbx_es_debug_enable(&es);
-
-	if (SUCCEED == DBfetch_webhook_timeout(scriptid, &timeout))
-		zbx_es_set_timeout(&es, timeout);
-
-	if (FAIL == zbx_es_compile(&es, command, &bytecode, &size, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
-		zbx_free(errmsg);
 		ret = FAIL;
 		goto out;
 	}
 
-	if (FAIL == zbx_es_execute(&es, NULL, bytecode, size, json_data.buffer, result, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
-		zbx_free(errmsg);
-		ret = FAIL;
-		goto out;
-	}
+	ret = zbx_es_execute_command(command, params, timeout, result, error, debug);
 out:
-	if (NULL != debug)
-		*debug = zbx_strdup(*debug, zbx_es_debug_info(&es));
-
-	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
-	{
-		zbx_error("cannot destroy scripting environment: %s", errmsg);
-		zbx_free(result);
-	}
-
-	zbx_free(bytecode);
-	zbx_free(errmsg);
 	zbx_json_free(&json_data);
 
 	return ret;
@@ -768,13 +594,20 @@ out:
  *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
  *                                                                            *
+ * Parameters:  script         - [IN] The script to be executed               *
+ *              host           - [IN] the host                                *
+ *              result         - [IN] the result of a script execution        *
+ *              max_error_len  - [IN] the maximum error length                *
+ *              error          - [OUT] the error reported by the script       *
+ *              debug          - [OUT] the debug data (optional)              *
+ *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
-		size_t max_error_len, char **debug)
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, size_t max_error_len,
+		char *error, char **debug)
 {
 	int	ret = FAIL;
 
@@ -785,7 +618,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_global_webhook_execute(script->scriptid, script->command, &error, result, debug);
+			ret = zbx_execute_webhook(script->scriptid, script->command, &error, result, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)

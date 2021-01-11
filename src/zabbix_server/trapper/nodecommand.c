@@ -204,11 +204,11 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
  *                                                                            *
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char *sessionid, const char *clientip,
-		char **result, char **debug, zbx_uint64_t eventid)
+		char **result, char **debug, zbx_script_exec_context ctx, zbx_uint64_t eventid)
 {
 	char		error[MAX_STRING_LEN];
 	int		ret = FAIL, rc;
-	DC_HOST		host = {0};
+	DC_HOST		host;
 	zbx_script_t	script;
 	zbx_user_t	user;
 
@@ -217,7 +217,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 
 	*error = '\0';
 
-	if (ZBX_MAX_UINT64 != hostid && SUCCEED != (rc = DCget_host_by_hostid(&host, hostid)))
+	if (ZBX_SCRIPT_CTX_HOST == ctx && SUCCEED != (rc = DCget_host_by_hostid(&host, hostid)))
 	{
 		zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 		goto fail;
@@ -241,12 +241,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 	script.scriptid = scriptid;
 
-	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, error, sizeof(error), eventid)))
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, sizeof(error), ctx, eventid, error)))
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			ret = zbx_script_execute(&script, &host, result, error, sizeof(error), debug);
+			ret = zbx_script_execute(&script, &host, result, sizeof(error), error, debug);
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 
@@ -281,11 +281,12 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	char		*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN], clientip[MAX_STRING_LEN];
-	char		*debug = NULL;
-	int		ret = FAIL;
-	zbx_uint64_t	scriptid, hostid = ZBX_MAX_UINT64, eventid = ZBX_MAX_UINT64;
-	struct zbx_json	j;
+	char			*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN];
+	char			*debug = NULL, clientip[MAX_STRING_LEN];
+	int			ret = FAIL;
+	zbx_uint64_t		scriptid, hostid = ZBX_MAX_UINT64, eventid = ZBX_MAX_UINT64;
+	zbx_script_exec_context ctx;
+	struct zbx_json		j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s ", __func__, data);
 
@@ -298,14 +299,24 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 		goto finish;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_EVENTID, tmp, sizeof(tmp), NULL))
-		is_uint64(tmp, &eventid);
-
-	if ((SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL) ||
-			FAIL == is_uint64(tmp, &hostid)) && ZBX_MAX_UINT64 == eventid)
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_EVENTID, tmp, sizeof(tmp), NULL) &&
+		FAIL == is_uint64(tmp, &eventid))
 	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_HOSTID);
+		result = zbx_dsprintf(result, "Failed to parse eventid tag: %s.", ZBX_PROTO_TAG_EVENTID);
 		goto finish;
+	}
+	else
+		ctx = ZBX_SCRIPT_CTX_EVENT;
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+	{
+		if (FAIL == is_uint64(tmp, &hostid))
+		{
+			result = zbx_dsprintf(result, "Failed to parse hostid tag: %s.", ZBX_PROTO_TAG_HOSTID);
+			goto finish;
+		}
+		else
+			ctx = ZBX_SCRIPT_CTX_HOST;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL))
@@ -317,7 +328,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, &result, &debug, eventid)))
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, &result, &debug, ctx, eventid)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
