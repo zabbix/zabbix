@@ -160,7 +160,22 @@ class testFormTags extends CWebTest {
 						]
 					]
 				]
-			]
+			],
+			[
+				[
+					'name' => 'Long tag name and value',
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'Long tag name. Long tag name. Long tag name. Long tag name. Long tag name.'
+									.' Long tag name. Long tag name. Long tag name.',
+							'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'
+									.' Long tag value. Long tag value. Long tag value. Long tag value.'
+						]
+					]
+				]
+			],
 		];
 	}
 
@@ -201,6 +216,23 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
+	}
+
+	/**
+	 * Check tag fields size.
+	 *
+	 * @param string   $object       host, template, trigger or prototype
+	 */
+	public function checkTagScreenshot($object) {
+		$this->page->login()->open($this->link);
+		$this->query('xpath://a[contains(@href, "'.$object.'") and contains(text(), "Long tag name and value")]')
+				->waitUntilPresent()->one()->click();
+		$form = $this->query('xpath://form[@aria-labeledby="page-title-general" and contains(@name, "Form")]')
+				->waitUntilPresent()->asForm()->one();
+
+		$form->selectTab('Tags');
+		$screenshot_area = $this->query('id:tags-table')->one();
+		$this->assertScreenshot($screenshot_area);
 	}
 
 	public static function getUpdateData() {
