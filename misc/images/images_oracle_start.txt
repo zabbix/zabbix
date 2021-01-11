@@ -1,16 +1,16 @@
 -- https://stackoverflow.com/questions/19539408/error-when-decoding-base-64-to-blob
 CREATE OR REPLACE FUNCTION base64_decode(p_content CLOB) RETURN BLOB
 	IS
-		C_CHUNK_SIZE CONSTANT INTEGER := 12000; -- should be a multiple of 4
+		C_CHUNK_SIZE CONSTANT INTEGER := 4000; -- should be a multiple of 4
 		C_NON_BASE64_SYM_PATTERN CONSTANT VARCHAR2(20) := '[^A-Za-z0-9+/]';
-		l_chunk_buf VARCHAR2(12000);
+		l_chunk_buf VARCHAR2(4000);
 		l_chunk_b64_buf RAW(9000);
 		l_chunk_offset INTEGER := 1;
 		l_chunk_size INTEGER;
 		l_res BLOB;
 
 		FUNCTION get_next_full_base64_chunk(l_data CLOB, p_cur_pos IN OUT INTEGER, p_desired_size INTEGER, p_cur_size IN OUT INTEGER) RETURN VARCHAR2 IS
-			l_res VARCHAR2(12000);
+			l_res VARCHAR2(4000);
 			l_tail_desired_size INTEGER;
 		BEGIN
 			l_res := dbms_lob.substr(l_data, p_desired_size, p_cur_pos);
