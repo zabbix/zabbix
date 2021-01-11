@@ -271,7 +271,7 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
-			'selectValueMaps' => API_OUTPUT_EXTEND,
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -316,7 +316,7 @@ class CConfigurationExport {
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
-			'selectValueMaps' => API_OUTPUT_EXTEND,
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		]);
