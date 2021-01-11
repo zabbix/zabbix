@@ -561,7 +561,7 @@ out:
 	return ret;
 }
 
-static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, char **error, char **result,
+static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, size_t max_error_len, char *error, char **result,
 		char **debug)
 {
 	int			timeout, ret = SUCCEED;
@@ -581,7 +581,7 @@ static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, char 
 		goto out;
 	}
 
-	ret = zbx_es_execute_command(command, params, timeout, result, error, debug);
+	ret = zbx_es_execute_command(command, params, timeout, result, max_error_len, error, debug);
 out:
 	zbx_json_free(&json_data);
 
@@ -618,7 +618,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **r
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_execute_webhook(script->scriptid, script->command, &error, result, debug);
+			ret = zbx_execute_webhook(script->scriptid, script->command, max_error_len, error, result, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)

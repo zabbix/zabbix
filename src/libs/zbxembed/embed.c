@@ -583,7 +583,7 @@ void	zbx_es_debug_disable(zbx_es_t *es)
 }
 
 int	zbx_es_execute_command(const char *command, const char *param, int timeout, char **result,
-		char **error, char **debug)
+		size_t max_error_len, char *error, char **debug)
 {
 	zbx_es_t	es;
 	char		*code = NULL;
@@ -595,7 +595,7 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 	zbx_es_init(&es);
 	if (FAIL == zbx_es_init_env(&es, &errmsg))
 	{
-		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
+		zbx_snprintf(error, max_error_len, "cannot initialize scripting environment: %s", errmsg);
 		zbx_free(errmsg);
 		ret = FAIL;
 		goto failure;
@@ -609,7 +609,7 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 
 	if (FAIL == zbx_es_compile(&es, command, &code, &size, &errmsg))
 	{
-		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
+		zbx_snprintf(error, max_error_len, "cannot compile script: %s", errmsg);
 		zbx_free(errmsg);
 		ret = FAIL;
 		goto out;
@@ -617,7 +617,7 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 
 	if (FAIL == zbx_es_execute(&es, NULL, code, size, param, result, &errmsg))
 	{
-		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
+		zbx_snprintf(error, max_error_len, "cannot execute script: %s", errmsg);
 		zbx_free(errmsg);
 		ret = FAIL;
 		goto out;
@@ -640,4 +640,3 @@ failure:
 
 	return ret;
 }
-

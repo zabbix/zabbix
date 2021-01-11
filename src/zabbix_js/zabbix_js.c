@@ -196,7 +196,7 @@ int	main(int argc, char **argv)
 {
 	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
 	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
-		*result = NULL;
+		*result = NULL, script_error[MAX_STRING_LEN];
 
 	progname = get_program_name(argv[0]);
 
@@ -291,9 +291,9 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, &error, NULL))
+	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, sizeof(script_error), script_error, NULL))
 	{
-		zbx_error("error executing script:\n%s", error);
+		zbx_error("error executing script:\n%s", script_error);
 		goto close;
 	}
 	ret = SUCCEED;
