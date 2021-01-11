@@ -361,8 +361,8 @@ static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, size_t max_error_len,
-		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error)
+int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user,
+		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error, size_t max_error_len)
 {
 	int			macro_mask, ret = FAIL;
 	zbx_uint64_t		groupid, userid, *p_userid = NULL;
@@ -479,7 +479,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (FAIL == zbx_script_prepare(script, host, user, max_error_len, ctx, eventid, error))
+			if (FAIL == zbx_script_prepare(script, host, user, ctx, eventid, error, max_error_len))
 				goto out;
 
 			break;
@@ -581,7 +581,7 @@ static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, size_
 		goto out;
 	}
 
-	ret = zbx_es_execute_command(command, params, timeout, result, max_error_len, error, debug);
+	ret = zbx_es_execute_command(command, params, timeout, result, error, max_error_len, debug);
 out:
 	zbx_json_free(&json_data);
 
@@ -606,8 +606,8 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, size_t max_error_len,
-		char *error, char **debug)
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, char **result, char *error,
+		size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 

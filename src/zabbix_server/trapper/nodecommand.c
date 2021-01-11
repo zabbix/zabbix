@@ -241,12 +241,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 	script.scriptid = scriptid;
 
-	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, sizeof(error), ctx, eventid, error)))
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, ctx, eventid, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			ret = zbx_script_execute(&script, &host, result, sizeof(error), error, debug);
+			ret = zbx_script_execute(&script, &host, result, error, sizeof(error), debug);
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 

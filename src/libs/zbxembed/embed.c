@@ -417,13 +417,13 @@ out:
  *                                                                            *
  * Purpose: executes script                                                   *
  *                                                                            *
- * Parameters: es     - [IN] the embedded scripting engine                    *
- *             script - [IN] the script to execute                            *
- *             code   - [IN] the precompiled bytecode                         *
- *             size   - [IN] the size of precompiled bytecode                 *
- *             param  - [IN] the parameter to pass to the script              *
- *             output - [OUT] the result value                                *
- *             error  - [OUT] the error message                               *
+ * Parameters: es         - [IN] the embedded scripting engine                *
+ *             script     - [IN] the script to execute                        *
+ *             code       - [IN] the precompiled bytecode                     *
+ *             size       - [IN] the size of precompiled bytecode             *
+ *             param      - [IN] the parameter to pass to the script          *
+ *             script_ret - [OUT] the result value                            *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
@@ -582,13 +582,30 @@ void	zbx_es_debug_disable(zbx_es_t *es)
 	zbx_free(es->env->json);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_es_execute_command                                           *
+ *                                                                            *
+ * Purpose: executes command (script in form of a text)                       *
+ *                                                                            *
+ * Parameters: command       - [IN] the command in form of a text             *
+ *             param         - [IN] the script parameters                     *
+ *             timeout       - [IN] the timeout for the execution (seconds)   *
+ *             result        - [OUT] the result of an execution               *
+ *             error         - [OUT] the error message                        *
+ *             max_error_len - [IN] the maximum length of an error            *
+ *             debug         - [OUT] the debug data (optional)                *
+ *                                                                            *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_es_execute_command(const char *command, const char *param, int timeout, char **result,
-		size_t max_error_len, char *error, char **debug)
+		char *error, size_t max_error_len, char **debug)
 {
+	int		size, ret = SUCCEED;
+	char		*code = NULL, *errmsg = NULL;
 	zbx_es_t	es;
-	char		*code = NULL;
-	int		ret = SUCCEED, size;
-	char		*errmsg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

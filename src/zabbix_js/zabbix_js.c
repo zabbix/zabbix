@@ -146,52 +146,6 @@ static char	*read_file(const char *filename, char **error)
 	return data;
 }
 
-/*
-static char	*execute_script(const char *script, const char *param, int timeout, char **error)
-{
-	zbx_es_t	es;
-	char		*code = NULL;
-	int		size;
-	char		*errmsg = NULL, *result = NULL;
-
-	zbx_es_init(&es);
-	if (FAIL == zbx_es_init_env(&es, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
-		zbx_free(errmsg);
-		return NULL;
-	}
-
-	if (0 != timeout)
-		zbx_es_set_timeout(&es, timeout);
-
-	if (FAIL == zbx_es_compile(&es, script, &code, &size, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
-		zbx_free(errmsg);
-		goto out;
-	}
-
-	if (FAIL == zbx_es_execute(&es, script, code, size, param, &result, &errmsg))
-	{
-		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
-		zbx_free(errmsg);
-		goto out;
-	}
-out:
-	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
-	{
-		zbx_error("cannot destroy scripting environment: %s", errmsg);
-		zbx_free(result);
-	}
-
-	zbx_free(code);
-	zbx_free(errmsg);
-
-	return result;
-}
-*/
-
 int	main(int argc, char **argv)
 {
 	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
@@ -291,7 +245,7 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, sizeof(script_error), script_error, NULL))
+	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, script_error, sizeof(script_error), NULL))
 	{
 		zbx_error("error executing script:\n%s", script_error);
 		goto close;
