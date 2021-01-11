@@ -122,7 +122,7 @@
 
 		// test confirmation button
 		$('#testConfirmation').click(function() {
-			executeScript(null, null, $('#confirmation').val(), this);
+			executeScript(null, $('#confirmation').val(), this);
 		});
 
 		// host group selection

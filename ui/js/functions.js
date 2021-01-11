@@ -563,14 +563,15 @@ function overlayDialogue(params, trigger_elmnt) {
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
  */
-function executeScript(scriptid, confirmation, trigger_elmnt, hostid, eventid) {
+function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
-		if (typeof eventid === 'undefined' && hostid !== null) {
+		if (hostid !== null) {
 			popup_options.hostid = hostid;
 		}
-		else if (eventid !== null) {
+
+		if (eventid !== null) {
 			popup_options.eventid = eventid;
 		}
 
@@ -587,13 +588,13 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid, eventid) {
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'focused': (hostid === null),
+					'focused': (hostid === null && eventid === null),
 					'action': function() {}
 				},
 				{
 					'title': t('Execute'),
-					'enabled': (hostid !== null),
-					'focused': (hostid !== null),
+					'enabled': (hostid !== null || eventid !== null),
+					'focused': (hostid !== null || eventid !== null),
 					'action': function() {
 						execute();
 					}
