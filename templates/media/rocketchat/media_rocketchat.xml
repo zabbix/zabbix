@@ -101,7 +101,7 @@
                 </parameter>
                 <parameter>
                     <name>rc_user_id</name>
-                    <value>&lt;PLACE LOGIN HERE&gt;</value>
+                    <value>&lt;PLACE USER ID HERE&gt;</value>
                 </parameter>
                 <parameter>
                     <name>rc_user_token</name>
@@ -318,11 +318,11 @@
 &#13;
         switch (room.response.room.t) {&#13;
             case 'c':&#13;
-                link += 'channel/' + rid + '?msg=' + id;&#13;
+                link += 'channel/' + room.response.room.name + '?msg=' + id;&#13;
                 break;&#13;
 &#13;
             case 'p':&#13;
-                link += 'group/' + rid + '?msg=' + id;&#13;
+                link += 'group/' + room.response.room.name + '?msg=' + id;&#13;
                 break;&#13;
 &#13;
             case 'd':&#13;
@@ -418,7 +418,7 @@ try {&#13;
         result.tags.__zbx_rc_msg_url = RocketChat.getMessageLink(response.rid, response.id);&#13;
     }&#13;
     // Send message for trigger-based events.&#13;
-    if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
+    else if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
         response = RocketChat.postMessage(false, params.alert_message, fields);&#13;
         result.tags.__zbx_rc_id = response.id;&#13;
         result.tags.__zbx_rc_rid = response.rid;&#13;
