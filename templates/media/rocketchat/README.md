@@ -25,7 +25,7 @@ The following parameters should be filled:<br>
 **rc_api_url** - API URL. Can be useful if the version will be changed.<br>
 **rc_send_to** - *#channel* or *@username*. Supports private and public channels and direct messages.<br>
 **use_default_message** - **false** (default) or **true**. If **true** all messages will be posted as text of *{ALERT.MESSAGE}.* For non trigger-based notifications, it is always set as **true**.<br>
-**field_1_short:Host** - contains data for each field of the attachment. "Field" parameters with another format or empty value will be ignored.<br>
+**field_1_short_p:Host** - contains data for each field of the attachment. "Field" parameters with another format or empty value will be ignored.<br>
 Format explanation:<br>
 - *field* - prefix of the parameter with field info.
 - *1* - the position of the field. Fields with the same position will be added in the alphabetical order.
@@ -37,7 +37,7 @@ Format explanation:<br>
 - *Host* - the title of the field. There can be any text including whitespaces or symbols.
 
 4\. Create a **Zabbix user** and add **Media** with the **Rocket.Chat** media type.
-"Send to" field should be filled as `#channel_name` or `@username`. 
+"Send to" field should be filled as `#channel_name` or `@username`.<br>
 Note, that "Send to" field cannot be empty. If the channel is already specified in the **rc_send_to** parameter, you can put any symbol in this field to comply with frontend requirements.
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into Rocket.Chat tasks.
 
