@@ -120,7 +120,7 @@ zabbix_export:
                     Object.keys(fields)
                         .forEach(function(field) {
                             if (fields[field] === '') {
-                                Zabbix.log(4, '[ RocketChat Webhook ] Field "' + field +
+                                Zabbix.Log(4, '[ RocketChat Webhook ] Field "' + field +
                                     '" can\'t be empty. The field ignored.');
                             }
                             else {
@@ -140,7 +140,7 @@ zabbix_export:
                                     }
                                 }
                                 catch (error) {
-                                    Zabbix.log(4, '[ RocketChat Webhook ] Can\'t parse field "' + field +
+                                    Zabbix.Log(4, '[ RocketChat Webhook ] Can\'t parse field "' + field +
                                         '". The field ignored.');
                                 }
                             }
@@ -162,49 +162,49 @@ zabbix_export:
                     url = RocketChat.params.url + query,
                     request = new CurlHttpRequest();
         
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('X-Auth-Token:' + RocketChat.params.user_token);
-                request.addHeader('X-User-Id:' + RocketChat.params.user_id);
+                request.AddHeader('Content-Type: application/json');
+                request.AddHeader('X-Auth-Token:' + RocketChat.params.user_token);
+                request.AddHeader('X-User-Id:' + RocketChat.params.user_id);
         
                 if (typeof RocketChat.HTTPProxy !== 'undefined' && RocketChat.HTTPProxy !== '') {
-                    request.setProxy(RocketChat.HTTPProxy);
+                    request.SetProxy(RocketChat.HTTPProxy);
                 }
         
                 if (typeof data !== 'undefined') {
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.log(4, '[ RocketChat Webhook ] Sending request: ' + url +
+                Zabbix.Log(4, '[ RocketChat Webhook ] Sending request: ' + url +
                     ((typeof data === 'string') ? ('\n' + data) : ''));
         
                 switch (method) {
                     case 'get':
-                        response = request.get(url, data);
+                        response = request.Get(url, data);
                         break;
         
                     case 'post':
-                        response = request.post(url, data);
+                        response = request.Post(url, data);
                         break;
         
                     default:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(4, '[ RocketChat Webhook ] Received response with status code ' +
-                    request.getStatus() + '\n' + response);
+                Zabbix.Log(4, '[ RocketChat Webhook ] Received response with status code ' +
+                    request.Status() + '\n' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.log(4, '[ RocketChat Webhook ] Failed to parse response received from RocketChat');
+                        Zabbix.Log(4, '[ RocketChat Webhook ] Failed to parse response received from RocketChat');
                         response = null;
                     }
                 }
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+                if (request.Status() < 200 || request.Status() >= 300) {
+                    var message = 'Request failed with status code ' + request.Status();
         
                     if (response !== null && typeof response.message !== 'undefined') {
                         message += ': ' + JSON.stringify(response.message);
@@ -217,7 +217,7 @@ zabbix_export:
                 }
         
                 return {
-                    status: request.getStatus(),
+                    status: request.Status(),
                     response: response
                 };
             },
@@ -308,7 +308,7 @@ zabbix_export:
                         break;
         
                     default:
-                        Zabbix.log(4, '[ RocketChat Webhook ] Can\'t get room type. Link to message will not be added.');
+                        Zabbix.Log(4, '[ RocketChat Webhook ] Can\'t get room type. Link to message will not be added.');
                 }
         
                 return link;
@@ -410,7 +410,7 @@ zabbix_export:
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(3, '[ RocketChat Webhook ] ERROR: ' + error);
+            Zabbix.Log(3, '[ RocketChat Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
