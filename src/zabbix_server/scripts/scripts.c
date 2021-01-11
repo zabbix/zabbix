@@ -561,8 +561,8 @@ out:
 	return ret;
 }
 
-static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, size_t max_error_len, char *error, char **result,
-		char **debug)
+static int	zbx_execute_webhook(zbx_uint64_t scriptid, const char *command, size_t max_error_len, char *error,
+		char **result, char **debug)
 {
 	int			timeout, ret = SUCCEED;
 	char			*params = NULL;
