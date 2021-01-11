@@ -24,10 +24,12 @@ import (
 
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/procfs"
+	"zabbix.com/pkg/zbxerr"
 )
 
 func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error) {
 	var mem float64
+
 	switch mode {
 	case "total", "":
 		mem, err = procfs.GetMemory("MemTotal")
@@ -59,6 +61,10 @@ func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error)
 		return nil, errors.New("Invalid first parameter.")
 	}
 
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
 	if mode == "pused" || mode == "pavailable" {
 		return mem, nil
 	}
@@ -73,6 +79,7 @@ func getUsed(percent bool) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	free, err := procfs.GetMemory("MemFree")
 	if err != nil {
 		return 0, err
@@ -80,7 +87,6 @@ func getUsed(percent bool) (float64, error) {
 
 	if percent {
 		return (total - free) / total * float64(100), nil
-
 	}
 
 	return total - free, nil
@@ -93,14 +99,17 @@ func getAvailable(percent bool) (float64, error) {
 		if err != nil {
 			return 0, err
 		}
+
 		free, err := procfs.GetMemory("MemFree")
 		if err != nil {
 			return 0, err
 		}
+
 		buff, err := procfs.GetMemory("Buffers")
 		if err != nil {
 			return 0, err
 		}
+
 		mem = (free + buff) + cached
 	}
 
@@ -109,6 +118,7 @@ func getAvailable(percent bool) (float64, error) {
 		if err != nil {
 			return 0, err
 		}
+
 		return mem / total * float64(100), nil
 	}
 

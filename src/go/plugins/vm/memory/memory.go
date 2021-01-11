@@ -43,6 +43,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if len(params) > 0 {
 			mode = params[0]
 		}
+
 		return p.exportVMMemorySize(mode)
 	default:
 		return nil, plugin.UnsupportedMetricError
