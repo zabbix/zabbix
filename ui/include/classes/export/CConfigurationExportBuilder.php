@@ -258,7 +258,7 @@ class CConfigurationExportBuilder {
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'dashboards' => $this->formatDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
-				'valuemaps' => $this->formatValueMaps($template['valuemaps']),
+				'valuemaps' => $this->formatValueMaps($template['valuemaps'])
 			];
 		}
 
@@ -299,8 +299,8 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($host['macros']),
 				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
-				'valuemaps' => $this->formatValueMaps($host['valuemaps']),
-				'tags' => $this->formatTags($host['tags'])
+				'tags' => $this->formatTags($host['tags']),
+				'valuemaps' => $this->formatValueMaps($host['valuemaps'])
 			];
 		}
 
