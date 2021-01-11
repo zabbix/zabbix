@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.2 and higher  
+For Zabbix version: 5.4 and higher  
 The template to monitor PHP-FPM by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -22,7 +22,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1. Open the php-fpm configuration file and enable the status page as shown.
     ```
@@ -105,7 +105,7 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Memory usage, % |<p>Memory used percentage relative to total memory available.</p> |ZABBIX_PASSIVE |proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,pmem] |
 |PHP-FPM |PHP-FPM: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util["{$PHP_FPM.PROCESS_NAME}"] |
 |PHP-FPM |PHP-FPM: Number of processes running |<p>-</p> |ZABBIX_PASSIVE |proc.num["{$PHP_FPM.PROCESS_NAME}"] |
-|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}$ 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}($|\n) 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |PHP-FPM |PHP-FPM: Processes, active |<p>The total number of active processes.</p> |DEPENDENT |php-fpm.processes_active<p>**Preprocessing**:</p><p>- JSONPATH: `$.['active processes']`</p> |
 |PHP-FPM |PHP-FPM: Version |<p>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</p> |DEPENDENT |php-fpm.version<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*X-Powered-By: PHP/([.\d]{1,}) \1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |PHP-FPM |PHP-FPM: Pool name |<p>The name of current pool.</p> |DEPENDENT |php-fpm.name<p>**Preprocessing**:</p><p>- JSONPATH: `$.pool`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
