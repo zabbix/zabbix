@@ -271,7 +271,7 @@ class CScript extends CApiService {
 			'groupid' =>		['type' => API_ID],
 			'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
 			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
-			'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:60', 'length' => DB::getFieldLength('scripts', 'timeout')],
+			'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:60'],
 			'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('script_param', 'value')]
@@ -422,7 +422,7 @@ class CScript extends CApiService {
 			'groupid' =>		['type' => API_ID],
 			'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
 			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
-			'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:60', 'length' => DB::getFieldLength('scripts', 'timeout')],
+			'timeout' =>		['type' => API_TIME_UNIT, 'in' => '1:60'],
 			'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('script_param', 'value')]
