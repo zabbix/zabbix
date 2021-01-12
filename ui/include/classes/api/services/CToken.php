@@ -430,6 +430,8 @@ class CToken extends CApiService {
 	}
 
 	/**
+	 * Generates authentication token string for given API tokens.
+	 *
 	 * @param array $tokenids
 	 *
 	 * @throws APIException if the input is invalid
