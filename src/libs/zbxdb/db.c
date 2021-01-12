@@ -596,13 +596,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		if (NULL != dbname && '\0' != *dbname)
 			connect = zbx_strdcatf(connect, "/%s", dbname);
 	}
-	else if (NULL != dbname && '\0' != *dbname)
+	else if (NULL != dbname)
 	{
 		/* Net Service Name method */
 		connect = zbx_strdup(connect, dbname);
 	}
-	else if ('\0' == *dbname)
-		connect = zbx_strdup(connect, "");
 
 	while (ZBX_DB_OK == ret)
 	{
