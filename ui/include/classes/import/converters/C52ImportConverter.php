@@ -68,7 +68,7 @@ class C52ImportConverter extends CConverter {
 	}
 
 	private static function convertValueMaps(array $import): array {
-		$valuemaps = self::transformValueMaps($import['value_maps']);
+		$valuemaps = zbx_toHash($import['value_maps'], 'name');
 		unset($import['value_maps']);
 
 		if (array_key_exists('hosts', $import)) {
@@ -80,15 +80,6 @@ class C52ImportConverter extends CConverter {
 		}
 
 		return $import;
-	}
-
-	private static function transformValueMaps(array $valuemaps): array {
-		$arr = [];
-		foreach ($valuemaps as $valuemap) {
-			$arr[$valuemap['name']] = $valuemap;
-		}
-
-		return $arr;
 	}
 
 	private static function moveValueMaps(array $hosts, array $valuemaps) {
@@ -103,6 +94,20 @@ class C52ImportConverter extends CConverter {
 				}
 			}
 			unset($item);
+
+			if (array_key_exists('discovery_rules', $host)) {
+				foreach ($host['discovery_rules'] as $drule) {
+					if (!array_key_exists('item_prototypes', $drule)) {
+						continue;
+					}
+
+					foreach ($drule['item_prototypes'] as $item_prototype) {
+						if (array_key_exists('valuemap', $item_prototype)) {
+							$host['valuemaps'][] = $valuemaps[$item_prototype['valuemap']['name']];
+						}
+					}
+				}
+			}
 		}
 		unset($host);
 
