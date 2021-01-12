@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION base64_decode(p_content CLOB) RETURN BLOB
 		C_CHUNK_SIZE CONSTANT INTEGER := 4000; -- should be a multiple of 4
 		C_NON_BASE64_SYM_PATTERN CONSTANT VARCHAR2(20) := '[^A-Za-z0-9+/]';
 		l_chunk_buf VARCHAR2(4000);
-		l_chunk_b64_buf RAW(9000);
+		l_chunk_b64_buf RAW(3000);
 		l_chunk_offset INTEGER := 1;
 		l_chunk_size INTEGER;
 		l_res BLOB;
