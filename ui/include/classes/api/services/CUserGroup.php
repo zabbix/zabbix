@@ -537,6 +537,7 @@ class CUserGroup extends CApiService {
 
 		foreach ($usrgrps as $usrgrp) {
 			if (self::userGroupDisabled($usrgrp, $method, $db_usrgrps)
+					&& array_key_exists('userids', $usrgrp)
 					&& uint_in_array(self::$userData['userid'], $usrgrp['userids'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_('User cannot add himself to a disabled group or a group with disabled GUI access.')

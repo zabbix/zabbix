@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
@@ -171,6 +172,7 @@ class SeleniumTests {
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
@@ -225,9 +227,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testFormAction');
+		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
-		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');

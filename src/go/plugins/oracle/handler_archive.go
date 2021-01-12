@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyArchive = "oracle.archive.info"
-
-const archiveMaxParams = 0
-
-func archiveHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func archiveHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var archiveLogs string
-
-	if len(params) > archiveMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

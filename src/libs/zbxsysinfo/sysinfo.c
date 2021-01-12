@@ -1026,7 +1026,9 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
 	{
 		zbx_strncpy_alloc(out, &out_alloc, &out_offset, pl, pr - pl);
 
-		pr++;
+		/* check if increasing pointer by 1 will not result in buffer overrun */
+		if ('\0' != pr[1])
+			pr++;
 
 		if ('0' == *pr)
 		{

@@ -25,16 +25,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyDatabasesDiscovery = "oracle.db.discovery"
-
-const databasesDiscoveryMaxParams = 0
-
-func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var lld string
-
-	if len(params) > databasesDiscoveryMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
