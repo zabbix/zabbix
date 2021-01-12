@@ -28,20 +28,24 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
-func (p *Plugin) executeSmartctl(args string, checkExit bool) ([]byte, error) {
+func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	path := "smartctl"
 
 	if p.options.Path != "" {
 		path = p.options.Path
 	}
 
-	out, err, exitErr := zbxcmd.Execute(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
-	if err != nil {
-		return nil, err
+	var out string
+	var err error
+
+	if strict {
+		out, err = zbxcmd.ExecuteStrict(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+	} else {
+		out, err = zbxcmd.Execute(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
 	}
 
-	if checkExit && exitErr != nil {
-		return nil, exitErr
+	if err != nil {
+		return nil, err
 	}
 
 	return []byte(out), nil

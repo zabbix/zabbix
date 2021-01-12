@@ -32,7 +32,25 @@ import (
 	"zabbix.com/pkg/log"
 )
 
-func Execute(s string, timeout time.Duration) (string, error, error) {
+// Execute runs the 's' command without checking cmd.Wait error.
+// This means that non zero exit status code will not return an error.
+// Returns an error if there is an issue with executing the command or
+// if the specified timeout has been reached or if maximum output length
+// has been reached.
+func Execute(s string, timeout time.Duration) (string, error) {
+	return execute(s, timeout, false)
+}
+
+// ExecuteStrict runs the 's' command and checks cmd.Wait error.
+// This means that non zero exit status code will return an error.
+// Also returns an error if there is an issue with executing the command or
+// if the specified timeout has been reached or if maximum output length
+// has been reached.
+func ExecuteStrict(s string, timeout time.Duration) (string, error) {
+	return execute(s, timeout, true)
+}
+
+func execute(s string, timeout time.Duration, strict bool) (string, error) {
 	cmd := exec.Command("sh", "-c", s)
 
 	var b bytes.Buffer
@@ -44,7 +62,7 @@ func Execute(s string, timeout time.Duration) (string, error, error) {
 	err := cmd.Start()
 
 	if err != nil {
-		return "", fmt.Errorf("Cannot execute command: %s", err), err
+		return "", fmt.Errorf("Cannot execute command: %s", err)
 	}
 
 	t := time.AfterFunc(timeout, func() {
@@ -54,17 +72,23 @@ func Execute(s string, timeout time.Duration) (string, error, error) {
 		}
 	})
 
-	err = cmd.Wait()
+	if strict {
+		if err = cmd.Wait(); err != nil {
+			return "", fmt.Errorf("Command execution failed: %s", err)
+		}
+	} else {
+		_ = cmd.Wait()
+	}
 
 	if !t.Stop() {
-		return "", fmt.Errorf("Timeout while executing a shell script."), nil
+		return "", fmt.Errorf("Timeout while executing a shell script.")
 	}
 
 	if maxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024), nil
+		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
 	}
 
-	return strings.TrimRight(b.String(), " \t\r\n"), nil, err
+	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
 func ExecuteBackground(s string) error {

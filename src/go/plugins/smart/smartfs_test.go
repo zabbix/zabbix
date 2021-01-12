@@ -32,9 +32,9 @@ func Test_evaluateVersion(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"+corret_version", args{[]int{7, 1}}, false},
-		{"+corret_version_one_digit", args{[]int{8}}, false},
-		{"+corret_version_multiple_digits", args{[]int{7, 1, 2}}, false},
+		{"+correct_version", args{[]int{7, 1}}, false},
+		{"+correct_version_one_digit", args{[]int{8}}, false},
+		{"+correct_version_multiple_digits", args{[]int{7, 1, 2}}, false},
 		{"-incorrect_version", args{[]int{7, 0}}, true},
 		{"-malformed_version", args{[]int{-7, 0}}, true},
 		{"-empty", args{}, true},
