@@ -54,9 +54,9 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"datastore.hv.list", VMCHECK_FUNC(check_vcenter_datastore_hv_list)},
 
 	{"hv.cluster.name", VMCHECK_FUNC(check_vcenter_hv_cluster_name)},
-	{"hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)}, //TODO: update to retrieve metric from performance counters and add option: average
-	{"hv.cpu.usage.avg", VMCHECK_FUNC(check_vcenter_hv_cpu_usage_avg)}, //TODO: remove
-	{"hv.cpu.utilization", VMCHECK_FUNC(check_vcenter_hv_cpu_utilization)}, //TODO: DONE
+	{"hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)}, // TODO: update to retrieve metric from performance counters and add option: average
+	{"hv.cpu.usage.avg", VMCHECK_FUNC(check_vcenter_hv_cpu_usage_avg)}, // TODO: remove
+	{"hv.cpu.utilization", VMCHECK_FUNC(check_vcenter_hv_cpu_utilization)}, // TODO: DONE
 	{"hv.datacenter.name", VMCHECK_FUNC(check_vcenter_hv_datacenter_name)},
 	{"hv.datastore.discovery", VMCHECK_FUNC(check_vcenter_hv_datastore_discovery)},
 	{"hv.datastore.read", VMCHECK_FUNC(check_vcenter_hv_datastore_read)},
@@ -78,7 +78,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.network.in", VMCHECK_FUNC(check_vcenter_hv_network_in)},
 	{"hv.network.out", VMCHECK_FUNC(check_vcenter_hv_network_out)},
 	{"hv.perfcounter", VMCHECK_FUNC(check_vcenter_hv_perfcounter)},
-	{"hv.power", VMCHECK_FUNC(check_vcenter_hv_power)}, //TODO: done
+	{"hv.power", VMCHECK_FUNC(check_vcenter_hv_power)}, // TODO: done
 	{"hv.sensor.health.state", VMCHECK_FUNC(check_vcenter_hv_sensor_health_state)},
 	{"hv.status", VMCHECK_FUNC(check_vcenter_hv_status)},
 	{"hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
@@ -88,14 +88,14 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
 	{"vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
 	{"vm.cpu.ready", VMCHECK_FUNC(check_vcenter_vm_cpu_ready)},
-	{"vm.cpu.usage", VMCHECK_FUNC(check_vcenter_vm_cpu_usage)}, //TODO: update to retrieve metric from performance counters and add option: average
-	{"vm.cpu.usage.avg", VMCHECK_FUNC(check_vcenter_vm_cpu_usage_avg)}, //TODO: remove
-	{"vm.cpu.latency", VMCHECK_FUNC(check_vcenter_vm_cpu_latency)}, //TODO: done
-	{"vm.cpu.readiness", VMCHECK_FUNC(check_vcenter_vm_cpu_readiness)}, //TODO: done
-	{"vm.cpu.swapwait", VMCHECK_FUNC(check_vcenter_vm_cpu_swapwait)}, //TODO: done
+	{"vm.cpu.usage", VMCHECK_FUNC(check_vcenter_vm_cpu_usage)}, // TODO: update to retrieve metric from performance counters and add option: average
+	{"vm.cpu.usage.avg", VMCHECK_FUNC(check_vcenter_vm_cpu_usage_avg)}, // TODO: remove
+	{"vm.cpu.latency", VMCHECK_FUNC(check_vcenter_vm_cpu_latency)}, // TODO: done
+	{"vm.cpu.readiness", VMCHECK_FUNC(check_vcenter_vm_cpu_readiness)}, // TODO: done
+	{"vm.cpu.swapwait", VMCHECK_FUNC(check_vcenter_vm_cpu_swapwait)}, // TODO: done
 	{"vm.datacenter.name", VMCHECK_FUNC(check_vcenter_vm_datacenter_name)},
 	{"vm.discovery", VMCHECK_FUNC(check_vcenter_vm_discovery)},
-	{"vm.guest.osuptime", VMCHECK_FUNC(check_vcenter_vm_guest_uptime)}, //TODO: should it be here some sort of instance parameter?
+	{"vm.guest.osuptime", VMCHECK_FUNC(check_vcenter_vm_guest_uptime)}, // TODO: should it be here some sort of instance parameter?
 	{"vm.hv.name", VMCHECK_FUNC(check_vcenter_vm_hv_name)},
 	{"vm.memory.size", VMCHECK_FUNC(check_vcenter_vm_memory_size)},
 	{"vm.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_vm_memory_size_ballooned)},
@@ -105,24 +105,24 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.memory.size.usage.host", VMCHECK_FUNC(check_vcenter_vm_memory_size_usage_host)},
 	{"vm.memory.size.private", VMCHECK_FUNC(check_vcenter_vm_memory_size_private)},
 	{"vm.memory.size.shared", VMCHECK_FUNC(check_vcenter_vm_memory_size_shared)},
-	{"vm.memory.size.consumed", VMCHECK_FUNC(check_vcenter_vm_memory_size_consumed)}, //TODO: done
-	{"vm.memory.usage", VMCHECK_FUNC(check_vcenter_vm_memory_usage)}, //TODO: done
-	{"vm.guest.memory.size.swapped", VMCHECK_FUNC(check_vcenter_vm_guest_memory_size_swapped)}, //TODO: done
+	{"vm.memory.size.consumed", VMCHECK_FUNC(check_vcenter_vm_memory_size_consumed)}, // TODO: done
+	{"vm.memory.usage", VMCHECK_FUNC(check_vcenter_vm_memory_usage)}, // TODO: done
+	{"vm.guest.memory.size.swapped", VMCHECK_FUNC(check_vcenter_vm_guest_memory_size_swapped)}, // TODO: done
 	{"vm.net.if.discovery", VMCHECK_FUNC(check_vcenter_vm_net_if_discovery)},
 	{"vm.net.if.in", VMCHECK_FUNC(check_vcenter_vm_net_if_in)},
 	{"vm.net.if.out", VMCHECK_FUNC(check_vcenter_vm_net_if_out)},
-	{"vm.net.if.received", VMCHECK_FUNC(check_vcenter_vm_net_if_received)}, //TODO: done
-	{"vm.net.if.tramsmitted", VMCHECK_FUNC(check_vcenter_vm_net_if_transmitted)}, //TODO: done
-	{"vm.net.if.usage", VMCHECK_FUNC(check_vcenter_vm_net_if_usage)}, //TODO: done
+	{"vm.net.if.received", VMCHECK_FUNC(check_vcenter_vm_net_if_received)}, // TODO: done
+	{"vm.net.if.tramsmitted", VMCHECK_FUNC(check_vcenter_vm_net_if_transmitted)}, // TODO: done
+	{"vm.net.if.usage", VMCHECK_FUNC(check_vcenter_vm_net_if_usage)}, // TODO: done
 	{"vm.perfcounter", VMCHECK_FUNC(check_vcenter_vm_perfcounter)},
 	{"vm.powerstate", VMCHECK_FUNC(check_vcenter_vm_powerstate)},
 	{"vm.storage.committed", VMCHECK_FUNC(check_vcenter_vm_storage_committed)},
 	{"vm.storage.unshared", VMCHECK_FUNC(check_vcenter_vm_storage_unshared)},
 	{"vm.storage.uncommitted", VMCHECK_FUNC(check_vcenter_vm_storage_uncommitted)},
-	{"vm.storage.readoio", VMCHECK_FUNC(check_vcenter_vm_storage_readoio)}, //TODO: done
-	{"vm.storage.writeoio", VMCHECK_FUNC(check_vcenter_vm_storage_writeoio)}, //TODO: done
-	{"vm.storage.totalwritelatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalwritelatency)}, //TODO: done
-	{"vm.storage.totalreadlatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalreadlatency)}, //TODO: done
+	{"vm.storage.readoio", VMCHECK_FUNC(check_vcenter_vm_storage_readoio)}, // TODO: done
+	{"vm.storage.writeoio", VMCHECK_FUNC(check_vcenter_vm_storage_writeoio)}, // TODO: done
+	{"vm.storage.totalwritelatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalwritelatency)}, // TODO: done
+	{"vm.storage.totalreadlatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalreadlatency)}, // TODO: done
 	{"vm.uptime", VMCHECK_FUNC(check_vcenter_vm_uptime)},
 	{"vm.vfs.dev.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_discovery)},
 	{"vm.vfs.dev.read", VMCHECK_FUNC(check_vcenter_vm_vfs_dev_read)},
