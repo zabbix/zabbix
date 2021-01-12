@@ -420,7 +420,9 @@ class CValueMap extends CApiService {
 			}
 		}
 
-		$this->checkDuplicates($names_by_hostid);
+		if ($names_by_hostid) {
+			$this->checkDuplicates($names_by_hostid);
+		}
 	}
 
 	protected function addRelatedObjects(array $options, array $db_valuemaps) {
