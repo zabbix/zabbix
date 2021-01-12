@@ -2811,8 +2811,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item->flags = (unsigned char)atoi(row[18]);
 		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
-		interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
-
 		if (SUCCEED != is_time_suffix(row[22], &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
 
@@ -2867,7 +2865,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		}
 
 		if (ITEM_STATUS_ACTIVE == status)
+		{
+			interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
 			dc_interface_update_agent_stats(interface, type, 1);
+		}
 
 		item->type = type;
 		item->status = status;
