@@ -91,7 +91,7 @@ $parameters_table->addRow([
 
 $form_list = (new CFormList())
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name']))
+		(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>script'))
@@ -115,11 +115,11 @@ $form_list = (new CFormList())
 		(new CTextArea('command', $data['command']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxLength(255)
+			->setMaxLength(DB::getFieldLength('scripts', 'command'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
-		(new CTextBox('commandipmi', $data['commandipmi']))
+		(new CTextBox('commandipmi', $data['commandipmi'], false, DB::getFieldLength('scripts', 'command')))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -143,10 +143,13 @@ $form_list = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow(new CLabel(_('Timeout'), 'timeout'),
-		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CTextBox('timeout', $data['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('scripts', 'description'))
 	);
 
 $select_usrgrpid = (new CSelect('usrgrpid'))
@@ -193,7 +196,8 @@ $form_list
 	);
 
 $form_list->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
-	(new CTextBox('confirmation', $data['confirmation']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	SPACE,
 	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 ]);
