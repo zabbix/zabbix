@@ -28,6 +28,8 @@ class testPageTriggers extends CLegacyWebTest {
 
 	public $hostid = 99050;
 
+	private $selector = 'xpath://form[@name="triggersForm"]/table[@class="list-table"]';
+
 	use FilterTrait;
 	use TableTrait;
 
@@ -51,7 +53,7 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		// Get table headers.
 		$result = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath("//thead/tr/th"));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//form[@name="triggersForm"]//thead/tr/th'));
 		foreach ($elements as $element) {
 			$result[] = $element->getText();
 		}
@@ -193,7 +195,7 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->setTags($data['tag_options']['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Name', $this->selector);
 	}
 
 	public function testPageTriggers_ResetTagsFilter() {
@@ -210,11 +212,11 @@ class testPageTriggers extends CLegacyWebTest {
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertTableDataColumn();
+		$this->assertTableDataColumn([], 'Name', $this->selector);
 
 		$form->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertTableDataColumn($result);
+		$this->assertTableDataColumn($result, 'Name', $this->selector);
 	}
 
 	public static function getFilterData() {
@@ -444,7 +446,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Name', $this->selector);
 	}
 
 	public static function getHostAndGroupData() {
@@ -609,6 +611,6 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->assertFalse($this->query('button:Create trigger (select host first)')->one()->isEnabled());
 		$this->assertTrue($this->query('class:breadcrumb')->all()->isEmpty());
 		// Check results in table.
-		$this->assertTableData(CTestArrayHelper::get($data, 'result', []));
+		$this->assertTableData(CTestArrayHelper::get($data, 'result', []), $this->selector);
 	}
 }
