@@ -737,7 +737,6 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 
 			if (itemTypeInterface($this->item_type) === false) {
-				$output[] = 'main';
 				$host_interfaces = API::HostInterface()->get([
 					'output' => $output,
 					'hostids' => $this->host['hostid'],
