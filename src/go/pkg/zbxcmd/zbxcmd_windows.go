@@ -49,7 +49,7 @@ func execute(s string, timeout time.Duration, strict bool) (out string, err erro
 
 	var job windows.Handle
 	if job, err = windows.CreateJobObject(nil, nil); err != nil {
-		return "", err
+		return
 	}
 	defer windows.CloseHandle(job)
 
@@ -72,7 +72,7 @@ func execute(s string, timeout time.Duration, strict bool) (out string, err erro
 
 	if err = windows.AssignProcessToJobObject(job, processHandle); err != nil {
 		log.Warningf("cannot assign process to a job: %s", err)
-		return "", err
+		return
 	}
 
 	t := time.AfterFunc(timeout, func() {
@@ -84,7 +84,7 @@ func execute(s string, timeout time.Duration, strict bool) (out string, err erro
 	var rc uintptr
 	if rc, _, err = ntResumeProcess.Call(uintptr(processHandle)); int32(rc) < 0 {
 		log.Warningf("cannot resume process: %s", err)
-		return "", err
+		return
 	}
 
 	if strict {
