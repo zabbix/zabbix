@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"zabbix.com/pkg/uri"
+
 	"github.com/omeid/go-yarn"
 )
 
@@ -34,8 +36,9 @@ func TestConnManager_closeUnused(t *testing.T) {
 		yarn.NewFromMap(map[string]string{}))
 	defer connMgr.Destroy()
 
-	uri, _ := newURIWithCreds(Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv)
-	_, err := connMgr.create(*uri)
+	u, _ := uri.NewWithCreds(Config.ora_uri+"/"+Config.ora_srv, Config.ora_user, Config.ora_pwd, uriDefaults)
+
+	_, err := connMgr.create(*u)
 	if err != nil {
 		t.Errorf("ConnManager.create() should create a connection, but got error: %s", err.Error())
 		return
@@ -44,7 +47,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		connMgr.closeUnused()
 		if len(connMgr.connections) != 0 {
-			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
 	})
 }
@@ -54,9 +57,9 @@ func TestConnManager_closeAll(t *testing.T) {
 		yarn.NewFromMap(map[string]string{}))
 	defer connMgr.Destroy()
 
-	uri, _ := newURIWithCreds(Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv)
+	u, _ := uri.NewWithCreds(Config.ora_uri+"/"+Config.ora_srv, Config.ora_user, Config.ora_pwd, uriDefaults)
 
-	_, err := connMgr.create(*uri)
+	_, err := connMgr.create(*u)
 	if err != nil {
 		t.Errorf("ConnManager.create() should create a connection, but got error: %s", err.Error())
 		return
@@ -65,20 +68,20 @@ func TestConnManager_closeAll(t *testing.T) {
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		connMgr.closeAll()
 		if len(connMgr.connections) != 0 {
-			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
 	})
 }
 
 func TestConnManager_create(t *testing.T) {
-	uri, _ := newURIWithCreds(Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv)
+	u, _ := uri.NewWithCreds(Config.ora_uri+"/"+Config.ora_srv, Config.ora_user, Config.ora_pwd, uriDefaults)
 
 	connMgr := NewConnManager(300*time.Second, 30*time.Second, 30*time.Second, hkInterval*time.Second,
 		yarn.NewFromMap(map[string]string{}))
 	defer connMgr.Destroy()
 
 	type args struct {
-		uri URI
+		uri uri.URI
 	}
 
 	tests := []struct {
@@ -91,14 +94,14 @@ func TestConnManager_create(t *testing.T) {
 		{
 			name:      "Should return *OraConn",
 			c:         connMgr,
-			args:      args{uri: *uri},
+			args:      args{uri: *u},
 			want:      &OraConn{},
 			wantPanic: false,
 		},
 		{
 			name:      "Must panic if connection already exists",
 			c:         connMgr,
-			args:      args{uri: *uri},
+			args:      args{uri: *u},
 			want:      nil,
 			wantPanic: true,
 		},
@@ -126,19 +129,19 @@ func TestConnManager_create(t *testing.T) {
 }
 
 func TestConnManager_get(t *testing.T) {
-	uri, _ := newURIWithCreds(Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv)
+	u, _ := uri.NewWithCreds(Config.ora_uri+"/"+Config.ora_srv, Config.ora_user, Config.ora_pwd, uriDefaults)
 
 	connMgr := NewConnManager(300*time.Second, 30*time.Second, 30*time.Second, hkInterval*time.Second,
 		yarn.NewFromMap(map[string]string{}))
 	defer connMgr.Destroy()
 
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
-		if got := connMgr.get(*uri); got != nil {
+		if got := connMgr.get(*u); got != nil {
 			t.Errorf("ConnManager.get() = %v, want <nil>", got)
 		}
 	})
 
-	conn, err := connMgr.create(*uri)
+	conn, err := connMgr.create(*u)
 	if err != nil {
 		t.Errorf("ConnManager.create() should create a connection, but got error: %s", err.Error())
 		return
@@ -147,7 +150,7 @@ func TestConnManager_get(t *testing.T) {
 	lastTimeAccess := conn.lastTimeAccess
 
 	t.Run("Should return connection if it exists", func(t *testing.T) {
-		got := connMgr.get(*uri)
+		got := connMgr.get(*u)
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("ConnManager.get() = %v, want %v", got, conn)
 		}
@@ -160,14 +163,14 @@ func TestConnManager_get(t *testing.T) {
 func TestConnManager_GetConnection(t *testing.T) {
 	var conn *OraConn
 
-	uri, _ := newURIWithCreds(Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv)
+	u, _ := uri.NewWithCreds(Config.ora_uri+"/"+Config.ora_srv, Config.ora_user, Config.ora_pwd, uriDefaults)
 
 	connMgr := NewConnManager(300*time.Second, 30*time.Second, 30*time.Second, hkInterval*time.Second,
 		yarn.NewFromMap(map[string]string{}))
 	defer connMgr.Destroy()
 
 	t.Run("Should create connection if it does not exist", func(t *testing.T) {
-		got, _ := connMgr.GetConnection(*uri)
+		got, _ := connMgr.GetConnection(*u)
 		if reflect.TypeOf(got) != reflect.TypeOf(conn) {
 			t.Errorf("ConnManager.GetConnection() = %s, want *OraConn", reflect.TypeOf(got))
 		}
@@ -175,7 +178,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 	})
 
 	t.Run("Should return previously created connection", func(t *testing.T) {
-		got, _ := connMgr.GetConnection(*uri)
+		got, _ := connMgr.GetConnection(*u)
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("ConnManager.GetConnection() = %v, want %v", got, conn)
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1580,13 +1580,6 @@ class testFormHost extends CWebTest {
 
 		// Clone host.
 		$this->query('button', $type)->waitUntilClickable()->one()->click();
-		$form->invalidate();
-		if ($full_clone) {
-			$original_items = CDBHelper::getAll('SELECT name FROM items WHERE itemid '
-					. 'IN ('.CDBHelper::escape(array_values(self::$itemids)).') ORDER BY name');
-			$cloned_items = $form->getField('Items')->getOptions()->asText();
-			$this->assertEquals(array_column($original_items, 'name'), $cloned_items);
-		}
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 

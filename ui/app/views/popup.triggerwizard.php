@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,10 +100,12 @@ $form->addItem(
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('add_key_or', _('OR')))->addClass(ZBX_STYLE_BTN_GREY),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CComboBox('expr_type', null, null, [
-				CTextTriggerConstructor::EXPRESSION_TYPE_MATCH => _('Include'),
-				CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH => _('Exclude')
-			]))->setId('expr_type'),
+			(new CSelect('expr_type'))
+				->addOptions(CSelect::createOptionsFromArray([
+					CTextTriggerConstructor::EXPRESSION_TYPE_MATCH => _('Include'),
+					CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH => _('Exclude')
+				]))
+				->setId('expr_type'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('add_exp', _('Add')))->addClass(ZBX_STYLE_BTN_GREY)
 		])

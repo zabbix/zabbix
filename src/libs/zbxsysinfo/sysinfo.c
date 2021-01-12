@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1024,7 +1024,9 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
 	{
 		zbx_strncpy_alloc(out, &out_alloc, &out_offset, pl, pr - pl);
 
-		pr++;
+		/* check if increasing pointer by 1 will not result in buffer overrun */
+		if ('\0' != pr[1])
+			pr++;
 
 		if ('0' == *pr)
 		{

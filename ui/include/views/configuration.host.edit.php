@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,273 +195,17 @@ $hostList->addRow(_('Description'),
 );
 
 // Proxy
-if ($data['readonly']) {
-	$proxy = (new CTextBox(null,
-		($data['proxy_hostid'] == 0) ? _('(no proxy)') : $data['proxies'][$data['proxy_hostid']], true)
-	)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-	$hostList->addVar('proxy_hostid', $data['proxy_hostid']);
-}
-else {
-	$proxy = new CComboBox('proxy_hostid', $data['proxy_hostid'], null, [0 => _('(no proxy)')] + $data['proxies']);
-	$proxy->setEnabled(true);
-}
-
-$hostList->addRow(_('Monitored by proxy'), $proxy);
+$hostList->addRow(new CLabel(_('Monitored by proxy'), 'label-proxy'),
+	(new CSelect('proxy_hostid'))
+		->setValue($data['proxy_hostid'])
+		->setFocusableElementId('label-proxy')
+		->setReadonly($data['readonly'])
+		->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+);
 
 $hostList->addRow(_('Enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
 );
-
-if ($data['clone_hostid'] != 0) {
-	// host applications
-	$hostApps = API::Application()->get([
-		'output' => ['name'],
-		'hostids' => [$data['clone_hostid']],
-		'inherited' => false,
-		'preservekeys' => true,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-
-	if ($hostApps) {
-		$applicationsList = [];
-		foreach ($hostApps as $hostAppId => $hostApp) {
-			$applicationsList[$hostAppId] = $hostApp['name'];
-		}
-		order_result($applicationsList);
-
-		$listBox = new CListBox('applications', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($applicationsList);
-		$hostList->addRow(_('Applications'), $listBox);
-	}
-
-	// host items
-	$hostItems = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'key_', 'name'],
-		'hostids' => [$data['clone_hostid']],
-		'inherited' => false,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	]);
-
-	if ($hostItems) {
-		$hostItems = CMacrosResolverHelper::resolveItemNames($hostItems);
-
-		$itemsList = [];
-		foreach ($hostItems as $hostItem) {
-			$itemsList[$hostItem['itemid']] = $hostItem['name_expanded'];
-		}
-		order_result($itemsList);
-
-		$listBox = new CListBox('items', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($itemsList);
-		$hostList->addRow(_('Items'), $listBox);
-	}
-
-	// host triggers
-	$hostTriggers = API::Trigger()->get([
-		'output' => ['triggerid', 'description'],
-		'selectItems' => ['type'],
-		'hostids' => [$data['clone_hostid']],
-		'inherited' => false,
-		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]]
-	]);
-
-	if ($hostTriggers) {
-		$triggersList = [];
-
-		foreach ($hostTriggers as $hostTrigger) {
-			if (httpItemExists($hostTrigger['items'])) {
-				continue;
-			}
-			$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
-		}
-
-		if ($triggersList) {
-			order_result($triggersList);
-
-			$listBox = new CListBox('triggers', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($triggersList);
-			$hostList->addRow(_('Triggers'), $listBox);
-		}
-	}
-
-	// host graphs
-	$hostGraphs = API::Graph()->get([
-		'output' => ['graphid', 'name'],
-		'selectHosts' => ['hostid'],
-		'selectItems' => ['type'],
-		'hostids' => [$data['clone_hostid']],
-		'inherited' => false,
-		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]]
-	]);
-
-	if ($hostGraphs) {
-		$graphsList = [];
-		foreach ($hostGraphs as $hostGraph) {
-			if (count($hostGraph['hosts']) > 1) {
-				continue;
-			}
-			if (httpItemExists($hostGraph['items'])) {
-				continue;
-			}
-			$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
-		}
-
-		if ($graphsList) {
-			order_result($graphsList);
-
-			$listBox = new CListBox('graphs', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($graphsList);
-			$hostList->addRow(_('Graphs'), $listBox);
-		}
-	}
-
-	// discovery rules
-	$hostDiscoveryRuleIds = [];
-
-	$hostDiscoveryRules = API::DiscoveryRule()->get([
-		'output' => ['itemid', 'hostid', 'key_', 'name'],
-		'hostids' => [$data['clone_hostid']],
-		'inherited' => false
-	]);
-
-	if ($hostDiscoveryRules) {
-		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemNames($hostDiscoveryRules);
-
-		$discoveryRuleList = [];
-		foreach ($hostDiscoveryRules as $discoveryRule) {
-			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name_expanded'];
-		}
-		order_result($discoveryRuleList);
-		$hostDiscoveryRuleIds = array_keys($discoveryRuleList);
-
-		$listBox = new CListBox('discoveryRules', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($discoveryRuleList);
-		$hostList->addRow(_('Discovery rules'), $listBox);
-	}
-
-	// item prototypes
-	$hostItemPrototypes = API::ItemPrototype()->get([
-		'output' => ['itemid', 'hostid', 'key_', 'name'],
-		'hostids' => [$data['clone_hostid']],
-		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false
-	]);
-
-	if ($hostItemPrototypes) {
-		$hostItemPrototypes = CMacrosResolverHelper::resolveItemNames($hostItemPrototypes);
-
-		$prototypeList = [];
-		foreach ($hostItemPrototypes as $itemPrototype) {
-			$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name_expanded'];
-		}
-		order_result($prototypeList);
-
-		$listBox = new CListBox('itemsPrototypes', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($prototypeList);
-		$hostList->addRow(_('Item prototypes'), $listBox);
-	}
-
-	// Trigger prototypes
-	$hostTriggerPrototypes = API::TriggerPrototype()->get([
-		'output' => ['triggerid', 'description'],
-		'selectItems' => ['type'],
-		'hostids' => [$data['clone_hostid']],
-		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false
-	]);
-
-	if ($hostTriggerPrototypes) {
-		$prototypeList = [];
-		foreach ($hostTriggerPrototypes as $triggerPrototype) {
-			// skip trigger prototypes with web items
-			if (httpItemExists($triggerPrototype['items'])) {
-				continue;
-			}
-			$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
-		}
-
-		if ($prototypeList) {
-			order_result($prototypeList);
-
-			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
-			$hostList->addRow(_('Trigger prototypes'), $listBox);
-		}
-	}
-
-	// Graph prototypes
-	$hostGraphPrototypes = API::GraphPrototype()->get([
-		'output' => ['graphid', 'name'],
-		'selectHosts' => ['hostid'],
-		'hostids' => [$data['clone_hostid']],
-		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false
-	]);
-
-	if ($hostGraphPrototypes) {
-		$prototypeList = [];
-		foreach ($hostGraphPrototypes as $graphPrototype) {
-			if (count($graphPrototype['hosts']) == 1) {
-				$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
-			}
-		}
-		order_result($prototypeList);
-
-		$listBox = new CListBox('graphPrototypes', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($prototypeList);
-		$hostList->addRow(_('Graph prototypes'), $listBox);
-	}
-
-	// host prototypes
-	$hostPrototypes = API::HostPrototype()->get([
-		'output' => ['hostid', 'name'],
-		'discoveryids' => $hostDiscoveryRuleIds,
-		'inherited' => false
-	]);
-
-	if ($hostPrototypes) {
-		$prototypeList = [];
-		foreach ($hostPrototypes as $hostPrototype) {
-			$prototypeList[$hostPrototype['hostid']] = $hostPrototype['name'];
-		}
-		order_result($prototypeList);
-
-		$listBox = new CListBox('hostPrototypes', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($prototypeList);
-		$hostList->addRow(_('Host prototypes'), $listBox);
-	}
-
-	// web scenarios
-	$httpTests = API::HttpTest()->get([
-		'output' => ['httptestid', 'name'],
-		'hostids' => [$data['clone_hostid']],
-		'inherited' => false
-	]);
-
-	if ($httpTests) {
-		$httpTestList = [];
-
-		foreach ($httpTests as $httpTest) {
-			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
-		}
-
-		order_result($httpTestList);
-
-		$listBox = new CListBox('httpTests', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($httpTestList);
-		$hostList->addRow(_('Web scenarios'), $listBox);
-	}
-}
 
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
@@ -577,26 +321,26 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
  * IPMI
  */
 if ($data['readonly']) {
-	$cmbIPMIAuthtype = [
+	$ipmi_authtype_select = [
 		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_authtype', $data['ipmi_authtype'])
 	];
-	$cmbIPMIPrivilege = [
+	$ipmi_privilege_select = [
 		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_privilege', $data['ipmi_privilege'])
 	];
 }
 else {
-	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
-	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
+	$ipmi_authtype_select = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, ipmiAuthTypes());
+	$ipmi_privilege_select = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, ipmiPrivileges());
 }
 
 $divTabs->addTab('ipmiTab', _('IPMI'),
 	(new CFormList())
-		->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
-		->addRow(_('Privilege level'), $cmbIPMIPrivilege)
+		->addRow(_('Authentication algorithm'), $ipmi_authtype_select)
+		->addRow(_('Privilege level'), $ipmi_privilege_select)
 		->addRow(_('Username'),
 			(new CTextBox('ipmi_username', $data['ipmi_username'], $data['readonly']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

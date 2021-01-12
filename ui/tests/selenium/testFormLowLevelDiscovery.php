@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1551,7 +1551,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if (array_key_exists('macro', $data)) {
 			$this->zbxTestTabSwitch('Filters');
 			$this->zbxTestInputTypeWait('conditions_0_macro', $data['macro']);
-			$this->zbxTestDropdownSelectWait('conditions_0_operator', $data['operator']);
+			$this->zbxTestDropdownSelectWait('conditions[0][operator]', $data['operator']);
 			$this->zbxTestInputType('conditions_0_value', $data['expression']);
 		}
 
@@ -1591,7 +1591,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
-			$this->zbxTestAssertElementPresentXpath("//select[@id='type']/option[text()='$type']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");
 			switch ($type) {
 				case 'Zabbix agent':
 				case 'Simple check':
@@ -1728,7 +1728,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $macro) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}
@@ -1868,7 +1868,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $macro) {
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
-				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestDropdownSelectWait('conditions['.$i.'][operator]', $macro['operator']);
 				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}

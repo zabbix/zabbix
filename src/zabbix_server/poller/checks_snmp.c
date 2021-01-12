@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -811,6 +811,7 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 	oid	parsed_oid[MAX_OID_LEN];
 	size_t	parsed_oid_len = MAX_OID_LEN;
 	char	printed_oid[MAX_STRING_LEN];
+	char	*printed_oid_escaped;
 
 	/**************************************************************************************************************/
 	/*                                                                                                            */
@@ -880,11 +881,15 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 		return SUCCEED;
 	}
 
-	if (NULL == snmp_parse_oid(printed_oid, parsed_oid, &parsed_oid_len))
+	printed_oid_escaped = zbx_dyn_escape_string(printed_oid, "\\");
+
+	if (NULL == snmp_parse_oid(printed_oid_escaped, parsed_oid, &parsed_oid_len))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot parse OID '%s'", __func__, printed_oid);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot parse OID '%s'", __func__, printed_oid_escaped);
+		zbx_free(printed_oid_escaped);
 		goto numeric;
 	}
+	zbx_free(printed_oid_escaped);
 
 	if (parsed_oid_len == objid_len && 0 == memcmp(parsed_oid, objid, parsed_oid_len * sizeof(oid)))
 	{

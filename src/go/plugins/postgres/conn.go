@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,7 +197,7 @@ func (c *connManager) GetPostgresConnection(connString string) (conn *postgresCo
 	return
 }
 
-// GetPostgresVersion exec query to get PG version from PG we conected to
+// GetPostgresVersion exec query to get PG version from PG we connected to
 func GetPostgresVersion(conn *pgxpool.Pool) (versionPG string, err error) {
 	err = conn.QueryRow(context.Background(), "select current_setting('server_version_num');").Scan(&versionPG)
 	if err != nil {

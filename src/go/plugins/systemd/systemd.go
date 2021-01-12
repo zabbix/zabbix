@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,6 +67,16 @@ type unitJson struct {
 	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
 }
 
+type state struct {
+	State int    `json:"state"`
+	Text  string `json:"text"`
+}
+
+type stateMapping struct {
+	unitName   string
+	stateNames []string
+}
+
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
 	var err error
 	var conn *dbus.Conn
@@ -123,6 +133,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	defer p.releaseConnection(conn)
 
 	switch key {
+	case "systemd.unit.get":
+		return p.get(params, conn)
 	case "systemd.unit.discovery":
 		return p.discovery(params, conn)
 	case "systemd.unit.info":
@@ -130,6 +142,42 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
+}
+
+func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
+	var unitType string
+	var values map[string]interface{}
+
+	if len(params) > 2 {
+		return nil, fmt.Errorf("Too many parameters.")
+	}
+
+	if len(params) == 0 || len(params[0]) == 0 {
+		return nil, fmt.Errorf("Invalid first parameter.")
+	}
+
+	if len(params) < 2 || len(params[1]) == 0 {
+		unitType = "Unit"
+	} else {
+		unitType = params[1]
+	}
+
+	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
+	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType).Store(&values)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot get unit property: %s", err)
+	}
+
+	if unitType == "Unit" {
+		p.setUnitStates(values)
+	}
+
+	val, err := json.Marshal(values)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+	}
+
+	return string(val), nil
 }
 
 func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error) {
@@ -155,7 +203,6 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 	var units []unit
 	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1"))
 	err := obj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store(&units)
-
 	if nil != err {
 		return nil, fmt.Errorf("Cannot retrieve list of units: %s", err)
 	}
@@ -218,8 +265,28 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 		unitType = params[2]
 	}
 
-	name := params[0]
+	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
+	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
+	if nil != err {
+		return nil, fmt.Errorf("Cannot get unit property: %s", err)
+	}
 
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.Slice:
+		fallthrough
+	case reflect.Array:
+		ret, err := json.Marshal(value)
+		if nil != err {
+			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+		}
+
+		return string(ret), nil
+	}
+
+	return value, nil
+}
+
+func getName(name string) string {
 	nameEsc := make([]byte, len(name)*3)
 	j := 0
 	for i := 0; i < len(name); i++ {
@@ -237,32 +304,41 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 		nameEsc[j] = zbxNum2hex(name[i] & 0xf)
 		j++
 	}
+	return string(nameEsc[:j])
+}
 
-	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+string(nameEsc[:j])))
-	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
-
-	if nil != err {
-		return nil, fmt.Errorf("Cannot get unit property: %s", err)
+func (p *Plugin) setUnitStates(v map[string]interface{}) {
+	mappings := []stateMapping{
+		{"LoadState", []string{"loaded", "error", "masked"}},
+		{"ActiveState", []string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}},
+		{"UnitFileState", []string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}},
 	}
 
-	switch reflect.TypeOf(value).Kind() {
-	case reflect.Slice:
-		fallthrough
-	case reflect.Array:
-		ret, err := json.Marshal(value)
+	for _, mapping := range mappings {
+		p.createStateMapping(v, mapping.unitName, mapping.stateNames)
+	}
+}
 
-		if nil != err {
-			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names []string) {
+	if value, ok := v[key].(string); ok {
+		for i, name := range names {
+			if value == name {
+				v[key] = &state{i + 1, value}
+				return
+			}
 		}
-
-		return string(ret), nil
+		v[key] = &state{0, value}
+		p.Debugf("cannot create mapping for '%s' unit state: unknown state '%s'", key, value)
+	} else {
+		p.Debugf("cannot create mapping for '%s' unit state: unit state with information type string not found", key)
 	}
 
-	return value, nil
 }
 
 func init() {
 	plugin.RegisterMetrics(&impl, "Systemd",
+		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
 		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
-		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].")
+		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
+	)
 }

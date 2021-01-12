@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,14 +70,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->assertEquals($form->getField($name)->getValue(), $value);
 				switch ($value) {
 					case 'SNMP agent':
-						$this->assertTrue($form->query('id:filter_snmp_oid')->one()->isVisible());
+						$this->assertTrue($form->getField('SNMP OID')->isVisible());
 						break;
 					case 'Zabbix trapper':
-						$this->assertFalse($form->query('id:filter_delay_row')->one()->isVisible());
+						$this->assertFalse($form->getField('Update interval')->isVisible());
 						break;
 					case 'Normal':
 					case 'Not supported':
-						$this->assertFalse($form->query('id:filter_status')->one()->isEnabled());
+						$this->assertFalse($form->getField('Status')->isEnabled());
+						$this->assertEquals('all', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -109,7 +110,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertRowCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$start_contents = $this->getTableData();
 
 		// Filling fields with needed discovery rule info.
@@ -118,7 +119,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertRowCount(1);
+		$this->assertTableStats(1);
 
 		// Checking that filtered discovery rule matches expected.
 		$this->assertEquals(['Discovery rule 3'], $this->getTableData());
@@ -126,7 +127,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
-		$this->assertRowCount($table->getRows()->count());
+		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, $this->getTableData());
 	}
 

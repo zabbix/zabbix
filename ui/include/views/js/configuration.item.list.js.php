@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,29 +25,12 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function() {
-		// disable the status filter when using the state filter
-		jQuery('#filter_state').change(function(event, saveValue) {
-			var stateObj = jQuery(this),
-				statusObj = jQuery('#filter_status'),
-				saveValue = (saveValue === undefined) ? true : saveValue;
+	$(() => {
+		const $status = $('#filter_status');
 
-			if (stateObj.val() == -1) {
-				// restore the last remembered status filter value
-				if (statusObj.prop('disabled') && statusObj.data('last-value') !== undefined) {
-					statusObj.val(statusObj.data('last-value'));
-				}
-				statusObj.prop('disabled', false);
-			}
-			else {
-				// remember the last status filter value
-				if (!statusObj.prop('disabled') && saveValue) {
-					statusObj.data('last-value', statusObj.val());
-				}
-				statusObj.prop('disabled', true).val(<?php echo ITEM_STATUS_ACTIVE ?>);
-			}
-		})
-		.trigger('change', false);
+		$('#filter_state').on('change', (e) => {
+			$status.prop('disabled', e.target.value != -1);
+		}).trigger('change');
 	});
 </script>
 

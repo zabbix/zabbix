@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,7 +133,9 @@ else {
 }
 
 // Append languages to form list.
-$lang = new CComboBox('lang', $data['lang']);
+$lang = (new CSelect('lang'))
+	->setFocusableElementId('label-lang')
+	->setValue($data['lang']);
 
 $all_locales_available = 1;
 
@@ -148,7 +150,7 @@ foreach (getLocales() as $localeid => $locale) {
 	 */
 	$locale_available = ($localeid === 'en_GB' || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
 
-	$lang->addItem($localeid, $locale['name'], null, $locale_available);
+	$lang->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
 	$all_locales_available &= (int) $locale_available;
 }
@@ -166,7 +168,7 @@ elseif ($all_locales_available == 0) {
 }
 
 $user_form_list
-	->addRow(_('Language'),
+	->addRow(new CLabel(_('Language'), $lang->getFocusableElementId()),
 		($language_error !== '')
 			? [$lang, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CSpan($language_error))
@@ -175,8 +177,11 @@ $user_form_list
 			]
 			: $lang
 	)
-	->addRow(_('Theme'),
-		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + APP::getThemes())
+	->addRow(new CLabel(_('Theme'), 'label-theme'),
+		(new CSelect('theme'))
+			->setFocusableElementId('label-theme')
+			->setValue($data['theme'])
+			->addOptions(CSelect::createOptionsFromArray([THEME_DEFAULT => _('System default')] + APP::getThemes()))
 	);
 
 // Append auto-login & auto-logout to form list.
@@ -313,16 +318,19 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 if ($data['action'] === 'user.edit') {
 	$permissions_form_list = new CFormList('permissionsFormList');
 
-	$type_combobox = new CComboBox('type', $data['type'], 'submit()', user_type2str());
+	$type_select = (new CSelect('type'))
+		->setFocusableElementId('label-type')
+		->setValue($data['type'])
+		->addOptions(CSelect::createOptionsFromArray(user_type2str()));
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-		$type_combobox->setEnabled(false);
-		$permissions_form_list->addRow(_('User type'),
-			[$type_combobox, ' ', new CSpan(_('User can\'t change type for himself'))]
+		$type_select->setDisabled();
+		$permissions_form_list->addRow(new CLabel(_('User type'), $type_select->getFocusableElementId()),
+			[$type_select, ' ', new CSpan(_('User can\'t change type for himself'))]
 		);
 	}
 	else {
-		$permissions_form_list->addRow(_('User type'), $type_combobox);
+		$permissions_form_list->addRow(new CLabel(_('User type'), $type_select->getFocusableElementId()), $type_select);
 	}
 
 	$permissions_table = (new CTable())
@@ -369,12 +377,16 @@ if ($data['action'] !== 'user.edit') {
 			(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
 			'timeout_row'
 		)
-		->addRow(_('Play sound'),
-			new CComboBox('messages[sounds.repeat]', $data['messages']['sounds.repeat'], null, [
-				1 => _('Once'),
-				10 => _n('%1$s second', '%1$s seconds', 10),
-				-1 => _('Message timeout')
-			]),
+		->addRow(new CLabel(_('Play sound'), 'label-sounds'),
+			(new CSelect('messages[sounds.repeat]'))
+				->setId('messages_sounds.repeat')
+				->setFocusableElementId('label-sounds')
+				->setValue($data['messages']['sounds.repeat'])
+				->addOptions(CSelect::createOptionsFromArray([
+					1 => _('Once'),
+					10 => _n('%1$s second', '%1$s seconds', 10),
+					-1 => _('Message timeout')
+				])),
 			'repeat_row'
 		);
 
@@ -387,7 +399,10 @@ if ($data['action'] !== 'user.edit') {
 				->setChecked($data['messages']['triggers.recovery'] == 1)
 				->setUncheckedValue(0),
 			[
-				new CComboBox('messages[sounds.recovery]', $data['messages']['sounds.recovery'], null, $zbx_sounds),
+				(new CSelect('messages[sounds.recovery]'))
+					->setId('messages_sounds.recovery')
+					->setValue($data['messages']['sounds.recovery'])
+					->addOptions(CSelect::createOptionsFromArray($zbx_sounds)),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
@@ -419,7 +434,10 @@ if ($data['action'] !== 'user.edit') {
 				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[
-				new CComboBox('messages[sounds.'.$severity.']', $data['messages']['sounds.'.$severity], null, $zbx_sounds),
+				(new CSelect('messages[sounds.'.$severity.']'))
+					->setId('messages_sounds.'.$severity)
+					->setValue($data['messages']['sounds.'.$severity])
+					->addOptions(CSelect::createOptionsFromArray($zbx_sounds)),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,14 +47,17 @@ $discoveryFormList = (new CFormList())
 	);
 
 // Append proxy to form list.
-$proxyComboBox = (new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']))
-	->addItem(0, _('No proxy'));
+$proxy_select = (new CSelect('proxy_hostid'))
+	->setValue($this->data['drule']['proxy_hostid'])
+	->setFocusableElementId('label-proxy')
+	->addOption(new CSelectOption(0, _('No proxy')));
+
 foreach ($this->data['proxies'] as $proxy) {
-	$proxyComboBox->addItem($proxy['proxyid'], $proxy['host']);
+	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
 }
 
 $discoveryFormList
-	->addRow(_('Discovery by proxy'), $proxyComboBox)
+	->addRow(new CLabel(_('Discovery by proxy'), $proxy_select->getFocusableElementId()), $proxy_select)
 	->addRow((new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
 		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

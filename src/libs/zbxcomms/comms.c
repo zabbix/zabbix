@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,7 +191,6 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  * Purpose: retrieve IP address by host name                                  *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_IPV6
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 {
 	struct addrinfo	hints, *ai = NULL;
@@ -222,26 +221,6 @@ out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
 }
-#else
-void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
-{
-	struct in_addr	*addr;
-	struct hostent  *hst;
-
-	assert(host);
-
-	if (NULL == (hst = gethostbyname(host)))
-	{
-		ip[0] = '\0';
-		return;
-	}
-
-	addr = (struct in_addr *)hst->h_addr_list[0];
-
-	zbx_strlcpy(ip , inet_ntoa(*addr),iplen);
-}
-#endif	/* HAVE_IPV6 */
-
 
 #endif	/* _WINDOWS */
 
@@ -531,6 +510,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
+	zbx_socket_clean(s);
+
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -549,7 +530,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 #endif
-	zbx_socket_clean(s);
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
 	memset(&hints, 0x00, sizeof(struct addrinfo));
@@ -635,7 +615,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	ZBX_SOCKADDR	servaddr_in;
-	struct hostent	*hp;
+	struct addrinfo	hints, *ai;
 	char		*error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
@@ -659,17 +639,21 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif
 	zbx_socket_clean(s);
 
-	if (NULL == (hp = gethostbyname(ip)))
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = type;
+
+	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
 #ifdef _WINDOWS
-		zbx_set_socket_strerror("gethostbyname() failed for '%s': %s",
+		zbx_set_socket_strerror("getaddrinfo() failed for '%s': %s",
 				ip, strerror_from_system(WSAGetLastError()));
 #else
 #ifdef HAVE_HSTRERROR
-		zbx_set_socket_strerror("gethostbyname() failed for '%s': [%d] %s",
+		zbx_set_socket_strerror("getaddrinfo() failed for '%s': [%d] %s",
 				ip, h_errno, hstrerror(h_errno));
 #else
-		zbx_set_socket_strerror("gethostbyname() failed for '%s': [%d]",
+		zbx_set_socket_strerror("getaddrinfo() failed for '%s': [%d]",
 				ip, h_errno);
 #endif
 #endif
@@ -677,8 +661,10 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 	servaddr_in.sin_family = AF_INET;
-	servaddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_addr = ((struct sockaddr_in *)ai->ai_addr)->sin_addr;
 	servaddr_in.sin_port = htons(port);
+
+	freeaddrinfo(ai);
 
 	if (ZBX_SOCKET_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
 	{
@@ -2054,7 +2040,15 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 	return SUCCEED;
 }
 
-#ifdef HAVE_IPV6
+#ifndef HAVE_IPV6
+static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+{
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
+
+	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
+}
+#else
 static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
@@ -2126,7 +2120,6 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				break;
 		}
 	}
-
 	return FAIL;
 }
 #endif
@@ -2211,11 +2204,7 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 
 	for (start = tmp; '\0' != *start;)
 	{
-#ifdef HAVE_IPV6
 		struct addrinfo	hints, *ai = NULL, *current_ai;
-#else
-		struct hostent	*hp;
-#endif /* HAVE_IPV6 */
 
 		prefix_size = -1;
 
@@ -2231,11 +2220,6 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 				*cidr_sep = '/';	/* CIDR is only supported for IP */
 		}
 
-		/* When adding IPv6 support it was decided to leave current implementation   */
-		/* (based on gethostbyname()) for handling non-IPv6-enabled components. In   */
-		/* the future it should be considered to switch completely to getaddrinfo(). */
-
-#ifdef HAVE_IPV6
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
@@ -2261,25 +2245,7 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 			}
 			freeaddrinfo(ai);
 		}
-#else
-		if (NULL != (hp = gethostbyname(start)))
-		{
-			int	i;
 
-			for (i = 0; NULL != hp->h_addr_list[i]; i++)
-			{
-				if (-1 == prefix_size)
-					prefix_size = IPV4_MAX_CIDR_PREFIX;
-
-				if (SUCCEED == subnet_match(AF_INET, prefix_size,
-						&((struct in_addr *)hp->h_addr_list[i])->s_addr,
-						&s->peer_info.sin_addr.s_addr))
-				{
-					return SUCCEED;
-				}
-			}
-		}
-#endif	/* HAVE_IPV6 */
 		if (NULL != end)
 			start = end + 1;
 		else

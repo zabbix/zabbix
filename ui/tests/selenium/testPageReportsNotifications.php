@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,11 +41,6 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('media_type', 'all');
 		$this->zbxTestDropdownAssertSelected('period', 'Weekly');
 		$this->zbxTestDropdownAssertSelected('year', date('Y'));
-		// Check media type links
-		$media_types = CDBHelper::getAll('SELECT mediatypeid,name FROM media_type');
-		foreach ($media_types as $media) {
-			$this->zbxTestAssertElementText('//a[@href="zabbix.php?action=mediatype.edit&mediatypeid='.$media['mediatypeid'].'"]', $media['name']);
-		}
 
 		// Get users from DB
 		$user_alias = [];
@@ -78,21 +73,15 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '4 (0/2/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0/0/0/0)', '',
-									'', '', '', '', '', '', '12 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0/0/0/0)'
-							]
+							'notifications' => [ '', '', '', '4', '', '', '', '', '', '', '', '12']
 						],
 						[
 							'alias' => 'guest',
-							'notifications' => [ '', '2 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0)', '', '', '',
-									'', '', '', '', '10 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/5/0/0/0/0/0/0/0/0/0/0)', '', ''
-							]
+							'notifications' => [ '', '2', '', '', '', '', '', '', '', '10', '', '']
 						],
 						[
 							'alias' => 'test-user',
-							'notifications' => [ '', '', '3 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0/0/0/0)', '', '',
-								'', '', '', '', '', '11 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0/0/0/0)', ''
-							]
+							'notifications' => [ '', '', '3', '', '', '', '', '', '', '', '11', '']
 						]
 					]
 				]
@@ -109,13 +98,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '', '', '', '', '', '',
-								'15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0/0/0/0)', '']
+							'notifications' => [ '', '', '', '', '', '', '', '', '', '', '15', '']
 						],
 						[
 							'alias' => 'user-for-blocking',
-							'notifications' => [ '', '', '', '', '', '',
-								'14 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0/0/0/0)', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '', '', '14', '', '', '', '', '']
 						]
 					]
 				]
@@ -127,13 +114,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '', '',
-								'16 (0/8/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0/0/0/0)', '']
+							'notifications' => [ '', '', '', '', '', '16', '']
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0/0/0/0)',
-								'7 (0/3/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/4/0/0/0/0/0/0/0/0/0/0)', '']
+							'notifications' => [ '', '', '', '', '15', '7', '']
 						]
 					]
 				]

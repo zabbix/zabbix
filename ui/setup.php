@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,6 +108,11 @@ if (!CWebUser::$data) {
 (new CPageHeader(_('Installation')))
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
+	->addJsFile((new CUrl('js/vendors/jquery.js'))->getUrl())
+	->addJsFile((new CUrl('js/class.overlaycollection.js'))->getUrl())
+	->addJsFile((new CUrl('js/common.js'))->getUrl())
+	->addJsFile((new CUrl('js/class.template.js'))->getUrl())
+	->addJsFile((new CUrl('js/component.z-select.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)
 		->setArgument('lang', CWebUser::$data['lang'])

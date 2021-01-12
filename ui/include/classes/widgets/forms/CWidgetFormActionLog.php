@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class CWidgetFormActionLog extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_ACTION_LOG);
 
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
+		$field_sort = (new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type').' ('._('descending').')',

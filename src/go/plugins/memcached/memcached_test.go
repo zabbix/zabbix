@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,13 @@
 package memcached
 
 import (
+	"errors"
 	"io"
 	"reflect"
 	"testing"
 	"time"
+
+	"zabbix.com/pkg/zbxerr"
 
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/plugins/memcached/mockserver"
@@ -31,7 +34,7 @@ import (
 
 func handleStat(req *mockserver.MCRequest, w io.Writer) (ret *mockserver.MCResponse) {
 	ret = &mockserver.MCResponse{}
-	ret.Status = mockserver.SUCCESS
+	ret.Status = mockserver.Success
 
 	switch string(req.Key) {
 	case statsTypeGeneral:
@@ -58,7 +61,7 @@ func handleStat(req *mockserver.MCRequest, w io.Writer) (ret *mockserver.MCRespo
 		ret.Body = []byte("1024")
 		_, _ = ret.Transmit(w)
 	default:
-		ret.Status = mockserver.UNKNOWN_COMMAND
+		ret.Status = mockserver.UnknownCommand
 		return
 	}
 
@@ -72,14 +75,25 @@ func handleNoOp(_ *mockserver.MCRequest, _ io.Writer) *mockserver.MCResponse {
 	return &mockserver.MCResponse{}
 }
 
+func TestPlugin_Start(t *testing.T) {
+	p := Plugin{}
+
+	t.Run("Connection manager must be initialized", func(t *testing.T) {
+		p.Start()
+		if p.connMgr == nil {
+			t.Error("Connection manager is not initialized")
+		}
+	})
+}
+
 func TestPlugin_Export(t *testing.T) {
 	ms, err := mockserver.NewMockServer()
 	if err != nil {
 		panic(err)
 	}
 
-	ms.RegisterHandler(mockserver.STAT, handleStat)
-	ms.RegisterHandler(mockserver.NOOP, handleNoOp)
+	ms.RegisterHandler(mockserver.Stat, handleStat)
+	ms.RegisterHandler(mockserver.Noop, handleNoOp)
 
 	go ms.ListenAndServe()
 
@@ -106,66 +120,52 @@ func TestPlugin_Export(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name:       "Unknown metric",
-			p:          &p,
-			args:       args{"unknown.metric", nil, nil},
-			wantResult: nil,
-			wantErr:    errorUnsupportedMetric,
-		},
-		{
 			name:       "Too many parameters",
 			p:          &p,
 			args:       args{keyPing, []string{"tcp://127.0.0.1", "", "", "excess_param"}, nil},
 			wantResult: nil,
-			wantErr:    errorTooManyParameters,
+			wantErr:    zbxerr.ErrorTooManyParameters,
 		},
 		{
-			name:       "Should fail if unknown session given",
-			p:          &p,
-			args:       args{"foo", []string{"fakeSession"}, nil},
-			wantResult: nil,
-			wantErr:    errorUnknownSession,
-		},
-		{
-			name:       "statsHandler should create connection to server and get general stats",
+			name:       "Must successfully get general stats",
 			p:          &p,
 			args:       args{keyStats, []string{"tcp://" + ms.GetAddr()}, nil},
 			wantResult: `{"version":"1.4.15"}`,
 			wantErr:    nil,
 		},
 		{
-			name:       "params should be passed correctly",
+			name:       "Type parameter must be passed correctly",
 			p:          &p,
 			args:       args{keyStats, []string{"tcp://" + ms.GetAddr(), "", "", statsTypeItems}, nil},
 			wantResult: `{"items:1:number":"1"}`,
 			wantErr:    nil,
 		},
 		{
-			name:       "statsHandler should fail if server is not working",
+			name:       "Must fail if server is not working",
 			p:          &p,
 			args:       args{keyStats, []string{"tcp://127.0.0.1:1"}, nil},
 			wantResult: nil,
-			wantErr:    errorCannotFetchData,
+			wantErr:    errors.New("Cannot fetch data: dial tcp 127.0.0.1:1: connect: connection refused."),
 		},
 		{
-			name:       "pingHandler should create connection to server and run NoOp command",
-			p:          &p,
-			args:       args{keyPing, []string{"tcp://" + ms.GetAddr()}, nil},
-			wantResult: pingOk,
-			wantErr:    nil,
-		},
-		{
-			name:       "pingHandler should fail if server is not working",
+			name:       "Must not fail if server is not working for " + keyPing,
 			p:          &p,
 			args:       args{keyPing, []string{"tcp://127.0.0.1:1"}, nil},
 			wantResult: pingFailed,
+			wantErr:    nil,
+		},
+		{
+			name:       "pingHandler must create connection to server and run NoOp command",
+			p:          &p,
+			args:       args{keyPing, []string{"tcp://" + ms.GetAddr()}, nil},
+			wantResult: pingOk,
 			wantErr:    nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
-			if err != tt.wantErr {
+			if err != nil && (tt.wantErr == nil || err.Error() != tt.wantErr.Error()) {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -174,17 +174,6 @@ func TestPlugin_Export(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestPlugin_Start(t *testing.T) {
-	p := Plugin{}
-
-	t.Run("Connection manager must be initialized", func(t *testing.T) {
-		p.Start()
-		if p.connMgr == nil {
-			t.Error("Connection manager is not initialized")
-		}
-	})
 }
 
 func TestPlugin_Stop(t *testing.T) {

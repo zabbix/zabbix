@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -223,7 +223,7 @@ $tab_axes = (new CFormList())->addRow('',
 			->addRow(CWidgetHelper::getLabel($fields['lefty_min']), CWidgetHelper::getNumericBox($fields['lefty_min']))
 			->addRow(CWidgetHelper::getLabel($fields['lefty_max']), CWidgetHelper::getNumericBox($fields['lefty_max']))
 			->addRow(CWidgetHelper::getLabel($fields['lefty_units']), [
-				CWidgetHelper::getComboBox($fields['lefty_units'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				CWidgetHelper::getSelect($fields['lefty_units'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				CWidgetHelper::getTextBox($fields['lefty_static_units'])
 			])
 			->addClass(ZBX_STYLE_COLUMN_33),
@@ -237,7 +237,7 @@ $tab_axes = (new CFormList())->addRow('',
 				CWidgetHelper::getNumericBox($fields['righty_max'])
 			)
 			->addRow(CWidgetHelper::getLabel($fields['righty_units']), [
-				CWidgetHelper::getComboBox($fields['righty_units'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				CWidgetHelper::getSelect($fields['righty_units'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				CWidgetHelper::getTextBox($fields['righty_static_units'])
 			])
 			->addClass(ZBX_STYLE_COLUMN_33),
@@ -299,7 +299,7 @@ $form_tabs = (new CTabView())
 // Add CTabView to form.
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .multiselect", onGraphConfigChange);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, z-select, .multiselect", onGraphConfigChange);';
 $scripts[] =
 	'jQuery(function($) {'.
 		'onGraphConfigChange();'.

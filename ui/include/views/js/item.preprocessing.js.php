@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,22 +26,25 @@
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-tmpl">
 	<?php
-	$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
+	$preproc_types_select = (new CSelect('preprocessing[#{rowNum}][type]'))
+		->setId('preprocessing_#{rowNum}_type')
+		->setValue(ZBX_PREPROC_REGSUB)
+		->setWidthAuto();
 
 	foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $group) {
-		$cb_group = new COptGroup($group['label']);
+		$opt_group = new CSelectOptionGroup($group['label']);
 
 		foreach ($group['types'] as $type => $label) {
-			$cb_group->addItem(new CComboItem($type, $label));
+			$opt_group->addOption(new CSelectOption($type, $label));
 		}
 
-		$preproc_types_cbbox->addItem($cb_group);
+		$preproc_types_select->addOptionGroup($opt_group);
 	}
 
 	echo (new CListItem([
 		(new CDiv([
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-			(new CDiv($preproc_types_cbbox))
+			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),
 			(new CDiv())->addClass('step-parameters'),
@@ -243,8 +246,8 @@
 		$preprocessing
 			.on('click', '.element-table-add', function() {
 				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
-					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index})),
-					type = $('select[name*="type"]', $row).val();
+					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index}));
+					type = $('z-select[name*="type"]', $row).val();
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
@@ -269,7 +272,7 @@
 			})
 			.on('click', '#preproc_test_all', function() {
 				var step_nums = [];
-				$('select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
+				$('z-select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
 					var str = $(this).attr('name');
 					step_nums.push(str.substr(14, str.length - 21));
 				});
@@ -298,7 +301,7 @@
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 			})
-			.on('change', 'select[name*="type"]', function() {
+			.on('change', 'z-select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
 					type = $(this).val(),
 					$on_fail = $row.find('[name*="on_fail"]');

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import (
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+
+	"zabbix.com/pkg/log"
 )
 
 const S_FALSE = 0x1
@@ -48,46 +50,114 @@ type valueResult struct {
 	data interface{}
 }
 
-// DeviceID is always appended to results which are sorted alphabetically - so it's location is not fixed.
+func clearOle(quals *ole.VARIANT) {
+	if err := quals.Clear(); err != nil {
+		log.Errf("cannot clear OLE: %s", err)
+	}
+}
+
+func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err error) {
+	rawQuals, err := propsCol.GetProperty("Qualifiers_")
+	if err != nil {
+		return false, err
+	}
+	defer clearOle(rawQuals)
+
+	quals := rawQuals.ToIDispatch()
+	defer quals.Release()
+
+	isKeyProperty = false
+
+	// loop through Property Qualifiers to find if this Property
+	// is a Key and should be skipped unless specifically queried for
+	oleErr := oleutil.ForEach(quals, func(vc2 *ole.VARIANT) (err error) {
+		qualsCol := vc2.ToIDispatch()
+		defer qualsCol.Release()
+
+		qualsName, err := oleutil.GetProperty(qualsCol, "Name")
+		if err != nil {
+			return
+		}
+		defer clearOle(qualsName)
+
+		if qualsName.Value().(string) == "key" {
+			isKeyProperty = true
+			return stopErrorCol
+		}
+		return
+	})
+	if _, ok := oleErr.(stopError); !ok {
+		return false, oleErr
+	}
+
+	return isKeyProperty, nil
+}
+
+// Key Qualifier ('Name', 'DeviceID', 'Tag' etc.) is always appended to results which are sorted alphabetically,
+// so it's location is not fixed.
 // The following processing rules will be applied depending on query:
-// * only DeviceID column is returned - it means deviceid was explicitly selected and must be returned
-// * DeviceID and more columns are returned - return value of the first column not named DeviceID
+// * only Key Qualifier column is returned - it means Key Qualifier was explicitly selected and must be returned
+// * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
+//   its Qualifiers_ property list
 func (r *valueResult) write(rs *ole.IDispatch) (err error) {
-	var deviceID interface{}
+	v, err := oleutil.GetProperty(rs, "Count")
+	if err != nil {
+		return err
+	}
+	defer clearOle(v)
+	if v.Val == 0 {
+		return errors.New("Empty WMI search result.")
+	}
+
+	var propertyKeyFieldValue interface{}
+
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
 		defer row.Release()
 
-		raw, err := row.GetProperty("Properties_")
+		rawProps, err := row.GetProperty("Properties_")
 		if err != nil {
 			return
 		}
-		defer raw.Clear()
-		props := raw.ToIDispatch()
+		defer clearOle(rawProps)
+
+		props := rawProps.ToIDispatch()
 		defer props.Release()
+
 		err = oleutil.ForEach(props, func(vc *ole.VARIANT) (err error) {
-			col := vc.ToIDispatch()
-			defer col.Release()
+			propsCol := vc.ToIDispatch()
+			defer propsCol.Release()
 
-			name, err := oleutil.GetProperty(col, "Name")
+			propsName, err := oleutil.GetProperty(propsCol, "Name")
 			if err != nil {
 				return
 			}
-			defer name.Clear()
+			defer clearOle(propsName)
 
-			val, err := oleutil.GetProperty(col, "Value")
+			propsVal, err := oleutil.GetProperty(propsCol, "Value")
 			if err != nil {
 				return
 			}
-			if name.Value().(string) != "DeviceID" {
-				r.data = val.Value()
+			defer clearOle(propsVal)
+
+			if propsVal.Value() == nil {
+				return errors.New("Empty WMI search result.")
+			}
+
+			isKeyProperty, err := isPropertyKeyProperty(propsCol)
+			if err != nil {
+				return
+			}
+
+			if !isKeyProperty {
+				r.data = propsVal.Value()
 				return stopErrorCol
-			} else {
-				// remeber deviceid value in the case it was the only selected column
-				deviceID = val.Value()
 			}
+			// remember key field value in the case it was the only selected column
+			propertyKeyFieldValue = propsVal.Value()
 			return
 		})
+
 		if err == nil {
 			return stopErrorRow
 		}
@@ -97,7 +167,7 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 		return oleErr
 	} else {
 		if oleErr == nil || stop == stopErrorRow {
-			r.data = deviceID
+			r.data = propertyKeyFieldValue
 		}
 	}
 	return
@@ -114,43 +184,75 @@ func variantToValue(v *ole.VARIANT) (result interface{}) {
 	return v.ToArray().ToValueArray()
 }
 
+// Key Qualifier is always appended to the result from ole library. This behavior is different from agent 1 which
+// uses the wmi enumerator and can set the WBEM_FLAG_NONSYSTEM_ONLY flag that would filter it. Ole library has only
+// the basic enumerator that cannot set any flags.
+// So that, we end up with these results for wmi.getAll where cases 1 and 2 are inconsistent with agent 1:
+//   1) 1 non-Key qualifier field selected	- key qualifier attached to the result, 2 elements are returned
+//   2) N non-Key qualifier fields selected	- key qualifier attached to the result, N+1 elements are returned
+//   3) Key qualifier field selected		- single key qualifier element is returned
+//   4) 1 non-Key qualifier and 1 Key qualifier elements selected
+//						- 2 elements are returned
+//   5) N fields selected and one of them is a Key-qualifier
+//						- N elements are returned
+//   6) * is selected				- all elements are returned (including the Key-qualifier)
 func (r *tableResult) write(rs *ole.IDispatch) (err error) {
+	v, err := oleutil.GetProperty(rs, "Count")
+	if err != nil {
+		return err
+	}
+	defer clearOle(v)
+
 	r.data = make([]map[string]interface{}, 0)
+
 	oleErr := oleutil.ForEach(rs, func(v *ole.VARIANT) (err error) {
 		rsRow := make(map[string]interface{})
 		row := v.ToIDispatch()
 		defer row.Release()
 
-		raw, err := row.GetProperty("Properties_")
+		rawProps, err := row.GetProperty("Properties_")
 		if err != nil {
 			return
 		}
-		defer raw.Clear()
-		props := raw.ToIDispatch()
+		defer clearOle(rawProps)
+
+		props := rawProps.ToIDispatch()
 		defer props.Release()
 		err = oleutil.ForEach(props, func(v *ole.VARIANT) (err error) {
-			col := v.ToIDispatch()
-			defer col.Release()
+			propsCol := v.ToIDispatch()
+			defer propsCol.Release()
 
-			name, err := oleutil.GetProperty(col, "Name")
+			propsName, err := oleutil.GetProperty(propsCol, "Name")
 			if err != nil {
 				return
 			}
-			defer name.Clear()
-			val, err := oleutil.GetProperty(col, "Value")
+			defer clearOle(propsName)
+
+			propsVal, err := oleutil.GetProperty(propsCol, "Value")
 			if err != nil {
 				return
 			}
-			defer val.Clear()
-			rsRow[name.ToString()] = variantToValue(val)
+			defer clearOle(propsVal)
+
+			variantValue := variantToValue(propsVal)
+			if variantValue != nil {
+				rsRow[propsName.ToString()] = variantValue
+			}
+
 			return
 		})
-		r.data = append(r.data, rsRow)
+
+		if 0 < len(rsRow) {
+			r.data = append(r.data, rsRow)
+		}
+
 		return
 	})
+
 	if _, ok := oleErr.(stopError); !ok {
 		return oleErr
 	}
+
 	return
 }
 
@@ -193,15 +295,6 @@ func performQuery(namespace string, query string, w resultWriter) (err error) {
 	result := raw.ToIDispatch()
 	defer raw.Clear()
 
-	v, err := oleutil.GetProperty(result, "Count")
-	if err != nil {
-		return
-	}
-	defer v.Clear()
-	count := int64(v.Val)
-	if count == 0 {
-		return
-	}
 	return w.write(result)
 }
 
@@ -216,7 +309,7 @@ func QueryValue(namespace string, query string) (value interface{}, err error) {
 	return r.data, nil
 }
 
-// QueryValue returns the result set returned by the query in a slice of maps, containing
+// QueryTable returns the result set returned by the query in a slice of maps, containing
 // field name, value pairs. The field values can be either nil (null value) or pointer of
 // the value in string format.
 func QueryTable(namespace string, query string) (table []map[string]interface{}, err error) {

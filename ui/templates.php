@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -653,10 +653,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			// copy template screens
 			$dbTemplateScreens = API::TemplateScreen()->get([
+				'noInheritance' => true,
 				'output' => ['screenid'],
 				'templateids' => $cloneTemplateId,
-				'preservekeys' => true,
-				'inherited' => false
+				'preservekeys' => true
 			]);
 
 			if ($dbTemplateScreens) {

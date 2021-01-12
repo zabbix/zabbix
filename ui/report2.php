@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'multiselect.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'multiselect.js', 'report2.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -192,7 +192,6 @@ else {
 	$select_mode = (new CSelect('mode'))
 		->setValue($report_mode)
 		->setFocusableElementId('mode')
-		->onChange('$(this).closest("form").submit()')
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_HOST, _('By host')))
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')));
 
@@ -205,7 +204,9 @@ else {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$select_mode
 			])
-	));
+		)
+		->setName('report2')
+	);
 
 	/*
 	 * Filter
@@ -219,7 +220,7 @@ else {
 
 	// Make filter fields.
 	if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		// Sanitize $data['filter']['groups'] and prepare "Template group" combo box.
+		// Sanitize $data['filter']['groups'] and prepare "Template group" select options.
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'templated_hosts' => true,
@@ -233,7 +234,7 @@ else {
 			$data['filter']['groups'] = 0;
 		}
 
-		// Sanitize $data['filter']['hostids'] and prepare "Template" combo box.
+		// Sanitize $data['filter']['hostids'] and prepare "Template" select options.
 		$templates = API::Template()->get([
 			'output' => ['name'],
 			'groupids' => $data['filter']['groups'] ? [$data['filter']['groups']] : null,
@@ -249,14 +250,13 @@ else {
 		$select_filter_hostid = (new CSelect('filter_templateid'))
 			->setValue($data['filter']['hostids'])
 			->setFocusableElementId('filter-templateid')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($templates as $templateid => $template) {
 			$select_filter_hostid->addOption(new CSelectOption($templateid, $template['name']));
 		}
 
-		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" combo box.
+		// Sanitize $data['filter']['tpl_triggerid'] and prepare "Template Trigger" select options.
 		$triggers = API::Trigger()->get([
 			'output' => ['description'],
 			'selectHosts' => ['name'],
@@ -293,7 +293,6 @@ else {
 		$select_tpl_triggerid = (new CSelect('tpl_triggerid'))
 			->setValue($data['filter']['tpl_triggerid'])
 			->setFocusableElementId('tpl-triggerid')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		$tpl_triggerids = [];
@@ -305,7 +304,7 @@ else {
 			$tpl_triggerids[$triggerid] = true;
 		}
 
-		// Sanitize $data['filter']['hostgroupid'] and prepare "Host Group" combo box.
+		// Sanitize $data['filter']['hostgroupid'] and prepare "Host Group" select options.
 		$host_groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'monitored_hosts' => true,
@@ -321,7 +320,6 @@ else {
 		$select_hostgroupid = (new CSelect('hostgroupid'))
 			->setValue($data['filter']['hostgroupid'])
 			->setFocusableElementId('hostgroupid')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($host_groups as $groupid => $group) {
@@ -378,7 +376,6 @@ else {
 			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
-			->onChange('$(this).closest("form").submit()')
 			->addOption(new CSelectOption(0, _('all')));
 
 		foreach ($groups as $groupid => $group) {

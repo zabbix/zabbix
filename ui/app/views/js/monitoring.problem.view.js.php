@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@
 
 <script type="text/x-jquery-tmpl" id="filter-inventory-row">
 	<?= (new CRow([
-			new CComboBox('filter_inventory[#{rowNum}][field]', null, null, $data['filter']['inventories']),
+			(new CSelect('filter_inventory[#{rowNum}][field]'))
+				->addOptions(CSelect::createOptionsFromArray($data['filter']['inventories'])),
 			(new CTextBox('filter_inventory[#{rowNum}][value]'))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('filter_inventory[#{rowNum}][remove]', _('Remove')))

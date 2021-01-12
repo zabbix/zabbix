@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,25 +43,31 @@ $operations_popup_form = (new CForm())
 
 $operations_popup_form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Object'), 'operationobject')),
-		(new CComboBox('operationobject', $options['operationobject'], null, [
-			OPERATION_OBJECT_ITEM_PROTOTYPE => _('Item prototype'),
-			OPERATION_OBJECT_TRIGGER_PROTOTYPE => _('Trigger prototype'),
-			OPERATION_OBJECT_GRAPH_PROTOTYPE => _('Graph prototype'),
-			OPERATION_OBJECT_HOST_PROTOTYPE => _('Host prototype')
-		]))
+		(new CLabel(_('Object'), 'label-operationobject')),
+		(new CSelect('operationobject'))
+			->setValue($options['operationobject'])
+			->setFocusableElementId('label-operationobject')
+			->addOptions(CSelect::createOptionsFromArray([
+				OPERATION_OBJECT_ITEM_PROTOTYPE => _('Item prototype'),
+				OPERATION_OBJECT_TRIGGER_PROTOTYPE => _('Trigger prototype'),
+				OPERATION_OBJECT_GRAPH_PROTOTYPE => _('Graph prototype'),
+				OPERATION_OBJECT_HOST_PROTOTYPE => _('Host prototype')
+			]))
 			->setId('operationobject')
 			->setReadonly($options['templated'])
 	)
-	->addRow((new CLabel(_('Condition'), 'operator')), [
-		(new CComboBox('operator', $options['operator'], null, [
-			CONDITION_OPERATOR_EQUAL  => _('equals'),
-			CONDITION_OPERATOR_NOT_EQUAL  => _('does not equal'),
-			CONDITION_OPERATOR_LIKE  => _('contains'),
-			CONDITION_OPERATOR_NOT_LIKE  => _('does not contain'),
-			CONDITION_OPERATOR_REGEXP => _('matches'),
-			CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-		]))
+	->addRow((new CLabel(_('Condition'), 'label-operator')), [
+		(new CSelect('operator'))
+			->setValue($options['operator'])
+			->setFocusableElementId('label-operator')
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_OPERATOR_EQUAL  => _('equals'),
+				CONDITION_OPERATOR_NOT_EQUAL  => _('does not equal'),
+				CONDITION_OPERATOR_LIKE  => _('contains'),
+				CONDITION_OPERATOR_NOT_LIKE  => _('does not contain'),
+				CONDITION_OPERATOR_REGEXP => _('matches'),
+				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
+			]))
 			->setReadonly($options['templated'])
 			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('value', $options['value'], $options['templated'],

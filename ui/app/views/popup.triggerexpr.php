@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,11 +95,16 @@ if ($data['parent_discoveryid'] !== '') {
 
 $expression_form_list->addRow((new CLabel(_('Item'), 'item_description'))->setAsteriskMark(), $item);
 
-$function_combo_box = new CComboBox('function', $data['function'], 'reloadPopup(this.form, "popup.triggerexpr")');
+$function_select = (new CSelect('function'))
+	->setFocusableElementId('label-function')
+	->setId('function')
+	->setValue($data['function']);
+
 foreach ($data['functions'] as $id => $f) {
-	$function_combo_box->addItem($id, $f['description']);
+	$function_select->addOption(new CSelectOption($id, $f['description']));
 }
-$expression_form_list->addRow(_('Function'), $function_combo_box);
+
+$expression_form_list->addRow(new CLabel(_('Function'), $function_select->getFocusableElementId()), $function_select);
 
 if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 	$paramid = 0;
@@ -125,10 +130,9 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 						$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_COUNTS))->removeId());
 					}
 					else {
-						$param_type_element = new CComboBox('paramtype',
-							$param_value === '' ? PARAM_TYPE_TIME : $data['paramtype'],
-							null, $param_function['M']
-						);
+						$param_type_element = (new CSelect('paramtype'))
+							->setValue($param_value === '' ? PARAM_TYPE_TIME : $data['paramtype'])
+							->addOptions(CSelect::createOptionsFromArray($param_function['M']));
 					}
 				}
 				else {
@@ -166,11 +170,12 @@ else {
 
 $expression_form_list->addRow(
 	(new CLabel(_('Result'), 'value'))->setAsteriskMark(), [
-		new CComboBox('operator', $data['operator'], null,
-			array_combine($data['functions'][$data['function']]['operators'],
+		(new CSelect('operator'))
+			->setValue($data['operator'])
+			->setFocusableElementId('value')
+			->addOptions(CSelect::createOptionsFromArray(array_combine($data['functions'][$data['function']]['operators'],
 				$data['functions'][$data['function']]['operators']
-			)
-		),
+			))),
 		' ',
 		(new CTextBox('value', $data['value']))
 			->setAriaRequired()
@@ -192,20 +197,7 @@ $output = [
 			'action' => 'return validate_trigger_expression(overlay);'
 		]
 	],
-	'script_inline' =>
-		'jQuery(function($) {'.
-			'$.valHooks.input = {'.
-				'get: function(elem) {'.
-					'return elem.value;'.
-				'},'.
-				'set: function(elem, value) {'.
-					'var tmp = elem.value;'.
-						'elem.value = value;'.
-
-					'"item_description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr");'.
-				'}'.
-			'};'.
-		'});'
+	'script_inline' => $this->readJsFile('popup.triggerexpr.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

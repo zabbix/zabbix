@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,10 @@ $item_form_list = (new CFormList('item-form-list'))
 			->setLabel(_('Type'))
 			->setChecked(array_key_exists('type', $data['visible']))
 			->setAttribute('autofocus', 'autofocus'),
-		new CComboBox('type', $data['type'], null, $data['itemTypes'])
+		(new CSelect('type'))
+			->setId('type')
+			->setValue($data['type'])
+			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
 	);
 
 // Add interfaces if mass updating item prototypes on host level.
@@ -158,13 +161,16 @@ $item_form_list
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information'))
 			->setChecked(array_key_exists('value_type', $data['visible'])),
-		new CComboBox('value_type', $data['value_type'], null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+		(new CSelect('value_type'))
+			->setId('value_type')
+			->setValue($data['value_type'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	)
 	// Append units to form list.
 	->addRow(
@@ -178,10 +184,13 @@ $item_form_list
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))
 			->setLabel(_('Authentication method'))
 			->setChecked(array_key_exists('authtype', $data['visible'])),
-		new CComboBox('authtype', $data['authtype'], null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		])
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue($data['authtype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
 	)
 	// Append username to form list.
 	->addRow(
@@ -336,19 +345,17 @@ $item_form_list
 			->setId('trends_div')
 	);
 
-	// Append status (create enabled) to form list.
-$status_combo_box = new CComboBox('status', $data['status']);
-
-foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
-	$status_combo_box->addItem($status, item_status2str($status));
-}
-
 $item_form_list
+	// Append status (create enabled) to form list.
 	->addRow(
 		(new CVisibilityBox('visible[status]', 'status', _('Original')))
 			->setLabel(_('Create enabled'))
 			->setChecked(array_key_exists('status', $data['visible'])),
-		$status_combo_box
+		(new CSelect('status'))
+			->setId('status')
+			->setValue($data['status'])
+			->addOption(new CSelectOption(ITEM_STATUS_ACTIVE, item_status2str(ITEM_STATUS_ACTIVE)))
+			->addOption(new CSelectOption(ITEM_STATUS_DISABLED, item_status2str(ITEM_STATUS_DISABLED)))
 	)
 	->addRow(
 		(new CVisibilityBox('visible[discover]', 'discover', _('Original')))
@@ -368,11 +375,13 @@ $item_form_list
 	);
 
 // append valuemap to form list
-$valuemaps_combo_box = new CComboBox('valuemapid', $data['valuemapid']);
-$valuemaps_combo_box->addItem(0, _('As is'));
+$valuemaps_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->addOption(new CSelectOption(0, _('As is')));
 
 foreach ($data['valuemaps'] as $valuemap) {
-	$valuemaps_combo_box->addItem($valuemap['valuemapid'], $valuemap['name']);
+	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 $item_form_list
@@ -380,7 +389,7 @@ $item_form_list
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
 			->setChecked(array_key_exists('valuemapid', $data['visible'])),
-		(new CDiv([$valuemaps_combo_box, ' ',
+		(new CDiv([$valuemaps_select, ' ',
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()

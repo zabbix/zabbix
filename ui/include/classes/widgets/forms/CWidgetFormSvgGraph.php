@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,14 +153,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_lefty_max->getName()] = $field_lefty_max;
 
 		// Specify the type of units on left Y axis.
-		$field_lefty_units = (new CWidgetFieldComboBox('lefty_units', _('Units'), [
+		$field_lefty_units = (new CWidgetFieldSelect('lefty_units', _('Units'), [
 			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
-			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
-			->setAction('jQuery("#lefty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
-			);
+			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO);
 
 		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -228,14 +225,11 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_righty_max->getName()] = $field_righty_max;
 
 		// Specify the type of units on right Y axis.
-		$field_righty_units = (new CWidgetFieldComboBox('righty_units', _('Units'), [
+		$field_righty_units = (new CWidgetFieldSelect('righty_units', _('Units'), [
 			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
-			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
-			->setAction('jQuery("#righty_static_units")'.
-							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))'
-			);
+			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO);
 
 		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_units->setFlags(CWidgetField::FLAG_DISABLED);

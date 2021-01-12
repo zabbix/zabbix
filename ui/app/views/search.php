@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,42 +61,42 @@ foreach ($data['hosts'] as $hostid => $host) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $app_count]
-		: [_('Applications'), $app_count];
+		: _('Applications');
 
 	$items_link = $host['editable']
 		? [new CLink(_('Items'), (new CUrl('items.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $item_count]
-		: [_('Items'), $item_count];
+		: _('Items');
 
 	$triggers_link = $host['editable']
 		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $trigger_count]
-		: [_('Triggers'), $trigger_count];
+		: _('Triggers');
 
 	$graphs_link = $host['editable']
 		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $graph_count]
-		: [_('Graphs'), $graph_count];
+		: _('Graphs');
 
 	$discovery_link = $host['editable']
 		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $discovery_count]
-		: [_('Discovery'), $discovery_count];
+		: _('Discovery');
 
 	$httptests_link = $host['editable']
 		? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $httptest_count]
-		: [_('Web'), $httptest_count];
+		: _('Web');
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$name
@@ -247,46 +247,46 @@ if ($data['admin']) {
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $app_count]
-			: [_('Applications'), $app_count];
+			: _('Applications');
 
 		$items_link = $template['editable']
 			? [new CLink(_('Items'), (new CUrl('items.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $item_count]
-			: [_('Items'), $item_count];
+			: _('Items');
 
 		$triggers_link = $template['editable']
 			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $trigger_count]
-			: [_('Triggers'), $trigger_count];
+			: _('Triggers');
 
 		$graphs_link = $template['editable']
 			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $graph_count]
-			: [_('Graphs'), $graph_count];
+			: _('Graphs');
 
 		$screens_link = $template['editable']
 			? [new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), $screen_count]
-			: [_('Screens'), $screen_count];
+			: _('Screens');
 
 		$discovery_link = $template['editable']
 			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $discovery_count]
-			: [_('Discovery'), $discovery_count];
+			: _('Discovery');
 
 		$httptests_link = $template['editable']
 			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $httptest_count]
-			: [_('Web'), $httptest_count];
+			: _('Web');
 
 		if ($template['host'] !== $template['name'] && strpos($template['host'], $data['search']) !== false) {
 			$template_cell[] = BR();

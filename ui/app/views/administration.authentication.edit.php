@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,11 +43,15 @@ $http_tab = (new CFormList('list_http'))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 			->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
 	)
-	->addRow(new CLabel(_('Default login form'), 'http_login_form'),
-		(new CComboBox('http_login_form', $data['http_login_form'], null, [
-			ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
-			ZBX_AUTH_FORM_HTTP => _('HTTP login form')
-		]))->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+	->addRow(new CLabel(_('Default login form'), 'label-http-login-form'),
+		(new CSelect('http_login_form'))
+			->setFocusableElementId('label-http-login-form')
+			->setValue($data['http_login_form'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
+				ZBX_AUTH_FORM_HTTP => _('HTTP login form')
+			]))
+			->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
 	)
 	->addRow(new CLabel(_('Remove domain name'), 'http_strip_domains'),
 		(new CTextBox('http_strip_domains', $data['http_strip_domains']))

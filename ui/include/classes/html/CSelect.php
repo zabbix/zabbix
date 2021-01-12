@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,19 +111,35 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @param bool $value
+	 *
 	 * @return self
 	 */
-	public function setDisabled(): self {
-		$this->setAttribute('disabled', 'disabled');
+	public function setDisabled(bool $value = true): self {
+		if ($value) {
+			$this->setAttribute('disabled', 'disabled');
+		}
+		else {
+			$this->removeAttribute('disabled');
+		}
 
 		return $this;
 	}
 
 	/**
+	 * Enable or disable readonly mode for the element.
+	 *
+	 * @param bool $value
+	 *
 	 * @return self
 	 */
-	public function setReadonly(): self {
-		$this->setAttribute('readonly', 'true');
+	public function setReadonly(bool $value = true): self {
+		if ($value) {
+			$this->setAttribute('readonly', 'readonly');
+		}
+		else {
+			$this->removeAttribute('readonly');
+		}
 
 		return $this;
 	}
@@ -135,6 +151,15 @@ class CSelect extends CTag {
 	 */
 	public function setWidth(int $width): self {
 		$this->setAttribute('width', $width);
+
+		return $this;
+	}
+
+	/**
+	 * @return self
+	 */
+	public function setWidthAuto(): self {
+		$this->setAttribute('width', 'auto');
 
 		return $this;
 	}
@@ -160,9 +185,7 @@ class CSelect extends CTag {
 	 * @return self
 	 */
 	public function onChange($onchange): self {
-		$this->setAttribute('onchange', $onchange);
-
-		return $this;
+		throw new RuntimeException(sprintf('Method is not implemented: "%s".', __METHOD__));
 	}
 
 	/**
@@ -178,7 +201,7 @@ class CSelect extends CTag {
 		$options = [];
 
 		foreach ($values as $value => $label) {
-			$options[] = new CSelectOption($value, $label);
+			$options[] = new CSelectOption($value, (string) $label);
 		}
 
 		return $options;
@@ -200,6 +223,12 @@ class CSelect extends CTag {
 	public function toString($destroy = true) {
 		$this->setAttribute('name', $this->name);
 		$this->setAttribute('data-options', json_encode($this->toArray()));
+
+		/*
+		 * This attribute makes element "focusable", it match by jQuery(':focusable') queries and also browser would be
+		 * able to evaluate "autofocus" attribute correctly.
+		 */
+		$this->setAttribute('tabindex', '-1');
 
 		return parent::toString($destroy);
 	}

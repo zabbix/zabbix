@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,6 +177,18 @@
 
 		jQuery('#esc_period').change(function() {
 			jQuery('form[name="action.edit"]').submit();
+		});
+
+		$('.js-edit-button').on('click', function() {
+			var operation = $(this).data('operation');
+
+			operation_details.open(this, operation.actionid, operation.eventsource, operation.operationtype,
+				JSON.parse($(['#operations_for_popup', operation.operationtype, operation.operationid].join('_')).val())
+			);
+		});
+
+		$('#evaltype').on('change', () => {
+			processTypeOfCalculation();
 		});
 
 		processTypeOfCalculation();

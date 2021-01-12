@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,11 +22,13 @@ package oracle
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"zabbix.com/pkg/uri"
 
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
@@ -52,7 +54,6 @@ type OraConn struct {
 	username       string
 }
 
-var errorTimeout = "timeout exceeded"
 var errorQueryNotFound = "query %q not found"
 
 // Query wraps DB.QueryContext.
@@ -60,18 +61,19 @@ func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{
 	rows, err = conn.client.QueryContext(ctx, query, args...)
 
 	if ctxErr := ctx.Err(); ctxErr != nil {
-		err = errors.New(errorTimeout)
+		err = ctxErr
 	}
 
 	return
 }
 
 // Query executes a query from queryStorage by its name and returns multiple rows.
-func (conn *OraConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
+func (conn *OraConn) QueryByName(ctx context.Context, queryName string,
+	args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
-		normalizedSql := strings.TrimRight(strings.TrimSpace(sql), ";")
+		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
-		return conn.Query(ctx, normalizedSql, args...)
+		return conn.Query(ctx, normalizedSQL, args...)
 	}
 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
@@ -82,18 +84,19 @@ func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interfa
 	row = conn.client.QueryRowContext(ctx, query, args...)
 
 	if ctxErr := ctx.Err(); ctxErr != nil {
-		err = errors.New(errorTimeout)
+		err = ctxErr
 	}
 
 	return
 }
 
-// Query executes a query from queryStorage by its name and returns a singe row.
-func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
+// Query executes a query from queryStorage by its name and returns a single row.
+func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string,
+	args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
-		normalizedSql := strings.TrimRight(strings.TrimSpace(sql), ";")
+		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
-		return conn.QueryRow(ctx, normalizedSql, args...)
+		return conn.QueryRow(ctx, normalizedSQL, args...)
 	}
 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
@@ -109,11 +112,11 @@ func (conn *OraConn) updateAccessTime() {
 	conn.lastTimeAccess = time.Now()
 }
 
-// Thread-safe structure for manage connections.
+// ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
 	sync.Mutex
 	connMutex      sync.Mutex
-	connections    map[URI]*OraConn
+	connections    map[uri.URI]*OraConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
@@ -122,11 +125,12 @@ type ConnManager struct {
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
+func NewConnManager(keepAlive, connectTimeout, callTimeout,
+	hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[URI]*OraConn),
+		connections:    make(map[uri.URI]*OraConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -180,8 +184,8 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 	}
 }
 
-// create creates a new connection with a given URI and password.
-func (c *ConnManager) create(uri URI) (*OraConn, error) {
+// create creates a new connection with given credentials.
+func (c *ConnManager) create(uri uri.URI) (*OraConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -197,9 +201,14 @@ func (c *ConnManager) create(uri URI) (*OraConn, error) {
 			Module:     godror.DriverName,
 		})
 
+	service, err := url.QueryUnescape(uri.GetParam("service"))
+	if err != nil {
+		return nil, err
+	}
+
 	connectString := fmt.Sprintf(`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 		`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		uri.Host(), uri.Port(), uri.ServiceName(), c.connectTimeout/time.Second)
+		uri.Host(), uri.Port(), service, c.connectTimeout/time.Second)
 
 	connector := godror.NewConnector(godror.ConnectionParams{
 		StandaloneConnection: true,
@@ -233,7 +242,7 @@ func (c *ConnManager) create(uri URI) (*OraConn, error) {
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri URI) *OraConn {
+func (c *ConnManager) get(uri uri.URI) *OraConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -246,7 +255,7 @@ func (c *ConnManager) get(uri URI) *OraConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri URI) (conn *OraConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI) (conn *OraConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 

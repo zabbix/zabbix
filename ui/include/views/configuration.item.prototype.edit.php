@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,17 +58,14 @@ $form_list->addRow(
 );
 
 // Append type to form list.
-if ($readonly) {
-	$form->addVar('type', $data['type']);
-	$form_list->addRow((new CLabel(_('Type'), 'typename')),
-		(new CTextBox('typename', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow((new CLabel(_('Type'), 'type')),
-		(new CComboBox('type', $data['type'], null, $data['types']))
-	);
-}
+$form_list->addRow(new CLabel(_('Type'), 'label-type'),
+	(new CSelect('type'))
+		->setFocusableElementId('label-type')
+		->setId('type')
+		->setValue($data['type'])
+		->addOptions(CSelect::createOptionsFromArray($data['types']))
+		->setReadonly($readonly)
+);
 
 // Append key to form list.
 $key_controls = [
@@ -87,7 +84,7 @@ if (!$readonly) {
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
 			]).
-				',{itemtype: jQuery("#type option:selected").val()}), null, this);'
+				',{itemtype: jQuery("#type").val()}), null, this);'
 		);
 
 }
@@ -166,16 +163,18 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
 	->addRow(
-		new CLabel(_('Request type'), 'request_method'),
-		[
-			$readonly ? new CVar('request_method', $data['request_method']) : null,
-			(new CComboBox($readonly ? '' : 'request_method', $data['request_method'], null, [
+		new CLabel(_('Request type'), 'label-request-method'),
+		(new CSelect('request_method'))
+			->setFocusableElementId('label-request-method')
+			->setId('request_method')
+			->setValue($data['request_method'])
+			->setReadonly($readonly)
+			->addOptions(CSelect::createOptionsFromArray([
 				HTTPCHECK_REQUEST_GET => 'GET',
 				HTTPCHECK_REQUEST_POST => 'POST',
 				HTTPCHECK_REQUEST_PUT => 'PUT',
 				HTTPCHECK_REQUEST_HEAD => 'HEAD'
-			]))->setEnabled(!$readonly)
-		],
+			])),
 		'request_method_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT Timeout field to form list.
@@ -303,16 +302,18 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
 	->addRow(
-		new CLabel(_('HTTP authentication'), 'http_authtype'),
-		[
-			$readonly ? new CVar('http_authtype', $data['http_authtype']) : null,
-			(new CComboBox($readonly ? '' : 'http_authtype', $data['http_authtype'], null, [
+		new CLabel(_('HTTP authentication'), 'label-http-authtype'),
+		(new CSelect('http_authtype'))
+			->setFocusableElementId('label-http-authtype')
+			->setId('http_authtype')
+			->setValue($data['http_authtype'])
+			->setReadonly($readonly)
+			->addOptions(CSelect::createOptionsFromArray([
 				HTTPTEST_AUTH_NONE => _('None'),
 				HTTPTEST_AUTH_BASIC => _('Basic'),
 				HTTPTEST_AUTH_NTLM => _('NTLM'),
 				HTTPTEST_AUTH_KERBEROS => _('Kerberos')
-			]))->setEnabled(!$readonly)
-		],
+			])),
 		'http_authtype_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT User name to form list.
@@ -460,11 +461,15 @@ $form_list
 		'row_ipmi_sensor'
 	)
 	// Append authentication method to form list.
-	->addRow(_('Authentication method'),
-		new CComboBox('authtype', $data['authtype'], null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		]),
+	->addRow(new CLabel(_('Authentication method'), 'label-authtype'),
+		(new CSelect('authtype'))
+			->setFocusableElementId('label-authtype')
+			->setId('authtype')
+			->setValue($data['authtype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			])),
 		'row_authtype'
 	)
 	->addRow((new CLabel(_('JMX endpoint'), 'jmx_endpoint'))->setAsteriskMark(),
@@ -525,24 +530,20 @@ $form_list
 	);
 
 // Append value type to form list.
-if ($readonly) {
-	$form->addVar('value_type', $data['value_type']);
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type_name')),
-		(new CTextBox('value_type_name', itemValueTypeString($data['value_type']), true))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow((new CLabel(_('Type of information'), 'value_type')),
-		(new CComboBox('value_type', $data['value_type'], null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		]))
-	);
-}
+$form_list->addRow((new CLabel(_('Type of information'), 'label-value-type')),
+(new CSelect('value_type'))
+	->setId('value_type')
+	->setFocusableElementId('label-value-type')
+	->setValue($data['value_type'])
+	->addOptions(CSelect::createOptionsFromArray([
+		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+		ITEM_VALUE_TYPE_STR => _('Character'),
+		ITEM_VALUE_TYPE_LOG => _('Log'),
+		ITEM_VALUE_TYPE_TEXT => _('Text')
+	]))
+	->setReadonly($readonly)
+);
 
 $form_list
 	->addRow(_('Units'),
@@ -638,22 +639,31 @@ $form_list
 
 // Append valuemap to form list.
 if ($readonly) {
-	$form->addVar('valuemapid', $data['valuemapid']);
-	$valuemapComboBox = (new CTextBox('valuemap_name',
-		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
-		true
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	if ($data['valuemaps']) {
+		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => $data['valuemaps']]];
+	}
+	else {
+		$valuemaps = [['valuemapid' => $data['valuemapid'], 'name' => _('As is')]];
+	}
 }
 else {
-	$valuemapComboBox = new CComboBox('valuemapid', $data['valuemapid']);
-	$valuemapComboBox->addItem(0, _('As is'));
-	foreach ($data['valuemaps'] as $valuemap) {
-		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
-	}
+	$valuemaps = $data['valuemaps'];
+	array_unshift($valuemaps, ['valuemapid' => 0, 'name' => _('As is')]);
+}
+
+$valuemap_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->setFocusableElementId('label-valuemap')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setReadonly($readonly);
+
+foreach ($valuemaps as $valuemap) {
+	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 $form_list
-	->addRow(_('Show value'), [$valuemapComboBox, SPACE,
+	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, SPACE,
 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
 			->getUrl()
@@ -675,13 +685,13 @@ $form_list
 		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 	);
 
-$applicationComboBox = new CListBox('applications[]', $data['applications'], 6);
-$applicationComboBox->addItem(0, '-'._('None').'-');
+$application_list_box = new CListBox('applications[]', $data['applications'], 6);
+$application_list_box->addItem(0, '-'._('None').'-');
 foreach ($data['db_applications'] as $application) {
-	$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
+	$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
 }
 $form_list
-	->addRow(_('Applications'), $applicationComboBox)
+	->addRow(_('Applications'), $application_list_box)
 	// Append application prototypes to form list.
 	->addRow(new CLabel(_('New application prototype'), 'new_application_prototype'),
 		(new CSpan(

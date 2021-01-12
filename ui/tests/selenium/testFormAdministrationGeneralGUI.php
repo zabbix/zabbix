@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementPresentId('update');
 
-		$this->zbxTestAssertAttribute("//select[@id='default_theme']/option[@selected='selected']", "value", $allValues['default_theme']);
+		$this->assertEquals($allValues['default_theme'], $this->zbxTestGetValue('//z-select[@name="default_theme"]'));
 
 		if ($allValues['server_check_interval']) {
 			$this->assertTrue($this->zbxTestCheckboxSelected('server_check_interval'));
@@ -80,14 +80,14 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestDropdownSelect('default_theme', 'Dark');
-		$this->zbxTestAssertElementValue('default_theme', 'dark-theme');
+		$this->assertEquals('dark-theme', $this->zbxTestGetValue('//z-select[@name="default_theme"]'));
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('dark-theme');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: "Dark" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->zbxTestDropdownSelect('default_theme', 'Blue');
-		$this->zbxTestAssertElementValue('default_theme', 'blue-theme');
+		$this->assertEquals('blue-theme', $this->zbxTestGetValue('//z-select[@name="default_theme"]'));
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('blue-theme');

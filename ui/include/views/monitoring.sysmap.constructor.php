@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,13 +62,17 @@ $menu = (new CList())
 			($data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off')
 		))->addClass(ZBX_STYLE_BTN_LINK)
 	])
-	->addItem(new CComboBox('gridsize', $data['sysmap']['grid_size'], null, [
-		20 => '20x20',
-		40 => '40x40',
-		50 => '50x50',
-		75 => '75x75',
-		100 => '100x100'
-	]))
+	->addItem((new CSelect('gridsize'))
+		->setId('gridsize')
+		->setValue($data['sysmap']['grid_size'])
+		->addOptions(CSelect::createOptionsFromArray([
+			20 => '20x20',
+			40 => '40x40',
+			50 => '50x50',
+			75 => '75x75',
+			100 => '100x100'
+		]))
+	)
 	->addItem((new CButton('gridalignall', _('Align map elements')))->addClass(ZBX_STYLE_BTN_LINK))
 	->addItem((new CSubmit('update', _('Update')))->setId('sysmap_update'));
 

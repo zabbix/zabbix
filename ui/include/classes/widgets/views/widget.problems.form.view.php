@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
 
 // Sort entries by.
 $form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
-	CWidgetHelper::getComboBox($fields['sort_triggers'])
+	CWidgetHelper::getSelect($fields['sort_triggers'])
 );
 
 // Show timeline.
@@ -120,6 +120,19 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']),
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
 
 $form->addItem($form_list);
+
+$sort_with_enabled_show_timeline = [
+	SCREEN_SORT_TRIGGERS_TIME_DESC => true,
+	SCREEN_SORT_TRIGGERS_TIME_ASC => true
+];
+
+$scripts[] = '$("#sort_triggers").on("change", (e) => {'.
+		'var sort_with_enabled_show_timeline = '.json_encode($sort_with_enabled_show_timeline).';'.
+		'$("#show_timeline")'.
+			'.filter(":disabled").prop("checked", true).end()'.
+			'.prop("disabled", !sort_with_enabled_show_timeline[e.target.value])'.
+			'.filter(":disabled").prop("checked", false);'.
+	'});';
 
 return [
 	'form' => $form,

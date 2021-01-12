@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -158,8 +158,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 				$this->zbxTestClickLinkTextWait($itemName);
 				$this->zbxTestAssertElementValue('name', $itemName);
 				$this->zbxTestAssertElementValue('key', $keyName);
-				$this->zbxTestAssertElementValue('type_name', 'Simple check');
-				$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
+				$this->zbxTestDropdownAssertSelected('type', 'Simple check');
+				$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
 				$this->zbxTestAssertElementValue('units', 'units');
 				$this->zbxTestAssertElementValue('delay', '33s');
 				$this->zbxTestAssertElementValue('history', '54d');
@@ -331,7 +331,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('name', 'Test LLD');
 		$this->zbxTestAssertElementValue('key', 'test-lld');
-		$this->zbxTestAssertElementValue('typename', 'Simple check');
+		$this->zbxTestDropdownAssertSelected('type', 'Simple check');
 		$this->zbxTestAssertElementValue('delay', '31s');
 		$this->zbxTestAssertElementValue('lifetime', '32d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
@@ -389,15 +389,15 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementValue('name', 'Test LLD item');
 		$this->zbxTestAssertElementValue('key', 'test-lld-item');
-		$this->zbxTestAssertElementValue('typename', 'Simple check');
-		$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
+		$this->zbxTestDropdownAssertSelected('type', 'Simple check');
+		$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
 		$this->zbxTestAssertElementValue('units', 'units');
 		$this->zbxTestAssertElementValue('delay', '33s');
 		$this->zbxTestAssertElementValue('history', '54d');
 		$this->zbxTestAssertElementValue('trends', '55d');
 		$this->zbxTestAssertElementValue('delay_flex_0_delay', '50s');
 		$this->zbxTestAssertElementValue('delay_flex_0_period', '1-7,00:00-24:00');
-		$this->zbxTestAssertElementValue('valuemap_name', 'APC Battery Status');
+		$this->zbxTestDropdownAssertSelected('valuemapid', 'APC Battery Status');
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);

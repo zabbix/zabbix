@@ -14,11 +14,11 @@ class Module extends CModule {
 	public function init(): void {
 		$menu = APP::Component()->get('menu.main');
 
-		$menu->remove(_('Reports'));
+		$menu->remove('Reports');
 
 		$menu
-			->find(_('Monitoring'))
+			->find('Monitoring')
 			->getSubMenu()
-			->remove(_('Screens'));
+			->remove('Screens');
 	}
 }

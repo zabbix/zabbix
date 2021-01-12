@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,10 @@ $item_form_list = (new CFormList('item-form-list'))
 			->setLabel(_('Type'))
 			->setChecked(isset($data['visible']['type']))
 			->setAttribute('autofocus', 'autofocus'),
-		new CComboBox('type', $data['type'], null, $data['itemTypes'])
+		(new CSelect('type'))
+			->setId('type')
+			->setValue($data['type'])
+			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
 	);
 
 // Append hosts to item form list.
@@ -162,13 +165,16 @@ $item_form_list
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information'))
 			->setChecked(isset($data['visible']['value_type'])),
-		new CComboBox('value_type', $data['value_type'], null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+		(new CSelect('value_type'))
+			->setValue($data['value_type'])
+			->setId('value_type')
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	)
 	// Append units to item form list.
 	->addRow(
@@ -182,10 +188,13 @@ $item_form_list
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))
 			->setLabel(_('Authentication method'))
 			->setChecked(isset($data['visible']['authtype'])),
-		new CComboBox('authtype', $data['authtype'], null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		])
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue($data['authtype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
 	)
 	// Append username to item form list.
 	->addRow(
@@ -338,17 +347,17 @@ $item_form_list
 			->setId('trends_div')
 	);
 
-// Append status to form list.
-$status_combo_box = new CComboBox('status', $data['status']);
-foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
-	$status_combo_box->addItem($status, item_status2str($status));
-}
 $item_form_list
+	// Append status to form list.
 	->addRow(
 		(new CVisibilityBox('visible[status]', 'status', _('Original')))
 			->setLabel(_('Status'))
 			->setChecked(isset($data['visible']['status'])),
-		$status_combo_box
+		(new CSelect('status'))
+			->setId('status')
+			->setValue($data['status'])
+			->addOption(new CSelectOption(ITEM_STATUS_ACTIVE, item_status2str(ITEM_STATUS_ACTIVE)))
+			->addOption(new CSelectOption(ITEM_STATUS_DISABLED, item_status2str(ITEM_STATUS_DISABLED)))
 	)
 	// Append logtime to form list.
 	->addRow(
@@ -359,10 +368,13 @@ $item_form_list
 	);
 
 // Append valuemap to form list.
-$value_maps_combo_box = new CComboBox('valuemapid', $data['valuemapid']);
-$value_maps_combo_box->addItem(0, _('As is'));
+$valuemap_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue($data['valuemapid'])
+	->addOption(new CSelectOption(0, _('As is')));
+
 foreach ($data['valuemaps'] as $valuemap) {
-	$value_maps_combo_box->addItem($valuemap['valuemapid'], $valuemap['name']);
+	$valuemap_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 $item_form_list
@@ -370,7 +382,7 @@ $item_form_list
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
 			->setChecked(isset($data['visible']['valuemapid'])),
-		(new CDiv([$value_maps_combo_box, SPACE,
+		(new CDiv([$valuemap_select, SPACE,
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()

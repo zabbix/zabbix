@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,6 +134,12 @@ static int	SYSTEM_SWAP_USED(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	if (0 == total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is 0."));
+		return SYSINFO_RET_FAIL;
+	}
+
 	SET_UI64_RESULT(result, total - free1);
 
 	return SYSINFO_RET_OK;
@@ -147,6 +153,12 @@ static int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SUCCEED != get_swapinfo(&total, &free1, &error))
 	{
 		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 == total)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is 0."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -168,7 +180,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == total)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is 0."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -190,7 +202,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == total)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is zero."));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -212,7 +224,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -220,16 +232,26 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 1);
 
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "free"))	/* default parameter */
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "free"))
+	{
 		ret = SYSTEM_SWAP_FREE(request, result);
+	}
 	else if (0 == strcmp(tmp, "total"))
+	{
 		ret = SYSTEM_SWAP_TOTAL(request, result);
+	}
 	else if (0 == strcmp(tmp, "used"))
+	{
 		ret = SYSTEM_SWAP_USED(request, result);
+	}
 	else if (0 == strcmp(tmp, "pfree"))
+	{
 		ret = SYSTEM_SWAP_PFREE(request, result);
+	}
 	else if (0 == strcmp(tmp, "pused"))
+	{
 		ret = SYSTEM_SWAP_PUSED(request, result);
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

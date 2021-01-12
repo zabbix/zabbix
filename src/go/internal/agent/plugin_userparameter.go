@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,25 +61,35 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 		b.Grow(len(s) + n)
 
 		for i := strings.IndexByte(s, '$'); i != -1; i = strings.IndexByte(s, '$') {
-			if len(s) > i+1 && s[i+1] >= '1' && s[i+1] <= '9' && int(s[i+1]-'0') <= len(params) {
-				param := params[s[i+1]-'0'-1]
-				if p.unsafeUserParameters == 0 {
-					if j := strings.IndexAny(param, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
-						if unicode.IsPrint(rune(param[j])) {
-							return "", fmt.Errorf("Character \"%c\" is not allowed", param[j])
-						}
+			b.WriteString(s[:i])
 
-						return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
-					}
-				}
-
-				b.WriteString(s[:i])
-				b.WriteString(param)
-				s = s[i+2:]
-			} else {
-				b.WriteString(s[:i+1])
-				s = s[i+1:]
+			if len(s) > i+1 {
+				i++
 			}
+
+			if s[i] == '0' {
+				b.WriteString(parameter.cmd)
+			} else if s[i] >= '1' && s[i] <= '9' {
+				if int(s[i]-'0') <= len(params) {
+					param := params[s[i]-'0'-1]
+					if p.unsafeUserParameters == 0 {
+						if j := strings.IndexAny(param, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
+							if unicode.IsPrint(rune(param[j])) {
+								return "", fmt.Errorf("Character \"%c\" is not allowed", param[j])
+							}
+
+							return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
+						}
+					}
+					b.WriteString(param)
+				}
+			} else {
+				if s[i] != '$' {
+					b.WriteByte('$')
+				}
+				b.WriteByte(s[i])
+			}
+			s = s[i+1:]
 		}
 
 		if len(s) != 0 {

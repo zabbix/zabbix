@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$sql = 'SELECT groupid FROM hstgrp';
 		$hgroups = DBfetchArray(DBselect($sql));
 		foreach ($hgroups as $group) {
-			$this->zbxTestAssertElementPresentXpath("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@name='discovery_groupid']//li[@value='".$group['groupid']."']");
 		}
 	}
 
@@ -91,7 +91,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
 		foreach ($usrgrp as $usrgroup) {
-			$this->zbxTestAssertElementPresentXpath("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@name='alert_usrgrpid']//li[@value='".$usrgroup['usrgrpid']."']");
 		}
 
 		$this->zbxTestDropdownHasOptions('alert_usrgrpid', ['None']);

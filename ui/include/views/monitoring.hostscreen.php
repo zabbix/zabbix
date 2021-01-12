@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.hostscreen.js.php');
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $screen_widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
@@ -44,23 +45,23 @@ else {
 
 	// host screen list
 	if (!empty($data['screens'])) {
-		$screen_combobox = new CComboBox('screenList', $url->toString(),
-			'javascript: redirect(this.options[this.selectedIndex].value);'
-		);
+		$screen_select = (new CSelect('screenList'))
+			->setId('screen-list')
+			->setValue($url->toString());
+
 		foreach ($data['screens'] as $screen) {
-			$screen_combobox->addItem(
-				$url
-					->setArgument('screenid', $screen['screenid'])
-					->toString(),
-				$screen['name']
-			);
+			$opt_value = $url
+				->setArgument('screenid', $screen['screenid'])
+				->toString();
+
+			$screen_select->addOption(new CSelectOption($opt_value, $screen['name']));
 		}
 
 		$screen_widget->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
-					->addItem($screen_combobox)
+					->addItem($screen_select)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 				)
 			))

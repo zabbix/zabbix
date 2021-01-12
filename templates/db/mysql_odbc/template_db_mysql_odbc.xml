@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-04T06:27:43Z</date>
+   <date>2020-12-28T17:38:38Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -12,16 +12,16 @@
          <template>Template DB MySQL by ODBC</template>
          <name>Template DB MySQL by ODBC</name>
          <description>Requirements for template operation:&#13;
-1.Create MySQL user for monitoring. For example:&#13;
+1. Create MySQL user for monitoring. For example:&#13;
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '&lt;password&gt;';&#13;
-GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
+GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';&#13;
 For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. &#13;
 2. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).&#13;
 &#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.38</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -102,7 +102,7 @@ Template tooling version used: 0.36</description>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1d</params>
+                     <params>6h</params>
                   </step>
                </preprocessing>
                <triggers>
@@ -173,7 +173,7 @@ Template tooling version used: 0.36</description>
                      <expression>{min(5m)}&gt;{$MYSQL.ABORTED_CONN.MAX.WARN}</expression>
                      <name>MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)</name>
                      <priority>AVERAGE</priority>
-                     <description>The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.</description>
+                     <description>The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.</description>
                      <dependencies>
                         <dependency>
                            <name>MySQL: Refused connections (max_connections limit reached)</name>
@@ -182,6 +182,33 @@ Template tooling version used: 0.36</description>
                      </dependencies>
                   </trigger>
                </triggers>
+            </item>
+            <item>
+               <name>MySQL: Binlog cache disk use</name>
+               <type>DEPENDENT</type>
+               <key>mysql.binlog_cache_disk_use</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of transactions which used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.Variable_name=='Binlog_cache_disk_use')].Value.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+               </master_item>
             </item>
             <item>
                <name>MySQL: Buffer pool efficiency</name>
@@ -224,7 +251,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <expression>{max(5m)}&lt;{$MYSQL.BUFF_UTIL.MIN.WARN}</expression>
                      <name>MySQL: Buffer pool utilization is too low (less {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</description>
+                     <description>The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</description>
                   </trigger>
                </triggers>
             </item>
@@ -420,7 +447,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
-               <name>MySQL: Connection errors internal per second</name>
+               <name>MySQL: Connection errors internal per second</name>
                <type>DEPENDENT</type>
                <key>mysql.connection_errors_internal.rate</key>
                <delay>0</delay>
@@ -447,7 +474,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
-               <name>MySQL: Connection errors max connections per second</name>
+               <name>MySQL: Connection errors max connections per second</name>
                <type>DEPENDENT</type>
                <key>mysql.connection_errors_max_connections.rate</key>
                <delay>0</delay>
@@ -482,7 +509,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </triggers>
             </item>
             <item>
-               <name>MySQL: Connection errors peer address per second</name>
+               <name>MySQL: Connection errors peer address per second</name>
                <type>DEPENDENT</type>
                <key>mysql.connection_errors_peer_address.rate</key>
                <delay>0</delay>
@@ -509,7 +536,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
-               <name>MySQL: Connection errors select per second</name>
+               <name>MySQL: Connection errors select per second</name>
                <type>DEPENDENT</type>
                <key>mysql.connection_errors_select.rate</key>
                <delay>0</delay>
@@ -536,7 +563,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
-               <name>MySQL: Connection errors tcpwrap per second</name>
+               <name>MySQL: Connection errors tcpwrap per second</name>
                <type>DEPENDENT</type>
                <key>mysql.connection_errors_tcpwrap.rate</key>
                <delay>0</delay>
@@ -841,6 +868,108 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
+               <name>MySQL: Innodb buffer pool wait free</name>
+               <type>DEPENDENT</type>
+               <key>mysql.innodb_buffer_pool_wait_free</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at increasing innodb_buffer_pool_size.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.Variable_name=='Innodb_buffer_pool_wait_free')].Value.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Calculated value of innodb_log_file_size</name>
+               <type>CALCULATED</type>
+               <key>mysql.innodb_log_file_size</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <params>(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}</params>
+               <description>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of innodb_log_file_size. Innodb_log_file_size is size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>MySQL: Innodb number open files</name>
+               <type>DEPENDENT</type>
+               <key>mysql.innodb_num_open_files</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of open files held by InnoDB. InnoDB only.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.Variable_name=='Innodb_num_open_files')].Value.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Innodb log written</name>
+               <type>DEPENDENT</type>
+               <key>mysql.innodb_os_log_written</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Number of bytes written to the InnoDB log.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.Variable_name=='Innodb_os_log_written')].Value.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
                <name>MySQL: InnoDB row lock time</name>
                <type>DEPENDENT</type>
                <key>mysql.innodb_row_lock_time</key>
@@ -953,6 +1082,60 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
+               <name>MySQL: Open table definitions</name>
+               <type>DEPENDENT</type>
+               <key>mysql.open_table_definitions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of cached table definitions.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.Variable_name=='Open_table_definitions')].Value.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MySQL: Open tables</name>
+               <type>DEPENDENT</type>
+               <key>mysql.open_tables</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of tables that are open.</description>
+               <applications>
+                  <application>
+                     <name>MySQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.Variable_name=='Open_tables')].Value.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>6h</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
                <name>MySQL: Queries per second</name>
                <type>DEPENDENT</type>
                <key>mysql.queries.rate</key>
@@ -1037,7 +1220,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <expression>{min(5m)}&gt;{$MYSQL.SLOW_QUERIES.MAX.WARN}</expression>
                      <name>MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.</description>
+                     <description>The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1223,6 +1406,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -1238,13 +1422,13 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <params>show slave status</params>
                <username>{$MYSQL.USER}</username>
                <password>{$MYSQL.PASSWORD}</password>
-               <description>If "show slave status" returns Master_Host, "Replication: *" items are created.</description>
+               <description>If "show slave status" returns Master_Host, "Replication: *" items are created.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>MySQL: Replication Slave status {#MASTER_HOST}</name>
                      <type>ODBC</type>
                      <key>db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]</key>
-                     <history>1h</history>
+                     <history>0</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
                      <params>show slave status</params>
@@ -1349,6 +1533,34 @@ explicitly stopped it with STOP SLAVE.</description>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
+                     <name>MySQL: Replication Slave SQL Running State {#MASTER_HOST}</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.slave_sql_running_state["{#MASTER_HOST}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>This shows the state of the SQL driver threads.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.Master_Host=='{#MASTER_HOST}')]['Slave_SQL_Running_State'].first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>MySQL: Replication Slave SQL Running {#MASTER_HOST}</name>
                      <type>DEPENDENT</type>
                      <key>mysql.slave_sql_running["{#MASTER_HOST}"]</key>
@@ -1392,10 +1604,157 @@ As with the I/O thread, this should normally be Yes.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1d</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>MariaDB discovery</name>
+               <type>DEPENDENT</type>
+               <key>mysql.extra_metric.discovery</key>
+               <delay>0</delay>
+               <description>Additional metrics if MariaDB is used.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>MySQL: Binlog commits</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.binlog_commits[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of transactions committed to the binary log.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.Variable_name=='Binlog_commits')].Value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Binlog group commits</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.binlog_group_commits[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of group commits done to the binary log.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.Variable_name=='Binlog_group_commits')].Value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Master GTID wait count</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.master_gtid_wait_count[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of times MASTER_GTID_WAIT called.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.Variable_name=='Master_gtid_wait_count')].Value.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Master GTID wait time</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.master_gtid_wait_time[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of time spent in MASTER_GTID_WAIT.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.Variable_name=='Master_gtid_wait_time')].Value.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MySQL: Master GTID wait timeouts</name>
+                     <type>DEPENDENT</type>
+                     <key>mysql.master_gtid_wait_timeouts[{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of timeouts occurring in MASTER_GTID_WAIT.</description>
+                     <applications>
+                        <application>
+                           <name>MySQL</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.Variable_name=='Master_gtid_wait_timeouts')].Value.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>6h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <master_item>
+                  <key>db.odbc.select[version,"{$MYSQL.DSN}"]</key>
+               </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(value.search('MariaDB')&gt;-1 ? [{'{#SINGLETON}': ''}] : []);</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1430,6 +1789,11 @@ As with the I/O thread, this should normally be Yes.</description>
                <macro>{$MYSQL.DSN}</macro>
                <value>&lt;Put your DSN here&gt;</value>
                <description>System data source name.</description>
+            </macro>
+            <macro>
+               <macro>{$MYSQL.INNODB_LOG_FILES}</macro>
+               <value>2</value>
+               <description>Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.PASSWORD}</macro>

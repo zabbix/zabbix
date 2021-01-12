@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,15 +29,21 @@ $widget = (new CWidget())
 
 $from_list = new CFormList();
 
-$discovery_group = new CComboBox('discovery_groupid', $data['discovery_groupid']);
+$discovery_group = (new CSelect('discovery_groupid'))
+	->setFocusableElementId('label-discovery-groupid')
+	->setValue($data['discovery_groupid']);
+
 foreach ($data['discovery_groups'] as $group) {
-	$discovery_group->addItem($group['groupid'], $group['name']);
+	$discovery_group->addOption(new CSelectOption($group['groupid'], $group['name']));
 }
 
-$alert_user_group = new CComboBox('alert_usrgrpid', $data['alert_usrgrpid']);
-$alert_user_group->addItem(0, _('None'));
+$alert_user_group = (new CSelect('alert_usrgrpid'))
+	->setFocusableElementId('label-alert-usrgrpid')
+	->setValue($data['alert_usrgrpid'])
+	->addOption(new CSelectOption(0, _('None')));
+
 foreach ($data['alert_usrgrps'] as $usrgrp) {
-	$alert_user_group->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
+	$alert_user_group->addOption(new CSelectOption($usrgrp['usrgrpid'], $usrgrp['name']));
 }
 
 $from_list
@@ -47,7 +53,7 @@ $from_list
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Group for discovered hosts'), $discovery_group)
+	->addRow(new CLabel(_('Group for discovered hosts'), $discovery_group->getFocusableElementId()), $discovery_group)
 	->addRow(_('Default host inventory mode'),
 		(new CRadioButtonList('default_inventory_mode', (int) $data['default_inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
@@ -55,7 +61,9 @@ $from_list
 			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 			->setModern(true)
 	)
-	->addRow(_('User group for database down message'), $alert_user_group)
+	->addRow(new CLabel(_('User group for database down message'), $alert_user_group->getFocusableElementId()),
+		$alert_user_group
+	)
 	->addRow(_('Log unmatched SNMP traps'),
 		(new CCheckBox('snmptrap_logging'))
 			->setUncheckedValue('0')

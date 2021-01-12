@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -553,9 +553,10 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	double			time_stat, time_now, sec;
+	double			time_stat, time_now, sec, time_idle = 0;
 	zbx_lld_manager_t	manager;
 	zbx_uint64_t		processed_num = 0;
+	int			ret;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -588,20 +589,25 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [processed " ZBX_FS_UI64 " LLD rules during " ZBX_FS_DBL " sec]",
+			zbx_setproctitle("%s #%d [processed " ZBX_FS_UI64 " LLD rules, idle " ZBX_FS_DBL
+					"sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num, processed_num,
-					time_now - time_stat);
+					time_idle, time_now - time_stat);
 
 			time_stat = time_now;
+			time_idle = 0;
 			processed_num = 0;
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		zbx_ipc_service_recv(&lld_service, 1, &client, &message);
+		ret = zbx_ipc_service_recv(&lld_service, 1, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
 		zbx_update_env(sec);
+
+		if (ZBX_IPC_RECV_IMMEDIATE != ret)
+			time_idle += sec - time_now;
 
 		if (NULL != message)
 		{

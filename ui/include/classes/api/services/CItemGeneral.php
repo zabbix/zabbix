@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1257,11 +1257,17 @@ abstract class CItemGeneral extends CApiService {
 							);
 						}
 
-						if (!is_numeric($params)
-								&& (new CUserMacroParser())->parse($params) != CParser::PARSE_SUCCESS
-								&& (!($this instanceof CItemPrototype)
-									|| ((new CLLDMacroFunctionParser())->parse($params) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS))) {
+						if (is_numeric($params)) {
+							break;
+						}
+
+						$types = ['usermacros' => true];
+
+						if ($this instanceof CItemPrototype) {
+							$types['lldmacros'] = true;
+						}
+
+						if (!(new CMacrosResolverGeneral)->getMacroPositions($params, $types)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('a numeric value is expected')
 							));
@@ -1669,37 +1675,97 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item pre-processing data in DB. Delete old records and create new ones.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array  $items
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['preprocessing']
+	 * @param int    $items[]['preprocessing'][]['type']
+	 * @param string $items[]['preprocessing'][]['params']
+	 * @param int    $items[]['preprocessing'][]['error_handler']
+	 * @param string $items[]['preprocessing'][]['error_handler_params']
 	 */
 	protected function updateItemPreprocessing(array $items) {
-		$item_preproc = [];
-		$item_preprocids = [];
+		$item_preprocs = [];
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
-				$item_preprocids[] = $item['itemid'];
+				$item_preprocs[$item['itemid']] = [];
 				$step = 1;
 
-				foreach ($item['preprocessing'] as $preprocessing) {
-					$item_preproc[] = [
-						'itemid' => $item['itemid'],
-						'step' => $step++,
-						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params'],
-						'error_handler' => $preprocessing['error_handler'],
-						'error_handler_params' => $preprocessing['error_handler_params']
+				foreach ($item['preprocessing'] as $item_preproc) {
+					$item_preprocs[$item['itemid']][$step++] = [
+						'type' => $item_preproc['type'],
+						'params' => $item_preproc['params'],
+						'error_handler' => $item_preproc['error_handler'],
+						'error_handler_params' => $item_preproc['error_handler_params']
 					];
 				}
 			}
 		}
 
-		if ($item_preprocids) {
-			DB::delete('item_preproc', ['itemid' => $item_preprocids]);
+		if (!$item_preprocs) {
+			return;
 		}
 
-		if ($item_preproc) {
-			DB::insertBatch('item_preproc', $item_preproc);
+		$ins_item_preprocs = [];
+		$upd_item_preprocs = [];
+		$del_item_preprocids = [];
+
+		$options = [
+			'output' => ['item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'],
+			'filter' => ['itemid' => array_keys($item_preprocs)]
+		];
+		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+
+		while ($db_item_preproc = DBfetch($db_item_preprocs)) {
+			if (array_key_exists($db_item_preproc['step'], $item_preprocs[$db_item_preproc['itemid']])) {
+				$item_preproc = $item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']];
+				$upd_item_preproc = [];
+
+				if ($item_preproc['type'] != $db_item_preproc['type']) {
+					$upd_item_preproc['type'] = $item_preproc['type'];
+				}
+				if ($item_preproc['params'] !== $db_item_preproc['params']) {
+					$upd_item_preproc['params'] = $item_preproc['params'];
+				}
+				if ($item_preproc['error_handler'] != $db_item_preproc['error_handler']) {
+					$upd_item_preproc['error_handler'] = $item_preproc['error_handler'];
+				}
+				if ($item_preproc['error_handler_params'] !== $db_item_preproc['error_handler_params']) {
+					$upd_item_preproc['error_handler_params'] = $item_preproc['error_handler_params'];
+				}
+
+				if ($upd_item_preproc) {
+					$upd_item_preprocs[] = [
+						'values' => $upd_item_preproc,
+						'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
+					];
+				}
+				unset($item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']]);
+			}
+			else {
+				$del_item_preprocids[] = $db_item_preproc['item_preprocid'];
+			}
+		}
+
+		foreach ($item_preprocs as $itemid => $preprocs) {
+			foreach ($preprocs as $step => $preproc) {
+				$ins_item_preprocs[] = [
+					'itemid' => $itemid,
+					'step' => $step
+				] + $preproc;
+			}
+		}
+
+		if ($del_item_preprocids) {
+			DB::delete('item_preproc', ['item_preprocid' => $del_item_preprocids]);
+		}
+
+		if ($upd_item_preprocs) {
+			DB::update('item_preproc', $upd_item_preprocs);
+		}
+
+		if ($ins_item_preprocs) {
+			DB::insertBatch('item_preproc', $ins_item_preprocs);
 		}
 	}
 

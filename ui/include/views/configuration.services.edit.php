@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,8 +73,12 @@ $servicesFormList->addRow((new CLabel(_('Parent service'), 'parent_name'))->setA
 
 // append algorithm to form list
 $servicesFormList->addRow(
-	(new CLabel(_('Status calculation algorithm'), 'algorithm')),
-	(new CComboBox('algorithm', $data['algorithm'], null, serviceAlgorithm()))
+	new CLabel(_('Status calculation algorithm'), 'label-algorithm'),
+	(new CSelect('algorithm'))
+		->setId('algorithm')
+		->setValue($data['algorithm'])
+		->addOptions(CSelect::createOptionsFromArray(serviceAlgorithm()))
+		->setFocusableElementId('label-algorithm')
 );
 
 // append SLA to form list
@@ -229,12 +233,16 @@ $servicesTimeFormList->addRow(_('Service times'),
 // create service time table
 $serviceTimeTable = (new CFormList())
 	->addRow(
-		(new CLabel(_('Period type'), 'new_service_time[type]')),
-		(new CComboBox('new_service_time[type]', $data['new_service_time']['type'], 'submit()', [
-			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
-			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
-			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-		]))
+		(new CLabel(_('Period type'), 'label-period-type')),
+		(new CSelect('new_service_time[type]'))
+			->setId('period-type')
+			->setFocusableElementId('label-period-type')
+			->setValue($data['new_service_time']['type'])
+			->addOptions(CSelect::createOptionsFromArray([
+				SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
+				SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
+				SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
+			]))
 	);
 
 if ($data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
@@ -261,13 +269,15 @@ if ($data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 		);
 }
 else {
-	$weekFromComboBox = new CComboBox('new_service_time[from_week]', isset($_REQUEST['new_service_time']['from_week'])
-			? $_REQUEST['new_service_time']['from_week'] : 0);
-	$weekToComboBox = new CComboBox('new_service_time[to_week]', isset($_REQUEST['new_service_time']['from_week'])
-			? $_REQUEST['new_service_time']['to_week'] : 0);
+	$week_from_select = (new CSelect('new_service_time[from_week]'))
+		->setValue(isset($_REQUEST['new_service_time']['from_week']) ? $_REQUEST['new_service_time']['from_week'] : 0);
+
+	$week_to_select = (new CSelect('new_service_time[to_week]'))
+		->setValue(isset($_REQUEST['new_service_time']['from_week']) ? $_REQUEST['new_service_time']['to_week'] : 0);
+
 	for ($dow = 0; $dow < 7; $dow++) {
-		$weekFromComboBox->addItem($dow, getDayOfWeekCaption($dow));
-		$weekToComboBox->addItem($dow, getDayOfWeekCaption($dow));
+		$week_from_select->addOption(new CSelectOption($dow, getDayOfWeekCaption($dow)));
+		$week_to_select->addOption(new CSelectOption($dow, getDayOfWeekCaption($dow)));
 	}
 	$timeFromHourTextBox = (new CTextBox('new_service_time[from_hour]', isset($_REQUEST['new_service_time']['from_hour'])
 			? $_REQUEST['new_service_time']['from_hour'] : '', false, 2))
@@ -294,7 +304,7 @@ else {
 		->addRow(
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
 			(new CDiv([
-					$weekFromComboBox,
+					$week_from_select,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					_('Time'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -308,7 +318,7 @@ else {
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
 			(new CDiv([
-				$weekToComboBox,
+				$week_to_select,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				_('Time'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

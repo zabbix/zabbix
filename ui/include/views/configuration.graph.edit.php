@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,10 +98,13 @@ $graphFormList
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Graph type'), 'graphtype')),
-		(new CComboBox('graphtype', $this->data['graphtype'], 'jQuery(\'form[name="graphForm"]\').submit()',
-			graphType())
-		)->setEnabled(!$readonly)
+	->addRow((new CLabel(_('Graph type'), 'label-graphtype')),
+		(new CSelect('graphtype'))
+			->setId('graphtype')
+			->setFocusableElementId('label-graphtype')
+			->setValue($this->data['graphtype'])
+			->addOptions(CSelect::createOptionsFromArray(graphType()))
+			->setDisabled($readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -160,11 +163,16 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, SPACE, $percentRightTextBox]);
 	}
 
-	$yaxisMinData = [(new CComboBox('ymin_type', $this->data['ymin_type'], null, [
-		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
-		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
-		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	]))->setEnabled(!$readonly)];
+	$yaxisMinData = [];
+	$yaxisMinData[] = (new CSelect('ymin_type'))
+		->setId('ymin_type')
+		->setValue($this->data['ymin_type'])
+		->addOptions(CSelect::createOptionsFromArray([
+			GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
+			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
+			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
+		]))
+		->setDisabled($readonly);
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -242,11 +250,16 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$graphFormList->addRow($yaxismin_label, $yaxisMinData);
 
-	$yaxisMaxData = [(new CComboBox('ymax_type', $this->data['ymax_type'], null, [
-		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
-		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
-		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	]))->setEnabled(!$readonly)];
+	$yaxisMaxData = [];
+	$yaxisMaxData[] = (new CSelect('ymax_type'))
+		->setId('ymax_type')
+		->setValue($this->data['ymax_type'])
+		->addOptions(CSelect::createOptionsFromArray([
+			GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
+			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
+			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
+		]))
+		->setDisabled($readonly);
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -500,6 +513,11 @@ else {
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))]
 	));
+}
+
+$graph_item_drawtypes = [];
+foreach (graph_item_drawtypes() as $drawtype) {
+	$graph_item_drawtypes[$drawtype] = graph_item_drawtype2str($drawtype);
 }
 
 // Insert js (depended from some variables inside the file).

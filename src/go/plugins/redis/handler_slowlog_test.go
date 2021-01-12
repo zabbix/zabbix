@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,10 @@ package redis
 
 import (
 	"errors"
-	"github.com/mediocregopher/radix/v3"
 	"reflect"
 	"testing"
+
+	"github.com/mediocregopher/radix/v3"
 )
 
 func Test_getLastSlowlogId(t *testing.T) {
@@ -100,7 +101,7 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 
 	type args struct {
 		conn   redisClient
-		params []string
+		params map[string]string
 	}
 	tests := []struct {
 		name    string
@@ -110,7 +111,7 @@ func TestPlugin_slowlogHandler(t *testing.T) {
 	}{
 		{
 			"Should fail if error occurred",
-			args{conn: conn, params: []string{"", "WantErr"}},
+			args{conn: conn, params: map[string]string{}},
 			nil,
 			true,
 		},

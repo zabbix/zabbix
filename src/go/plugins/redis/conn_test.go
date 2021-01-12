@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,23 +20,25 @@
 package redis
 
 import (
-	"github.com/mediocregopher/radix/v3"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/mediocregopher/radix/v3"
+	"zabbix.com/pkg/uri"
 )
 
 func TestConnManager_closeUnused(t *testing.T) {
 	connMgr := NewConnManager(1*time.Microsecond, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
-	uri, _ := parseURI("tcp://127.0.0.1")
-	_, _ = connMgr.create(*uri)
+	u, _ := uri.New("tcp://127.0.0.1", nil)
+	_, _ = connMgr.create(*u)
 
 	t.Run("Unused connections should have been deleted", func(t *testing.T) {
 		connMgr.closeUnused()
 		if len(connMgr.connections) != 0 {
-			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
 	})
 }
@@ -45,49 +47,30 @@ func TestConnManager_closeAll(t *testing.T) {
 	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
-	uri, _ := parseURI("tcp://127.0.0.1")
-	_, _ = connMgr.create(*uri)
+	u, _ := uri.New("tcp://127.0.0.1", nil)
+	_, _ = connMgr.create(*u)
 
 	t.Run("All connections should have been deleted", func(t *testing.T) {
 		connMgr.closeAll()
 		if len(connMgr.connections) != 0 {
-			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
+			t.Errorf("connMgr.connections expected to be empty, but actual length is %d", len(connMgr.connections))
 		}
 	})
 }
 
-//func TestConnManager_housekeeper(t *testing.T) {
-//	connMgr := NewConnManager(
-//		500*time.Millisecond,
-//		30*time.Second,
-//		100*time.Millisecond,
-//	)
-//
-//	uri, _ := parseURI("tcp://127.0.0.1")
-//	_ = connMgr.create(uri)
-//
-//	time.Sleep(1 * time.Second)
-//
-//	t.Run("Unused connections should have been deleted by housekeeper", func(t *testing.T) {
-//		if len(connMgr.connections) != 0 {
-//			t.Errorf("connMgr.connections excpected to be empty, but actual length is %d", len(connMgr.connections))
-//		}
-//	})
-//}
-
 func TestConnManager_create(t *testing.T) {
-	uri, _ := parseURI("tcp://127.0.0.1")
+	u, _ := uri.New("tcp://127.0.0.1", nil)
 
 	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
-	connMgr.connections[*uri] = &RedisConn{
+	connMgr.connections[*u] = &RedisConn{
 		client:         radix.Stub("", "", nil),
 		lastTimeAccess: time.Now(),
 	}
 
 	type args struct {
-		uri URI
+		uri uri.URI
 	}
 
 	tests := []struct {
@@ -101,7 +84,7 @@ func TestConnManager_create(t *testing.T) {
 		{
 			name:      "Must panic if connection already exists",
 			c:         connMgr,
-			args:      args{uri: *uri},
+			args:      args{uri: *u},
 			want:      nil,
 			wantErr:   false,
 			wantPanic: true,
@@ -133,13 +116,13 @@ func TestConnManager_create(t *testing.T) {
 }
 
 func TestConnManager_get(t *testing.T) {
-	uri, _ := parseURI("tcp://127.0.0.1")
+	u, _ := uri.New("tcp://127.0.0.1", nil)
 
 	connMgr := NewConnManager(300*time.Second, 30*time.Second, hkInterval*time.Second)
 	defer connMgr.Destroy()
 
 	t.Run("Should return nil if connection does not exist", func(t *testing.T) {
-		if got := connMgr.get(*uri); got != nil {
+		if got := connMgr.get(*u); got != nil {
 			t.Errorf("ConnManager.get() = %v, want <nil>", got)
 		}
 	})
@@ -150,10 +133,10 @@ func TestConnManager_get(t *testing.T) {
 		lastTimeAccess: lastTimeAccess,
 	}
 
-	connMgr.connections[*uri] = conn
+	connMgr.connections[*u] = conn
 
 	t.Run("Should return connection if it exists", func(t *testing.T) {
-		got := connMgr.get(*uri)
+		got := connMgr.get(*u)
 		if !reflect.DeepEqual(got, conn) {
 			t.Errorf("ConnManager.get() = %v, want %v", got, conn)
 		}

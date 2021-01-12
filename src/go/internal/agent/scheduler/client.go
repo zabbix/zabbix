@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ func (c *client) ID() uint64 {
 	return c.id
 }
 
-// Output returns client ouput interface where plugins results can be written.
+// Output returns client output interface where plugins results can be written.
 // While it's used by tasks to implement ContextProvider interface, client output cannot
 // change, so no synchronization is required.
 func (c *client) Output() plugin.ResultWriter {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -130,13 +130,18 @@ function getItemFilterForm(&$items) {
 
 	// type select
 	$fTypeVisibility = [];
-	$cmbType = new CComboBox('filter_type', $filter_type, null, [-1 => _('all')]);
+	$type_select = (new CSelect('filter_type'))
+		->setId('filter_type')
+		->setValue($filter_type)
+		->setFocusableElementId('label-filter-type')
+		->addOption(new CSelectOption(-1, _('all')));
+
 	zbx_subarray_push($fTypeVisibility, -1, 'filter_delay_row');
 
 	$item_types = item_type2str();
 	unset($item_types[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
 
-	$cmbType->addItems($item_types);
+	$type_select->addOptions(CSelect::createOptionsFromArray($item_types));
 
 	foreach ($item_types as $type => $name) {
 		if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
@@ -175,23 +180,30 @@ function getItemFilterForm(&$items) {
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-	$filterColumn2->addRow(_('Type'), $cmbType);
-	$filterColumn3->addRow(_('Type of information'),
-		new CComboBox('filter_value_type', $filter_value_type, null, [
-			-1 => _('all'),
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+	$filterColumn2->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select);
+	$filterColumn3->addRow(new CLabel(_('Type of information'), 'label-filter-value-type'),
+		(new CSelect('filter_value_type'))
+			->setFocusableElementId('label-filter-value-type')
+			->setValue($filter_value_type)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	);
-	$filterColumn4->addRow(_('State'),
-		new CComboBox('filter_state', $filter_state, null, [
-			-1 => _('all'),
-			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
-			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
-		])
+	$filterColumn4->addRow(new CLabel(_('State'), 'label-filter-state'),
+		(new CSelect('filter_state'))
+			->setId('filter_state')
+			->setFocusableElementId('label-filter-state')
+			->setValue($filter_state)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
+				ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
+			]))
 	);
 
 	// row 2
@@ -228,12 +240,16 @@ function getItemFilterForm(&$items) {
 		(new CTextBox('filter_delay', $filter_delay))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
 	);
-	$filterColumn4->addRow(_('Status'),
-		new CComboBox('filter_status', $filter_status, null, [
-			-1 => _('all'),
-			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
-			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
-		])
+	$filterColumn4->addRow(new CLabel(_('Status'), 'label-filter-status'),
+		(new CSelect('filter_status'))
+			->setId('filter_status')
+			->setFocusableElementId('label-filter-status')
+			->setValue($filter_status)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
+				ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
+			]))
 	);
 
 	// row 3
@@ -259,12 +275,15 @@ function getItemFilterForm(&$items) {
 	$filterColumn3->addRow(_('History'),
 		(new CTextBox('filter_history', $filter_history))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn4->addRow(_('Triggers'),
-		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
-			-1 => _('all'),
-			1 => _('With triggers'),
-			0 => _('Without triggers')
-		])
+	$filterColumn4->addRow(new CLabel(_('Triggers'), 'label-filter-with-triggers'),
+		(new CSelect('filter_with_triggers'))
+			->setFocusableElementId('label-filter-with-triggers')
+			->setValue($filter_with_triggers)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				1 => _('With triggers'),
+				0 => _('Without triggers')
+			]))
 	);
 
 	// row 4
@@ -278,24 +297,30 @@ function getItemFilterForm(&$items) {
 	$filterColumn3->addRow(_('Trends'),
 		(new CTextBox('filter_trends', $filter_trends))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn4->addRow(_('Template'),
-		new CComboBox('filter_templated_items', $filter_templated_items, null, [
-			-1 => _('all'),
-			1 => _('Inherited items'),
-			0 => _('Not inherited items')
-		])
+	$filterColumn4->addRow(new CLabel(_('Template'), 'label-filter-templated-items'),
+		(new CSelect('filter_templated_items'))
+			->setFocusableElementId('label-filter-templated-items')
+			->setValue($filter_templated_items)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				1 => _('Inherited items'),
+				0 => _('Not inherited items')
+			]))
 	);
 
 	// row 5
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn4->addRow(_('Discovery'),
-		new CComboBox('filter_discovery', $filter_discovery, null, [
-			-1 => _('all'),
-			ZBX_FLAG_DISCOVERY_CREATED => _('Discovered items'),
-			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
-		])
+	$filterColumn4->addRow(new CLabel(_('Discovery'), 'label-filter-discovery'),
+		(new CSelect('filter_discovery'))
+			->setFocusableElementId('label-filter-discovery')
+			->setValue($filter_discovery)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ZBX_FLAG_DISCOVERY_CREATED => _('Discovered items'),
+				ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
+			]))
 	);
 
 	// subfilters
@@ -1207,17 +1232,21 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	$i = 0;
 
 	foreach ($preprocessing as $step) {
-		// Create a combo box with preprocessing types.
-		$preproc_types_cbbox = (new CComboBox('preprocessing['.$i.'][type]', $step['type']))->setReadonly($readonly);
+		// Create a select with preprocessing types.
+		$preproc_types_select = (new CSelect('preprocessing['.$i.'][type]'))
+			->setId('preprocessing_'.$i.'_type')
+			->setValue($step['type'])
+			->setReadonly($readonly)
+			->setWidthAuto();
 
 		foreach (get_preprocessing_types(null, true, $types) as $group) {
-			$cb_group = new COptGroup($group['label']);
+			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$cb_group->addItem(new CComboItem($type, $label, ($type == $step['type'])));
+				$opt_group->addOption(new CSelectOption($type, $label));
 			}
 
-			$preproc_types_cbbox->addItem($cb_group);
+			$preproc_types_select->addOptionGroup($opt_group);
 		}
 
 		// Depending on preprocessing type, display corresponding params field and placeholders.
@@ -1412,7 +1441,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv())
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
-					(new CDiv($preproc_types_cbbox))
+					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
@@ -1682,31 +1711,52 @@ function getTriggerFormData(array $data) {
 			foreach ($item_parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
 							];
 						}
 						else {
-							$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-								$templateid => $template
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
 							];
 						}
 					}
 				}
 			}
 
-			foreach ($data['tags'] as $tag) {
-				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-				}
-				else {
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid']
+			]);
+
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
 				}
 			}
 
-			$data['tags'] = array_values($inherited_tags);
+			foreach ($data['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+				else {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+			}
+
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,8 +74,17 @@
 	<div class="<?= ZBX_STYLE_HOST_INTERFACE_CELL ?> <?= ZBX_STYLE_HOST_INTERFACE_CELL_DETAILS ?> <?= ZBX_STYLE_LIST_ACCORDION_ITEM_BODY ?>">
 		<?= (new CFormList('snmp_details_#{iface.interfaceid}'))
 				->cleanItems()
-				->addRow((new CLabel(_('SNMP version'), 'interfaces[#{iface.interfaceid}][details][version]'))->setAsteriskMark(),
-					new CComboBox('interfaces[#{iface.interfaceid}][details][version]', SNMP_V2C, null, [SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]),
+				->addRow((new CLabel(_('SNMP version'), 'label_interfaces_#{iface.interfaceid}_details_version'))
+						->setAsteriskMark(),
+					(new CSelect('interfaces[#{iface.interfaceid}][details][version]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							SNMP_V1 => _('SNMPv1'),
+							SNMP_V2C => _('SNMPv2'),
+							SNMP_V3 => _('SNMPv3')
+						]))
+						->setValue(SNMP_V2C)
+						->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_version')
+						->setId('interfaces_#{iface.interfaceid}_details_version'),
 					'row_snmp_version_#{iface.interfaceid}'
 				)
 				->addRow((new CLabel(_('SNMP community'), 'interfaces[#{iface.interfaceid}][details][community]'))->setAsteriskMark(),
@@ -95,11 +104,15 @@
 					'row_snmpv3_securityname_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Security level'), 'interfaces[#{iface.interfaceid}][details][securitylevel]'),
-					new CComboBox('interfaces[#{iface.interfaceid}][details][securitylevel]', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, null, [
-						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-					]),
+					(new CSelect('interfaces[#{iface.interfaceid}][details][securitylevel]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
+							ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
+						]))
+						->setValue(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+						->setFocusableElementId('label_interfaces_#{iface.interfaceid}_details_securitylevel')
+						->setId('interfaces_#{iface.interfaceid}_details_securitylevel'),
 					'row_snmpv3_securitylevel_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Authentication protocol'), 'interfaces[#{iface.interfaceid}][details][authprotocol]'),
@@ -531,6 +544,10 @@
 				});
 
 				[...row.querySelectorAll('.<?= ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE ?>')].map((el) => el.remove());
+
+				[...row.querySelectorAll('z-select')].map((el) => {
+					el.readOnly = true;
+				});
 
 				// Change select to input.
 				[...row.querySelectorAll('select')].map((el) => {

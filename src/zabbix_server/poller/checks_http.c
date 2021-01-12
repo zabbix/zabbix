@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,10 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	zbx_http_response_t	*response;
 
 	response = (zbx_http_response_t*)userdata;
+
+	if (ZBX_MAX_RECV_DATA_SIZE < response->offset + r_size)
+		return 0;
+
 	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
 
 	return r_size;
@@ -374,8 +378,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
-				'\0' == *errbuf ? curl_easy_strerror(err) : errbuf));
+		if (CURLE_WRITE_ERROR == err)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "The requested value is too large"));
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot perform request: %s",
+					'\0' == *errbuf ? curl_easy_strerror(err) : errbuf));
+		}
 		goto clean;
 	}
 

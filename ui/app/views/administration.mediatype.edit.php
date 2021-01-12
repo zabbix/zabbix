@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,12 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(new CLabel(_('Type'), 'type'), new CComboBox('type', $data['type'], null, media_type2str()))
+	->addRow(new CLabel(_('Type'), 'label-type'), (new CSelect('type'))
+		->setId('type')
+		->setFocusableElementId('label-type')
+		->addOptions(CSelect::createOptionsFromArray(media_type2str()))
+		->setValue($data['type'])
+	)
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

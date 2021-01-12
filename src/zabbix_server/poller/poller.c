@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -818,7 +818,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
-	DC_ITEM			items[MAX_POLLER_ITEMS];
+	DC_ITEM			item, *items;
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
 	int			errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
@@ -827,7 +827,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	num = DCconfig_get_poller_items(poller_type, items);
+	items = &item;
+	num = DCconfig_get_poller_items(poller_type, &items);
 
 	if (0 == num)
 	{
@@ -932,6 +933,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	DCconfig_clean_items(items, NULL, num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
+	if (items != &item)
+		zbx_free(items);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 

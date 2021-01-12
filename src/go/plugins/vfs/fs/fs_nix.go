@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,15 +111,15 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		return nil, err
 	}
 
-	var avialable uint64
+	var available uint64
 	if fs.Bavail > 0 {
-		avialable = fs.Bavail
+		available = fs.Bavail
 	}
 
 	total := fs.Blocks * uint64(fs.Bsize)
-	free := avialable * uint64(fs.Bsize)
+	free := available * uint64(fs.Bsize)
 	used := (fs.Blocks - fs.Bfree) * uint64(fs.Bsize)
-	pfree := 100.00 * float64(avialable) / float64(fs.Blocks-fs.Bfree+fs.Bavail)
+	pfree := 100.00 * float64(available) / float64(fs.Blocks-fs.Bfree+fs.Bavail)
 	stats = &FsStats{
 		Total: total,
 		Free:  free,

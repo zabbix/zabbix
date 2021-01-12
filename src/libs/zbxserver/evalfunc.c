@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1677,15 +1677,13 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 			goto out;
 		}
 
-		if (0 == (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
-			period = arg1 + (ts.sec - lastaccess);
+		period = arg1 + (ts.sec - lastaccess);
 	}
 	else
 		period = arg1;
 
-	if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) ||
-			(SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
-			1 == values.values_num))
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
+			1 == values.values_num)
 	{
 		*value = zbx_strdup(*value, "0");
 	}
@@ -1703,6 +1701,12 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 		{
 			*error = zbx_strdup(*error,
 					"item does not have enough data after server start or item creation");
+			goto out;
+		}
+
+		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+		{
+			*error = zbx_strdup(*error, "historical data transfer from proxy is still in progress");
 			goto out;
 		}
 
@@ -2198,11 +2202,11 @@ static int	evaluate_STRLEN(char **value, DC_ITEM *item, const char *parameters, 
 		if (arg1 <= values.values_num)
 		{
 			size_t	sz, value_alloc = 0, value_offset = 0;
+			char	*hist_val;
 
-			if (ITEM_VALUE_TYPE_LOG == item->value_type)
-				sz = zbx_strlen_utf8(values.values[0].value.log->value);
-			else
-				sz = zbx_strlen_utf8(values.values[0].value.str);
+			hist_val = zbx_history_value2str_dyn(&values.values[arg1 - 1].value, item->value_type);
+			sz = zbx_strlen_utf8(hist_val);
+			zbx_free(hist_val);
 
 			zbx_snprintf_alloc(value, &value_alloc, &value_offset, ZBX_FS_SIZE_T, sz);
 			ret = SUCCEED;

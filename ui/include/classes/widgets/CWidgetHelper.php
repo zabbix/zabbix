@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,30 +40,40 @@ class CWidgetHelper {
 	 * @param string $type
 	 * @param int $view_mode (ZBX_WIDGET_VIEW_MODE_NORMAL|ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 	 * @param array $known_widget_types
-	 * @param CWidgetFieldComboBox $field_rf_rate
+	 * @param CWidgetFieldSelect $field_rf_rate
 	 *
 	 * @return CFormList
 	 */
 	public static function createFormList($dialogue_name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
 		return (new CFormList())
 			->addItem((new CListItem([
-					(new CDiv(new CLabel(_('Type'), 'type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-					(new CDiv(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types)))
-						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT),
-					(new CDiv((new CCheckBox('show_header'))
+					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CDiv([
+						(new CDiv((new CCheckBox('show_header'))
 							->setLabel(_('Show header'))
 							->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
 							->setId('show_header')
-							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-				]))->addClass('table-forms-row-with-second-field')
+							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
+						(new CSelect('type'))
+							->setFocusableElementId('label-type')
+							->setId('type')
+							->setValue($type)
+							->setAttribute('autofocus', 'autofocus')
+							->addOptions(CSelect::createOptionsFromArray($known_widget_types))
+					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+				]))
+				->addClass('table-forms-row-with-second-field')
 			)
 			->addRow(_('Name'),
 				(new CTextBox('name', $dialogue_name))
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
-			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
+			->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate))
+			->addItem((new CScriptTag('$("z-select#type").on("change", updateWidgetConfigDialogue);'))
+				->setOnDocumentReady()
+			);
 	}
 
 	/**
@@ -87,21 +97,28 @@ class CWidgetHelper {
 	 * @return CLabel
 	 */
 	public static function getLabel($field) {
+		if ($field instanceof CWidgetFieldSelect) {
+			return (new CLabel($field->getLabel(), 'label-'.$field->getName()))
+				->setAsteriskMark(self::isAriaRequired($field));
+		}
+
 		return (new CLabel($field->getLabel(), $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
 	}
 
 	/**
-	 * @param CWidgetFieldComboBox $field
+	 * @param CWidgetFieldSelect $field
 	 *
-	 * @return CComboBox
+	 * @return CSelect
 	 */
-	public static function getComboBox($field) {
-		$combo_box = (new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
-			->setAriaRequired(self::isAriaRequired($field))
-			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
-
-		return $combo_box;
+	public static function getSelect($field) {
+		return (new CSelect($field->getName()))
+			->setId($field->getName())
+			->setFocusableElementId('label-'.$field->getName())
+			->setValue($field->getValue())
+			->addOptions(CSelect::createOptionsFromArray($field->getValues()))
+			->setDisabled($field->getFlags() & CWidgetField::FLAG_DISABLED)
+			->setAriaRequired(self::isAriaRequired($field));
 	}
 
 	/**
@@ -345,14 +362,16 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Creates CComboBox field without values, to later fill it by JS script.
+	 * Creates select field without values, to later fill it by JS script.
 	 *
-	 * @param CWidgetFieldWidgetListComboBox $field
+	 * @param CWidgetFieldWidgetSelect $field
 	 *
-	 * @return CComboBox
+	 * @return CSelect
 	 */
-	public static function getEmptyComboBox($field) {
-		return (new CComboBox($field->getName(), [], $field->getAction(), []))
+	public static function getEmptySelect($field) {
+		return (new CSelect($field->getName()))
+			->setFocusableElementId('label-'.$field->getName())
+			->setId($field->getName())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}
@@ -1085,11 +1104,15 @@ class CWidgetHelper {
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregation function'),
-								(new CComboBox(
-									$field_name.'['.$row_num.'][aggregate_function]',
-									(int) $value['aggregate_function'], null,
-									[
+							->addRow(
+								new CLabel(_('Aggregation function'),
+									'label-'.$field_name.'_'.$row_num.'_aggregate_function'
+								),
+								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
+									->setId($field_name.'_'.$row_num.'_aggregate_function')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
+									->setValue((int) $value['aggregate_function'])
+									->addOptions(CSelect::createOptionsFromArray([
 										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
 										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
 										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
@@ -1098,10 +1121,8 @@ class CWidgetHelper {
 										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
 										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
 										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
-									]
-								))
+									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-									->onChange('changeDataSetAggregateFunction(this);')
 							)
 							->addRow(_('Aggregation interval'),
 								(new CTextBox(
@@ -1346,6 +1367,9 @@ class CWidgetHelper {
 				'update: function() {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.
+			'});'.
+			'$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {'.
+				'changeDataSetAggregateFunction(e.target);'.
 			'});'
 		];
 

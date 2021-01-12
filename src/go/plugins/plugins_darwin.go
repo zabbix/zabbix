@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,10 @@ package plugins
 
 import (
 	_ "zabbix.com/plugins/ceph"
+	_ "zabbix.com/plugins/docker"
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/memcached"
+	_ "zabbix.com/plugins/mysql"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/oracle"
 	_ "zabbix.com/plugins/postgres"

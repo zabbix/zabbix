@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['layout.mode.js', 'multiselect.js'];
+$page['scripts'] = ['layout.mode.js', 'multiselect.js', 'monitoring.overview.js'];
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
@@ -136,8 +136,7 @@ $data = [
 	'dependencies' => [],
 	'triggers_by_name' => [],
 	'hosts_by_name' => [],
-	'exceeded_hosts' => false,
-	'exceeded_trigs' => false
+	'exceeded_limit' => false
 ];
 
 // fetch trigger data
@@ -214,9 +213,9 @@ if ($type == SHOW_TRIGGERS) {
 		$host_options['hostids'] = array_keys($filter['hosts']);
 	}
 
-	list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-		$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
-	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
+	[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'], $data['hosts_by_name'],
+		$data['exceeded_limit']
+	] = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
 
 	$data['filter'] = $filter;
 
@@ -253,23 +252,7 @@ else {
 	$groupids = $data['filter']['groups'] ? getSubGroups(array_keys($data['filter']['groups'])) : null;
 	$hostids = $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null;
 
-	if ($data['view_style'] == STYLE_TOP) {
-		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewTop($groupids, $hostids,
-			$data['filter']['application']
-		);
-	}
-	else {
-		list($db_items, $db_hosts, $items_by_name, $has_hidden_data) = getDataOverviewLeft($groupids, $hostids,
-			$data['filter']['application']
-		);
-	}
-
-	$data['visible_items'] = getDataOverviewCellData($db_hosts, $db_items, $items_by_name,
-		$data['filter']['show_suppressed']
-	);
-	$data['db_hosts'] = $db_hosts;
-	$data['items_by_name'] = $items_by_name;
-	$data['has_hidden_data'] = $has_hidden_data;
+	[$data['items'], $data['hosts'], $data['has_hidden_data']] = getDataOverview($groupids, $hostids, $data['filter']);
 
 	// Render view.
 	echo (new CView('monitoring.overview.items', $data))->getOutput();

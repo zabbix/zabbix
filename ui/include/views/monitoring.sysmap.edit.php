@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,25 +108,35 @@ $map_tab->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 	);
 
 // Append background image to form list.
-$background = (new CComboBox('backgroundid', $data['sysmap']['backgroundid']))
-	->addItem(0, _('No image'));
+$background = (new CSelect('backgroundid'))
+	->setValue($data['sysmap']['backgroundid'])
+	->setFocusableElementId('label-backgroundid')
+	->addOption(new CSelectOption(0, _('No image')));
+
 foreach ($data['images'] as $image) {
-	$background->addItem($image['imageid'], $image['name']);
+	$background->addOption(new CSelectOption($image['imageid'], $image['name']));
 }
-$map_tab->addRow(_('Background image'), $background);
+
+$map_tab->addRow(new CLabel(_('Background image'), $background->getFocusableElementId()), $background);
 
 // Append iconmapping to form list.
-$icon_mapping = (new CComboBox('iconmapid', $data['sysmap']['iconmapid']))
-	->addItem(0, _('<manual>'));
+$icon_mapping = (new CSelect('iconmapid'))
+	->setValue($data['sysmap']['iconmapid'])
+	->setFocusableElementId('label-iconmapid')
+	->addOption(new CSelectOption(0, _('<manual>')));
+
 foreach ($data['iconMaps'] as $iconMap) {
-	$icon_mapping->addItem($iconMap['iconmapid'], $iconMap['name']);
+	$icon_mapping->addOption(new CSelectOption($iconMap['iconmapid'], $iconMap['name']));
 }
+
 $icon_mapping_link = (new CLink(_('show icon mappings'), (new CUrl('zabbix.php'))
 		->setArgument('action', 'iconmap.list')
 		->getUrl()
 	))
 	->setAttribute('target', '_blank');
-$map_tab->addRow(_('Automatic icon mapping'), [$icon_mapping, SPACE, $icon_mapping_link]);
+$map_tab->addRow(new CLabel(_('Automatic icon mapping'), $icon_mapping->getFocusableElementId()),
+	[$icon_mapping, SPACE, $icon_mapping_link]
+);
 
 // Append multiple checkboxes to form list.
 $map_tab->addRow(_('Icon highlight'),
@@ -150,8 +160,12 @@ $map_tab->addRow(_('Advanced labels'),
 
 // Append hostgroup to form list.
 $map_tab
-	->addRow(_('Host group label type'),
-		new CComboBox('label_type_hostgroup', $data['sysmap']['label_type_hostgroup'], null, $data['labelTypesLimited'])
+	->addRow(new CLabel(_('Host group label type'), 'label-label-type-hostgroup'),
+		(new CSelect('label_type_hostgroup'))
+			->setId('label_type_hostgroup')
+			->setFocusableElementId('label-label-type-hostgroup')
+			->setValue($data['sysmap']['label_type_hostgroup'])
+			->addOptions(CSelect::createOptionsFromArray($data['labelTypesLimited']))
 	)
 	->addRow(null,
 		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
@@ -160,8 +174,12 @@ $map_tab
 
 // Append host to form list.
 $map_tab
-	->addRow(_('Host label type'),
-		new CComboBox('label_type_host', $data['sysmap']['label_type_host'], null, $data['labelTypes'])
+	->addRow(new CLabel(_('Host label type'), 'label-label-type-host'),
+		(new CSelect('label_type_host'))
+			->setId('label_type_host')
+			->setFocusableElementId('label-label-type-host')
+			->setValue($data['sysmap']['label_type_host'])
+			->addOptions(CSelect::createOptionsFromArray($data['labelTypes']))
 	)
 	->addRow(null,
 		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
@@ -170,8 +188,12 @@ $map_tab
 
 // Append trigger to form list.
 $map_tab
-	->addRow(_('Trigger label type'),
-		new CComboBox('label_type_trigger', $data['sysmap']['label_type_trigger'], null, $data['labelTypesLimited'])
+	->addRow(new CLabel(_('Trigger label type'), 'label-label-type-trigger'),
+		(new CSelect('label_type_trigger'))
+			->setId('label_type_trigger')
+			->setFocusableElementId('label-label-type-trigger')
+			->setValue($data['sysmap']['label_type_trigger'])
+			->addOptions(CSelect::createOptionsFromArray($data['labelTypesLimited']))
 	)
 	->addRow(null,
 		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
@@ -180,8 +202,12 @@ $map_tab
 
 // Append map to form list.
 $map_tab
-	->addRow(_('Map label type'),
-		new CComboBox('label_type_map', $data['sysmap']['label_type_map'], null, $data['labelTypesLimited'])
+	->addRow(new CLabel(_('Map label type'), 'label-label-type-map'),
+		(new CSelect('label_type_map'))
+			->setId('label_type_map')
+			->setFocusableElementId('label-label-type-map')
+			->setValue($data['sysmap']['label_type_map'])
+			->addOptions(CSelect::createOptionsFromArray($data['labelTypesLimited']))
 	)
 	->addRow(null,
 		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
@@ -190,8 +216,12 @@ $map_tab
 
 // Append image to form list.
 $map_tab
-	->addRow(_('Image label type'),
-		new CComboBox('label_type_image', $data['sysmap']['label_type_image'], null, $data['labelTypesImage'])
+	->addRow(new CLabel(_('Image label type'), 'label-label-type-image'),
+		(new CSelect('label_type_image'))
+			->setId('label_type_image')
+			->setFocusableElementId('label-label-type-image')
+			->setValue($data['sysmap']['label_type_image'])
+			->addOptions(CSelect::createOptionsFromArray($data['labelTypesImage']))
 	)
 	->addRow(null,
 		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
@@ -200,27 +230,37 @@ $map_tab
 
 // Append map element label to form list.
 unset($data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);
-$map_tab->addRow(_('Map element label type'),
-	new CComboBox('label_type', $data['sysmap']['label_type'], null, $data['labelTypes'])
+$map_tab->addRow(new CLabel(_('Map element label type'), 'label-label-type'),
+	(new CSelect('label_type'))
+		->setId('label_type')
+		->setFocusableElementId('label-label-type')
+		->setValue($data['sysmap']['label_type'])
+		->addOptions(CSelect::createOptionsFromArray($data['labelTypes']))
 );
 
 // Append map element label location to form list.
-$map_tab->addRow(_('Map element label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
-	[
-		0 => _('Bottom'),
-		1 => _('Left'),
-		2 => _('Right'),
-		3 => _('Top')
-	]
-));
+$map_tab->addRow(new CLabel(_('Map element label location'), 'label-label-location'),
+	(new CSelect('label_location'))
+		->setFocusableElementId('label-label-location')
+		->setValue($data['sysmap']['label_location'])
+		->addOptions(CSelect::createOptionsFromArray([
+			0 => _('Bottom'),
+			1 => _('Left'),
+			2 => _('Right'),
+			3 => _('Top')
+		]))
+);
 
 // Append show unack to form list.
-$map_tab->addRow(_('Problem display'),
-	new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
-		EXTACK_OPTION_ALL => _('All'),
-		EXTACK_OPTION_BOTH => _('Separated'),
-		EXTACK_OPTION_UNACK => _('Unacknowledged only')
-	])
+$map_tab->addRow(new CLabel(_('Problem display'), 'label-show-unack'),
+	(new CSelect('show_unack'))
+		->setFocusableElementId('label-show-unack')
+		->setValue($data['sysmap']['show_unack'])
+		->addOptions(CSelect::createOptionsFromArray([
+			EXTACK_OPTION_ALL => _('All'),
+			EXTACK_OPTION_BOTH => _('Separated'),
+			EXTACK_OPTION_UNACK => _('Unacknowledged only')
+		]))
 );
 
 $map_tab->addRow(_('Minimum severity'),
@@ -244,45 +284,27 @@ foreach ($data['sysmap']['urls'] as $url) {
 		(new CRow([
 			(new CTextBox('urls['.$i.'][name]', $url['name']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			(new CTextBox('urls['.$i.'][url]', $url['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types()),
+			(new CSelect('urls['.$i.'][elementtype]'))
+				->setValue($url['elementtype'])
+				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(
 				(new CButton(null, _('Remove')))
-					->onClick('$("#urlEntry_'.$i.'").remove();')
+					->onClick('$("#url-row-'.$i.'").remove();')
 					->addClass(ZBX_STYLE_BTN_LINK)
 			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->setId('urlEntry_'.$i)
+		]))->setId('url-row-'.$i)
 	);
 	$i++;
 }
 
-// Append empty template row to url table.
-$template_url_label = (new CTextBox('urls[#{id}][name]', ''))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAttribute('disabled', 'disabled');
-$template_url_link = (new CTextBox('urls[#{id}][url]', ''))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAttribute('disabled', 'disabled');
-$template_url_etype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
-$template_url_etype->setAttribute('disabled', 'disabled');
-$template_remove_button = (new CButton(null, _('Remove')))
-	->onClick('$("#entry_#{id}").remove();')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$template_url_row = (new CRow([
-	$template_url_label,
-	$template_url_link,
-	$template_url_etype,
-	(new CCol($template_remove_button))->addClass(ZBX_STYLE_NOWRAP)
-]))
-	->addStyle('display: none')
-	->setId('urlEntryTpl');
-$url_table->addRow($template_url_row);
-
 // Append "add" button to url table.
-$add_button = (new CButton(null, _('Add')))
-	->onClick('cloneRow("urlEntryTpl", '.$i.')')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$add_button_column = (new CCol($add_button))->setColSpan(4);
-$url_table->addRow($add_button_column);
+$url_table->addRow(
+	(new CCol(
+		(new CButton(null, _('Add')))
+			->setId('add-url')
+			->addClass(ZBX_STYLE_BTN_LINK))
+	)->setColSpan(4)
+);
 
 // Append url table to form list.
 $map_tab->addRow(_('URLs'),

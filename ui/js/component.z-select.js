@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ class ZSelect extends HTMLElement {
 		this._list = document.createElement('ul');
 
 		this._events = {};
-		this.onchange = () => {};
 
 		this._is_connected = false;
 	}
@@ -58,7 +57,7 @@ class ZSelect extends HTMLElement {
 	 * @return {array}
 	 */
 	static get observedAttributes() {
-		return ['name', 'value', 'disabled', 'readonly', 'width', 'onchange'];
+		return ['name', 'value', 'disabled', 'readonly', 'width'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -76,7 +75,7 @@ class ZSelect extends HTMLElement {
 
 					if (option && !option.disabled) {
 						this._input.value = option.value;
-						this.dispatchEvent(new Event('change'));
+						this.dispatchEvent(new Event('change', {bubbles: true}));
 					}
 					else {
 						this._input.value = null;
@@ -95,18 +94,22 @@ class ZSelect extends HTMLElement {
 				break;
 
 			case 'width':
-				this._button.style.width = `${new_value}px`;
-				this._list.style.width = `${new_value}px`;
-				break;
-
-			case 'onchange':
-				this.onchange = new Function('e', new_value);
+				if (new_value === 'auto') {
+					this.style.width = '100%';
+				}
+				else if (new_value !== null) {
+					this.style.width = `${new_value}px`;
+				}
+				else {
+					this.style.width = '';
+				}
 				break;
 		}
 	}
 
 	init() {
 		this._button.type = 'button';
+		this._button.classList.add('focusable');
 		this.appendChild(this._button);
 
 		this._input.type = 'hidden';
@@ -234,6 +237,10 @@ class ZSelect extends HTMLElement {
 		this.setAttribute('name', name);
 	}
 
+	get options() {
+		return this.getOptions();
+	}
+
 	get value() {
 		return !this._is_connected
 			? this.getAttribute('value')
@@ -307,11 +314,12 @@ class ZSelect extends HTMLElement {
 				this._list.style.maxHeight = `${space_above - offset_top}px`;
 			}
 		}
+		this._list.style.width = `${this.scrollWidth}px`;
 
 		this._highlight(this._preselected_index);
 
 		document.addEventListener('wheel', this._events.document_wheel);
-		document.querySelector('.wrapper').addEventListener('scroll', this._events.document_wheel);
+		setTimeout(() => document.querySelector('.wrapper').addEventListener('scroll', this._events.document_wheel));
 	}
 
 	_collapse() {
@@ -354,6 +362,7 @@ class ZSelect extends HTMLElement {
 		}
 
 		this._preselected_index = index;
+		this._highlighted_index = index;
 	}
 
 	_change(index) {
@@ -472,6 +481,10 @@ class ZSelect extends HTMLElement {
 	registerEvents() {
 		this._events = {
 			button_mousedown: (e) => {
+				if (this._button.readOnly) {
+					return;
+				}
+
 				// Safari fix - event needs to be prevented, else blur event is fired on this button.
 				e.preventDefault();
 				// Safari fix - a click button on label would not focus button element.
@@ -489,6 +502,10 @@ class ZSelect extends HTMLElement {
 			},
 
 			button_keydown: (e) => {
+				if (this._button.readOnly) {
+					return;
+				}
+
 				!this._isVisible() && this.scrollIntoView({block: 'nearest'})
 
 				if (e.which !== KEY_SPACE && !e.metaKey && !e.ctrlKey && e.key.length === 1) {
@@ -588,7 +605,15 @@ class ZSelect extends HTMLElement {
 				document.activeElement !== this._button && this._button.focus();
 			},
 
+			focus: (e) => {
+				this._button.focus();
+			},
+
 			button_blur: () => {
+				if (this._button.readOnly) {
+					return;
+				}
+
 				this._change(this._preselected_index);
 				this._collapse();
 			},
@@ -648,6 +673,8 @@ class ZSelect extends HTMLElement {
 		this._list.addEventListener('mouseup', this._events.list_mouseup);
 		this._list.addEventListener('mousemove', this._events.list_mousemove);
 
+		this.addEventListener('focus', this._events.focus);
+
 		window.addEventListener('resize', this._events.window_resize);
 	}
 
@@ -662,6 +689,8 @@ class ZSelect extends HTMLElement {
 		this._list.removeEventListener('mousedown', this._events.list_mousedown);
 		this._list.removeEventListener('mouseup', this._events.list_mouseup);
 		this._list.removeEventListener('mousemove', this._events.list_mousemove);
+
+		this.removeEventListener('focus', this._events.focus);
 
 		window.removeEventListener('resize', this._events.window_resize);
 	}

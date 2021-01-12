@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,13 +28,12 @@ class CWidgetFormClock extends CWidgetForm {
 		parent::__construct($data, WIDGET_CLOCK);
 
 		// Time type field.
-		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), [
+		$field_time_type = (new CWidgetFieldSelect('time_type', _('Time type'), [
 			TIME_TYPE_LOCAL => _('Local time'),
 			TIME_TYPE_SERVER => _('Server time'),
 			TIME_TYPE_HOST => _('Host time')
 		]))
-			->setDefault(TIME_TYPE_LOCAL)
-			->setAction('updateWidgetConfigDialogue()');
+			->setDefault(TIME_TYPE_LOCAL);
 
 		if (array_key_exists('time_type', $this->data)) {
 			$field_time_type->setValue($this->data['time_type']);

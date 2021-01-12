@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class CWidgetForm {
 		];
 		$rf_rates += CWidgetConfig::getRfRates();
 
-		$rf_rate_field = (new CWidgetFieldComboBox('rf_rate', _('Refresh interval'), $rf_rates))
+		$rf_rate_field = (new CWidgetFieldSelect('rf_rate', _('Refresh interval'), $rf_rates))
 			->setDefault(-1);
 
 		if (array_key_exists('rf_rate', $this->data)) {

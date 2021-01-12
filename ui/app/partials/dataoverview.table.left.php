@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,27 +26,29 @@ $table = (new CTableInfo())
 	->makeVerticalRotation()
 	->setHeadingColumn(0);
 
-$headings[] = _('Hosts');
-foreach ($data['items_by_name'] as $name => $hostid_to_itemid) {
-	$headings[] = (new CColHeader($name))
-		->addClass('vertical_rotation')
-		->setTitle($name);
+$header = [_('Hosts')];
+foreach ($data['items'] as $item_name => $item_data) {
+	foreach ($item_data as $columns_data) {
+		$header[] = (new CColHeader($item_name))
+			->addClass('vertical_rotation')
+			->setTitle($item_name);
+	}
 }
+$table->setHeader($header);
 
-$table->setHeader($headings);
-
-foreach ($data['db_hosts'] as $hostid => $host) {
+foreach ($data['hosts'] as $hostid => $host) {
 	$name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 	$row = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 
-	foreach ($data['items_by_name'] as $hostid_to_itemid) {
-		if (!array_key_exists($host['hostid'], $hostid_to_itemid)) {
-			$row[] = new CCol();
-		}
-		else {
-			$itemid = $hostid_to_itemid[$host['hostid']];
-			$item = $data['visible_items'][$itemid];
-			$row[] = getItemDataOverviewCell($item, $item['trigger']);
+	foreach ($data['items'] as $item_name => $columns_data) {
+		foreach ($columns_data as $column_data) {
+			if (array_key_exists($host['name'], $column_data)) {
+				$item = $column_data[$host['name']];
+				$row[] = getItemDataOverviewCell($item, $item['trigger']);
+			}
+			else {
+				$row[] = new CCol();
+			}
 		}
 	}
 

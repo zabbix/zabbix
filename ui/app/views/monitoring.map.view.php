@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('layout.mode.js');
+$this->includeJsFile('monitoring.map.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -38,14 +39,18 @@ $web_layout_mode = $this->getLayoutMode();
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
+			->setName('map.view')
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('Minimum severity'), 'severity_min'),
+					new CLabel(_('Minimum severity'), 'label-severity-min'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('severity_min', $data['severity_min'], 'javascript: submit();', $data['severities'])
+					(new CSelect('severity_min'))
+						->setFocusableElementId('label-severity-min')
+						->setValue($data['severity_min'])
+						->addOptions(CSelect::createOptionsFromArray($data['severities']))
 				])
 			),
 		(new CTag('nav', true, (new CList())
