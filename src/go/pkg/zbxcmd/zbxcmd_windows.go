@@ -88,16 +88,21 @@ func Execute(s string, timeout time.Duration) (out string, err error) {
 		return
 	}
 
+	var werr error
+
 	if strict {
-		if err = cmd.Wait(); err != nil {
-			return "", fmt.Errorf("Command execution failed: %s", err)
-		}
+		werr = cmd.Wait()
 	} else {
 		_ = cmd.Wait()
 	}
 
 	if !t.Stop() {
 		return "", fmt.Errorf("Timeout while executing a shell script.")
+	}
+
+	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
+	if werr != nil {
+		return "", fmt.Errorf("Command execution failed: %s", err)
 	}
 
 	if maxExecuteOutputLenB <= len(b.String()) {
