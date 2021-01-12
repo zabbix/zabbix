@@ -42,7 +42,7 @@ class CMenu extends CTag {
 	/**
 	 * Return all menu items.
 	 *
-	 * @return CMenuItem[]
+	 * @return array  Collection of CMenuItem objects.
 	 */
 	public function getMenuItems(): array {
 		return $this->menu_items;
