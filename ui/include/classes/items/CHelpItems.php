@@ -835,6 +835,10 @@ class CHelpItems {
 					'description' => _('VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
+					'key' => 'vmware.hv.cpu.usage.avg[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
 					'key' => 'vmware.hv.datacenter.name[<url>,<uuid>]',
 					'description' => _('VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string')
 				],

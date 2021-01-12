@@ -337,6 +337,7 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_PROPMAP("summary.quickStats.uptime"),		/* ZBX_VMWARE_HVPROP_UPTIME */
 	ZBX_PROPMAP("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
 	ZBX_PROPMAP("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
+	ZBX_PROPMAP("config.multipathState.path"),		/* ZBX_VMWARE_HVPROP_MULTIPATH */
 	ZBX_PROPMAP("overallStatus")				/* ZBX_VMWARE_HVPROP_STATUS */
 };
 
@@ -4697,7 +4698,9 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"net/packetsRx[summation]", "net/packetsTx[summation]",
 						"net/received[average]", "net/transmitted[average]",
 						"datastore/totalReadLatency[average]",
-						"datastore/totalWriteLatency[average]", NULL
+						"datastore/totalWriteLatency[average]", "cpu/usage[average]",
+						"cpu/utilization[average]", "cpu/utilization[average]",
+						NULL
 					};
 	const char			*vm_perfcounters[] = {
 						"virtualDisk/read[average]", "virtualDisk/write[average]",
@@ -4705,7 +4708,16 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"virtualDisk/numberWriteAveraged[average]",
 						"net/packetsRx[summation]", "net/packetsTx[summation]",
 						"net/received[average]", "net/transmitted[average]",
-						"cpu/ready[summation]", NULL
+						"cpu/ready[summation]", "net/usage[average]",
+						"cpu/usage[average]", "cpu/latency[average]",
+						"cpu/readiness[average]", "cpu/swapwait[summation]",
+						"system/osUptime[latest]", "memory/consumed[average]",
+						"memory/usage[average]", "memory/swapped[average]",
+						"network/received[average]", "network/transmitted[average]",
+						"network/usage[average]", "virtualDisk/readOIO[latest]",
+						"virtualDisk/writeOIO[latest]", "virtualDisk/totalWriteLatency[latest]",
+						"virtualDisk/totalReadLatency[latest]",
+						NULL
 					};
 
 	const char			*ds_perfcounters[] = {
