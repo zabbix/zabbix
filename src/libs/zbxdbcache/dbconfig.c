@@ -2737,7 +2737,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_INTERFACE	*interface, *interface_old;
+	ZBX_DC_INTERFACE	*interface;
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
@@ -2856,9 +2856,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			if (ITEM_STATUS_ACTIVE == status && ITEM_STATUS_ACTIVE != item->status)
 				item->data_expected_from = now;
 
-			interface_old = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &item->interfaceid);
 			if (ITEM_STATUS_ACTIVE == item->status)
+			{
+				ZBX_DC_INTERFACE	*interface_old;
+
+				interface_old = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
+						&item->interfaceid);
 				dc_interface_update_agent_stats(interface_old, item->type, -1);
+			}
 		}
 
 		if (ITEM_STATUS_ACTIVE == status)
