@@ -53,7 +53,6 @@ $fields = [
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
 	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
-	'valuemap' => 				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -100,7 +99,6 @@ if (getRequest('parent_discoveryid')) {
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
-			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'hostids' => [$hostid],
 			'editable' => true
 		]);
@@ -309,28 +307,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
 	}
 
-	if ($result) {
-		$valuemap = getRequest('valuemap', []);
-		if ($valuemap) {
-			$db_valuemap = API::ValueMap()->get([
-				'output' => ['valuemapid'],
-				'hostids' => [$hostid],
-				'preservekeys' => true
-			]);
-
-			if ($db_valuemap) {
-				API::ValueMap()->delete(array_keys($db_valuemap));
-			}
-
-			API::ValueMap()->create(array_map(function (array $value) use ($hostid): array {
-				$value['hostid'] = $hostid;
-				unset($value['valuemapid']);
-
-				return $value;
-			}, $valuemap));
-		}
-	}
-
 	$result = DBend($result);
 
 	if ($result) {
@@ -423,7 +399,6 @@ if (hasRequest('form')) {
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,
-		'valuemaps' => getRequest('valuemap', []),
 		'context' => getRequest('context'),
 		// Parent discovery rules.
 		'templates' => []
@@ -547,16 +522,6 @@ if (hasRequest('form')) {
 	}
 	else {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-	}
-
-	// Valuemaps.
-	if (!$data['valuemaps']) {
-		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectMappings' => API_OUTPUT_EXTEND,
-			'hostids' => [$hostid],
-			'preservekeys' => true
-		]);
 	}
 
 	$macros = $data['host_prototype']['macros'];
