@@ -704,6 +704,10 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15000, 15000, 1)
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15002, 15002, 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15015, 15015, 1);
 
+INSERT INTO valuemap (valuemapid, hostid, name) VALUES (5701, 15000, 'Template value mapping');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (57001, 5701, 1, 'yes');
+INSERT INTO valuemap_mapping (valuemap_mappingid, valuemapid, value, newvalue) VALUES (57002, 5701, 0, 'no');
+
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (15001, 'Template inheritance test host', 'Template inheritance test host', 0, '');
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15000, 15001, 1, '127.0.0.1', 1, '10051', 1);
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15001, 15001, 1, '127.0.0.2', 1, '10052', 0);
