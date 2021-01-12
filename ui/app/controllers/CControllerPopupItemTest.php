@@ -426,7 +426,8 @@ abstract class CControllerPopupItemTest extends CController {
 			$interface_input['address'] = $input['address'];
 		}
 
-		if (array_key_exists('data', $input) && array_key_exists('interface_details', $input['data'])) {
+		if (array_key_exists('data', $input) && array_key_exists('interface_details', $input['data'])
+				&& is_array($input['data']['interface_details'])) {
 			$interface_input['details'] = $input['data']['interface_details'];
 		}
 		elseif (array_key_exists('interface', $input) && array_key_exists('details', $input['interface'])) {
