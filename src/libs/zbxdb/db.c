@@ -593,7 +593,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		connect = zbx_strdcatf(connect, "//%s", host);
 		if (0 != port)
 			connect = zbx_strdcatf(connect, ":%d", port);
-		if (NULL != dbname && '\0' != *dbname)
+		if ('\0' != *dbname)
 			connect = zbx_strdcatf(connect, "/%s", dbname);
 	}
 	else
