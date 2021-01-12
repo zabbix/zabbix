@@ -42,7 +42,7 @@ class CMenu extends CTag {
 	/**
 	 * Return all menu items.
 	 *
-	 * @return array  Collection of CMenuItem objects.
+	 * @return CMenuItem[]
 	 */
 	public function getMenuItems(): array {
 		return $this->menu_items;
@@ -190,8 +190,7 @@ class CMenu extends CTag {
 		return $this;
 	}
 
-	public function toString($destroy = true)
-	{
+	public function toString($destroy = true) {
 		$this->addItem($this->menu_items);
 
 		return parent::toString($destroy);

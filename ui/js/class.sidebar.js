@@ -191,15 +191,14 @@ class CSidebar extends CBaseComponent {
 
 		if (force) {
 			update();
-		} else {
-			if (!this._animation_frame_running) {
-				this._animation_frame_running = true;
+		}
+		else if (!this._animation_frame_running) {
+			this._animation_frame_running = true;
 
-				window.requestAnimationFrame(() => {
-					update();
-					this._animation_frame_running = false;
-				});
-			}
+			window.requestAnimationFrame(() => {
+				update();
+				this._animation_frame_running = false;
+			});
 		}
 	}
 
