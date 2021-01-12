@@ -40,13 +40,8 @@ type process struct {
 
 var ntResumeProcess *syscall.Proc
 
-<<<<<<< HEAD
-func execute(s string, timeout time.Duration, strict bool) (out string, err error) {
-	cmd := exec.Command("cmd", "/C", s)
-=======
 func Execute(s string, timeout time.Duration) (out string, err error) {
 	cmd := exec.Command("cmd")
->>>>>>> release/5.0
 
 	var b bytes.Buffer
 	cmd.Stdout = &b
