@@ -157,6 +157,8 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$template_form->selectTab('Tags');
 
 		$template_tags = [
+			['name'=>'tag', 'value'=>'value:'],
+			['name'=>'tag:value', 'value'=>''],
 			['name'=>'template', 'value'=>'template'],
 			['name'=>'test', 'value'=>'inheritance']
 		];
@@ -211,8 +213,10 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		// All expected trigger tags including host and template tags.
 		$inherited_trigger_tags = [
 			['name'=>'host_tag', 'value'=>'host_tag_value'],
+			['name'=>'tag', 'value'=>'value:'],
 			['name'=>'tag1', 'value'=>'trigger'],
 			['name'=>'tag2', 'value'=>'templated'],
+			['name'=>'tag:value', 'value'=>''],
 			['name'=>'template', 'value'=>'template'],
 			['name'=>'test', 'value'=>'inheritance']
 		];
