@@ -187,15 +187,17 @@ class CConfigFile {
 
 			$this->check();
 
-			if (!file_put_contents($this->configFile, $this->getString())) {
-				if (file_exists($this->configFile)) {
-					if (file_get_contents($this->configFile) !== $this->getString()) {
-						self::exception(_('Unable to overwrite the existing configuration file.'));
-					}
+			if (is_writable($this->configFile) || is_writable(dirname($this->configFile))) {
+				file_put_contents($this->configFile, $this->getString());
+			}
+
+			if (file_exists($this->configFile)) {
+				if (file_get_contents($this->configFile) !== $this->getString()) {
+					self::exception(_('Unable to overwrite the existing configuration file.'));
 				}
-				else {
-					self::exception(_('Unable to create the configuration file.'));
-				}
+			}
+			else {
+				self::exception(_('Unable to create the configuration file.'));
 			}
 
 			return true;
