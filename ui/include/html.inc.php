@@ -837,9 +837,13 @@ function makePageFooter($with_version = true) {
 /**
  * Get drop-down submenu item list for the User settings section.
  *
- * @return array  Menu definition for CWidget::setTitleSubmenu.
+ * @return array|null  Menu definition for CWidget::setTitleSubmenu.
  */
-function getUserSettingsSubmenu(): array {
+function getUserSettingsSubmenu(): ?array {
+	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+		return null;
+	}
+
 	$profile_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'userprofile.edit')
 		->getUrl();
@@ -852,9 +856,7 @@ function getUserSettingsSubmenu(): array {
 		'main_section' => [
 			'items' => array_filter([
 				$profile_url => _('User profile'),
-				$tokens_url  => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-									? _('API tokens')
-									: null
+				$tokens_url  => _('API tokens')
 			])
 		]
 	];
