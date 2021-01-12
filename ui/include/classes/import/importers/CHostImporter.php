@@ -72,7 +72,7 @@ class CHostImporter extends CImporter {
 			}
 
 			if ($host['valuemaps']) {
-				$valuemaps = $host['valuemaps'];
+				$valuemaps[$host['host']] = $host['valuemaps'];
 			}
 		}
 
@@ -119,8 +119,8 @@ class CHostImporter extends CImporter {
 					]);
 				}
 
-				if ($valuemaps) {
-					foreach ($valuemaps as $valuemap) {
+				if (array_key_exists($hostHost, $valuemaps)) {
+					foreach ($valuemaps[$hostHost] as $valuemap) {
 						$valuemap['hostid'] = $hostId;
 
 						API::ValueMap()->create($valuemap);
@@ -155,7 +155,7 @@ class CHostImporter extends CImporter {
 					]);
 				}
 
-				if ($valuemaps) {
+				if (array_key_exists($host['host'], $valuemaps)) {
 					$db_valuemaps = API::ValueMap()->get([
 						'output' => ['valuemapid', 'name'],
 						'selectMappings' => ['value', 'newvalue'],
@@ -170,7 +170,7 @@ class CHostImporter extends CImporter {
 					if ($this->options['valueMaps']['updateExisting']) {
 						$valuemaps_update = [];
 						foreach ($db_valuemaps as $db_valuemap) {
-							foreach ($valuemaps as $valuemap) {
+							foreach ($valuemaps[$host['host']] as $valuemap) {
 								if ($db_valuemap['name'] === $valuemap['name']) {
 									$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
 									$valuemaps_update[] = $valuemap;
@@ -181,7 +181,7 @@ class CHostImporter extends CImporter {
 						API::ValueMap()->update($valuemaps_update);
 					}
 					else {
-						foreach ($valuemaps as $valuemap) {
+						foreach ($valuemaps[$host['host']] as $valuemap) {
 							$valuemap['hostid'] = $host['hostid'];
 
 							API::ValueMap()->create($valuemap);
