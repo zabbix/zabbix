@@ -30,7 +30,7 @@ class CMessageHelper {
 	/**
 	 * @var string
 	 */
-	private static $type = self::MESSAGE_TYPE_SUCCESS;
+	private static $type;
 
 	/**
 	 * @var string
@@ -81,6 +81,10 @@ class CMessageHelper {
 	 * @param string $source
 	 */
 	public static function addError(string $message, string $source = ''): void {
+		if (self::$type === null) {
+			self::$type = self::MESSAGE_TYPE_ERROR;
+		}
+
 		self::$messages[] = [
 			'type' => self::MESSAGE_TYPE_ERROR,
 			'message' => $message,
@@ -125,6 +129,7 @@ class CMessageHelper {
 	 * @param $title
 	 */
 	public static function setSuccessTitle(string $title): void {
+		self::$type = self::MESSAGE_TYPE_SUCCESS;
 		self::$title = $title;
 	}
 
@@ -133,7 +138,7 @@ class CMessageHelper {
 	 *
 	 * @return string
 	 */
-	public static function getType(): string {
+	public static function getType(): ?string {
 		return self::$type;
 	}
 
