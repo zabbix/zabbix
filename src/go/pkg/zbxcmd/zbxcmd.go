@@ -19,4 +19,24 @@
 
 package zbxcmd
 
+import "time"
+
 const maxExecuteOutputLenB = 512 * 1024
+
+// Execute runs the 's' command without checking cmd.Wait error.
+// This means that non zero exit status code will not return an error.
+// Returns an error if there is an issue with executing the command or
+// if the specified timeout has been reached or if maximum output length
+// has been reached.
+func Execute(s string, timeout time.Duration) (string, error) {
+	return execute(s, timeout, false)
+}
+
+// ExecuteStrict runs the 's' command and checks cmd.Wait error.
+// This means that non zero exit status code will return an error.
+// Also returns an error if there is an issue with executing the command or
+// if the specified timeout has been reached or if maximum output length
+// has been reached.
+func ExecuteStrict(s string, timeout time.Duration) (string, error) {
+	return execute(s, timeout, true)
+}

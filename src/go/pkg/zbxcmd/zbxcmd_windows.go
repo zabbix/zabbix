@@ -40,7 +40,7 @@ type process struct {
 
 var ntResumeProcess *syscall.Proc
 
-func Execute(s string, timeout time.Duration) (out string, err error, waitErr error) {
+func execute(s string, timeout time.Duration, strict bool) (out string, err error) {
 	cmd := exec.Command("cmd", "/C", s)
 
 	var b bytes.Buffer
@@ -49,7 +49,7 @@ func Execute(s string, timeout time.Duration) (out string, err error, waitErr er
 
 	var job windows.Handle
 	if job, err = windows.CreateJobObject(nil, nil); err != nil {
-		return "", err, nil
+		return "", err
 	}
 	defer windows.CloseHandle(job)
 
@@ -57,7 +57,7 @@ func Execute(s string, timeout time.Duration) (out string, err error, waitErr er
 		CreationFlags: windows.CREATE_SUSPENDED,
 	}
 	if err = cmd.Start(); err != nil {
-		return "", fmt.Errorf("Cannot execute command: %s", err), nil
+		return "", fmt.Errorf("Cannot execute command: %s", err)
 	}
 
 	processHandle := windows.Handle((*process)(unsafe.Pointer(cmd.Process)).Handle)
@@ -72,7 +72,7 @@ func Execute(s string, timeout time.Duration) (out string, err error, waitErr er
 
 	if err = windows.AssignProcessToJobObject(job, processHandle); err != nil {
 		log.Warningf("cannot assign process to a job: %s", err)
-		return "", err, nil
+		return "", err
 	}
 
 	t := time.AfterFunc(timeout, func() {
@@ -84,20 +84,26 @@ func Execute(s string, timeout time.Duration) (out string, err error, waitErr er
 	var rc uintptr
 	if rc, _, err = ntResumeProcess.Call(uintptr(processHandle)); int32(rc) < 0 {
 		log.Warningf("cannot resume process: %s", err)
-		return "", err, nil
+		return "", err
 	}
 
-	waitErr = cmd.Wait()
+	if strict {
+		if err = cmd.Wait(); err != nil {
+			return "", fmt.Errorf("Command execution failed: %s", err)
+		}
+	} else {
+		_ = cmd.Wait()
+	}
 
 	if !t.Stop() {
-		return "", fmt.Errorf("Timeout while executing a shell script."), nil
+		return "", fmt.Errorf("Timeout while executing a shell script.")
 	}
 
 	if maxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024), nil
+		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
 	}
 
-	return strings.TrimRight(b.String(), " \t\r\n"), nil, waitErr
+	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
 func ExecuteBackground(s string) error {

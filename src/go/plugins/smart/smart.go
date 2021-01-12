@@ -214,8 +214,8 @@ func getType(devType string, rate int) (out string) {
 
 func init() {
 	plugin.RegisterMetrics(&impl, "Smart",
-		"smart.disk.discovery", "Returns JSON array of smart devices, usage: smart.disk.discovery.",
-		"smart.disk.get", "Returns JSON data of smart device, usage: smart.disk.get.",
-		"smart.attribute.discovery", "Returns JSON array of smart device attributes, usage: smart.attribute.discovery.",
+		"smart.disk.discovery", "Returns JSON array of smart devices.",
+		"smart.disk.get", "Returns JSON data of smart device.",
+		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
 	)
 }
