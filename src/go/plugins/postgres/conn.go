@@ -211,7 +211,13 @@ func (c *ConnManager) create(uri uri.URI) (*PGConn, error) {
 	if uri.Scheme() == "unix" {
 		socket := uri.Addr()
 		host = filepath.Dir(socket)
-		port = filepath.Ext(filepath.Base(socket))[1:]
+
+		ext := filepath.Ext(filepath.Base(socket))
+		if len(ext) <= 1 {
+			return nil, fmt.Errorf("incorrect socket: %q", socket)
+		}
+
+		port = ext[1:]
 	}
 
 	dbname, err := url.QueryUnescape(uri.GetParam("dbname"))
