@@ -193,9 +193,9 @@ fail:
 
 static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script, zbx_uint64_t *groupid)
 {
+	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -402,7 +402,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 						MACRO_TYPE_MESSAGE_RECOVERY);
 			}
 
-			if (user != NULL)
+			if (NULL != user)
 			{
 				/* Make a copy to preserve const-correctness. */
 				userid = user->userid;
@@ -444,7 +444,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (user != NULL)
+			if (NULL != user)
 			{
 				/* zbx_script_prepare() receives 'user' as const-pointer but */
 				/* substitute_simple_macros() takes 'userid' as non-const pointer. */
@@ -552,9 +552,9 @@ static int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *hos
 {
 	int		ret = SUCCEED, macro_type = MACRO_TYPE_SCRIPT;
 	zbx_uint64_t	userid, *p_userid = NULL;
+	char		error[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		error[MAX_STRING_LEN];
 	struct zbx_json	json_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -673,7 +673,7 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, DB_EVENT *event,
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, const DB_EVENT *event,
 		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
