@@ -75,7 +75,7 @@ class CControllerUserTokenEdit extends CController {
 				'tokenid' => 0,
 				'name' => '',
 				'description' => '',
-				'expires_at' => date(DATE_TIME_FORMAT_SECONDS, time()),
+				'expires_at' => null,
 				'expires_state' => '1',
 				'status' => ZBX_AUTH_TOKEN_ENABLED
 			];
