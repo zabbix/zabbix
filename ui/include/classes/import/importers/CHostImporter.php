@@ -156,6 +156,10 @@ class CHostImporter extends CImporter {
 				}
 
 				if (array_key_exists($host['host'], $valuemaps)) {
+					$valuemaps_create = [];
+					$valuemaps_update = [];
+					$valuemaps_delete = [];
+
 					$db_valuemaps = API::ValueMap()->get([
 						'output' => ['valuemapid', 'name'],
 						'selectMappings' => ['value', 'newvalue'],
@@ -163,12 +167,20 @@ class CHostImporter extends CImporter {
 						'preservekeys' => true
 					]);
 
-					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
-						API::ValueMap()->delete(array_keys($db_valuemaps));
+					if ($this->options['valueMaps']['createMissing']) {
+						foreach ($valuemaps[$host['host']] as $valuemap) {
+							if (!in_array($valuemap['name'], array_column($db_valuemaps, 'name'))) {
+								$valuemap['hostid'] = $host['hostid'];
+								$valuemaps_create[] = $valuemap;
+							}
+						}
+
+						if ($valuemaps_create) {
+							API::ValueMap()->create($valuemaps_create);
+						}
 					}
 
 					if ($this->options['valueMaps']['updateExisting']) {
-						$valuemaps_update = [];
 						foreach ($db_valuemaps as $db_valuemap) {
 							foreach ($valuemaps[$host['host']] as $valuemap) {
 								if ($db_valuemap['name'] === $valuemap['name']) {
@@ -178,13 +190,20 @@ class CHostImporter extends CImporter {
 							}
 						}
 
-						API::ValueMap()->update($valuemaps_update);
+						if ($valuemaps_update) {
+							API::ValueMap()->update($valuemaps_update);
+						}
 					}
-					else {
-						foreach ($valuemaps[$host['host']] as $valuemap) {
-							$valuemap['hostid'] = $host['hostid'];
 
-							API::ValueMap()->create($valuemap);
+					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
+						foreach ($db_valuemaps as $db_valuemap) {
+							if (!in_array($db_valuemap['name'], array_column($valuemaps[$host['host']], 'name'))) {
+								$valuemaps_delete[] = $db_valuemap['valuemapid'];
+							}
+						}
+
+						if ($valuemaps_delete) {
+							API::ValueMap()->delete($valuemaps_delete);
 						}
 					}
 				}

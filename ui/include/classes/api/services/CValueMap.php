@@ -214,7 +214,7 @@ class CValueMap extends CApiService {
 					unset($mapping[$db_mapping['value']]);
 				}
 				else {
-					$del_mapingids[] = $db_mapping['mappingid'];
+					$del_mapingids[] = $db_mapping['valuemap_mappingid'];
 				}
 			}
 			unset($mapping);
@@ -226,7 +226,7 @@ class CValueMap extends CApiService {
 			}
 
 			if ($del_mapingids) {
-				DB::delete('valuemap_mapping', ['value_mappingid' => $del_mapingids]);
+				DB::delete('valuemap_mapping', ['valuemap_mappingid' => $del_mapingids]);
 			}
 
 			if ($upd_mapings) {
@@ -255,7 +255,7 @@ class CValueMap extends CApiService {
 		}
 
 		$db_valuemaps = DB::select('valuemap', [
-			'output' => ['valuemapid', 'hostid'],
+			'output' => ['valuemapid', 'hostid', 'name'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);

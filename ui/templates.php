@@ -300,6 +300,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				return $value;
 			}, $valuemap));
 		}
+		else {
+			$db_valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid'],
+				'hostids' => [$templateId],
+				'preservekeys' => true
+			]);
+
+			if ($db_valuemap) {
+				API::ValueMap()->delete(array_keys($db_valuemap));
+			}
+		}
 
 
 		// full clone

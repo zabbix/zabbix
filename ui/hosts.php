@@ -526,6 +526,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				return $value;
 			}, $valuemap));
 		}
+		else {
+			$db_valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid'],
+				'hostids' => [$hostId],
+				'preservekeys' => true
+			]);
+
+			if ($db_valuemap) {
+				API::ValueMap()->delete(array_keys($db_valuemap));
+			}
+		}
 
 		// full clone
 		if (getRequest('form', '') === 'full_clone' && getRequest('clone_hostid', 0) != 0) {
