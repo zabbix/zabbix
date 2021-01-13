@@ -49,6 +49,10 @@ class CControllerUserTokenList extends CController {
 	}
 
 	protected function checkPermissions() {
+		if (CWebUser::isGuest()) {
+			return false;
+		}
+
 		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 	}
 

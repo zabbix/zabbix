@@ -916,6 +916,8 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
+	$can_access_tokens = (!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS));
+
 	return [
 		'main_section' => [
 			'items' => array_filter([
@@ -929,9 +931,7 @@ function getAdministrationGeneralSubmenu() {
 				$valuemap_url     => _('Value mapping'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
-				$tokens_url       => CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)
-										? _('API tokens')
-										: null,
+				$tokens_url       => $can_access_tokens ? _('API tokens') : null,
 				$miscconfig_url   => _('Other')
 			])
 		]
