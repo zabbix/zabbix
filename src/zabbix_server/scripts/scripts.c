@@ -215,7 +215,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 		script->command_orig = zbx_strdup(script->command_orig, row[2]);
 		ZBX_DBROW2UINT64(*groupid, row[3]);
 		ZBX_STR2UCHAR(script->host_access, row[4]);
-		tm = zbx_strdup(NULL, row[0]);
+		tm = zbx_strdup(NULL, row[5]);
 
 		ret = is_time_suffix(tm, &script->timeout, ZBX_LENGTH_UNLIMITED);
 

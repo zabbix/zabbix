@@ -621,9 +621,6 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 	if (NULL != debug)
 		zbx_es_debug_enable(&es);
 
-	if (0 != timeout)
-		zbx_es_set_timeout(&es, timeout);
-
 	if (FAIL == zbx_es_compile(&es, command, &code, &size, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot compile script: %s", errmsg);
@@ -631,6 +628,9 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 		ret = FAIL;
 		goto out;
 	}
+
+	if (0 != timeout)
+		zbx_es_set_timeout(&es, timeout);
 
 	if (FAIL == zbx_es_execute(&es, NULL, code, size, param, result, &errmsg))
 	{
