@@ -165,8 +165,7 @@ function getMainMenu(): CMenu {
 						->setAction('proxy.list')
 						->setAliases(['proxy.edit']),
 					(new CMenuItem(_('Authentication')))
-						->setAction('authentication.edit')
-						->setAliases(['authentication.update']),
+						->setAction('authentication.edit'),
 					(new CMenuItem(_('User groups')))
 						->setAction('usergroup.list')
 						->setAliases(['usergroup.edit']),
