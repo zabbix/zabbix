@@ -123,7 +123,7 @@ class CMenuItem extends CBaseComponent {
 
 			blur: () => {
 				if (this.hasSubmenu() && this._is_expanded) {
-					this.collapseSubmenu();
+					this.collapseSubmenu(1);
 				}
 			},
 
