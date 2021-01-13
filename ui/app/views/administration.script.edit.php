@@ -145,6 +145,7 @@ $form_list = (new CFormList())
 	->addRow(new CLabel(_('Timeout'), 'timeout'),
 		(new CTextBox('timeout', $data['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
