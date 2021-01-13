@@ -517,11 +517,8 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 			}
 			else
 			{
-				if (NULL != script_ret)
-				{
-					*script_ret = zbx_strdup(*script_ret, output);
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
-				}
+				*script_ret = zbx_strdup(NULL, output);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
 			}
 		}
 	}
