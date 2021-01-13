@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:21Z'
+  date: '2021-01-13T10:34:03Z'
   groups:
     -
       name: Templates/Databases
@@ -212,13 +212,15 @@ zabbix_export:
           value_type: TEXT
           params: |
             SELECT
-            df.tablespace_name AS tablespace,
-            df.type AS TYPE,
-            SUM(df.bytes) AS used_bytes,
-            SUM(df.max_bytes) AS max_bytes,
-            SUM(f.free) AS free_bytes,
-            ROUND(SUM(df.bytes)/ SUM(df.max_bytes)* 100, 2) AS used_pct,
-            DECODE(df.status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status
+              df.tablespace_name AS TABLESPACE, 
+              df.type AS TYPE, 
+              NVL(SUM(df.BYTES), 0) AS FILE_BYTES, 
+              NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES, 
+              NVL(SUM(f.FREE), 0) AS FREE_BYTES,
+              SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
+              ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+              ROUND(DECODE(SUM(df.BYTES), 0, 0,(SUM(df.BYTES)-SUM(f.FREE))/ SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
+              DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
             FROM ( SELECT
                ddf.file_id,
                dt.contents AS TYPE,
@@ -237,13 +239,15 @@ zabbix_export:
                GROUP BY df.tablespace_name, df.TYPE, df.status
             UNION ALL
             SELECT
-               Y.name AS tablespace_name,
-               Y.type AS TYPE,
-               SUM(Y.bytes) AS bytes,
-               SUM(Y.max_bytes) AS max_bytes,
-               MAX(NVL(Y.free_bytes, 0)) AS FREE,
-               ROUND(SUM(Y.bytes)/ SUM(Y.max_bytes)* 100, 2) AS used_pct,
-               DECODE(Y.tbs_status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status
+              Y.name AS TABLESPACE, 
+              Y.type AS TYPE, 
+              NVL(SUM(Y.BYTES), 0) AS FILE_BYTES, 
+              NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES, 
+              NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
+              SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES,
+              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+              ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-SUM(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
+              DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS 
                FROM ( SELECT
                  dtf.tablespace_name AS name,
                  dt.contents AS TYPE,
@@ -269,7 +273,7 @@ zabbix_export:
                 sys.dba_tablespaces dt
                WHERE
                dtf.tablespace_name = dt.tablespace_name ) Y
-               GROUP BY Y.name, Y.TYPE, Y.tbs_status ORDER BY tablespace;
+               GROUP BY Y.name, Y.TYPE, Y.tbs_status;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'Get tablespaces stats.'
@@ -1999,7 +2003,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_BYTES.first()'
+                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].FILE_BYTES.first()'
               master_item:
                 key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
             -
@@ -2074,7 +2078,57 @@ zabbix_export:
                   priority: WARNING
                   description: 'The tablespase is in the offline state.'
             -
-              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage percent'
+              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace used, bytes'
+              type: DEPENDENT
+              key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Currently used bytes for tablespace (current size of datafiles-free space).'
+              application_prototypes:
+                -
+                  name: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_BYTES.first()'
+              master_item:
+                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+            -
+              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage, percent'
+              type: DEPENDENT
+              key: 'oracle.tbs_used_file_pct["{#TABLESPACE}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Used bytes/Allocated bytes*100'
+              application_prototypes:
+                -
+                  name: 'Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_FILE_PCT.first()'
+              master_item:
+                key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
+                  priority: HIGH
+                -
+                  expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
+                      expression: '{Oracle by ODBC:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+            -
+              name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
               type: DEPENDENT
               key: 'oracle.tbs_used_pct["{#TABLESPACE}"]'
               delay: '0'
@@ -2089,22 +2143,22 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_PCT.first()'
+                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_PCT_MAX.first()'
               master_item:
                 key: 'db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]'
               trigger_prototypes:
                 -
-                  expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
-                  priority: HIGH
-                -
                   expression: '{min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
-                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
                   dependencies:
                     -
-                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
-                      expression: '{Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
+                      name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
+                      expression: '{Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                -
+                  expression: '{min(5m)}>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+                  name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
+                  priority: HIGH
           graph_prototypes:
             -
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace ''{#TABLESPACE}'''
@@ -2120,6 +2174,12 @@ zabbix_export:
                   item:
                     host: 'Oracle by ODBC'
                     key: 'oracle.tbs_max_bytes["{#TABLESPACE}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Oracle by ODBC'
+                    key: 'oracle.tbs_used_bytes["{#TABLESPACE}"]'
       macros:
         -
           macro: '{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
@@ -2160,7 +2220,7 @@ zabbix_export:
         -
           macro: '{$ORACLE.PGA.USE.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of PGA usage alert treshold (for trigger expression).'
+          description: 'Maximum percentage of PGA usage alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.PORT}'
           value: '1521'
@@ -2168,11 +2228,11 @@ zabbix_export:
         -
           macro: '{$ORACLE.PROCESSES.MAX.WARN}'
           value: '80'
-          description: 'Maximum percentage of active processes alert treshold (for trigger expression).'
+          description: 'Maximum percentage of active processes alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.REDO.MIN.WARN}'
           value: '3'
-          description: 'Minimum number of REDO logs alert treshold (for trigger expression).'
+          description: 'Minimum number of REDO logs alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.SESSION.LOCK.MAX.TIME}'
           value: '600'
@@ -2180,19 +2240,19 @@ zabbix_export:
         -
           macro: '{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
           value: '3'
-          description: 'Maximum number of the prolongely locked sessions alert treshold (for trigger expression).'
+          description: 'Maximum number of the prolongely locked sessions alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.SESSIONS.LOCK.MAX.WARN}'
           value: '20'
-          description: 'Maximum percentage of locked sessions alert treshold (for trigger expression).'
+          description: 'Maximum percentage of locked sessions alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.SESSIONS.MAX.WARN}'
           value: '80'
-          description: 'Maximum percentage of active sessions alert treshold (for trigger expression).'
+          description: 'Maximum percentage of active sessions alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.SHARED.FREE.MIN.WARN}'
           value: '5'
-          description: 'Minimum percentage of free shared pool alert treshold (for trigger expression).'
+          description: 'Minimum percentage of free shared pool alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.TABLESPACE.NAME.MATCHES}'
           value: '.*'
@@ -2203,12 +2263,20 @@ zabbix_export:
           description: 'This macro is used in tablespace discovery. It can be overridden on a host or linked template level.'
         -
           macro: '{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
-          value: '90'
-          description: 'Maximum percentage of used tablespace high severity alert treshold (for trigger expression).'
+          value: '95'
+          description: 'Maximum percentage of used (Used bytes/Allocated bytes) tablespace high severity alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.TBS.USED.PCT.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used (Used bytes/Allocated bytes) tablespace warning severity alert threshold (for trigger expression).'
+        -
+          macro: '{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
+          value: '90'
+          description: 'Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).'
+        -
+          macro: '{$ORACLE.TBS.UTIL.PCT.MAX.WARN}'
           value: '80'
-          description: 'Maximum percentage of used tablespace warning severity alert treshold (for trigger expression).'
+          description: 'Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).'
         -
           macro: '{$ORACLE.USER}'
           value: '<Put your username here>'
