@@ -632,33 +632,43 @@ switch ($data['popup_type']) {
 
 	case 'valuemaps':
 		foreach ($data['table_records'] as $item) {
+			$name = [];
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
 				: null;
+
+			if (array_key_exists('hostname', $item)) {
+				$name[] = (new CSpan($item['hostname']))->addClass(ZBX_STYLE_GREY);
+				$name[] = NAME_DELIMITER;
+			}
 
 			if (array_key_exists('_disabled', $item)) {
 				if ($data['multiselect']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);
 				}
-				$name = $item['name'];
+				$name[] = $item['name'];
 
 				unset($data['table_records'][$item['id']]);
 			}
 			else {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($item['id']).', '.$options['parentid'].');';
+				$js_action = 'addValue('.json_encode($options['reference']).', '.
+					json_encode($item['id']).', '.$options['parentid'].');';
 
-				$name = (new CLink($item['name'], 'javascript:void(0);'))
+				$name[] = (new CLink($item['name'], '#'))
 					->setId('spanid'.$item['id'])
 					->onClick($js_action.$js_action_onclick);
 			}
 
 			$span = [];
 
-			foreach ($item['mappings'] as $mapping) {
+			foreach (array_slice($item['mappings'], 0, 3) as $mapping) {
 				$span[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
 				$span[] = BR();
+			}
+
+			if (count($item['mappings']) > 3) {
+				$span[] = '...';
 			}
 
 			$table->addRow([$check_box, $name, $span]);

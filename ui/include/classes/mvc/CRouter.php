@@ -180,7 +180,7 @@ class CRouter {
 		'popup.triggerwizard'				=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
 		'popup.massupdate.host'				=> ['CControllerPopupMassupdateHost',				'layout.json',			'popup.massupdate.host'],
 		'popup.massupdate.item'				=> ['CControllerPopupMassupdateItem',				'layout.json',			'popup.massupdate.item'],
-		'popup.massupdate.itemprototype'	=> ['CControllerPopupMassupdateItemPrototype',		'layout.json',			'popup.massupdate.item'],
+		'popup.massupdate.itemprototype'	=> ['CControllerPopupMassupdateItem',				'layout.json',			'popup.massupdate.item'],
 		'popup.massupdate.template'			=> ['CControllerPopupMassupdateTemplate',			'layout.json',			'popup.massupdate.template'],
 		'popup.massupdate.trigger'			=> ['CControllerPopupMassupdateTrigger',			'layout.json',			'popup.massupdate.trigger'],
 		'popup.massupdate.triggerprototype'	=> ['CControllerPopupMassupdateTrigger',			'layout.json',			'popup.massupdate.trigger'],

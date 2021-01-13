@@ -79,6 +79,7 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
 		link.innerHTML = this.data.name;
+		link.classList.add('valuemap-label');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click',
 			() => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, this)
@@ -107,7 +108,9 @@ var AddValueMap = class {
 		let i = 0;
 		const cell = document.createElement('td');
 		for (let value of this.data.mappings) {
-			cell.append(`${value.value} ⇒ ${value.newvalue}`, document.createElement('br'));
+			if (i <= 3) {
+				cell.append((i < 3) ? `${value.value} ⇒ ${value.newvalue}` : '...', document.createElement('br'));
+			}
 
 			cell.appendChild(this.createHiddenInput(`[mappings][${i}][value]`, value.value));
 			cell.appendChild(this.createHiddenInput(`[mappings][${i}][newvalue]`, value.newvalue));

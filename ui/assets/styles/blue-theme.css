@@ -5994,3 +5994,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   display: none; }
   .valuemap-remove .valuemap-checkbox {
     margin-top: 10px; }
+
+.valuemap-table .valuemap-label {
+  word-break: break-all; }

@@ -6006,6 +6006,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .valuemap-remove .valuemap-checkbox {
     margin-top: 10px; }
 
+.valuemap-table .valuemap-label {
+  word-break: break-all; }
+
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
 

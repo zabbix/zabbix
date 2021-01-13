@@ -34,18 +34,12 @@ $form = (new CForm())
 	->setName('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('ids', $data['ids'])
-	->addVar('action', $data['prototype'] ? 'popup.massupdate.itemprototype' : 'popup.massupdate.item')
+	->addVar('action', $data['action'])
+	->addVar('prototype', $data['prototype'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
-	->addVar('context', $data['context'])
+	->addVar('context', $data['context'], uniqid('context_'))
 	->disablePasswordAutofill();
-
-if ($data['prototype']) {
-	$form->addVar('parent_discoveryid', $data['parent_discoveryid']);
-}
-else {
-	$form->addVar('hostid', $data['hostid']);
-}
 
 // Create item form list.
 $item_form_list = (new CFormList('item-form-list'))
@@ -57,17 +51,17 @@ $item_form_list = (new CFormList('item-form-list'))
 		(new CSelect('type'))
 			->setId('type')
 			->setValue(ITEM_TYPE_ZABBIX)
-			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
+			->addOptions(CSelect::createOptionsFromArray($data['item_types']))
 	);
 
-// Append hosts to item form list.
-if ($data['display_interfaces']) {
+// Append hosts interface select to form list.
+if ($data['single_host_selected'] && $data['context'] === 'host') {
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
 		(new CDiv([
-			getInterfaceSelect($data['hosts']['interfaces'])
+			getInterfaceSelect($data['interfaces'])
 				->setId('interface-select')
 				->setValue('0')
 				->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE),
@@ -352,28 +346,31 @@ $item_form_list->addRow(
 	(new CTextBox('logtimefmt', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
-$item_form_list->addRow(
-	(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
-	(new CDiv([
-		(new CMultiSelect([
-			'name' => 'valuemapid',
-			'object_name' => 'valuemaps',
-			'multiple' => false,
-			'data' => [],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'valuemaps',
-					'srcfld1' => 'valuemapid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'valuemapid',
-					'hostids' => $data['prototype'] ? [$data['parent_discoveryid']] : [$data['hostid']],
-					'editable' => true
+// Append value map select when only one host or template is selected.
+if ($data['single_host_selected']) {
+	$item_form_list->addRow(
+		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
+		(new CDiv([
+			(new CMultiSelect([
+				'name' => 'valuemapid',
+				'object_name' => 'valuemaps',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'valuemaps',
+						'srcfld1' => 'valuemapid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'valuemapid',
+						'hostids' => [$data['hostid']],
+						'editable' => true
+					]
 				]
-			]
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]))->setId('valuemapid_div')
-);
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))->setId('valuemapid_div')
+	);
+}
 
 $item_form_list->addRow(
 		(new CVisibilityBox('visible[allow_traps]', 'allow_traps', _('Original')))->setLabel(_('Enable trapping')),
@@ -388,7 +385,7 @@ $item_form_list->addRow(
 	);
 
 // Append applications to form list.
-if ($data['displayApplications']) {
+if ($data['single_host_selected']) {
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
 			->setLabel(_('Applications')),
@@ -454,7 +451,7 @@ if ($data['prototype']) {
 }
 
 // Append master item select to form list.
-if ($data['displayMasteritems']) {
+if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
 		$master_item = (new CDiv([
 			(new CMultiSelect([
@@ -539,7 +536,7 @@ $item_form_list->addRow(
 );
 
 $tabs = (new CTabView())
-	->addTab('item_tab', $data['prototype'] ? _('Item prototype') :_('Item'), $item_form_list)
+	->addTab('item_tab', $data['prototype'] ? _('Item prototype') : _('Item'), $item_form_list)
 	->addTab('preprocessing_tab', _('Preprocessing'), $preprocessing_form_list)
 	->setSelected(0);
 
@@ -547,7 +544,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php', $data)));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));

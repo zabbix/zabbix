@@ -356,7 +356,7 @@ function interfaceType2str($type) {
 
 function itemTypeInterface($type = null) {
 	$types = [
-		ITEM_TYPE_SNMP =>  INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_SNMP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
 		ITEM_TYPE_ZABBIX => INTERFACE_TYPE_AGENT,

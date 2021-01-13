@@ -291,15 +291,12 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	[...obj.querySelectorAll('[name=valuemap_massupdate]')].map((elem) => {
 		elem.addEventListener('click', (event) => {
-			const value = event.currentTarget.value;
+			const visible = obj.querySelector(`[data-type="${event.currentTarget.value}"]`);
 
-			if (value == <?= ZBX_ACTION_REMOVE ?>) {
-				obj.querySelector('.valuemap-remove').style.display = 'block';
-				obj.querySelector('#valuemap-table').style.display = 'none';
-			}
-			else {
-				obj.querySelector('.valuemap-remove').style.display = 'none';
-				obj.querySelector('#valuemap-table').style.display = 'table';
+			obj.querySelectorAll('[data-type]').forEach(elm => elm.style.display = 'none');
+
+			if (visible) {
+				visible.style.display = 'block';
 			}
 		});
 	});

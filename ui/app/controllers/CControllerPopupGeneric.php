@@ -1363,24 +1363,34 @@ class CControllerPopupGeneric extends CController {
 
 			case 'valuemaps':
 				$records = [];
-				$options += [
-					'output' => ['valuemapid', 'hostid', 'name'],
-					'selectMappings' => API_OUTPUT_EXTEND,
-					'hostids' => $this->getInput('hostids', []),
-					'preservekeys' => true
-				];
+				$hostids = $this->getInput('hostids', []);
 
-				$valuemaps = API::ValueMap()->get($options);
-
-				foreach ($valuemaps as $valuemap) {
-					$records[$valuemap['valuemapid']] = [
-						'id' => $valuemap['valuemapid'],
-						'name' => $valuemap['name'],
-						'mappings' => $valuemap['mappings']
+				if ($hostids) {
+					$options += [
+						'output' => ['valuemapid', 'hostid', 'name'],
+						'selectMappings' => ['value', 'newvalue'],
+						'hostids' => $hostids,
+						'preservekeys' => true
 					];
+					$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get($options), ['valuemapid' => 'id']);
+
+					// For multiple hosts show hostname as value map name prefix.
+					if (count($hostids) > 1) {
+						$hosts = API::Host()->get([
+							'output' => ['name'],
+							'hostids' => $hostids,
+							'preservekeys' => true
+						]);
+
+						foreach ($records as &$record) {
+							$record['hostname'] = $hosts[$record['hostid']]['name'];
+						}
+						unset($record);
+					}
+
+					CArrayHelper::sort($records, ['name']);
 				}
 
-				CArrayHelper::sort($records, ['name']);
 				break;
 		}
 
