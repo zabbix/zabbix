@@ -198,10 +198,10 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
  * Function: execute_script                                                                       *
  *                                                                                                *
  * Parameters:  scriptid       - [IN] the id of a script to be executed                           *
- *              hosti          - [IN] the host the script will be executed on                     *
+ *              hostid         - [IN] the host the script will be executed on                     *
  *              sessionid      - [IN] the id of a session when the command was received           *
  *              clientip       - [IN] the IP of client                                            *
- *              ctx            - [IN] the context of an executions                                *
+ *              ctx            - [IN] the execution context                                       *
  *              eventid        - [IN] the id of an event (can be 0 for HOST context)              *
  *              result         - [OUT] the result of a script execution                           *
  *              debug          - [OUT] the debug data (optional)                                  *

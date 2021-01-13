@@ -647,8 +647,7 @@ out:
 
 	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
 	{
-		zabbix_log(LOG_LEVEL_WARNING,
-				"cannot destroy embedded scripting engine environment: %s", errmsg);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot destroy embedded scripting engine environment: %s", errmsg);
 		zbx_free(errmsg);
 	}
 
