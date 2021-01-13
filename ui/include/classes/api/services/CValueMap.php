@@ -26,9 +26,9 @@ class CValueMap extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
 	protected $tableName = 'valuemap';
