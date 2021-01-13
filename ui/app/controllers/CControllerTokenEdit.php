@@ -73,7 +73,7 @@ class CControllerTokenEdit extends CController {
 				$data['expires_state'] = '1';
 			}
 			else {
-				$data['expires_at'] = date(DATE_TIME_FORMAT_SECONDS, time());
+				$data['expires_at'] = null;
 				$data['expires_state'] = '0';
 			}
 		}
