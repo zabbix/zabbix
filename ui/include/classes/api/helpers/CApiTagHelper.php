@@ -39,10 +39,8 @@ class CApiTagHelper {
 	 * @return string
 	 */
 	public static function addWhereCondition(array $tags, $evaltype, $parent_alias, $table, $field) {
-		$values_by_tag = [
-			'NOT EXISTS' => [],
-			'EXISTS' => []
-		];
+		$values_by_tag = [];
+
 		foreach ($tags as $tag) {
 			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
 			$value = array_key_exists('value', $tag) ? $tag['value'] : '';
@@ -54,11 +52,26 @@ class CApiTagHelper {
 				$operator = TAG_OPERATOR_EXISTS;
 			}
 
+			if (!array_key_exists($tag['tag'], $values_by_tag)) {
+				$values_by_tag[$tag['tag']] = [
+					'NOT EXISTS' => [],
+					'EXISTS' => []
+				];
+			}
+
 			$slot = in_array($operator, [TAG_OPERATOR_EXISTS, TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])
 				? 'EXISTS'
 				: 'NOT EXISTS';
 
-			if (array_key_exists($tag['tag'], $values_by_tag[$slot]) && !is_array($values_by_tag[$slot][$tag['tag']])) {
+			if (!is_array($values_by_tag[$tag['tag']][$slot])) {
+				/*
+				 * If previously there was the same tagname with operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS,
+				 * we don't collect more values anymore because TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS has higher
+				 * priority.
+				 *
+				 * `continue` is necessary to accidantly not overwrite boolean with array. Tag values collected before
+				 * will be later removed.
+				 */
 				continue;
 			}
 
@@ -68,26 +81,38 @@ class CApiTagHelper {
 					$value = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
 					$value = '%'.mb_strtoupper($value).'%';
 
-					$values_by_tag[$slot][$tag['tag']][]
+					$values_by_tag[$tag['tag']][$slot][]
 						= 'UPPER('.$table.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 					break;
 
 				case TAG_OPERATOR_EXISTS:
 				case TAG_OPERATOR_NOT_EXISTS:
-					$values_by_tag[$slot][$tag['tag']] = false;
+					$values_by_tag[$tag['tag']][$slot] = false;
 					break;
 
 				case TAG_OPERATOR_EQUAL:
 				case TAG_OPERATOR_NOT_EQUAL:
-					$values_by_tag[$slot][$tag['tag']][] = $table.'.value='.zbx_dbstr($value);
+					$values_by_tag[$tag['tag']][$slot][] = $table.'.value='.zbx_dbstr($value);
 					break;
 			}
 		}
 
-		$evaltype_glue = ($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 		$sql_where = [];
-		foreach ($values_by_tag as $prefix => $filters) {
-			foreach ($filters as $tag => $values) {
+		foreach ($values_by_tag as $tag => $filters) {
+			// Tag operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS are both canceling explicit values of same tag.
+			if ($filters['EXISTS'] === false) {
+				unset($filters['NOT EXISTS']);
+			}
+			elseif ($filters['NOT EXISTS'] === false) {
+				unset($filters['EXISTS']);
+			}
+
+			$_where = [];
+			foreach ($filters as $prefix => $values) {
+				if ($values === []) {
+					continue;
+				}
+
 				$values = $values ? array_filter($values) : false;
 
 				$statement = $table.'.tag='.zbx_dbstr($tag);
@@ -97,11 +122,18 @@ class CApiTagHelper {
 						: ' AND ('.implode(' OR ', $values).')';
 				}
 
-				$sql_where[] = $prefix.' ('.
+				$_where[] = $prefix.' ('.
 					'SELECT NULL'.
 					' FROM '.$table.
 					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.' AND '.$statement.
 				')';
+			}
+
+			if (count($_where) == 1) {
+				$sql_where[] = $_where[0];
+			}
+			else {
+				$sql_where[] = '('.$_where[0].' OR '.$_where[1].')';
 			}
 		}
 
@@ -110,6 +142,7 @@ class CApiTagHelper {
 		}
 
 		$sql_where_cnt = count($sql_where);
+		$evaltype_glue = ($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 		$sql_where = implode($evaltype_glue, $sql_where);
 
 		return ($sql_where_cnt > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;

@@ -109,7 +109,7 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'Host Browser', 'Host Browser - IE'
+					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE'
 				]
 			],
 			'test-not-equals-with-empty-value' => [
@@ -149,7 +149,7 @@ class testTagFiltering extends CAPITest {
 				],
 				'expected' => [
 					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE',
-					'Host OS - Android', 'Host without tags', 'Host with very general tags only'
+					'Host without tags', 'Host with very general tags only'
 				]
 			],
 			'test-two-not-exists-with-exception' => [
