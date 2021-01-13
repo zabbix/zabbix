@@ -4,7 +4,7 @@
    <date>2020-12-31T16:03:02Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/SAN</name>
       </group>
    </groups>
    <templates>
@@ -26,7 +26,7 @@ Template tooling version used: 0.38</description>
          </templates>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/SAN</name>
             </group>
          </groups>
          <applications>
