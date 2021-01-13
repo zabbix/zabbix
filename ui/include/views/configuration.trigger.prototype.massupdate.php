@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 $widget = (new CWidget())->setTitle(_('Trigger prototypes'));
 
 // Append host summary to widget header.
-$widget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
+$widget->setNavigation(getHostNavigation('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
 // Create form.
 $form = (new CForm())

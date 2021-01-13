@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,14 @@ package docker
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"net"
 	"net/http"
+	"path"
 	"time"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
 type client struct {
@@ -44,4 +49,29 @@ func newClient(socketPath string, timeout int) *client {
 	}
 
 	return &client
+}
+
+func (cli *client) Query(queryPath string) ([]byte, error) {
+	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		var apiErr ErrorMessage
+
+		if err = json.Unmarshal(body, &apiErr); err != nil {
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		}
+
+		return nil, zbxerr.New(apiErr.Message)
+	}
+
+	return body, nil
 }

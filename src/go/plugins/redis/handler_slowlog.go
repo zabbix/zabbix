@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@
 package redis
 
 import (
-	"fmt"
 	"github.com/mediocregopher/radix/v3"
+	"zabbix.com/pkg/zbxerr"
 )
-
-const slowlogMaxParams = 0
 
 type slowlog []interface{}
 type logItem = []interface{}
@@ -37,31 +35,27 @@ func getLastSlowlogID(sl slowlog) (int64, error) {
 
 	item, ok := sl[0].(logItem)
 	if !ok {
-		return 0, errorCannotParseData
+		return 0, zbxerr.ErrorCannotParseResult
 	}
 
 	if len(item) == 0 {
-		return 0, errorCannotParseData
+		return 0, zbxerr.ErrorCannotParseResult
 	}
 
 	id, ok := item[0].(int64)
 	if !ok {
-		return 0, errorCannotParseData
+		return 0, zbxerr.ErrorCannotParseResult
 	}
 
 	return id + 1, nil
 }
 
 // slowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
-func slowlogHandler(conn redisClient, params []string) (interface{}, error) {
+func slowlogHandler(conn redisClient, _ map[string]string) (interface{}, error) {
 	var res []interface{}
 
-	if len(params) > slowlogMaxParams {
-		return nil, errorInvalidParams
-	}
-
 	if err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1")); err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	lastID, err := getLastSlowlogID(slowlog(res))

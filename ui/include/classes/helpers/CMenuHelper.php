@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -209,7 +209,6 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION)
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
-					->setAliases(['authentication.update'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
 				? (new CMenuItem(_('User groups')))

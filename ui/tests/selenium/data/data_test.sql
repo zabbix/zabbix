@@ -1130,10 +1130,18 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99519,'{99948}=0','testFormTriggerPrototype2','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99520,'{99949}=0','testFormTriggerPrototype3','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99521,'{99950}=0','testFormTriggerPrototype4','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99522,'{99951}=0','Trigger prototype with tags for updating','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (99523,'{99952}=0','Trigger prototype with tags for cloning','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99947,23804,99518,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99948,23804,99519,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99949,23804,99520,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99950,23804,99521,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99951,23804,99522,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (99952,23804,99523,'last','0');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (200, 99522, 'action', 'update');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (201, 99522, 'tag', 'trigger_prototype');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (202, 99523, 'action', 'clode');
+INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (203, 99523, 'tag', 'trigger_prototype');
 
 -- testFormGraphPrototype.LayoutCheck and testFormGraphPrototype.SimpleUpdate
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600000,'testFormGraphPrototype1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
@@ -1429,6 +1437,26 @@ INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, 
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 9, 7);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'no-access-to-the-frontend', '$2y$10$cExfysPEJsHzIoCkoUVH..XM0OSIwIQPE1sob2UgXDcH1Iyw8Wtny', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 12, 8);
+
+-- testFormFilterProblems, testFormFilterHosts
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (92, 'filter-create', '$2y$10$nA7hh4cZ5oHM.GgXPqzZ/e/vaD1LYcOi.3ZfulCjZV/9H4PFtIKnK', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (106, 7, 92);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (93, 'filter-delete', '$2y$10$z9toljmutmrQqkrl6BZiGO2kvQNcfN4wY.Pi00CeyhFMwPRIYBt16', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (107, 7, 93);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (94, 'filter-update', '$2y$10$rHPaFkVgIx.ceaZYTlMTiuH9HyCv5M/GXQkrCyQLcK2sdubp303ze', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (108, 7, 94);
+
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (24, 93, 'web.monitoring.problem.properties', 1, 0, 0, '{"hostids":["10084"],"filter_name":"delete_problems_1"}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (25, 93, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (20, 93, 'web.monitoring.hosts.properties', 1, 0, 0, '{"groupids":["4"],"filter_name":"delete_hosts_1"}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (21, 93, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (30, 93, 'web.monitoring.problem.properties', 2, 0, 0, '{"filter_name":"delete_problems_2"}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (31, 93, 'web.monitoring.hosts.properties', 2, 0, 0, '{"filter_name":"delete_hosts_2"}', 3);
+
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (26, 94, 'web.monitoring.problem.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1,"show_timeline":"0"}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (27, 94, 'web.monitoring.problem.properties', 0, 0, 0, '{"filter_name":""}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (28, 94, 'web.monitoring.hosts.properties', 1, 0, 0, '{"filter_name":"update_tab","filter_show_counter":1}', 3);
+INSERT INTO profiles (profileid, userid, idx, idx2, value_id, value_int, value_str, type) VALUES (29, 94, 'web.monitoring.hosts.properties', 0, 0, 0, '{"filter_name":""}', 3);
 
 -- testTimezone
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'test-timezone', '$2y$10$TUIJdrXgEUaoCmbOdhiLhe8kWc3M.EE.paOv0rC7bgSP2til3643O', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
@@ -2177,12 +2205,12 @@ INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (319, 40000, 'action
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (321, 40000, 'test', 'test_tag');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (408, 40000, 'tag', 'TEMPLATE');
 
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99127, 'Template with tags for cloning', 'Template with tags for cloning', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99127, 'A template with tags for cloning', 'A template with tags for cloning', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99979, 99127, 4);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (315, 99127, 'action', 'clone');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (316, 99127, 'tag', 'template');
 
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99128, 'Template with tags for updating', 'Template with tags for updating', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99128, 'A template with tags for updating', 'A template with tags for updating', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99980, 99128, 4);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (317, 99128, 'action', 'update');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (318, 99128, 'tag', 'template');

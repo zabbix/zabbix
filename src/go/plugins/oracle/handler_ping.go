@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ package oracle
 import (
 	"context"
 	"fmt"
-
-	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -31,21 +29,13 @@ const (
 	pingOk     = 1
 )
 
-const keyPing = "oracle.ping"
-
-const pingMaxParams = 0
-
 // pingHandler queries 'SELECT 1 FROM DUAL' and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func pingHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var res int
-
-	if len(params) > pingMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", pingOk))
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return pingFailed, nil
 	}
 
 	err = row.Scan(&res)

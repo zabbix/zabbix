@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -872,6 +872,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['timeout'] === $item['timeout']) {
 						unset($item['timeout']);
 					}
+
+					if ($db_item['params'] !== getRequest('params', '')) {
+						$item['params'] = getRequest('params', '');
+					}
+				}
+				else {
+					// If type is changed, even if value stays the same, it must be set. It is required by API.
+					$item['params'] = getRequest('params', '');
+				}
+			}
+			else {
+				if ($db_item['params'] !== getRequest('params', '')) {
+					$item['params'] = getRequest('params', '');
 				}
 			}
 

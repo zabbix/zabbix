@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,7 +247,8 @@ function itemCompleteTest(overlay) {
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
-		value: form_data['value']
+		value: form_data['value'],
+		not_supported: form_data['not_supported']
 	});
 
 	<?php if ($data['show_prev']): ?>
@@ -463,13 +464,26 @@ jQuery(document).ready(function($) {
 	});
 
 	<?php if ($data['is_item_testable']): ?>
-		$('#get_value').on('change', function() {
-			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
-				$form = $('#preprocessing-test-form'),
-				$submit_btn = overlays_stack.getById('item-test').$btn_submit;
+		$('#not_supported').on('change', function() {
+			var $form = $('#preprocessing-test-form');
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+			}
+			else {
+				$('#value', $form).multilineInput('unsetReadOnly');
+			}
+		});
+
+		$('#get_value').on('change', function() {
+			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
+				$form = $('#preprocessing-test-form'),
+				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
+				$not_supported = $('#not_supported', $form);
+
+			if ($(this).is(':checked')) {
+				$('#value', $form).multilineInput('setReadOnly');
+				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
@@ -536,7 +550,8 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$('#value', $form).multilineInput('unsetReadOnly');
+				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
+				$not_supported.prop('disabled', false);
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

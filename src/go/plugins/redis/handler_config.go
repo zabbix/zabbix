@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,45 +22,34 @@ package redis
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mediocregopher/radix/v3"
 	"strings"
-)
 
-const configMaxParams = 1
+	"github.com/mediocregopher/radix/v3"
+	"zabbix.com/pkg/zbxerr"
+)
 
 const globChars = "*?[]!"
 
-const anyCommand = "*"
-
 // configHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
-func configHandler(conn redisClient, params []string) (interface{}, error) {
+func configHandler(conn redisClient, params map[string]string) (interface{}, error) {
 	var res map[string]string
 
-	if len(params) > configMaxParams {
-		return nil, errorInvalidParams
-	}
-
-	pattern := anyCommand
-	if len(params) > 0 && len(params[0]) > 0 {
-		pattern = params[0]
-	}
-
-	if err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", pattern)); err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
+	if err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"])); err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	if len(res) == 0 {
-		return nil, fmt.Errorf("No config parameter found for pattern %q.", pattern)
+		return nil, fmt.Errorf("no config parameter found for pattern %q", params["Pattern"])
 	}
 
-	if strings.ContainsAny(pattern, globChars) {
+	if strings.ContainsAny(params["Pattern"], globChars) {
 		jsonRes, err := json.Marshal(res)
 		if err != nil {
-			return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
 		return string(jsonRes), nil
 	}
 
-	return res[strings.ToLower(pattern)], nil
+	return res[strings.ToLower(params["Pattern"])], nil
 }

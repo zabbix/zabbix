@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:05Z'
+  date: '2021-01-11T16:17:25Z'
   groups:
     -
       name: Templates/Applications
@@ -171,7 +171,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '{$PHP_FPM.PING.REPLY}$'
+                - '{$PHP_FPM.PING.REPLY}($|\n)'
                 - '1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'

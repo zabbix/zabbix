@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2678,14 +2678,22 @@ ZABBIX.apps.map = (function($) {
 			this.domNode = $(tpl.evaluate(formTplData)).appendTo(formContainer);
 
 			// populate icons selects
+			const select_icon_off = document.getElementById('iconid_off');
+			const select_icon_on = document.getElementById('iconid_on');
+			const select_icon_maintenance = document.getElementById('iconid_maintenance');
+			const select_icon_disabled = document.getElementById('iconid_disabled');
+
+			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0'});
+
 			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
-				$('#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled')
-					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
+				select_icon_off.addOption({label: icon.name, value: icon.imageid});
+				select_icon_on.addOption({label: icon.name, value: icon.imageid});
+				select_icon_maintenance.addOption({label: icon.name, value: icon.imageid});
+				select_icon_disabled.addOption({label: icon.name, value: icon.imageid});
 			}
-			$('#iconid_on, #iconid_maintenance, #iconid_disabled')
-				.prepend('<option value="0">' + t('S_DEFAULT') + '</option>');
-			$('#iconid_on, #iconid_maintenance, #iconid_disabled').val(0);
 
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
@@ -3172,13 +3180,28 @@ ZABBIX.apps.map = (function($) {
 			this.domNode = $(tpl.evaluate()).appendTo(formContainer);
 
 			// populate icons selects
+			const select_icon_off = document.getElementById('massIconidOff');
+			const select_icon_on = document.getElementById('massIconidOn');
+			const select_icon_maintenance = document.getElementById('massIconidMaintenance');
+			const select_icon_disabled = document.getElementById('massIconidDisabled');
+
+			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0'});
+
 			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
-				$('#massIconidOff, #massIconidOn, #massIconidMaintenance, #massIconidDisabled')
-					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
+				select_icon_off.addOption({label: icon.name, value: icon.imageid});
+				select_icon_on.addOption({label: icon.name, value: icon.imageid});
+				select_icon_maintenance.addOption({label: icon.name, value: icon.imageid});
+				select_icon_disabled.addOption({label: icon.name, value: icon.imageid});
 			}
-			$('#massIconidOn, #massIconidMaintenance, #massIconidDisabled')
-				.prepend('<option value="0">' + t('S_DEFAULT') + '</option>');
+
+			document.getElementById('massLabelLocation').selectedIndex = 0;
+			select_icon_off.selectedIndex = 0
+			select_icon_on.selectedIndex = 0
+			select_icon_maintenance.selectedIndex = 0
+			select_icon_disabled.selectedIndex = 0
 
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
@@ -3203,9 +3226,8 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				this.domNode.toggle(false);
 				$(':checkbox', this.domNode).prop('checked', false);
-				$('select', this.domNode).each(function() {
-					var select = $(this);
-					select.val($('option:first', select).val());
+				$('z-select', this.domNode).each(function() {
+					this.selectedIndex = 0;
 				});
 				$('textarea', this.domNode).val('');
 				this.actionProcessor.process();
@@ -3468,10 +3490,6 @@ ZABBIX.apps.map = (function($) {
 				this.domNode.toggle(false);
 				this.active = false;
 				$(':checkbox', this.domNode).prop('checked', false).prop("disabled", false);
-				$('select', this.domNode).each(function() {
-					var select = $(this);
-					select.val($('option:first', select).val());
-				});
 				$('textarea, input[type=text]', this.domNode).val('');
 				$('.input-color-picker input', this.domNode).change();
 				this.actionProcessor.process();
@@ -3584,7 +3602,7 @@ ZABBIX.apps.map = (function($) {
 					optgroups = {},
 					optgroupType,
 					optgroupLabel,
-					optgroupDom,
+					optgroup,
 					i,
 					ln;
 
@@ -3606,7 +3624,10 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// populate list of elements to connect with
-				$('#selementid2').empty();
+				const connect_to_select = document.createElement('z-select');
+				connect_to_select._button.id = 'label-selementid2';
+				connect_to_select.id = 'selementid2';
+				connect_to_select.name = 'selementid2';
 
 				// sort by type
 				for (selementid in this.sysmap.selements) {
@@ -3646,17 +3667,19 @@ ZABBIX.apps.map = (function($) {
 							break;
 					}
 
-					optgroupDom = $('<optgroup label="' + optgroupLabel + '"></optgroup>');
+					optgroup = {label: optgroupLabel, options: []};
 
 					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
-						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">'
-							+ optgroups[optgroupType][i].getName().replace(/&/g,'&amp;').replace(/</g,'&lt;')
-									.replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\'/g,'&apos;') + '</option>'
-						);
+						optgroup.options.push({
+							value: optgroups[optgroupType][i].id,
+							label: optgroups[optgroupType][i].getName()
+						});
 					}
 
-					$('#selementid2').append(optgroupDom);
+					connect_to_select.addOptionGroup(optgroup);
 				}
+
+				$('#selementid2').replaceWith(connect_to_select);
 
 				// set values for form elements
 				for (elementName in link) {

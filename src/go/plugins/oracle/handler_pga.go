@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyPGA = "oracle.pga.stats"
-
-const PGAMaxParams = 0
-
-func PGAHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func pgaHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var PGA string
-
-	if len(params) > PGAMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

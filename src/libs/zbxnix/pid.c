@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,10 +58,10 @@ int	create_pid_file(const char *pidfile)
 	}
 
 	/* lock file */
-	if (-1 != (fdpid = fileno(fpid)))
+	if (-1 != (fdpid = fileno(fpid)) && (-1 == fcntl(fdpid, F_SETLK, &fl) || -1 == fcntl(fdpid,
+			F_SETFD, FD_CLOEXEC)))
 	{
-		fcntl(fdpid, F_SETLK, &fl);
-		fcntl(fdpid, F_SETFD, FD_CLOEXEC);
+		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
 	}
 
 	/* write pid to file */
@@ -103,8 +103,8 @@ void	drop_pid_file(const char *pidfile)
 	fl.l_pid = zbx_get_thread_id();
 
 	/* unlock file */
-	if (-1 != fdpid)
-		fcntl(fdpid, F_SETLK, &fl);
+	if (-1 != fdpid && -1 == fcntl(fdpid, F_SETLK, &fl))
+		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
 
 	/* close pid file */
 	zbx_fclose(fpid);

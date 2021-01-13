@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,9 @@ package docker
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"path"
+
+	"zabbix.com/pkg/zbxerr"
 
 	"zabbix.com/pkg/plugin"
 )
@@ -35,32 +33,9 @@ const (
 	dockerVersion = "1.28"
 )
 
-type containerDiscovery struct {
-	ID   string `json:"{#ID}"`
-	Name string `json:"{#NAME}"`
-}
-
-type imageDiscovery struct {
-	ID   string `json:"{#ID}"`
-	Name string `json:"{#NAME}"`
-}
-
-type itemKey struct {
-	name      string
-	path      string
-	numParams int
-}
-
-var (
-	keyInfo                = itemKey{"docker.info", "info", 0}
-	keyContainers          = itemKey{"docker.containers", "containers/json?all=true", 0}
-	keyContainersDiscovery = itemKey{"docker.containers.discovery", "containers/json?all=%s", 1}
-	keyImages              = itemKey{"docker.images", "images/json", 0}
-	keyImagesDiscovery     = itemKey{"docker.images.discovery", "images/json", 0}
-	keyDataUsage           = itemKey{"docker.data_usage", "system/df", 0}
-	keyContainerInfo       = itemKey{"docker.container_info", "containers/%s/json", 1}
-	keyContainerStats      = itemKey{"docker.container_stats", "containers/%s/stats?stream=false", 1}
-	keyPing                = itemKey{"docker.ping", "_ping", 0}
+const (
+	pingFailed = 0
+	pingOk     = 1
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -72,295 +47,162 @@ type Plugin struct {
 
 var impl Plugin
 
-func checkParams(params []string, paramNum int) error {
-	if paramLen := len(params); paramNum == 0 && paramLen > paramNum {
-		return errors.New(errorParametersNotAllowed)
-	} else if paramLen != paramNum {
-		return errors.New(errorTooManyParams)
-	}
-	return nil
-}
-
-func (cli *client) Query(params []string, key *itemKey) ([]byte, error) {
-	keyPath := key.path
-
-	if len(params) > 0 {
-		iSlice := make([]interface{}, len(params))
-		for i, p := range params {
-			iSlice[i] = p
-		}
-		keyPath = fmt.Sprintf(keyPath, iSlice...)
-	}
-
-	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, keyPath))
-	if err != nil {
-		impl.Debugf("cannot fetch data: %s", err)
-		return nil, errors.New(errorCannotFetchData)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.New(errorCannotReadResponse)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		var apiErr ErrorMessage
-		if err = json.Unmarshal(body, &apiErr); err != nil {
-			return nil, errors.New(errorCannotUnmarshalAPIError)
-		}
-		return nil, errors.New(apiErr.Message)
-	}
-
-	return body, nil
-}
-
-func (p *Plugin) getContainersDiscovery(params []string, data []Container) (result []byte, err error) {
-	containers := make([]containerDiscovery, 0)
-
-	for _, container := range data {
-		if len(container.Names) == 0 {
-			continue
-		}
-
-		containers = append(containers, containerDiscovery{ID: container.ID, Name: container.Names[0]})
-	}
-
-	if result, err = json.Marshal(&containers); err != nil {
-		return nil, errors.New(errorCannotUnmarshalJSON)
-	}
-
-	return
-}
-
-func (p *Plugin) getImagesDiscovery(params []string, data []Image) (result []byte, err error) {
-	images := make([]imageDiscovery, 0)
-
-	for _, image := range data {
-		if len(image.RepoTags) == 0 {
-			continue
-		}
-
-		images = append(images, imageDiscovery{ID: image.ID, Name: image.RepoTags[0]})
-	}
-
-	if result, err = json.Marshal(&images); err != nil {
-		return nil, errors.New(errorCannotUnmarshalJSON)
-	}
-
-	return
-}
-
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (interface{}, error) {
 	var result []byte
 
+	params, err := metrics[key].EvalParams(rawParams, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	queryPath := metricsMeta[key].path
+
 	switch key {
-	case keyInfo.name:
+	case keyInfo:
 		var data Info
-		if err := checkParams(params, keyInfo.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyInfo)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
 		result, err = json.Marshal(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
-	case keyContainers.name:
+	case keyContainers:
 		var data []Container
-		if err := checkParams(params, keyContainers.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyContainers)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
 		result, err = json.Marshal(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
-	case keyContainersDiscovery.name:
+	case keyContainersDiscovery:
 		var data []Container
-		if err := checkParams(params, keyContainersDiscovery.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyContainersDiscovery)
+		body, err := p.client.Query(fmt.Sprintf(queryPath, params["All"]))
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
-		result, err = p.getContainersDiscovery(params, data)
+		result, err = p.getContainersDiscovery(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, err
 		}
 
-	case keyImages.name:
+	case keyImages:
 		var data []Image
-		if err := checkParams(params, keyImages.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyImages)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
 		result, err = json.Marshal(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
-	case keyImagesDiscovery.name:
+	case keyImagesDiscovery:
 		var data []Image
-		if err := checkParams(params, keyImagesDiscovery.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyImagesDiscovery)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
-		result, err = p.getImagesDiscovery(params, data)
+		result, err = p.getImagesDiscovery(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, err
 		}
 
-	case keyDataUsage.name:
+	case keyDataUsage:
 		var data DiskUsage
-		if err := checkParams(params, keyDataUsage.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyDataUsage)
+		body, err := p.client.Query(queryPath)
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
 		result, err = json.Marshal(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
-	case keyContainerInfo.name:
+	case keyContainerInfo:
 		var data ContainerInfo
-		if err := checkParams(params, keyContainerInfo.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyContainerInfo)
+		body, err := p.client.Query(fmt.Sprintf(queryPath, params["Container"]))
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
 		result, err = json.Marshal(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
-	case keyContainerStats.name:
+	case keyContainerStats:
 		var data ContainerStats
-		if err := checkParams(params, keyContainerStats.numParams); err != nil {
-			return nil, err
-		}
 
-		body, err := p.client.Query(params, &keyContainerStats)
+		body, err := p.client.Query(fmt.Sprintf(queryPath, params["Container"]))
 		if err != nil {
 			return nil, err
 		}
 
 		if err = json.Unmarshal(body, &data); err != nil {
-			p.Debugf("cannot unmarshal JSON: %s", err)
-			return nil, errors.New(errorCannotUnmarshalJSON)
+			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
 		result, err = json.Marshal(data)
 		if err != nil {
-			p.Debugf("cannot marshal JSON: %s", err)
-			return nil, errors.New(errorCannotMarshalJSON)
+			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 		}
 
-	case keyPing.name:
-		if err := checkParams(params, keyPing.numParams); err != nil {
-			return nil, err
-		}
-
-		body, err := p.client.Query(params, &keyPing)
+	case keyPing:
+		body, err := p.client.Query(queryPath)
 		if err != nil || string(body) != "OK" {
-			return 0, nil
+			return pingFailed, nil
 		}
 
-		return 1, nil
-
-	default:
-		return nil, errors.New(errorUnsupportedMetric)
+		return pingOk, nil
 	}
 
 	return string(result), nil
-}
-
-// init registers metrics.
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName,
-		keyInfo.name, "Returns information about the docker server.",
-		keyContainers.name, "Returns a list of containers.",
-		keyContainersDiscovery.name, "Returns a list of containers, used for low-level discovery.",
-		keyImages.name, "Returns a list of images.",
-		keyImagesDiscovery.name, "Returns a list of images, used for low-level discovery.",
-		keyDataUsage.name, "Returns information about current data usage.",
-		keyContainerInfo.name, "Return low-level information about a container.",
-		keyContainerStats.name, "Returns near realtime stats for a given container.",
-		keyPing.name, "Pings the server and returns 0 or 1.")
 }
