@@ -154,7 +154,7 @@ class CMenuHelper {
 						'triggers.php?context=template', 'graphs.php?context=template',
 						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
 						'trigger_prototypes.php?context=template', 'host_prototypes.php?context=template',
-						'httpconf.php?context=template', 'conf.import.php?rules_preset=template'
+						'httpconf.php?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
@@ -164,8 +164,7 @@ class CMenuHelper {
 						'application.list', 'application.edit', 'items.php?context=host', 'triggers.php?context=host',
 						'graphs.php?context=host', 'host_discovery.php?context=host',
 						'disc_prototypes.php?context=host', 'trigger_prototypes.php?context=host',
-						'host_prototypes.php?context=host', 'httpconf.php?context=host',
-						'conf.import.php?rules_preset=host'
+						'host_prototypes.php?context=host', 'httpconf.php?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
@@ -204,11 +203,10 @@ class CMenuHelper {
 				? (new CMenuItem(_('General')))
 					->setAction('gui.edit')
 					->setAliases([
-						'autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
-						'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
-						'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
-						'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
-						'conf.import.php?rules_preset=valuemap', 'token.list', 'token.edit', 'token.view'
+						'autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit', 'iconmap.list', 'iconmap.edit',
+						'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list', 'valuemap.edit', 'workingtime.edit',
+						'trigseverity.edit', 'trigdisplay.edit', 'miscconfig.edit', 'module.list', 'module.edit',
+						'module.scan', 'token.list', 'token.edit', 'token.view'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
@@ -219,7 +217,6 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION)
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
-					->setAliases(['authentication.update'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
 				? (new CMenuItem(_('User groups')))
@@ -239,7 +236,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)
 				? (new CMenuItem(_('Media types')))
 					->setAction('mediatype.list')
-					->setAliases(['mediatype.edit', 'conf.import.php?rules_preset=mediatype'])
+					->setAliases(['mediatype.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)
 				? (new CMenuItem(_('Scripts')))

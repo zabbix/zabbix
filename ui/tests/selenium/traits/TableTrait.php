@@ -85,13 +85,13 @@ trait TableTrait {
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
 	 */
-	public function assertTableDataColumn($rows = [], $field = 'Name') {
+	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
 		$data = [];
 		foreach ($rows as $row) {
 			$data[] = [$field => $row];
 		}
 
-		$this->assertTableData($data);
+		$this->assertTableData($data, $selector);
 	}
 
 	/**

@@ -247,6 +247,119 @@ static int	DBpatch_5030003(void)
 
 static int	DBpatch_5030004(void)
 {
+	const ZBX_FIELD	field = {"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
+static int	DBpatch_5030005(void)
+{
+	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
+static int	DBpatch_5030006(void)
+{
+	const ZBX_FIELD	field = {"errors_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
+static int	DBpatch_5030007(void)
+{
+	const ZBX_FIELD	field = {"disable_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface", &field);
+}
+
+static int	DBpatch_5030008(void)
+{
+	return DBdrop_field("hosts", "available");
+}
+
+static int	DBpatch_5030009(void)
+{
+	return DBdrop_field("hosts", "ipmi_available");
+}
+
+static int	DBpatch_5030010(void)
+{
+	return DBdrop_field("hosts", "snmp_available");
+}
+
+static int	DBpatch_5030011(void)
+{
+	return DBdrop_field("hosts", "jmx_available");
+}
+
+static int	DBpatch_5030012(void)
+{
+	return DBdrop_field("hosts", "disable_until");
+}
+
+static int	DBpatch_5030013(void)
+{
+	return DBdrop_field("hosts", "ipmi_disable_until");
+}
+
+static int	DBpatch_5030014(void)
+{
+	return DBdrop_field("hosts", "snmp_disable_until");
+}
+
+static int	DBpatch_5030015(void)
+{
+	return DBdrop_field("hosts", "jmx_disable_until");
+}
+
+static int	DBpatch_5030016(void)
+{
+	return DBdrop_field("hosts", "errors_from");
+}
+
+static int	DBpatch_5030017(void)
+{
+	return DBdrop_field("hosts", "ipmi_errors_from");
+}
+
+static int	DBpatch_5030018(void)
+{
+	return DBdrop_field("hosts", "snmp_errors_from");
+}
+
+static int	DBpatch_5030019(void)
+{
+	return DBdrop_field("hosts", "jmx_errors_from");
+}
+
+static int	DBpatch_5030020(void)
+{
+	return DBdrop_field("hosts", "error");
+}
+
+static int	DBpatch_5030021(void)
+{
+	return DBdrop_field("hosts", "ipmi_error");
+}
+
+static int	DBpatch_5030022(void)
+{
+	return DBdrop_field("hosts", "snmp_error");
+}
+
+static int	DBpatch_5030023(void)
+{
+	return DBdrop_field("hosts", "jmx_error");
+}
+
+static int	DBpatch_5030024(void)
+{
+	return DBcreate_index("interface", "interface_3", "available", 0);
+}
+
+static int	DBpatch_5030025(void)
+{
 	const ZBX_TABLE table =
 		{"token", "tokenid", 0,
 			{
@@ -268,40 +381,39 @@ static int	DBpatch_5030004(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030005(void)
+static int	DBpatch_5030026(void)
 {
 	return DBcreate_index("token", "token_1", "name", 0);
 }
 
-static int	DBpatch_5030006(void)
+static int	DBpatch_5030027(void)
 {
 	return DBcreate_index("token", "token_2", "userid,name", 1);
 }
 
-static int	DBpatch_5030007(void)
+static int	DBpatch_5030028(void)
 {
 	return DBcreate_index("token", "token_3", "token", 1);
 }
 
-static int	DBpatch_5030008(void)
+static int	DBpatch_5030029(void)
 {
 	return DBcreate_index("token", "token_4", "creator_userid", 0);
 }
 
-static int	DBpatch_5030009(void)
+static int	DBpatch_5030030(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("token", 1, &field);
 }
 
-static int	DBpatch_5030010(void)
+static int	DBpatch_5030031(void)
 {
 	const ZBX_FIELD field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token", 2, &field);
 }
-
 #endif
 
 DBPATCH_START(5030)
@@ -319,5 +431,26 @@ DBPATCH_ADD(5030007, 0, 1)
 DBPATCH_ADD(5030008, 0, 1)
 DBPATCH_ADD(5030009, 0, 1)
 DBPATCH_ADD(5030010, 0, 1)
+DBPATCH_ADD(5030011, 0, 1)
+DBPATCH_ADD(5030012, 0, 1)
+DBPATCH_ADD(5030013, 0, 1)
+DBPATCH_ADD(5030014, 0, 1)
+DBPATCH_ADD(5030015, 0, 1)
+DBPATCH_ADD(5030016, 0, 1)
+DBPATCH_ADD(5030017, 0, 1)
+DBPATCH_ADD(5030018, 0, 1)
+DBPATCH_ADD(5030019, 0, 1)
+DBPATCH_ADD(5030020, 0, 1)
+DBPATCH_ADD(5030021, 0, 1)
+DBPATCH_ADD(5030022, 0, 1)
+DBPATCH_ADD(5030023, 0, 1)
+DBPATCH_ADD(5030024, 0, 1)
+DBPATCH_ADD(5030025, 0, 1)
+DBPATCH_ADD(5030026, 0, 1)
+DBPATCH_ADD(5030027, 0, 1)
+DBPATCH_ADD(5030028, 0, 1)
+DBPATCH_ADD(5030029, 0, 1)
+DBPATCH_ADD(5030030, 0, 1)
+DBPATCH_ADD(5030031, 0, 1)
 
 DBPATCH_END()

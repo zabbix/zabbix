@@ -3385,7 +3385,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]).'.'
 			],
 			// LLD rule override operation
 			'Test /1/overrides/1/operations/1/operationobject type is validated.' => [

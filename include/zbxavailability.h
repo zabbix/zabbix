@@ -22,11 +22,12 @@
 
 #include "zbxtypes.h"
 #include "zbxalgo.h"
+#include "db.h"
 
 #define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
 #define ZBX_IPC_AVAILABILITY_REQUEST	1
 
 void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size);
-void	zbx_availabilities_flush(const zbx_vector_ptr_t *host_availabilities);
+void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
 
 #endif /* ZABBIX_AVAILABILITY_H */

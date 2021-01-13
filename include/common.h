@@ -377,6 +377,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_NOT_REGEXP		9
 #define CONDITION_OPERATOR_YES			10
 #define CONDITION_OPERATOR_NO			11
+#define CONDITION_OPERATOR_EXIST		12
+#define CONDITION_OPERATOR_NOT_EXIST		13
 
 /* maintenance tag operators */
 #define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
@@ -638,10 +640,10 @@ zbx_prototype_discover_t;
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
-/* host availability */
-#define HOST_AVAILABLE_UNKNOWN		0
-#define HOST_AVAILABLE_TRUE		1
-#define HOST_AVAILABLE_FALSE		2
+/* interface availability */
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
 
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0

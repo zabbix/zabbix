@@ -667,7 +667,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.
-									$host_interface['ip'].' : '.$host_interface['port'].'"]');
+									$host_interface['ip'].':'.$host_interface['port'].'"]');
 						}
 					}
 					else {

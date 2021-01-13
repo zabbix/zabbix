@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyFRA = "oracle.fra.stats"
-
-const FRAMaxParams = 0
-
-func FRAHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func fraHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var FRA string
-
-	if len(params) > FRAMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
