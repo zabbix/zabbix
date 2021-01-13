@@ -209,7 +209,6 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION)
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
-					->setAliases(['authentication.update'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)
 				? (new CMenuItem(_('User groups')))
