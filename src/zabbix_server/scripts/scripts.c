@@ -207,7 +207,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		char	*tm = NULL;
+		char	*tm;
 
 		ZBX_STR2UCHAR(script->type, row[0]);
 		ZBX_STR2UCHAR(script->execute_on, row[1]);
@@ -217,10 +217,7 @@ static int	DBget_script_by_scriptid(zbx_uint64_t scriptid, zbx_script_t *script,
 		ZBX_STR2UCHAR(script->host_access, row[4]);
 		tm = zbx_strdup(NULL, row[0]);
 
-		if (FAIL == is_time_suffix(tm, &script->timeout, ZBX_LENGTH_UNLIMITED))
-			ret = FAIL;
-		else
-			ret = SUCCEED;
+		ret = is_time_suffix(tm, &script->timeout, ZBX_LENGTH_UNLIMITED);
 
 		zbx_free(tm);
 	}
