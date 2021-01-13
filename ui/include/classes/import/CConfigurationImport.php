@@ -144,7 +144,6 @@ class CConfigurationImport {
 
 		// import objects
 		$this->processApplications();
-		$this->processValueMaps();
 		$this->processHttpTests();
 		$this->processItems();
 		$this->processTriggers();
@@ -240,10 +239,6 @@ class CConfigurationImport {
 			foreach ($applications as $app) {
 				$applicationsRefs[$host][$app['name']] = $app['name'];
 			}
-		}
-
-		foreach ($this->getFormattedValueMaps() as $valuemap) {
-			$valueMapsRefs[$valuemap['name']] = $valuemap['name'];
 		}
 
 		foreach ($this->getFormattedItems() as $host => $items) {
@@ -657,48 +652,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Import value maps.
-	 */
-	protected function processValueMaps() {
-		if (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting']) {
-			return;
-		}
-
-		$all_valuemaps = $this->getFormattedValueMaps();
-
-		if (!$all_valuemaps) {
-			return;
-		}
-
-		$valuemaps_to_create = [];
-		$valuemaps_to_update = [];
-
-		foreach ($all_valuemaps as $valuemap) {
-			$valuemapid = $this->referencer->resolveValueMap($valuemap['name']);
-
-			if ($valuemapid) {
-				$valuemap['valuemapid'] = $valuemapid;
-				$valuemaps_to_update[] = $valuemap;
-			}
-			else {
-				$valuemaps_to_create[] = $valuemap;
-			}
-		}
-
-		if ($this->options['valueMaps']['createMissing'] && $valuemaps_to_create) {
-			$valuemapids = API::ValueMap()->create($valuemaps_to_create);
-
-			foreach ($valuemaps_to_create as $key => $valuemap) {
-				$this->referencer->addValueMapRef($valuemap['name'], $valuemapids['valuemapids'][$key]);
-			}
-		}
-
-		if ($this->options['valueMaps']['updateExisting'] && $valuemaps_to_update) {
-			API::ValueMap()->update($valuemaps_to_update);
-		}
-	}
-
-	/**
 	 * Import items.
 	 */
 	protected function processItems() {
@@ -773,6 +726,7 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valueMapId;
+					unset($item['valuemap']);
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
@@ -1166,6 +1120,7 @@ class CConfigurationImport {
 						}
 
 						$prototype['valuemapid'] = $valueMapId;
+						unset($prototype['valuemap']);
 					}
 
 					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
@@ -2477,19 +2432,6 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['applications'];
-	}
-
-	/**
-	 * Get formatted value maps.
-	 *
-	 * @return array
-	 */
-	protected function getFormattedValueMaps() {
-		if (!isset($this->formattedData['valueMaps'])) {
-			$this->formattedData['valueMaps'] = $this->adapter->getValueMaps();
-		}
-
-		return $this->formattedData['valueMaps'];
 	}
 
 	/**

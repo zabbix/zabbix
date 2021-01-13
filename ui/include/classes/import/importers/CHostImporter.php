@@ -120,10 +120,14 @@ class CHostImporter extends CImporter {
 				}
 
 				if (array_key_exists($hostHost, $valuemaps)) {
+					$valuemaps_create = [];
 					foreach ($valuemaps[$hostHost] as $valuemap) {
 						$valuemap['hostid'] = $hostId;
+						$valuemaps_create[] = $valuemap;
+					}
 
-						API::ValueMap()->create($valuemap);
+					if ($valuemaps_create) {
+						API::ValueMap()->create($valuemaps_create);
 					}
 				}
 			}
