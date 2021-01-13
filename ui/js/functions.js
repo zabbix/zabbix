@@ -583,7 +583,10 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 	if (confirmation.length > 0) {
 		overlayDialogue({
 			'title': t('Execution confirmation'),
-			'content': jQuery('<span>').text(confirmation),
+			'content': jQuery('<span>')
+				.addClass('confirmation-msg')
+				.text(confirmation),
+			'class': 'modal-popup modal-popup-small',
 			'buttons': [
 				{
 					'title': t('Cancel'),

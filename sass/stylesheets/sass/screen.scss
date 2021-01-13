@@ -4089,6 +4089,11 @@ $form-icon-btn: (
 			min-width: 450px;
 		}
 
+		&.modal-popup-small {
+			max-width: 450px;
+			width: 100%;
+		}
+
 		&.modal-popup-static {
 			max-width: 700px;
 			width: 100%;
@@ -5909,7 +5914,8 @@ svg {
 	}
 }
 
-.lld-overrides-operations-table {
+.lld-overrides-operations-table,
+.confirmation-msg {
 	white-space: normal;
 	word-break: break-word;
 }
