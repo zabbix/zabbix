@@ -184,6 +184,10 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function create(array $tokens): array {
+		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$this->validateCreate($tokens);
 
 		array_walk($tokens, function (&$token) {
@@ -296,6 +300,10 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function update(array $tokens): array {
+		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$this->validateUpdate($tokens, $db_tokens);
 
 		$upd_tokens = [];
@@ -402,6 +410,10 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $tokenids): array {
+		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $tokenids, '/', $error)) {
@@ -440,6 +452,10 @@ class CToken extends CApiService {
 	 * @return array
 	 */
 	public function generate(array $tokenids): array {
+		if ($this::$userData['alias'] === ZBX_GUEST_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $tokenids, '/', $error)) {
