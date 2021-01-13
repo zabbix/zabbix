@@ -36,10 +36,12 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 				JSON_OBJECT(TABLESPACE_NAME VALUE 
 					JSON_OBJECT(
 						'contents'   VALUE CONTENTS, 
-						'used_bytes' VALUE USED_BYTES, 
+						'file_bytes' VALUE FILE_BYTES, 
 						'max_bytes'  VALUE MAX_BYTES, 
 						'free_bytes' VALUE FREE_BYTES, 
-						'used_pct'   VALUE USED_PCT, 
+						'used_bytes' VALUE USED_BYTES,
+						'used_pct_max'   VALUE USED_PCT_MAX, 
+						'used_file_pct'   VALUE USED_FILE_PCT, 
 						'status'     VALUE STATUS 
 					) 
 				) RETURNING CLOB 
@@ -49,10 +51,12 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 			SELECT
 				df.TABLESPACE_NAME AS TABLESPACE_NAME, 
 				df.CONTENTS AS CONTENTS, 
-				NVL(SUM(df.BYTES), 0) AS USED_BYTES, 
+				NVL(SUM(df.BYTES), 0) AS FILE_BYTES, 
 				NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES, 
 				NVL(SUM(f.FREE), 0) AS FREE_BYTES,
-				ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT, 
+				SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
+				ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+				ROUND(DECODE(SUM(df.BYTES), 0, 0,(SUM(df.BYTES)-SUM(f.FREE))/ SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
 				DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
 			FROM
 				(
@@ -87,10 +91,12 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 			SELECT
 				Y.NAME AS TABLESPACE_NAME, 
 				Y.CONTENTS AS CONTENTS, 
-				NVL(SUM(Y.BYTES), 0) AS BYTES, 
+				NVL(SUM(Y.BYTES), 0) AS FILE_BYTES, 
 				NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES, 
 				NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
-				ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT, 
+				SUM(Y.BYTES)-SUM(Y.FREE_BYTES) AS USED_BYTES,
+				ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX, 
+				ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-SUM(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
 				DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
 			FROM
 				(
