@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-11T13:00:38Z</date>
+   <date>2021-01-12T13:47:39Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2414,7 +2414,7 @@
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage percent</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_file_pct["{#TABLESPACE}"]</key>
                      <delay>0</delay>
@@ -2456,7 +2456,7 @@
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocation percent</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
                      <delay>0</delay>
@@ -2481,18 +2481,18 @@
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilisation is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</name>
                            <priority>WARNING</priority>
                            <dependencies>
                               <dependency>
-                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace utilisation is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
                                  <expression>{Template DB Oracle by Zabbix Agent 2:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
-                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilisation is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -2633,23 +2633,23 @@
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.HIGH}</macro>
-               <value>90</value>
+               <value>95</value>
                <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace high severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.USED.PCT.MAX.WARN}</macro>
-               <value>80</value>
+               <value>90</value>
                <description>Maximum percentage of used (Used bytes/Allocated bytes) tablespace warning severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</macro>
                <value>90</value>
-               <description>Maximum percentage of utilisation (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).</description>
+               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}</macro>
                <value>80</value>
-               <description>Maximum percentage of utilisation (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).</description>
+               <description>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).</description>
             </macro>
             <macro>
                <macro>{$ORACLE.USER}</macro>
