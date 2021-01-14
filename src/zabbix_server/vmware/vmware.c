@@ -4703,6 +4703,7 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"power/powerCap[average]",
 						NULL
 					};
+
 	const char			*vm_perfcounters[] = {
 						"virtualDisk/read[average]", "virtualDisk/write[average]",
 						"virtualDisk/numberReadAveraged[average]",
