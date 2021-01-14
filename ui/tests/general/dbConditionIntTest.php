@@ -48,6 +48,11 @@ class dbConditionIntTest extends CTest {
 				"field=1"
 			],
 			[
+				['field', [], true],
+				'1=1',
+				'1=1'
+			],
+			[
 				['field', []],
 				'1=0',
 				'1=0'
