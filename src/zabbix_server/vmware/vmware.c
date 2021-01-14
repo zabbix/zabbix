@@ -4713,12 +4713,12 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"cpu/ready[summation]", "net/usage[average]",
 						"cpu/usage[average]", "cpu/latency[average]",
 						"cpu/readiness[average]", "cpu/swapwait[summation]",
-						"system/osUptime[latest]", "memory/consumed[average]",
-						"memory/usage[average]", "memory/swapped[average]",
-						"network/received[average]", "network/transmitted[average]",
-						"network/usage[average]", "virtualDisk/readOIO[latest]",
-						"virtualDisk/writeOIO[latest]", "virtualDisk/totalWriteLatency[latest]",
-						"virtualDisk/totalReadLatency[latest]",
+						"sys/osUptime[latest]", "mem/consumed[average]",
+						"mem/usage[average]", "mem/swapped[average]",
+						"net/received[average]", "net/transmitted[average]",
+						"net/usage[average]", "virtualDisk/readOIO[latest]",
+						"virtualDisk/writeOIO[latest]", "virtualDisk/totalWriteLatency[average]",
+						"virtualDisk/totalReadLatency[average]",
 						NULL
 					};
 

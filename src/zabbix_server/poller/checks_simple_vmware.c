@@ -3559,7 +3559,7 @@ int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "network/usage[average]", ZBX_KIBIBYTE, result);
+	ret = vmware_service_get_vm_counter(service, uuid, instance, "net/usage[average]", ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3604,7 +3604,7 @@ int	check_vcenter_vm_net_if_received(AGENT_REQUEST *request, const char *usernam
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "network/received[average]", ZBX_KIBIBYTE, result);
+	ret = vmware_service_get_vm_counter(service, uuid, instance, "net/received[average]", ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3649,7 +3649,7 @@ int	check_vcenter_vm_net_if_transmitted(AGENT_REQUEST *request, const char *user
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, instance, "network/transmitted[average]", ZBX_KIBIBYTE, result);
+	ret = vmware_service_get_vm_counter(service, uuid, instance, "net/transmitted[average]", ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3687,7 +3687,7 @@ int	check_vcenter_vm_guest_memory_size_swapped(AGENT_REQUEST *request, const cha
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "memory/swapped[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/swapped[average]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3725,7 +3725,7 @@ int	check_vcenter_vm_memory_size_consumed(AGENT_REQUEST *request, const char *us
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "memory/consumed[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/consumed[average]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3763,7 +3763,7 @@ int	check_vcenter_vm_memory_usage(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "memory/usage[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/usage[average]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4029,7 +4029,7 @@ int	check_vcenter_vm_storage_totalwritelatency(AGENT_REQUEST *request, const cha
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "virtualDisk/totalWriteLatency[latest]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "virtualDisk/totalWriteLatency[average]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4067,7 +4067,7 @@ int	check_vcenter_vm_storage_totalreadlatency(AGENT_REQUEST *request, const char
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "virtualDisk/totalReadLatency[latest]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "virtualDisk/totalReadLatency[average]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4105,7 +4105,7 @@ int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "system/osUptime[latest]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "sys/osUptime[latest]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
