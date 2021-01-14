@@ -579,7 +579,7 @@ class CHost extends CHostGeneral {
 						')';
 					}
 
-					// Extend results with hosts having inherited tags matching filtering criterias.
+					// Extend results with hosts having inherited tags matching filtering criteria.
 					if ($_tag['templateids_in']) {
 						$_where .= ' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids_in']));
 					}
