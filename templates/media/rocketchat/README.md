@@ -1,7 +1,6 @@
 # Rocket.Chat webhook
 
 This guide describes how to integrate Zabbix 5.4 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
-Please note that recovery and update operations are supported only for trigger-based events.<br>
 By default, all new alerts will be posted as messages with an attachment card. Event updates and resolve messages will be added to the thread of the first message.
 
 ## Setting up Rocket.Chat
@@ -30,11 +29,10 @@ Format explanation:<br>
 - *field* - prefix of the parameter with field info.
 - *1* - the position of the field. Fields with the same position will be added in the alphabetical order.
 - *short* - whether the field should be short or not. If *short*, there can be several fields on one line, otherwise, the field will be placed on a separate line.
-- *p* - used if the field should be sent only on problem/recovery/update operation. Possible values:
+- *p* - optional. Used if the field should be sent only on problem/recovery operation. Possible values:
     - *p* - problem
     - *r* - recovery
-    - *u* - update
-- *Host* - the title of the field. There can be any text including whitespaces or symbols.
+- *Host* - the title of the field. There can be any text including whitespaces or symbols.aces or symbols.
 
 4\. Create a **Zabbix user** and add **Media** with the **Rocket.Chat** media type.
 "Send to" field should be filled as `#channel_name` or `@username`.<br>

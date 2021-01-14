@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-11T14:01:55Z'
+  date: '2021-01-14T12:31:14Z'
   media_types:
     -
       name: Rocket.Chat
@@ -15,9 +15,6 @@ zabbix_export:
         -
           name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_recovery_value
-          value: '{EVENT.RECOVERY.VALUE}'
         -
           name: event_source
           value: '{EVENT.SOURCE}'
@@ -129,9 +126,8 @@ zabbix_export:
                                         prefix = parts[0].split('_');
         
                                     if (typeof prefix[2] === 'undefined'
-                                            || (prefix[2] === 'p' && params.event_value === '0')
-                                            || (prefix[2] === 'r' && params.event_recovery_value === '0')
-                                            || (prefix[2] === 'u' && params.event_update_status === '1')) {
+                                            || (prefix[2] === 'p' && params.event_value === '1')
+                                            || (prefix[2] === 'r' && params.event_value === '0')) {
                                         data.push({
                                             title: field.substring(field.indexOf(':') + 1),
                                             value: fields[field],
@@ -322,7 +318,7 @@ zabbix_export:
                 rc = {},
                 update = {},
                 result = {tags: {}},
-                required_params = ['alert_subject', 'alert_message', 'event_recovery_value', 'event_source', 'event_value'],
+                required_params = ['alert_subject', 'alert_message', 'event_source', 'event_value'],
                 severities = [
                     {name: 'not_classified', color: '#97AAB3'},
                     {name: 'information', color: '#7499FF'},
@@ -370,10 +366,6 @@ zabbix_export:
             // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
             if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
                 throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
-        
-            if (params.event_source !== '0' && params.event_recovery_value === '0') {
-                throw 'Recovery operations are supported only for trigger-based actions.';
             }
         
             if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
