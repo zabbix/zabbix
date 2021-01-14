@@ -1315,6 +1315,8 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
 		$hostPrototypeIds = array_keys($result);
 
 		// adding discovery rule
