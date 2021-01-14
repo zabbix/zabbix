@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -253,6 +253,7 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('items.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
+					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['items'])
 		],
@@ -261,6 +262,7 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('triggers.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
+					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['triggers'])
 		],
@@ -269,6 +271,7 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('graphs.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
+					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['graphs'])
 		],
@@ -276,7 +279,9 @@ foreach ($data['templates'] as $template) {
 			new CLink(_('Dashboards'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'template.dashboard.list')
-					->setArgument('templateid', $template['templateid'])),
+					->setArgument('templateid', $template['templateid'])
+					->setArgument('context', 'template')
+			),
 			CViewHelper::showNum($template['dashboards'])
 		],
 		[
@@ -284,6 +289,7 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('host_discovery.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
+					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['discoveries'])
 		],
@@ -292,6 +298,7 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('httpconf.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
+					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 
 void	__wrap_zbx_sleep_loop(int sleeptime);
 zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num);
-int	__wrap_zbx_host_availability_is_set(const zbx_host_availability_t *ha);
+int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha);
 int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
@@ -56,7 +56,7 @@ zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num)
 	return 0;
 }
 
-int	__wrap_zbx_host_availability_is_set(const zbx_host_availability_t *ha)
+int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha)
 {
 	ZBX_UNUSED(ha);
 	return SUCCEED;

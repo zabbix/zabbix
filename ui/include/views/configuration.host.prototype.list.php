@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,22 +31,24 @@ $widget = (new CWidget())
 				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'create')
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('context', $data['context'])
 					->getUrl()
 			))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(
-		get_header_host_table('hosts', $this->data['discovery_rule']['hostid'], $this->data['parent_discoveryid'])
+	->setNavigation(
+		getHostNavigation('hosts', $this->data['discovery_rule']['hostid'], $this->data['parent_discoveryid'])
 	);
-
-// create form
-$itemForm = (new CForm())
-	->setName('hosts')
-	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 $url = (new CUrl('host_prototypes.php'))
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->setArgument('context', $data['context'])
 	->getUrl();
+
+// create form
+$itemForm = (new CForm('post', $url))
+	->setName('hosts')
+	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
 // create table
 $hostTable = (new CTableInfo())
@@ -72,6 +74,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 			->setArgument('hostid', $hostPrototype['hostid'])
+			->setArgument('context', $data['context'])
 	);
 
 	// template list
@@ -88,7 +91,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
 				$caption[] = (new CLink($template['name'],
-					'templates.php?form=update&templateid='.$template['templateid']
+					(new CUrl('templates.php'))
+						->setArgument('form', 'update')
+						->setArgument('templateid', $template['templateid'])
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY);
@@ -105,7 +110,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				foreach ($linkedTemplates as $tpl) {
 					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
 						$caption[] = (new CLink($tpl['name'],
-							'templates.php?form=update&templateid='.$tpl['templateid']
+							(new CUrl('templates.php'))
+								->setArgument('form', 'update')
+								->setArgument('templateid', $tpl['templateid'])
 						))
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
@@ -133,12 +140,15 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// status
 	$status = (new CLink(
 		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
-		'?group_hostid='.$hostPrototype['hostid'].
-			'&parent_discoveryid='.$this->data['discovery_rule']['itemid'].
-			'&action='.(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
+		(new CUrl('host_prototypes.php'))
+			->setArgument('group_hostid', $hostPrototype['hostid'])
+			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
+			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			)
+			->setArgument('context', $data['context'])
+			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($hostPrototype['status']))
@@ -151,7 +161,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 				->setArgument('action', 'hostprototype.updatediscover')
 				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-				->setArgumentSID()
+				->setArgument('context', $data['context'])
 				->getUrl()
 		))
 			->addSID()
@@ -171,7 +181,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 // append table to form
 $itemForm->addItem([
 	$hostTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => ['name' => _('Create enabled'),
@@ -184,7 +194,7 @@ $itemForm->addItem([
 				'confirm' => _('Delete selected host prototypes?')
 			]
 		],
-		$this->data['discovery_rule']['itemid']
+		$data['discovery_rule']['itemid']
 	)
 ]);
 

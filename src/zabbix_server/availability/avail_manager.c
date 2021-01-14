@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,25 +36,25 @@ static sigset_t		orig_mask;
 #define ZBX_AVAILABILITY_MANAGER_DELAY			1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
 
-static int	host_availability_compare(const void *d1, const void *d2)
+static int	interface_availability_compare(const void *d1, const void *d2)
 {
-	const zbx_host_availability_t	*ha1 = *(const zbx_host_availability_t **)d1;
-	const zbx_host_availability_t	*ha2 = *(const zbx_host_availability_t **)d2;
+	const zbx_interface_availability_t	*ia1 = *(const zbx_interface_availability_t **)d1;
+	const zbx_interface_availability_t	*ia2 = *(const zbx_interface_availability_t **)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(ha1->hostid, ha2->hostid);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->interfaceid, ia2->interfaceid);
 
-	return ha1->id - ha2->id;
+	return ia1->id - ia2->id;
 }
 
 ZBX_THREAD_ENTRY(availability_manager_thread, args)
 {
-	zbx_ipc_service_t	service;
-	char			*error = NULL;
-	zbx_ipc_client_t	*client;
-	zbx_ipc_message_t	*message;
-	int			ret, processed_num = 0;
-	double			time_stat, time_idle = 0, time_now, time_flush, sec;
-	zbx_vector_ptr_t	host_availabilities;
+	zbx_ipc_service_t		service;
+	char				*error = NULL;
+	zbx_ipc_client_t		*client;
+	zbx_ipc_message_t		*message;
+	int				ret, processed_num = 0;
+	double				time_stat, time_idle = 0, time_now, time_flush, sec;
+	zbx_vector_availability_ptr_t	interface_availabilities;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -83,7 +83,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	time_stat = zbx_time();
 	time_flush = time_stat;
 
-	zbx_vector_ptr_create(&host_availabilities);
+	zbx_vector_availability_ptr_create(&interface_availabilities);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -96,7 +96,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
-					host_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
+					interface_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
@@ -114,7 +114,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 		if (NULL != message)
 		{
-			zbx_availability_deserialize(message->data, message->size, &host_availabilities);
+			zbx_availability_deserialize(message->data, message->size, &interface_availabilities);
 			zbx_ipc_message_free(message);
 		}
 
@@ -125,24 +125,25 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		{
 			time_flush = time_now;
 
-			if (0 == host_availabilities.values_num)
+			if (0 == interface_availabilities.values_num)
 				continue;
 
 			zbx_block_signals(&orig_mask);
-			zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-			zbx_db_update_host_availabilities(&host_availabilities);
+			zbx_vector_availability_ptr_sort(&interface_availabilities, interface_availability_compare);
+			zbx_db_update_interface_availabilities(&interface_availabilities);
 			zbx_unblock_signals(&orig_mask);
 
-			processed_num = host_availabilities.values_num;
-			zbx_vector_ptr_clear_ext(&host_availabilities, (zbx_clean_func_t)zbx_host_availability_free);
+			processed_num = interface_availabilities.values_num;
+			zbx_vector_availability_ptr_clear_ext(&interface_availabilities,
+					zbx_interface_availability_free);
 		}
 	}
 
 	zbx_block_signals(&orig_mask);
-	if (0 != host_availabilities.values_num)
+	if (0 != interface_availabilities.values_num)
 	{
-		zbx_vector_ptr_sort(&host_availabilities, host_availability_compare);
-		zbx_db_update_host_availabilities(&host_availabilities);
+		zbx_vector_availability_ptr_sort(&interface_availabilities, interface_availability_compare);
+		zbx_db_update_interface_availabilities(&interface_availabilities);
 	}
 	DBclose();
 	zbx_unblock_signals(&orig_mask);

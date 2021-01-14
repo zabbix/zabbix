@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -783,6 +783,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 
 		url.setArgument('form', 'update');
 		url.setArgument('triggerid', options.triggerid);
+		url.setArgument('context', 'host');
 
 		items[items.length] = {
 			label: t('Configuration'),
@@ -847,6 +848,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
  * @param array  options['triggers']                  (optional)
  * @param string options['triggers'][n]['triggerid']
  * @param string options['triggers'][n]['name']
+ * @param string options['context']                   Additional parameter in URL to identify main section.
  * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
  *
  * @return array
@@ -899,11 +901,11 @@ function getMenuPopupItem(options, trigger_elmnt) {
 	}
 
 	var url = new Curl('items.php', false);
-
 	url.setArgument('form', 'create');
 	url.setArgument('hostid', options.hostid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
+	url.setArgument('context', options.context);
 
 	items.push({
 		label: t('Create dependent item'),
@@ -911,11 +913,12 @@ function getMenuPopupItem(options, trigger_elmnt) {
 		disabled: !options.create_dependent_item
 	});
 
-	url = new Curl('host_discovery.php');
+	url = new Curl('host_discovery.php', false);
 	url.setArgument('form', 'create');
 	url.setArgument('hostid', options.hostid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
+	url.setArgument('context', options.context);
 
 	items.push({
 		label: t('Create dependent discovery rule'),
@@ -935,6 +938,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
  * @param array options['name']
  * @param array options['itemid']
  * @param array options['parent_discoveryid']
+ * @param string options['context']                   Additional parameter in URL to identify main section.
  *
  * @return array
  */
@@ -945,6 +949,7 @@ function getMenuPopupItemPrototype(options) {
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
+	url.setArgument('context', options.context);
 
 	return [{
 		label: options.name,

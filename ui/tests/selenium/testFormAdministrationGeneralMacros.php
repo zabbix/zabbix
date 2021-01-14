@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -829,7 +829,7 @@ class testFormAdministrationGeneralMacros extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
-		$item_url = 'items.php?filter_set=1&filter_hostids%5B0%5D=99134';
+		$item_url = 'items.php?filter_set=1&context=host&filter_hostids%5B0%5D=99134';
 		$macro = [
 			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
 			'value' => 'Value 2 B resolved'

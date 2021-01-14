@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CTestArrayHelper.php';
 
 /**
  * Base class for Preprocessing tests.
@@ -722,8 +723,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Does not match regular expression', 'parameter_1' => '8g!@#$%^&*()-='],
 						['type' => 'Check for error in JSON', 'parameter_1' => '9h!@#$%^&*()-='],
 						['type' => 'Check for error in XML', 'parameter_1' => '0i!@#$%^&*()-='],
-						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-='],
-						['type' => 'Check for not supported value']
+						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-=']
 					]
 				]
 			],
@@ -818,7 +818,6 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Right trim', 'parameter_1' => '    22   '],
 						['type' => 'Left trim', 'parameter_1' => '   33  '],
 						['type' => 'Trim', 'parameter_1' => '   0    '],
-						['type' => 'Check for not supported value'],
 						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    '],
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    '],
 						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],
@@ -1899,10 +1898,10 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
 		$this->query('id:param_add')->one()->click();
 
-		$this->assertTrue($this->query('xpath://select[@id="preprocessing_0_type"]'.
-				'//option[text()="Check for not supported value"]')->one()->isEnabled());
-		$this->assertFalse($this->query('xpath://select[@id="preprocessing_1_type"]'.
-				'//option[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertTrue($this->query('xpath://z-select[@id="preprocessing_0_type"]'.
+				'//li[text()="Check for not supported value"]')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://z-select[@id="preprocessing_1_type"]'.
+				'//li[text()="Check for not supported value"]')->one()->isEnabled());
 	}
 
 	/*
@@ -1990,7 +1989,11 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		foreach($this->getCommonCustomOnFailData() as $packed) {
 			$case = $packed[0];
-			$case['preprocessing'] = array_merge($case['preprocessing'], [
+			$case['preprocessing'] = array_merge([
+				[
+					'type' => 'Check for not supported value',
+					'on_fail' => true
+				],
 				[
 					'type' => 'Trim',
 					'parameter_1' => '111'
@@ -2026,12 +2029,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					'parameter_1' => 'expression',
 					'parameter_2' => 'output',
 					'on_fail' => true
-				],
-				[
-					'type' => 'Check for not supported value',
-					'on_fail' => true
 				]
-			]);
+			], $case['preprocessing']);
 
 			$data[] = [self::appendErrorHandler($case)];
 		}
@@ -2064,7 +2063,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
-	public function checkCustomOnFail($data) {
+	public function checkCustomOnFail($data, $lld = null) {
 		$form = $this->addItemWithPreprocessing($data);
 		$steps = $this->getPreprocessingSteps();
 
@@ -2100,10 +2099,11 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		foreach ($data['preprocessing'] as $i => $options) {
 			// Check "Custom on fail" value in DB.
-			$expected = (!array_key_exists('on_fail', $options) || !$options['on_fail'])
-					? ZBX_PREPROC_FAIL_DEFAULT : $data['value'];
+			$expected = CTestArrayHelper::get($options, 'on_fail', false) === false
+				? (($options['type'] === 'Check for not supported value') ? 1 : ZBX_PREPROC_FAIL_DEFAULT)
+				: $data['value'];
 
-			$this->assertEquals($expected, $rows[$i + 1]);
+			$this->assertEquals($expected, $lld ? $rows[$i+1] : $rows[$i]);
 
 			if (in_array($options['type'], [
 				'Trim',
@@ -2335,13 +2335,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public function getItemInheritancePreprocessing() {
 		$data = $this->getCommonInheritancePreprocessing();
-		$data[0][0]['preprocessing'] =  array_merge($data[0][0]['preprocessing'], [
+		$data[0][0]['preprocessing'] =  array_merge([
+					[
+						'type' => 'Check for not supported value'
+					],
 					[
 						'type' => 'Right trim',
 						'parameter_1' => '5'
-					],
-					[
-						'type' => 'Check for not supported value'
 					],
 					[
 						'type' => 'Custom multiplier',
@@ -2374,7 +2374,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'error_handler' => 'Set error to',
 						'error_handler_params' => 'Custom_text'
 					]
-		]);
+				], $data[0][0]['preprocessing']);
 
 		return $data;
 	}

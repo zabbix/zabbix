@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,10 +219,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @param array $data	test case data from data provider
 	 */
 	private function sqlForHostPrototypeCompare($data) {
-		$sql = 'SELECT host, status, name, disable_until, error, available, errors_from, lastaccess, ipmi_authtype,'.
-				' ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, snmp_disable_until,'.
-				' snmp_available, ipmi_errors_from, ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
-				' jmx_errors_from, jmx_error, description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
+		$sql = 'SELECT host, status, name, lastaccess, ipmi_authtype,'.
+				' ipmi_privilege, ipmi_username, ipmi_password,'.
+				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
 				' tls_psk_identity, tls_psk, auto_compress, flags'.
 				' FROM hosts'.
 				' WHERE flags=2 AND hostid IN ('.
@@ -536,7 +535,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			);
 		}
 
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.
+		$this->zbxTestLogin('host_prototypes.php?form=update&context=host&parent_discoveryid='.$discovery_id.'&hostid='.
 				$host_prototype
 		);
 	}
@@ -565,7 +564,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			]
 		];
 		// Edit host prototype on template and add macros.
-		$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='
+		$this->page->login()->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
 			.$template_lld_id.'&hostid='.$template_prototype_id);
 
 		$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
@@ -574,7 +573,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->submit();
 
 		// Open host prototype inherited from template on host and check inherited macros.
-		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='
+		$this->page->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
 			.$host_lld_id.'&hostid='.$host_prototype_id);
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
@@ -619,7 +618,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
 		);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.$discovery_id);
+		$this->zbxTestLogin('host_prototypes.php?context=host&parent_discoveryid='.$discovery_id);
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();

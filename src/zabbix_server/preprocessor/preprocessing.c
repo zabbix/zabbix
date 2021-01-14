@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1034,9 +1034,9 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
 		{
-			result = NULL;
-			state = ITEM_STATE_NOTSUPPORTED;
-			error = "Value is too large.";
+			result_ptr.result = NULL;
+			value.state = ITEM_STATE_NOTSUPPORTED;
+			value.error = "Value is too large.";
 		}
 	}
 

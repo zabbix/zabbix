@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,25 +50,44 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
-		SET_UI64_RESULT(result, mem.pgsp_free << ZBX_PERFSTAT_PAGE_SHIFT);
-	else if (0 == strcmp(mode, "total"))
-		SET_UI64_RESULT(result, mem.pgsp_total << ZBX_PERFSTAT_PAGE_SHIFT);
-	else if (0 == strcmp(mode, "used"))
-		SET_UI64_RESULT(result, (mem.pgsp_total - mem.pgsp_free) << ZBX_PERFSTAT_PAGE_SHIFT);
-	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, mem.pgsp_total ? 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 0.0);
-	else if (0 == strcmp(mode, "pused"))
-		SET_DBL_RESULT(result, mem.pgsp_total ? 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total) : 0.0);
+	if (0 == mem.pgsp_total && (NULL == mode || 0 != strcmp(mode, "total")))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot be calculated because swap file size is 0."));
+		return SYSINFO_RET_FAIL;
+	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
+		{
+			SET_UI64_RESULT(result, mem.pgsp_free << ZBX_PERFSTAT_PAGE_SHIFT);
+		}
+		else if (0 == strcmp(mode, "total"))
+		{
+			SET_UI64_RESULT(result, mem.pgsp_total << ZBX_PERFSTAT_PAGE_SHIFT);
+		}
+		else if (0 == strcmp(mode, "used"))
+		{
+			SET_UI64_RESULT(result, (mem.pgsp_total - mem.pgsp_free) << ZBX_PERFSTAT_PAGE_SHIFT);
+		}
+		else if (0 == strcmp(mode, "pfree"))
+		{
+			SET_DBL_RESULT(result, 100.0 * (mem.pgsp_free / (double)mem.pgsp_total));
+		}
+		else if (0 == strcmp(mode, "pused"))
+		{
+			SET_DBL_RESULT(result, 100.0 - 100.0 * (mem.pgsp_free / (double)mem.pgsp_total));
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			return SYSINFO_RET_FAIL;
+		}
 	}
 
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

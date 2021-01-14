@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -868,7 +868,7 @@ err:
  *               FAIL    - failed to create modbus mutex                      *
  *                                                                            *
  ******************************************************************************/
-int zbx_init_modbus(char **error)
+int	zbx_init_modbus(char **error)
 {
 #ifdef HAVE_LIBMODBUS
 #	ifdef _WINDOWS
@@ -879,5 +879,12 @@ int zbx_init_modbus(char **error)
 #else
 	ZBX_UNUSED(error);
 	return SUCCEED;
+#endif
+}
+
+void	zbx_deinit_modbus(void)
+{
+#ifdef HAVE_LIBMODBUS
+	zbx_mutex_destroy(&modbus_lock);
 #endif
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,6 +56,10 @@ class CZDropdownElement extends CElement {
 	 */
 	public function select($text) {
 		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
+
+		if ($text === $this->getText()) {
+			return $this;
+		}
 
 		for ($i = 0; $i < 2; $i++) {
 			try {

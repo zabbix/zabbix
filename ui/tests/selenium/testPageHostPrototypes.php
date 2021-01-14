@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	const HOST_PROTOTYPES_COUNT = 10;
 
 	public function testPageHostPrototypes_CheckLayout() {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID);
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('xpath://form[@name="hosts"]/table[@class="list-table"]')->asTable()->one();
 		$headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
 		$this->assertSame($headers, $table->getHeadersText());
 
@@ -97,7 +97,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	 */
 	private function selectHostPrototype($data) {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid'].'&context=host');
 
 		if ($data['hosts'] === 'all') {
 			$this->zbxTestCheckboxSelect('all_hosts');
@@ -218,7 +218,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	 */
 	public function testPageHostPrototypes_SingleEnableDisable($data) {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid'].'&context=host');
 
 		$this->checkPageAction($data, 'Click on state', $data['status']);
 	}

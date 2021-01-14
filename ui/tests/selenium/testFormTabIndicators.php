@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ class testFormTabIndicators extends CWebTest {
 			// Host prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=31369',
+					'url' => 'host_prototypes.php?form=create&context=host&parent_discoveryid=31369',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[
@@ -234,7 +234,7 @@ class testFormTabIndicators extends CWebTest {
 			// Item configuration form tab data.
 			[
 				[
-					'url' => 'items.php?form=create&hostid=10084',
+					'url' => 'items.php?form=create&context=host&hostid=10084',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -261,7 +261,7 @@ class testFormTabIndicators extends CWebTest {
 			// Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=31369',
+					'url' => 'disc_prototypes.php?form=create&context=host&parent_discoveryid=31369',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -288,7 +288,7 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger configuration form tab data.
 			[
 				[
-					'url' => 'triggers.php?hostid=40001&form=create',
+					'url' => 'triggers.php?hostid=40001&context=host&form=create',
 					'form' => 'name:triggersForm',
 					'tabs' => [
 						[
@@ -322,7 +322,7 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=33800&form=create',
+					'url' => 'trigger_prototypes.php?parent_discoveryid=33800&context=host&form=create',
 					'form' => 'name:triggersForm',
 					'tabs' => [
 						[
@@ -359,7 +359,7 @@ class testFormTabIndicators extends CWebTest {
 			// LLD rule configuration form tab data.
 			[
 				[
-					'url' => 'host_discovery.php?form=create&hostid=10084',
+					'url' => 'host_discovery.php?form=create&context=host&hostid=10084',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -427,7 +427,7 @@ class testFormTabIndicators extends CWebTest {
 			// Web scenarios configuration form tab data.
 			[
 				[
-					'url' => 'httpconf.php?form=create&hostid=10084',
+					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
 					'form' => 'name:httpForm',
 					'tabs' => [
 						[

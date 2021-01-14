@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@ class testInheritanceWeb extends CLegacyWebTest {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('httpconf.php?form=update&hostid='.$data['hostid'].'&httptestid='.$data['httptestid']);
+		$this->zbxTestLogin('httpconf.php?form=update&context=host&hostid='.$data['hostid'].'&httptestid='.
+				$data['httptestid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('Web scenario updated');
@@ -99,7 +100,7 @@ class testInheritanceWeb extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceWeb_SimpleCreate($data) {
-		$this->zbxTestLogin('httpconf.php?form=Create+web+scenario&hostid='.$this->templateid);
+		$this->zbxTestLogin('httpconf.php?form=Create+web+scenario&context=template&hostid='.$this->templateid);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);

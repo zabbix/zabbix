@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -477,6 +477,34 @@ function hostInterfaceTypeNumToName($type) {
 	return $name;
 }
 
+/**
+ * Returns the host interface as a string of the host's IP address (or DNS name) and port number.
+ *
+ * @param array|null $interface
+ * @param int    $interface['useip']  Interface use IP or DNS. INTERFACE_USE_DNS or INTERFACE_USE_IP.
+ * @param string $interface['ip']     Interface IP.
+ * @param string $interface['dns']    Interface DNS.
+ * @param string $interface['port']   Interface port.
+ *
+ * @return string
+ */
+function getHostInterface(?array $interface): string {
+	if ($interface === null) {
+		return '';
+	}
+
+	if ($interface['useip'] == INTERFACE_USE_IP) {
+		$ip_or_dns = (filter_var($interface['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false)
+			? '['.$interface['ip'].']'
+			: $interface['ip'];
+	}
+	else {
+		$ip_or_dns = $interface['dns'];
+	}
+
+	return $ip_or_dns.':'.$interface['port'];
+}
+
 function get_hostgroup_by_groupid($groupid) {
 	$groups = DBfetch(DBselect('SELECT g.* FROM hstgrp g WHERE g.groupid='.zbx_dbstr($groupid)));
 
@@ -834,6 +862,7 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 		$name = (new CLink(CHtml::encode($template['name']),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
+				->setArgument('context', 'template')
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
@@ -864,6 +893,7 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
+					->setArgument('context', 'template')
 			);
 		}
 		else {

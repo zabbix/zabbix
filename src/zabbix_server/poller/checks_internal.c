@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -330,16 +330,24 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<type>,"available"] */
 		{
+			zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
+			int				i;
+
+			zbx_get_host_interfaces_availability(item->host.hostid, agents);
+
+			for (i = 0; i < ZBX_AGENT_MAX; i++)
+				zbx_free(agents[i].error);
+
 			tmp = get_rparam(&request, 1);
 
 			if (0 == strcmp(tmp, "agent"))
-				SET_UI64_RESULT(result, item->host.available);
+				SET_UI64_RESULT(result, agents[ZBX_AGENT_ZABBIX].available);
 			else if (0 == strcmp(tmp, "snmp"))
-				SET_UI64_RESULT(result, item->host.snmp_available);
+				SET_UI64_RESULT(result, agents[ZBX_AGENT_SNMP].available);
 			else if (0 == strcmp(tmp, "ipmi"))
-				SET_UI64_RESULT(result, item->host.ipmi_available);
+				SET_UI64_RESULT(result, agents[ZBX_AGENT_IPMI].available);
 			else if (0 == strcmp(tmp, "jmx"))
-				SET_UI64_RESULT(result, item->host.jmx_available);
+				SET_UI64_RESULT(result, agents[ZBX_AGENT_JMX].available);
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,10 +215,15 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		ioctlsocket(s.socket, FIONBIO, &argp);	/* non-zero value sets the socket to non-blocking */
 #else
 		flags = fcntl(s.socket, F_GETFL);
-		if (0 == (flags & O_NONBLOCK))
-			fcntl(s.socket, F_SETFL, flags | O_NONBLOCK);
-#endif
+		if (-1 == flags)
+			zabbix_log(LOG_LEVEL_DEBUG, " error in getting the status flag: %s", zbx_strerror(errno));
 
+		if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, " error in setting the status flag: %s",
+				zbx_strerror(errno));
+		}
+#endif
 		if (SUCCEED == telnet_test_login(s.socket))
 			*value_int = 1;
 		else
@@ -227,7 +232,9 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		zbx_tcp_close(&s);
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __func__, zbx_socket_strerror());
+	}
 
 	return SYSINFO_RET_OK;
 }
