@@ -4699,7 +4699,8 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"net/received[average]", "net/transmitted[average]",
 						"datastore/totalReadLatency[average]",
 						"datastore/totalWriteLatency[average]", "cpu/usage[average]",
-						"cpu/utilization[average]", "cpu/utilization[average]",
+						"cpu/utilization[average]", "power/power[average]",
+						"power/powerCap[average]",
 						NULL
 					};
 	const char			*vm_perfcounters[] = {

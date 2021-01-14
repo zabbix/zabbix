@@ -909,6 +909,46 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 	return ret;
 }
 
+int	check_vcenter_hv_cpu_usage_avg(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *uuid;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	int			ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/usage[average]", "",
+			ZBX_KIBIBYTE, result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_cpu_utilization(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -4066,46 +4106,6 @@ int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, 
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "system/osUptime[latest]", 1, result);
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
-
-	return ret;
-}
-
-int	check_vcenter_hv_cpu_usage_avg(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
-{
-	char			*url, *uuid;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	int			ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (2 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/usage[average]", "",
-			ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
