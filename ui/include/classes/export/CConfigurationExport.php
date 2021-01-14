@@ -790,8 +790,7 @@ class CConfigurationExport {
 
 		if ($valuemapids) {
 			$db_valuemaps = API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'selectMappings' => ['value', 'newvalue'],
+				'output' => ['name'],
 				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
