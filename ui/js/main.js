@@ -80,7 +80,7 @@ var PageRefresh = {
 
 		if (this.delayLeft < 0 && !overlays_stack.length) {
 			if (ED) {
-				sessionStorage.scrollTop = jQuery(window).scrollTop();
+				sessionStorage.scrollTop = $('.wrapper').scrollTop();
 			}
 
 			location.reload();
@@ -924,7 +924,7 @@ jQuery(function ($) {
 	};
 
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
-		$(window).scrollTop(sessionStorage.scrollTop);
+		$('.wrapper').scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');
 	}
 });

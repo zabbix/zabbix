@@ -358,6 +358,17 @@ static int	DBpatch_5030024(void)
 	return DBcreate_index("interface", "interface_3", "available", 0);
 }
 
+static int	DBpatch_5030025(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.overview.type' or idx='web.actionconf.eventsource'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -389,5 +400,6 @@ DBPATCH_ADD(5030021, 0, 1)
 DBPATCH_ADD(5030022, 0, 1)
 DBPATCH_ADD(5030023, 0, 1)
 DBPATCH_ADD(5030024, 0, 1)
+DBPATCH_ADD(5030025, 0, 1)
 
 DBPATCH_END()
