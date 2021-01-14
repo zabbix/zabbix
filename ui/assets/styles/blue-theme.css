@@ -1328,7 +1328,7 @@ z-select,
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
-pre, pre a, pre td, pre span {
+pre, pre a, pre td, pre span, .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word; }
@@ -4450,12 +4450,12 @@ a.link-action {
     margin: 0; }
   .status-container span {
     border-radius: 0; }
-    .status-container span:only-child {
-      border-radius: 2px; }
-    .status-container span:first-of-type:not(:only-child) {
-      border-radius: 2px 0 0 2px; }
-    .status-container span:last-of-type:not(:only-child) {
-      border-radius: 0 2px 2px 0; }
+    .status-container span:first-of-type {
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px; }
+    .status-container span:last-of-type {
+      border-top-right-radius: 2px;
+      border-bottom-right-radius: 2px; }
   .status-container .status-na-bg,
   .status-container .status-info-bg,
   .status-container .status-warning-bg,

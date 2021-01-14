@@ -4007,6 +4007,7 @@ $form-icon-btn: (
 
 			.table-forms {
 				.table-forms-td-right {
+					@extend %space-pre-wrap;
 					padding-right: 8px;
 				}
 
@@ -5103,16 +5104,14 @@ a.link-action {
 	span {
 		border-radius: 0;
 
-		&:only-child {
-			border-radius: 2px;
+		&:first-of-type {
+			border-top-left-radius: 2px;
+			border-bottom-left-radius: 2px;
 		}
 
-		&:first-of-type:not(:only-child) {
-			border-radius: 2px 0 0 2px;
-		}
-
-		&:last-of-type:not(:only-child) {
-			border-radius: 0 2px 2px 0;
+		&:last-of-type {
+			border-top-right-radius: 2px;
+			border-bottom-right-radius: 2px;
 		}
 	}
 

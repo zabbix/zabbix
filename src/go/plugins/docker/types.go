@@ -29,12 +29,17 @@ type unixTime int64
 // UnmarshalJSON is used to convert time to unixtime
 func (tm *unixTime) UnmarshalJSON(b []byte) (err error) {
 	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return nil
+	}
+
 	t, err := time.Parse(time.RFC3339, s)
 	if err != nil {
 		return nil
 	}
 
 	*tm = unixTime(t.Unix())
+
 	return err
 }
 

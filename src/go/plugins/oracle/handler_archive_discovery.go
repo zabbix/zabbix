@@ -25,16 +25,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyArchiveDiscovery = "oracle.archive.discovery"
-
-const archiveDiscoveryMaxParams = 0
-
-func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var lld string
-
-	if len(params) > archiveDiscoveryMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

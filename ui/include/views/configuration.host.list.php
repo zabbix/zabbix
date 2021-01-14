@@ -219,14 +219,6 @@ foreach ($data['hosts'] as $host) {
 		}
 	}
 
-	$host_interface = '';
-	if ($interface !== null) {
-		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		if (array_key_exists('port', $interface) && $interface['port'] !== '') {
-			$host_interface .= NAME_DELIMITER.$interface['port'];
-		}
-	}
-
 	$description = [];
 
 	if ($host['discoveryRule']) {
@@ -465,7 +457,7 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		$host_interface,
+		getHostInterface($interface),
 		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY)
 			? ($host['proxy_hostid'] != 0)
@@ -474,7 +466,7 @@ foreach ($data['hosts'] as $host) {
 			: null,
 		$hostTemplates,
 		$status,
-		getHostAvailabilityTable($host),
+		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]

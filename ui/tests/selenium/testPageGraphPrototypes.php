@@ -78,7 +78,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 
 		// Check table headers.
 		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type', 'Discover'],
-				$this->getTextOfElements("//thead/tr/th[not(@class)]")
+				$this->getTextOfElements('//form[@name="graphForm"]//thead/tr/th[not(@class)]')
 		);
 
 		// Check graph prototype number in breadcrumb.
