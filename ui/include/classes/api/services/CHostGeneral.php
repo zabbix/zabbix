@@ -985,6 +985,11 @@ abstract class CHostGeneral extends CHostBase {
 				$options['selectValueMaps'] = ['valuemapid', 'name', 'mappings'];
 			}
 
+			foreach ($result as &$host) {
+				$host['valuemaps'] = [];
+			}
+			unset($host);
+
 			$valuemaps_options = [
 				'output' => ['valuemapid', 'hostid'],
 				'filter' => ['hostid' => $hostids],
