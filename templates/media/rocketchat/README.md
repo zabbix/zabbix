@@ -30,10 +30,9 @@ Format explanation:<br>
 - *field* - prefix of the parameter with field info.
 - *1* - the position of the field. Fields with the same position will be added in the alphabetical order.
 - *short* - whether the field should be short or not. If *short*, there can be several fields on one line, otherwise, the field will be placed on a separate line.
-- *p* - used if the field should be sent only on problem/recovery/update operation. Possible values:
+- *p* - optional. Used if the field should be sent only on problem/recovery operation. Possible values:
     - *p* - problem
     - *r* - recovery
-    - *u* - update
 - *Host* - the title of the field. There can be any text including whitespaces or symbols.
 
 4\. Create a **Zabbix user** and add **Media** with the **Rocket.Chat** media type.
