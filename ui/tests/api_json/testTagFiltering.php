@@ -305,6 +305,17 @@ class testTagFiltering extends CAPITest {
 				],
 				'expected' => []
 			],
+			'tests-inheritance-from-2nd-level-template' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'office', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Riga']
+					]
+				],
+				'expected' => [
+					'Host OS - Windows'
+				]
+			],
 
 			// evaltype: OR
 			'tests-equal-one-of-two-tags' => [
@@ -418,7 +429,7 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'Template Browser - FF'
+					'Template Browser - FF', 'Workstation'
 				]
 			],
 			'templates-not-queal-single-tag' => [
@@ -429,7 +440,7 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver'
+					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Workstation'
 				]
 			],
 			'templates-exists-two-tags' => [
@@ -462,7 +473,9 @@ class testTagFiltering extends CAPITest {
 						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EXISTS]
 					]
 				],
-				'expected' => []
+				'expected' => [
+					'Workstation'
+				]
 			],
 
 			// evaltype: OR
@@ -511,7 +524,8 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Windows'
+					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Windows',
+					'Workstation'
 				]
 			],
 		];

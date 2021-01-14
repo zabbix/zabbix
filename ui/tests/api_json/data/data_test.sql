@@ -1476,6 +1476,7 @@ INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99023
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99024, 'Template OS - Windows', 'Template OS - Windows', 3, 0, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99025, 'Template Browser - FF', 'Template Browser - FF', 3, 0, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99026, 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Ubuntu Bionic Beaver', 3, 0, '');
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99027, 'Workstation', 'Workstation', 3, 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50023, 99013, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50024, 99014, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50025, 99015, 50027);
@@ -1490,9 +1491,11 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50033, 99023, 50
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50034, 99024, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50035, 99025, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50036, 99026, 50027);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50037, 99027, 50027);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50004, 99013, 99024);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50005, 99014, 99025);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50006, 99015, 99026);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50007, 99024, 99027);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1000, 99013, 'OS', 'Windows');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1001, 99014, 'Browser', 'Firefox');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1002, 99015, 'OS', 'Linux');
@@ -1507,6 +1510,7 @@ INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1010, 99024, 'OS', 
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1011, 99025, 'Browser', 'FF');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1012, 99026, 'OS', 'Ubuntu Bionic Beaver');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1013, 99025, 'Webbrowser', 'Mozilla');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1014, 99027, 'office', 'Riga');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '', '', 4, '', '');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50172, 'trigger1', '{50232}=1', '', '1');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '');
