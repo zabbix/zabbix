@@ -54,7 +54,7 @@ void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.available);
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.errors_from);
 	ptr += zbx_serialize_value(ptr, interface_availability->agent.disable_until);
-	ptr += zbx_serialize_str(ptr, interface_availability->agent.error, error_len);
+	zbx_serialize_str(ptr, interface_availability->agent.error, error_len);
 }
 
 void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
