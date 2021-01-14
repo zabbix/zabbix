@@ -36,6 +36,7 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	}
 
 	var out string
+
 	var err error
 
 	if strict {

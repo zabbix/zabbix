@@ -105,6 +105,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			if err != nil {
 				return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 			}
+
 			break
 		}
 
