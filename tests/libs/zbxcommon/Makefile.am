@@ -6,6 +6,8 @@ SERVER_tests = \
 	calculate_item_nextcheck \
 	calculate_item_nextcheck_unreachable \
 	zbx_function_get_param_dyn \
+	zbx_json_to_xml \
+	zbx_xml_to_json \
 	zbx_token_find \
 	zbx_interval_preproc \
 	zbx_validate_interval \
@@ -77,6 +79,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
@@ -180,6 +183,34 @@ zbx_function_get_param_dyn_LDADD += @SERVER_LIBS@
 zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_function_get_param_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_json_to_xml_SOURCES = \
+	zbx_json_to_xml.c \
+	$(COMMON_SRC_FILES)
+
+zbx_json_to_xml_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_json_to_xml_LDADD += @SERVER_LIBS@
+
+zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_xml_to_json_SOURCES = \
+	zbx_xml_to_json.c \
+	$(COMMON_SRC_FILES)
+
+zbx_xml_to_json_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_xml_to_json_LDADD += @SERVER_LIBS@
+
+zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 zbx_token_find_SOURCES = \

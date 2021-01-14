@@ -50,7 +50,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
-		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE
+		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -64,7 +65,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
-		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE
+		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
