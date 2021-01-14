@@ -381,6 +381,7 @@ class CMenuHelper {
 							->setAction('userprofile.edit'),
 						(new CMenuItem(_('API tokens')))
 							->setAction('user.token.list')
+							->setAliases(['user.token.view', 'user.token.edit'])
 					]))
 			);
 		}
