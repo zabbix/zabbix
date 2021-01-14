@@ -245,15 +245,6 @@ class testTagFiltering extends CAPITest {
 					'Host OS - Windows'
 				]
 			],
-			'tests-contain-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'OS', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'win7']
-					]
-				],
-				'expected' => ['Host OS - Windows']
-			],
 			'tests-not-exist-single-tag' => [
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
@@ -328,19 +319,6 @@ class testTagFiltering extends CAPITest {
 				],
 				'expected' => [
 					'Host Browser - Firefox', 'Host OS - Windows'
-				]
-			],
-			'tests-not-equal-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Ubuntu Bionic Beaver']
-					]
-				],
-				'expected' => [
-					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE',
-					'Host OS', 'Host OS - Android', 'Host OS - Mac', 'Host OS - Windows', 'Host without tags',
-					'Host with very general tags only'
 				]
 			]
 		];
