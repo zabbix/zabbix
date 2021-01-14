@@ -108,5 +108,4 @@ void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
-
 #endif
