@@ -3532,7 +3532,7 @@ int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (3 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -3574,7 +3574,7 @@ int	check_vcenter_vm_net_if_received(AGENT_REQUEST *request, const char *usernam
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (3 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -3616,7 +3616,7 @@ int	check_vcenter_vm_net_if_transmitted(AGENT_REQUEST *request, const char *user
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (3 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -3810,7 +3810,7 @@ int	check_vcenter_vm_cpu_readiness(AGENT_REQUEST *request, const char *username,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -3852,7 +3852,7 @@ int	check_vcenter_vm_cpu_swapwait(AGENT_REQUEST *request, const char *username, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
