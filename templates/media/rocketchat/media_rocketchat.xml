@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-01-11T14:14:16Z</date>
+    <date>2021-01-14T12:16:05Z</date>
     <media_types>
         <media_type>
             <name>Rocket.Chat</name>
@@ -18,10 +18,6 @@
                 <parameter>
                     <name>event_nseverity</name>
                     <value>{EVENT.NSEVERITY}</value>
-                </parameter>
-                <parameter>
-                    <name>event_recovery_value</name>
-                    <value>{EVENT.RECOVERY.VALUE}</value>
                 </parameter>
                 <parameter>
                     <name>event_source</name>
@@ -156,9 +152,8 @@
                                 prefix = parts[0].split('_');&#13;
 &#13;
                             if (typeof prefix[2] === 'undefined'&#13;
-                                    || (prefix[2] === 'p' &amp;&amp; params.event_value === '0')&#13;
-                                    || (prefix[2] === 'r' &amp;&amp; params.event_recovery_value === '0')&#13;
-                                    || (prefix[2] === 'u' &amp;&amp; params.event_update_status === '1')) {&#13;
+                                    || (prefix[2] === 'p' &amp;&amp; params.event_value === '1')&#13;
+                                    || (prefix[2] === 'r' &amp;&amp; params.event_value === '0')) {&#13;
                                 data.push({&#13;
                                     title: field.substring(field.indexOf(':') + 1),&#13;
                                     value: fields[field],&#13;
@@ -349,7 +344,7 @@ try {&#13;
         rc = {},&#13;
         update = {},&#13;
         result = {tags: {}},&#13;
-        required_params = ['alert_subject', 'alert_message', 'event_recovery_value', 'event_source', 'event_value'],&#13;
+        required_params = ['alert_subject', 'alert_message', 'event_source', 'event_value'],&#13;
         severities = [&#13;
             {name: 'not_classified', color: '#97AAB3'},&#13;
             {name: 'information', color: '#7499FF'},&#13;
@@ -397,10 +392,6 @@ try {&#13;
     // Check {EVENT.UPDATE.STATUS} only for trigger-based events.&#13;
     if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
-    }&#13;
-&#13;
-    if (params.event_source !== '0' &amp;&amp; params.event_recovery_value === '0') {&#13;
-        throw 'Recovery operations are supported only for trigger-based actions.';&#13;
     }&#13;
 &#13;
     if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
