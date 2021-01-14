@@ -371,6 +371,19 @@ class CMenuHelper {
 					->setTitle(getUserFullname($user))
 			);
 		}
+		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+			$menu->add(
+				(new CMenuItem(_('User settings')))
+					->setIcon('icon-profile')
+					->setTitle(getUserFullname($user))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Profile')))
+							->setAction('userprofile.edit'),
+						(new CMenuItem(_('API tokens')))
+							->setAction('user.token.list')
+					]))
+			);
+		}
 		else {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
