@@ -295,6 +295,16 @@ class testTagFiltering extends CAPITest {
 					'Host with very general tags only'
 				]
 			],
+			'tests-containing-template-tag-with-excluding-different-hosts-tag' => [
+				'filter' => [
+					'evaltype' => TAG_EVAL_TYPE_AND_OR,
+					'tags' => [
+						['tag' => 'Webbrowser', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Mozilla'],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Firefox']
+					]
+				],
+				'expected' => []
+			],
 
 			// evaltype: OR
 			'tests-equal-one-of-two-tags' => [

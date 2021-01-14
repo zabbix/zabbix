@@ -1506,6 +1506,7 @@ INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1009, 99023, 'Brows
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1010, 99024, 'OS', 'Win7');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1011, 99025, 'Browser', 'FF');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1012, 99026, 'OS', 'Ubuntu Bionic Beaver');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1013, 99025, 'Webbrowser', 'Mozilla');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '', '', 4, '', '');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50172, 'trigger1', '{50232}=1', '', '1');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '');

@@ -200,6 +200,9 @@ class CApiTagHelper {
 						$exclude[$tag['hostid']] = true;
 						unset($include[$tag['hostid']]);
 					}
+					elseif ($tag['hosttagid'] != 0) {
+						unset($include[$tag['hostid']]);
+					}
 				}
 				break;
 
@@ -210,6 +213,9 @@ class CApiTagHelper {
 							&& $filter_tag['tag'] === $tag['tag']
 							&& $filter_tag['value'] === $tag['value']) {
 						$exclude[$tag['hostid']] = true;
+						unset($include[$tag['hostid']]);
+					}
+					elseif ($tag['hosttagid'] != 0) {
 						unset($include[$tag['hostid']]);
 					}
 				}
@@ -228,6 +234,9 @@ class CApiTagHelper {
 				foreach ($template_tags as $tag) {
 					if ($tag['hosttagid'] != 0 && $filter_tag['tag'] === $tag['tag']) {
 						$exclude[$tag['hostid']] = true;
+						unset($include[$tag['hostid']]);
+					}
+					elseif ($tag['hosttagid'] != 0) {
 						unset($include[$tag['hostid']]);
 					}
 				}
