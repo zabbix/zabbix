@@ -979,6 +979,46 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
+		// Add value mapping.
+		if ($options['selectValueMaps'] !== null && $options['selectValueMaps'] != API_OUTPUT_COUNT) {
+			if ($options['selectValueMaps'] === API_OUTPUT_EXTEND) {
+				$options['selectValueMaps'] = ['valuemapid', 'name', 'mappings'];
+			}
+
+			$valuemaps_options = [
+				'output' => ['valuemapid', 'hostid'],
+				'filter' => ['hostid' => $hostids],
+				'preservekeys' => true
+			];
+
+			if ($this->outputIsRequested('name', $options['selectValueMaps'])) {
+				$valuemaps_options['output'][] = 'name';
+			}
+
+			$valuemaps = DBfetchArrayAssoc(DBselect(DB::makeSql('valuemap', $valuemaps_options)), 'valuemapid');
+
+			if ($this->outputIsRequested('mappings', $options['selectValueMaps']) && $valuemaps) {
+				$params = [
+					'output' => ['valuemapid', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)]
+				];
+				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
+
+				while ($mapping = DBfetch($query)) {
+					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'value' => $mapping['value'],
+						'newvalue' => $mapping['newvalue']
+					];
+				}
+			}
+
+			foreach ($valuemaps as $valuemap) {
+				$result[$valuemap['hostid']]['valuemaps'][] = array_intersect_key($valuemap,
+					array_flip($options['selectValueMaps'])
+				);
+			}
+		}
+
 		return $result;
 	}
 
