@@ -73,9 +73,31 @@ $menu-main-submenu-selected-color: #ffffff !default;
 $menu-main-submenu-selected-bg-color: #0b2d42 !default;
 $menu-main-submenu-selected-border-color: #87d1ff !default;
 
+$menu-main-submenu-next-level-bg: #0a466a !default;
+$menu-main-submenu-next-level-shadow: rgba(#768D99, .35) !default;
+
 $menu-user-color: #cedae1 !default;
 $menu-user-hover-color: #ffffff !default;
 $menu-user-disabled-color: $disabled-item-color !default;
+$menu-user-selected-color: $menu-main-selected-color !default;
+$menu-user-selected-bg-color: $menu-main-selected-bg-color !default;
+$menu-user-selected-border-color: $menu-main-selected-border-color !default;
+$menu-user-expanded-color: $menu-main-expanded-color !default;
+$menu-user-expanded-bg-color: $menu-main-expanded-bg-color !default;
+$menu-user-expanded-border-color: $menu-main-expanded-border-color !default;
+
+$menu-user-submenu-color: $menu-main-submenu-color !default;
+$menu-user-submenu-bg-color: $menu-main-submenu-bg-color !default;
+$menu-user-submenu-border-color: $menu-main-submenu-border-color !default;
+$menu-user-submenu-hover-color: $menu-main-submenu-hover-color !default;
+$menu-user-submenu-hover-bg-color: $menu-main-submenu-hover-bg-color !default;
+$menu-user-submenu-hover-border-color: $menu-main-submenu-hover-border-color !default;
+$menu-user-submenu-selected-color: $menu-main-submenu-selected-color !default;
+$menu-user-submenu-selected-bg-color: $menu-main-submenu-selected-bg-color !default;
+$menu-user-submenu-selected-border-color: $menu-main-submenu-selected-border-color !default;
+
+$menu-user-submenu-next-level-bg: $menu-main-submenu-next-level-bg !default;
+$menu-user-submenu-next-level-shadow: $menu-main-submenu-next-level-shadow !default;
 
 // Sidebar
 $sidebar-server-name-color: rgba($menu-user-color, 0.5) !default;
