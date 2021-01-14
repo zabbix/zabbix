@@ -11,7 +11,7 @@ The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.
 
 This template was tested on:
 
-- NetApp FAS3220
+- NetApp FAS3220, firmware version 5.3.0
 - Zabbix, version 5.0
 
 ## Setup

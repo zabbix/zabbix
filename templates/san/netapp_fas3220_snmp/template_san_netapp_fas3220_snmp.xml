@@ -14,7 +14,7 @@
          <description>The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.&#13;
 &#13;
 MIBs used:&#13;
-IF-MIB&#13;
+NETAPP-MIB&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/416694-discussion-thread-for-official-zabbix-template-netapp-fas3220&#13;
 &#13;
@@ -845,8 +845,7 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>MIB: IF-MIB&#13;
-The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <description>The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -866,8 +865,7 @@ The number of inbound packets which were chosen to be discarded even though no e
                      <key>fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>MIB: IF-MIB&#13;
-The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
+                     <description>The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -911,8 +909,7 @@ The number of inbound packets that contained errors preventing them from being d
                      <key>fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>MIB: IF-MIB&#13;
-The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <description>The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -932,8 +929,7 @@ The number of outbound packets which were chosen to be discarded even though no 
                      <key>fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>MIB: IF-MIB&#13;
-The number of outbound packets that could not be transmitted because of errors.</description>
+                     <description>The number of outbound packets that could not be transmitted because of errors.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
