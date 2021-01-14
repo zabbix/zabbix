@@ -115,6 +115,86 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
 				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Tag\')'
+			],
+			[
+				[
+					[
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Chrome']
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Browser\' AND event_tag.value=\'Chrome\')'
+			],
+			[
+				[
+					[
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Chrome'],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Firefox']
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Browser\' AND (event_tag.value=\'Chrome\' OR event_tag.value=\'Firefox\'))'
+			],
+			[
+				[
+					[
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_EXISTS]
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Browser\')'
+			],
+			[
+				[
+					[
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_EXISTS],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Chrome'],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'Firefox']
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Browser\')'
+			],
+			[
+				[
+					[
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Android']
+					],
+					TAG_EVAL_TYPE_OR
+				] + $sql_args,
+				'NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'OS\')'
+			],
+			[
+				[
+					[
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'Browser', 'operator' => TAG_OPERATOR_NOT_EXISTS],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'Android']
+					],
+					TAG_EVAL_TYPE_OR
+				] + $sql_args,
+				'(NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'OS\') OR NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'Browser\'))'
+			],
+			[
+				[
+					[
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'win']
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'OS\' AND UPPER(event_tag.value) LIKE \'%WIN%\' ESCAPE \'!\')'
+			],
+			[
+				[
+					[
+						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value'],
+						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'win']
+
+					],
+					TAG_EVAL_TYPE_AND_OR
+				] + $sql_args,
+				'NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'tag1\' AND UPPER(event_tag.value) LIKE \'%VALUE%\' ESCAPE \'!\') AND NOT EXISTS (SELECT NULL FROM event_tag WHERE e.eventid=event_tag.eventid AND event_tag.tag=\'OS\' AND UPPER(event_tag.value) LIKE \'%WIN%\' ESCAPE \'!\')'
 			]
 		];
 	}
