@@ -526,7 +526,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Function: zbx_es_set_timeout                                               *
- *                                              es_init_global_functions                              *
+ *                                                                            *
  * Purpose: sets script execution timeout                                     *
  *                                                                            *
  * Parameters: es      - [IN] the embedded scripting engine                   *
