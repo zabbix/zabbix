@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_PROTOCOL_H
-#define ZABBIX_AVAIL_PROTOCOL_H
+#ifndef ZABBIX_XML_H
+#define ZABBIX_XML_H
 
-#include "common.h"
-#include "db.h"
-#include "zbxalgo.h"
+int	zbx_es_init_xml(zbx_es_t *es, char **error);
 
-void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_interface_availability_t *interface_availability);
-void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_availability_ptr_t  *interface_availabilities);
 #endif

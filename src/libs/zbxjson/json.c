@@ -1295,3 +1295,8 @@ out:
 	zbx_jsonpath_clear(&jsonpath);
 	return ret;
 }
+
+zbx_json_type_t	zbx_json_valuetype(const char *p)
+{
+	return __zbx_json_type(p);
+}

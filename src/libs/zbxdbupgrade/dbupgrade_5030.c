@@ -360,6 +360,17 @@ static int	DBpatch_5030024(void)
 
 static int	DBpatch_5030025(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.overview.type' or idx='web.actionconf.eventsource'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030026(void)
+{
 	const ZBX_TABLE table =
 		{"token", "tokenid", 0,
 			{
@@ -381,34 +392,34 @@ static int	DBpatch_5030025(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_5030026(void)
+static int	DBpatch_5030027(void)
 {
 	return DBcreate_index("token", "token_1", "name", 0);
 }
 
-static int	DBpatch_5030027(void)
+static int	DBpatch_5030028(void)
 {
 	return DBcreate_index("token", "token_2", "userid,name", 1);
 }
 
-static int	DBpatch_5030028(void)
+static int	DBpatch_5030029(void)
 {
 	return DBcreate_index("token", "token_3", "token", 1);
 }
 
-static int	DBpatch_5030029(void)
+static int	DBpatch_5030030(void)
 {
 	return DBcreate_index("token", "token_4", "creator_userid", 0);
 }
 
-static int	DBpatch_5030030(void)
+static int	DBpatch_5030031(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("token", 1, &field);
 }
 
-static int	DBpatch_5030031(void)
+static int	DBpatch_5030032(void)
 {
 	const ZBX_FIELD field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
@@ -452,5 +463,6 @@ DBPATCH_ADD(5030028, 0, 1)
 DBPATCH_ADD(5030029, 0, 1)
 DBPATCH_ADD(5030030, 0, 1)
 DBPATCH_ADD(5030031, 0, 1)
+DBPATCH_ADD(5030032, 0, 1)
 
 DBPATCH_END()
