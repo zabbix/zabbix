@@ -604,6 +604,8 @@ abstract class CItemGeneral extends CApiService {
 			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
 
 			$this->validateItemPreprocessing($fullItem);
+
+			$this->validateValueMap($fullItem, $host['name']);
 		}
 		unset($item);
 
@@ -2588,5 +2590,32 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check that valuemap belong to same host as item.
+	 *
+	 * @param array  $item
+	 * @param string $host_name
+	 */
+	protected function validateValueMap(array $item, string $host_name): void {
+		if ((array_key_exists('templateid', $item) && $item['templateid'] != 0)
+				|| (array_key_exists('flags', $item) && $item['flags'] === ZBX_FLAG_DISCOVERY_CREATED)) {
+			return;
+		}
+
+		if (array_key_exists('valuemapid', $item) && $item['valuemapid']) {
+			$db_valuemap = API::ValueMap()->get([
+				'output' => ['hostid'],
+				'valuemapids' => [$item['valuemapid']],
+				'preservekeys' => true
+			]);
+
+			if ($item['hostid'] !== $db_valuemap[$item['valuemapid']]['hostid']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
+					$item['valuemapid'], $host_name
+				));
+			}
+		}
 	}
 }
