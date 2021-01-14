@@ -469,7 +469,6 @@ class CControllerPopupMassupdateItem extends CController {
 	 * @return CControllerResponse
 	 */
 	protected function form(): CControllerResponse {
-		$url = (new CUrl('items.php'))->setArgument('context', $this->getInput('context'));
 		$data = [
 			'action' => $this->getAction(),
 			'context' => $this->getInput('context'),
@@ -487,7 +486,8 @@ class CControllerPopupMassupdateItem extends CController {
 
 		if ($data['prototype']) {
 			$data += [
-				'location_url' => $url
+				'location_url' => (new CUrl('disc_prototypes.php'))
+					->setArgument('context', $this->getInput('context'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
@@ -496,7 +496,9 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 		else {
 			$data += [
-				'location_url' => $url->getUrl(),
+				'location_url' => (new CUrl('items.php'))
+					->setArgument('context', $this->getInput('context'))
+					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 				'preprocessing_types' => CItem::$supported_preprocessing_types
 			];
@@ -538,8 +540,15 @@ class CControllerPopupMassupdateItem extends CController {
 				'itemids' => $data['ids']
 			]);
 
-			$item_interface_types = array_intersect_key(itemTypeInterface(), array_column($items, 'type', 'type'));
-			$data['multiple_interface_types'] = (count(array_flip($item_interface_types)) > 1);
+			$item_types = array_column($items, 'type', 'type');
+			$item_interface_types = array_intersect_key(
+				itemTypeInterface() + array_fill_keys($item_types, false),
+				$item_types
+			);
+			$initial_type = count($item_interface_types) ? min(array_keys($item_interface_types)) : 0;
+			$data['initial_item_type'] = $initial_type;
+			$data['multiple_interface_types'] = (count(array_unique($item_interface_types)) > 1);
+			$data['type'] = $initial_type;
 		}
 
 		$data['item_types'] = item_type2str();
