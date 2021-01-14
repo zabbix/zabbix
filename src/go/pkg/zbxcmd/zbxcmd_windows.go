@@ -88,8 +88,6 @@ func execute(s string, timeout time.Duration, strict bool) (out string, err erro
 		return
 	}
 
-	var werr error
-
 	werr := cmd.Wait()
 
 	if !t.Stop() {
