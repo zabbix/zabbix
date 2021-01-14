@@ -857,6 +857,9 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 			pname = (NULL == arr_name) ? pname : arr_name;
 			node = NULL;
 
+			if (0 == deep && 0 < idx)
+				break;
+
 			if (ZBX_JSON_TYPE_ARRAY == type)
 			{
 				array_loc = name;
@@ -871,14 +874,14 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 
 			if (0 == deep)
 			{
-				if (0 < idx)
-					break;
-				if (node != NULL)
+				if (NULL != node)
 					xmlDocSetRootElement(doc, node);
+				else
+					break;
 			}
 			else
 			{
-				if (node != NULL && node != parent_node)
+				if (NULL != node && node != parent_node)
 					node = xmlAddChild(parent_node, node);
 			}
 
