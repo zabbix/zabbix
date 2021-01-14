@@ -84,29 +84,34 @@ class C52ImportConverter extends CConverter {
 
 	private static function moveValueMaps(array $hosts, array $valuemaps) {
 		foreach ($hosts as &$host) {
-			if (!array_key_exists('items', $host)) {
-				continue;
-			}
+			$used_valuemaps = [];
 
-			foreach ($host['items'] as &$item) {
-				if (array_key_exists('valuemap', $item)) {
-					$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
+			if (array_key_exists('items', $host)) {
+				foreach ($host['items'] as &$item) {
+					if (array_key_exists('valuemap', $item)
+							&& !in_array($item['valuemap']['name'], $used_valuemaps)) {
+						$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
+						$used_valuemaps[] = $item['valuemap']['name'];
+					}
 				}
+				unset($item);
 			}
-			unset($item);
 
 			if (array_key_exists('discovery_rules', $host)) {
-				foreach ($host['discovery_rules'] as $drule) {
+				foreach ($host['discovery_rules'] as &$drule) {
 					if (!array_key_exists('item_prototypes', $drule)) {
 						continue;
 					}
 
 					foreach ($drule['item_prototypes'] as $item_prototype) {
-						if (array_key_exists('valuemap', $item_prototype)) {
+						if (array_key_exists('valuemap', $item_prototype)
+								&& !in_array($item_prototype['valuemap']['name'], $used_valuemaps)) {
 							$host['valuemaps'][] = $valuemaps[$item_prototype['valuemap']['name']];
+							$used_valuemaps[] = $item_prototype['valuemap']['name'];
 						}
 					}
 				}
+				unset($drule);
 			}
 		}
 		unset($host);
