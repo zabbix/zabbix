@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -310,34 +310,10 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
-	int		errors_from;
-	int		disable_until;
-	int		snmp_errors_from;
-	int		snmp_disable_until;
-	int		ipmi_errors_from;
-	int		ipmi_disable_until;
-	int		jmx_errors_from;
-	int		jmx_disable_until;
-
-	/* item statistics per interface type */
-	int		items_num;
-	int		snmp_items_num;
-	int		ipmi_items_num;
-	int		jmx_items_num;
-
-	/* timestamp of last availability status (available/error) field change on any interface */
-	int		availability_ts;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
-	unsigned char	available;
-	unsigned char	snmp_available;
-	unsigned char	ipmi_available;
-	unsigned char	jmx_available;
 	unsigned char	status;
-
-	/* flag to reset host availability to unknown */
-	unsigned char	reset_availability;
 
 	/* flag to force update for all items */
 	unsigned char	update_items;
@@ -350,10 +326,6 @@ typedef struct
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
-	const char	*error;
-	const char	*snmp_error;
-	const char	*ipmi_error;
-	const char	*jmx_error;
 
 	zbx_vector_ptr_t	interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
@@ -477,9 +449,19 @@ typedef struct
 	const char	*ip;
 	const char	*dns;
 	const char	*port;
+	const char	*error;
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	useip;
+	unsigned char	available;
+	int		disable_until;
+	int		errors_from;
+	/* timestamp of last availability status (available/error) field change on interface */
+	int		availability_ts;
+	/* flag to reset interface availability to unknown */
+	unsigned char	reset_availability;
+	/* item statistics per interface */
+	int		items_num;
 }
 ZBX_DC_INTERFACE;
 

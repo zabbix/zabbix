@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -739,9 +739,9 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 			],
 			'interface' => [
 				'Zabbix agent' => 'available',
-				'SNMP' => 'snmp_available',
-				'IPMI' => 'ipmi_available',
-				'JMX' => 'jmx_available'
+				'SNMP' => 'available',
+				'IPMI' => 'available',
+				'JMX' => 'available'
 			],
 			'status' => [
 				'Unknown' => 0,
@@ -786,14 +786,14 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 			else {
 				// Add interface status flag based on interface type.
 				$db_values = [
-					'Zabbix agent' => CDBHelper::getCount($interfaces_sql.'1 AND hostid IN ('.$hosts_sql.' AND available='.
-							$db_interfaces['status'][$header].')'),
-					'SNMP' => CDBHelper::getCount($interfaces_sql.'2 AND hostid IN ('.$hosts_sql.' AND snmp_available='.
-							$db_interfaces['status'][$header].')'),
-					'IPMI' => CDBHelper::getCount($interfaces_sql.'3 AND hostid IN ('.$hosts_sql.' AND ipmi_available='.
-							$db_interfaces['status'][$header].')'),
-					'JMX' => CDBHelper::getCount($interfaces_sql.'4 AND hostid IN ('.$hosts_sql.' AND jmx_available='.
-							$db_interfaces['status'][$header].')')
+					'Zabbix agent' => CDBHelper::getCount($interfaces_sql.'1 AND available='.
+							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+					'SNMP' => CDBHelper::getCount($interfaces_sql.'2 AND available='.
+							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+					'IPMI' => CDBHelper::getCount($interfaces_sql.'3 AND available='.
+							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+					'JMX' => CDBHelper::getCount($interfaces_sql.'4 AND available='.
+							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')')
 				];
 			}
 		}

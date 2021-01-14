@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2132,7 +2132,7 @@ class testDiscoveryRule extends CAPITest {
 							}
 						}
 
-						// If "lld_macro_pathid" is not given, compare by "itemid" and "lld_macro" (unique combo).
+						// If "lld_macro_pathid" is not given, compare by "itemid" and "lld_macro" (unique combination).
 						if (!array_key_exists('lld_macro_pathid', $lld_macro_path)) {
 							// Keys "lld_macro" and "path" should exist at this point.
 							if ($old_lld_macro_paths) {
@@ -3411,7 +3411,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]).'.'
 			],
 			// LLD rule override operation
 			'Test /1/overrides/1/operations/1/operationobject type is validated.' => [

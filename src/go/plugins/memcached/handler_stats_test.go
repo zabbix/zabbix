@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+
+	"zabbix.com/pkg/zbxerr"
 
 	"github.com/memcachier/mc/v3"
 )
@@ -54,7 +56,7 @@ func TestPlugin_statsHandler(t *testing.T) {
 
 	type args struct {
 		conn   MCClient
-		params []string
+		params map[string]string
 	}
 
 	tests := []struct {
@@ -64,37 +66,19 @@ func TestPlugin_statsHandler(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Should return error if wrong type specified",
-			args: args{
-				conn:   &fakeConn,
-				params: []string{"wrong_type"},
-			},
-			want:    nil,
-			wantErr: zabbixError{"unknown stats type"},
-		},
-		{
 			name: "Should return error if cannot fetch data",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{statsTypeSettings},
+				params: map[string]string{"Type": statsTypeSettings},
 			},
 			want:    nil,
-			wantErr: errorCannotFetchData,
-		},
-		{
-			name: "General stats should be returned if type is not specified",
-			args: args{
-				conn:   &fakeConn,
-				params: []string{},
-			},
-			want:    `{"pid":"1234","version":"1.4.15"}`,
-			wantErr: nil,
+			wantErr: zbxerr.ErrorCannotFetchData,
 		},
 		{
 			name: "Type should be passed to stats command if specified",
 			args: args{
 				conn:   &fakeConn,
-				params: []string{statsTypeSizes},
+				params: map[string]string{"Type": statsTypeSizes},
 			},
 			want:    `{"96":"1"}`,
 			wantErr: nil,

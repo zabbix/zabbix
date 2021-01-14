@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,21 +20,14 @@
 package redis
 
 import (
-	"errors"
 	"time"
+
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/uri"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const pluginName = "Redis"
-
-const (
-	keyInfo    = "redis.info"
-	keyPing    = "redis.ping"
-	keyConfig  = "redis.config"
-	keySlowlog = "redis.slowlog.count"
-)
-
-const commonParamsNum = 2
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
@@ -43,79 +36,24 @@ type Plugin struct {
 	options PluginOptions
 }
 
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn redisClient, params []string) (res interface{}, err error)
-
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
-// whereToConnect builds a URI based on key's parameters and a configuration file.
-func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
-	const user = "zabbix"
-
-	password := ""
-	if len(params) > 1 {
-		password = params[1]
-	}
-
-	uri := defaultURI
-
-	// The first param can be either a URI or a session identifier
-	if len(params) > 0 && len(params[0]) > 0 {
-		if isLooksLikeURI(params[0]) {
-			// Use the URI defined as key's parameter
-			uri = params[0]
-		} else {
-			if _, ok := sessions[params[0]]; !ok {
-				return nil, errorUnknownSession
-			}
-
-			// Use a pre-defined session
-			uri = sessions[params[0]].URI
-			password = sessions[params[0]].Password
-		}
-	}
-
-	if len(password) > 0 {
-		return newURIWithCreds(uri, user, password)
-	}
-
-	return parseURI(uri)
-}
-
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	var (
-		handleMetric  handlerFunc
-		handlerParams []string
-		zbxErr        zabbixError
-	)
-
-	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
+func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	params, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
 	}
 
-	// Extract handler related params
-	if len(params) > commonParamsNum {
-		handlerParams = params[commonParamsNum:]
+	uri, err := uri.NewWithCreds(params["URI"], "zabbix", params["Password"], uriDefaults)
+	if err != nil {
+		return nil, err
 	}
 
-	switch key {
-	case keyInfo:
-		handleMetric = infoHandler // redis.info[[connString][,password][,section]]
-
-	case keyPing:
-		handleMetric = pingHandler // redis.ping[[connString][,password]]
-
-	case keyConfig:
-		handleMetric = configHandler // redis.config[[connString][,password][,pattern]]
-
-	case keySlowlog:
-		handleMetric = slowlogHandler // redis.slowlog[[connString][,password]]
-
-	default:
-		return nil, errorUnsupportedMetric
+	handleMetric := getHandlerFunc(key)
+	if handleMetric == nil {
+		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
 	conn, err := p.connMgr.GetConnection(*uri)
@@ -128,19 +66,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		p.Errf(err.Error())
 
-		return nil, errors.New(formatZabbixError(err.Error()))
+		return nil, err
 	}
 
-	result, err = handleMetric(conn, handlerParams)
+	result, err = handleMetric(conn, params)
 	if err != nil {
 		p.Errf(err.Error())
-
-		if errors.As(err, &zbxErr) {
-			return nil, zbxErr
-		}
 	}
 
-	return result, nil
+	return result, err
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
@@ -156,12 +90,4 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName,
-		keyInfo, "Returns output of INFO command.",
-		keyPing, "Test if connection is alive or not.",
-		keyConfig, "Returns configuration parameters of Redis server.",
-		keySlowlog, "Returns the number of slow log entries since Redis has been started.")
 }

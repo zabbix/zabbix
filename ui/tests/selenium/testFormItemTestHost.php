@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,6 +118,6 @@ class testFormItemTestHost extends testFormItemTest {
 	 * @depends testFormItemTestHost_CheckLLDTestButtonState
 	 */
 	public function testFormItemTestHost_TestLLD($data) {
-		$this->checkTestItem($this->getCreateLink('host_discovery'), $data, self::IS_HOST);
+		$this->checkTestItem($this->getCreateLink('host_discovery'), $data, self::IS_HOST, true);
 	}
 }

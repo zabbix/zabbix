@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,10 @@ package oracle
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"time"
+
+	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 
 	"github.com/omeid/go-yarn"
@@ -30,14 +33,11 @@ import (
 	"zabbix.com/pkg/plugin"
 )
 
-const pluginName = "Oracle"
-
-const hkInterval = 10
-
-// Common params: [connString][,user][,password][,service]
-const commonParamsNum = 4
-
-const sqlExt = ".sql"
+const (
+	pluginName = "Oracle"
+	hkInterval = 10
+	sqlExt     = ".sql"
+)
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
@@ -49,59 +49,24 @@ type Plugin struct {
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
-// whereToConnect builds a URI based on key's parameters and a configuration file.
-func whereToConnect(params []string, options *PluginOptions) (u *URI, err error) {
-	user := ""
-	if len(params) > 1 {
-		user = params[1]
-	}
-
-	password := ""
-	if len(params) > 2 {
-		password = params[2]
-	}
-
-	serviceName := options.ServiceName
-	if len(params) > 3 {
-		serviceName = params[3]
-	}
-
-	uri := options.URI
-
-	// The first param can be either a URI or a session identifier
-	if len(params) > 0 && len(params[0]) > 0 {
-		if isLooksLikeURI(params[0]) {
-			// Use a URI defined as key's parameter
-			uri = params[0]
-		} else {
-			if _, ok := options.Sessions[params[0]]; !ok {
-				return nil, zbxerr.ErrorUnknownSession
-			}
-			// Use a pre-defined session
-			uri = options.Sessions[params[0]].URI
-			user = options.Sessions[params[0]].User
-			password = options.Sessions[params[0]].Password
-			serviceName = options.Sessions[params[0]].ServiceName
-		}
-	}
-
-	return newURIWithCreds(uri, user, password, serviceName)
-}
-
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
-	var (
-		handlerParams []string
-	)
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
+	var extraParams []string
 
-	uri, err := whereToConnect(params, &p.options)
+	params, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
 	}
 
-	// Extract handler related params
-	if len(params) > commonParamsNum {
-		handlerParams = params[commonParamsNum:]
+	service := url.QueryEscape(params["Service"])
+
+	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, params["User"], params["Password"], uriDefaults)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(rawParams) > len(params) {
+		extraParams = rawParams[len(params):]
 	}
 
 	handleMetric := getHandlerFunc(key)
@@ -125,13 +90,13 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 	ctx, cancel := context.WithTimeout(conn.ctx, conn.callTimeout)
 	defer cancel()
 
-	result, err = handleMetric(ctx, conn, handlerParams)
+	result, err = handleMetric(ctx, conn, params, extraParams...)
 
 	if err != nil {
 		p.Errf(err.Error())
 	}
 
-	return
+	return result, err
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.

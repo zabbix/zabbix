@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,9 +304,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'status', 'available', 'proxy_hostid', 'tls_subject',
-					'ipmi_available', 'jmx_available', 'snmp_available', 'maintenance_status', 'maintenance_type',
-					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+				'output' => ['hostid', 'host', 'name', 'status', 'proxy_hostid', 'tls_subject', 'maintenance_status',
+					'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 					'tls_issuer', 'tls_connect'
 				],
 				'hostids' => [$hostid],
@@ -315,7 +314,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			if (!$hosts) {
 				$hosts = API::Template()->get([
-					'output' => ['templateid', 'host', 'name', 'status', 'available', 'jmx_available'],
+					'output' => ['templateid', 'host', 'name', 'status'],
 					'templateids' => [$hostid],
 					'editable' => true
 				]);
@@ -530,17 +529,13 @@ abstract class CControllerPopupItemTest extends CController {
 				$data += [
 					'key' => $input['key'],
 					'host' => [
-						'hostid' => $this->host['hostid'],
-						'available' => $this->host['available'],
-						'jmx_available' => $this->host['jmx_available']
+						'hostid' => $this->host['hostid']
 					]
 				];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data['host'] += [
 						'maintenance_status' => $this->host['maintenance_status'],
-						'ipmi_available' => $this->host['ipmi_available'],
-						'snmp_available' => $this->host['snmp_available'],
 						'maintenance_type' => $this->host['maintenance_type']
 					];
 				}

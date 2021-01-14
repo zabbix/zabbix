@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,15 +25,12 @@ import (
 	"net/http"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"zabbix.com/pkg/uri"
 
 	"zabbix.com/pkg/plugin"
 )
 
 const pluginName = "Ceph"
-
-// Common params: [connString][,user][,apikey]
-const commonParamsNum = 3
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
@@ -45,58 +42,27 @@ type Plugin struct {
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
-// whereToConnect builds a URI based on key's parameters and a configuration file.
-func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
-	user := ""
-	if len(params) > 1 {
-		user = params[1]
-	}
-
-	apikey := ""
-	if len(params) > 2 {
-		apikey = params[2]
-	}
-
-	uri := defaultURI
-
-	// The first param can be either a URI or a session identifier
-	if len(params) > 0 && len(params[0]) > 0 {
-		if isLooksLikeURI(params[0]) {
-			// Use a URI defined as key's parameter
-			uri = params[0]
-		} else {
-			if _, ok := sessions[params[0]]; !ok {
-				return nil, zbxerr.ErrorUnknownSession
-			}
-
-			// Use a pre-defined session
-			uri = sessions[params[0]].URI
-			user = sessions[params[0]].User
-			apikey = sessions[params[0]].APIKey
-		}
-	}
-
-	return newURIWithCreds(uri, user, apikey)
-}
-
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
-	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
+	params, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
-		return nil, zbxerr.New(err.Error())
+		return nil, err
 	}
 
-	if len(params) > commonParamsNum {
-		return nil, zbxerr.ErrorTooManyParameters
+	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["APIKey"], uriDefaults)
+	if err != nil {
+		return nil, err
 	}
 
-	m := metrics[key]
+	meta := metricsMeta[key]
 	responses := make(map[command][]byte)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	resCh := asyncRequest(ctx, cancel, p.client, uri.String(), m)
 
-	for range m.commands {
+	resCh := asyncRequest(ctx, cancel, p.client, uri.String(), meta)
+
+	for range meta.commands {
 		r := <-resCh
 		if r.err != nil {
 			if err == nil {
@@ -119,7 +85,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		return nil, err
 	}
 
-	result, err = m.handle(responses)
+	result, err = meta.handle(responses)
 	if err != nil {
 		p.Errf(err.Error())
 	}

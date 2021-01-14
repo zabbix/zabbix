@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,18 @@ package redis
 import (
 	"reflect"
 	"testing"
+
 	"zabbix.com/pkg/plugin"
 )
+
+func TestPlugin_Start(t *testing.T) {
+	t.Run("Connection manager must be initialized", func(t *testing.T) {
+		impl.Start()
+		if impl.connMgr == nil {
+			t.Error("Connection manager is not initialized")
+		}
+	})
+}
 
 func TestPlugin_Export(t *testing.T) {
 	type args struct {
@@ -42,25 +52,18 @@ func TestPlugin_Export(t *testing.T) {
 		wantErr    bool
 	}{
 		{
-			"Unknown metric",
-			&impl,
-			args{"unknown.metric", nil, nil},
-			nil,
-			true,
+			name:       "Too many parameters",
+			p:          &impl,
+			args:       args{keyPing, []string{"localhost", "sEcReT", "param1", "param2"}, nil},
+			wantResult: nil,
+			wantErr:    true,
 		},
 		{
-			"Too many parameters",
-			&impl,
-			args{keyPing, []string{"param1", "param2"}, nil},
-			nil,
-			true,
-		},
-		{
-			"Should fail if unknown session given",
-			&impl,
-			args{keyPing, []string{"fakeSession"}, nil},
-			nil,
-			true,
+			name:       "Must fail if server is not working",
+			p:          &impl,
+			args:       args{keySlowlog, []string{"tcp://127.0.0.1:1"}, nil},
+			wantResult: nil,
+			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {
@@ -75,4 +78,13 @@ func TestPlugin_Export(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPlugin_Stop(t *testing.T) {
+	t.Run("Connection manager must be deinitialized", func(t *testing.T) {
+		impl.Stop()
+		if impl.connMgr != nil {
+			t.Error("Connection manager is not deinitialized")
+		}
+	})
 }

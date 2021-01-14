@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,10 +304,8 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		$sql=
-			'SELECT hostid,proxy_hostid,status,error,available,errors_from,ipmi_authtype,ipmi_privilege,ipmi_username,'.
-				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
-				'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
-				'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error'.
+			'SELECT hostid,proxy_hostid,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from'.
 			' FROM hosts'.
 			' ORDER BY hostid';
 

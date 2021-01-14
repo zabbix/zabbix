@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,18 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	flags = fcntl(s.socket, F_GETFL);
-	if (0 == (flags & O_NONBLOCK))
-		fcntl(s.socket, F_SETFL, flags | O_NONBLOCK);
+
+	if (-1 == flags)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in getting the status flag: %s",
+				zbx_strerror(errno)));
+	}
+
+	if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in setting the status flag: %s",
+				zbx_strerror(errno)));
+	}
 
 	if (FAIL == telnet_login(s.socket, item->username, item->password, result))
 		goto tcp_close;

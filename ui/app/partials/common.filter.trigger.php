@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,12 @@
  * @var CPartial $this
  */
 
-$this->includeJsFile('common.filter.trigger.js.php');
+$inventory_fields = [];
+foreach (getHostInventories() as $inventory) {
+	$inventory_fields[$inventory['db_field']] = $inventory['title'];
+}
+
+$this->includeJsFile('common.filter.trigger.js.php', ['inventory_fields' => $inventory_fields]);
 
 $filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 	->setProfile($data['profileIdx'])
@@ -109,8 +114,11 @@ $column1
 	->addRow(_('Name'),
 		(new CTextBox('txt_select', $data['filter']['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Minimum severity'),
-		new CComboBox('show_severity', $data['filter']['showSeverity'], null, $severityNames)
+	->addRow(new CLabel(_('Minimum severity'), 'label-show-severity'),
+		(new CSelect('show_severity'))
+			->setFocusableElementId('label-show-severity')
+			->setValue($data['filter']['showSeverity'])
+			->addOptions(CSelect::createOptionsFromArray($severityNames))
 	)
 	->addRow(_('Age less than'), [
 		(new CCheckBox('status_change'))
@@ -129,17 +137,15 @@ if (!$inventoryFilters) {
 		['field' => '', 'value' => '']
 	];
 }
-$inventoryFields = [];
-foreach (getHostInventories() as $inventory) {
-	$inventoryFields[$inventory['db_field']] = $inventory['title'];
-}
 
 $inventoryFilterTable = new CTable();
 $inventoryFilterTable->setId('inventory-filter');
 $i = 0;
 foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow([
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
+		(new CSelect('inventory['.$i.'][field]'))
+			->setValue($field['field'])
+			->addOptions(CSelect::createOptionsFromArray($inventory_fields)),
 		(new CTextBox('inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CCol(
 			(new CButton('inventory['.$i.'][remove]', _('Remove')))

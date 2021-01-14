@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,12 +75,20 @@ insert_javascript_for_visibilitybox();
 				->setAttribute('data-formulaid', '#{formulaId}'),
 			(new CSelect('overrides_filters[#{rowNum}][operator]'))
 				->setValue(CONDITION_OPERATOR_REGEXP)
-				->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-				->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match'))),
-			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
+				->addClass('js-operator')
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_OPERATOR_REGEXP => _('matches'),
+					CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+					CONDITION_OPERATOR_EXISTS => _('exists'),
+					CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+				])),
+			(new CDiv(
+				(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
 					DB::getFieldLength('lld_override_condition', 'value')))
-				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setAttribute('placeholder', _('regular expression')),
+						->addClass('js-value')
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+						->setAttribute('placeholder', _('regular expression'))
+			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
 			(new CCol(
 				(new CButton('overrides_filters#{rowNum}_remove', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -777,6 +785,11 @@ insert_javascript_for_visibilitybox();
 					that.updateExpression();
 				}
 			})
+			.on('afteradd.dynamicRows', (event) => {
+				[...event.currentTarget.querySelectorAll('.js-operator')]
+					.pop()
+					.addEventListener('change', toggleConditionValue);
+			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
 				overlays_stack.end().centerDialog();
@@ -795,6 +808,10 @@ insert_javascript_for_visibilitybox();
 		});
 
 		jQuery('#overrides-evaltype').trigger('change');
+
+		[...document.getElementById('overrides_filters').querySelectorAll('.js-operator')].map((elem) => {
+			elem.addEventListener('change', toggleConditionValue);
+		});
 	};
 
 	/**

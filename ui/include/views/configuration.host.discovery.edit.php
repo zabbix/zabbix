@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->addItem(get_header_host_table('discoveries', $data['hostid'],
+	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
 
@@ -49,28 +49,25 @@ if (!empty($data['templates'])) {
 	$form_list->addRow(_('Parent discovery rules'), $data['templates']);
 }
 
-$form_list->addRow(
-	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-	(new CTextBox('name', $data['name'], $data['limited']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autofocus', 'autofocus')
-);
-
-// Append type to form list.
-if ($data['limited']) {
-	$form->addVar('type', $data['type']);
-	$form_list->addRow((new CLabel(_('Type'), 'typename')),
-		(new CTextBox('typename', item_type2str($data['type']), true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	);
-}
-else {
-	$form_list->addRow((new CLabel(_('Type'), 'type')),
-		(new CComboBox('type', $data['type']))->addItems($data['types'])
-	);
-}
-
 $form_list
+	// Append name field to form list.
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CTextBox('name', $data['name'], $data['limited']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
+	// Append type select to form list.
+	->addRow(
+		new CLabel(_('Type'), 'label-type'),
+		(new CSelect('type'))
+			->setValue($data['type'])
+			->setId('type')
+			->setFocusableElementId('label-type')
+			->addOptions(CSelect::createOptionsFromArray($data['types']))
+			->setReadonly($data['limited'])
+	)
 	// Append key to form list.
 	->addRow(
 		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
@@ -245,16 +242,18 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
 	->addRow(
-		new CLabel(_('Request type'), 'request_method'),
-		[
-			$data['limited'] ? new CVar('request_method', $data['request_method']) : null,
-			(new CComboBox($data['limited'] ? '' : 'request_method', $data['request_method'], null, [
+		new CLabel(_('Request type'), 'label-request-method'),
+		(new CSelect('request_method'))
+			->addOptions(CSelect::createOptionsFromArray([
 				HTTPCHECK_REQUEST_GET => 'GET',
 				HTTPCHECK_REQUEST_POST => 'POST',
 				HTTPCHECK_REQUEST_PUT => 'PUT',
 				HTTPCHECK_REQUEST_HEAD => 'HEAD'
-			]))->setEnabled(!$data['limited'])
-		],
+			]))
+			->setReadonly($data['limited'])
+			->setFocusableElementId('label-request-method')
+			->setId('request_method')
+			->setValue($data['request_method']),
 		'request_method_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
@@ -374,13 +373,13 @@ $form_list
 	)
 	// Append ITEM_TYPE_HTTPAGENT HTTP authentication to form list.
 	->addRow(
-		new CLabel(_('HTTP authentication'), 'http_authtype'),
-		[
-			$data['limited'] ? new CVar('http_authtype', $data['http_authtype']) : null,
-			(new CComboBox($data['limited'] ? '' : 'http_authtype', $data['http_authtype'], null,
-				httptest_authentications()
-			))->setEnabled(!$data['limited'])
-		],
+		new CLabel(_('HTTP authentication'), 'label-http-authtype'),
+		(new CSelect('http_authtype'))
+			->setValue($data['http_authtype'])
+			->setId('http_authtype')
+			->setFocusableElementId('label-http-authtype')
+			->addOptions(CSelect::createOptionsFromArray(httptest_authentications()))
+			->setReadonly($data['limited']),
 		'http_authtype_row'
 	)
 	// Append ITEM_TYPE_HTTPAGENT User name to form list.
@@ -515,11 +514,13 @@ $form_list
 		'row_ipmi_sensor'
 	)
 	// Append authentication method to form list.
-	->addRow(_('Authentication method'),
-		new CComboBox('authtype', $data['authtype'], null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		]),
+	->addRow(new CLabel(_('Authentication method'), 'label-authtype'),
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setFocusableElementId('label-authtype')
+			->setValue($data['authtype'])
+			->addOption(new CSelectOption(ITEM_AUTHTYPE_PASSWORD, _('Password')))
+			->addOption(new CSelectOption(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'))),
 		'row_authtype'
 	)
 	->addRow((new CLabel(_('JMX endpoint'), 'jmx_endpoint'))->setAsteriskMark(),
@@ -656,14 +657,18 @@ $form_list
 $conditionFormList = new CFormList();
 
 // type of calculation
-$conditionFormList->addRow(_('Type of calculation'),
+$conditionFormList->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'),
 	[
-		new CComboBox('evaltype', $data['evaltype'], null, [
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or'),
-			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-		]),
+		(new CSelect('evaltype'))
+			->setFocusableElementId('label-evaltype')
+			->setId('evaltype')
+			->setValue($data['evaltype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+				CONDITION_EVAL_TYPE_AND => _('And'),
+				CONDITION_EVAL_TYPE_OR => _('Or'),
+				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+			])),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan(''))
 			->setId('expression'),
@@ -678,7 +683,7 @@ $conditionFormList->addRow(_('Type of calculation'),
 // macros
 $conditionTable = (new CTable())
 	->setId('conditions')
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
 $conditions = $data['conditions'];
@@ -694,15 +699,17 @@ else {
 	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
 }
 
-$operators = [
+$operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
-	CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
-];
+	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+	CONDITION_OPERATOR_EXISTS => _('exists'),
+	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+]);
 
 // fields
 foreach ($conditions as $i => $condition) {
 	// formula id
-	$formulaId = [
+	$formulaid = [
 		new CSpan($condition['formulaid']),
 		new CVar('conditions['.$i.'][formulaid]', $condition['formulaid'])
 	];
@@ -715,23 +722,37 @@ foreach ($conditions as $i => $condition) {
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $condition['formulaid']);
 
+	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
+		->setValue($condition['operator'])
+		->addClass('js-operator')
+		->addOptions($operators);
+
 	// value
 	$value = (new CTextBox('conditions['.$i.'][value]', $condition['value'], false, 255))
+		->addClass('js-value')
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
+	if ($condition['operator'] == CONDITION_OPERATOR_EXISTS
+			|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+		$value->addClass(ZBX_STYLE_DISPLAY_NONE);
+	}
+
 	// delete button
-	$deleteButtonCell = [
+	$delete_button_cell = [
 		(new CButton('conditions_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	];
 
-	$row = [$formulaId, $macro,
-		(new CComboBox('conditions['.$i.'][operator]', $condition['operator'], null, $operators))->addClass('operator'),
-		$value,
-		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
+	$row = [
+		$formulaid,
+		$macro,
+		$operator_select,
+		(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	];
+
 	$conditionTable->addRow($row, 'form_row');
 }
 

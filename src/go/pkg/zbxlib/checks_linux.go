@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,8 +74,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.NET_DNS)
 	case "net.dns.record":
 		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
-	case "proc.mem":
-		cfunc = unsafe.Pointer(C.PROC_MEM)
 	case "proc.num":
 		cfunc = unsafe.Pointer(C.PROC_NUM)
 	case "system.boottime":

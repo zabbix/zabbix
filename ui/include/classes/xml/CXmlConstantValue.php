@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -278,6 +278,8 @@ class CXmlConstantValue {
 
 	const CONDITION_MATCHES_REGEX = CONDITION_OPERATOR_REGEXP; // Duplicate.
 	const CONDITION_NOT_MATCHES_REGEX = CONDITION_OPERATOR_NOT_REGEXP; // Duplicate.
+	const CONDITION_EXISTS = CONDITION_OPERATOR_EXISTS;
+	const CONDITION_NOT_EXISTS = CONDITION_OPERATOR_NOT_EXISTS;
 
 	const OUTPUT_FORMAT_RAW = HTTPCHECK_STORE_RAW;
 	const OUTPUT_FORMAT_JSON = HTTPCHECK_STORE_JSON;

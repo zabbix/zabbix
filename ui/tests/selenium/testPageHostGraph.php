@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,9 +57,7 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
-		foreach (['ZBX', 'SNMP', 'JMX', 'IPMI'] as $text) {
-			$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="'.$text.'"]');
-		}
+		$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="ZBX"]');
 
 		// Check host breadcrumbs text and url.
 		$filter->getField('Hosts')->fill($host_name);
@@ -88,7 +86,8 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		// Check table headers on page.
-		$get_headers = $this->webDriver->findElements(WebDriverBy::xpath('//thead/tr/th[not(@class)]'));
+		$xpath = '//form[@name="graphForm"]//thead/tr/th[not(@class)]';
+		$get_headers = $this->webDriver->findElements(WebDriverBy::xpath($xpath));
 		foreach ($get_headers as $row) {
 			$table_headers[] = $row->getText();
 		}

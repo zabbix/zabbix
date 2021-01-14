@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,8 +141,18 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 {
 	int	fd[2], stdout_orig, stderr_orig;
+	DIR	*test_dir;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __func__, command);
+
+	if (NULL != dir)
+	{
+		if (NULL == (test_dir = opendir(dir)))
+			return -1;
+
+		if (-1 == closedir(test_dir))
+			return -1;
+	}
 
 	if (-1 == pipe(fd))
 		return -1;
@@ -192,8 +202,17 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 		exit(EXIT_FAILURE);
 	}
 
-	fcntl(stdout_orig, F_SETFD, FD_CLOEXEC);
-	fcntl(stderr_orig, F_SETFD, FD_CLOEXEC);
+	if (-1 == fcntl(stdout_orig, F_SETFD, FD_CLOEXEC))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): failed to set the FD_CLOEXEC file descriptor flag on stdout: %s",
+				__func__, zbx_strerror(errno));
+	}
+
+	if (-1 == fcntl(stderr_orig, F_SETFD, FD_CLOEXEC))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): failed to set the FD_CLOEXEC file descriptor flag on stderr: %s",
+				__func__, zbx_strerror(errno));
+	}
 
 	/* redirect output right before script execution after all logging is done */
 

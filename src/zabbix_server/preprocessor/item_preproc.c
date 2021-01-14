@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,8 +188,9 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
  * Return value: FAIL - for further error handling                            *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_notsupport(void)
+static int	item_preproc_validate_notsupport(char **errmsg)
 {
+	*errmsg = zbx_dsprintf(*errmsg, "item is not supported");
 	return FAIL;
 }
 
@@ -2117,7 +2118,7 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			ret = item_preproc_str_replace(value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			ret = item_preproc_validate_notsupport();
+			ret = item_preproc_validate_notsupport(error);
 			break;
 		case ZBX_PREPROC_XML_TO_JSON:
 			ret = item_preproc_xml_to_json(value, error);
