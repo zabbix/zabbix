@@ -1,0 +1,130 @@
+---
+test case: 'Test 1: simple xml'
+in:
+  xml: '<a>b</a>'
+out:
+  return: SUCCEED
+  json: '{"a":"b"}'
+---
+test case: 'Test 2: xml with repeating and not repeating tags'
+in:
+  xml: '<xml><foo>BAR</foo><foo attr="eee">ATR</foo><foo><baz>BAZ</baz></foo><zoo>XUQ</zoo><a>A</a><foo>QUX</foo><a>B</a><a>A</a></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"foo":["BAR",{"@attr":"eee","#text":"ATR"},{"baz":"BAZ"},"QUX"],"zoo":"XUQ","a":["A","B","A"]}}'
+---
+test case: 'Test 3: cdata'
+in:
+  xml: '<xml><![CDATA[<tag> value </tag>]]></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":"<tag> value </tag>"}'
+---
+test case: 'Test 4: wrong xml (empty)'
+in:
+  xml: ''
+out:
+  return: FAIL
+  json: ''
+---
+test case: 'Test 5: wrong xml (several roots)'
+in:
+  xml: '<xml1>xml1</xml1><xml2>xml2</xml2>'
+out:
+  return: FAIL
+  json: ''
+---
+test case: 'Test 6: special symbols'
+in:
+  xml: '<xml attr="atr">10 &gt; 9 &amp; 8 &lt; 9</xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"@attr":"atr","#text":"10 > 9 & 8 < 9"}}'
+---
+test case: 'Test 7: wrong xml (empty attribute)'
+in:
+  xml: '<xml attr>xml</xml>'
+out:
+  return: FAIL
+  json: ''
+---
+test case: 'Test 8: hierarchy of objects'
+in:
+  xml: '<c><a>b</a></c>'
+out:
+  return: SUCCEED
+  json: '{"c":{"a":"b"}}'
+---
+test case: 'Test 9: multiline xml'
+in:
+  xml: '<c>
+<a>b
+</a></c>'
+out:
+  return: SUCCEED
+  json: '{"c":{"a":"b
+"}}'
+---
+test case: 'Test 10: self-closing tag'
+in:
+  xml: '<a/>'
+out:
+  return: SUCCEED
+  json: '{"a":null}'
+---
+test case: 'Test 11: hierarchy with null'
+in:
+  xml: '<c><a/></c>'
+out:
+  return: SUCCEED
+  json: '{"c":{"a":null}}'
+---
+test case: 'Test 12: attribute'
+in:
+  xml: '<c a="b"/>'
+out:
+  return: SUCCEED
+  json: '{"c":{"@a":"b"}}'
+---
+test case: 'Test 13: attribute with text'
+in:
+  xml: '<c a="b">d</c>'
+out:
+  return: SUCCEED
+  json: '{"c":{"@a":"b","#text":"d"}}'
+---
+test case: 'Test 14: deep hierarchy'
+in:
+  xml: '<x1><x2><x3><x4><x5><x6><x7><x8><x9><x10>end</x10></x9></x8></x7></x6></x5></x4></x3></x2></x1>'
+out:
+  return: SUCCEED
+  json: '{"x1":{"x2":{"x3":{"x4":{"x5":{"x6":{"x7":{"x8":{"x9":{"x10":"end"}}}}}}}}}}'
+---
+test case: 'Test 15: array'
+in:
+  xml: '<xml><foo>BAR</foo><foo>BAZ</foo><foo>QUX</foo></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"foo":["BAR","BAZ","QUX"]}}'
+---
+test case: 'Test 16: tag name "text"'
+in:
+  xml: '<xml><text>BAR</text></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"text":"BAR"}}'
+---
+test case: 'Test 17: tag name "cdata"'
+in:
+  xml: '<xml><CDATA>BAR</CDATA><cdata>BAZ</cdata></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"CDATA":"BAR","cdata":"BAZ"}}'
+---
+test case: 'Test 18: comment'
+in:
+  xml: '<xml foo="FOO"><!--COMMENT HERE!!!! PLEASE!!! SEE ME!!!--><bar><baz>BAZ</baz></bar></xml>'
+out:
+  return: SUCCEED
+  json: '{"xml":{"@foo":"FOO","bar":{"baz":"BAZ"}}}'
+...

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,6 +254,8 @@ class CXmlConstantName {
 	const IN_RANGE = 'IN_RANGE';
 	const MATCHES_REGEX = 'MATCHES_REGEX';
 	const NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX';
+	const EXISTS = 'EXISTS';
+	const NOT_EXISTS = 'NOT_EXISTS';
 	const CHECK_JSON_ERROR = 'CHECK_JSON_ERROR';
 	const CHECK_XML_ERROR = 'CHECK_XML_ERROR';
 	const CHECK_REGEX_ERROR = 'CHECK_REGEX_ERROR';
@@ -265,6 +267,7 @@ class CXmlConstantName {
 	const PROMETHEUS_TO_JSON = 'PROMETHEUS_TO_JSON';
 	const CSV_TO_JSON = 'CSV_TO_JSON';
 	const STR_REPLACE = 'STR_REPLACE';
+	const XML_TO_JSON = 'XML_TO_JSON';
 
 	const AND_OR = 'AND_OR';
 	const XML_AND = 'AND';

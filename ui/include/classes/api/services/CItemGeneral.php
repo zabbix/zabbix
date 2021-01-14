@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1244,7 +1244,7 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => $this::$supported_preprocessing_types]);
+			$type_validator = new CLimitedSetValidator(['values' => static::SUPPORTED_PREPROCESSING_TYPES]);
 
 			$error_handler_validator = new CLimitedSetValidator([
 				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
@@ -1446,6 +1446,7 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_DELTA_VALUE:
 					case ZBX_PREPROC_DELTA_SPEED:
+					case ZBX_PREPROC_XML_TO_JSON:
 						// Check if 'params' is empty, because it must be empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1457,12 +1458,15 @@ abstract class CItemGeneral extends CApiService {
 							);
 						}
 
-						// Check if one of the deltas (Delta per second or Delta value) already exists.
-						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
-						}
-						else {
-							$delta = true;
+						if ($preprocessing['type'] == ZBX_PREPROC_DELTA_VALUE
+								|| $preprocessing['type'] == ZBX_PREPROC_DELTA_SPEED) {
+							// Check if one of the deltas (Delta per second or Delta value) already exists.
+							if ($delta) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
+							}
+							else {
+								$delta = true;
+							}
 						}
 						break;
 
@@ -1746,37 +1750,98 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item pre-processing data in DB. Delete old records and create new ones.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
+	 * @param array  $items
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['preprocessing']
+	 * @param int    $items[]['preprocessing'][]['type']
+	 * @param string $items[]['preprocessing'][]['params']
+	 * @param int    $items[]['preprocessing'][]['error_handler']
+	 * @param string $items[]['preprocessing'][]['error_handler_params']
 	 */
 	protected function updateItemPreprocessing(array $items) {
-		$item_preproc = [];
-		$item_preprocids = [];
+		$item_preprocs = [];
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
-				$item_preprocids[] = $item['itemid'];
+				$item_preprocs[$item['itemid']] = [];
 				$step = 1;
 
-				foreach ($item['preprocessing'] as $preprocessing) {
-					$item_preproc[] = [
-						'itemid' => $item['itemid'],
-						'step' => $preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++,
-						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params'],
-						'error_handler' => $preprocessing['error_handler'],
-						'error_handler_params' => $preprocessing['error_handler_params']
+				foreach ($item['preprocessing'] as $item_preproc) {
+					$curr_step = $item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 0 : $step++;
+					$item_preprocs[$item['itemid']][$curr_step] = [
+						'type' => $item_preproc['type'],
+						'params' => $item_preproc['params'],
+						'error_handler' => $item_preproc['error_handler'],
+						'error_handler_params' => $item_preproc['error_handler_params']
 					];
 				}
 			}
 		}
 
-		if ($item_preprocids) {
-			DB::delete('item_preproc', ['itemid' => $item_preprocids]);
+		if (!$item_preprocs) {
+			return;
 		}
 
-		if ($item_preproc) {
-			DB::insertBatch('item_preproc', $item_preproc);
+		$ins_item_preprocs = [];
+		$upd_item_preprocs = [];
+		$del_item_preprocids = [];
+
+		$options = [
+			'output' => ['item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'],
+			'filter' => ['itemid' => array_keys($item_preprocs)]
+		];
+		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+
+		while ($db_item_preproc = DBfetch($db_item_preprocs)) {
+			if (array_key_exists($db_item_preproc['step'], $item_preprocs[$db_item_preproc['itemid']])) {
+				$item_preproc = $item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']];
+				$upd_item_preproc = [];
+
+				if ($item_preproc['type'] != $db_item_preproc['type']) {
+					$upd_item_preproc['type'] = $item_preproc['type'];
+				}
+				if ($item_preproc['params'] !== $db_item_preproc['params']) {
+					$upd_item_preproc['params'] = $item_preproc['params'];
+				}
+				if ($item_preproc['error_handler'] != $db_item_preproc['error_handler']) {
+					$upd_item_preproc['error_handler'] = $item_preproc['error_handler'];
+				}
+				if ($item_preproc['error_handler_params'] !== $db_item_preproc['error_handler_params']) {
+					$upd_item_preproc['error_handler_params'] = $item_preproc['error_handler_params'];
+				}
+
+				if ($upd_item_preproc) {
+					$upd_item_preprocs[] = [
+						'values' => $upd_item_preproc,
+						'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
+					];
+				}
+				unset($item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']]);
+			}
+			else {
+				$del_item_preprocids[] = $db_item_preproc['item_preprocid'];
+			}
+		}
+
+		foreach ($item_preprocs as $itemid => $preprocs) {
+			foreach ($preprocs as $step => $preproc) {
+				$ins_item_preprocs[] = [
+					'itemid' => $itemid,
+					'step' => $step
+				] + $preproc;
+			}
+		}
+
+		if ($del_item_preprocids) {
+			DB::delete('item_preproc', ['item_preprocid' => $del_item_preprocids]);
+		}
+
+		if ($upd_item_preprocs) {
+			DB::update('item_preproc', $upd_item_preprocs);
+		}
+
+		if ($ins_item_preprocs) {
+			DB::insertBatch('item_preproc', $ins_item_preprocs);
 		}
 	}
 

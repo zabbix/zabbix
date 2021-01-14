@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,14 +78,11 @@ static void	dump_item(const DC_ITEM *item)
 	zabbix_log(LOG_LEVEL_TRACE, "  host:'%s'", item->host.host);
 	zabbix_log(LOG_LEVEL_TRACE, "  maintenance_status: %u", item->host.maintenance_status);
 	zabbix_log(LOG_LEVEL_TRACE, "  maintenance_type: %u", item->host.maintenance_type);
-	zabbix_log(LOG_LEVEL_TRACE, "  snmp_available: %u", item->host.snmp_available);
-	zabbix_log(LOG_LEVEL_TRACE, "  available: %u", item->host.available);
-	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_available: %u", item->host.ipmi_available);
+	zabbix_log(LOG_LEVEL_TRACE, "  available: %u", item->interface.available);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_authtype: %d", item->host.ipmi_authtype);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_privilege: %u", item->host.ipmi_privilege);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_username:'%s'", item->host.ipmi_username);
 	zabbix_log(LOG_LEVEL_TRACE, "  ipmi_password:'%s'", item->host.ipmi_password);
-	zabbix_log(LOG_LEVEL_TRACE, "  jmx_available: %u", item->host.jmx_available);
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_connect: %u", item->host.tls_connect);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zabbix_log(LOG_LEVEL_TRACE, "  tls_issuer:'%s'", item->host.tls_issuer);
@@ -228,6 +225,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	db_string_from_json(&jp_interface, ZBX_PROTO_TAG_PORT, table_interface, "port", item.interface.port_orig,
 			sizeof(item.interface.port_orig));
 
+	db_uchar_from_json(&jp_interface, ZBX_PROTO_TAG_AVAILABLE, table_interface, "available",
+			&item.interface.available);
+
 	if (FAIL == zbx_json_brackets_by_name(&jp_interface, ZBX_PROTO_TAG_DETAILS, &jp_details))
 		zbx_json_open("{}", &jp_details);
 
@@ -272,11 +272,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			&item.host.maintenance_status);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
 			&item.host.maintenance_type);
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_AVAILABLE, table_hosts, "available", &item.host.available);
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_SNMP_AVAILABLE, table_hosts, "snmp_available",
-			&item.host.snmp_available);
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_AVAILABLE, table_hosts, "ipmi_available",
-			&item.host.ipmi_available);
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
 		item.host.ipmi_authtype = atoi(tmp);
 	else
@@ -287,8 +282,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			item.host.ipmi_username, sizeof(item.host.ipmi_username));
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PASSWORD, table_hosts, "ipmi_password",
 			item.host.ipmi_password, sizeof(item.host.ipmi_password));
-	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_JMX_AVAILABLE, table_hosts, "jmx_available",
-			&item.host.jmx_available);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_TLS_CONNECT, table_hosts, "tls_connect", &item.host.tls_connect);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_TLS_ISSUER, table_hosts, "tls_issuer", item.host.tls_issuer,

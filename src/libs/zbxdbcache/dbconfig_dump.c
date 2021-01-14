@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,26 +106,9 @@ static void	DCdump_hosts(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:" ZBX_FS_UI64, host->proxy_hostid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  zabbix:[available:%u, errors_from:%d disable_until:%d error:'%s']",
-				host->available, host->errors_from, host->disable_until, host->error);
-		zabbix_log(LOG_LEVEL_TRACE, "  snmp:[available:%u, errors_from:%d disable_until:%d error:'%s']",
-				host->snmp_available, host->snmp_errors_from, host->snmp_disable_until,
-				host->snmp_error);
-		zabbix_log(LOG_LEVEL_TRACE, "  ipmi:[available:%u, errors_from:%d disable_until:%d error:'%s']",
-				host->ipmi_available, host->ipmi_errors_from, host->ipmi_disable_until,
-				host->ipmi_error);
-		zabbix_log(LOG_LEVEL_TRACE, "  jmx:[available:%u, errors_from:%d disable_until:%d error:'%s']",
-				host->jmx_available, host->jmx_errors_from, host->jmx_disable_until, host->jmx_error);
-
-		/* timestamp of last availability status (available/error) field change on any interface */
-		zabbix_log(LOG_LEVEL_TRACE, "  availability_ts:%d", host->availability_ts);
-
 		zabbix_log(LOG_LEVEL_TRACE, "  maintenanceid:" ZBX_FS_UI64 " maintenance_status:%u maintenance_type:%u"
 				" maintenance_from:%d", host->maintenanceid, host->maintenance_status,
 				host->maintenance_type, host->maintenance_from);
-
-		zabbix_log(LOG_LEVEL_TRACE, "  number of items: zabbix:%d snmp:%d ipmi:%d jmx:%d", host->items_num,
-				host->snmp_items_num, host->ipmi_items_num, host->jmx_items_num);
 
 		/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 		zabbix_log(LOG_LEVEL_TRACE, "  tls:[connect:%u accept:%u]", host->tls_connect, host->tls_accept);
@@ -424,9 +407,14 @@ static void	DCdump_interfaces(void)
 		interface = (ZBX_DC_INTERFACE *)index.values[i];
 
 		zbx_snprintf_alloc(&if_msg, &alloc, &offset, "interfaceid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64
-				" ip:'%s' dns:'%s' port:'%s' type:%u main:%u useip:%u",
+				" ip:'%s' dns:'%s' port:'%s' type:%u main:%u useip:%u"
+				" available:%u errors_from:%d disable_until:%d error:'%s' availability_ts:%d"
+				" reset_availability:%d items_num %d",
 				interface->interfaceid, interface->hostid, interface->ip, interface->dns,
-				interface->port, interface->type, interface->main, interface->useip);
+				interface->port, interface->type, interface->main, interface->useip,
+				interface->available, interface->errors_from, interface->disable_until,
+				interface->error, interface->availability_ts, interface->reset_availability,
+				interface->items_num);
 
 		if (INTERFACE_TYPE_SNMP == interface->type &&
 				NULL != (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,

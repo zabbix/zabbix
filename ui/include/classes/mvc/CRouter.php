@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -293,7 +293,6 @@ class CRouter {
 		'chart5.php'					=> ['CLegacyAction', null, null],
 		'chart6.php'					=> ['CLegacyAction', null, null],
 		'chart7.php'					=> ['CLegacyAction', null, null],
-		'conf.import.php'				=> ['CLegacyAction', null, null],
 		'disc_prototypes.php'			=> ['CLegacyAction', null, null],
 		'graphs.php'					=> ['CLegacyAction', null, null],
 		'history.php'					=> ['CLegacyAction', null, null],
@@ -314,12 +313,10 @@ class CRouter {
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'latest.php'					=> ['CLegacyAction', null, null],
 		'maintenance.php'				=> ['CLegacyAction', null, null],
-		'map.import.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'overview.php'					=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],
-		'screen.import.php'				=> ['CLegacyAction', null, null],
 		'screenconf.php'				=> ['CLegacyAction', null, null],
 		'screenedit.php'				=> ['CLegacyAction', null, null],
 		'screens.php'					=> ['CLegacyAction', null, null],

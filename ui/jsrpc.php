@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -633,6 +633,9 @@ if ($requestType == PAGE_TYPE_JSON) {
 			'result' => $result,
 			'id' => $data['id']
 		]);
+
+		session_write_close();
+		exit();
 	}
 }
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
@@ -640,6 +643,9 @@ elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
 		'jsonrpc' => '2.0',
 		'result' => $result
 	]);
+
+	session_write_close();
+	exit();
 }
 elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
 	echo $result;

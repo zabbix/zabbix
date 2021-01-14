@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.v2'
 					],
-					'host_interface' => '127.0.0.2 : 161',
+					'host_interface' => '127.0.0.2:161',
 					'snmp_fields' => [
 						'version' => 'SNMPv2',
 						'comunity' => 'public'
@@ -255,7 +255,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.v1'
 					],
-					'host_interface' => '127.0.0.5 : 161',
+					'host_interface' => '127.0.0.5:161',
 					'snmp_fields' => [
 						'version' => 'SNMPv1',
 						'comunity' => 'public'
@@ -269,7 +269,7 @@ class testFormItemTest extends CWebTest {
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.v3'
 					],
-					'host_interface' => '127.0.0.6 : 161',
+					'host_interface' => '127.0.0.6:161',
 					'snmp_fields' => [
 						'version' => 'SNMPv3',
 						'context' => 'test_context',
@@ -669,7 +669,8 @@ class testFormItemTest extends CWebTest {
 				$item_form->getField('Host interface')->fill($data['host_interface']);
 			}
 			// Get ip and port separately.
-			$host_interface = explode(' : ', $item_form->getField('Host interface')->getText(), 2);
+			$host_interface = explode(':', $item_form->getField('Host interface')
+				->getText(), 2);
 		}
 
 		if (CTestArrayHelper::get($data, 'preprocessing')){

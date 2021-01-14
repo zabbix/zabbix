@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,6 +82,10 @@ typedef struct
 	unsigned char	useip;
 	unsigned char	type;
 	unsigned char	main;
+	unsigned char	available;
+	int		disable_until;
+	char		error[INTERFACE_ERROR_LEN_MAX];
+	int		errors_from;
 }
 DC_INTERFACE;
 
@@ -109,22 +113,10 @@ typedef struct
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
-	int		errors_from;
-	unsigned char	available;
-	int		disable_until;
-	int		snmp_errors_from;
-	unsigned char	snmp_available;
-	int		snmp_disable_until;
-	int		ipmi_errors_from;
-	unsigned char	ipmi_available;
-	int		ipmi_disable_until;
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
-	int		jmx_errors_from;
-	unsigned char	jmx_available;
-	int		jmx_disable_until;
 	char		inventory_mode;
 	unsigned char	status;
 	unsigned char	tls_connect;
@@ -135,10 +127,6 @@ typedef struct
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
-	char		error[HOST_ERROR_LEN_MAX];
-	char		snmp_error[HOST_ERROR_LEN_MAX];
-	char		ipmi_error[HOST_ERROR_LEN_MAX];
-	char		jmx_error[HOST_ERROR_LEN_MAX];
 }
 DC_HOST;
 
@@ -759,11 +747,11 @@ void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *
 char	*DCexpression_expand_user_macros(const char *expression);
 char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params);
 
-int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
-		zbx_agent_availability_t *in, zbx_agent_availability_t *out);
+int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
+		zbx_agent_availability_t *out);
 
-int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
-		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg);
+int	DCinterface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
+		zbx_agent_availability_t *out, const char *error_msg);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -802,20 +790,20 @@ unsigned int	DCget_internal_action_count(void);
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
-int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
+int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
-int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
-void	DCupdate_hosts_availability(void);
+int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
+void	DCupdate_interfaces_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
-int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
-void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids);
+int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
+void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
 
-void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
-void	zbx_host_availability_clean(zbx_host_availability_t *ha);
-void	zbx_host_availability_free(zbx_host_availability_t *availability);
-int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
+void	zbx_interface_availability_init(zbx_interface_availability_t *availability, zbx_uint64_t interfaceid);
+void	zbx_interface_availability_clean(zbx_interface_availability_t *ia);
+void	zbx_interface_availability_free(zbx_interface_availability_t *availability);
+int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia);
 
 void	zbx_set_availability_diff_ts(int ts);
 
@@ -1015,5 +1003,7 @@ void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 
 int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
+
+void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
 
 #endif

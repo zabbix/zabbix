@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -580,7 +580,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'multiple_interface_types' => false,
 				'initial_item_type' => null,
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
-				'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
+				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES,
 				'displayApplications' => true,
 				'display_interfaces' => true,
 				'displayMasteritems' => true,

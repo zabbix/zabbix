@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -225,14 +225,6 @@ foreach ($data['hosts'] as $host) {
 				$interface = reset($host_interfaces);
 				break;
 			}
-		}
-	}
-
-	$host_interface = '';
-	if ($interface !== null) {
-		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		if (array_key_exists('port', $interface) && $interface['port'] !== '') {
-			$host_interface .= NAME_DELIMITER.$interface['port'];
 		}
 	}
 
@@ -474,7 +466,7 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		$host_interface,
+		getHostInterface($interface),
 		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY)
 			? ($host['proxy_hostid'] != 0)
@@ -483,7 +475,7 @@ foreach ($data['hosts'] as $host) {
 			: null,
 		$hostTemplates,
 		$status,
-		getHostAvailabilityTable($host),
+		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]

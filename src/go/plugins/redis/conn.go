@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,13 @@ package redis
 
 import (
 	"context"
-	"github.com/mediocregopher/radix/v3"
 	"sync"
 	"time"
+
+	"github.com/mediocregopher/radix/v3"
 	"zabbix.com/pkg/log"
+	"zabbix.com/pkg/uri"
+	"zabbix.com/pkg/zbxerr"
 )
 
 const hkInterval = 10
@@ -48,11 +51,11 @@ func (r *RedisConn) updateAccessTime() {
 	r.lastTimeAccess = time.Now()
 }
 
-// Thread-safe structure for manage connections.
+// ConnManager is thread-safe structure for manage connections.
 type ConnManager struct {
 	sync.Mutex
 	connMutex   sync.Mutex
-	connections map[URI]*RedisConn
+	connections map[uri.URI]*RedisConn
 	keepAlive   time.Duration
 	timeout     time.Duration
 	Destroy     context.CancelFunc
@@ -63,7 +66,7 @@ func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections: make(map[URI]*RedisConn),
+		connections: make(map[uri.URI]*RedisConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
@@ -121,8 +124,8 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 	}
 }
 
-// create creates a new connection with a given URI and password.
-func (c *ConnManager) create(uri URI) (*RedisConn, error) {
+// create creates a new connection with given credentials.
+func (c *ConnManager) create(uri uri.URI) (*RedisConn, error) {
 	const clientName = "zbx_monitor"
 
 	const poolSize = 1
@@ -165,7 +168,7 @@ func (c *ConnManager) create(uri URI) (*RedisConn, error) {
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri URI) *RedisConn {
+func (c *ConnManager) get(uri uri.URI) *RedisConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -178,7 +181,7 @@ func (c *ConnManager) get(uri URI) *RedisConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri URI) (conn *RedisConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI) (conn *RedisConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -186,6 +189,10 @@ func (c *ConnManager) GetConnection(uri URI) (conn *RedisConn, err error) {
 
 	if conn == nil {
 		conn, err = c.create(uri)
+	}
+
+	if err != nil {
+		err = zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
 
 	return conn, err

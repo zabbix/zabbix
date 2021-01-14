@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@
 define('ZABBIX_VERSION',		'5.4.0alpha1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030003);
+define('ZABBIX_DB_VERSION',		5030025);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2020');
+define('ZABBIX_COPYRIGHT_TO',	'2021');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -292,6 +292,8 @@ define('CONDITION_OPERATOR_REGEXP',		8);
 define('CONDITION_OPERATOR_NOT_REGEXP',	9);
 define('CONDITION_OPERATOR_YES',		10);
 define('CONDITION_OPERATOR_NO',			11);
+define('CONDITION_OPERATOR_EXISTS',		12);
+define('CONDITION_OPERATOR_NOT_EXISTS',	13);
 
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
@@ -361,9 +363,10 @@ define('MAINTENANCE_STATUS_EXPIRED',	2);
 define('MODULE_STATUS_DISABLED', 0);
 define('MODULE_STATUS_ENABLED',	1);
 
-define('HOST_AVAILABLE_UNKNOWN',	0);
-define('HOST_AVAILABLE_TRUE',		1);
-define('HOST_AVAILABLE_FALSE',		2);
+define('INTERFACE_AVAILABLE_UNKNOWN',	0);
+define('INTERFACE_AVAILABLE_TRUE',		1);
+define('INTERFACE_AVAILABLE_FALSE',		2);
+define('INTERFACE_AVAILABLE_MIXED',		3);
 
 // Logo.
 define('LOGO_TYPE_NORMAL',			0);
@@ -589,6 +592,7 @@ define('ZBX_PREPROC_PROMETHEUS_TO_JSON',		23);
 define('ZBX_PREPROC_CSV_TO_JSON',				24);
 define('ZBX_PREPROC_STR_REPLACE',				25);
 define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
+define('ZBX_PREPROC_XML_TO_JSON',				27);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -377,6 +377,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_NOT_REGEXP		9
 #define CONDITION_OPERATOR_YES			10
 #define CONDITION_OPERATOR_NO			11
+#define CONDITION_OPERATOR_EXIST		12
+#define CONDITION_OPERATOR_NOT_EXIST		13
 
 /* maintenance tag operators */
 #define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
@@ -638,10 +640,10 @@ zbx_prototype_discover_t;
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
-/* host availability */
-#define HOST_AVAILABLE_UNKNOWN		0
-#define HOST_AVAILABLE_TRUE		1
-#define HOST_AVAILABLE_FALSE		2
+/* interface availability */
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
 
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0
@@ -1582,6 +1584,7 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 #define ZBX_PREPROC_CSV_TO_JSON			24
 #define ZBX_PREPROC_STR_REPLACE			25
 #define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
+#define ZBX_PREPROC_XML_TO_JSON			27
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
@@ -1713,5 +1716,12 @@ typedef enum
 zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
+int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
+int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
+#ifdef HAVE_LIBXML2
+int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
+int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
+#endif
 
 #endif

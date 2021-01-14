@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
-		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE
+		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -64,7 +65,8 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
-		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE
+		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -314,7 +316,9 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 
 	private $FILTER_CONDITION_OPERATOR = [
 		CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
-		CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX
+		CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
+		CXmlConstantValue::CONDITION_EXISTS => CXmlConstantName::EXISTS,
+		CXmlConstantValue::CONDITION_NOT_EXISTS => CXmlConstantName::NOT_EXISTS
 	];
 
 	private $LLD_OVERRIDE_OPERATION_OBJECT = [

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -269,6 +269,7 @@ class CXmlConstantValue {
 	const PROMETHEUS_TO_JSON = ZBX_PREPROC_PROMETHEUS_TO_JSON;
 	const CSV_TO_JSON = ZBX_PREPROC_CSV_TO_JSON;
 	const STR_REPLACE = ZBX_PREPROC_STR_REPLACE;
+	const XML_TO_JSON = ZBX_PREPROC_XML_TO_JSON;
 
 	const AND_OR = CONDITION_EVAL_TYPE_AND_OR;
 	const XML_AND = CONDITION_EVAL_TYPE_AND;
@@ -277,6 +278,8 @@ class CXmlConstantValue {
 
 	const CONDITION_MATCHES_REGEX = CONDITION_OPERATOR_REGEXP; // Duplicate.
 	const CONDITION_NOT_MATCHES_REGEX = CONDITION_OPERATOR_NOT_REGEXP; // Duplicate.
+	const CONDITION_EXISTS = CONDITION_OPERATOR_EXISTS;
+	const CONDITION_NOT_EXISTS = CONDITION_OPERATOR_NOT_EXISTS;
 
 	const OUTPUT_FORMAT_RAW = HTTPCHECK_STORE_RAW;
 	const OUTPUT_FORMAT_JSON = HTTPCHECK_STORE_JSON;

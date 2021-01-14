@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,22 +28,20 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
  */
 class testInheritanceTrigger extends CLegacyWebTest {
 
+	private $templateid = 15000;	// 'Inheritance test template'
+	private $template = 'Inheritance test template';
+
+	private $hostid = 15001;		// 'Template inheritance test host'
+	private $host = 'Template inheritance test host';
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
-
-	private $templateid = 15000;	// 'Inheritance test template'
-	private $template = 'Inheritance test template';
-
-	private $hostid = 15001;		// 'Template inheritance test host'
-	private $host = 'Template inheritance test host';
 
 	// return list of triggers from a template
 	public static function update() {
@@ -150,32 +148,36 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		// Go to Template form.
 		$this->page->login()->open('templates.php?groupid=1');
-		$this->query('link', $this->template)->one()->waitUntilClickable()->click();
+		$this->query('link', $this->template)->one()->click();
 
-		$template_form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
+		$templates_form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		// Fill tags on template.
-		$template_form->selectTab('Tags');
+		$templates_form->selectTab('Tags');
 
 		$template_tags = [
+			['name'=>'tag', 'value'=>'value:'],
+			['name'=>'tag:value', 'value'=>''],
 			['name'=>'template', 'value'=>'template'],
 			['name'=>'test', 'value'=>'inheritance']
 		];
 		$template_tags_count = count($template_tags);
 
 		$this->fillTags($template_tags, $template_tags_count);
-		$template_form->submit();
+		$templates_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Template updated');
 
 		// Go to Trigger form on Template.
-		$updated_templates_table = $this->query('class:list-table')->asTable()->one();
+		$updated_templates_table = $this->query('xpath://form[@name="templates"]/table[@class="list-table"]')
+				->asTable()->waitUntilReady()->one();
 		$updated_templates_table->findRow('Name', $this->template)->getColumn('Triggers')->query('tag:a')->one()->click();
-		$updated_templates_table->waitUntilReloaded();
-		$updated_templates_table->findRow('Name', $inherited_trigger)->getColumn('Name')->query('tag:a')->one()->click();
+		$triggers_table = $this->query('xpath://form[@name="triggersForm"]/table[@class="list-table"]')
+				->asTable()->waitUntilReady()->one();
+		$triggers_table->findRow('Name', $inherited_trigger)->getColumn('Name')->query('tag:a')->one()->click();
 
-		$trigger_form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
+		$triggers_form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		// Fill tags on trigger.
-		$trigger_form->selectTab('Tags');
+		$triggers_form->selectTab('Tags');
 
 		$templated_trigger_tags = [
 			['name'=>'tag1', 'value'=>'trigger'],
@@ -184,7 +186,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$templated_trigger_tags_count = count($templated_trigger_tags);
 
 		$this->fillTags($templated_trigger_tags, $templated_trigger_tags_count);
-		$trigger_form->submit();
+		$triggers_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Trigger updated');
 
@@ -192,27 +194,34 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		// Go to host.
 		$this->page->login()->open('triggers.php?filter_set=1&context=host&filter_hostids[0]='.$this->hostid);
 		// Go to inherited trigger.
-		$host_triggers_table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
+		$host_triggers_table = $this->query('xpath:.//form[@name="triggersForm"]/table[@class="list-table"]')
+					->waitUntilPresent()->asTable()->one();
 		$host_triggers_table->query('link', $inherited_trigger)->one()->click();
 		// Check trigger name.
-		$trigger_form->invalidate();
-		$name = $trigger_form->getField('Name')->getValue();
+		$triggers_form->invalidate();
+//		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
+		$name = $triggers_form->getField('Name')->getValue();
 		$this->assertEquals($name, $inherited_trigger);
 		// Check tags.
-		$trigger_form->selectTab('Tags');
+		$triggers_form->selectTab('Tags');
 		$trigger_tags_table = $this->query('id:tags-table')->asTable()->one();
 		// Check trigger tags.
 		$triggers_tags_slice_1 = $trigger_tags_table->getRows()->slice(0, -1); // Remove Add button from cycle.
 		$this->checkTags($triggers_tags_slice_1, $templated_trigger_tags);
 
 		// Click on inherited and trigger tags radio.
-		$trigger_form->getField('id:show_inherited_tags')->fill('Inherited and trigger tags');
+		$triggers_form->getField('id:show_inherited_tags')->fill('Inherited and trigger tags');
+
+		$triggers_tags_slice_2 = $trigger_tags_table->getRows()->slice(0, -($template_tags_count+1)); // Remove templated tags and Add button from cycle.
+		$template_tags_slice = $trigger_tags_table->getRows()->slice($templated_trigger_tags_count, -1); // Remove trigger tags and Add button from cycle.
 
 		// All expected trigger tags including host and template tags.
 		$inherited_trigger_tags = [
 			['name'=>'host_tag', 'value'=>'host_tag_value'],
+			['name'=>'tag', 'value'=>'value:'],
 			['name'=>'tag1', 'value'=>'trigger'],
 			['name'=>'tag2', 'value'=>'templated'],
+			['name'=>'tag:value', 'value'=>''],
 			['name'=>'template', 'value'=>'template'],
 			['name'=>'test', 'value'=>'inheritance']
 		];

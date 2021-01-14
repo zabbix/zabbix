@@ -1,6 +1,14 @@
 Changes for 5.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
+...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
+..F.....S. [ZBXNEXT-6252] added support of LLD rule filter condition operators "exists" and "does not exist" (agriscenko, asestakovs)
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.......PS. [ZBXNEXT-6380] added new key vmware.cl.perfcounter (dgoloscapov, MVekslers)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6219] added "HashiCorp Vault" template (afayantsev)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
 ..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 ..F....... [ZBXNEXT-6291] implemented breadcrumbs on host dashboards page (ozdancuka)
@@ -39,6 +47,14 @@ A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from front
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+...G...... [ZBX-17716] fixed 'UserParameter' parsing and possible buffer overrun (viktors)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update(), itemprototype.update() and discoveryrule.update() methods (Sasha)
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)
 ........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
@@ -118,12 +134,26 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.4rc1
 
 New features:
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
+...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6219] added "HashiCorp Vault" template (afayantsev)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
 ..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 ..F....... [ZBXNEXT-6291] implemented breadcrumbs on host dashboards page (ozdancuka)
 A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
 
 Bug fixes:
+A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+...G...... [ZBX-17716] fixed 'UserParameter' parsing and possible buffer overrun (viktors)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update(), itemprototype.update() and discoveryrule.update() methods (Sasha)
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ..F....... [ZBX-18637] fixed item update form when changing type from calculate or DB monitoring to script item type (Ivo)
 ........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
@@ -463,10 +493,22 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.8rc1
 
 New features:
+...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
+...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
+.........T [ZBXNEXT-6330] added Microsoft Exchange Server 2016 template (tuskov)
+.........T [ZBXNEXT-6231] added Apache ActiveMQ template (tuskov)
 ..F....... [ZBXNEXT-6358] removed detailed information from Reports -> Notifications page (Ivo)
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+...G...... [ZBX-17716] fixed 'UserParameter' parsing and possible buffer overrun (viktors)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update(), itemprototype.update() and discoveryrule.update() methods (Sasha)
+.........T [ZBX-17169] added locale forced to English in userparameter pgsql.ping.time [*] in agent configuration (abakaldin)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 ........S. [ZBX-18612] added error message for when real-time data export file become inaccessible (viktors)
 .......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
@@ -2366,6 +2408,10 @@ New features:
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
+........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
+..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)
+A......... [ZBX-18796] improved update performance of the preprocessing rules in item.update() and itemprototype.update() methods (Sasha)
 ..F....... [ZBX-18623] fixed the global search showing number of objects that user has no permissions (Ivo)
 .......PS. [ZBX-18784] fixed memory leak when handling vmware events (MVekslers)
 .......PS. [ZBX-18761] fixed possible heap overflow issues in IPC commonications when deserializing huge text values (wiper)

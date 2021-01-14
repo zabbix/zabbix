@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ func TestPlugin_pingHandler(t *testing.T) {
 
 	type args struct {
 		conn   MCClient
-		params []string
+		params map[string]string
 	}
 
 	tests := []struct {
@@ -56,7 +56,7 @@ func TestPlugin_pingHandler(t *testing.T) {
 			name: fmt.Sprintf("pingHandler should return %d if connection is ok", pingOk),
 			args: args{
 				conn:   &badConn,
-				params: []string{},
+				params: map[string]string{},
 			},
 			want:    pingFailed,
 			wantErr: nil,
@@ -65,7 +65,7 @@ func TestPlugin_pingHandler(t *testing.T) {
 			name: fmt.Sprintf("pingHandler should return %d if request failed", pingFailed),
 			args: args{
 				conn:   &aliveConn,
-				params: []string{},
+				params: map[string]string{},
 			},
 			want:    pingOk,
 			wantErr: nil,

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,29 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package memcached
+package mysql
 
-import "strings"
+import (
+	"context"
+	"fmt"
+)
 
-type zabbixError struct {
-	err string
-}
+const (
+	pingFailed = 0
+	pingOk     = 1
+)
 
-func (e zabbixError) Error() string {
-	errText := e.err
-	if errText[len(errText)-1:] != "." {
-		errText += "."
+// pingHandler queries 'SELECT 1' and returns pingOk if a connection is alive or pingFailed otherwise.
+func pingHandler(ctx context.Context, conn MyClient, params map[string]string, _ ...string) (interface{}, error) {
+	var res int
+
+	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d", pingOk))
+	if err != nil {
+		return pingFailed, nil
 	}
 
-	return strings.Title(errText)
-}
+	err = row.Scan(&res)
 
-var (
-	errorInvalidParams     = zabbixError{"invalid parameters"}
-	errorTooManyParameters = zabbixError{"too many parameters"}
-	errorCannotFetchData   = zabbixError{"cannot fetch data"}
-	errorCannotMarshalJSON = zabbixError{"cannot marshal JSON"}
-	errorUnsupportedMetric = zabbixError{"unsupported metric"}
-	errorEmptyResult       = zabbixError{"empty result"}
-	errorUnknownSession    = zabbixError{"unknown session"}
-)
+	if err != nil || res != pingOk {
+		return pingFailed, nil
+	}
+
+	return pingOk, nil
+}

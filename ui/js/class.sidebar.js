@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ class CSidebar extends CBaseComponent {
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
 				this.removeClass('focus-off');
-				ZABBIX.MenuMain.focusSelected();
+				ZABBIX.MenuMain.focusSelected(1);
 			}
 
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
@@ -117,13 +117,21 @@ class CSidebar extends CBaseComponent {
 
 			if (this._view_mode === SIDEBAR_VIEW_MODE_COMPACT) {
 				ZABBIX.MenuMain.collapseExpanded();
+				ZABBIX.UserMain.collapseExpanded();
 				this._sidebar_scrollable.scrollTop = 0;
 			}
 
+			if (this._view_mode === SIDEBAR_VIEW_MODE_HIDDEN) {
+				ZABBIX.MenuMain.collapseExpanded(1);
+				ZABBIX.UserMain.collapseExpanded(1);
+			}
+
 			if ([SIDEBAR_VIEW_MODE_COMPACT, SIDEBAR_VIEW_MODE_HIDDEN].includes(this._view_mode)) {
-				const active_parent = document.activeElement.parentElement;
-				if (active_parent !== null && active_parent.classList.contains('has-submenu')) {
-					active_parent.blur();
+				const active_item = document.activeElement;
+
+				if (active_item != null && active_item.parentElement != null
+					&& active_item.parentElement.classList.contains('has-submenu')) {
+						active_item.blur();
 				}
 
 				this._opened_timer = setTimeout(() => {
@@ -166,6 +174,32 @@ class CSidebar extends CBaseComponent {
 		}
 
 		return this;
+	}
+
+	updateSubmenuPosition(force) {
+		const update = () => {
+			let menu_item = ZABBIX.MenuMain.getExpanded();
+
+			if (menu_item) {
+				menu_item = menu_item.getSubmenu().getExpanded();
+				menu_item && menu_item.getSubmenu().updateRect(menu_item._target, {
+					top: document.querySelector('.sidebar-nav').getBoundingClientRect().top,
+					bottom: document.getElementById('msg-global-footer').offsetHeight
+				});
+			}
+		};
+
+		if (force) {
+			update();
+		}
+		else if (!this._animation_frame_running) {
+			this._animation_frame_running = true;
+
+			window.requestAnimationFrame(() => {
+				update();
+				this._animation_frame_running = false;
+			});
+		}
 	}
 
 	/**
@@ -236,6 +270,7 @@ class CSidebar extends CBaseComponent {
 			expandSelected: () => {
 				this._expand_timer = setTimeout(() => {
 					ZABBIX.MenuMain.expandSelected();
+					ZABBIX.UserMain.expandSelected();
 				}, MENU_EXPAND_SELECTED_DELAY);
 			},
 
@@ -256,18 +291,39 @@ class CSidebar extends CBaseComponent {
 						});
 					}, UI_TRANSITION_DURATION);
 				}
+
+				this.updateSubmenuPosition(true);
 			},
 
-			viewmodechange: (e) => {
+			collapseSubmenu: (e) => {
+				if (!this._target.contains(e.target)) {
+					ZABBIX.MenuMain.collapseExpanded(1);
+				}
+			},
+
+			updateSubmenuPosition: () => {
+				this.updateSubmenuPosition(false);
+			},
+
+			scroll: () => {
+				ZABBIX.MenuMain.collapseExpanded(1);
+			},
+
+			viewmodeChange: (e) => {
 				if (e.target.classList.contains('button-compact')) {
 					ZABBIX.MenuMain.collapseExpanded();
+					ZABBIX.UserMain.collapseExpanded();
 					clearTimeout(this._expand_timer);
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
 				}
 				else if (e.target.classList.contains('button-hide')) {
+					ZABBIX.MenuMain.collapseExpanded(1);
+					ZABBIX.UserMain.collapseExpanded(1);
 					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);
 				}
 				else {
+					ZABBIX.MenuMain.expandSelected(1);
+					ZABBIX.UserMain.expandSelected(1);
 					this.setViewMode(SIDEBAR_VIEW_MODE_FULL);
 				}
 
@@ -291,12 +347,20 @@ class CSidebar extends CBaseComponent {
 					for (const item of ZABBIX.MenuMain.getItems()) {
 						item.hasSubmenu() && item.on('mouseenter', () => this._events.expandOver(item));
 					}
+
+					for (const item of ZABBIX.UserMain.getItems()) {
+						item.hasSubmenu() && item.on('mouseenter', () => this._events.expandOver(item));
+					}
 				}
 				else {
 					this.off('mouseenter', this._events.mouseenter);
 					this.off('mouseleave', this._events.mouseleave);
 
 					for (const item of ZABBIX.MenuMain.getItems()) {
+						item.hasSubmenu() && item.off('mouseenter', () => this._events.expandOver(item));
+					}
+
+					for (const item of ZABBIX.UserMain.getItems()) {
 						item.hasSubmenu() && item.off('mouseenter', () => this._events.expandOver(item));
 					}
 				}
@@ -322,6 +386,12 @@ class CSidebar extends CBaseComponent {
 				if (view_mode === SIDEBAR_VIEW_MODE_FULL) {
 					document.removeEventListener('keyup', this._events.escape);
 					document.removeEventListener('click', this._events.click);
+					document.addEventListener('click', this._events.collapseSubmenu);
+					window.addEventListener('resize', this._events.updateSubmenuPosition);
+				}
+				else {
+					document.removeEventListener('click', this._events.collapseSubmenu);
+					window.removeEventListener('resize', this._events.updateSubmenuPosition);
 				}
 			}
 		};
@@ -330,10 +400,13 @@ class CSidebar extends CBaseComponent {
 		this.on('focusout', this._events.focusout);
 
 		for (const el of this._target.querySelectorAll('.js-sidebar-mode')) {
-			el.addEventListener('click', this._events.viewmodechange);
+			el.addEventListener('click', this._events.viewmodeChange);
 		}
 
 		ZABBIX.MenuMain.on('expand', this._events.expand);
+
+		this._sidebar_scrollable.addEventListener('scroll', this._events.updateSubmenuPosition);
+		document.querySelector('.wrapper').addEventListener('scroll', this._events.collapseSubmenu);
 
 		this._events._update(this._view_mode);
 	}

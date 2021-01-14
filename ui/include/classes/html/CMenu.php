@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,15 @@ class CMenu extends CTag {
 		foreach ($menu_items as $item) {
 			$this->add($item);
 		}
+	}
+
+	/**
+	 * Return all menu items.
+	 *
+	 * @return CMenuItem[]
+	 */
+	public function getMenuItems(): array {
+		return $this->menu_items;
 	}
 
 	/**
@@ -153,9 +162,9 @@ class CMenu extends CTag {
 	 *
 	 * @return bool  True, if menu item was selected.
 	 */
-	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
+	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = false): bool {
 		foreach ($this->menu_items as $item) {
-			if ($item->setSelectedByAction($action_name, $request_params, $expand)) {
+			if ($item->setSelectedByAction($action_name, $request_params)) {
 				if ($expand && $item->hasSubMenu()) {
 					$item->addClass('is-expanded');
 				}
@@ -164,13 +173,6 @@ class CMenu extends CTag {
 		}
 
 		return false;
-	}
-
-	public function toString($destroy = true)
-	{
-		$this->addItem($this->menu_items);
-
-		return parent::toString($destroy);
 	}
 
 	private function insert(string $label, CMenuItem $menu_item, $after = false): self {
@@ -188,7 +190,9 @@ class CMenu extends CTag {
 		return $this;
 	}
 
-	public function getMenuItems(): array {
-		return $this->menu_items;
+	public function toString($destroy = true) {
+		$this->addItem($this->menu_items);
+
+		return parent::toString($destroy);
 	}
 }

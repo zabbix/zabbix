@@ -17,17 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package docker
+#ifndef ZABBIX_XML_H
+#define ZABBIX_XML_H
 
-const (
-	errorCannotFetchData         = "Cannot fetch data."
-	errorCannotReadResponse      = "Cannot read response."
-	errorCannotUnmarshalJSON     = "Cannot unmarshal JSON."
-	errorCannotUnmarshalAPIError = "Cannot unmarshal API error."
-	errorCannotMarshalJSON       = "Cannot marshal JSON."
-	errorTooManyParams           = "Too many parameters."
-	errorUnsupportedMetric       = "Unsupported metric."
-	errorParametersNotAllowed    = "Item does not allow parameters."
-	errorInvalidEndpoint         = "Invalid endpoint format."
-	errorQueryErrorMessage       = "Docker returned an error."
-)
+int	zbx_es_init_xml(zbx_es_t *es, char **error);
+
+#endif

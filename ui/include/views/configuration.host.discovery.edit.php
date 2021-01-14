@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -683,7 +683,7 @@ $conditionFormList->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'
 // macros
 $conditionTable = (new CTable())
 	->setId('conditions')
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
 $conditions = $data['conditions'];
@@ -699,10 +699,17 @@ else {
 	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
 }
 
+$operators = CSelect::createOptionsFromArray([
+	CONDITION_OPERATOR_REGEXP => _('matches'),
+	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
+	CONDITION_OPERATOR_EXISTS => _('exists'),
+	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
+]);
+
 // fields
 foreach ($conditions as $i => $condition) {
 	// formula id
-	$formulaId = [
+	$formulaid = [
 		new CSpan($condition['formulaid']),
 		new CVar('conditions['.$i.'][formulaid]', $condition['formulaid'])
 	];
@@ -715,27 +722,37 @@ foreach ($conditions as $i => $condition) {
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $condition['formulaid']);
 
+	$operator_select = (new CSelect('conditions['.$i.'][operator]'))
+		->setValue($condition['operator'])
+		->addClass('js-operator')
+		->addOptions($operators);
+
 	// value
 	$value = (new CTextBox('conditions['.$i.'][value]', $condition['value'], false, 255))
+		->addClass('js-value')
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
+	if ($condition['operator'] == CONDITION_OPERATOR_EXISTS
+			|| $condition['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+		$value->addClass(ZBX_STYLE_DISPLAY_NONE);
+	}
+
 	// delete button
-	$deleteButtonCell = [
+	$delete_button_cell = [
 		(new CButton('conditions_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 	];
 
-	$row = [$formulaId, $macro,
-		(new CSelect('conditions['.$i.'][operator]'))
-			->addOption(new CSelectOption(CONDITION_OPERATOR_REGEXP, _('matches')))
-			->addOption(new CSelectOption(CONDITION_OPERATOR_NOT_REGEXP, _('does not match')))
-			->setValue($condition['operator'])
-			->addClass('operator'),
-		$value,
-		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
+	$row = [
+		$formulaid,
+		$macro,
+		$operator_select,
+		(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	];
+
 	$conditionTable->addRow($row, 'form_row');
 }
 

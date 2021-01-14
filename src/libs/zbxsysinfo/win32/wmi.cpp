@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -812,7 +812,7 @@ extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VAR
 				ret = SYSINFO_RET_FAIL;
 			}
 			else
-				zbx_json_addfloat(jdoc, prop_json, (double)vtProp->llVal);
+				zbx_json_addfloat(jdoc, prop_json, vtProp->dblVal);
 
 			break;
 		default:

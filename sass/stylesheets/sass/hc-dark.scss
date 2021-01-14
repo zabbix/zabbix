@@ -65,6 +65,9 @@ $menu-main-submenu-selected-color: #ffffff;
 $menu-main-submenu-selected-bg-color: #0c0c0c;
 $menu-main-submenu-selected-border-color: #787878;
 
+$menu-main-submenu-next-level-bg: #ffffff !default;
+$menu-main-submenu-next-level-shadow: transparent !default;
+
 $menu-main-icons-opacity: 1;
 
 $menu-main-arrow-bg-position: -579px -434px;
@@ -263,8 +266,9 @@ $dashboard-my-bg-color: #e0e0e0;
 
 // components/menu-main
 .menu-main {
-	& > li.has-submenu {
+	li.has-submenu {
 		&.is-expanded > a,
+		.is-selected > a,
 		& > a:hover,
 		& > a:focus {
 			&::before {

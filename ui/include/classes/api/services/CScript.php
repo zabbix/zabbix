@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,11 +59,8 @@ class CScript extends CApiService {
 		];
 		$group_fields = ['groupid', 'name', 'flags', 'internal'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
-			'available', 'snmp_available', 'jmx_available', 'ipmi_available', 'error', 'snmp_error', 'jmx_error',
-			'ipmi_error', 'errors_from', 'snmp_errors_from', 'jmx_errors_from', 'ipmi_errors_from', 'disable_until',
-			'snmp_disable_until', 'jmx_disable_until', 'ipmi_disable_until', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
-			'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
+			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status',
+			'maintenance_type', 'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4554,27 +4554,27 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCupdate_hosts_availability                                      *
+ * Function: DCupdate_interfaces_availability                                 *
  *                                                                            *
- * Purpose: performs host availability reset for hosts with availability set  *
- *          on interfaces without enabled items                               *
+ * Purpose: performs interface availability reset for hosts with              *
+ *          availability set on interfaces without enabled items              *
  *                                                                            *
  ******************************************************************************/
-void	DCupdate_hosts_availability(void)
+void	DCupdate_interfaces_availability(void)
 {
-	zbx_vector_ptr_t	hosts;
+	zbx_vector_availability_ptr_t		interfaces;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_availability_ptr_create(&interfaces);
 
-	if (SUCCEED != DCreset_hosts_availability(&hosts))
+	if (SUCCEED != DCreset_interfaces_availability(&interfaces))
 		goto out;
 
-	zbx_availabilities_flush(&hosts);
+	zbx_availabilities_flush(&interfaces);
 out:
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_availability_ptr_clear_ext(&interfaces, zbx_interface_availability_free);
+	zbx_vector_availability_ptr_destroy(&interfaces);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

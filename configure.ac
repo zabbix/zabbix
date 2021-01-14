@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2020 Zabbix SIA
+dnl Copyright (C) 2001-2021 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -1532,11 +1532,9 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_libxml2="yes"
 		fi
 	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
+	
+	LDFLAGS="$LDFLAGS $LIBXML2_LDFLAGS"
+	LIBS="$LIBS $LIBXML2_LIBS"
 
 	AC_SUBST(LIBXML2_CFLAGS)
 

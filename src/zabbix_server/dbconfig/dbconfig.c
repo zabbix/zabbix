@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		else
 		{
 			DCsync_configuration(ZBX_DBSYNC_UPDATE, NULL);
-			DCupdate_hosts_availability();
+			DCupdate_interfaces_availability();
 			nextcheck = time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 		}
 

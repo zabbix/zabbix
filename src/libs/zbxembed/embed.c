@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "log.h"
-#include "zbxjson.h"
 #include "zbxembed.h"
-#include "embed.h"
+
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
-
-#include "duktape.h"
+#include "xml.h"
+#include "embed.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 10)
 #define ZBX_ES_TIMEOUT		10
@@ -228,6 +226,9 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	/* initialize HttpRequest and CurlHttpRequest prototypes */
 	if (FAIL == zbx_es_init_httprequest(es, error))
+		goto out;
+
+	if (FAIL == zbx_es_init_xml(es, error))
 		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
