@@ -12,7 +12,7 @@ zabbix_export:
         The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.
         
         MIBs used:
-        IF-MIB
+        NETAPP-MIB
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/416694-discussion-thread-for-official-zabbix-template-netapp-fas3220
         
@@ -675,7 +675,6 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: |
-                MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.
               application_prototypes:
                 -
@@ -693,7 +692,6 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: |
-                MIB: IF-MIB
                 The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
               application_prototypes:
                 -
@@ -731,7 +729,6 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: |
-                MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.
               application_prototypes:
                 -
@@ -749,7 +746,6 @@ zabbix_export:
               delay: 3m
               history: 7d
               description: |
-                MIB: IF-MIB
                 The number of outbound packets that could not be transmitted because of errors.
               application_prototypes:
                 -
