@@ -1270,7 +1270,7 @@ static void	copy_template_item_tags(const zbx_vector_uint64_t *templateids, cons
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select it.itemid,it.tag,ip.value"
+			"select it.itemid,it.tag,it.value"
 				" from item_tag it,items i"
 				" where it.itemid=i.itemid"
 				" and");
