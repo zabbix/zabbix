@@ -254,7 +254,7 @@ class CValueMap extends CApiService {
 		}
 
 		$db_valuemaps = $this->get([
-			'output' => ['valuemapid', 'hostid', 'name'],
+			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $valuemapids,
 			'editable' => true,
 			'preservekeys' => true
