@@ -172,7 +172,7 @@ static int	DBpatch_5030012(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	zbx_uint64_t	itemid, itemtagid;
+	zbx_uint64_t	itemid;
 	int		ret = SUCCEED;
 	char		*value;
 	zbx_db_insert_t	db_insert;
@@ -181,7 +181,6 @@ static int	DBpatch_5030012(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
-	itemtagid = DBget_maxid("item_tag");
 
 	result = DBselect(
 			"select i.itemid,ap.name from items i"
@@ -192,7 +191,40 @@ static int	DBpatch_5030012(void)
 	{
 		ZBX_DBROW2UINT64(itemid, row[0]);
 		value = DBdyn_escape_string(row[1]);
-		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030013(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	httptestid, httptesttagid = 1;
+	int		ret = SUCCEED;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
+	result = DBselect(
+			"select h.httptestid,a.name from httptest h"
+			" join applications a on h.applicationid=a.applicationid;");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(httptestid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, httptesttagid++, httptestid, "Application", value);
 		zbx_free(value);
 	}
 	DBfree_result(result);
@@ -203,7 +235,7 @@ static int	DBpatch_5030012(void)
 	return ret;
 }
 
-static int	DBpatch_5030013(void)
+static int	DBpatch_5030014(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -235,7 +267,7 @@ static int	DBpatch_5030013(void)
 	return ret;
 }
 
-static int	DBpatch_5030014(void)
+static int	DBpatch_5030015(void)
 {
 #define CONDITION_TYPE_APPLICATION	15
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -251,7 +283,7 @@ static int	DBpatch_5030014(void)
 #undef CONDITION_TYPE_APPLICATION
 }
 
-static int	DBpatch_5030015(void)
+static int	DBpatch_5030016(void)
 {
 #define AUDIT_RESOURCE_APPLICATION	12
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -264,7 +296,7 @@ static int	DBpatch_5030015(void)
 #undef AUDIT_RESOURCE_APPLICATION
 }
 
-static int	DBpatch_5030016(void)
+static int	DBpatch_5030017(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -279,52 +311,52 @@ static int	DBpatch_5030016(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030017(void)
+static int	DBpatch_5030018(void)
 {
 	return DBdrop_foreign_key("httptest", 1);
 }
 
-static int	DBpatch_5030018(void)
+static int	DBpatch_5030019(void)
 {
 	return DBdrop_index("httptest", "httptest_1");
 }
 
-static int	DBpatch_5030019(void)
+static int	DBpatch_5030020(void)
 {
 	return DBdrop_field("httptest", "applicationid");
 }
 
-static int	DBpatch_5030020(void)
+static int	DBpatch_5030021(void)
 {
 	return DBdrop_field("sysmaps_elements", "application");
 }
 
-static int	DBpatch_5030021(void)
+static int	DBpatch_5030022(void)
 {
 	return DBdrop_table("application_discovery");
 }
 
-static int	DBpatch_5030022(void)
+static int	DBpatch_5030023(void)
 {
 	return DBdrop_table("item_application_prototype");
 }
 
-static int	DBpatch_5030023(void)
+static int	DBpatch_5030024(void)
 {
 	return DBdrop_table("application_prototype");
 }
 
-static int	DBpatch_5030024(void)
+static int	DBpatch_5030025(void)
 {
 	return DBdrop_table("application_template");
 }
 
-static int	DBpatch_5030025(void)
+static int	DBpatch_5030026(void)
 {
 	return DBdrop_table("items_applications");
 }
 
-static int	DBpatch_5030026(void)
+static int	DBpatch_5030027(void)
 {
 	return DBdrop_table("applications");
 }
@@ -362,5 +394,6 @@ DBPATCH_ADD(5030023, 0, 1)
 DBPATCH_ADD(5030024, 0, 1)
 DBPATCH_ADD(5030025, 0, 1)
 DBPATCH_ADD(5030026, 0, 1)
+DBPATCH_ADD(5030027, 0, 1)
 
 DBPATCH_END()

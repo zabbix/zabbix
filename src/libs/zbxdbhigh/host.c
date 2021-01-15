@@ -4717,6 +4717,14 @@ httpstep_t;
 
 typedef struct
 {
+	zbx_uint64_t		httptesttagid;
+	char			*tag;
+	char			*value;
+}
+httptesttag_t;
+
+typedef struct
+{
 	zbx_uint64_t		t_itemid;
 	zbx_uint64_t		h_itemid;
 	unsigned char		type;
@@ -4736,6 +4744,7 @@ typedef struct
 	char			*http_proxy;
 	zbx_vector_ptr_t	httpsteps;
 	zbx_vector_ptr_t	httptestitems;
+	zbx_vector_ptr_t	httptesttags;
 	int			retries;
 	unsigned char		status;
 	unsigned char		authentication;
@@ -4764,6 +4773,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 	DB_ROW			row;
 	httptest_t		*httptest;
 	httpstep_t		*httpstep;
+	httptesttag_t		*httptesttag;
 	httpfield_t		*httpfield;
 	httptestitem_t		*httptestitem;
 	httpstepitem_t		*httpstepitem;
@@ -4801,6 +4811,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 		zbx_vector_ptr_create(&httptest->httpsteps);
 		zbx_vector_ptr_create(&httptest->httptestitems);
 		zbx_vector_ptr_create(&httptest->fields);
+		zbx_vector_ptr_create(&httptest->httptesttags);
 
 		zbx_vector_ptr_append(httptests, httptest);
 
@@ -4976,6 +4987,52 @@ static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *temp
 			zbx_vector_ptr_append(&httpstep->fields, httpfield);
 		}
 		DBfree_result(result);
+
+		/* web scenario tags */
+		httptest = NULL;
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select httptesttagid,httptestid,tag,value"
+				" from httptest_tag"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
+				httptestids.values, httptestids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by httptestid");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(httptestid, row[1]);
+
+			if (NULL == httptest || httptest->templateid != httptestid)
+			{
+				if (FAIL == (i = zbx_vector_ptr_bsearch(httptests, &httptestid,
+						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				httptest = (httptest_t *)httptests->values[i];
+			}
+
+			httptesttag = (httptesttag_t *)zbx_malloc(NULL, sizeof(httptesttag_t));
+
+			ZBX_STR2UINT64(httptesttag->httptesttagid, row[0]);
+			httptesttag->tag = zbx_strdup(NULL, row[2]);
+			httptesttag->value = zbx_strdup(NULL, row[3]);
+
+			zbx_vector_ptr_append(&httptest->httptesttags, httptesttag);
+		}
+		DBfree_result(result);
+
+		for (i = 0; i < httptests->values_num; i++)
+		{
+			httptest = (httptest_t *)httptests->values[i];
+			zbx_vector_ptr_sort(&httptest->httptesttags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		}
 	}
 
 	/* web scenario items */
@@ -5157,12 +5214,13 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	httpstep_t	*httpstep;
 	httptestitem_t	*httptestitem;
 	httpstepitem_t	*httpstepitem;
+	httptesttag_t	*httptesttag;
 	zbx_uint64_t	httptestid = 0, httpstepid = 0, httptestitemid = 0, httpstepitemid = 0, httptestfieldid = 0,
-			httpstepfieldid = 0;
+			httpstepfieldid = 0, httptesttagid = 0;
 	int		i, j, k, num_httptests = 0, num_httpsteps = 0, num_httptestitems = 0, num_httpstepitems = 0,
-			num_httptestfields = 0, num_httpstepfields = 0;
+			num_httptestfields = 0, num_httpstepfields = 0, num_httptesttags = 0;
 	zbx_db_insert_t	db_insert_htest, db_insert_hstep, db_insert_htitem, db_insert_hsitem, db_insert_tfield,
-			db_insert_sfield;
+			db_insert_sfield, db_insert_httag;
 
 	if (0 == httptests->values_num)
 		return;
@@ -5177,6 +5235,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 			num_httpsteps += httptest->httpsteps.values_num;
 			num_httptestitems += httptest->httptestitems.values_num;
 			num_httptestfields += httptest->fields.values_num;
+			num_httptesttags += httptest->httptesttags.values_num;
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
@@ -5239,6 +5298,14 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 		zbx_db_insert_prepare(&db_insert_sfield, "httpstep_field", "httpstep_fieldid", "httpstepid", "type",
 				"name", "value", NULL);
+	}
+
+	if (0 != num_httptesttags)
+	{
+		httptesttagid = DBget_maxid_num("httptest_tag", num_httptesttags);
+
+		zbx_db_insert_prepare(&db_insert_httag, "httptest_tag", "httptesttagid", "httptestid", "tag", "value",
+				NULL);
 	}
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -5308,6 +5375,16 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 
 				httptestitemid++;
 			}
+
+			for (j = 0; j < httptest->httptesttags.values_num; j++)
+			{
+				httptesttag = (httptesttag_t *)httptest->httptesttags.values[j];
+
+				zbx_db_insert_add_values(&db_insert_httag, httptesttagid, httptest->httptestid,
+						httptesttag->tag, httptesttag->value);
+
+				httptesttagid++;
+			}
 		}
 		else
 		{
@@ -5355,6 +5432,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 		zbx_db_insert_clean(&db_insert_sfield);
 	}
 
+	if (0 != num_httptesttags)
+	{
+		zbx_db_insert_execute(&db_insert_httag);
+		zbx_db_insert_clean(&db_insert_httag);
+	}
+
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
@@ -5374,6 +5457,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 	httptest_t	*httptest;
 	httpfield_t	*httpfield;
 	httpstep_t	*httpstep;
+	httptesttag_t	*httptesttag;
 	int		i, j, k;
 
 	for (i = 0; i < httptests->values_num; i++)
@@ -5398,6 +5482,18 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 		}
 
 		zbx_vector_ptr_destroy(&httptest->fields);
+
+		for (j = 0; j < httptest->httptesttags.values_num; j++)
+		{
+			httptesttag = (httptesttag_t *)httptest->httptesttags.values[j];
+
+			zbx_free(httptesttag->tag);
+			zbx_free(httptesttag->value);
+
+			zbx_free(httptesttag);
+		}
+
+		zbx_vector_ptr_destroy(&httptest->httptesttags);
 
 		for (j = 0; j < httptest->httpsteps.values_num; j++)
 		{
