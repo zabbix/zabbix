@@ -87,18 +87,17 @@ class C52ImportConverter extends CConverter {
 			$used_valuemaps = [];
 
 			if (array_key_exists('items', $host)) {
-				foreach ($host['items'] as &$item) {
+				foreach ($host['items'] as $item) {
 					if (array_key_exists('valuemap', $item)
 							&& !in_array($item['valuemap']['name'], $used_valuemaps)) {
 						$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
 						$used_valuemaps[] = $item['valuemap']['name'];
 					}
 				}
-				unset($item);
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				foreach ($host['discovery_rules'] as &$drule) {
+				foreach ($host['discovery_rules'] as $drule) {
 					if (!array_key_exists('item_prototypes', $drule)) {
 						continue;
 					}
@@ -111,7 +110,6 @@ class C52ImportConverter extends CConverter {
 						}
 					}
 				}
-				unset($drule);
 			}
 		}
 		unset($host);
