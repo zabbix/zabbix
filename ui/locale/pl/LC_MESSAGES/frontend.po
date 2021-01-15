@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-08 19:55+0200\n"
+"POT-Creation-Date: 2021-01-15 19:56+0200\n"
 "PO-Revision-Date: 2020-02-17 09:59+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -688,7 +688,7 @@ msgstr "Aktywne do"
 #: app/views/popup.media.php:127 app/views/popup.mediatype.message.php:95
 #: app/views/popup.triggerwizard.php:116 app/views/popup.triggerwizard.php:150
 #: include/classes/widgets/CWidgetHelper.php:503 include/forms.inc.php:1571
-#: include/forms.inc.php:2110 include/views/configuration.action.edit.php:130
+#: include/forms.inc.php:2118 include/views/configuration.action.edit.php:130
 #: include/views/configuration.action.edit.php:316
 #: include/views/configuration.action.edit.php:404
 #: include/views/configuration.action.edit.php:486
@@ -874,7 +874,7 @@ msgstr ""
 msgid "Admin"
 msgstr "Admin"
 
-#: include/classes/helpers/CMenuHelper.php:247
+#: include/classes/helpers/CMenuHelper.php:246
 #: include/classes/helpers/CRoleHelper.php:355
 msgid "Administration"
 msgstr "Administracja"
@@ -1400,7 +1400,7 @@ msgstr "Hasło uwierzytelniania"
 msgid "Authentication protocol"
 msgstr "Protokół uwierzytelniania"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:361
+#: app/controllers/CControllerAuthenticationUpdate.php:359
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -2981,7 +2981,7 @@ msgstr "Nie można zaktualizować akcji"
 msgid "Cannot update application"
 msgstr "Nie można zaktualizować aplikacji"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:365
+#: app/controllers/CControllerAuthenticationUpdate.php:363
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -4610,7 +4610,7 @@ msgstr ""
 msgid "Dashed line"
 msgstr "Linia przerywana"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2215
+#: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:772
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -6558,8 +6558,8 @@ msgstr "Wyrażenie nie może być puste"
 msgid "Expression constructor"
 msgstr "Konstruktor wyrażeń"
 
-#: include/forms.inc.php:1943 include/forms.inc.php:1949
-#: include/forms.inc.php:1958
+#: include/forms.inc.php:1951 include/forms.inc.php:1957
+#: include/forms.inc.php:1966
 msgid "Expression syntax error."
 msgstr "Błąd składni wyrażenia."
 
@@ -7402,7 +7402,7 @@ msgstr "Grupowanie wg"
 msgid "Groups"
 msgstr "Grupy"
 
-#: include/classes/helpers/CMenuHelper.php:298
+#: include/classes/helpers/CMenuHelper.php:297
 msgid "Guest user"
 msgstr ""
 
@@ -7410,8 +7410,7 @@ msgstr ""
 msgid "H:i"
 msgstr "H:i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1048
-#: include/classes/graphdraw/CLineGraphDraw.php:1055
+#: include/classes/graphdraw/CLineGraphDraw.php:961
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -7509,8 +7508,8 @@ msgstr "Hebrajski (he_IL)"
 msgid "Height"
 msgstr "Wysokość"
 
-#: include/classes/helpers/CMenuHelper.php:284
-#: include/classes/helpers/CMenuHelper.php:287
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CMenuHelper.php:286
 #: include/views/general.login.php:87
 msgid "Help"
 msgstr "Pomoc"
@@ -9270,7 +9269,7 @@ msgstr "Błędna wartość \"%1$s\" dla pola \"%2$s\"."
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:153
+#: app/controllers/CControllerAuthenticationUpdate.php:151
 #: include/classes/api/services/CAction.php:1763
 #: include/classes/api/services/CScreenItem.php:550
 #: include/validate.inc.php:341
@@ -9337,9 +9336,9 @@ msgstr "Błędna wartość \"%1$s\" w polu \"%2$s\" dla typu mediów \"%3$s\"."
 msgid "Incorrect value for \"%1$s\" field."
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:103
-#: app/controllers/CControllerAuthenticationUpdate.php:143
-#: app/controllers/CControllerAuthenticationUpdate.php:215
+#: app/controllers/CControllerAuthenticationUpdate.php:101
+#: app/controllers/CControllerAuthenticationUpdate.php:141
+#: app/controllers/CControllerAuthenticationUpdate.php:213
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
@@ -9540,9 +9539,9 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:1210
 #: include/classes/api/services/CUserGroup.php:470
 #: include/classes/api/services/CUser.php:643
-#: include/classes/graphdraw/CLineGraphDraw.php:117
-#: include/classes/graphdraw/CLineGraphDraw.php:242
-#: include/classes/graphdraw/CLineGraphDraw.php:252
+#: include/classes/graphdraw/CLineGraphDraw.php:115
+#: include/classes/graphdraw/CLineGraphDraw.php:240
+#: include/classes/graphdraw/CLineGraphDraw.php:250
 #: include/classes/graphdraw/CPieGraphDraw.php:167
 #: include/classes/graphdraw/CPieGraphDraw.php:177
 #: include/classes/helpers/CSvgGraphHelper.php:372
@@ -10614,11 +10613,11 @@ msgstr "Uwierzytelnianie LDAP"
 msgid "LDAP host"
 msgstr "Host LDAP"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:104
+#: app/controllers/CControllerAuthenticationUpdate.php:102
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:251
+#: app/controllers/CControllerAuthenticationUpdate.php:249
 msgid "LDAP login successful"
 msgstr "Pomyślnie zalogowano z LDAP"
 
@@ -11121,7 +11120,7 @@ msgstr "Stracone"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "Niskopoziomowa reguła wykrywania w stanie \"niewspierany\""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1016
+#: include/classes/graphdraw/CLineGraphDraw.php:966
 msgid "M"
 msgstr "M"
 
@@ -11590,7 +11589,7 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:31
 #: app/views/administration.mediatype.list.php:31
-#: include/classes/helpers/CMenuHelper.php:230
+#: include/classes/helpers/CMenuHelper.php:229
 #: include/classes/helpers/CRoleHelper.php:456
 #: include/views/conf.import.php:51
 msgid "Media types"
@@ -14577,7 +14576,7 @@ msgstr "Plik klucza publicznego"
 msgid "Query fields"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:240
+#: include/classes/helpers/CMenuHelper.php:239
 #: include/classes/helpers/CRoleHelper.php:458 queue.php:25
 msgid "Queue"
 msgstr "Kolejka"
@@ -14713,8 +14712,8 @@ msgstr "Odzyskiwanie"
 msgid "Recovery expression"
 msgstr "Wyrażenie dla przywracania"
 
-#: include/forms.inc.php:1991 include/forms.inc.php:1997
-#: include/forms.inc.php:2006
+#: include/forms.inc.php:1999 include/forms.inc.php:2005
+#: include/forms.inc.php:2014
 msgid "Recovery expression syntax error."
 msgstr "Błąd składni wyrażenia przywracania."
 
@@ -14846,7 +14845,7 @@ msgstr "Zdalne polecenie"
 #: app/views/popup.media.php:45 app/views/popup.media.php:110
 #: include/classes/widgets/CWidgetHelper.php:491
 #: include/classes/widgets/CWidgetHelper.php:535 include/forms.inc.php:1551
-#: include/forms.inc.php:2079 include/views/configuration.action.edit.php:94
+#: include/forms.inc.php:2087 include/views/configuration.action.edit.php:94
 #: include/views/configuration.action.edit.php:270
 #: include/views/configuration.action.edit.php:298
 #: include/views/configuration.action.edit.php:386
@@ -15814,7 +15813,7 @@ msgstr "Zaktualizowano skrypt"
 #: app/controllers/CControllerPopupScriptExec.php:62
 #: app/views/administration.script.edit.php:30
 #: app/views/administration.script.list.php:31
-#: include/classes/helpers/CMenuHelper.php:235
+#: include/classes/helpers/CMenuHelper.php:234
 #: include/classes/helpers/CRoleHelper.php:457 jsLoader.php:310
 msgid "Scripts"
 msgstr "Skrypty"
@@ -16249,7 +16248,7 @@ msgstr ""
 msgid "Shape"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:275
+#: include/classes/helpers/CMenuHelper.php:274
 msgid "Share"
 msgstr ""
 
@@ -16443,8 +16442,8 @@ msgstr ""
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:313
-#: include/classes/helpers/CMenuHelper.php:316
+#: include/classes/helpers/CMenuHelper.php:312
+#: include/classes/helpers/CMenuHelper.php:315
 msgid "Sign out"
 msgstr "Wyloguj"
 
@@ -16948,7 +16947,7 @@ msgstr "Niedziela"
 msgid "Super admin"
 msgstr ""
 
-#: include/classes/helpers/CMenuHelper.php:268
+#: include/classes/helpers/CMenuHelper.php:267
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "Wsparcie"
@@ -17811,7 +17810,7 @@ msgstr "Trendy"
 #: app/controllers/CControllerPopupTriggerWizard.php:225
 #: app/controllers/CControllerPopupTriggerWizard.php:299
 #: app/views/popup.services.php:48 include/actions.inc.php:46
-#: include/classes/graphdraw/CLineGraphDraw.php:474 include/events.inc.php:252
+#: include/classes/graphdraw/CLineGraphDraw.php:472 include/events.inc.php:252
 #: include/maps.inc.php:26 include/triggers.inc.php:1181
 #: include/views/configuration.services.edit.php:96
 #: include/views/configuration.services.edit.php:126
@@ -18254,7 +18253,11 @@ msgstr "Adresy URL"
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukraiński (uk_UA)"
 
-#: include/classes/core/CConfigFile.php:246
+#: include/classes/core/CConfigFile.php:241
+msgid "Unable to change configuration file permissions to 0600."
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:251
 msgid "Unable to create the configuration file."
 msgstr "Nie można utworzyć pliku konfiguracji."
 
@@ -18281,7 +18284,7 @@ msgstr ""
 msgid "Unable to load settings API parameters."
 msgstr ""
 
-#: include/classes/core/CConfigFile.php:242
+#: include/classes/core/CConfigFile.php:247
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
@@ -18829,7 +18832,7 @@ msgstr ""
 #: app/views/administration.usergroup.edit.php:29
 #: app/views/administration.usergroup.list.php:31
 #: app/views/dashboard.share.edit.php:29
-#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CMenuHelper.php:214
 #: include/classes/helpers/CRoleHelper.php:453
 #: include/views/monitoring.screen.edit.php:118
 #: include/views/monitoring.slideconf.edit.php:177
@@ -18908,7 +18911,7 @@ msgstr ""
 #: app/views/administration.user.list.php:73
 #: app/views/administration.userrole.edit.php:29
 #: app/views/administration.userrole.list.php:31
-#: include/classes/helpers/CMenuHelper.php:220
+#: include/classes/helpers/CMenuHelper.php:219
 #: include/classes/helpers/CRoleHelper.php:454
 msgid "User roles"
 msgstr ""
@@ -18917,7 +18920,7 @@ msgstr ""
 msgid "User sessions"
 msgstr "Sesje użytkownika"
 
-#: include/classes/helpers/CMenuHelper.php:305
+#: include/classes/helpers/CMenuHelper.php:304
 msgid "User settings"
 msgstr ""
 
@@ -18998,7 +19001,7 @@ msgstr ""
 #: app/views/administration.userrole.list.php:115
 #: app/views/dashboard.share.edit.php:50
 #: app/views/reports.auditlog.list.php:47
-#: include/classes/helpers/CMenuHelper.php:225
+#: include/classes/helpers/CMenuHelper.php:224
 #: include/classes/helpers/CRoleHelper.php:455
 #: include/views/monitoring.screen.edit.php:154
 #: include/views/monitoring.slideconf.edit.php:215
@@ -19845,7 +19848,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:321
-#: include/classes/graphdraw/CLineGraphDraw.php:1873
+#: include/classes/graphdraw/CLineGraphDraw.php:1872
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Wartość MAX osi Y musi być większa od wartości MIN osi Y."
 
@@ -20043,11 +20046,11 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/classes/helpers/CMenuHelper.php:278
+#: include/classes/helpers/CMenuHelper.php:277
 msgid "Zabbix Share"
 msgstr "Współdzielenie Zabbix"
 
-#: include/classes/helpers/CMenuHelper.php:271
+#: include/classes/helpers/CMenuHelper.php:270
 msgid "Zabbix Technical Support"
 msgstr ""
 
@@ -20248,7 +20251,7 @@ msgstr "dotyczy wyłącznie danych przefiltrowanych"
 msgid "agent"
 msgstr "agent"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1398
+#: include/classes/graphdraw/CLineGraphDraw.php:1397
 #: include/classes/html/CSeverity.php:73
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -20369,8 +20372,8 @@ msgstr ""
 msgid "autoregistration"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1380
-#: include/classes/graphdraw/CLineGraphDraw.php:1402
+#: include/classes/graphdraw/CLineGraphDraw.php:1379
+#: include/classes/graphdraw/CLineGraphDraw.php:1401
 #: include/classes/graphdraw/CPieGraphDraw.php:301 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:67
 #: include/views/js/configuration.graph.edit.js.php:138
@@ -20409,8 +20412,8 @@ msgstr ""
 msgid "cannot be changed"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:143
-#: app/controllers/CControllerAuthenticationUpdate.php:215
+#: app/controllers/CControllerAuthenticationUpdate.php:141
+#: app/controllers/CControllerAuthenticationUpdate.php:213
 #: app/controllers/CControllerPopupItemTest.php:1194
 #: app/controllers/CControllerPopupItemTest.php:1202
 #: app/controllers/CControllerPopupItemTest.php:1209
@@ -20847,11 +20850,11 @@ msgstr ""
 msgid "invalid byte sequence in UTF-8"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:117 include/items.inc.php:2055
+#: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2055
 msgid "invalid delay"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:243
+#: include/classes/graphdraw/CLineGraphDraw.php:241
 #: include/classes/graphdraw/CPieGraphDraw.php:168
 #: include/classes/helpers/CSvgGraphHelper.php:373
 msgid "invalid history storage period"
@@ -20869,7 +20872,7 @@ msgstr ""
 msgid "invalid regular expression"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:253
+#: include/classes/graphdraw/CLineGraphDraw.php:251
 #: include/classes/graphdraw/CPieGraphDraw.php:178
 #: include/classes/helpers/CSvgGraphHelper.php:385
 msgid "invalid trend storage period"
@@ -20909,7 +20912,7 @@ msgid "key is empty"
 msgstr "klucz jest pusty"
 
 #: app/views/popup.maintenance.period.php:128
-#: include/classes/graphdraw/CLineGraphDraw.php:1378
+#: include/classes/graphdraw/CLineGraphDraw.php:1377
 #: include/classes/graphdraw/CPieGraphDraw.php:296 include/graphs.inc.php:88
 #: include/maintenances.inc.php:109
 #: include/views/js/configuration.graph.edit.js.php:215
@@ -20921,7 +20924,7 @@ msgstr "ostatni"
 msgid "last() - Last (most recent) T value"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1517
+#: include/classes/graphdraw/CLineGraphDraw.php:1516
 msgid "left"
 msgstr ""
 
@@ -20955,9 +20958,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1016
-#: include/classes/graphdraw/CLineGraphDraw.php:1024
-#: include/classes/graphdraw/CLineGraphDraw.php:1031
+#: include/classes/graphdraw/CLineGraphDraw.php:963
+#: include/classes/graphdraw/CLineGraphDraw.php:964
+#: include/classes/graphdraw/CLineGraphDraw.php:965
 msgid "m-d"
 msgstr "m-d"
 
@@ -20988,8 +20991,8 @@ msgid "matches"
 msgstr "pasuje do"
 
 #: include/classes/api/services/CItemGeneral.php:1417
-#: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/graphdraw/CLineGraphDraw.php:1395
+#: include/classes/graphdraw/CLineGraphDraw.php:1380
+#: include/classes/graphdraw/CLineGraphDraw.php:1394
 #: include/classes/graphdraw/CPieGraphDraw.php:292 include/forms.inc.php:1397
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:68
@@ -21019,8 +21022,8 @@ msgid "maximum number of dependency levels reached"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1417
-#: include/classes/graphdraw/CLineGraphDraw.php:1379
-#: include/classes/graphdraw/CLineGraphDraw.php:1392
+#: include/classes/graphdraw/CLineGraphDraw.php:1378
+#: include/classes/graphdraw/CLineGraphDraw.php:1391
 #: include/classes/graphdraw/CPieGraphDraw.php:288 include/forms.inc.php:1396
 #: include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:66
@@ -21094,7 +21097,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "nowy"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1475
+#: include/classes/graphdraw/CLineGraphDraw.php:1474
 #: include/classes/graphdraw/CPieGraphDraw.php:322
 msgid "no data"
 msgstr "brak danych"
@@ -21271,7 +21274,7 @@ msgstr "wyrażenie regularne"
 msgid "replacement"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1517
+#: include/classes/graphdraw/CLineGraphDraw.php:1516
 msgid "right"
 msgstr ""
 
@@ -21401,7 +21404,7 @@ msgstr ""
 #: app/views/administration.usergroup.edit.php:182
 #: include/classes/api/services/CUserGroup.php:470
 #: include/classes/widgets/CWidgetHelper.php:476
-#: include/classes/widgets/CWidgetHelper.php:523 include/forms.inc.php:2072
+#: include/classes/widgets/CWidgetHelper.php:523 include/forms.inc.php:2080
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.maintenance.edit.php:174
 #: include/views/configuration.template.list.php:47
@@ -21635,7 +21638,7 @@ msgstr "niewspierany numer wersji"
 #: include/classes/widgets/CWidgetHelper.php:531
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:173
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:245
-#: include/forms.inc.php:2077
+#: include/forms.inc.php:2085
 #: include/views/configuration.host.discovery.edit.php:182
 #: include/views/configuration.host.discovery.edit.php:320
 #: include/views/configuration.host.list.php:70
