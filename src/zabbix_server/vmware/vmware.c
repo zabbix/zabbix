@@ -4036,6 +4036,9 @@ out:
 	zbx_free(event_session);
 	zbx_xml_free_doc(doc);
 
+	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num)
+		zabbix_log(LOG_LEVEL_WARNING, "vmware events collector returned empty result");
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);
 
 	return ret;
