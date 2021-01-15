@@ -78,7 +78,7 @@ class CValueMap extends CApiService {
 		$db_valuemaps = [];
 		$sql_parts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
 
-		// PERMISSION CHECK
+		// Permission check.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
