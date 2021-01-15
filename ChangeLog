@@ -134,6 +134,10 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.4rc1
 
 New features:
+...G...... [ZBXCTR-13] added custom query support for PostgreSQL plugin, fixed unix-socket support (Daria_V, vadimipatov)
+.........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
+.........T [ZBXNEXT-6389] added template for NetApp FAS3220 (tuskov)
+...G.....T [ZBXNEXT-6419] added tablespace metrics to Oracle Templates (ychukina)
 ...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
 ...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
@@ -146,6 +150,15 @@ New features:
 A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
 
 Bug fixes:
+.......PS. [ZBX-18860] fixed crash of log item during "Check for not supported value" preprocessing step (akozlovs)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+.........T [ZBX-18853] removed hardcoded teams_endpoint check (tuskov)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18815] fixed displaying incomplete list of inherited trigger tags under rare circumstances (ozdancuka)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
+.........T [ZBX-18468] changed preprocessing for item "PHP-FPM: Ping" in PHP-FPM templates (mchudinov)
+...G...... [ZBX-17369] fixed retrieval of decimal values from WMI (dgoloscapov)
+........S. [ZBX-18410] fixed retrieval of Nth most recent values in trigger function strlen (dgoloscapov)
 A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
 ...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
 ...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)
