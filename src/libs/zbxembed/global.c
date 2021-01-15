@@ -83,7 +83,7 @@ static duk_ret_t	es_atob(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_md5sum                                                        *
+ * Function: es_md5                                                           *
  *                                                                            *
  * Purpose: compute a md5 checksum                                            *
  *                                                                            *
