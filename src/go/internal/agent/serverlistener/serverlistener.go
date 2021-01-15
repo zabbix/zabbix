@@ -69,7 +69,7 @@ func (sl *ServerListener) run() {
 
 	for {
 		conn, err := sl.listener.Accept(time.Second*time.Duration(sl.options.Timeout),
-			tls.MoveConnectionTimeoutOnEachReadOrWrite)
+			zbxcomms.TimeoutModeShift)
 
 		if err == nil {
 			if !sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {

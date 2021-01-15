@@ -960,17 +960,12 @@ func describeCiphersuites(context unsafe.Pointer) (desc string) {
 	return
 }
 
-const (
-	TimeoutConnectionStartingFromWhenItOpens = iota
-	MoveConnectionTimeoutOnEachReadOrWrite
-)
-
 type tlsConn struct {
-	conn        net.Conn
-	tls         unsafe.Pointer
-	buf         []byte
-	timeout     time.Duration
-	timeoutMode int
+	conn          net.Conn
+	tls           unsafe.Pointer
+	buf           []byte
+	timeout       time.Duration
+	shiftDeadline bool
 }
 
 func (c *tlsConn) Error() (err error) {
@@ -993,7 +988,7 @@ func (c *tlsConn) ready() bool {
 func (c *tlsConn) flushTLS() (err error) {
 	for {
 		if cn := C.tls_recv((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
-			if c.timeoutMode == MoveConnectionTimeoutOnEachReadOrWrite {
+			if c.shiftDeadline {
 				if err = c.conn.SetWriteDeadline(time.Now().Add(c.timeout)); err != nil {
 					return
 				}
@@ -1011,7 +1006,7 @@ func (c *tlsConn) flushTLS() (err error) {
 // Note, don't use flushTLS() and recvTLS() concurrently
 func (c *tlsConn) recvTLS() (err error) {
 	var n int
-	if c.timeoutMode == MoveConnectionTimeoutOnEachReadOrWrite {
+	if c.shiftDeadline {
 		if err = c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
 			return
 		}
@@ -1138,7 +1133,7 @@ func (c *Client) Read(b []byte) (n int, err error) {
 	}
 }
 
-func NewClient(nc net.Conn, cfg *Config, timeout time.Duration) (conn net.Conn, err error) {
+func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bool) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
 	}
@@ -1163,11 +1158,11 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration) (conn net.Conn, 
 	// for TLS we overwrite the timeoutMode and force it to move on every read or write
 	c := &Client{
 		tlsConn: tlsConn{
-			conn:        nc,
-			buf:         make([]byte, 4096),
-			tls:         unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret)),
-			timeout:     timeout,
-			timeoutMode: MoveConnectionTimeoutOnEachReadOrWrite,
+			conn:          nc,
+			buf:           make([]byte, 4096),
+			tls:           unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret)),
+			timeout:       timeout,
+			shiftDeadline: shiftDeadline,
 		},
 	}
 	runtime.SetFinalizer(c, func(c *Client) { C.tls_free((*C.tls_t)(c.tls)) })
@@ -1247,7 +1242,7 @@ func (s *Server) Read(b []byte) (n int, err error) {
 	}
 }
 
-func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration) (conn net.Conn, err error) {
+func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftDeadline bool) (conn net.Conn, err error) {
 	if !supported {
 		return nil, errors.New(SupportedErrMsg())
 	}
@@ -1271,11 +1266,11 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration) (conn 
 	// for TLS we overwrite the timeoutMode and force it to move on every read or write
 	s := &Server{
 		tlsConn: tlsConn{
-			conn:        nc,
-			buf:         make([]byte, 4096),
-			tls:         unsafe.Pointer(C.tls_new_server(C.SSL_CTX_LP(context), cUser, cSecret)),
-			timeout:     timeout,
-			timeoutMode: MoveConnectionTimeoutOnEachReadOrWrite,
+			conn:          nc,
+			buf:           make([]byte, 4096),
+			tls:           unsafe.Pointer(C.tls_new_server(C.SSL_CTX_LP(context), cUser, cSecret)),
+			timeout:       timeout,
+			shiftDeadline: shiftDeadline,
 		},
 	}
 	runtime.SetFinalizer(s, func(s *Server) { C.tls_free((*C.tls_t)(s.tls)) })

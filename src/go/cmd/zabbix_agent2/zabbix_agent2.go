@@ -134,8 +134,7 @@ func run() (err error) {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	var control *remotecontrol.Conn
-	var testConnectionTimeout = time.Duration(agent.Options.Timeout) * time.Second
-	if control, err = remotecontrol.New(agent.Options.ControlSocket, testConnectionTimeout); err != nil {
+	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
 		return
 	}
 	control.Start()

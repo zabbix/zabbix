@@ -33,6 +33,11 @@ import (
 	"zabbix.com/pkg/tls"
 )
 
+const (
+	TimeoutModeFixed = iota
+	TimeoutModeShift
+)
+
 const headerSize = 4 + 1 + 4 + 4
 const tcpProtocol = byte(0x01)
 const zlibCompress = byte(0x02)
@@ -75,7 +80,7 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMod
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
 		if tlsconfig != nil {
-			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout)
+			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout, timeoutMode == TimeoutModeShift)
 		}
 	}
 	return
@@ -111,7 +116,7 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 }
 
 func (c *Connection) Write(data []byte) error {
-	if c.TimeoutMode == tls.MoveConnectionTimeoutOnEachReadOrWrite {
+	if c.TimeoutMode == TimeoutModeShift {
 		if err := c.conn.SetWriteDeadline(time.Now().Add(c.Timeout)); err != nil {
 			return err
 		}
@@ -239,7 +244,7 @@ func (c *Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
 }
 
 func (c *Connection) Read() (data []byte, err error) {
-	if c.TimeoutMode == tls.MoveConnectionTimeoutOnEachReadOrWrite {
+	if c.TimeoutMode == TimeoutModeShift {
 		if err = c.conn.SetReadDeadline(time.Now().Add(c.Timeout)); err != nil {
 			return
 		}
@@ -267,7 +272,7 @@ func (c *Connection) Read() (data []byte, err error) {
 			return nil, errors.New("cannot accept encrypted connection")
 		}
 		var tlsConn net.Conn
-		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, c.Timeout); err != nil {
+		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, c.Timeout, c.TimeoutMode == TimeoutModeShift); err != nil {
 			return
 		}
 		c.conn = tlsConn
@@ -334,7 +339,7 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 		}
 	}
 
-	c, err := Open(address, localAddr, timeout, tls.TimeoutConnectionStartingFromWhenItOpens, tlsconfig)
+	c, err := Open(address, localAddr, timeout, TimeoutModeFixed, tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
