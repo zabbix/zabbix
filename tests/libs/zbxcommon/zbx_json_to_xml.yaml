@@ -103,4 +103,11 @@ in:
 out:
   return: SUCCEED
   xml: '<xml attr="atr">10 &gt; 9 &amp; 8 &lt; 9</xml>'
+---
+test case: 'Test 16: several roots with text'
+in:
+  json: '{"a":"b","c":"d"}'
+out:
+  return: SUCCEED
+  xml: '<a>b</a>'
 ...
