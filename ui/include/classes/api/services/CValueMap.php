@@ -323,9 +323,14 @@ class CValueMap extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$hostids = [];
+		foreach ($valuemaps as $valuemap) {
+			$hostids[$valuemap['hostid']] = true;
+		}
+
 		$db_hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => array_keys(array_flip(array_column($valuemaps, 'hostid'))),
+			'hostids' => array_keys($hostids),
 			'templated_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
