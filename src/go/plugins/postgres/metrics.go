@@ -164,7 +164,10 @@ func (v PostgresURIValidator) Validate(value *string) error {
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
-			WithValidator(PostgresURIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+			WithValidator(PostgresURIValidator{
+			Defaults:       uriDefaults,
+			AllowedSchemes: []string{"tcp", "postgresql", "unix"},
+		})
 	paramUsername = metric.NewConnParam("User", "PostgreSQL user.").WithDefault("postgres")
 	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("").
 			WithValidator(metric.LenValidator{Max: &maxPassLen})
