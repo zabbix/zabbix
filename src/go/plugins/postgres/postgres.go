@@ -110,7 +110,7 @@ func (p *Plugin) Start() {
 
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.ConnectTimeout)*time.Second,
+		time.Duration(p.options.Timeout)*time.Second,
 		time.Duration(p.options.CallTimeout)*time.Second,
 		hkInterval*time.Second,
 		queryStorage,

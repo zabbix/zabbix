@@ -41,9 +41,9 @@ type Session struct {
 
 // PluginOptions are options for PostgreSQL connection.
 type PluginOptions struct {
-	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
+	// Timeout is the maximum time in seconds for waiting when a connection has to be established.
 	// Default value equals to the global agent timeout.
-	ConnectTimeout int `conf:"optional,range=1:30"`
+	Timeout int `conf:"optional,range=1:30"`
 
 	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
 	// Default value equals to the global agent timeout.
@@ -66,8 +66,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.ConnectTimeout == 0 {
-		p.options.ConnectTimeout = global.Timeout
+	if p.options.Timeout == 0 {
+		p.options.Timeout = global.Timeout
 	}
 
 	if p.options.CallTimeout == 0 {

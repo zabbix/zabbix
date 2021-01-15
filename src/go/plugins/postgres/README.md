@@ -25,7 +25,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Postgres.ConnectTimeout** — The maximum time in seconds for waiting when a connection has to be established.  
+**Plugins.Postgres.Timeout** — The maximum time in seconds for waiting when a connection has to be established.  
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
