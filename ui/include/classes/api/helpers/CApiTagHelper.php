@@ -65,11 +65,11 @@ class CApiTagHelper {
 
 			if (!is_array($values_by_tag[$tag['tag']][$slot])) {
 				/*
-				 * If previously there was the same tagname with operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS,
+				 * If previously there was the same tag name with operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS,
 				 * we don't collect more values anymore because TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS has higher
 				 * priority.
 				 *
-				 * `continue` is necessary to accidantly not overwrite boolean with array. Tag values collected before
+				 * `continue` is necessary to accidentally not overwrite boolean with array. Tag values collected before
 				 * will be later removed.
 				 */
 				continue;
@@ -112,8 +112,6 @@ class CApiTagHelper {
 				if ($values === []) {
 					continue;
 				}
-
-				$values = $values ? array_filter($values) : false;
 
 				$statement = $table.'.tag='.zbx_dbstr($tag);
 				if ($values) {
