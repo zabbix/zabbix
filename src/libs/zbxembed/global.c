@@ -94,7 +94,7 @@ static duk_ret_t	es_atob(duk_context *ctx)
  *               - if the value stack is empty                                *
  *                                                                            *
  ******************************************************************************/
-static duk_ret_t	es_md5sum(duk_context *ctx)
+static duk_ret_t	es_md5(duk_context *ctx)
 {
 	const char	*hex = "0123456789abcdef";
 	md5_state_t	state;
@@ -142,6 +142,6 @@ void	es_init_global_functions(zbx_es_t *es)
 	duk_push_c_function(es->env->ctx, es_btoa, 1);
 	duk_put_global_string(es->env->ctx, "btoa");
 
-	duk_push_c_function(es->env->ctx, es_md5sum, 1);
-	duk_put_global_string(es->env->ctx, "md5sum");
+	duk_push_c_function(es->env->ctx, es_md5, 1);
+	duk_put_global_string(es->env->ctx, "md5");
 }
