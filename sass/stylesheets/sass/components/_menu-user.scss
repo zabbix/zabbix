@@ -2,14 +2,24 @@ $menu-user-icons-opacity: .75 !default;
 
 $menu-user-arrow-bg-position: -606px -434px !default;
 $menu-user-arrow-hover-bg-position: -606px -434px !default;
+$menu-user-selected-arrow-bg-position: -606px -434px !default;
 
 $menu-user-icons: (
-		support: -247px -48px,
-		share: -90px -84px,
-		help: -90px -48px,
-		guest: -247px -156px,
-		profile: -90px -120px,
-		signout: -90px -156px
+	support: -247px -48px,
+	share: -90px -84px,
+	help: -90px -48px,
+	guest: -247px -156px,
+	profile: -90px -120px,
+	signout: -90px -156px
+) !default;
+
+$menu-user-expanded-icons: (
+	support: -247px -48px,
+	share: -90px -84px,
+	help: -90px -48px,
+	guest: -247px -156px,
+	profile: -90px -120px,
+	signout: -90px -156px
 ) !default;
 
 %menu-user-icon-common {
@@ -33,6 +43,21 @@ $menu-user-icons: (
 		@extend %menu-user-icon-common;
 
 		&::before {
+			background-position: $bg-position;
+		}
+	}
+}
+
+// Dynamically generated classes for icons:
+//  .icon-support
+//  .icon-share
+//  .icon-help
+//  .icon-guest
+//  .icon-profile
+//  .icon-signout
+@each $class, $bg-position in $menu-user-expanded-icons {
+	.is-expanded {
+		.icon-#{$class}::before {
 			background-position: $bg-position;
 		}
 	}
@@ -150,7 +175,7 @@ $menu-user-icons: (
 		&.is-expanded {
 			& > a {
 				&::after {
-					background-position: $menu-user-arrow-hover-bg-position;
+					background-position: $menu-user-selected-arrow-bg-position;
 					transform: rotate(-180deg);
 				}
 
