@@ -104,15 +104,16 @@ class CTemplateImporter extends CImporter {
 						]);
 					}
 
-					if (array_key_exists($createdTemplate['host'], $valuemaps)) {
-						$valuemaps_create = [];
+					if ($this->options['valueMaps']['createMissing']
+							&& array_key_exists($createdTemplate['host'], $valuemaps)) {
+						$ins_valuemaps = [];
 						foreach ($valuemaps[$createdTemplate['host']] as $valuemap) {
 							$valuemap['hostid'] = $templateId;
-							$valuemaps_create[] = $valuemap;
+							$ins_valuemaps[] = $valuemap;
 						}
 
-						if ($valuemaps_create) {
-							API::ValueMap()->create($valuemaps_create);
+						if ($ins_valuemaps) {
+							API::ValueMap()->create($ins_valuemaps);
 						}
 					}
 				}
@@ -172,58 +173,60 @@ class CTemplateImporter extends CImporter {
 						]);
 					}
 
-					if (array_key_exists($updatedTemplate['host'], $valuemaps)) {
-						$valuemaps_create = [];
-						$valuemaps_update = [];
-						$valuemaps_delete = [];
+					$db_valuemaps = API::ValueMap()->get([
+						'output' => ['valuemapid', 'name'],
+						'hostids' => [$updatedTemplate['templateid']]
+					]);
 
-						$db_valuemaps = API::ValueMap()->get([
-							'output' => ['valuemapid', 'name'],
-							'selectMappings' => ['value', 'newvalue'],
-							'hostids' => [$updatedTemplate['templateid']],
-							'preservekeys' => true
-						]);
+					if ($this->options['valueMaps']['createMissing']
+							&& array_key_exists($updatedTemplate['host'], $valuemaps)) {
+						$ins_valuemaps = [];
+						$valuemap_names = array_column($db_valuemaps, 'name');
+						foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
+							if (!in_array($valuemap['name'], $valuemap_names)) {
+								$valuemap['hostid'] = $updatedTemplate['templateid'];
+								$ins_valuemaps[] = $valuemap;
+							}
+						}
 
-						if ($this->options['valueMaps']['createMissing']) {
+						if ($ins_valuemaps) {
+							API::ValueMap()->create($ins_valuemaps);
+						}
+					}
+
+					if ($this->options['valueMaps']['updateExisting']
+							&& array_key_exists($updatedTemplate['host'], $valuemaps)) {
+						$upd_valuemaps = [];
+						foreach ($db_valuemaps as $db_valuemap) {
 							foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
-								if (!in_array($valuemap['name'], array_column($db_valuemaps, 'name'))) {
-									$valuemap['hostid'] = $updatedTemplate['templateid'];
-									$valuemaps_create[] = $valuemap;
+								if ($db_valuemap['name'] === $valuemap['name']) {
+									$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
+									$upd_valuemaps[] = $valuemap;
 								}
-							}
-
-							if ($valuemaps_create) {
-								API::ValueMap()->create($valuemaps_create);
 							}
 						}
 
-						if ($this->options['valueMaps']['updateExisting']) {
-							foreach ($db_valuemaps as $db_valuemap) {
-								foreach ($valuemaps[$updatedTemplate['host']] as $valuemap) {
-									if ($db_valuemap['name'] === $valuemap['name']) {
-										$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
-										$valuemaps_update[] = $valuemap;
-									}
-								}
-							}
+						if ($upd_valuemaps) {
+							API::ValueMap()->update($upd_valuemaps);
+						}
+					}
 
-							if ($valuemaps_update) {
-								API::ValueMap()->update($valuemaps_update);
+					if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
+						$del_valuemapids = [];
+						if (array_key_exists($updatedTemplate['host'], $valuemaps)) {
+							$valuemap_names = array_column($valuemaps[$updatedTemplate['host']], 'name');
+							foreach ($db_valuemaps as $db_valuemap) {
+								if (!in_array($db_valuemap['name'], $valuemap_names)) {
+									$del_valuemapids[] = $db_valuemap['valuemapid'];
+								}
 							}
 						}
+						else {
+							$del_valuemapids = array_column($db_valuemaps, 'valuemapid');
+						}
 
-						if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
-							foreach ($db_valuemaps as $db_valuemap) {
-								if (!in_array($db_valuemap['name'],
-											array_column($valuemaps[$updatedTemplate['host']], 'name')
-										)) {
-									$valuemaps_delete[] = $db_valuemap['valuemapid'];
-								}
-							}
-
-							if ($valuemaps_delete) {
-								API::ValueMap()->delete($valuemaps_delete);
-							}
+						if ($del_valuemapids) {
+							API::ValueMap()->delete($del_valuemapids);
 						}
 					}
 				}
