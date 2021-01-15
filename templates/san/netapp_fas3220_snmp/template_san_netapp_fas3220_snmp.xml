@@ -47,7 +47,7 @@ Template tooling version used: 0.38</description>
                <snmp_oid>1.3.6.1.4.1.789.1.6.4.7.0</snmp_oid>
                <key>fas3220.disk[diskFailedCount]</key>
                <history>7d</history>
-               <description>The number of disks which are currently broken.</description>
+               <description>The number of disks that are currently broken.</description>
                <applications>
                   <application>
                      <name>NetApp FAS3220</name>
@@ -89,7 +89,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
-               <description>Version string for the Firmware running on this platform.</description>
+               <description>Version string for the firmware running on this platform.</description>
                <applications>
                   <application>
                      <name>NetApp FAS3220</name>
@@ -110,7 +110,7 @@ Template tooling version used: 0.38</description>
                <history>7d</history>
                <trends>0</trends>
                <value_type>CHAR</value_type>
-               <description>Version String for the Software Running on this platform.</description>
+               <description>Version string for the software running on this platform.</description>
                <applications>
                   <application>
                      <name>NetApp FAS3220</name>
@@ -139,7 +139,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.19.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"]</key>
                      <history>7d</history>
-                     <description>Count of the number of chassis fans which are not operating within the recommended RPM range.</description>
+                     <description>Count of the number of chassis fans that are not operating within the recommended RPM range.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Node {#NODE.NAME} Health</name>
@@ -160,7 +160,7 @@ Template tooling version used: 0.38</description>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
-                     <description>Text message describing the current condition of chassis fans. This is useful only if envFailedFanCount is not zero.</description>
+                     <description>Text message describing current condition of chassis fans. This is useful only if envFailedFanCount is not zero.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Node {#NODE.NAME} Health</name>
@@ -179,7 +179,7 @@ Template tooling version used: 0.38</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.25.2.1.21.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"]</key>
                      <history>7d</history>
-                     <description>Count of the number of power supplies which are in degraded mode.</description>
+                     <description>Count of the number of power supplies that are in degraded mode.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Node {#NODE.NAME} Health</name>
@@ -200,7 +200,7 @@ Template tooling version used: 0.38</description>
                      <history>7d</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
-                     <description>Text message describing the state of any power supplies which are currently degraded. This is useful only if envFailedPowerSupplyCount is not zero.</description>
+                     <description>Text message describing the state of any power supplies that are currently degraded. This is useful only if envFailedPowerSupplyCount is not zero.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Node {#NODE.NAME} Health</name>
@@ -408,7 +408,7 @@ fullyCharged(9).</description>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}&gt;0 and {Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={Template SAN NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}</expression>
-                     <name>Node {#NODE.NAME}: Degraded power supplies count is over than zero</name>
+                     <name>Node {#NODE.NAME}: Degraded power supplies count is more than zero</name>
                      <priority>AVERAGE</priority>
                      <description>{{ITEM.VALUE2}.regsub("(.*)", \1)}</description>
                   </trigger_prototype>
@@ -691,7 +691,7 @@ fullyCharged(9).</description>
                      <snmp_oid>1.3.6.1.4.1.789.1.21.2.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"]</key>
                      <history>7d</history>
-                     <description>The reason node cannot takeover it's HA partner {#PARTNER.NAME}.&#13;
+                     <description>The reason node cannot take over it's HA partner {#PARTNER.NAME}.&#13;
 Possible states:&#13;
   ok(1),&#13;
   unknownReason(2),&#13;
@@ -777,7 +777,7 @@ Possible states:&#13;
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=5</expression>
-                           <name>Node {#NODE.NAME}: Node has been takenover</name>
+                           <name>Node {#NODE.NAME}: Node has been taken over</name>
                            <priority>HIGH</priority>
                            <description>The thisNodeDead(5) setting indicates that this node has been takenover.</description>
                         </trigger_prototype>
@@ -845,7 +845,7 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <description>The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -909,7 +909,7 @@ Possible states:&#13;
                      <key>fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]</key>
                      <delay>3m</delay>
                      <history>7d</history>
-                     <description>The number of outbound packets which were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
+                     <description>The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -1060,7 +1060,7 @@ Possible states:&#13;
                      <snmp_oid>1.3.6.1.4.1.789.1.22.2.1.11.{#SNMPINDEX}</snmp_oid>
                      <key>fas3220.net.port[netportSpeedOper, "{#NODE}", "{#IFNAME}"]</key>
                      <history>7d</history>
-                     <description>The speed appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
+                     <description>The speed that appears on the port. It can be either undef(0), auto(1), ten Mb/s(2), hundred Mb/s(3), one Gb/s(4), or ten Gb/s(5).</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#IFDESCR}</name>
@@ -1246,7 +1246,7 @@ return JSON.stringify(out);</params>
             <macro>
                <macro>{$FAS3220.FS.AVAIL.MIN.CRIT}</macro>
                <value>10G</value>
-               <description>Minimum available space on disk. Can be used with {#FSNAME} as context.</description>
+               <description>Minimum available space on the disk. Can be used with {#FSNAME} as context.</description>
             </macro>
             <macro>
                <macro>{$FAS3220.FS.NAME.MATCHES}</macro>
