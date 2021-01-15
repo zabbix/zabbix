@@ -980,7 +980,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		// Add value mapping.
-		if ($options['selectValueMaps'] !== null && $options['selectValueMaps'] != API_OUTPUT_COUNT) {
+		if ($options['selectValueMaps'] !== null) {
 			if ($options['selectValueMaps'] === API_OUTPUT_EXTEND) {
 				$options['selectValueMaps'] = ['valuemapid', 'name', 'mappings'];
 			}
@@ -990,17 +990,13 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			unset($host);
 
-			$valuemaps_options = [
-				'output' => ['valuemapid', 'hostid'],
+			$valuemaps = DB::select('valuemap', [
+				'output' => array_diff($this->outputExtend($options['selectValueMaps'], ['valuemapid', 'hostid']),
+					['mappings']
+				),
 				'filter' => ['hostid' => $hostids],
 				'preservekeys' => true
-			];
-
-			if ($this->outputIsRequested('name', $options['selectValueMaps'])) {
-				$valuemaps_options['output'][] = 'name';
-			}
-
-			$valuemaps = DBfetchArrayAssoc(DBselect(DB::makeSql('valuemap', $valuemaps_options)), 'valuemapid');
+			]);
 
 			if ($this->outputIsRequested('mappings', $options['selectValueMaps']) && $valuemaps) {
 				$params = [
