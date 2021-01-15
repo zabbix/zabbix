@@ -4036,7 +4036,7 @@ out:
 	zbx_free(event_session);
 	zbx_xml_free_doc(doc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __func__, zbx_result_string(ret), events->values_num);
 
 	return ret;
 }
@@ -4895,6 +4895,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 			else
 				skip_old = 0;
 		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
+				" bytes of free VMwareCache memory. Reading events skipped", service->eventlog.req_sz);
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
