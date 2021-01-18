@@ -468,7 +468,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -618,7 +618,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 											]],
-											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
@@ -876,7 +876,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -1135,7 +1135,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -1283,7 +1283,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 											]],
-											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
@@ -1539,7 +1539,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
@@ -2056,6 +2056,21 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 	}
 
 	/**
+	 * Chooses default value for preprocessing step error handler.
+	 *
+	 * @param array $parent_data  Data's parent array.
+	 *
+	 * @return int
+	 */
+	public function defaultPreprocErrHandler(array $parent_data): int {
+		if ($parent_data['type'] == CXmlConstantValue::CHECK_NOT_SUPPORTED) {
+			return CXmlConstantValue::DISCARD_VALUE;
+		}
+
+		return CXmlConstantValue::ORIGINAL_ERROR;
+	}
+
+	/**
 	 * Validate "screen_item/resource" tag.
 	 *
 	 * @param array|string $data         Import data.
@@ -2295,6 +2310,29 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Validate preprocessing step error handler.
+	 *
+	 * @param string|array $data         Import data.
+	 * @param array        $parent_data  Data's parent array.
+	 * @param string       $path         XML path.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return string|array
+	 */
+	public function validatePreprocErrHandler($data, array $parent_data, $path) {
+		$in = $this->ITEM_PREPROCESSING_ERROR_HANDLER;
+
+		if ($parent_data['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
+			unset($in[CXmlConstantValue::ORIGINAL_ERROR]);
+		}
+
+		$rules = ['type' => XML_STRING, 'in' => $in];
+
+		return $this->doValidate($rules, $data, $path);
 	}
 
 	/**
