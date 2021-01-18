@@ -503,8 +503,10 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
-
 	mask = duk_to_int32(ctx, 0);
+
+	if (0 != (mask & ~(CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NEGOTIATE | CURLAUTH_NTLM)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "invalid HTTP authentication mask");
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
