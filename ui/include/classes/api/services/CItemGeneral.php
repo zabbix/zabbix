@@ -2604,14 +2604,14 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		if (array_key_exists('valuemapid', $item) && $item['valuemapid']) {
+		if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0) {
 			$db_valuemap = API::ValueMap()->get([
 				'output' => ['hostid'],
 				'valuemapids' => [$item['valuemapid']],
 				'preservekeys' => true
 			]);
 
-			if ($item['hostid'] !== $db_valuemap[$item['valuemapid']]['hostid']) {
+			if (bccomp($item['hostid'], $db_valuemap[$item['valuemapid']]['hostid' ]) != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
 					$item['valuemapid'], $host_name
 				));

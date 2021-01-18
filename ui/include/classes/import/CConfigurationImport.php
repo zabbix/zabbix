@@ -250,7 +250,7 @@ class CConfigurationImport {
 				}
 
 				if (!empty($item['valuemap'])) {
-					$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
+					$valueMapsRefs[$host][$item['valuemap']['name']] = $item['valuemap']['name'];
 				}
 			}
 		}
@@ -267,7 +267,7 @@ class CConfigurationImport {
 					}
 
 					if (!empty($itemp['valuemap'])) {
-						$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
+						$valueMapsRefs[$host][$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
 					}
 				}
 
@@ -714,7 +714,7 @@ class CConfigurationImport {
 				}
 
 				if (isset($item['valuemap']) && $item['valuemap']) {
-					$valueMapId = $this->referencer->resolveValueMap($item['valuemap']['name']);
+					$valueMapId = $this->referencer->resolveValueMap($hostId, $item['valuemap']['name']);
 
 					if (!$valueMapId) {
 						throw new Exception(_s(
@@ -1107,7 +1107,7 @@ class CConfigurationImport {
 					}
 
 					if ($prototype['valuemap']) {
-						$valueMapId = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
+						$valueMapId = $this->referencer->resolveValueMap($hostId, $prototype['valuemap']['name']);
 
 						if (!$valueMapId) {
 							throw new Exception(_s(
