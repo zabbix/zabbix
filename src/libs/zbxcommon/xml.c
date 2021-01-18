@@ -653,10 +653,17 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
 	{
 		if (NULL != (pErr = xmlGetLastError()))
 		{
-			if (0 > maxerrlen)
-				*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pErr->message);
+			const char	*pmessage;
+
+			if (NULL != strstr(pErr->message, "use XML_PARSE_HUGE option"))
+				pmessage = "Excessive depth in XML document";
 			else
-				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML value: %s", pErr->message);
+				pmessage = pErr->message;
+
+			if (0 > maxerrlen)
+				*errmsg = zbx_dsprintf(*errmsg, "cannot parse xml value: %s", pmessage);
+			else
+				zbx_snprintf(*errmsg, (size_t)maxerrlen, "Cannot parse XML value: %s", pmessage);
 		}
 		else
 		{
@@ -904,6 +911,8 @@ static void	json_to_xmlnode(struct zbx_json_parse *jp, char *arr_name, int deep,
 		idx++;
 	}
 	while (NULL != json_string_ptr);
+
+	zbx_free(pvalue);
 }
 #endif /* HAVE_LIBXML2 */
 

@@ -22,19 +22,23 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
 
 func TestPlugin_databasesAgeHandler(t *testing.T) {
-	sharedPool, err := getConnPool(t)
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -43,24 +47,19 @@ func TestPlugin_databasesAgeHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("databasesAgeHandler should return age of each database "),
+			fmt.Sprintf("databaseAgeHandler should return age of each database "),
 			&impl,
-			args{conn: sharedPool, params: []string{"postgres"}},
+			args{context.Background(), sharedPool, keyDatabaseAge, testParamDatabase, []string{}},
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			_, err := tt.p.databasesAgeHandler(tt.args.conn, keyPostgresDatabasesAge, tt.args.params)
+			_, err := databaseAgeHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.databaseAgeHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
-			/* if got.(int64) == 0 {
-				t.Errorf("Plugin.databasesHandler() = %v", got)
-			} */
 		})
 	}
 }

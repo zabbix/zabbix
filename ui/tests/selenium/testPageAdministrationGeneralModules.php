@@ -549,7 +549,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
 		foreach ($module['menu_entries'] as $entry) {
-//			$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
 			sleep(1);
 			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
