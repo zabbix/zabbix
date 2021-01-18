@@ -217,7 +217,9 @@ if (count($data['steps']) > 0) {
 
 		$result_table->addRow([
 			$step['num'].':',
-			(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
+			(new CCol($step['name']))
+				->setId('preproc-test-step-'.$i.'-name')
+				->addClass(ZBX_STYLE_PREWRAP),
 			(new CCol())
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result')

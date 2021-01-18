@@ -1024,7 +1024,7 @@ z-select,
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
-pre, pre a, pre td, pre span, .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
+pre, pre a, pre td, pre span, .prewrap {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word; }
@@ -5438,9 +5438,9 @@ svg {
     margin-left: auto;
     line-height: 24px; }
 
-table.preprocessing-test-results td {
+.preprocessing-test-results td {
   vertical-align: top !important; }
-table.preprocessing-test-results .rel-container {
+.preprocessing-test-results .rel-container {
   top: 4px;
   margin-left: 3px; }
 
