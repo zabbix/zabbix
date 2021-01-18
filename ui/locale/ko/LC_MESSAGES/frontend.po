@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 19:56+0200\n"
+"POT-Creation-Date: 2021-01-18 17:40+0200\n"
 "PO-Revision-Date: 2018-12-04 06:16+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6885,7 +6885,7 @@ msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:437
+#: app/views/popup.itemtestedit.view.php:439
 msgid "Get value and test"
 msgstr ""
 
@@ -10081,7 +10081,7 @@ msgstr "\"%2$s\" 상의 아이템 \"%1$s\": 어플리케이션 \"%3$s\"는 존�
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
 
-#: app/views/popup.itemtestedit.view.php:422
+#: app/views/popup.itemtestedit.view.php:424
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
 
@@ -14018,7 +14018,7 @@ msgstr "설치 사전 준비 요약"
 msgid "Preprocessing"
 msgstr "보존하기 전의 처리"
 
-#: app/views/popup.itemtestedit.view.php:356
+#: app/views/popup.itemtestedit.view.php:358
 #: include/views/configuration.host.discovery.edit.php:856
 #: include/views/configuration.item.edit.php:946
 #: include/views/configuration.item.massupdate.php:243
@@ -14978,7 +14978,7 @@ msgstr ""
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
 #: app/views/popup.itemtestedit.view.php:329
-#: app/views/popup.itemtestedit.view.php:367
+#: app/views/popup.itemtestedit.view.php:369
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:179
 #: include/classes/debug/CProfiler.php:183
@@ -17106,7 +17106,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:437
+#: app/views/popup.itemtestedit.view.php:439
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1547
 #: include/views/configuration.host.discovery.edit.php:881

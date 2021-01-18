@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 19:56+0200\n"
+"POT-Creation-Date: 2021-01-18 17:40+0200\n"
 "PO-Revision-Date: 2015-12-27 12:32+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: NL\n"
@@ -6960,7 +6960,7 @@ msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:437
+#: app/views/popup.itemtestedit.view.php:439
 msgid "Get value and test"
 msgstr ""
 
@@ -10164,7 +10164,7 @@ msgstr "Item \"%1$s\" op \"%2$s\": applicatie \"%3$s\" bestaat niet."
 msgid "Item added"
 msgstr "Item toegevoegd"
 
-#: app/views/popup.itemtestedit.view.php:422
+#: app/views/popup.itemtestedit.view.php:424
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
 
@@ -14122,7 +14122,7 @@ msgstr ""
 msgid "Preprocessing"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:356
+#: app/views/popup.itemtestedit.view.php:358
 #: include/views/configuration.host.discovery.edit.php:856
 #: include/views/configuration.item.edit.php:946
 #: include/views/configuration.item.massupdate.php:243
@@ -15084,7 +15084,7 @@ msgstr ""
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
 #: app/views/popup.itemtestedit.view.php:329
-#: app/views/popup.itemtestedit.view.php:367
+#: app/views/popup.itemtestedit.view.php:369
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:179
 #: include/classes/debug/CProfiler.php:183
@@ -17213,7 +17213,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:437
+#: app/views/popup.itemtestedit.view.php:439
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1547
 #: include/views/configuration.host.discovery.edit.php:881
