@@ -62,7 +62,6 @@ A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result 
 .........T [ZBX-18853] removed hardcoded teams_endpoint check (tuskov)
 ...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
 ..F....... [ZBX-18815] fixed displaying incomplete list of inherited trigger tags under rare circumstances (ozdancuka)
-..F....... [ZBX-18843] fixed incorrect message type for error (rlataria)
 ..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
 .........T [ZBX-18468] changed preprocessing for item "PHP-FPM: Ping" in PHP-FPM templates (mchudinov)
 ...G...... [ZBX-17369] fixed retrieval of decimal values from WMI (dgoloscapov)
