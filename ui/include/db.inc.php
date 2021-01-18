@@ -620,7 +620,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 	$MAX_NUM_IN = 950; // Maximum number of values for using "IN (<id1>,<id2>,...,<idN>)".
 
 	if (is_bool(reset($values))) {
-		return '1=0';
+		return $not_in ? '1=1' : '1=0';
 	}
 
 	$values = array_flip($values);
@@ -940,4 +940,50 @@ function zbx_dbcast_2bigint($field) {
 		default:
 			return false;
 	}
+}
+
+/**
+ * Get the updated values of a record by comparing the new and old ones, taking field types into account.
+ *
+ * @param string  $table_name
+ * @param array   $new_values
+ * @param array   $old_values
+ *
+ * @return array  The updated fields.
+ */
+function dbUpdatedValues(string $table_name, array $new_values, array $old_values): array {
+	$update = [];
+
+	$fields = array_intersect_key(DB::getSchema($table_name)['fields'], $new_values);
+
+	foreach ($fields as $name => $spec) {
+		if (!array_key_exists($name, $old_values)) {
+			$update[$name] = $new_values[$name];
+			continue;
+		}
+
+		switch ($spec['type']) {
+			case DB::FIELD_TYPE_ID:
+				if (!idcmp($new_values[$name], $old_values[$name])) {
+					$update[$name] = $new_values[$name];
+				}
+				break;
+
+			case DB::FIELD_TYPE_INT:
+			case DB::FIELD_TYPE_UINT:
+			case DB::FIELD_TYPE_FLOAT:
+				if ($new_values[$name] != $old_values[$name]) {
+					$update[$name] = $new_values[$name];
+				}
+				break;
+
+			default:
+				if ($new_values[$name] !== $old_values[$name]) {
+					$update[$name] = $new_values[$name];
+				}
+				break;
+		}
+	}
+
+	return $update;
 }
