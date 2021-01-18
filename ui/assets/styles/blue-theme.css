@@ -1011,7 +1011,7 @@ z-select,
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
-pre, pre a, pre td, pre span, .prewrap {
+pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word; }
@@ -1528,6 +1528,10 @@ form.is-loading {
 
 .wordwrap {
   word-break: break-all; }
+
+.wordbreak {
+  white-space: pre-wrap;
+  word-break: break-word; }
 
 .overflow-table {
   overflow-x: auto;

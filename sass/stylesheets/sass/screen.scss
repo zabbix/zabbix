@@ -985,8 +985,9 @@ form {
 	word-break: break-all;
 }
 
-.prewrap {
-	@extend %space-pre-wrap;
+.wordbreak {
+	white-space: pre-wrap;
+	word-break: break-word;
 }
 
 .overflow-table {
