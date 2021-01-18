@@ -5085,7 +5085,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 			perfvalue->instance = (NULL != instance ? instance : zbx_strdup(NULL, ""));
 
 			if (0 == strcmp(value, "-1") || SUCCEED != is_uint64(value, &perfvalue->value))
-				perfvalue->value = UINT64_MAX;
+				perfvalue->value = ZBX_MAX_UINT64;
 			else if (FAIL == ret)
 				ret = SUCCEED;
 
