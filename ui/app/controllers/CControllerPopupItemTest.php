@@ -137,56 +137,56 @@ abstract class CControllerPopupItemTest extends CController {
 		'url' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'posts' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'http_proxy' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'ssl_cert_file' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'ssl_key_file' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'query_fields' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'headers' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'parameters' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
-			'item' => ['{ITEM.ID}', '{ITEM.KEY}'],
+			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
@@ -914,9 +914,30 @@ abstract class CControllerPopupItemTest extends CController {
 				'{ITEM.ID}' => (array_key_exists('itemid', $inputs) && $inputs['itemid'])
 					? $inputs['itemid']
 					: UNRESOLVED_MACRO_STRING,
-				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : UNRESOLVED_MACRO_STRING
+				'{ITEM.KEY}' => array_key_exists('key', $inputs) ? $inputs['key'] : UNRESOLVED_MACRO_STRING,
+				'{ITEM.KEY.ORIG}' => array_key_exists('key', $inputs) ? $inputs['key'] : UNRESOLVED_MACRO_STRING
 			]
 		];
+
+		if (array_key_exists('key', $inputs) && strstr($inputs['key'], '{') !== false) {
+			$usermacros = CMacrosResolverHelper::extractItemTestMacros([
+				'steps' => [],
+				'delay' => '',
+				'supported_macros' => array_diff_key($this->macros_by_item_props['key'],
+					['support_user_macros' => true, 'support_lld_macros' => true]
+				),
+				'support_lldmacros' => ($this->preproc_item instanceof CItemPrototype),
+				'texts_support_macros' => [$inputs['key']],
+				'texts_support_lld_macros' => [$inputs['key']],
+				'texts_support_user_macros' => [$inputs['key']],
+				'hostid' => $this->host ? $this->host['hostid'] : 0,
+				'macros_values' => array_intersect_key($macros, $this->macros_by_item_props['key'])
+			]);
+
+			foreach ($usermacros['macros'] as $macro => $value) {
+				$macros['item']['{ITEM.KEY}'] = str_replace($macro, $value, $macros['item']['{ITEM.KEY}']);
+			}
+		}
 
 		return $macros;
 	}
