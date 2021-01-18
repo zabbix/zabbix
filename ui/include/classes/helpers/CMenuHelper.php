@@ -232,7 +232,7 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
-					->setSubMenu(new CMenu([
+					->setSubMenu(new CMenu(array_filter([
 						(new CMenuItem(_('GUI')))
 							->setAction('gui.edit'),
 						(new CMenuItem(_('Autoregistration')))
@@ -258,12 +258,14 @@ class CMenuHelper {
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
-						(new CMenuItem(_('API tokens')))
-							->setAction('token.list')
-							->setAliases(['token.edit', 'token.view']),
+						(!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS))
+							? (new CMenuItem(_('API tokens')))
+								->setAction('token.list')
+								->setAliases(['token.edit', 'token.view'])
+							: null,
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
-					]))
+					])))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				? (new CMenuItem(_('Proxies')))
