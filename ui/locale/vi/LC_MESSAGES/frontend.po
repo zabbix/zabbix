@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 19:54+0200\n"
+"POT-Creation-Date: 2021-01-18 17:38+0200\n"
 "PO-Revision-Date: 2020-09-14 08:12+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -6653,7 +6653,7 @@ msgid "Get value"
 msgstr "Lấy giá trị"
 
 #: app/views/js/popup.itemtestedit.view.js.php:485
-#: app/views/popup.itemtestedit.view.php:312
+#: app/views/popup.itemtestedit.view.php:314
 msgid "Get value and test"
 msgstr "Nhận giá trị và kiểm tra"
 
@@ -9858,7 +9858,7 @@ msgstr "Item \"%1$s\" trên \"%2$s\": ứng dụng \"%3$s\" không tồn tại
 msgid "Item added"
 msgstr "Item đã được thêm vào"
 
-#: app/views/popup.itemtestedit.view.php:297
+#: app/views/popup.itemtestedit.view.php:299
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
 msgstr "Mục chứa macro người dùng định nghĩa loại \"Secret text\". Giá trị của macro phải được nhập thủ công."
 
@@ -13688,7 +13688,7 @@ msgstr "Tóm tắt chuẩn bị cài đặt"
 msgid "Preprocessing"
 msgstr "Tiền xử lý"
 
-#: app/views/popup.itemtestedit.view.php:228
+#: app/views/popup.itemtestedit.view.php:230
 #: include/views/configuration.host.discovery.edit.php:766
 #: include/views/configuration.item.edit.php:859
 #: include/views/configuration.item.massupdate.php:237
@@ -14627,7 +14627,7 @@ msgstr "Kiểu phản hồi: chuỗi"
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
 #: app/views/popup.itemtestedit.view.php:201
-#: app/views/popup.itemtestedit.view.php:236
+#: app/views/popup.itemtestedit.view.php:238
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:172
 #: include/classes/debug/CProfiler.php:183
@@ -16682,7 +16682,7 @@ msgstr "Các mẫu đã được cập nhật"
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:508
-#: app/views/popup.itemtestedit.view.php:312
+#: app/views/popup.itemtestedit.view.php:314
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1450
 #: include/views/configuration.host.discovery.edit.php:790

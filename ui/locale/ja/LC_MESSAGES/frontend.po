@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 19:54+0200\n"
+"POT-Creation-Date: 2021-01-18 17:38+0200\n"
 "PO-Revision-Date: 2020-12-20 09:11+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -6653,7 +6653,7 @@ msgid "Get value"
 msgstr "値の取得"
 
 #: app/views/js/popup.itemtestedit.view.js.php:485
-#: app/views/popup.itemtestedit.view.php:312
+#: app/views/popup.itemtestedit.view.php:314
 msgid "Get value and test"
 msgstr "値の取得とテスト"
 
@@ -9858,7 +9858,7 @@ msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は�
 msgid "Item added"
 msgstr "アイテムを追加しました"
 
-#: app/views/popup.itemtestedit.view.php:297
+#: app/views/popup.itemtestedit.view.php:299
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
 msgstr "アイテムに\"隠しテキスト\"形式のユーザーマクロが含まれています。これらのマクロの値は手動で入力してください。"
 
@@ -13688,7 +13688,7 @@ msgstr "インストール事前準備概要"
 msgid "Preprocessing"
 msgstr "保存前処理"
 
-#: app/views/popup.itemtestedit.view.php:228
+#: app/views/popup.itemtestedit.view.php:230
 #: include/views/configuration.host.discovery.edit.php:766
 #: include/views/configuration.item.edit.php:859
 #: include/views/configuration.item.massupdate.php:237
@@ -14627,7 +14627,7 @@ msgstr "レスポンスタイプ: 文字列"
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
 #: app/views/popup.itemtestedit.view.php:201
-#: app/views/popup.itemtestedit.view.php:236
+#: app/views/popup.itemtestedit.view.php:238
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:172
 #: include/classes/debug/CProfiler.php:183
@@ -16682,7 +16682,7 @@ msgstr "テンプレートを更新しました"
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:508
-#: app/views/popup.itemtestedit.view.php:312
+#: app/views/popup.itemtestedit.view.php:314
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1450
 #: include/views/configuration.host.discovery.edit.php:790
