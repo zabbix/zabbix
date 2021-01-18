@@ -52,7 +52,7 @@ $token_from_list = (new CFormList())
 			? ['&nbsp;', makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
 			: null
 	])
-	->addRow(_('Description').':', (new CDiv($data['description']))->addClass(ZBX_STYLE_WORDBREAK))
+	->addRow(_('Description').':', $data['description'])
 	->addRow(new CLabel(_('Enabled').':', 'enabled'),
 		(new CCheckBox('enabled'))
 			->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)

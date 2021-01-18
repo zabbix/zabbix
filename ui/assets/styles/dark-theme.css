@@ -1852,9 +1852,6 @@ form.is-loading {
 .wordwrap {
   word-break: break-all; }
 
-.wordbreak {
-  word-break: break-word; }
-
 .overflow-table {
   overflow-x: auto;
   position: relative; }
