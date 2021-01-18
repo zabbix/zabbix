@@ -612,18 +612,6 @@ int	zbx_es_init_httprequest(zbx_es_t *es, char **error)
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NEGOTIATE");
 	duk_push_number(es->env->ctx, CURLAUTH_NTLM);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NTLM");
-	duk_push_number(es->env->ctx, CURLAUTH_DIGEST_IE);
-	duk_put_global_string(es->env->ctx, "HTTPAUTH_DIGEST_IE");
-	duk_push_number(es->env->ctx, CURLAUTH_NTLM_WB);
-	duk_put_global_string(es->env->ctx, "HTTPAUTH_NTLM_WB");
-	duk_push_number(es->env->ctx, CURLAUTH_BEARER);
-	duk_put_global_string(es->env->ctx, "HTTPAUTH_BEARER");
-	duk_push_number(es->env->ctx, CURLAUTH_ONLY);
-	duk_put_global_string(es->env->ctx, "HTTPAUTH_ONLY");
-	duk_push_number(es->env->ctx, (zbx_uint32_t)CURLAUTH_ANY);
-	duk_put_global_string(es->env->ctx, "HTTPAUTH_ANY");
-	duk_push_number(es->env->ctx, (zbx_uint32_t)CURLAUTH_ANYSAFE);
-	duk_put_global_string(es->env->ctx, "HTTPAUTH_ANYSAFE");
 
 	return SUCCEED;
 }
