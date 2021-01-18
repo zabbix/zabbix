@@ -1,1 +1,0 @@
-...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
