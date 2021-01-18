@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 19:58+0200\n"
-"PO-Revision-Date: 2021-01-15 10:03+0300\n"
+"POT-Creation-Date: 2021-01-18 17:41+0200\n"
+"PO-Revision-Date: 2021-01-18 14:09+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1610697810.000000\n"
+"X-POOTLE-MTIME: 1610971749.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -6985,7 +6985,7 @@ msgid "Get value"
 msgstr "קבלת ערך"
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:437
+#: app/views/popup.itemtestedit.view.php:439
 msgid "Get value and test"
 msgstr "קבלת ערך ובדיקה"
 
@@ -10193,7 +10193,7 @@ msgstr "הפריט „%1$s” על גבי „%2$s”: היישום „%3$s” ל
 msgid "Item added"
 msgstr "נוסף פריט"
 
-#: app/views/popup.itemtestedit.view.php:422
+#: app/views/popup.itemtestedit.view.php:424
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr "הפריט מכיל תסריטי מאקרו שנערכו על ידי המשתמש עם ערכים סודיים. את הערכים של תסריטי המאקרו האלה יש למלא ידנית."
 
@@ -14108,7 +14108,7 @@ msgstr "תקציר טרום התקנה"
 msgid "Preprocessing"
 msgstr "עיבוד טרומי"
 
-#: app/views/popup.itemtestedit.view.php:356
+#: app/views/popup.itemtestedit.view.php:358
 #: app/views/popup.massupdate.item.php:217
 #: include/views/configuration.host.discovery.edit.php:877
 #: include/views/configuration.item.edit.php:946
@@ -15065,7 +15065,7 @@ msgstr "סוג התגובה: מחרוזת"
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
 #: app/views/popup.itemtestedit.view.php:329
-#: app/views/popup.itemtestedit.view.php:367
+#: app/views/popup.itemtestedit.view.php:369
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:179
 #: include/classes/debug/CProfiler.php:183
@@ -15376,7 +15376,7 @@ msgstr "גרסת SNMP"
 #: include/items.inc.php:1261 include/items.inc.php:1265
 #, c-format
 msgid "SNMPv%1$d"
-msgstr ""
+msgstr "SNMPv%1$d"
 
 #: app/views/popup.itemtestedit.view.php:132
 #: include/views/js/configuration.host.edit.js.php:80
@@ -17197,7 +17197,7 @@ msgstr "תבניות עודכנו"
 #: app/views/administration.mediatype.list.php:141
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:437
+#: app/views/popup.itemtestedit.view.php:439
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1565
 #: include/views/configuration.host.discovery.edit.php:902
@@ -18136,7 +18136,7 @@ msgstr "אוקראינית (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:241
 msgid "Unable to change configuration file permissions to 0600."
-msgstr ""
+msgstr "לא ניתן לשנות את הרשאות קובץ ההגדרות ל־0600."
 
 #: include/classes/core/CConfigFile.php:251
 msgid "Unable to create the configuration file."
@@ -19698,7 +19698,7 @@ msgstr "אמור להיות XML"
 
 #: include/items.inc.php:1817
 msgid "XML to JSON"
-msgstr ""
+msgstr "XML ל־JSON"
 
 #: include/forms.inc.php:1396 include/views/js/item.preprocessing.js.php:141
 msgid "XPath"
