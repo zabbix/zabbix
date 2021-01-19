@@ -533,7 +533,6 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (NULL != password)
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PASSWORD, password, err);
-
 out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
@@ -610,7 +609,11 @@ int	zbx_es_init_httprequest(zbx_es_t *es, char **error)
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_BASIC");
 	duk_push_number(es->env->ctx, CURLAUTH_DIGEST);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_DIGEST");
+#if LIBCURL_VERSION_NUM >= 0x072600
 	duk_push_number(es->env->ctx, CURLAUTH_NEGOTIATE);
+#else
+	duk_push_number(es->env->ctx, CURLAUTH_GSSNEGOTIATE);
+#endif
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NEGOTIATE");
 	duk_push_number(es->env->ctx, CURLAUTH_NTLM);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NTLM");
