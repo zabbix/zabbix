@@ -888,82 +888,6 @@ abstract class CDashboardGeneral extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$dashboardids = array_keys($result);
-
-		// Adding user shares.
-		if ($options['selectUsers'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'dashboardid', 'userid', 'dashboard_user');
-			// Get all allowed users.
-			$db_users = API::User()->get([
-				'output' => [],
-				'userids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
-
-			if ($db_users) {
-				$db_dashboard_users = API::getApiService()->select('dashboard_user', [
-					'output' => $this->outputExtend($options['selectUsers'], ['dashboardid', 'userid']),
-					'filter' => ['dashboardid' => $dashboardids, 'userid' => array_keys($db_users)],
-					'preservekeys' => true
-				]);
-
-				$relation_map = $this->createRelationMap($db_dashboard_users, 'dashboardid', 'dashboard_userid');
-
-				$db_dashboard_users = $this->unsetExtraFields($db_dashboard_users, ['userid'], $options['selectUsers']);
-
-				foreach ($db_dashboard_users as &$db_dashboard_user) {
-					unset($db_dashboard_user['dashboard_userid'], $db_dashboard_user['dashboardid']);
-				}
-				unset($db_dashboard_user);
-
-				$result = $relation_map->mapMany($result, $db_dashboard_users, 'users');
-			}
-			else {
-				foreach ($result as &$row) {
-					$row['users'] = [];
-				}
-				unset($row);
-			}
-		}
-
-		// Adding user group shares.
-		if ($options['selectUserGroups'] !== null) {
-			$relation_map = $this->createRelationMap($result, 'dashboardid', 'usrgrpid', 'dashboard_usrgrp');
-			// Get all allowed groups.
-			$db_usrgrps = API::UserGroup()->get([
-				'output' => [],
-				'usrgrpids' => $relation_map->getRelatedIds(),
-				'preservekeys' => true
-			]);
-
-			if ($db_usrgrps) {
-				$db_dashboard_usrgrps = API::getApiService()->select('dashboard_usrgrp', [
-					'output' => $this->outputExtend($options['selectUserGroups'], ['dashboardid', 'usrgrpid']),
-					'filter' => ['dashboardid' => $dashboardids, 'usrgrpid' => array_keys($db_usrgrps)],
-					'preservekeys' => true
-				]);
-
-				$relation_map = $this->createRelationMap($db_dashboard_usrgrps, 'dashboardid', 'dashboard_usrgrpid');
-
-				$db_dashboard_usrgrps =
-					$this->unsetExtraFields($db_dashboard_usrgrps, ['usrgrpid'], $options['selectUserGroups']);
-
-				foreach ($db_dashboard_usrgrps as &$db_dashboard_usrgrp) {
-					unset($db_dashboard_usrgrp['dashboard_usrgrpid'], $db_dashboard_usrgrp['dashboardid']);
-				}
-				unset($db_dashboard_usrgrp);
-
-				$result = $relation_map->mapMany($result, $db_dashboard_usrgrps, 'userGroups');
-			}
-			else {
-				foreach ($result as &$row) {
-					$row['userGroups'] = [];
-				}
-				unset($row);
-			}
-		}
-
-		// Adding dashboard pages.
 		if ($options['selectPages'] !== null) {
 			foreach ($result as &$row) {
 				$row['pages'] = [];
@@ -978,64 +902,66 @@ abstract class CDashboardGeneral extends CApiService {
 
 			$db_pages = API::getApiService()->select('dashboard_page', [
 				'output' => $this->outputExtend($options['selectPages'], ['dashboardid', 'sortorder']),
-				'filter' => ['dashboardid' => $dashboardids],
+				'filter' => ['dashboardid' => array_keys($result)],
 				'preservekeys' => true
 			]);
 
-			uasort($db_pages,
-				function(array $db_page_1, array $db_page_2): int {
-					return $db_page_1['sortorder'] <=> $db_page_2['sortorder'];
-				}
-			);
-
-			if ($widgets_requested) {
-				foreach ($db_pages as &$db_page) {
-					$db_page['widgets'] = [];
-				}
-				unset($db_page);
-
-				$db_widgets = API::getApiService()->select('widget', [
-					'output' => API_OUTPUT_EXTEND,
-					'filter' => ['dashboard_pageid' => array_keys($db_pages)],
-					'preservekeys' => true
-				]);
-
-				if ($db_widgets) {
-					foreach ($db_widgets as &$db_widget) {
-						$db_widget['fields'] = [];
+			if ($db_pages) {
+				uasort($db_pages,
+					function(array $db_page_1, array $db_page_2): int {
+						return $db_page_1['sortorder'] <=> $db_page_2['sortorder'];
 					}
-					unset($db_widget);
+				);
 
-					$db_fields = API::getApiService()->select('widget_field', [
+				if ($widgets_requested) {
+					foreach ($db_pages as &$db_page) {
+						$db_page['widgets'] = [];
+					}
+					unset($db_page);
+
+					$db_widgets = API::getApiService()->select('widget', [
 						'output' => API_OUTPUT_EXTEND,
-						'filter' => [
-							'widgetid' => array_keys($db_widgets),
-							'type' => array_keys(self::WIDGET_FIELD_TYPE_COLUMNS)
-						]
+						'filter' => ['dashboard_pageid' => array_keys($db_pages)],
+						'preservekeys' => true
 					]);
 
-					foreach ($db_fields as $db_field) {
-						$db_widgets[$db_field['widgetid']]['fields'][] = [
-							'type' => $db_field['type'],
-							'name' => $db_field['name'],
-							'value' => $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]]
-						];
+					if ($db_widgets) {
+						foreach ($db_widgets as &$db_widget) {
+							$db_widget['fields'] = [];
+						}
+						unset($db_widget);
+
+						$db_fields = API::getApiService()->select('widget_field', [
+							'output' => API_OUTPUT_EXTEND,
+							'filter' => [
+								'widgetid' => array_keys($db_widgets),
+								'type' => array_keys(self::WIDGET_FIELD_TYPE_COLUMNS)
+							]
+						]);
+
+						foreach ($db_fields as $db_field) {
+							$db_widgets[$db_field['widgetid']]['fields'][] = [
+								'type' => $db_field['type'],
+								'name' => $db_field['name'],
+								'value' => $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]]
+							];
+						}
+					}
+
+					foreach ($db_widgets as $db_widget) {
+						$db_pages[$db_widget['dashboard_pageid']]['widgets'][] = array_diff_key($db_widget, array_flip([
+							'dashboard_pageid'
+						]));
 					}
 				}
 
-				foreach ($db_widgets as $db_widget) {
-					$db_pages[$db_widget['dashboard_pageid']]['widgets'][] = array_diff_key($db_widget, array_flip([
-						'dashboard_pageid'
+				$db_pages = $this->unsetExtraFields($db_pages, ['dashboard_pageid'], $options['selectPages']);
+
+				foreach ($db_pages as $db_page) {
+					$result[$db_page['dashboardid']]['pages'][] = array_diff_key($db_page, array_flip(['dashboardid',
+						'sortorder'
 					]));
 				}
-			}
-
-			$db_pages = $this->unsetExtraFields($db_pages, ['dashboard_pageid'], $options['selectPages']);
-
-			foreach ($db_pages as $db_page) {
-				$result[$db_page['dashboardid']]['pages'][] = array_diff_key($db_page, array_flip(['dashboardid',
-					'sortorder'
-				]));
 			}
 		}
 

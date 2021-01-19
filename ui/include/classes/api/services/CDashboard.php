@@ -632,4 +632,85 @@ class CDashboard extends CDashboardGeneral {
 			DB::delete('dashboard_usrgrp', ['dashboard_usrgrpid' => $del_dashboard_usrgrpids]);
 		}
 	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$dashboardids = array_keys($result);
+
+		// Adding user shares.
+		if ($options['selectUsers'] !== null) {
+			$relation_map = $this->createRelationMap($result, 'dashboardid', 'userid', 'dashboard_user');
+			// Get all allowed users.
+			$db_users = API::User()->get([
+				'output' => [],
+				'userids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			if ($db_users) {
+				$db_dashboard_users = API::getApiService()->select('dashboard_user', [
+					'output' => $this->outputExtend($options['selectUsers'], ['dashboardid', 'userid']),
+					'filter' => ['dashboardid' => $dashboardids, 'userid' => array_keys($db_users)],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($db_dashboard_users, 'dashboardid', 'dashboard_userid');
+
+				$db_dashboard_users = $this->unsetExtraFields($db_dashboard_users, ['userid'], $options['selectUsers']);
+
+				foreach ($db_dashboard_users as &$db_dashboard_user) {
+					unset($db_dashboard_user['dashboard_userid'], $db_dashboard_user['dashboardid']);
+				}
+				unset($db_dashboard_user);
+
+				$result = $relation_map->mapMany($result, $db_dashboard_users, 'users');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['users'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		// Adding user group shares.
+		if ($options['selectUserGroups'] !== null) {
+			$relation_map = $this->createRelationMap($result, 'dashboardid', 'usrgrpid', 'dashboard_usrgrp');
+			// Get all allowed groups.
+			$db_usrgrps = API::UserGroup()->get([
+				'output' => [],
+				'usrgrpids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			if ($db_usrgrps) {
+				$db_dashboard_usrgrps = API::getApiService()->select('dashboard_usrgrp', [
+					'output' => $this->outputExtend($options['selectUserGroups'], ['dashboardid', 'usrgrpid']),
+					'filter' => ['dashboardid' => $dashboardids, 'usrgrpid' => array_keys($db_usrgrps)],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($db_dashboard_usrgrps, 'dashboardid', 'dashboard_usrgrpid');
+
+				$db_dashboard_usrgrps =
+					$this->unsetExtraFields($db_dashboard_usrgrps, ['usrgrpid'], $options['selectUserGroups']);
+
+				foreach ($db_dashboard_usrgrps as &$db_dashboard_usrgrp) {
+					unset($db_dashboard_usrgrp['dashboard_usrgrpid'], $db_dashboard_usrgrp['dashboardid']);
+				}
+				unset($db_dashboard_usrgrp);
+
+				$result = $relation_map->mapMany($result, $db_dashboard_usrgrps, 'userGroups');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['userGroups'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		return $result;
+	}
 }
