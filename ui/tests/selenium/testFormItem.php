@@ -756,12 +756,21 @@ class testFormItem extends CLegacyWebTest {
 						$mappings = [];
 						$i = 0;
 						foreach ($db_mappings as $db_mapping) {
-							// Need to add check that not more than 3 mappings are displayed, when its implemented.
-							// while ($i < 3) {
+							$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+
 							if ($db_mapping['name'] === $valuemap_name) {
-								$this->assertTrue(str_contains($value_mapping->getColumn('Mapping')->getText(), $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								$mappings_text = $value_mapping->getColumn('Mapping')->getText();
+								$i++;
+								// Only the first three mappings are displayed in the form for each value mapping
+								if ($i < 4) {
+									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
+								}
+								else {
+									$this->assertTrue(str_contains($mappings_text, '...'));
+
+									break;
+								}
 							}
-							// }
 						}
 					}
 				}
