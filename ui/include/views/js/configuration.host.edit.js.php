@@ -116,8 +116,8 @@
 				)
 				->addRow(new CLabel(_('Authentication protocol'), 'interfaces[#{iface.interfaceid}][details][authprotocol]'),
 					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][authprotocol]', ITEM_AUTHPROTOCOL_MD5))
-						->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_AUTHPROTOCOL_MD5)
-						->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_AUTHPROTOCOL_SHA)
+						->addValue('MD5', ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_AUTHPROTOCOL_MD5)
+						->addValue('SHA', ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_AUTHPROTOCOL_SHA)
 						->setModern(true),
 					'row_snmpv3_authprotocol_#{iface.interfaceid}'
 				)
@@ -129,8 +129,8 @@
 				)
 				->addRow(new CLabel(_('Privacy protocol'), 'interfaces[#{iface.interfaceid}][details][privprotocol]'),
 					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][privprotocol]', ITEM_PRIVPROTOCOL_DES))
-						->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_PRIVPROTOCOL_DES)
-						->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_PRIVPROTOCOL_AES)
+						->addValue('DES', ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_PRIVPROTOCOL_DES)
+						->addValue('AES', ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_PRIVPROTOCOL_AES)
 						->setModern(true),
 					'row_snmpv3_privprotocol_#{iface.interfaceid}'
 				)

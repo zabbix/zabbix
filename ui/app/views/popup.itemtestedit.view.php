@@ -193,8 +193,8 @@ if ($data['is_item_testable']) {
 				(new CRadioButtonList('interface[details][authprotocol]',
 					(int) $data['inputs']['interface']['details']['authprotocol']
 				))
-					->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
-					->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+					->addValue('MD5', ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
+					->addValue('SHA', ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 					->setModern(true)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -217,8 +217,8 @@ if ($data['is_item_testable']) {
 				(new CRadioButtonList('interface[details][privprotocol]',
 					(int) $data['inputs']['interface']['details']['privprotocol']
 				))
-					->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
-					->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+					->addValue('DES', ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
+					->addValue('AES', ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 					->setModern(true)
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
