@@ -232,6 +232,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 		zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 		goto fail;
 	}
+	else if (ZBX_SCRIPT_CTX_EVENT == ctx)
+		memset(&host, 0, sizeof(host));
 
 	if (SUCCEED != (rc = DBget_user_by_active_session(sessionid, &user)))
 	{
