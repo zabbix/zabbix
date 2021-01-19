@@ -620,7 +620,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 	$MAX_NUM_IN = 950; // Maximum number of values for using "IN (<id1>,<id2>,...,<idN>)".
 
 	if (is_bool(reset($values))) {
-		return $not_in ? '1=1' : '1=0';
+		return '1=0';
 	}
 
 	$values = array_flip($values);
@@ -945,11 +945,11 @@ function zbx_dbcast_2bigint($field) {
 /**
  * Get the updated values of a record by comparing the new and old ones, taking field types into account.
  *
- * @param string  $table_name
- * @param array   $new_values
- * @param array   $old_values
+ * @param string $table_name
+ * @param array  $new_values
+ * @param array  $old_values
  *
- * @return array  The updated fields.
+ * @return array
  */
 function dbUpdatedValues(string $table_name, array $new_values, array $old_values): array {
 	$update = [];
