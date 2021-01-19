@@ -245,7 +245,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'display_period' =>	['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
 			'auto_start' =>		['type' => API_INT32, 'in' => '0,1'],
-			'pages' =>			['type' => API_OBJECTS, 'fields' => [
+			'pages' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 				'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
 				'display_period' =>	['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],
 				'widgets' =>		['type' => API_OBJECTS, 'fields' => [
@@ -302,7 +302,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
 			'display_period' =>		['type' => API_INT32, 'in' => implode(',', DASHBOARD_DISPLAY_PERIODS)],
 			'auto_start' =>			['type' => API_INT32, 'in' => '0,1'],
-			'pages' =>				['type' => API_OBJECTS, 'uniq' => [['dashboard_pageid']], 'fields' => [
+			'pages' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['dashboard_pageid']], 'fields' => [
 				'dashboard_pageid' =>	['type' => API_ID],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('dashboard_page', 'name')],
 				'display_period' =>		['type' => API_INT32, 'in' => implode(',', array_merge([0], DASHBOARD_DISPLAY_PERIODS))],

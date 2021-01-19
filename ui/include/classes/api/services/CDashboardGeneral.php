@@ -219,9 +219,7 @@ abstract class CDashboardGeneral extends CApiService {
 					]);
 
 					foreach ($db_fields as $fieldid => $db_field) {
-						$db_widgets[$db_field['widgetid']]['fields'][$fieldid] = $db_field + [
-							'value' => $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]]
-						];
+						$db_widgets[$db_field['widgetid']]['fields'][$fieldid] = $db_field;
 					}
 				}
 
@@ -427,19 +425,24 @@ abstract class CDashboardGeneral extends CApiService {
 						$db_widget = $db_pages[$page['dashboard_pageid']]['widgets'][$widgetid];
 
 						foreach ($db_widget['fields'] as $db_field) {
-							$current_fields[$db_field['type']][$db_field['value']] = true;
+							if (array_key_exists($db_field['type'], $ids)) {
+								$value = $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]];
+								$current_fields[$db_field['type']][$value] = true;
+							}
 						}
 					}
 
 					foreach ($widget['fields'] as $field) {
-						if ($widgetid === null
-								|| !array_key_exists($field['type'], $current_fields)
-								|| !array_key_exists($field['value'], $current_fields[$field['type']])) {
-							if ($this instanceof CTemplateDashboard) {
-								$ids[$field['type']][$field['value']][$dashboard['templateid']] = true;
-							}
-							else {
-								$ids[$field['type']][$field['value']] = true;
+						if (array_key_exists($field['type'], $ids)) {
+							if ($widgetid === null
+									|| !array_key_exists($field['type'], $current_fields)
+									|| !array_key_exists($field['value'], $current_fields[$field['type']])) {
+								if ($this instanceof CTemplateDashboard) {
+									$ids[$field['type']][$field['value']][$dashboard['templateid']] = true;
+								}
+								else {
+									$ids[$field['type']][$field['value']] = true;
+								}
 							}
 						}
 					}
@@ -654,9 +657,9 @@ abstract class CDashboardGeneral extends CApiService {
 					unset($db_pages[$page['dashboard_pageid']]);
 				}
 				else {
-					unset($page['widgets']);
-
-					$ins_pages[] = ['dashboardid' => $dashboard['dashboardid']] + $page;
+					$ins_pages[] = ['dashboardid' => $dashboard['dashboardid']] + array_diff_key($page, array_flip([
+						'widgets'
+					]));
 				}
 			}
 		}
