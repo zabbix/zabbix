@@ -23,6 +23,9 @@ class CControllerResponseRedirect extends CControllerResponse {
 
 	protected $formData = [];
 
+	/**
+	 * @param string|CUrl $location
+	 */
 	public function __construct($location) {
 		if ($location instanceof CUrl) {
 			$location = $location->getUrl();

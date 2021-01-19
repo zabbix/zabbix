@@ -20,7 +20,6 @@
 #ifndef ZABBIX_TRAPPER_H
 #define ZABBIX_TRAPPER_H
 
-#include "comms.h"
 #include "threads.h"
 
 extern int	CONFIG_TIMEOUT;
