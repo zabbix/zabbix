@@ -964,7 +964,7 @@ function dbUpdatedValues(string $table_name, array $new_values, array $old_value
 
 		switch ($spec['type']) {
 			case DB::FIELD_TYPE_ID:
-				if (!idcmp($new_values[$name], $old_values[$name])) {
+				if (bccomp($new_values[$name], $old_values[$name]) != 0) {
 					$update[$name] = $new_values[$name];
 				}
 				break;
