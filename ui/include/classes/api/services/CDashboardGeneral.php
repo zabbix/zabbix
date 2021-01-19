@@ -41,7 +41,7 @@ abstract class CDashboardGeneral extends CApiService {
 	protected const WIDGET_FIELD_TYPE_COLUMNS = [
 		ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
 		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str',
-	] + WIDGET_FIELD_TYPE_COLUMNS_FK;
+	] + self::WIDGET_FIELD_TYPE_COLUMNS_FK;
 
 	protected $tableName = 'dashboard';
 	protected $tableAlias = 'd';
@@ -195,7 +195,209 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Check widgets. For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
+	 * Add existing pages, widgets and widget fields to $db_dashboards whether these are affected by the update.
+	 *
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
+	 */
+	protected function addAffectedObjects(array $dashboards, array &$db_dashboards): void {
+		// Parent ID criteria for fetching child objects - pages, widgets and fields.
+		$dashboardids = [];
+		$pageids = [];
+		$widgetids = [];
+
+		// The requested parent-child relations.
+		$page_parents = [];
+		$widget_parents = [];
+
+		foreach ($dashboards as $dashboard) {
+			$dashboardid = $dashboard['dashboardid'];
+
+			// Updating dashboard pages?
+			if (array_key_exists('pages', $dashboard)) {
+				// Fetch all pages of this dashboard.
+				$dashboardids[$dashboardid] = true;
+
+				foreach ($dashboard['pages'] as $page) {
+					if (array_key_exists('dashboard_pageid', $page)) {
+						$pageid = $page['dashboard_pageid'];
+						$page_parents[$pageid] = $dashboardid;
+
+						// Updating page widgets?
+						if (array_key_exists('widgets', $page)) {
+							// Fetch all widgets of this page.
+							$pageids[$pageid] = true;
+
+							foreach ($page['widgets'] as $widget) {
+								if (array_key_exists('widgetid', $widget)) {
+									$widgetid = $widget['widgetid'];
+									$widget_parents[$widgetid] = $pageid;
+
+									// Updating widget fields?
+									if (array_key_exists('fields', $widget)) {
+										// Fetch all fields of this widget.
+										$widgetids[$widgetid] = true;
+									}
+								}
+							}
+						}
+					}
+					else {
+						// Page widgets can't have IDs specified if the page itself didn't have one.
+						if (array_key_exists('widgets', $page) && array_column($page['widgets'], 'widgetid')) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_('No permissions to referred object or it does not exist!')
+							);
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($db_dashboards as &$db_dashboard) {
+			$db_dashboard['pages'] = [];
+		}
+		unset($db_dashboard);
+
+		if ($dashboardids) {
+			$db_pages = DB::select('dashboard_page', [
+				'output' => array_keys(DB::getSchema('dashboard_page')['fields']),
+				'filter' => ['dashboardid' => array_keys($dashboardids)],
+				'preservekeys' => true
+			]);
+
+			foreach ($page_parents as $pageid => $dashboardid) {
+				if (!array_key_exists($pageid, $db_pages)
+						|| bccomp($db_pages[$pageid]['dashboardid'], $dashboardid) != 0) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+			}
+
+			foreach ($db_pages as &$db_page) {
+				$db_page['widgets'] = [];
+			}
+			unset($db_page);
+
+			if ($pageids) {
+				$db_widgets = DB::select('widget', [
+					'output' => array_keys(DB::getSchema('widget')['fields']),
+					'filter' => ['dashboard_pageid' => array_keys($pageids)],
+					'preservekeys' => true
+				]);
+
+				foreach ($widget_parents as $widgetid => $pageid) {
+					if (!array_key_exists($widgetid, $db_widgets)
+							|| bccomp($db_widgets[$widgetid]['dashboard_pageid'], $pageid) != 0) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+				}
+
+				foreach ($db_widgets as &$db_widget) {
+					$db_widget['fields'] = [];
+				}
+				unset($db_widget);
+
+				if ($widgetids) {
+					$db_fields = DB::select('widget_field', [
+						'output' => array_keys(DB::getSchema('widget_field')['fields']),
+						'filter' => ['widgetid' => array_keys($widgetids)],
+						'preservekeys' => true
+					]);
+
+					foreach ($db_fields as $fieldid => $db_field) {
+						$db_widgets[$db_field['widgetid']]['fields'][$fieldid] = $db_field + [
+							'value' => $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]]
+						];
+					}
+				}
+
+				foreach ($db_widgets as $widgetid => $db_widget) {
+					$db_pages[$db_widget['dashboard_pageid']]['widgets'][$widgetid] = $db_widget;
+				}
+			}
+
+			foreach ($db_pages as $pageid => $db_page) {
+				$db_dashboards[$db_page['dashboardid']]['pages'][$pageid] = $db_page;
+			}
+		}
+	}
+
+	/**
+	 * Check for unique dashboard names.
+	 *
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
+	 *
+	 * @throws APIException if dashboard names are not unique.
+	 */
+	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+		$criteria = [];
+
+		foreach ($dashboards as $dashboard) {
+			$name = null;
+			$dashboardid = null;
+
+			if ($db_dashboards === null) {
+				$name = $dashboard['name'];
+			}
+			elseif ($dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
+				$name = $dashboard['name'];
+				$dashboardid = $dashboard['dashboardid'];
+			}
+
+			if ($name !== null) {
+				$templateid = ($this instanceof CTemplateDashboard) ? $dashboard['templateid'] : 0;
+
+				if (!array_key_exists($templateid, $criteria)) {
+					$criteria[$templateid] = ['names' => [], 'dashboardids' => []];
+				}
+
+				$criteria[$templateid]['names'][] = $name;
+
+				if ($dashboardid !== null) {
+					$criteria[$templateid]['dashboardids'][] = $dashboardid;
+				}
+			}
+		}
+
+		if (!$criteria) {
+			return;
+		}
+
+		$where_or = [];
+
+		foreach ($criteria as $templateid => $criterion) {
+			$where_and = [
+				dbConditionId('templateid', [$templateid]),
+				dbConditionString('name', $criterion['names'])
+			];
+
+			if ($criterion['dashboardids']) {
+				$where_and[] = dbConditionId('dashboardid', $criterion['dashboardids'], true);
+			}
+
+			$where_or[] = implode(' AND ', $where_and);
+		}
+
+		$where = (count($where_or) == 1) ? $where_or[0] : '('.implode(') OR (', $where_or).')';
+
+		$duplicate = DBfetch(DBselect('SELECT name FROM dashboard WHERE '.$where));
+
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Dashboard "%1$s" already exists.', $duplicate['name'])
+			);
+		}
+	}
+
+	/**
+	 * Check widgets.
+	 *
+	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
 	 *
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
@@ -252,7 +454,9 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Check widget fields. For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
+	 * Check widget fields.
+	 *
+	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
 	 *
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards

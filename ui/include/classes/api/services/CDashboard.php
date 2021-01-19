@@ -20,7 +20,7 @@
 
 
 /**
- * Class for dashboards API.
+ * Dashboards API implementation.
  */
 class CDashboard extends CDashboardGeneral {
 
@@ -48,7 +48,7 @@ class CDashboard extends CDashboardGeneral {
 				'dashboardid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'private' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])],
+				'private' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [PUBLIC_SHARING, PRIVATE_SHARING])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
@@ -276,183 +276,16 @@ class CDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		// Copy original dashboard names when not specified (for error reporting purpose).
+		// Copy original dashboard names when not specified (for error reporting).
 		$dashboards = $this->extendObjectsByKey($dashboards, $db_dashboards, 'dashboardid', ['name']);
 
-		// Parent ID criteria for fetching child objects - pages, widgets and fields.
-		$dashboardids = [];
-		$pageids = [];
-		$widgetids = [];
-
-		// The requested parent-child relations.
-		$page_parents = [];
-		$widget_parents = [];
-
-		foreach ($dashboards as $dashboard) {
-			$dashboardid = $dashboard['dashboardid'];
-
-			// Updating dashboard pages?
-			if (array_key_exists('pages', $dashboard)) {
-				// Fetch all pages of this dashboard.
-				$dashboardids[$dashboardid] = true;
-
-				foreach ($dashboard['pages'] as $page) {
-					if (array_key_exists('dashboard_pageid', $page)) {
-						$pageid = $page['dashboard_pageid'];
-						$page_parents[$pageid] = $dashboardid;
-
-						// Updating page widgets?
-						if (array_key_exists('widgets', $page)) {
-							// Fetch all widgets of this page.
-							$pageids[$pageid] = true;
-
-							foreach ($page['widgets'] as $widget) {
-								if (array_key_exists('widgetid', $widget)) {
-									$widgetid = $widget['widgetid'];
-									$widget_parents[$widgetid] = $pageid;
-
-									// Updating widget fields?
-									if (array_key_exists('fields', $widget)) {
-										// Fetch all fields of this widget.
-										$widgetids[$widgetid] = true;
-									}
-								}
-							}
-						}
-					}
-					else {
-						// Page widgets can't have IDs specified if the page itself didn't have one.
-						if (array_key_exists('widgets', $page) && array_column($page['widgets'], 'widgetid')) {
-							self::exception(ZBX_API_ERROR_PERMISSIONS,
-								_('No permissions to referred object or it does not exist!')
-							);
-						}
-					}
-				}
-			}
-		}
-
-		foreach ($db_dashboards as &$db_dashboard) {
-			$db_dashboard['pages'] = [];
-		}
-		unset($db_dashboard);
-
-		if ($dashboardids) {
-			$db_pages = DB::select('dashboard_page', [
-				'output' => array_keys(DB::getSchema('dashboard_page')['fields']),
-				'filter' => ['dashboardid' => array_keys($dashboardids)],
-				'preservekeys' => true
-			]);
-
-			foreach ($page_parents as $pageid => $dashboardid) {
-				if (!array_key_exists($pageid, $db_pages)
-						|| bccomp($db_pages[$pageid]['dashboardid'], $dashboardid) != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-
-			foreach ($db_pages as &$db_page) {
-				$db_page['widgets'] = [];
-			}
-			unset($db_page);
-
-			if ($pageids) {
-				$db_widgets = DB::select('widget', [
-					'output' => array_keys(DB::getSchema('widget')['fields']),
-					'filter' => ['dashboard_pageid' => array_keys($pageids)],
-					'preservekeys' => true
-				]);
-
-				foreach ($widget_parents as $widgetid => $pageid) {
-					if (!array_key_exists($widgetid, $db_widgets)
-							|| bccomp($db_widgets[$widgetid]['dashboard_pageid'], $pageid) != 0) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('No permissions to referred object or it does not exist!')
-						);
-					}
-				}
-
-				foreach ($db_widgets as &$db_widget) {
-					$db_widget['fields'] = [];
-				}
-				unset($db_widget);
-
-				if ($widgetids) {
-					$db_fields = DB::select('widget_field', [
-						'output' => array_keys(DB::getSchema('widget_field')['fields']),
-						'filter' => ['widgetid' => array_keys($widgetids)],
-						'preservekeys' => true
-					]);
-
-					foreach ($db_fields as $fieldid => $db_field) {
-						$db_widgets[$db_field['widgetid']]['fields'][$fieldid] = $db_field + [
-							'value' => $db_field[self::WIDGET_FIELD_TYPE_COLUMNS[$db_field['type']]]
-						];
-					}
-				}
-
-				foreach ($db_widgets as $widgetid => $db_widget) {
-					$db_pages[$db_widget['dashboard_pageid']]['widgets'][$widgetid] = $db_widget;
-				}
-			}
-
-			foreach ($db_pages as $pageid => $db_page) {
-				$db_dashboards[$db_page['dashboardid']]['pages'][$pageid] = $db_page;
-			}
-		}
+		$this->addAffectedObjects($dashboards, $db_dashboards);
 
 		$this->checkDuplicates($dashboards, $db_dashboards);
 		$this->checkUsers($dashboards, $db_dashboards);
 		$this->checkUserGroups($dashboards);
 		$this->checkWidgets($dashboards, $db_dashboards);
 		$this->checkWidgetFields($dashboards, $db_dashboards);
-	}
-
-	/**
-	 * Check for unique dashboard names.
-	 *
-	 * @param array      $dashboards
-	 * @param string     $dashboards[]['name']
-	 * @param array|null $db_dashboards
-	 * @param string     $db_dashboards[]['name']
-	 *
-	 * @throws APIException if dashboard names are not unique.
-	 */
-	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
-		$names = [];
-		$dashboardids = [];
-
-		if ($db_dashboards === null) {
-			$names = array_column($dashboards, 'name');
-		}
-		else {
-			foreach ($dashboards as $dashboard) {
-				if ($dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
-					$names[] = $dashboard['name'];
-					$dashboardids[] = $dashboard['dashboardid'];
-				}
-			}
-		}
-
-		if (!$names) {
-			return;
-		}
-
-		$duplicate = DBfetch(DBselect(
-			'SELECT d.name'.
-			' FROM dashboard d'.
-			' WHERE d.templateid IS NULL'.
-				' AND '.dbConditionString('d.name', $names).
-				' AND '.dbConditionId('d.dashboardid', $dashboardids, true), 1
-		));
-
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Dashboard "%1$s" already exists.', $duplicate['name'])
-			);
-		}
 	}
 
 	/**
