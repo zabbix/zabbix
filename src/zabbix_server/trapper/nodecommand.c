@@ -227,13 +227,20 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 
 	*error = '\0';
 
-	if (ZBX_SCRIPT_CTX_HOST == ctx && SUCCEED != (rc = DCget_host_by_hostid(&host, hostid)))
+	if (ZBX_SCRIPT_CTX_HOST == ctx)
 	{
-		zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
-		goto fail;
+		if (SUCCEED != (rc = DCget_host_by_hostid(&host, hostid)))
+		{
+			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
+			goto fail;
+		}
 	}
 	else if (ZBX_SCRIPT_CTX_EVENT == ctx)
+	{
 		memset(&host, 0, sizeof(host));
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
 
 	if (SUCCEED != (rc = DBget_user_by_active_session(sessionid, &user)))
 	{
@@ -296,7 +303,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 	char			*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN];
 	char			*debug = NULL, clientip[MAX_STRING_LEN];
 	int			ret = FAIL;
-	zbx_uint64_t		scriptid, hostid = ZBX_MAX_UINT64, eventid = ZBX_MAX_UINT64;
+	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	zbx_script_exec_context ctx;
 	struct zbx_json		j;
 
