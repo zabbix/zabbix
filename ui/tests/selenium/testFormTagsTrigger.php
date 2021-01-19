@@ -41,13 +41,6 @@ class testFormTagsTrigger extends testFormTags {
 	}
 
 	/**
-	 * Check tag fields.
-	 */
-	public function testFormTagsTrigger_Screenshot() {
-		$this->checkTagScreenshot('trigger');
-	}
-
-	/**
 	 * Test update of Trigger with tags.
 	 *
 	 * @dataProvider getUpdateData

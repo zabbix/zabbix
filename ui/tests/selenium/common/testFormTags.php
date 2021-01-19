@@ -218,23 +218,6 @@ class testFormTags extends CWebTest {
 		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
 	}
 
-	/**
-	 * Check tag fields size.
-	 *
-	 * @param string   $object       host, template, trigger or prototype
-	 */
-	public function checkTagScreenshot($object) {
-		$this->page->login()->open($this->link);
-		$this->query('xpath://a[contains(@href, "'.$object.'") and contains(text(), "Long tag name and value")]')
-				->waitUntilPresent()->one()->click();
-		$form = $this->query('xpath://form[@aria-labeledby="page-title-general" and contains(@name, "Form")]')
-				->waitUntilPresent()->asForm()->one();
-
-		$form->selectTab('Tags');
-		$screenshot_area = $this->query('id:tags-table')->one();
-		$this->assertScreenshot($screenshot_area);
-	}
-
 	public static function getUpdateData() {
 		return [
 			[
@@ -477,5 +460,10 @@ class testFormTags extends CWebTest {
 		unset($tag);
 
 		$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected);
+
+		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+			$screenshot_area = $this->query('id:tags-table')->one();
+			$this->assertScreenshot($screenshot_area, $data['name']);
+		}
 	}
 }
