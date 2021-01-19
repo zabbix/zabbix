@@ -257,7 +257,7 @@ class testToken extends CAPITest {
 						'userid' => 2 // Guest user ID.
 					]
 				],
-				'expected_error' => 'API token "test-token-exists" already exists for user "2".'
+				'expected_error' => 'API token "test-token-exists" already exists for userid "2".'
 			],
 			// Admin role.
 			[
@@ -1054,7 +1054,7 @@ class testToken extends CAPITest {
 							'name' => 'update-user-5' // This user has token (ID: 21) using this name.
 						]
 					],
-					'expect_error' => 'API token "update-user-5" already exists for user "5".'
+					'expect_error' => 'API token "update-user-5" already exists for userid "5".'
 				],
 			'#15 case "cannot update identical token names within request"' =>
 				[

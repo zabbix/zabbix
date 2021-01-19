@@ -287,7 +287,7 @@ class CToken extends CApiService {
 			));
 
 			if ($db_tokens) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('API token "%1$s" already exists for user "%2$s".',
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('API token "%1$s" already exists for userid "%2$s".',
 						$db_tokens[0]['name'], $db_tokens[0]['userid']
 				));
 			}
