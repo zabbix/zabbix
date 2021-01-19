@@ -647,7 +647,7 @@ switch ($data['popup_type']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);
 				}
-				$name[] = $item['name'];
+				$name[] = (new CSpan($item['name']))->addClass(ZBX_STYLE_GREY);
 
 				unset($data['table_records'][$item['id']]);
 			}

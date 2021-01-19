@@ -23,6 +23,15 @@
  * @var CView $this
  */
 ?>
+<?= (new CScriptTemplate('valuemap-rename-row-tmpl'))->addItem(
+	(new CRow([
+		new CTextBox('valuemap_rename[#{rowNum}][from]', '', false, DB::getFieldLength('valuemap', 'name')),
+		new CTextBox('valuemap_rename[#{rowNum}][to]', '', false, DB::getFieldLength('valuemap', 'name')),
+		(new CButton(null, _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))->addClass('form_row')
+); ?>
 
 <script type="text/x-jquery-tmpl" id="macro-row-tmpl">
 	<?= (new CRow([

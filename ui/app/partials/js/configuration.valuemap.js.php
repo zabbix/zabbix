@@ -24,22 +24,21 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="mapping-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('mappings[#{rowNum}][value]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'&rArr;',
-			(new CTextBox('mappings[#{rowNum}][newvalue]', '', false, 64))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired(),
-			(new CButton('mappings[#{rowNum}][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
-</script>
+<script type="text/javascript">
+(() => {
+	document.querySelectorAll('#valuemap-table .element-table-add').forEach((elm) => elm.addEventListener('click',
+		(event) => openAddPopup(event))
+	);
 
+	function openAddPopup(event) {
+		let valuemap_names = [];
+		let valuemap_table = event.target.closest('table');
+
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => valuemap_names.push(elm.value));
+		PopUp("popup.valuemap.edit", {valuemap_names: valuemap_names}, null, event.target);
+	}
+})();
+</script>
 <script type="text/javascript">
 var valuemap_number = 0;
 
@@ -49,7 +48,7 @@ var AddValueMap = class {
 		this.data = data;
 
 		this.row = document.createElement('tr');
-		this.row.classList.add(`valuemap-row-${valuemap_number}`);
+		this.row.classList.add('valuemap-row');
 		this.row.appendChild(this.createNameCell());
 		this.row.appendChild(this.createMappingCell());
 		this.row.appendChild(this.createRemoveCell());
@@ -82,7 +81,7 @@ var AddValueMap = class {
 		link.classList.add('valuemap-label');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click',
-			() => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, this)
+			(event) => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, event.target)
 		);
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
@@ -129,4 +128,9 @@ var AddValueMap = class {
 		return input;
 	}
 }
+
+// Initialize value maps from data array.
+let valuemaps = <?= json_encode($data['valuemaps']) ?>;
+
+valuemaps.forEach((valuemap) => new AddValueMap(valuemap));
 </script>

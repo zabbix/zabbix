@@ -22,52 +22,55 @@
 /**
  * @var CPartial $this
  */
+$change_container = new CDiv(new CPartial('configuration.valuemap', [
+	'source' => 'template',
+	'valuemaps' => [],
+	'readonly' => false,
+	'form' => 'massupdate'
+]));
 
-$table = (new CTable())
-	->setId('valuemap-table')
+$rename_container = (new CTable())
+	->setId('valuemap-rename-table')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->addStyle('width:100%;')
-	->setHeader([_('Name'), _('Value'), _('Action')]);
-
-$table->addItem([
-	(new CTag('tfoot', true))->addItem([
-		new CCol(
-			(new CButton('valuemap_add', _('Add')))
+	->setHeader([_('From'), _('To'), _('Action')])
+	->addItem((new CTag('tfoot', true))->addItem([
+		new CCol([
+			(new CButton(null, _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
-				->onClick('return PopUp("popup.valuemap.edit", jQuery.extend('.
-					json_encode([]).', null), null, this);'
-				)
-		)
-	])
+		])
+]));
+
+$remove_container = (new CDiv())->addClass('valuemap-remove');
+
+$remove_container->addItem([
+	(new CMultiSelect([
+		'name' => 'valuemap[]',
+		'object_name' => 'valuemaps',
+		'data' => [],
+		'popup' => [
+			'parameters' => [
+				'srctbl' => 'valuemaps',
+				'srcfld1' => 'valuemapid',
+				'dstfrm' => 'massupdate-form',
+				'dstfld1' => 'valuemap_',
+				'hostids' => $data['hostids'],
+				'editable' => true
+			]
+		]
+	]))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv(
+		(new CCheckBox('valuemap_checkbox'))
+			->setLabel(_('Except selected'))
+			->setUncheckedValue(0)
+	))->addClass('valuemap-checkbox')
 ]);
 
-$remove_div = (new CDiv())->addClass('valuemap-remove');
-
-$remove_div
-	->addItem([
-		(new CMultiSelect([
-			'name' => 'valuemap[]',
-			'object_name' => 'valuemaps',
-			'data' => [],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'valuemaps',
-					'srcfld1' => 'valuemapid',
-					'dstfrm' => 'massupdate-form',
-					'dstfld1' => 'valuemap_',
-					'hostids' => $data['hostids'],
-					'editable' => true
-				]
-			]
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CDiv(
-			(new CCheckBox('valuemap_checkbox'))
-				->setLabel(_('Except selected'))
-				->setUncheckedValue(0)
-		))->addClass('valuemap-checkbox')
-	]);
+$remove_all_container = (new CDiv())->addItem((new CDiv(
+	(new CCheckBox('valuemap_remove_all'))
+		->setLabel(_('I confirm to remove all macros'))
+)));
 
 $form_list = (new CFormList('valuemap-form-list'))
 	->addRow(
@@ -78,14 +81,16 @@ $form_list = (new CFormList('valuemap-form-list'))
 			(new CRadioButtonList('valuemap_massupdate', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
 				->addValue(_('Update'), ZBX_ACTION_REPLACE)
+				->addValue(_('Rename'), ZBX_ACTION_RENAME)
 				->addValue(_('Remove'), ZBX_ACTION_REMOVE)
+				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
 				->setModern(true)
 				->addStyle('margin-bottom: 10px;'),
-			$table,
-			$remove_div
+			$change_container->setAttribute('data-type', ZBX_ACTION_ADD),
+			$rename_container->setAttribute('data-type', ZBX_ACTION_RENAME),
+			$remove_container->setAttribute('data-type', ZBX_ACTION_REMOVE),
+			$remove_all_container->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL)
 		]))->setId('valuemap-div')
 	);
-
-$form_list->addItem(new CJsScript($this->readJsFile('configuration.valuemap.js.php')));
 
 $form_list->show();

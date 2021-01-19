@@ -23,73 +23,40 @@
  * @var CView $this
  */
 ?>
-
 $(() => {
-	$('#mappings_table').dynamicRows({template: '#mapping-row-tmpl'});
+	$('#mappings_table').dynamicRows({template: '#mapping-row-tmpl', rows: <?= json_encode($data['mappings']) ?>});
 });
 
 function submitValueMap(overlay) {
-	const form = document.querySelector('#valuemap-edit-form');
-	const is_edit = !!form.querySelector('#edit');
-	const name = form.querySelector('#name').value;
-	const source_name = form.querySelector('#source-name').value;
-	const names = [...document
-			.querySelector('#valuemap-table')
-			.querySelectorAll("input[name$='[name]'")
-		].map((elem) => elem.value);
-	const data = {name: name, mappings: []};
-	let mapping_value = [];
+	var $form = overlay.$dialogue.find('form'),
+		url = new Curl($form.attr('action'));
 
-	overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+	fetch(url.getUrl(), {
+		method: 'POST',
+		body: new URLSearchParams(new FormData($form.get(0)))
+	})
+		.then(response => response.json())
+		.then(response => {
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-	try {
-		if (name !== source_name && names.includes(name)) {
-			throw `<?= _('Value map already exists.') ?>`;
-		}
+			if (response.errors) {
+				document
+					.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
+					.prepend($(response.errors).get(0));
+				overlay.unsetLoading();
 
-		if (name === '') {
-			throw `<?= _('Invalid parameter "name": cannot be empty.') ?>`;
-		}
-
-		if (form.querySelectorAll('[id$="_value"]').length === 0 || (form.querySelector('[id$="_value"]').value === ''
-					|| form.querySelector('[id$="_newvalue"]').value === '')) {
-			throw  `<?= _('The parameter "mappings" is missing.') ?>`;
-		}
-
-		[...form.querySelectorAll('[id$="_value"]')].map(
-			(elem) => {
-				if (elem.value === '') {
-					return false;
-				}
-
-				if (mapping_value.includes(elem.value)) {
-					throw  `<?= _('Some mapping not unique.') ?>`;
-				}
-
-				mapping_value.push(elem.value);
-
-				const key = elem.id.split('_')[1];
-				data.mappings.push({
-					value: elem.value,
-					newvalue: form.querySelector(`#mappings_${key}_newvalue`).value
-				});
+				return;
 			}
-		);
-	}
-	catch (error) {
-		document
-			.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}']`)
-			.querySelector('.overlay-dialogue-body')
-			.prepend(makeMessageBox('bad', error, null)[0]);
-		overlay.unsetLoading();
-		return false;
-	}
 
-	overlayDialogueDestroy(overlay.dialogueid);
+			new AddValueMap(response, response.edit ? overlay.element.closest('tr') : null);
+			overlayDialogueDestroy(overlay.dialogueid);
+		})
+		.catch((e) => {
+			document
+				.querySelector(`.overlay-dialogue[data-dialogueid='${overlay.dialogueid}'] .overlay-dialogue-body`)
+				.prepend(makeMessageBox('bad', e, null)[0]);
+			overlay.unsetLoading();
+		});
 
-	if (is_edit) {
-		return new AddValueMap(data, document.querySelector(`[name$='[name]'][value=${JSON.stringify(source_name)}]`).closest('tr'));
-	}
-
-	return new AddValueMap(data);
+	return;
 }

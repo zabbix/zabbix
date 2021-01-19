@@ -22,20 +22,28 @@
 /**
  * @var CView $this
  */
-
-
 $form = (new CForm())
 	->cleanItems()
 	->setId('valuemap-edit-form')
 	->setName('valuemap-edit-form')
+	->addVar('action', $data['action'])
+	->addVar('update', 1)
 	->addVar('source-name', $data['name']);
 
-if ($data['valuemapid'] > 0) {
+if ($data['valuemapid']) {
 	$form->addVar('valuemapid', $data['valuemapid']);
 }
 
-if ($data['edit'] > 0) {
+if ($data['edit']) {
 	$form->addVar('edit', $data['edit']);
+}
+
+if ($data['name_readonly']) {
+	$form->addVar('name_readonly', $data['name_readonly']);
+}
+
+foreach (array_values($data['valuemap_names']) as $index => $name) {
+	$form->addVar('valuemap_names['.$index.']', $name);
 }
 
 $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
@@ -45,43 +53,9 @@ $table = (new CTable())
 	->setHeader([_('Value'), '', _('Mapped to'), _('Action')])
 	->addStyle('width: 100%;');
 
-if (count($data['mappings'])) {
-	$i = 0;
-	foreach ($data['mappings'] as $mapping) {
-		$table->addItem([
-			(new CRow([
-				(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				'&rArr;',
-				(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setAriaRequired(),
-				(new CButton('mappings['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			]))->addClass('form_row')
-		]);
-
-		$i++;
-	}
-}
-else {
-	$table->addItem([
-		(new CRow([
-			(new CTextBox('mappings[0][value]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'&rArr;',
-			(new CTextBox('mappings[0][newvalue]', '', false, 64))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired(),
-			(new CButton('mappings[0][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))->addClass('form_row')
-	]);
-}
-
 $table->addRow([
 		(new CCol(
-			(new CButton('mapping_add', _('Add')))
+			(new CButton(null, _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
 		))->setColSpan(4)
@@ -91,7 +65,7 @@ $form_grid
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name']))
+			(new CTextBox('name', $data['name'], $data['name_readonly']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired()
@@ -108,13 +82,28 @@ $form_grid
 
 $form->addItem($form_grid);
 
+// Value map mapping template.
+$form->addItem((new CScriptTemplate('mapping-row-tmpl'))->addItem(
+	(new CRow([
+		(new CTextBox('mappings[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'&rArr;',
+		(new CTextBox('mappings[#{rowNum}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
+		(new CButton('mappings[#{rowNum}][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))->addClass('form_row')
+));
+
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.valuemap.edit.js.php'),
+	'script_inline' => $this->readJsFile('popup.valuemap.edit.js.php', ['mappings' => $data['mappings']]),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => _('Add'),
+			'title' => $data['edit'] ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,

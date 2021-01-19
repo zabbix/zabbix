@@ -468,6 +468,8 @@ class CControllerPopupGeneric extends CController {
 			'with_webitems' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
+			'show_host_name' =>						'in 1',
+			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
 			'orig_names' =>							'in 1',
@@ -1375,7 +1377,7 @@ class CControllerPopupGeneric extends CController {
 					$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get($options), ['valuemapid' => 'id']);
 
 					// For multiple hosts show hostname as value map name prefix.
-					if (count($hostids) > 1) {
+					if ($this->getInput('show_host_name', 0)) {
 						$hosts = API::Host()->get([
 							'output' => ['name'],
 							'hostids' => $hostids,
@@ -1384,6 +1386,17 @@ class CControllerPopupGeneric extends CController {
 
 						foreach ($records as &$record) {
 							$record['hostname'] = $hosts[$record['hostid']]['name'];
+						}
+						unset($record);
+					}
+
+					if ($this->hasInput('disable_names')) {
+						$disable_names = $this->getInput('disable_names');
+
+						foreach ($records as &$record) {
+							if (in_array($record['name'], $disable_names)) {
+								$record['_disabled'] = true;
+							}
 						}
 						unset($record);
 					}

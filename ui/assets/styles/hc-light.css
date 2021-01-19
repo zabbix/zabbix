@@ -5945,13 +5945,17 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-macros-table .table-col-template-value {
   width: 300px; }
 
-.valuemap-remove {
-  display: none; }
-  .valuemap-remove .valuemap-checkbox {
-    margin-top: 10px; }
+#valuemap-table, #valuemap-rename-table {
+  width: 100%; }
 
-.valuemap-table .valuemap-label {
-  word-break: break-all; }
+#valuemap-table .valuemap-row td {
+  vertical-align: top; }
+#valuemap-table .valuemap-label {
+  word-break: break-all;
+  white-space: normal; }
+
+.valuemap-checkbox {
+  margin-top: 10px; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }

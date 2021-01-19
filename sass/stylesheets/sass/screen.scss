@@ -7448,15 +7448,21 @@ z-select,
 	}
 }
 
-.valuemap-remove {
-	display: none;
-
-	.valuemap-checkbox {
-		margin-top: 10px;
-	}
+#valuemap-table, #valuemap-rename-table {
+	width: 100%;
 }
-.valuemap-table {
+
+#valuemap-table {
+	.valuemap-row td {
+		vertical-align: top;
+	}
+
 	.valuemap-label {
 		word-break: break-all;
+		white-space: normal;
 	}
+}
+
+.valuemap-checkbox {
+	margin-top: 10px;
 }

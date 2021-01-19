@@ -995,12 +995,23 @@ function openMassupdatePopup(elem, popup_name) {
 	const form = elem.closest('form');
 
 	data['ids'] = [...form.querySelectorAll('input:checked')].map((input) => input.value);
-	data['context'] = form.querySelector('#context').value;
-	data['prototype'] = 0;
 
-	if (popup_name === 'popup.massupdate.triggerprototype' || popup_name == 'popup.massupdate.itemprototype') {
-		data['parent_discoveryid'] = form.querySelector('#parent_discoveryid').value;
-		data['prototype'] = 1;
+	switch (popup_name) {
+		case 'popup.massupdate.item':
+			data['context'] = form.querySelector('#context').value;
+			data['prototype'] = 0;
+			break;
+
+		case 'popup.massupdate.trigger':
+			data['context'] = form.querySelector('#context').value;
+			break;
+
+		case 'popup.massupdate.itemprototype':
+		case 'popup.massupdate.triggerprototype':
+			data['parent_discoveryid'] = form.querySelector('#parent_discoveryid').value;
+			data['context'] = form.querySelector('#context').value;
+			data['prototype'] = 1;
+			break;
 	}
 
 	return PopUp(popup_name, data, null, this);

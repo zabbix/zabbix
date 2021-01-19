@@ -280,6 +280,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 // Value maps.
 (() => {
 	const valuemap = document.querySelector('#valuemap-div');
+
 	if (!valuemap) {
 		return false;
 	}
@@ -289,17 +290,65 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		obj = valuemap.originalObject;
 	}
 
-	[...obj.querySelectorAll('[name=valuemap_massupdate]')].map((elem) => {
-		elem.addEventListener('click', (event) => {
-			const visible = obj.querySelector(`[data-type="${event.currentTarget.value}"]`);
+	var hostids = [];
 
-			obj.querySelectorAll('[data-type]').forEach(elm => elm.style.display = 'none');
+	document.getElementById('massupdate-form').querySelectorAll('[type="hidden"][name^="ids["]').forEach(
+		hostid => hostids.push(hostid.value)
+	);
+	obj.querySelectorAll('[name=valuemap_massupdate]').forEach((elem) => elem.addEventListener('click',
+		(event) => toggleVisible(obj, event.currentTarget.value)
+	));
+	obj.querySelectorAll('.element-table-addfrom').forEach(elm => elm.addEventListener('click',
+		(event) => openAddfromPopup(event.target)
+	));
 
-			if (visible) {
-				visible.style.display = 'block';
-			}
-		});
+	$('#valuemap-rename-table').dynamicRows({
+		template: '#valuemap-rename-row-tmpl',
+		row: '.form_row',
+		rows: [{from: '', to: ''}]
 	});
+	$(document)
+		.off('add.popup')
+		.on('add.popup', processAddfromPopup);
+
+	function processAddfromPopup(ev, data) {
+		let value = data.values[0];
+
+		new AddValueMap({
+			valuemapid: value.id,
+			name: value.name,
+			mappings: value.mappings,
+			name_readonly: 1
+		});
+	}
+
+	function openAddfromPopup(elm) {
+		let disable_names = [];
+		let valuemap_table = elm.closest('table');
+
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
+		PopUp('popup.generic', {
+			srctbl: 'valuemaps',
+			srcfld1: 'valuemapid',
+			hostids: hostids,
+			disable_names: disable_names,
+			editable: true,
+			show_host_name: 1
+		}, null, elm);
+	}
+
+	function toggleVisible(obj, data_type) {
+		data_type = (data_type == <?= ZBX_ACTION_REPLACE ?>) ? <?= ZBX_ACTION_ADD ?> : data_type;
+		const visible = obj.querySelector(`[data-type="${data_type}"]`);
+
+		obj.querySelectorAll('[data-type]').forEach(elm => elm.style.display = 'none');
+
+		if (visible) {
+			visible.style.display = 'block';
+		}
+	}
+
+	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);
 })();
 
 function visibility_status_changeds(value, obj_id, replace_to) {

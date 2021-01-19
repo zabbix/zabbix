@@ -516,11 +516,14 @@ $encryption_form_list
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
 
 // Value mapping.
-$divTabs->addTab('valuemap-tab', _('Value mapping'), new CPartial('configuration.valuemap', [
+$divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
+	new CPartial('configuration.valuemap', [
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
-		'readonly' => $data['readonly']
-	]), TAB_INDICATOR_VALUEMAPS
+		'readonly' => $data['readonly'],
+		'form' => 'host'
+	])),
+	TAB_INDICATOR_VALUEMAPS
 );
 
 /*

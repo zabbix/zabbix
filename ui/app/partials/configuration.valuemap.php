@@ -22,9 +22,6 @@
 /**
  * @var CPartial $this
  */
-
-$form_list = new CFormList('valuemap-formlist');
-
 $table = (new CTable())
 	->setId('valuemap-table')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
@@ -40,25 +37,21 @@ $table = (new CTable())
 			->addClass('table-col-handle')
 	]);
 
-foreach ($this->data['valuemaps'] as $valuemap) {
-	zbx_add_post_js('new AddValueMap('.json_encode($valuemap).')');
+$buttons = [
+	(new CButton('valuemap_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+		->setEnabled(!$this->data['readonly'])
+];
+
+if ($data['form'] === 'massupdate') {
+	$buttons[] = (new CButton(null, _('Add from')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-addfrom');
 }
 
-$table->addItem([
-	(new CTag('tfoot', true))->addItem([
-		new CCol(
-			(new CButton('valuemap_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-				->setEnabled(!$this->data['readonly'])
-				->onClick('return PopUp("popup.valuemap.edit", jQuery.extend('.
-					json_encode([]).', null), null, this);'
-				)
-		)
-	])
-]);
+$table->addItem((new CTag('tfoot', true))->addItem([new CCol($buttons)]));
 
-$form_list->addRow(null, $table);
-$form_list->show();
+$table->show();
 
-$this->includeJsFile('configuration.valuemap.js.php');
+$this->includeJsFile('configuration.valuemap.js.php', ['valuemaps' => $data['valuemaps']]);
