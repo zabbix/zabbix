@@ -51,8 +51,8 @@ trait FilterTrait {
 				],
 				[
 					'name' => 'operator',
-					'selector' => 'class:radio-list-control',
-					'class' => 'CSegmentedRadioElement'
+					'selector' => 'xpath:./z-select[contains(@id, "tags")]',
+					'class' => 'CZDropdownElement'
 				],
 				[
 					'name' => 'value',
