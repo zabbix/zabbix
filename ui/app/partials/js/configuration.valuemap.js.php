@@ -130,7 +130,7 @@ var AddValueMap = class {
 }
 
 // Initialize value maps from data array.
-let valuemaps = <?= json_encode($data['valuemaps']) ?>;
+var valuemaps = <?= json_encode($data['valuemaps']) ?>;
 
 valuemaps.forEach((valuemap) => new AddValueMap(valuemap));
 </script>
