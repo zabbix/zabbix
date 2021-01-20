@@ -216,7 +216,6 @@ class testFormTags extends CWebTest {
 		// Check screenshots of text area right after filling.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
-			sleep(10);
 			$screenshot_area = $this->query('id:tags-table')->one();
 			$this->assertScreenshot($screenshot_area, $data['name']);
 		}
