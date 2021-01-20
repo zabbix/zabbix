@@ -379,7 +379,7 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Check table "widget_field".
+	 * Check widget fields.
 	 *
 	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
 	 *
