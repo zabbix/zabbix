@@ -51,14 +51,14 @@ func New(path string) (conn *Conn, err error) {
 	return &c, nil
 }
 
-func SendCommand(path string, command string) (reply string, err error) {
+func SendCommand(path string, command string, timeout time.Duration) (reply string, err error) {
 	var conn net.Conn
-	if conn, err = npipe.DialTimeout(path, time.Second); err != nil {
+	if conn, err = npipe.DialTimeout(path, timeout); err != nil {
 		return
 	}
 	defer conn.Close()
 
-	if err = conn.SetDeadline(time.Now().Add(time.Second)); err != nil {
+	if err = conn.SetDeadline(time.Now().Add(timeout)); err != nil {
 		return
 	}
 	if _, err = conn.Write([]byte(command + "\n")); err != nil {
