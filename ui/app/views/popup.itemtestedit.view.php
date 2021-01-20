@@ -187,15 +187,13 @@ if ($data['is_item_testable']) {
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmpv3-securitylevel'),
 
-			(new CLabel(_('Authentication protocol'), 'interface[details][authprotocol]'))
+			(new CLabel(_('Authentication protocol'), 'label-authprotocol'))
 				->addClass('js-popup-row-snmpv3-authprotocol'),
 			(new CFormField(
-				(new CRadioButtonList('interface[details][authprotocol]',
-					(int) $data['inputs']['interface']['details']['authprotocol']
-				))
-					->addValue('MD5', ITEM_SNMPV3_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_SNMPV3_AUTHPROTOCOL_MD5)
-					->addValue('SHA', ITEM_SNMPV3_AUTHPROTOCOL_SHA1, 'snmpv3_authprotocol_'.ITEM_SNMPV3_AUTHPROTOCOL_SHA1)
-					->setModern(true)
+				(new CSelect('interfaces[details][authprotocol]'))
+					->setValue((int) $data['inputs']['interface']['details']['authprotocol'])
+					->setFocusableElementId('label-authprotocol')
+					->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols()))
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmpv3-authprotocol'),
@@ -211,15 +209,12 @@ if ($data['is_item_testable']) {
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmpv3-authpassphrase'),
 
-			(new CLabel(_('Privacy protocol'), 'interface[details][privprotocol]'))
-				->addClass('js-popup-row-snmpv3-privprotocol'),
+			(new CLabel(_('Privacy protocol'), 'label-privprotocol'))->addClass('js-popup-row-snmpv3-privprotocol'),
 			(new CFormField(
-				(new CRadioButtonList('interface[details][privprotocol]',
-					(int) $data['inputs']['interface']['details']['privprotocol']
-				))
-					->addValue('DES', ITEM_SNMPV3_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_SNMPV3_PRIVPROTOCOL_DES)
-					->addValue('AES', ITEM_SNMPV3_PRIVPROTOCOL_AES128, 'snmpv3_privprotocol_'.ITEM_SNMPV3_PRIVPROTOCOL_AES128)
-					->setModern(true)
+				(new CSelect('interfaces[details][privprotocol]'))
+					->setValue((int) $data['inputs']['interface']['details']['privprotocol'])
+					->setFocusableElementId('label-privprotocol')
+					->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols()))
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmpv3-privprotocol'),

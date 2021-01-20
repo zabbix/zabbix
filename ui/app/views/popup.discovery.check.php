@@ -93,11 +93,11 @@ $form_list = (new CFormList())
 		$select_snmpv3_securitylevel,
 		'row_dcheck_snmpv3_securitylevel'
 	)
-	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
-		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['params']['snmpv3_authprotocol']))
-			->addValue('MD5', ITEM_SNMPV3_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_SNMPV3_AUTHPROTOCOL_MD5)
-			->addValue('SHA', ITEM_SNMPV3_AUTHPROTOCOL_SHA1, 'snmpv3_authprotocol_'.ITEM_SNMPV3_AUTHPROTOCOL_SHA1)
-			->setModern(true),
+	->addRow(new CLabel(_('Authentication protocol'), 'label-authprotocol'),
+		(new CSelect('snmpv3_authprotocol'))
+			->setValue((int) $data['params']['snmpv3_authprotocol'])
+			->setFocusableElementId('label-authprotocol')
+			->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols())),
 		'row_dcheck_snmpv3_authprotocol'
 	)
 	->addRow(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase'),
@@ -107,11 +107,11 @@ $form_list = (new CFormList())
 			->disableAutocomplete(),
 		'row_dcheck_snmpv3_authpassphrase'
 	)
-	->addRow(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'),
-		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['params']['snmpv3_privprotocol']))
-			->addValue('DES', ITEM_SNMPV3_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_SNMPV3_PRIVPROTOCOL_DES)
-			->addValue('AES', ITEM_SNMPV3_PRIVPROTOCOL_AES128, 'snmpv3_privprotocol_'.ITEM_SNMPV3_PRIVPROTOCOL_AES128)
-			->setModern(true),
+	->addRow(new CLabel(_('Privacy protocol'), 'label-privprotocol'),
+		(new CSelect('snmpv3_privprotocol'))
+			->setValue((int) $data['params']['snmpv3_privprotocol'])
+			->setFocusableElementId('label-privprotocol')
+			->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols())),
 		'row_dcheck_snmpv3_privprotocol'
 	)
 	->addRow((new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase'))->setAsteriskMark(),

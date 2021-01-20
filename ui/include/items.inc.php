@@ -1256,16 +1256,30 @@ function getInterfaceSelect(array $interfaces): CSelect {
 		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-			$version = $interface['details']['version'];
-			if ($version == SNMP_V3) {
-				$option->setExtra('description', sprintf('%s, %s: %s', _s('SNMPv%1$d', $version),
-					_('Context name'), $interface['details']['contextname']
-				));
+			$snmp_desc = [
+				_s('SNMPv%1$d', $interface['details']['version'])
+			];
+
+			if ($interface['details']['version'] == SNMP_V3) {
+				$snmp_desc[] = _('Context name').': '.$interface['details']['contextname'];
+
+				if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
+					[$interface['details']['privprotocol'] => $priv_protocol] = getSnmpV3PrivProtocols();
+
+					$snmp_desc[] = '(priv: '.$priv_protocol.', auth: '.$auth_protocol.')';
+				}
+				elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+					[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
+
+					$snmp_desc[] = '(auth: '.$auth_protocol.')';
+				}
+
 			} else {
-				$option->setExtra('description', sprintf('%s, %s: %s', _s('SNMPv%1$d', $version),
-					_x('Community', 'SNMP Community'), $interface['details']['community']
-				));
+				$snmp_desc[] = _x('Community', 'SNMP Community').':'.$interface['details']['community'];
 			}
+
+			$option->setExtra('description', implode(', ', $snmp_desc));
 		}
 
 		$options_by_type[$interface['type']][] = $option;

@@ -114,11 +114,10 @@
 						->setId('interfaces_#{iface.interfaceid}_details_securitylevel'),
 					'row_snmpv3_securitylevel_#{iface.interfaceid}'
 				)
-				->addRow(new CLabel(_('Authentication protocol'), 'interfaces[#{iface.interfaceid}][details][authprotocol]'),
-					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][authprotocol]', ITEM_SNMPV3_AUTHPROTOCOL_MD5))
-						->addValue('MD5', ITEM_SNMPV3_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_AUTHPROTOCOL_MD5)
-						->addValue('SHA', ITEM_SNMPV3_AUTHPROTOCOL_SHA1, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_AUTHPROTOCOL_SHA1)
-						->setModern(true),
+				->addRow(new CLabel(_('Authentication protocol'), 'label-authprotocol-#{iface.interfaceid}'),
+					(new CSelect('interfaces[#{iface.interfaceid}][details][authprotocol]'))
+						->setFocusableElementId('label-authprotocol-#{iface.interfaceid}')
+						->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols())),
 					'row_snmpv3_authprotocol_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Authentication passphrase'), 'interfaces[#{iface.interfaceid}][details][authpassphrase]'),
@@ -127,11 +126,10 @@
 						->disableAutocomplete(),
 					'row_snmpv3_authpassphrase_#{iface.interfaceid}'
 				)
-				->addRow(new CLabel(_('Privacy protocol'), 'interfaces[#{iface.interfaceid}][details][privprotocol]'),
-					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][privprotocol]', ITEM_SNMPV3_PRIVPROTOCOL_DES))
-						->addValue('DES', ITEM_SNMPV3_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_PRIVPROTOCOL_DES)
-						->addValue('AES', ITEM_SNMPV3_PRIVPROTOCOL_AES128, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_PRIVPROTOCOL_AES128)
-						->setModern(true),
+				->addRow(new CLabel(_('Privacy protocol'), 'label-privprotocol-#{iface.interfaceid}'),
+					(new CSelect('interfaces[#{iface.interfaceid}][details][privprotocol]'))
+						->setFocusableElementId('label-privprotocol-#{iface.interfaceid}')
+						->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols())),
 					'row_snmpv3_privprotocol_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Privacy passphrase'), 'interfaces[#{iface.interfaceid}][details][privpassphrase]'),
@@ -244,17 +242,11 @@
 					.value = iface.details.securitylevel;
 			}
 
-			if (iface.details.privprotocol == <?= ITEM_SNMPV3_PRIVPROTOCOL_AES128 ?>) {
-				elem
-					.querySelector(`#snmpv3_privprotocol_${iface.interfaceid}_1`)
-					.checked = true;
-			}
+			elem.querySelector(`[name="interfaces[${iface.interfaceid}][details][privprotocol]"]`).value
+				= iface.details.privprotocol;
 
-			if (iface.details.authprotocol == <?= ITEM_SNMPV3_AUTHPROTOCOL_SHA1 ?>) {
-				elem
-					.querySelector(`#snmpv3_authprotocol_${iface.interfaceid}_1`)
-					.checked = true;
-			}
+			elem.querySelector(`[name="interfaces[${iface.interfaceid}][details][authprotocol]"]`).value
+				= iface.details.authprotocol;
 
 			if (iface.details.bulk == <?= SNMP_BULK_ENABLED ?>) {
 				elem
