@@ -124,7 +124,7 @@ $macros = array_filter($macros, function($macro) {
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
 
-$valuemap = getRequest('valuemap', []);
+$valuemaps = getRequest('valuemap', []);
 
 /*
  * Actions
@@ -282,36 +282,64 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		if ($valuemap) {
-			$db_valuemap = API::ValueMap()->get([
-				'output' => ['valuemapid'],
-				'hostids' => [$templateId],
-				'preservekeys' => true
-			]);
+		$db_valuemaps = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'hostids' => [$templateId],
+			'selectMappings' => ['value', 'newvalue'],
+			'preservekeys' => true
+		]);
+		$valuemaps_create = [];
+		$valuemaps_update = [];
+		$valuemaps_delete = $result ? array_column($db_valuemaps, 'valuemapid') : [];
 
-			if ($db_valuemap) {
-				API::ValueMap()->delete(array_keys($db_valuemap));
+		if ($result && $valuemaps) {
+			$valuemaps_delete = array_flip($valuemaps_delete);
+
+			foreach ($valuemaps as $valuemap) {
+				$db_valuemap = array_key_exists('valuemapid', $valuemap) ? $db_valuemaps[$valuemap['valuemapid']] : [];
+
+				if ($db_valuemap) {
+					$update = [];
+					$db_mappings = array_column($db_valuemap['mappings'], 'newvalue', 'value');
+					$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
+
+					if ($db_valuemap['name'] !== $valuemap['name']) {
+						$update['name'] = $valuemap['name'];
+					}
+
+					if (array_diff($db_mappings, $mappings) || array_diff($mappings, $db_mappings)) {
+						$update['mappings'] = $valuemap['mappings'];
+					}
+
+					if ($update) {
+						$valuemaps_update[] = ['valuemapid' => $valuemap['valuemapid']] + $update;
+					}
+
+					unset($valuemaps_delete[$valuemap['valuemapid']]);
+				}
+				else {
+					$valuemaps_create[] = [
+						'name' => $valuemap['name'],
+						'hostid' => $templateId,
+						'mappings' => $valuemap['mappings']
+					];
+				}
 			}
 
-			API::ValueMap()->create(array_map(function (array $value) use ($templateId): array {
-				$value['hostid'] = $templateId;
-				unset($value['valuemapid']);
-
-				return $value;
-			}, $valuemap));
-		}
-		else {
-			$db_valuemap = API::ValueMap()->get([
-				'output' => ['valuemapid'],
-				'hostids' => [$templateId],
-				'preservekeys' => true
-			]);
-
-			if ($db_valuemap) {
-				API::ValueMap()->delete(array_keys($db_valuemap));
-			}
+			$valuemaps_delete = array_keys($valuemaps_delete);
 		}
 
+		if ($valuemaps_update && !API::ValueMap()->update($valuemaps_update)) {
+			throw new Exception();
+		}
+
+		if ($valuemaps_create && !API::ValueMap()->create($valuemaps_create)) {
+			throw new Exception();
+		}
+
+		if ($valuemaps_delete && !API::ValueMap()->delete($valuemaps_delete)) {
+			throw new Exception();
+		}
 
 		// full clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
@@ -492,7 +520,7 @@ if (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
 		'macros' => $macros,
-		'valuemaps' => $valuemap
+		'valuemaps' => $valuemaps
 	];
 
 	if ($data['templateid'] != 0) {
@@ -502,7 +530,7 @@ if (hasRequest('form')) {
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
-			'selectValueMaps' => ['name', 'mappings'],
+			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
@@ -514,9 +542,8 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
+			$data['valuemaps'] = $data['dbTemplate']['valuemaps'];
 		}
-
-		$data['valuemaps'] = $data['dbTemplate']['valuemaps'];
 	}
 
 	// description

@@ -893,9 +893,6 @@ if (hasRequest('form')) {
 				$data['hostDiscovery'] = $dbHost['hostDiscovery'];
 			}
 
-			// Valuemap
-			$data['valuemaps'] = $dbHost['valuemaps'];
-
 			$templateids = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 			$data['original_templates'] = array_combine($templateids, $templateids);
 		}

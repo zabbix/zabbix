@@ -219,12 +219,14 @@ $divTabs->addTab('macroTab', _('Macros'),
 );
 
 // Value mapping.
-$divTabs->addTab('valuemap-tab', _('Value mapping'), new CPartial('configuration.valuemap', [
+$divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
+	new CPartial('configuration.valuemap', [
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
 		'form' => 'template'
-	]), TAB_INDICATOR_VALUEMAPS
+	])),
+	TAB_INDICATOR_VALUEMAPS
 );
 
 // footer
