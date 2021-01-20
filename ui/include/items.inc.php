@@ -1289,6 +1289,38 @@ function getInterfaceSelect(array $interfaces): CSelect {
 }
 
 /**
+ * Named SNMPv3 authentication protocols.
+ *
+ * @return array
+ */
+function getSnmpV3AuthProtocols(): array {
+	return [
+		ITEM_SNMPV3_AUTHPROTOCOL_MD5 => 'MD5',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA1 => 'SHA1',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA224 => 'SHA224',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA256 => 'SHA256',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA384 => 'SHA384',
+		ITEM_SNMPV3_AUTHPROTOCOL_SHA512 => 'SHA512'
+	];
+}
+
+/**
+ * Named SNMPv3 privacy protocols.
+ *
+ * @return array
+ */
+function getSnmpV3PrivProtocols(): array {
+	return [
+		ITEM_SNMPV3_PRIVPROTOCOL_DES => 'DES',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES128 => 'AES128',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES192 => 'AES192',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES256 => 'AES256',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES192C => 'AES192C',
+		ITEM_SNMPV3_PRIVPROTOCOL_AES256C => 'AES256C'
+	];
+}
+
+/**
  * @param array $item
  * @param array $trigger
  *
