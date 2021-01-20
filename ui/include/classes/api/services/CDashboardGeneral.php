@@ -379,9 +379,9 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Check widget fields.
+	 * Check table "widget_field".
 	 *
-	 * Notes: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
+	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
 	 *
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
@@ -619,6 +619,8 @@ abstract class CDashboardGeneral extends CApiService {
 	/**
 	 * Update table "dashboard_page".
 	 *
+	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
+	 *
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
@@ -693,6 +695,8 @@ abstract class CDashboardGeneral extends CApiService {
 
 	/**
 	 * Update table "widget".
+	 *
+	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
 	 *
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
@@ -787,6 +791,8 @@ abstract class CDashboardGeneral extends CApiService {
 
 	/**
 	 * Update table "widget_field".
+	 *
+	 * Note: For any object with ID in $dashboards a corresponding object in $db_dashboards must exist.
 	 *
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
