@@ -1,1 +1,0 @@
-...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)

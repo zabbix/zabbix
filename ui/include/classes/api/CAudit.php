@@ -30,6 +30,7 @@ class CAudit {
 		AUDIT_RESOURCE_ACTION => 				['actionid', 'name', 'actions'],
 		AUDIT_RESOURCE_APPLICATION =>			['applicationid', 'name', 'applications'],
 		AUDIT_RESOURCE_AUTHENTICATION =>		['configid', null, 'config'],
+		AUDIT_RESOURCE_AUTH_TOKEN =>			['tokenid', 'name', 'token'],
 		AUDIT_RESOURCE_AUTOREGISTRATION =>		['configid', null, 'config'],
 		AUDIT_RESOURCE_CORRELATION =>			['correlationid', 'name', 'correlation'],
 		AUDIT_RESOURCE_DASHBOARD =>				['dashboardid', 'name', 'dashboard'],
@@ -102,6 +103,9 @@ class CAudit {
 			],
 			'media_type' => [
 				'fields' => ['passwd' => true]
+			],
+			'token' => [
+				'fields' => ['token' => true]
 			],
 			'users' => [
 				'fields' => ['passwd' => true]

@@ -1378,8 +1378,14 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 
-#define ZBX_SESSION_ACTIVE	0
-#define ZBX_SESSION_PASSIVE	1
+#define ZBX_SESSION_ACTIVE		0
+#define ZBX_SESSION_PASSIVE		1
+#define ZBX_AUTH_TOKEN_ENABLED		0
+#define ZBX_AUTH_TOKEN_DISABLED		1
+#define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
+
+#define	ZBX_SID_SESSION_LENGTH		32
+#define	ZBX_SID_AUTH_TOKEN_LENGTH	64
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 

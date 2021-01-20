@@ -755,6 +755,24 @@ footer {
 .icon-signout::before {
   background-position: -90px -156px; }
 
+.is-expanded .icon-support::before {
+  background-position: -247px -48px; }
+
+.is-expanded .icon-share::before {
+  background-position: -90px -84px; }
+
+.is-expanded .icon-help::before {
+  background-position: -90px -48px; }
+
+.is-expanded .icon-guest::before {
+  background-position: -247px -156px; }
+
+.is-expanded .icon-profile::before {
+  background-position: -90px -120px; }
+
+.is-expanded .icon-signout::before {
+  background-position: -90px -156px; }
+
 .menu-user {
   padding: 12px 0; }
   .menu-user li {
@@ -1328,7 +1346,7 @@ z-select,
 .monospace-font {
   font-family: "Courier New", Courier, monospace; }
 
-pre, pre a, pre td, pre span, .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
+pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word; }
@@ -1822,6 +1840,10 @@ form.is-loading {
 
 .wordwrap {
   word-break: break-all; }
+
+.wordbreak {
+  white-space: pre-wrap;
+  word-break: break-word; }
 
 .overflow-table {
   overflow-x: auto;
@@ -5726,9 +5748,9 @@ svg {
 .inline-sr-only {
   font-size: 0; }
 
-table.preprocessing-test-results td {
+.preprocessing-test-results td {
   vertical-align: top !important; }
-table.preprocessing-test-results .rel-container {
+.preprocessing-test-results .rel-container {
   top: 4px;
   margin-left: 3px; }
 

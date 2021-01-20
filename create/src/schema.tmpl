@@ -1869,7 +1869,23 @@ FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
 INDEX		|1		|roleid
 INDEX		|2		|value_moduleid
 
+TABLE|token|tokenid|ZBX_DATA
+FIELD	|tokenid	|t_id		|	|NOT NULL	|0
+FIELD	|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD	|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD	|userid		|t_id		|	|NOT NULL	|0	|1	|users
+FIELD	|token		|t_varchar(128)	|	|NULL		|0
+FIELD	|lastaccess	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD	|expires_at	|t_time		|'0'	|NOT NULL	|0
+FIELD	|created_at	|t_time		|'0'	|NOT NULL	|0
+FIELD	|creator_userid	|t_id		|	|NULL		|0	|2	|users	|userid	|RESTRICT
+INDEX	|1		|name
+UNIQUE	|2		|userid,name
+UNIQUE	|3		|token
+INDEX	|4		|creator_userid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030025	|5030025
+ROW		|5030032	|5030032
