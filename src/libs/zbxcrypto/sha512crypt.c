@@ -224,6 +224,7 @@ sha512_finish_ctx (struct sha512_ctx *ctx, void *resbuf)
 {
 	/* Take yet unprocessed bytes into account.  */
 	uint64_t bytes = ctx->buflen;
+	unsigned int i = 0;
 	size_t pad;
 
 	/* Now count remaining bytes.  */
@@ -242,7 +243,6 @@ sha512_finish_ctx (struct sha512_ctx *ctx, void *resbuf)
 	sha512_process_block (ctx->buffer, bytes + pad + 16, ctx);
 
 	/* Put result from CTX in first 64 bytes following RESBUF.  */
-	unsigned int i = 0;
 	for (i = 0; i < 8; ++i)
 		((uint64_t *) resbuf)[i] = SWAP (ctx->H[i]);
 
