@@ -65,7 +65,7 @@ $form_grid
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], $data['name_readonly']))
+			(new CTextBox('name', $data['name'], $data['name_readonly'], DB::getFieldLength('valuemap', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired()

@@ -555,16 +555,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$valuemaps_delete = array_keys($valuemaps_delete);
 		}
 
-		if ($valuemaps_update) {
-			API::ValueMap()->update($valuemaps_update);
+		if ($valuemaps_update && !API::ValueMap()->update($valuemaps_update)) {
+			throw new Exception();
 		}
 
-		if ($valuemaps_create) {
-			API::ValueMap()->create($valuemaps_create);
+		if ($valuemaps_create && !API::ValueMap()->create($valuemaps_create)) {
+			throw new Exception();
 		}
 
-		if ($valuemaps_delete) {
-			API::ValueMap()->delete($valuemaps_delete);
+		if ($valuemaps_delete && !API::ValueMap()->delete($valuemaps_delete)) {
+			throw new Exception();
 		}
 
 		// full clone
