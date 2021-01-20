@@ -2620,6 +2620,10 @@ abstract class CItemGeneral extends CApiService {
 			);
 			while ($row = DBfetch($result)) {
 				unset($valuemapids_by_hostid[$row['hostid']][$row['valuemapid']]);
+
+				if (count($valuemapids_by_hostid[$row['hostid']]) === 0) {
+					unset($valuemapids_by_hostid[$row['hostid']]);
+				}
 			}
 
 			if ($valuemapids_by_hostid) {
