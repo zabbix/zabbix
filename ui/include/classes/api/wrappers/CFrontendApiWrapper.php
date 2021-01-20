@@ -75,7 +75,7 @@ class CFrontendApiWrapper extends CApiWrapper {
 			// add an error message
 			$trace = $response->errorMessage;
 			if ($response->debug) {
-				$trace .= ' ['.$this->profiler->formatCallStack($response->debug).']';
+				$trace = rtrim($trace).' ['.$this->profiler->formatCallStack($response->debug).']';
 			}
 			error($trace);
 
