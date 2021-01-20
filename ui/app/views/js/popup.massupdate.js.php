@@ -307,9 +307,13 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		row: '.form_row',
 		rows: [{from: '', to: ''}]
 	});
-	$(document)
-		.off('add.popup')
-		.on('add.popup', processAddfromPopup);
+
+	let overlay = overlays_stack.end();
+
+	$(overlay.$dialogue||document).on('remove', () => {
+		$(document).off('add.popup', processAddfromPopup);
+	});
+	$(document).on('add.popup', processAddfromPopup);
 
 	function processAddfromPopup(ev, data) {
 		let value = data.values[0];

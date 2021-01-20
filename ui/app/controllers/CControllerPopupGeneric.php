@@ -1414,6 +1414,7 @@ class CControllerPopupGeneric extends CController {
 						unset($record);
 					}
 
+					$records = array_column($records, null, 'id');
 					CArrayHelper::sort($records, ['name']);
 				}
 

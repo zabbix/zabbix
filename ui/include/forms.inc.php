@@ -352,9 +352,7 @@ function getItemFilterForm(&$data) {
 					'editable' => true
 				]
 			]
-		]))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		'filter_snmp_oid_row'
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
 	if ($data['context'] === 'host') {
