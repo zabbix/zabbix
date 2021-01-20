@@ -31,6 +31,7 @@ define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
 $form = (new CForm())
 	->cleanItems()
 	->setId('massupdate-form')
+	->setName('massupdate-form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.host')
 	->addVar('ids', $data['ids'])

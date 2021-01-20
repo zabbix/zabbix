@@ -45,7 +45,7 @@ $remove_container = (new CDiv())->addClass('valuemap-remove');
 
 $remove_container->addItem([
 	(new CMultiSelect([
-		'name' => 'valuemap[]',
+		'name' => 'valuemap_remove[]',
 		'object_name' => 'valuemaps',
 		'data' => [],
 		'popup' => [
@@ -53,7 +53,7 @@ $remove_container->addItem([
 				'srctbl' => 'valuemaps',
 				'srcfld1' => 'valuemapid',
 				'dstfrm' => 'massupdate-form',
-				'dstfld1' => 'valuemap_',
+				'dstfld1' => 'valuemap_remove_',
 				'hostids' => $data['hostids'],
 				'editable' => true
 			]
@@ -61,7 +61,7 @@ $remove_container->addItem([
 	]))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv(
-		(new CCheckBox('valuemap_checkbox'))
+		(new CCheckBox('valuemap_remove_except'))
 			->setLabel(_('Except selected'))
 			->setUncheckedValue(0)
 	))->addClass('valuemap-checkbox')

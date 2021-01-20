@@ -1376,6 +1376,11 @@ class CControllerPopupGeneric extends CController {
 					];
 					$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get($options), ['valuemapid' => 'id']);
 
+					if ($this->getInput('multiselect', 0)) {
+						// In multiselect mode show only unique vlue maps names across all selected hosts.
+						$records = array_column($records, null, 'name');
+					}
+
 					// For multiple hosts show hostname as value map name prefix.
 					if ($this->getInput('show_host_name', 0)) {
 						$hosts = API::Host()->get([
@@ -1383,6 +1388,14 @@ class CControllerPopupGeneric extends CController {
 							'hostids' => $hostids,
 							'preservekeys' => true
 						]);
+
+						if (!$hosts) {
+							$hosts = API::Template()->get([
+								'output' => ['name'],
+								'templateids' => $hostids,
+								'preservekeys' => true
+							]);
+						}
 
 						foreach ($records as &$record) {
 							$record['hostname'] = $hosts[$record['hostid']]['name'];

@@ -314,12 +314,14 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	function processAddfromPopup(ev, data) {
 		let value = data.values[0];
 
-		new AddValueMap({
-			valuemapid: value.id,
-			name: value.name,
-			mappings: value.mappings,
-			name_readonly: 1
-		});
+		if (data.parentId === null) {
+			new AddValueMap({
+				valuemapid: value.id,
+				name: value.name,
+				mappings: value.mappings,
+				name_readonly: 1
+			});
+		}
 	}
 
 	function openAddfromPopup(elm) {
