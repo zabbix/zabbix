@@ -2598,49 +2598,38 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items
 	 */
 	protected function validateValueMaps(array $items): void {
-		$hostid_by_valuemapid = [];
 		$valuemapids_by_hostid = [];
 
 		foreach ($items as $item) {
-			if ((array_key_exists('templateid', $item) && $item['templateid'] != 0)
-					|| (array_key_exists('flags', $item) && $item['flags'] === ZBX_FLAG_DISCOVERY_CREATED)) {
-				continue;
-			}
-
 			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0) {
 				$valuemapids_by_hostid[$item['hostid']][$item['valuemapid']] = true;
-				$hostid_by_valuemapid[$item['valuemapid']] = $item['hostid'];
 			}
 		}
 
-		if ($valuemapids_by_hostid) {
-			$sql_where = [];
-			foreach ($valuemapids_by_hostid as $hostid => $valuemapids) {
-				$sql_where[] .= '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-					dbConditionString('vm.valuemapid', array_keys($valuemapids)).')';
+		$sql_where = [];
+		foreach ($valuemapids_by_hostid as $hostid => $valuemapids) {
+			$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
+				dbConditionId('vm.valuemapid', array_keys($valuemapids)).')';
+		}
+
+		if ($sql_where) {
+			$result = DBselect(
+				'SELECT vm.valuemapid,vm.hostid'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+			while ($row = DBfetch($result)) {
+				unset($valuemapids_by_hostid[$row['hostid']][$row['valuemapid']]);
 			}
 
-			if ($sql_where) {
-				$db_hostids_by_valuemapids = [];
-				$result = DBselect(
-					'SELECT vm.valuemapid,vm.hostid'.
-					' FROM valuemap vm'.
-					' WHERE '.implode(' OR ', $sql_where)
+			if ($valuemapids_by_hostid) {
+				$host_row = DBfetch(
+					DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr(key($valuemapids_by_hostid))),
+					'host'
 				);
-				while ($row = DBfetch($result)) {
-					$db_hostids_by_valuemapids[$row['valuemapid']] = $row['hostid'];
-				}
-
-				foreach ($hostid_by_valuemapid as $valuemapid => $hostid) {
-					if (!array_key_exists($valuemapid, $db_hostids_by_valuemapids)) {
-						$host_row = DBfetch(
-							DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)), 'host'
-						);
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
-							$valuemapid, $host_row['host']
-						));
-					}
-				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
+					key($valuemapids_by_hostid[key($valuemapids_by_hostid)]), $host_row['host']
+				));
 			}
 		}
 	}
