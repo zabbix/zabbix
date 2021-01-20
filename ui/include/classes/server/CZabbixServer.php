@@ -529,7 +529,7 @@ class CZabbixServer {
 		}
 
 		// An error on the server side occurred.
-		$this->error = $response['info'];
+		$this->error = rtrim($response['info']);
 
 		return false;
 	}
