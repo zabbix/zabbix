@@ -90,7 +90,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 						ZBX_CONST_STRLEN(SW_OS_OPTION_PRETTY_NAME)))
 					continue;
 
-				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line))
+				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line) ||
+						1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^\n]", line))
 				{
 					line_read = SUCCEED;
 					break;
