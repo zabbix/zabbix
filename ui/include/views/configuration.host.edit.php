@@ -518,7 +518,7 @@ $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_IN
 // Value mapping.
 $divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
 	new CPartial('configuration.valuemap', [
-		'source' => 'template',
+		'source' => 'host',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
 		'form' => 'host'
