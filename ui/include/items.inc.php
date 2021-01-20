@@ -1256,30 +1256,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-			$snmp_desc = [
-				_s('SNMPv%1$d', $interface['details']['version'])
-			];
-
-			if ($interface['details']['version'] == SNMP_V3) {
-				$snmp_desc[] = _('Context name').': '.$interface['details']['contextname'];
-
-				if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
-					[$interface['details']['privprotocol'] => $priv_protocol] = getSnmpV3PrivProtocols();
-
-					$snmp_desc[] = '(priv: '.$priv_protocol.', auth: '.$auth_protocol.')';
-				}
-				elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-					[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
-
-					$snmp_desc[] = '(auth: '.$auth_protocol.')';
-				}
-
-			} else {
-				$snmp_desc[] = _x('Community', 'SNMP Community').':'.$interface['details']['community'];
-			}
-
-			$option->setExtra('description', implode(', ', $snmp_desc));
+			$option->setExtra('description', getSnmpInterfaceDescription($interface));
 		}
 
 		$options_by_type[$interface['type']][] = $option;
@@ -1300,6 +1277,46 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	}
 
 	return $interface_select;
+}
+
+/**
+ * Creates SNMP interface description.
+ *
+ * @param array $interface
+ * @param int   $interface['details']['version']        Interface SNMP version.
+ * @param int   $interface['details']['contextname']    Interface context name for SNMP version 3.
+ * @param int   $interface['details']['community']      Interface community for SNMP non version 3 interface.
+ * @param int   $interface['details']['securitylevel']  Security level for SNMP version 3 interface.
+ * @param int   $interface['details']['authprotocol']   Authentication protocol for SNMP version 3 interface.
+ * @param int   $interface['details']['privprotocol']   Privacy protocol for SNMP version 3 interface.
+ *
+ * @return string
+ */
+function getSnmpInterfaceDescription(array $interface): string {
+	$snmp_desc = [
+		_s('SNMPv%1$d', $interface['details']['version'])
+	];
+
+	if ($interface['details']['version'] == SNMP_V3) {
+		$snmp_desc[] = _('Context name').': '.$interface['details']['contextname'];
+
+		if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+			[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
+			[$interface['details']['privprotocol'] => $priv_protocol] = getSnmpV3PrivProtocols();
+
+			$snmp_desc[] = '(priv: '.$priv_protocol.', auth: '.$auth_protocol.')';
+		}
+		elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+			[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
+
+			$snmp_desc[] = '(auth: '.$auth_protocol.')';
+		}
+
+	} else {
+		$snmp_desc[] = _x('Community', 'SNMP Community').':'.$interface['details']['community'];
+	}
+
+	return implode(', ', $snmp_desc);
 }
 
 /**
