@@ -53,8 +53,8 @@ type Connection struct {
 	tlsConfig   *tls.Config
 	state       int
 	compress    bool
-	Timeout     time.Duration
-	TimeoutMode int
+	timeout     time.Duration
+	timeoutMode int
 }
 
 type Listener struct {
@@ -63,7 +63,7 @@ type Listener struct {
 }
 
 func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMode int, args ...interface{}) (c *Connection, err error) {
-	c = &Connection{state: connStateConnect, compress: true, Timeout: timeout, TimeoutMode: timeoutMode}
+	c = &Connection{state: connStateConnect, compress: true, timeout: timeout, timeoutMode: timeoutMode}
 	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
 
@@ -116,8 +116,8 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 }
 
 func (c *Connection) Write(data []byte) error {
-	if c.TimeoutMode == TimeoutModeShift {
-		if err := c.conn.SetWriteDeadline(time.Now().Add(c.Timeout)); err != nil {
+	if c.timeoutMode == TimeoutModeShift {
+		if err := c.conn.SetWriteDeadline(time.Now().Add(c.timeout)); err != nil {
 			return err
 		}
 	}
@@ -244,8 +244,8 @@ func (c *Connection) uncompress(data []byte, expLen uint32) ([]byte, error) {
 }
 
 func (c *Connection) Read() (data []byte, err error) {
-	if c.TimeoutMode == TimeoutModeShift {
-		if err = c.conn.SetReadDeadline(time.Now().Add(c.Timeout)); err != nil {
+	if c.timeoutMode == TimeoutModeShift {
+		if err = c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
 			return
 		}
 	}
@@ -272,7 +272,7 @@ func (c *Connection) Read() (data []byte, err error) {
 			return nil, errors.New("cannot accept encrypted connection")
 		}
 		var tlsConn net.Conn
-		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, c.Timeout, c.TimeoutMode == TimeoutModeShift); err != nil {
+		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, c.timeout, c.timeoutMode == TimeoutModeShift); err != nil {
 			return
 		}
 		c.conn = tlsConn
@@ -307,8 +307,8 @@ func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection
 	if conn, err = l.listener.Accept(); err != nil {
 		return
 	} else {
-		c = &Connection{conn: conn, tlsConfig: l.tlsconfig, state: connStateAccept, Timeout: timeout,
-			TimeoutMode: timeoutMode}
+		c = &Connection{conn: conn, tlsConfig: l.tlsconfig, state: connStateAccept, timeout: timeout,
+			timeoutMode: timeoutMode}
 	}
 	return
 }
