@@ -2623,12 +2623,14 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if ($valuemapids_by_hostid) {
+				$hostid = key($valuemapids_by_hostid);
+				$valuemapid = key($valuemapids_by_hostid[$hostid]);
+
 				$host_row = DBfetch(
-					DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr(key($valuemapids_by_hostid))),
-					'host'
+					DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)), 'host'
 				);
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
-					key($valuemapids_by_hostid[key($valuemapids_by_hostid)]), $host_row['host']
+					$valuemapid, $host_row['host']
 				));
 			}
 		}
