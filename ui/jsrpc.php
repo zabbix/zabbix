@@ -558,11 +558,12 @@ switch ($data['method']) {
 
 				if ($db_valuemaps) {
 					foreach ($db_valuemaps as $valuemap) {
-						$result[$valuemap['valuemapid']] = [
+						$result[$valuemap['name']] = [
 							'id' => $valuemap['valuemapid'],
 							'name' => $valuemap['name'],
 						];
 					}
+					$result = array_column($result, null, 'valuemapid');
 
 					CArrayHelper::sort($result, ['name']);
 				}

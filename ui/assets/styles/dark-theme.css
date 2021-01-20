@@ -6001,9 +6001,14 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-macros-table .table-col-template-value {
   width: 300px; }
 
-#valuemap-table, #valuemap-rename-table {
+#valuemap-rename-table {
   width: 100%; }
 
+#valuemap-table tbody td {
+  background-color: #2b2b2b;
+  border-collapse: separate;
+  border-top: 1px solid #303030;
+  border-bottom: 1px solid #303030; }
 #valuemap-table .valuemap-row td {
   vertical-align: top; }
 #valuemap-table .valuemap-label {

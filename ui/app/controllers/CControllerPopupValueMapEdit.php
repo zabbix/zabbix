@@ -112,6 +112,7 @@ class CControllerPopupValueMapEdit extends CController {
 		$data['mappings'] = array_filter($data['mappings'], function ($mapping) {
 			return ($mapping['value'] !== '' && $mapping['newvalue'] !== '');
 		});
+		$data['mappings'] = array_values($data['mappings']);
 
 		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
 	}
