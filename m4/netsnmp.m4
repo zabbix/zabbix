@@ -136,6 +136,32 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 		AC_CHECK_LIB(netsnmp, main, , [AC_MSG_ERROR([Not found Net-SNMP library])])
 
+		dnl Check for SHA224/256/384/512 protocol support for auth
+		AC_MSG_CHECKING(for strong SHA auth protocol support)
+		AC_TRY_LINK([
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>],
+		[
+struct snmp_session session;
+session.securityAuthProto = usmHMAC384SHA512AuthProtocol;
+		],
+		AC_DEFINE(HAVE_NETSNMP_STRONG_AUTH, 1, [Define to 1 if strong SHA auth protocols are supported.])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+		dnl Check for AES192/256 protocol support for auth
+		AC_MSG_CHECKING(for strong AES privacy protocol support)
+		AC_TRY_LINK([
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>],
+		[
+struct snmp_session session;
+session.securityAuthProto = usmAES256PrivProtocol;
+		],
+		AC_DEFINE(HAVE_NETSNMP_STRONG_PRIV, 1, [Define to 1 if strong AES priv protocols are supported.])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
 		dnl Check for localname in struct snmp_session
 		AC_MSG_CHECKING(for localname in struct snmp_session)
 		AC_TRY_COMPILE([
