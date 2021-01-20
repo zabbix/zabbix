@@ -513,11 +513,11 @@ class CImportReferencer {
 	 * @param array $valueMaps
 	 */
 	public function addValueMaps(array $valueMaps) {
-		foreach ($valueMaps as $host => $vms) {
+		foreach ($valueMaps as $host => $valuemap_names) {
 			if (!array_key_exists($host, $this->valueMaps)) {
 				$this->valueMaps[$host] = [];
 			}
-			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $vms));
+			$this->valueMaps[$host] = array_unique(array_merge($this->valueMaps[$host], $valuemap_names));
 		}
 	}
 
@@ -786,7 +786,6 @@ class CImportReferencer {
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'host'],
 				'filter' => ['host' => $this->hosts],
-				'selectValueMaps' => ['name', 'mappings'],
 				'preservekeys' => true,
 				'templated_hosts' => true
 			]);
@@ -874,11 +873,11 @@ class CImportReferencer {
 			$this->valueMapsRefs = [];
 			$sql_where = [];
 
-			foreach ($this->valueMaps as $host => $valuemaps) {
+			foreach ($this->valueMaps as $host => $valuemap_names) {
 				$hostid = $this->resolveHostOrTemplate($host);
 				if ($hostid) {
 					$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-						dbConditionString('vm.name', $valuemaps).')';
+						dbConditionString('vm.name', $valuemap_names).')';
 				}
 			}
 
