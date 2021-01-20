@@ -581,6 +581,26 @@ function copyItems($srcHostId, $dstHostId) {
 		'templated_hosts' => true
 	]);
 	$dstHost = reset($dstHosts);
+	$src_valuemaps = array_column($srcItems, 'valuemapid', 'valuemapid');
+	unset($src_valuemaps[0]);
+
+	if ($src_valuemaps) {
+		$src_valuemaps = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'valuemapids' => $src_valuemaps
+		]);
+		$src_valuemaps = array_column($src_valuemaps, 'valuemapid', 'name');
+		$dest_valuemaps = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'hostids' => $dstHostId
+		]);
+		$dest_valuemaps = array_column($dest_valuemaps, 'valuemapid', 'name');
+		$valuemapids_map = [];
+
+		foreach ($src_valuemaps as $name => $valuemapid) {
+			$valuemapids_map[$valuemapid] = $dest_valuemaps[$name];
+		}
+	}
 
 	$create_order = [];
 	$src_itemid_to_key = [];
@@ -634,6 +654,9 @@ function copyItems($srcHostId, $dstHostId) {
 			}
 			$itemkey_to_id[$srcItem['key_']] = $srcItem['itemid'];
 			continue;
+		}
+		else if ($srcItem['valuemapid']) {
+			$srcItem['valuemapid'] = $valuemapids_map[$srcItem['valuemapid']];
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {

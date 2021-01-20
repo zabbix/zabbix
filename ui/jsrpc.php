@@ -563,7 +563,7 @@ switch ($data['method']) {
 							'name' => $valuemap['name'],
 						];
 					}
-					$result = array_column($result, null, 'valuemapid');
+					$result = array_column($result, null, 'id');
 
 					CArrayHelper::sort($result, ['name']);
 				}
