@@ -149,7 +149,7 @@ session.securityAuthProto = usmHMAC384SHA512AuthProtocol;
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
-		dnl Check for AES192/256 protocol support for auth
+		dnl Check for AES192/256 protocol support for privacy
 		AC_MSG_CHECKING(for strong AES privacy protocol support)
 		AC_TRY_LINK([
 #include <net-snmp/net-snmp-config.h>
