@@ -95,8 +95,8 @@ $form_list = (new CFormList())
 	)
 	->addRow(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol'),
 		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['params']['snmpv3_authprotocol']))
-			->addValue('MD5', ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
-			->addValue('SHA', ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+			->addValue('MD5', ITEM_SNMPV3_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_SNMPV3_AUTHPROTOCOL_MD5)
+			->addValue('SHA', ITEM_SNMPV3_AUTHPROTOCOL_SHA1, 'snmpv3_authprotocol_'.ITEM_SNMPV3_AUTHPROTOCOL_SHA1)
 			->setModern(true),
 		'row_dcheck_snmpv3_authprotocol'
 	)
@@ -109,8 +109,8 @@ $form_list = (new CFormList())
 	)
 	->addRow(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol'),
 		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['params']['snmpv3_privprotocol']))
-			->addValue('DES', ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
-			->addValue('AES', ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+			->addValue('DES', ITEM_SNMPV3_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_SNMPV3_PRIVPROTOCOL_DES)
+			->addValue('AES', ITEM_SNMPV3_PRIVPROTOCOL_AES128, 'snmpv3_privprotocol_'.ITEM_SNMPV3_PRIVPROTOCOL_AES128)
 			->setModern(true),
 		'row_dcheck_snmpv3_privprotocol'
 	)

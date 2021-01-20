@@ -46,9 +46,9 @@ class CControllerPopupDiscoveryCheck extends CController {
 			'snmpv3_contextname' =>		'string|db dchecks.snmpv3_contextname',
 			'snmpv3_securityname' =>	'string|db dchecks.snmpv3_securityname',
 			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
-			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA,
+			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.ITEM_SNMPV3_AUTHPROTOCOL_MD5.','.ITEM_SNMPV3_AUTHPROTOCOL_SHA1,
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
-			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES,
+			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.ITEM_SNMPV3_PRIVPROTOCOL_DES.','.ITEM_SNMPV3_PRIVPROTOCOL_AES128,
 			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
 		];
 

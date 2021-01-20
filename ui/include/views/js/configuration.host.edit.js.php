@@ -115,9 +115,9 @@
 					'row_snmpv3_securitylevel_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Authentication protocol'), 'interfaces[#{iface.interfaceid}][details][authprotocol]'),
-					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][authprotocol]', ITEM_AUTHPROTOCOL_MD5))
-						->addValue('MD5', ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_AUTHPROTOCOL_MD5)
-						->addValue('SHA', ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_AUTHPROTOCOL_SHA)
+					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][authprotocol]', ITEM_SNMPV3_AUTHPROTOCOL_MD5))
+						->addValue('MD5', ITEM_SNMPV3_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_AUTHPROTOCOL_MD5)
+						->addValue('SHA', ITEM_SNMPV3_AUTHPROTOCOL_SHA1, 'snmpv3_authprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_AUTHPROTOCOL_SHA1)
 						->setModern(true),
 					'row_snmpv3_authprotocol_#{iface.interfaceid}'
 				)
@@ -128,9 +128,9 @@
 					'row_snmpv3_authpassphrase_#{iface.interfaceid}'
 				)
 				->addRow(new CLabel(_('Privacy protocol'), 'interfaces[#{iface.interfaceid}][details][privprotocol]'),
-					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][privprotocol]', ITEM_PRIVPROTOCOL_DES))
-						->addValue('DES', ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_PRIVPROTOCOL_DES)
-						->addValue('AES', ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_PRIVPROTOCOL_AES)
+					(new CRadioButtonList('interfaces[#{iface.interfaceid}][details][privprotocol]', ITEM_SNMPV3_PRIVPROTOCOL_DES))
+						->addValue('DES', ITEM_SNMPV3_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_PRIVPROTOCOL_DES)
+						->addValue('AES', ITEM_SNMPV3_PRIVPROTOCOL_AES128, 'snmpv3_privprotocol_#{iface.interfaceid}_'.ITEM_SNMPV3_PRIVPROTOCOL_AES128)
 						->setModern(true),
 					'row_snmpv3_privprotocol_#{iface.interfaceid}'
 				)
@@ -244,13 +244,13 @@
 					.value = iface.details.securitylevel;
 			}
 
-			if (iface.details.privprotocol == <?= ITEM_PRIVPROTOCOL_AES ?>) {
+			if (iface.details.privprotocol == <?= ITEM_SNMPV3_PRIVPROTOCOL_AES128 ?>) {
 				elem
 					.querySelector(`#snmpv3_privprotocol_${iface.interfaceid}_1`)
 					.checked = true;
 			}
 
-			if (iface.details.authprotocol == <?= ITEM_AUTHPROTOCOL_SHA ?>) {
+			if (iface.details.authprotocol == <?= ITEM_SNMPV3_AUTHPROTOCOL_SHA1 ?>) {
 				elem
 					.querySelector(`#snmpv3_authprotocol_${iface.interfaceid}_1`)
 					.checked = true;
@@ -326,8 +326,8 @@
 					community: '{$SNMP_COMMUNITY}',
 					bulk: <?= SNMP_BULK_ENABLED ?>,
 					securitylevel: <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>,
-					authprotocol: <?= ITEM_AUTHPROTOCOL_MD5 ?>,
-					privprotocol: <?= ITEM_PRIVPROTOCOL_DES ?>
+					authprotocol: <?= ITEM_SNMPV3_AUTHPROTOCOL_MD5 ?>,
+					privprotocol: <?= ITEM_SNMPV3_PRIVPROTOCOL_DES ?>
 				}
 			};
 		}
