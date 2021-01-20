@@ -507,35 +507,64 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		$valuemap = getRequest('valuemap', []);
-		if ($valuemap) {
-			$db_valuemap = API::ValueMap()->get([
-				'output' => ['valuemapid'],
-				'hostids' => [$hostId],
-				'preservekeys' => true
-			]);
+		$valuemaps = getRequest('valuemap', []);
+		$db_valuemaps = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'hostids' => [$hostId],
+			'selectMappings' => ['value', 'newvalue'],
+			'preservekeys' => true
+		]);
+		$valuemaps_create = [];
+		$valuemaps_update = [];
+		$valuemaps_delete = array_column($db_valuemaps, 'valuemapid');
 
-			if ($db_valuemap) {
-				API::ValueMap()->delete(array_keys($db_valuemap));
+		if ($valuemaps) {
+			$valuemaps_delete = array_flip($valuemaps_delete);
+
+			foreach ($valuemaps as $valuemap) {
+				$db_valuemap = array_key_exists('valuemapid', $valuemap) ? $db_valuemaps[$valuemap['valuemapid']] : [];
+
+				if ($db_valuemap) {
+					$update = [];
+					$db_mappings = array_column($db_valuemap['mappings'], 'newvalue', 'value');
+					$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
+
+					if ($db_valuemap['name'] !== $valuemap['name']) {
+						$update['name'] = $valuemap['name'];
+					}
+
+					if (array_diff($db_mappings, $mappings) || array_diff($mappings, $db_mappings)) {
+						$update['mappings'] = $valuemap['mappings'];
+					}
+
+					if ($update) {
+						$valuemaps_update[] = ['valuemapid' => $valuemap['valuemapid']] + $update;
+					}
+
+					unset($valuemaps_delete[$valuemap['valuemapid']]);
+				}
+				else {
+					$valuemaps_create[] = [
+						'name' => $valuemap['name'],
+						'hostid' => $hostId,
+						'mappings' => $valuemap['mappings']
+					];
+				}
 			}
 
-			API::ValueMap()->create(array_map(function (array $value) use ($hostId): array {
-				$value['hostid'] = $hostId;
-				unset($value['valuemapid']);
-
-				return $value;
-			}, $valuemap));
+			$valuemaps_delete = array_keys($valuemaps_delete);
 		}
-		else {
-			$db_valuemap = API::ValueMap()->get([
-				'output' => ['valuemapid'],
-				'hostids' => [$hostId],
-				'preservekeys' => true
-			]);
 
-			if ($db_valuemap) {
-				API::ValueMap()->delete(array_keys($db_valuemap));
-			}
+		if ($valuemaps_update) {
+			API::ValueMap()->update($valuemaps_update);
+		}
+
+		if ($valuemaps_create) {
+			API::ValueMap()->create($valuemaps_create);
+		}
+
+		if ($valuemaps_delete) {
+			API::ValueMap()->delete($valuemaps_delete);
 		}
 
 		// full clone
