@@ -168,9 +168,13 @@ class testDataCollection extends CIntegrationTest {
 			'temporarily disabling Zabbix agent checks on host "agent": interface unavailable'
 		);
 
-		$data = $this->call('host.get', [
-			'hostids'	=> self::$hostids['agent'],
-			'output'	=> ['available']
+		$data = $this->call('hostinterface.get', [
+			'output' => ['available'],
+			'hostids' => self::$hostids['agent'],
+			'filter' => [
+				'type' => 1,
+				'main' => 1
+			]
 		]);
 
 		$this->assertTrue(is_array($data['result']));
