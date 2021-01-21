@@ -73,15 +73,22 @@ class CControllerPopupValueMapEdit extends CController {
 		}
 
 		$mappings = $this->getInput('mappings', []);
-		$mappings = array_filter($this->getInput('mappings', []), function ($mapping) {
-			$mapping += ['value' => '', 'newvalue' => ''];
-
-			return ($mapping['value'] !== '' && $mapping['newvalue'] !== '');
-		});
 
 		if (!$mappings) {
 			error(_s('Incorrect value for field "%1$s": %2$s.', 'mappings', _('cannot be empty')));
 			return false;
+		}
+
+		foreach ($mappings as $mapping) {
+			if ($mapping['value'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				return false;
+			}
+
+			if ($mapping['newvalue'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'newvalue', _('cannot be empty')));
+				return false;
+			}
 		}
 
 		if (count($mappings) != count(array_column($mappings, null, 'value'))) {
@@ -108,10 +115,6 @@ class CControllerPopupValueMapEdit extends CController {
 	protected function update(): CControllerResponse {
 		$data = [];
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit', 'name_readonly']);
-
-		$data['mappings'] = array_filter($data['mappings'], function ($mapping) {
-			return ($mapping['value'] !== '' && $mapping['newvalue'] !== '');
-		});
 		$data['mappings'] = array_values($data['mappings']);
 
 		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
