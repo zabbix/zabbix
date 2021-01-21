@@ -107,7 +107,6 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Change tag value filter to "Equals"
 		$this->query('id:tags_00_operator')->asZDropdown()->one()->fill('Equals');
-//		$this->zbxTestClickXpath('//label[@for="tags_100"]');
 		$this->query('name:filter_apply')->one()->click();
 		$this->zbxTestAssertElementText('//tbody/tr[@class="nothing-to-show"]/td', 'No data found.');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
@@ -125,7 +124,6 @@ class testPageProblems extends CLegacyWebTest {
 		// Select tag option "OR" and exact "Equals" tag value match
 		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
 		$this->query('id:tags_00_operator')->asZDropdown()->one()->fill('Equals');
-//		$this->zbxTestClickXpath('//label[@for="tags_100"]');
 
 		// Filter by two tags
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
