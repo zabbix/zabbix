@@ -175,7 +175,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$this->assertTrue(is_array($data['result']));
 		$this->assertEquals(1, count($data['result']));
-		$this->assertEquals(HOST_AVAILABLE_FALSE, $data['result'][0]['available']);
+		$this->assertEquals(INTERFACE_AVAILABLE_FALSE, $data['result'][0]['available']);
 	}
 
 	/**
