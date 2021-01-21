@@ -202,7 +202,8 @@ class CXmlConstantName {
 	const SHA1 = 'SHA1';
 
 	const DES = 'DES';
-	const AES = 'AES';
+	const AES = 'AES'; // Used in version 5.2 as interface "privprotocol" invariant.
+	const AES128 = 'AES128';
 
 	const NOAUTHNOPRIV = 'NOAUTHNOPRIV';
 	const AUTHNOPRIV = 'AUTHNOPRIV';

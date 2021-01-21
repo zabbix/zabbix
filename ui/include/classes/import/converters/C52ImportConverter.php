@@ -122,6 +122,11 @@ class C52ImportConverter extends CConverter {
 						&& $interface['details']['authprotocol'] === CXmlConstantName::SHA) {
 					$interface['details']['authprotocol'] = CXmlConstantName::SHA1;
 				}
+
+				if (array_key_exists('privprotocol', $interface['details'])
+						&& $interface['details']['privprotocol'] === CXmlConstantName::AES) {
+					$interface['details']['privprotocol'] = CXmlConstantName::AES128;
+				}
 			}
 
 			$result[] = $interface;
