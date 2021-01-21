@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-20T12:13:52Z'
+  date: '2021-01-21T09:13:51Z'
   media_types:
     -
       name: VictorOps
@@ -91,16 +91,16 @@ zabbix_export:
                 }
         
                 VictorOps.params = params;
-                if (VictorOps.params.endpiont) {
-                    if (!VictorOps.params.endpiont.endsWith('/')) {
-                        VictorOps.params.endpiont += '/';
-                    }
-                    if (typeof VictorOps.params.vops_routing_key !== 'undefined'
-                            && VictorOps.params.vops_routing_key !== '{ALERT.SENDTO}'
-                            && VictorOps.params.vops_routing_key !== 'Default') {
-                        VictorOps.params.endpiont += VictorOps.params.vops_routing_key;
+                if (VictorOps.params.endpoint) {
+                    if (!VictorOps.params.endpoint.endsWith('/')) {
+                        VictorOps.params.endpoint += '/';
                     }
         
+                    if (typeof VictorOps.params.routing_key !== 'undefined'
+                            && VictorOps.params.routing_key !== '{ALERT.SENDTO}'
+                            && VictorOps.params.routing_key !== 'Default') {
+                        VictorOps.params.endpoint += VictorOps.params.routing_key;
+                    }
                 }
             },
         
@@ -111,7 +111,7 @@ zabbix_export:
             addFields: function (fields) {
                 var data = {};
         
-                if (typeof fields === 'object' && Object.keys(fields).length) {
+                if (typeof fields === 'object') {
                     Object.keys(fields)
                         .forEach(function(field) {
                             if (fields[field] === '') {
@@ -144,7 +144,7 @@ zabbix_export:
             request: function (data) {
                 if (typeof VictorOps.params !== 'object' || typeof VictorOps.params.endpoint === 'undefined'
                         || VictorOps.params.endpoint === '' ) {
-                    throw 'Required parameter is not set: "vops_endpiont".';
+                    throw 'Required parameter is not set: "vops_endpoint".';
                 }
         
                 var response,
