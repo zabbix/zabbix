@@ -38,6 +38,10 @@ class C52ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
+		}
+
 		return $data;
 	}
 
@@ -57,9 +61,118 @@ class C52ImportConverter extends CConverter {
 
 		foreach ($hosts as &$host) {
 			$host = array_diff_key($host, $tls_fields);
+
+			if (array_key_exists('interfaces', $host)) {
+				$host['interfaces'] = self::convertIntefaces($host['interfaces']);
+			}
+
+			if (array_key_exists('discovery_rules', $host)) {
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+			}
 		}
 		unset($host);
 
 		return $hosts;
+	}
+
+	/**
+	 * Convert templates.
+	 *
+	 * @static
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	private static function convertTemplates(array $templates): array {
+		$result = [];
+
+		foreach ($templates as $template) {
+			if (array_key_exists('discovery_rules', $template)) {
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+			}
+
+			$result[] = $template;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert interfaces.
+	 *
+	 * @static
+	 *
+	 * @param array $interfaces
+	 *
+	 * @return array
+	 */
+	private static function convertIntefaces(array $interfaces): array {
+		$result = [];
+
+		foreach ($interfaces as $interface) {
+			$snmp_v3_convert = array_key_exists('type', $interface)
+				&& $interface['type'] === CXmlConstantName::SNMP
+				&& array_key_exists('details', $interface)
+				&& array_key_exists('version', $interface['details'])
+				&& $interface['details']['version'] === CXmlConstantName::SNMPV3;
+
+			if ($snmp_v3_convert) {
+				if (array_key_exists('authprotocol', $interface['details'])
+						&& $interface['details']['authprotocol'] === CXmlConstantName::SHA) {
+					$interface['details']['authprotocol'] = CXmlConstantName::SHA1;
+				}
+			}
+
+			$result[] = $interface;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert discover rules.
+	 *
+	 * @static
+	 *
+	 * @param array $discovery_rules
+	 *
+	 * @return array
+	 */
+	private static function convertDiscoveryRules(array $discovery_rules): array {
+		$result = [];
+
+		foreach ($discovery_rules as $discovery_rule) {
+			if (array_key_exists('host_prototypes', $discovery_rule)) {
+				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
+			}
+
+			$result[] = $discovery_rule;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Convert host prototypes.
+	 *
+	 * @static
+	 *
+	 * @param array $host_prototypes
+	 *
+	 * @return array
+	 */
+	private static function convertHostPrototypes(array $host_prototypes): array {
+		$result = [];
+
+		foreach ($host_prototypes as $host_prototype) {
+			if (array_key_exists('interfaces', $host_prototype)) {
+				$host_prototype['interfaces'] = self::convertIntefaces($host_prototype['interfaces']);
+			}
+
+			$result[] = $host_prototype;
+		}
+
+		return $result;
 	}
 }

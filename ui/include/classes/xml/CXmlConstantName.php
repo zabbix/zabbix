@@ -198,7 +198,8 @@ class CXmlConstantName {
 
 
 	// const MD5 = 'MD5'; // Duplicate.
-	const SHA = 'SHA';
+	const SHA = 'SHA'; // Used in version 5.2 as interface "authprotocol" invariant.
+	const SHA1 = 'SHA1';
 
 	const DES = 'DES';
 	const AES = 'AES';
