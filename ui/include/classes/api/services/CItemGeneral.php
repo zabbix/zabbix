@@ -2621,7 +2621,7 @@ abstract class CItemGeneral extends CApiService {
 			while ($row = DBfetch($result)) {
 				unset($valuemapids_by_hostid[$row['hostid']][$row['valuemapid']]);
 
-				if (count($valuemapids_by_hostid[$row['hostid']]) === 0) {
+				if (!$valuemapids_by_hostid[$row['hostid']]) {
 					unset($valuemapids_by_hostid[$row['hostid']]);
 				}
 			}
@@ -2630,9 +2630,7 @@ abstract class CItemGeneral extends CApiService {
 				$hostid = key($valuemapids_by_hostid);
 				$valuemapid = key($valuemapids_by_hostid[$hostid]);
 
-				$host_row = DBfetch(
-					DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)), 'host'
-				);
+				$host_row = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
 					$valuemapid, $host_row['host']
 				));
