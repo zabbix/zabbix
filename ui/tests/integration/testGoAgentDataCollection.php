@@ -299,7 +299,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 16384
+			'threshold' => 262144
 		],
 		[
 			'key' => 'vm.memory.size[free]',
