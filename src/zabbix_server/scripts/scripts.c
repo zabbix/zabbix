@@ -321,6 +321,7 @@ void	zbx_script_clean(zbx_script_t *script)
 
 static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
 {
+	int			ret = SUCCEED;
 	zbx_vector_ptr_t	events;
 	zbx_vector_uint64_t	eventids;
 
@@ -333,12 +334,12 @@ static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
 	if (0 < events.values_num)
 		memcpy(event_out, events.values[0], sizeof(DB_EVENT));
 	else
-		return FAIL;
+		ret = FAIL;
 
 	zbx_vector_ptr_destroy(&events);
 	zbx_vector_uint64_destroy(&eventids);
 
-	return SUCCEED;
+	return ret;
 }
 
 /***********************************************************************************
