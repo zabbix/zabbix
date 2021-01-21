@@ -401,7 +401,7 @@ out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
 
-	return 1;
+	return 0;
 }
 
 /******************************************************************************
@@ -486,6 +486,64 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_set_httpauth                                      *
+ *                                                                            *
+ * Purpose: CurlHttpRequest.SetHttpAuth method                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
+{
+	zbx_es_httprequest_t	*request;
+	char			*username = NULL, *password = NULL;
+	int			err_index = -1, mask;
+	CURLcode		err;
+
+	if (NULL == (request = es_httprequest(ctx)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+
+	mask = duk_to_int32(ctx, 0);
+
+	if (0 != (mask & ~(CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NEGOTIATE | CURLAUTH_NTLM)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "invalid HTTP authentication mask");
+
+	if (0 == duk_is_null_or_undefined(ctx, 1))
+	{
+		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &username))
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
+			goto out;
+		}
+	}
+
+	if (0 == duk_is_null_or_undefined(ctx, 2))
+	{
+		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 2), &password))
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
+			goto out;
+		}
+	}
+
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPAUTH, mask, err);
+
+	if (NULL != username)
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_USERNAME, username, err);
+
+	if (NULL != password)
+		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PASSWORD, password, err);
+
+out:
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	zbx_free(password);
+	zbx_free(username);
+
+	return 0;
+}
+
 static const duk_function_list_entry	curlhttprequest_methods[] = {
 	{"AddHeader", es_httprequest_add_header, 1},
 	{"ClearHeader", es_httprequest_clear_header, 0},
@@ -496,6 +554,7 @@ static const duk_function_list_entry	curlhttprequest_methods[] = {
 	{"Status", es_httprequest_status, 0},
 	{"SetProxy", es_httprequest_set_proxy, 1},
 	{"GetHeaders", es_httprequest_get_headers, 0},
+	{"SetHttpAuth", es_httprequest_set_httpauth, 3},
 	{NULL, NULL, 0}
 };
 
@@ -509,6 +568,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"getStatus", es_httprequest_status, 0},
 	{"setProxy", es_httprequest_set_proxy, 1},
 	{"getHeaders", es_httprequest_get_headers, 0},
+	{"setHttpAuth", es_httprequest_set_httpauth, 3},
 	{NULL, NULL, 0}
 };
 
@@ -561,6 +621,21 @@ int	zbx_es_init_httprequest(zbx_es_t *es, char **error)
 		duk_pop(es->env->ctx);
 		return FAIL;
 	}
+
+	duk_push_number(es->env->ctx, CURLAUTH_NONE);
+	duk_put_global_string(es->env->ctx, "HTTPAUTH_NONE");
+	duk_push_number(es->env->ctx, CURLAUTH_BASIC);
+	duk_put_global_string(es->env->ctx, "HTTPAUTH_BASIC");
+	duk_push_number(es->env->ctx, CURLAUTH_DIGEST);
+	duk_put_global_string(es->env->ctx, "HTTPAUTH_DIGEST");
+#if LIBCURL_VERSION_NUM >= 0x072600
+	duk_push_number(es->env->ctx, CURLAUTH_NEGOTIATE);
+#else
+	duk_push_number(es->env->ctx, CURLAUTH_GSSNEGOTIATE);
+#endif
+	duk_put_global_string(es->env->ctx, "HTTPAUTH_NEGOTIATE");
+	duk_push_number(es->env->ctx, CURLAUTH_NTLM);
+	duk_put_global_string(es->env->ctx, "HTTPAUTH_NTLM");
 
 	return SUCCEED;
 }
