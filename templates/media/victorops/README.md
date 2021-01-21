@@ -8,7 +8,7 @@ This guide describes how to integrate Zabbix 5.2 installation with VictorOps usi
 
 2\. Create *REST* integration. See VictorOps [documentation](https://help.victorops.com/knowledge-base/rest-endpoint-integration-guide/) for the information.<br>
 
-3\. Save endpiont URL from *URL to notify* field.
+3\. Save endpoint URL from *URL to notify* field.
 
 
 ## Setting up the webhook in Zabbix
@@ -16,11 +16,11 @@ This guide describes how to integrate Zabbix 5.2 installation with VictorOps usi
 
 2\. Open the newly added **VictorOps** media type and replace *&lt;PLACE ENDPOINT URL HERE&gt;* placeholder with your REST integration endpiont URL.<br>
 The following parameters should be filled:<br>
-**vops_endpoint** - URL of your VictorOps REST endpiont.<br>
+**vops_endpoint** - URL of your VictorOps REST endpoint.<br>
 **vops_routing_key** - routhong key of the escalation policy.<br>
 
 3\. The following parameters can help you customize the alerts ([documentation](https://help.victorops.com/knowledge-base/incident-fields-glossary/#glossary-of-fields) for the information):<br>
-**priority_severity** - value for the VictorOps *message_type* field. *severity* is the severity's name in default Zabbix instatllation. *message_type* is used to determine the behavior of the alert when it arrives.<br>
+**priority_severity** - value for the VictorOps *message_type* field. *severity* is the severity's name in the default Zabbix installation. *message_type* is used to determine the behavior of the alert when it arrives.<br>
 **field:Hostname** or **field_p:Hostname** - contains data for custom fields. "Field" parameters with another format or empty value will be ignored.<br>
 Format explanation:<br>
 - *field* - prefix of the parameter with field info.
@@ -28,7 +28,7 @@ Format explanation:<br>
     - *p* - problem
     - *r* - recovery
     - *u* - update
-- *Host* - the title of the field. There can be any text contains characters and "_" symbol. Whitespaces and special symbols is not allowed.
+- *Host* - the title of the field. There can be any text that contains characters and "_" symbol. Whitespaces and special symbols are not allowed.
 
 4\. Create a **Zabbix user** and add **Media** with the **VictorOps** media type.
 "Send to" field should be filled as "Default" or your routing key.<br>
