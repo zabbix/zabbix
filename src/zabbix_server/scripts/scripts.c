@@ -319,11 +319,10 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->command_orig);
 }
 
-static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
+static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
 {
 	zbx_vector_ptr_t	events;
 	zbx_vector_uint64_t	eventids;
-	DB_EVENT		*evt;
 
 	zbx_vector_ptr_create(&events);
 	zbx_vector_uint64_create(&eventids);
@@ -332,14 +331,14 @@ static DB_EVENT	*zbx_get_event_by_eventid(zbx_uint64_t eventid)
 	zbx_db_get_events_by_eventids(&eventids, &events);
 
 	if (0 < events.values_num)
-		evt = (DB_EVENT*)events.values[0];
+		memcpy(event_out, events.values[0], sizeof(DB_EVENT));
 	else
-		evt = NULL;
+		return FAIL;
 
 	zbx_vector_ptr_destroy(&events);
 	zbx_vector_uint64_destroy(&eventids);
 
-	return evt;
+	return SUCCEED;
 }
 
 /***********************************************************************************
@@ -404,7 +403,7 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 			macro_mask = MACRO_TYPE_SCRIPT;
 
-			if (ZBX_SCRIPT_CTX_EVENT == ctx && NULL != (event = zbx_get_event_by_eventid(eventid)))
+			if (ZBX_SCRIPT_CTX_EVENT == ctx && FAIL != zbx_get_event_by_eventid(eventid, event))
 			{
 				macro_mask |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL |
 						MACRO_TYPE_MESSAGE_RECOVERY);
@@ -562,13 +561,15 @@ static int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *hos
 		p_userid = &userid;
 	}
 
-	if (NULL == event)
-		macro_type |= MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY;
+	if (NULL != event)
+		macro_type |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY);
 
 	*params = zbx_strdup(NULL, json_data.buffer);
 
-	if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
-			NULL, NULL, NULL, params, MACRO_TYPE_SCRIPT, error, sizeof(error)))
+	if (substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL, NULL, NULL,
+			params, MACRO_TYPE_SCRIPT, error, sizeof(error)) ||
+			SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
+			NULL, NULL, NULL, params, macro_type, error, sizeof(error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to substitute macros for script '%s'", script->command_orig);
 	}
