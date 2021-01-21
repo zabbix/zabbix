@@ -1002,10 +1002,15 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 
 // Problem and event tag constants.
-define('TAG_EVAL_TYPE_AND_OR',	0);
-define('TAG_EVAL_TYPE_OR',		2);
-define('TAG_OPERATOR_LIKE',		0);
-define('TAG_OPERATOR_EQUAL',	1);
+define('TAG_EVAL_TYPE_AND_OR',		0);
+define('TAG_EVAL_TYPE_OR',			2);
+
+define('TAG_OPERATOR_LIKE',			0);
+define('TAG_OPERATOR_EQUAL',		1);
+define('TAG_OPERATOR_NOT_LIKE',		2);
+define('TAG_OPERATOR_NOT_EQUAL',	3);
+define('TAG_OPERATOR_EXISTS',		4);
+define('TAG_OPERATOR_NOT_EXISTS',	5);
 
 define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
 
