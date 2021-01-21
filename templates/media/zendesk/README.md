@@ -95,7 +95,7 @@ In addition, you can override the severity mapping between the Zabbix problem an
 
 8\. Use the Zendesk User in any Actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Zendesk](https://developer.zendesk.com/rest_api/docs/support/tickets) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Zendesk](https://developer.zendesk.com/rest_api/docs/support/tickets) documentations.
 
 # Supported Versions
 

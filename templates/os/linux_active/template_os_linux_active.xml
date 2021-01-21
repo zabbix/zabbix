@@ -1347,7 +1347,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <key>vm.memory.size[available]</key>
                <history>7d</history>
                <units>B</units>
-               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -1361,7 +1361,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
                      <name>Memory</name>
