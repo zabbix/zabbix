@@ -713,7 +713,7 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/current/ru/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.2/manual/config/items/itemtypes/simple_checks'
   graphs:
     -
       name: 'IIS: Cache hits percentage'

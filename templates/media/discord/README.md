@@ -33,7 +33,7 @@ http://zabbix/<br>
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
-2\. In the "Administration > Media types" section, import the [media_discord.xml](media_discord.xml)
+2\. In the "Administration > Media types" section, import the [media_discord.yaml](media_discord.yaml)
 
 3\. If you want to change values of default parameters, open the newly added **Discord** media type.<br>
 You can also choose between two notification modes by modifying _"use_default_message"_ parameter value:
@@ -54,7 +54,7 @@ The "Send to" field must contain Discord webhook URL created before.
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
 
 ## Supported Versions
 Zabbix 4.4

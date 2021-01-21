@@ -311,7 +311,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_tpd_issuelink}'
       event_menu_name: 'TOPdesk: {EVENT.TAGS.__zbx_tpd_issuekey}'
       description: |
-        Please refer to https://developers.topdesk.com/documentation/index.html and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.
+        Please refer to https://developers.topdesk.com/documentation/index.html and https://www.zabbix.com/documentation/5.2/manual/config/notifications/media/webhook#example_scripts.
           
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "TOPdesk".

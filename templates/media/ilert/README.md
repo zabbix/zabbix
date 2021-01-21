@@ -53,7 +53,7 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 
 [![](images/tn_5.png?raw=true)](images/5.png)
 
-3\. Select the Import file [media_ilert.xml](media_ilert.xml) and click **Import** at the bottom to import the iLert media type.
+3\. Select the Import file [media_ilert.yaml](media_ilert.yaml) and click **Import** at the bottom to import the iLert media type.
 
 [![](images/tn_6.png?raw=true)](images/6.png)
 
@@ -91,7 +91,7 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 
 8\. Use the iLert User in any Actions of your choice. The text from "Action Operations" will be sent to "iLert Alert" when a problem happens.
 ​
-For more information use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
+For more information use the [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
 ​
 
 ## Supported Versions
