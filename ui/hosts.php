@@ -782,7 +782,7 @@ if (hasRequest('form')) {
 		'psk_edit_mode' => getRequest('psk_edit_mode', 1),
 
 		// Valuemap
-		'valuemaps' => getRequest('valuemap', [])
+		'valuemaps' => array_values(getRequest('valuemap', []))
 	];
 
 	if (!hasRequest('form_refresh')) {

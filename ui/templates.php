@@ -124,7 +124,7 @@ $macros = array_filter($macros, function($macro) {
 	return (bool) array_filter(array_intersect_key($macro, $keys));
 });
 
-$valuemaps = getRequest('valuemap', []);
+$valuemaps = array_values(getRequest('valuemap', []));
 
 /*
  * Actions
