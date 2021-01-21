@@ -453,6 +453,32 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		'templated_hosts' => true
 	]);
 
+	$src_valuemaps = array_column($items, 'valuemapid', 'valuemapid');
+	unset($src_valuemaps[0]);
+
+	if ($src_valuemaps) {
+		$src_valuemaps = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'valuemapids' => $src_valuemaps
+		]);
+		$src_valuemaps = array_column($src_valuemaps, 'name', 'valuemapid');
+		$dest_valuemaps = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name', 'hostid'],
+			'hostids' => $dst_hostids
+		]);
+		$valuemapids_map = [];
+
+		foreach ($src_valuemaps as $valuemapid => $name) {
+			foreach ($dest_valuemaps as $dest_valuemap) {
+				if ($dest_valuemap['name'] !== $name) {
+					continue;
+				}
+
+				$valuemapids_map[$valuemapid][$dest_valuemap['hostid']] = $dest_valuemap['valuemapid'];
+			}
+		}
+	}
+
 	foreach ($dstHosts as $dstHost) {
 		$interfaceids = [];
 
@@ -507,6 +533,20 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				}
 			}
 			unset($item['itemid']);
+
+			if ($item['valuemapid']) {
+				if (array_key_exists($item['valuemapid'], $valuemapids_map)
+						&& array_key_exists($dstHost['hostid'], $valuemapids_map[$item['valuemapid']])) {
+					$item['valuemapid'] = $valuemapids_map[$item['valuemapid']][$dstHost['hostid']];
+				}
+				else {
+					error(_s('Valuemap "%1$s" is not available on "%2$s".',
+						$src_valuemaps[$item['valuemapid']], $dstHost['host']
+					));
+					return false;
+				}
+			}
+
 			$item['hostid'] = $dstHost['hostid'];
 			$item['applications'] = get_same_applications_for_host(
 				zbx_objectValues($item['applications'], 'applicationid'),
