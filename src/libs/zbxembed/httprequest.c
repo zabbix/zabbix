@@ -603,6 +603,7 @@ int	zbx_es_init_httprequest(zbx_es_t *es, char **error)
 		return FAIL;
 	}
 
+#ifdef HAVE_LIBCURL
 	duk_push_number(es->env->ctx, CURLAUTH_NONE);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NONE");
 	duk_push_number(es->env->ctx, CURLAUTH_BASIC);
@@ -617,6 +618,7 @@ int	zbx_es_init_httprequest(zbx_es_t *es, char **error)
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NEGOTIATE");
 	duk_push_number(es->env->ctx, CURLAUTH_NTLM);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NTLM");
+#endif
 
 	return SUCCEED;
 }
