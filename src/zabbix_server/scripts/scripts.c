@@ -377,9 +377,6 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 
 	switch (script->type)
 	{
-		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
-			break;
 		case ZBX_SCRIPT_TYPE_SSH:
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->publickey, MACRO_TYPE_COMMON, NULL, 0);
@@ -401,6 +398,9 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
+		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
+			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 			macro_mask = MACRO_TYPE_SCRIPT;
 
@@ -461,26 +461,24 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				p_userid = &userid;
 			}
 
-			if (ZBX_SCRIPT_TYPE_WEBHOOK != script->type)
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host,
+					NULL, NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error,
+					max_error_len))
 			{
-				if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host,
-						NULL, NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error,
-						max_error_len))
-				{
-					goto out;
-				}
-
-				/* expand macros in command_orig used for non-secure logging */
-				if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL,
-						NULL, NULL, NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error,
-						max_error_len))
-				{
-					/* script command_orig is a copy of script command - if the script command  */
-					/* macro substitution succeeded, then it will succeed also for command_orig */
-					THIS_SHOULD_NEVER_HAPPEN;
-				}
+				goto out;
 			}
-			else if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
+
+			/* expand macros in command_orig used for non-secure logging */
+			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL,
+					NULL, NULL, NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error,
+					max_error_len))
+			{
+				/* script command_orig is a copy of script command - if the script command  */
+				/* macro substitution succeeded, then it will succeed also for command_orig */
+				THIS_SHOULD_NEVER_HAPPEN;
+			}
+
+			if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
 			{
 				/* DBget_script_by_scriptid() may overwrite type with anything but global script */
 				/* ... therefore this recursion is no more than two layers deep */
@@ -515,6 +513,7 @@ out:
  *              host           - [IN] the host the script will be executed on                     *
  *              event          - [IN] the event for the execution case                            *
  *              user           - [IN] the user executing script (can be NULL)                     *
+ *              ctx            - [IN] the script execution context                                *
  *              params         - [OUT] parsed parameters with expanded macros                     *
  *                                                                                                *
  * Return value:  SUCCEED - processed successfully                                                *
@@ -522,9 +521,9 @@ out:
  *                                                                                                *
  **************************************************************************************************/
 static int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
-		const zbx_user_t *user, char **params)
+		const zbx_user_t *user, zbx_script_exec_context ctx, char **params)
 {
-	int		ret = SUCCEED, macro_type = MACRO_TYPE_SCRIPT;
+	int		ret = SUCCEED;
 	zbx_uint64_t	userid, *p_userid = NULL;
 	char		error[MAX_STRING_LEN];
 	DB_RESULT	result;
@@ -562,17 +561,24 @@ static int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *hos
 		p_userid = &userid;
 	}
 
-	if (NULL != event)
-		macro_type |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY);
-
 	*params = zbx_strdup(NULL, json_data.buffer);
 
-	if (substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL, NULL, NULL,
-			params, MACRO_TYPE_SCRIPT, error, sizeof(error)) ||
-			SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
-			NULL, NULL, NULL, params, macro_type, error, sizeof(error)))
+	if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host,
+						NULL, NULL, NULL, NULL, params, MACRO_TYPE_SCRIPT, error,
+						sizeof(error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to substitute macros for script '%s'", script->command_orig);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to expand macros for script '%s'", script->command_orig);
+	}
+
+	if (ZBX_SCRIPT_CTX_EVENT == ctx)
+	{
+		if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
+				NULL, NULL, NULL, params, (MACRO_TYPE_MESSAGE_ACK |
+						MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY),
+						error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to expand macros for script '%s'", script->command_orig);
+		}
 	}
 
 	zbx_json_free(&json_data);
@@ -592,6 +598,7 @@ out:
  * Parameters:  script         - [IN] the script to be executed                                   *
  *              host           - [IN] the host the script will be executed on                     *
  *              event          - [IN] the event for the execution case                            *
+ *              ctx            - [IN] the script execution context                                *
  *              user           - [IN] the user executing script (can be NULL)                     *
  *              error          - [IN/OUT] the error reported by the script (or the script engine) *
  *              max_error_len  - [IN] the maximum error length                                    *
@@ -603,14 +610,15 @@ out:
  *                                                                                                *
  **************************************************************************************************/
 static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
-		const zbx_user_t *user, char *error, size_t max_error_len, char **result, char **debug)
+		zbx_script_exec_context ctx, const zbx_user_t *user, char *error, size_t max_error_len, char **result,
+		char **debug)
 {
 	int	ret;
 	char	*params;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == DBfetch_webhook_params(script, host, event, user, &params))
+	if (FAIL == DBfetch_webhook_params(script, host, event, user, ctx, &params))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to fetch script parameters for script id " ZBX_FS_UI64,
 				script->scriptid);
@@ -634,6 +642,7 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
  *              host           - [IN] the host the script will be executed on *
  *              user           - [IN] the user executing script (can be NULL) *
  *              event          - [IN] the event for the execution case        *
+ *              ctx            - [IN] the script execution context            *
  *              result         - [OUT] the result of a script execution       *
  *              error          - [OUT] the error reported by the script       *
  *              max_error_len  - [IN] the maximum error length                *
@@ -645,7 +654,7 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
  *                                                                            *
  ******************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, const DB_EVENT *event,
-		char **result, char *error, size_t max_error_len, char **debug)
+		zbx_script_exec_context ctx, char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -656,7 +665,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zb
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_execute_webhook(script, host, event, user, error, max_error_len, result, debug);
+			ret = zbx_execute_webhook(script, host, event, ctx, user, error, max_error_len, result, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
