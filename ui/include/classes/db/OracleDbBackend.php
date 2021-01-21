@@ -72,7 +72,7 @@ class OracleDbBackend extends DbBackend {
 		if ($host) {
 			$connect = '//'.$host.(($port) ? ':'.$port : '').(($dbname) ? '/'.$dbname : '');
 		}
-		else if ($dbname) {
+		elseif ($dbname) {
 			$connect = $dbname;
 		}
 
