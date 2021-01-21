@@ -7456,8 +7456,8 @@ z-select,
 	tbody td {
 		background-color: $ui-bg-color;
 		border-collapse: separate;
-		border-top: 1px solid $ui-border-color;
-		border-bottom: 1px solid $ui-border-color;
+		border-top: 1px solid $table-border-color;
+		border-bottom: 1px solid $table-border-color;
 	}
 
 	.valuemap-row td {

@@ -5951,8 +5951,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 #valuemap-table tbody td {
   background-color: #000000;
   border-collapse: separate;
-  border-top: 1px solid #444444;
-  border-bottom: 1px solid #444444; }
+  border-top: 1px solid #333333;
+  border-bottom: 1px solid #333333; }
 #valuemap-table .valuemap-row td {
   vertical-align: top; }
 #valuemap-table .valuemap-label {
