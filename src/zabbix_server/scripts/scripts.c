@@ -563,19 +563,17 @@ static int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *hos
 
 	*params = zbx_strdup(NULL, json_data.buffer);
 
-	if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host,
-						NULL, NULL, NULL, NULL, params, MACRO_TYPE_SCRIPT, error,
-						sizeof(error)))
+	if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL, NULL,
+			NULL, params, MACRO_TYPE_SCRIPT, error, sizeof(error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to expand macros for script '%s'", script->command_orig);
 	}
 
 	if (ZBX_SCRIPT_CTX_EVENT == ctx)
 	{
-		if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
-				NULL, NULL, NULL, params, (MACRO_TYPE_MESSAGE_ACK |
-						MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY),
-						error, sizeof(error)))
+		if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL, NULL,
+				NULL, NULL, params, (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL |
+				MACRO_TYPE_MESSAGE_RECOVERY), error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to expand macros for script '%s'", script->command_orig);
 		}
