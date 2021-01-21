@@ -68,8 +68,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
-		$zdropdown = $this->query('id:tags_00_operator')->asZDropdown()->one();
-		$this->assertEquals('Contains', $zdropdown->getText());
+		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
 
 		// Select "AND" option and two tag names with partial "Contains" value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
@@ -106,7 +105,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Test trigger with tag');
 
 		// Change tag value filter to "Equals"
-		$this->query('id:tags_00_operator')->asZDropdown()->one()->fill('Equals');
+		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
 		$this->query('name:filter_apply')->one()->click();
 		$this->zbxTestAssertElementText('//tbody/tr[@class="nothing-to-show"]/td', 'No data found.');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
@@ -123,7 +122,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Select tag option "OR" and exact "Equals" tag value match
 		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
-		$this->query('id:tags_00_operator')->asZDropdown()->one()->fill('Equals');
+		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
 
 		// Filter by two tags
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
