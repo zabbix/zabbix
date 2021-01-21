@@ -31,11 +31,11 @@ import (
 	"github.com/natefinch/npipe"
 )
 
-func New(path string) (conn *Conn, err error) {
+func New(path string, timeout time.Duration) (conn *Conn, err error) {
 	c := Conn{}
 	if path != "" {
 		if _, tmperr := os.Stat(path); !os.IsNotExist(tmperr) {
-			if _, err = SendCommand(path, "version"); err == nil {
+			if _, err = SendCommand(path, "version", timeout); err == nil {
 				return nil, fmt.Errorf("An agent is already using control pipe %s", path)
 			}
 			if err = os.Remove(path); err != nil {
