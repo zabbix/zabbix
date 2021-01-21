@@ -344,14 +344,9 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	}
 
 	function toggleVisible(obj, data_type) {
-		data_type = (data_type == <?= ZBX_ACTION_REPLACE ?>) ? <?= ZBX_ACTION_ADD ?> : data_type;
-		const visible = obj.querySelector(`[data-type="${data_type}"]`);
-
-		obj.querySelectorAll('[data-type]').forEach(elm => elm.style.display = 'none');
-
-		if (visible) {
-			visible.style.display = 'block';
-		}
+		obj.querySelectorAll('[data-type]').forEach((elm) => {
+			elm.style.display = (elm.getAttribute('data-type').split(',').indexOf(data_type) != -1) ? 'block' : 'none';
+		});
 	}
 
 	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);

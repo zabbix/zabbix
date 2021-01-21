@@ -29,6 +29,14 @@ $change_container = new CDiv(new CPartial('configuration.valuemap', [
 	'form' => 'massupdate'
 ]));
 
+$update_existing = (new CDiv(
+	(new CCheckBox('valuemap_update_existing'))->setLabel(_('Update existing'))
+))->addClass(ZBX_STYLE_CHECKBOX_BLOCK);
+
+$add_missing = (new CDiv(
+	(new CCheckBox('valuemap_add_missing'))->setLabel(_('Add missing'))
+))->addClass(ZBX_STYLE_CHECKBOX_BLOCK);
+
 $rename_container = (new CTable())
 	->setId('valuemap-rename-table')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
@@ -86,7 +94,9 @@ $form_list = (new CFormList('valuemap-form-list'))
 				->addValue(_('Remove all'), ZBX_ACTION_REMOVE_ALL)
 				->setModern(true)
 				->addStyle('margin-bottom: 10px;'),
-			$change_container->setAttribute('data-type', ZBX_ACTION_ADD),
+			$change_container->setAttribute('data-type', ZBX_ACTION_ADD.','.ZBX_ACTION_REPLACE),
+			$update_existing->setAttribute('data-type', ZBX_ACTION_ADD),
+			$add_missing->setAttribute('data-type', ZBX_ACTION_REPLACE),
 			$rename_container->setAttribute('data-type', ZBX_ACTION_RENAME),
 			$remove_container->setAttribute('data-type', ZBX_ACTION_REMOVE),
 			$remove_all_container->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL)
