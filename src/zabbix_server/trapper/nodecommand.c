@@ -353,7 +353,10 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != debug)
+		{
 			zbx_json_addraw(&j, "debug", debug);
+			zbx_free(debug);
+		}
 
 		send = j.buffer;
 	}
