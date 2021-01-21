@@ -48,7 +48,7 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
+	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN], line2[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL, line_read = FAIL;
 	FILE	*f = NULL;
 
@@ -91,7 +91,8 @@ int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 					continue;
 
 				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line) ||
-						1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^\n]", line))
+						1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%s%*[ \t]%s", line,
+								line2))
 				{
 					line_read = SUCCEED;
 					break;
