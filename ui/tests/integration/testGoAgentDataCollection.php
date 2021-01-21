@@ -435,8 +435,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	 */
 	public function testGoAgentDataCollection_checkDataCollection() {
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'enabling Zabbix agent checks on host "'.
-					$component.'": host became available', false
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+				'enabling Zabbix agent checks on host "'.$component.'": interface became available', false
 			);
 		}
 
