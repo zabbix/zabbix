@@ -93,9 +93,6 @@ class C52ImportConverter extends CConverter {
 							$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
 							$used_valuemaps[] = $item['valuemap']['name'];
 						}
-						else {
-							unset($item['valuemap']);
-						}
 					}
 				}
 				unset($item);
@@ -113,9 +110,6 @@ class C52ImportConverter extends CConverter {
 							if (array_key_exists($item_prototype['valuemap']['name'], $valuemaps)) {
 								$host['valuemaps'][] = $valuemaps[$item_prototype['valuemap']['name']];
 								$used_valuemaps[] = $item_prototype['valuemap']['name'];
-							}
-							else {
-								unset($drule['item_prototypes'][$key]['valuemap']);
 							}
 						}
 					}
