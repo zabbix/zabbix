@@ -70,7 +70,6 @@ class CControllerPopupScriptExec extends CController {
 		$scriptid = $this->getInput('scriptid');
 		$hostid = $this->getInput('hostid', '');
 		$eventid = $this->getInput('eventid', '');
-		$msg_title = _('Cannot execute script.');
 
 		$data = [
 			'title' => _('Scripts'),
@@ -114,7 +113,6 @@ class CControllerPopupScriptExec extends CController {
 				$data['output'] = $result['value'];
 				$data['debug'] = $result['debug'];
 				$data['success'] = true;
-				$msg_title = null;
 				info(_('Script execution successful.'));
 			}
 		}
@@ -122,7 +120,7 @@ class CControllerPopupScriptExec extends CController {
 			error(_('No permissions to referred object or it does not exist!'));
 		}
 
-		$data['messages'] = getMessages($data['success'], $msg_title);
+		$data['messages'] = getMessages($data['success'], $data['success'] ? null : _('Cannot execute script.'));
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
