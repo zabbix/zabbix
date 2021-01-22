@@ -454,7 +454,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else{
 				DB::update('items', [
-					'values' => ['templateid' => 0],
+					'values' => ['templateid' => 0, 'valuemapid' => 0],
 					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL])]
 				]);
 
@@ -473,7 +473,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 			else {
 				DB::update('items', [
-					'values' => ['templateid' => 0],
+					'values' => ['templateid' => 0, 'valuemapid' => 0],
 					'where' => ['itemid' => $item_prototypeids]
 				]);
 
