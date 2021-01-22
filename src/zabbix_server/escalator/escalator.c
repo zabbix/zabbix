@@ -1230,8 +1230,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 					break;
 			}
 
-			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_EVENT,
-					event->eventid, error, sizeof(error), 0)))
+			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_ACTION,
+					event->eventid, error, sizeof(error), (DB_EVENT*)event)))
 			{
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 				{

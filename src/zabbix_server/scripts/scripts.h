@@ -26,7 +26,8 @@
 typedef enum
 {
 	ZBX_SCRIPT_CTX_HOST,
-	ZBX_SCRIPT_CTX_EVENT
+	ZBX_SCRIPT_CTX_EVENT,
+	ZBX_SCRIPT_CTX_ACTION
 } zbx_script_exec_context;
 
 void	zbx_script_init(zbx_script_t *script);

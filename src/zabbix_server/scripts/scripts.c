@@ -404,7 +404,8 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 			macro_mask = MACRO_TYPE_SCRIPT;
 
-			if (ZBX_SCRIPT_CTX_EVENT == ctx && FAIL != zbx_get_event_by_eventid(eventid, event))
+			if ((ZBX_SCRIPT_CTX_EVENT == ctx && FAIL != zbx_get_event_by_eventid(eventid, event)) ||
+					ZBX_SCRIPT_CTX_ACTION == ctx)
 			{
 				macro_mask |= (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL |
 						MACRO_TYPE_MESSAGE_RECOVERY);
