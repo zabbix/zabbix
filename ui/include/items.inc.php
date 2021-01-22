@@ -540,8 +540,8 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 					$item['valuemapid'] = $valuemapids_map[$item['valuemapid']][$dstHost['hostid']];
 				}
 				else {
-					error(_s('Valuemap "%1$s" is not available on "%2$s".',
-						$src_valuemaps[$item['valuemapid']], $dstHost['host']
+					error(_s('Valuemap "%1$s" is not available on "%2$s".', $src_valuemaps[$item['valuemapid']],
+						$dstHost['host']
 					));
 					return false;
 				}
@@ -698,7 +698,15 @@ function copyItems($srcHostId, $dstHostId) {
 			continue;
 		}
 		else if ($srcItem['valuemapid']) {
-			$srcItem['valuemapid'] = $valuemapids_map[$srcItem['valuemapid']];
+			if (array_key_exists($srcItem['valuemapid'], $valuemapids_map)) {
+				$srcItem['valuemapid'] = $valuemapids_map[$srcItem['valuemapid']];
+			}
+			else {
+				error(_s('Valuemap "%1$s" is not available on "%2$s".',
+					array_search($srcItem['valuemapid'], $src_valuemaps), $dstHost['host']
+				));
+				return false;
+			}
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
