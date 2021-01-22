@@ -1020,6 +1020,32 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
+		if ($options['selectInheritedValueMaps'] !== null) {
+			$hosts_templates = [];
+			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
+
+			$templates = API::Template()->get([
+				'output' => [],
+				'selectValueMaps' => $options['selectInheritedValueMaps'],
+				'templateids' => $templateids,
+				'preservekeys' => true,
+				'nopermissions' => true
+			]);
+
+			foreach ($result as $hostid => &$host) {
+				$valuemaps = [];
+
+				foreach ($hosts_templates[$hostid] as $templateid) {
+					foreach ($templates[$templateid]['valuemaps'] as $db_valuemap) {
+						$valuemaps[] = $db_valuemap;
+					}
+				}
+
+				$host['inheritedValueMaps'] = $valuemaps;
+			}
+			unset($host);
+		}
+
 		return $result;
 	}
 
