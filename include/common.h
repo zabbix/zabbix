@@ -839,6 +839,7 @@ typedef struct
 	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
+	int		timeout;
 }
 zbx_script_t;
 
@@ -847,6 +848,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_TYPE_SSH		2
 #define ZBX_SCRIPT_TYPE_TELNET		3
 #define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
+#define ZBX_SCRIPT_TYPE_WEBHOOK		5
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1

@@ -538,36 +538,47 @@ function overlayDialogue(params, trigger_elmnt) {
 /**
  * Execute script.
  *
- * @param string hostid				host id
- * @param string scriptid			script id
- * @param string confirmation		confirmation text
+ * @param string scriptid			Script ID.
+ * @param string confirmation		Confirmation text.
  * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
+ * @param string hostid				Host ID.
+ * @param string eventid			Event ID.
  */
-function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
+function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
 	var execute = function() {
+		var popup_options = {scriptid: scriptid};
+
 		if (hostid !== null) {
-			PopUp('popup.scriptexec', {
-				hostid: hostid,
-				scriptid: scriptid
-			}, null, trigger_elmnt);
+			popup_options.hostid = hostid;
+		}
+
+		if (eventid !== null) {
+			popup_options.eventid = eventid;
+		}
+
+		if (Object.keys(popup_options).length === 2) {
+			PopUp('popup.scriptexec', popup_options, null, trigger_elmnt);
 		}
 	};
 
 	if (confirmation.length > 0) {
 		overlayDialogue({
 			'title': t('Execution confirmation'),
-			'content': jQuery('<span>').text(confirmation),
+			'content': jQuery('<span>')
+				.addClass('confirmation-msg')
+				.text(confirmation),
+			'class': 'modal-popup modal-popup-small',
 			'buttons': [
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'focused': (hostid === null),
+					'focused': (hostid === null && eventid === null),
 					'action': function() {}
 				},
 				{
 					'title': t('Execute'),
-					'enabled': (hostid !== null),
-					'focused': (hostid !== null),
+					'enabled': (hostid !== null || eventid !== null),
+					'focused': (hostid !== null || eventid !== null),
 					'action': function() {
 						execute();
 					}
