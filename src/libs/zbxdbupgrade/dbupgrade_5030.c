@@ -1041,7 +1041,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		zbx_vector_ptr_append(functions, dbpatch_new_function(functionid2, time_itemid, "last", "$",
 				ZBX_DBPATCH_FUNCTION_CREATE));
 
-		expression = zbx_dsprintf(NULL, "%s or ({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", trigger->expression,
+		expression = zbx_dsprintf(NULL, "(%s) or ({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", trigger->expression,
 				functionid2, functionid2);
 		zbx_free(trigger->expression);
 		trigger->expression = expression;
