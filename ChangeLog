@@ -1,6 +1,13 @@
 Changes for 5.4.0alpha1
 
 New features:
+..F....PS. [ZBXNEXT-5759] added Oracle DB tnsnames.ora service name lookup support (viktors, vmaksimovs)
+A.F.I...S. [ZBXNEXT-6360] added support of JavaScript for global scripts (dgoloscapov, vmaksimovs)
+.......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
+A.F....... [ZBXNEXT-6376] implemented support of negative filtering for tags (Ivo, miks)
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+..F.....S. [ZBXNEXT-6399] added support of host and item macros for Script item parameters (viktors, vmaksimovs)
+A.F.I...S. [ZBXNEXT-6207,ZBXNEXT-6318] added support of API tokens (arimdjonoks, averza, talbergs)
 ...G.....T [ZBXCTR-13] added custom query support for PostgreSQL plugin and template, fixed unix-socket support (afayantsev, Daria_V, vadimipatov)
 A.F....PS. [ZBXNEXT-5518] added support of XML parsing in JavaScript (akozlovs, Ivo)
 .........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
