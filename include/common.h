@@ -1545,6 +1545,7 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_BASIC			0x00
 #define ZBX_TOKEN_SEARCH_REFERENCES		0x01
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
+#define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
 
 typedef int zbx_token_search_t;
 

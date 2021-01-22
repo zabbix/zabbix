@@ -4290,7 +4290,31 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 
 	while (SUCCEED != ret)
 	{
-		ptr = strchr(ptr, '{');
+		int	 quoted = 0;
+
+		/* skip macros in string constants when looking for functionid */
+		for (; '{' != *ptr || 0 != quoted; ptr++)
+		{
+			if ('\0' == *ptr)
+				return FAIL;
+
+			if (0 != (token_search & ZBX_TOKEN_SEARCH_FUNCTIONID))
+			{
+				switch (*ptr)
+				{
+					case '\\':
+						if (0 != quoted)
+						{
+							if ('\0' == *(++ptr))
+								return FAIL;
+						}
+						break;
+					case '"':
+						quoted = !quoted;
+						break;
+				}
+			}
+		}
 
 		if (0 != (token_search & ZBX_TOKEN_SEARCH_REFERENCES))
 		{
