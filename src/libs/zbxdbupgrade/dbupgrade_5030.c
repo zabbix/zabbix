@@ -420,6 +420,16 @@ zbx_dbpatch_function_t;
 
 typedef struct
 {
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	char		*name;
+}
+zbx_dbpatch_common_function_t;
+
+
+typedef struct
+{
 	zbx_uint64_t	triggerid;
 	unsigned char	recovery_mode;
 	unsigned char	flags;
@@ -432,6 +442,12 @@ static void	dbpatch_function_free(zbx_dbpatch_function_t *func)
 {
 	zbx_free(func->name);
 	zbx_free(func->parameter);
+	zbx_free(func);
+}
+
+static void	dbpatch_common_function_free(zbx_dbpatch_common_function_t *func)
+{
+	zbx_free(func->name);
 	zbx_free(func);
 }
 
@@ -615,16 +631,26 @@ static void	dbpatch_update_func_strlen(zbx_uint64_t functionid, zbx_uint64_t ite
 	zbx_free(replace);
 }
 
-static void	dbpatch_update_hist2common(zbx_uint64_t functionid, const char *name, zbx_dbpatch_trigger_t *trigger,
-		zbx_vector_ptr_t *functions)
+static void	dbpatch_update_hist2common(zbx_uint64_t functionid, zbx_uint64_t itemid, int extended,
+		zbx_dbpatch_trigger_t *trigger, zbx_vector_ptr_t *functions)
 {
-	char	*replace;
+	char	*str  = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
 
-	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, 0, NULL, NULL, ZBX_DBPATCH_FUNCTION_DELETE));
+	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$",
+			ZBX_DBPATCH_FUNCTION_UPDATE));
 
-	replace = zbx_dsprintf(NULL, "%s()", name);
-	dbpatch_update_trigger(trigger, functionid, replace);
-	zbx_free(replace);
+	if (0 == extended)
+		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '(');
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, trigger->expression);
+	if (0 == extended)
+		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ')');
+
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, " or ({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", functionid,
+			functionid);
+
+	zbx_free(trigger->expression);
+	trigger->expression = str;
 }
 
 /******************************************************************************
@@ -810,18 +836,24 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
  ******************************************************************************/
 static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_ptr_t *functions)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	zbx_uint64_t		functionid, itemid, time_itemid = 0;
-	int			hist_function = 0;
-	zbx_vector_loc_t	params;
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_uint64_t			functionid, itemid, hostid;
+	zbx_vector_loc_t		params;
+	zbx_vector_ptr_t		common_functions;
+	zbx_vector_uint64_t		hostids;
+	zbx_dbpatch_common_function_t	*func;
 
 	zbx_vector_loc_create(&params);
+	zbx_vector_ptr_create(&common_functions);
+	zbx_vector_uint64_create(&hostids);
 
-	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,i.value_type"
+	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,i.value_type,h.hostid"
 			" from functions f"
 			" left join items i"
 				" on f.itemid=i.itemid"
+			" left join hosts h"
+				" on i.hostid=h.hostid"
 			" where triggerid=" ZBX_FS_UI64
 			" order by functionid",
 			trigger->triggerid);
@@ -832,17 +864,28 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 		ZBX_STR2UINT64(functionid, row[0]);
 		ZBX_STR2UINT64(itemid, row[1]);
+		ZBX_STR2UINT64(hostid, row[5]);
 
 		if (0 == strcmp(row[2], "date") || 0 == strcmp(row[2], "dayofmonth") ||
 				0 == strcmp(row[2], "dayofweek") || 0 == strcmp(row[2], "now") ||
 				0 == strcmp(row[2], "time"))
 		{
-			dbpatch_update_hist2common(functionid, row[2], trigger, functions);
-			time_itemid = itemid;
+			char	replace[FUNCTION_NAME_LEN * 4 + 1];
+
+			zbx_snprintf(replace, sizeof(replace), "%s()", row[2]);
+			dbpatch_update_trigger(trigger, functionid, replace);
+
+			func = (zbx_dbpatch_common_function_t *)zbx_malloc(NULL, sizeof(zbx_dbpatch_common_function_t));
+			func->functionid = functionid;
+			func->itemid = itemid;
+			func->hostid = hostid;
+			func->name = zbx_strdup(NULL, row[2]);
+			zbx_vector_ptr_append(&common_functions, func);
+
 			continue;
 		}
 
-		hist_function = 1;
+		zbx_vector_uint64_append(&hostids, hostid);
 		dbpatch_parse_function_params(row[3], &params);
 
 		if (0 == strcmp(row[2], "abschange"))
@@ -1028,24 +1071,36 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	}
 
 	DBfree_result(result);
-	zbx_vector_loc_destroy(&params);
 
 	/* when time functions are used without historical functions fake historical functions */
 	/* must be added to associate the trigger expression to a host                         */
-	if (0 != time_itemid && 0 == hist_function)
+	if (0 != common_functions.values_num)
 	{
-		char		*expression;
-		zbx_uint64_t	functionid2;
+		int	i, extended = 0;
 
-		functionid2 = DBget_maxid("functions");
-		zbx_vector_ptr_append(functions, dbpatch_new_function(functionid2, time_itemid, "last", "$",
-				ZBX_DBPATCH_FUNCTION_CREATE));
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		expression = zbx_dsprintf(NULL, "(%s) or ({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", trigger->expression,
-				functionid2, functionid2);
-		zbx_free(trigger->expression);
-		trigger->expression = expression;
+		for (i = 0; i < common_functions.values_num; i++)
+		{
+			func = (zbx_dbpatch_common_function_t *)common_functions.values[i];
+
+			if (FAIL != zbx_vector_uint64_search(&hostids, func->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zbx_vector_ptr_append(functions, dbpatch_new_function(func->functionid, 0, NULL, NULL,
+						ZBX_DBPATCH_FUNCTION_DELETE));
+				continue;
+			}
+
+			dbpatch_update_hist2common(func->functionid, func->itemid, extended, trigger, functions);
+			extended = 1;
+		}
 	}
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_ptr_clear_ext(&common_functions, (zbx_clean_func_t)dbpatch_common_function_free);
+	zbx_vector_ptr_destroy(&common_functions);
+	zbx_vector_loc_destroy(&params);
 
 	if (0 != (trigger->flags & ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION))
 	{

@@ -206,6 +206,7 @@ struct	_DC_TRIGGER;
 
 #define EVENT_NAME_LEN			2048
 
+#define FUNCTION_NAME_LEN		12
 #define FUNCTION_PARAM_LEN		255
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
