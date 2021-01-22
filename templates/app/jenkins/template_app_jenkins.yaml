@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-12-25T12:42:03Z'
+  date: '2021-01-22T14:56:18Z'
   groups:
     -
       name: Templates/Applications
@@ -10,7 +10,7 @@ zabbix_export:
       name: 'Jenkins by HTTP'
       description: |
         Get Jenkins metrics by HTTP agent.
-        Metrics are collected by requests to Metrics API. Install  Metrics pluginand configure access to the Metrics Servlet by issuing API key.
+        Metrics are collected by requests to Metrics API. Install  Metrics plugin and configure access to the Metrics Servlet by issuing API key.
         Don't forget to change macros {$JENKINS.URL}, {$JENKINS.USER}, {$JENKINS.API.TOKEN}, {$JENKINS.API.KEY}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -2250,7 +2250,7 @@ zabbix_export:
       macros:
         -
           macro: '{$JENKINS.API.KEY}'
-          description: 'API key for access to the Metrics Servlet.'
+          description: 'API key to access Metrics Servlet'
         -
           macro: '{$JENKINS.API.TOKEN}'
           description: 'API token for HTTP BASIC authentication.'
@@ -2298,7 +2298,7 @@ zabbix_export:
         Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}
     -
       expression: '{Jenkins by HTTP:jenkins.thread_deadlock.last()}=0 and {Jenkins by HTTP:jenkins.thread_deadlock.message.strlen()}>0'
-      name: 'Jenkins: There is are deadlocked threads in the Jenkins master JVM'
+      name: 'Jenkins: There are deadlocked threads in Jenkins master JVM'
       priority: WARNING
       description: |
         There are any deadlocked threads in the Jenkins master JVM.

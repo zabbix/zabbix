@@ -34,7 +34,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$JENKINS.API.KEY} |<p>API key for access to the Metrics Servlet.</p> |`` |
+|{$JENKINS.API.KEY} |<p>API key to access Metrics Servlet</p> |`` |
 |{$JENKINS.API.TOKEN} |<p>API token for HTTP BASIC authentication.</p> |`` |
 |{$JENKINS.FILE_DESCRIPTORS.MAX.WARN} |<p>Maximum percentage of file descriptors usage alert threshold (for trigger expression).</p> |`85` |
 |{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN} |<p>Minimum job's health score (for trigger expression).</p> |`50` |
@@ -163,7 +163,7 @@ There are no template links in this template.
 |Jenkins: Disk space is too low |<p>Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.</p><p>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p> |`{TEMPLATE_NAME:jenkins.disk_space.last()}=0 and {Jenkins by HTTP:jenkins.disk_space.message.strlen()}>0` |WARNING | |
 |Jenkins: One or more Jenkins plugins failed to start |<p>A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues. </p><p>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p> |`{TEMPLATE_NAME:jenkins.plugins.last()}=0 and {Jenkins by HTTP:jenkins.plugins.message.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Jenkins: Temporary space is too low |<p>Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.</p><p>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p> |`{TEMPLATE_NAME:jenkins.temporary_space.last()}=0 and {Jenkins by HTTP:jenkins.temporary_space.message.strlen()}>0` |WARNING | |
-|Jenkins: There is are deadlocked threads in the Jenkins master JVM |<p>There are any deadlocked threads in the Jenkins master JVM.</p><p>Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p> |`{TEMPLATE_NAME:jenkins.thread_deadlock.last()}=0 and {Jenkins by HTTP:jenkins.thread_deadlock.message.strlen()}>0` |WARNING | |
+|Jenkins: There are deadlocked threads in Jenkins master JVM |<p>There are any deadlocked threads in the Jenkins master JVM.</p><p>Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p> |`{TEMPLATE_NAME:jenkins.thread_deadlock.last()}=0 and {Jenkins by HTTP:jenkins.thread_deadlock.message.strlen()}>0` |WARNING | |
 |Jenkins: Service has no online nodes |<p>-</p> |`{TEMPLATE_NAME:jenkins.node.online.last()}=0` |AVERAGE | |
 |Jenkins: Version has changed (new version: {ITEM.VALUE}) |<p>Jenkins version has changed. Ack to close.</p> |`{TEMPLATE_NAME:jenkins.version.diff()}=1 and {TEMPLATE_NAME:jenkins.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Jenkins: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:jenkins.system.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
