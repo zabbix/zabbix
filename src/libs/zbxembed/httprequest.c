@@ -28,6 +28,16 @@
 
 #ifdef HAVE_LIBCURL
 
+#define ZBX_HTTPAUTH_NONE		CURLAUTH_NONE
+#define ZBX_HTTPAUTH_BASIC		CURLAUTH_BASIC
+#define ZBX_HTTPAUTH_DIGEST		CURLAUTH_DIGEST
+#if LIBCURL_VERSION_NUM >= 0x072600
+#	define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_NEGOTIATE
+#else
+#	define ZBX_HTTPAUTH_NEGOTIATE	CURLAUTH_GSSNEGOTIATE
+#endif
+#define ZBX_HTTPAUTH_NTLM		CURLAUTH_NTLM
+
 extern char	*CONFIG_SOURCE_IP;
 
 typedef struct
@@ -505,7 +515,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	mask = duk_to_int32(ctx, 0);
 
-	if (0 != (mask & ~(CURLAUTH_BASIC | CURLAUTH_DIGEST | CURLAUTH_NEGOTIATE | CURLAUTH_NTLM)))
+	if (0 != (mask & ~(ZBX_HTTPAUTH_BASIC | ZBX_HTTPAUTH_DIGEST | ZBX_HTTPAUTH_NEGOTIATE | ZBX_HTTPAUTH_NTLM)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "invalid HTTP authentication mask");
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
@@ -623,19 +633,15 @@ int	zbx_es_init_httprequest(zbx_es_t *es, char **error)
 	}
 
 #ifdef HAVE_LIBCURL
-	duk_push_number(es->env->ctx, CURLAUTH_NONE);
+	duk_push_number(es->env->ctx, ZBX_HTTPAUTH_NONE);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NONE");
-	duk_push_number(es->env->ctx, CURLAUTH_BASIC);
+	duk_push_number(es->env->ctx, ZBX_HTTPAUTH_BASIC);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_BASIC");
-	duk_push_number(es->env->ctx, CURLAUTH_DIGEST);
+	duk_push_number(es->env->ctx, ZBX_HTTPAUTH_DIGEST);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_DIGEST");
-#if LIBCURL_VERSION_NUM >= 0x072600
-	duk_push_number(es->env->ctx, CURLAUTH_NEGOTIATE);
-#else
-	duk_push_number(es->env->ctx, CURLAUTH_GSSNEGOTIATE);
-#endif
+	duk_push_number(es->env->ctx, ZBX_HTTPAUTH_NEGOTIATE);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NEGOTIATE");
-	duk_push_number(es->env->ctx, CURLAUTH_NTLM);
+	duk_push_number(es->env->ctx, ZBX_HTTPAUTH_NTLM);
 	duk_put_global_string(es->env->ctx, "HTTPAUTH_NTLM");
 #endif
 
