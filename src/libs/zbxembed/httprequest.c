@@ -535,11 +535,11 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PASSWORD, password, err);
 
 out:
-	if (-1 != err_index)
-		return duk_throw(ctx);
-
 	zbx_free(password);
 	zbx_free(username);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
 
 	return 0;
 }
