@@ -18,13 +18,13 @@
 **/
 
 #include "common.h"
-#include "nodecommand.h"
 #include "comms.h"
-#include "zbxserver.h"
 #include "db.h"
 #include "log.h"
 #include "../scripts/scripts.h"
 
+#include "trapper_auth.h"
+#include "nodecommand.h"
 
 /******************************************************************************
  *                                                                            *
@@ -199,7 +199,7 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
  *                                                                                                *
  * Parameters:  scriptid       - [IN] the id of a script to be executed                           *
  *              hostid         - [IN] the host the script will be executed on                     *
- *              sessionid      - [IN] the id of a session when the command was received           *
+ *              user           - [IN] the user who executed the command                           *
  *              clientip       - [IN] the IP of client                                            *
  *              ctx            - [IN] the execution context                                       *
  *              eventid        - [IN] the id of an event (can be 0 for HOST context)              *
@@ -212,7 +212,7 @@ static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, c
  *                FAIL - an error occurred                                                        *
  *                                                                                                *
  **************************************************************************************************/
-static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char *sessionid, const char *clientip,
+static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t *user, const char *clientip,
 		zbx_script_exec_context ctx, zbx_uint64_t eventid, char **result, char **debug)
 {
 	char		error[MAX_STRING_LEN];
@@ -220,10 +220,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	DC_HOST		host;
 	DB_EVENT	event;
 	zbx_script_t	script;
-	zbx_user_t	user;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " sessionid:%s",
-			__func__, scriptid, hostid, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64,
+			__func__, scriptid, hostid, user->userid);
 
 	*error = '\0';
 
@@ -242,13 +241,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	if (SUCCEED != (rc = DBget_user_by_active_session(sessionid, &user)))
-	{
-		zbx_strlcpy(error, "Permission denied.", sizeof(error));
-		goto fail;
-	}
-
-	if (SUCCEED != (rc = zbx_check_user_administration_actions_permissions(&user,
+	if (SUCCEED != (rc = zbx_check_user_administration_actions_permissions(user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS)))
 	{
 		zbx_strlcpy(error, "Permission denied. No role access.", sizeof(error));
@@ -260,12 +253,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
 	script.scriptid = scriptid;
 
-	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, ctx, eventid, error, sizeof(error), &event)))
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, user, ctx, eventid, error, sizeof(error), &event)))
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			ret = zbx_script_execute(&script, &host, &user, &event, ctx, result, error, sizeof(error), debug);
+			ret = zbx_script_execute(&script, &host, user, &event, ctx, result, error, sizeof(error), debug);
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 
@@ -274,7 +267,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 		else
 			perror = error;
 
-		auditlog_global_script(scriptid, hostid, host.proxy_hostid, user.userid, clientip, script.command_orig,
+		auditlog_global_script(scriptid, hostid, host.proxy_hostid, user->userid, clientip, script.command_orig,
 				script.execute_on, poutput, perror);
 	}
 
@@ -300,12 +293,12 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	char			*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN];
-	char			*debug = NULL, clientip[MAX_STRING_LEN];
+	char			clientip[MAX_STRING_LEN], tmp[64], *result = NULL, *send = NULL, *debug = NULL;
 	int			ret = FAIL;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	zbx_script_exec_context ctx;
 	struct zbx_json		j;
+	zbx_user_t		user;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s ", __func__, data);
 
@@ -338,16 +331,13 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 			ctx = ZBX_SCRIPT_CTX_HOST;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL))
-	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_SID);
+	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
-	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, ctx, eventid, &result, &debug)))
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, &user, clientip, ctx, eventid, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);

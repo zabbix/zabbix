@@ -14,7 +14,7 @@ require (
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/godror/godror v0.20.1
-	github.com/jackc/pgx/v4 v4.6.0
+	github.com/jackc/pgx/v4 v4.8.2-0.20200910143026-040df1ccef85
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/memcachier/mc/v3 v3.0.1

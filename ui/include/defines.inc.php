@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.4.0alpha1');
 define('ZABBIX_API_VERSION',	'5.4.0');
 define('ZABBIX_EXPORT_VERSION',	'5.4');
-define('ZABBIX_DB_VERSION',		5030030);
+define('ZABBIX_DB_VERSION',		5030038);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2021');
@@ -254,6 +254,7 @@ define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
 define('AUDIT_RESOURCE_AUTHENTICATION',		42);
 define('AUDIT_RESOURCE_TEMPLATE_DASHBOARD',	43);
 define('AUDIT_RESOURCE_USER_ROLE',			44);
+define('AUDIT_RESOURCE_AUTH_TOKEN',			45);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -593,6 +594,7 @@ define('ZBX_PREPROC_PROMETHEUS_TO_JSON',		23);
 define('ZBX_PREPROC_CSV_TO_JSON',				24);
 define('ZBX_PREPROC_STR_REPLACE',				25);
 define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
+define('ZBX_PREPROC_XML_TO_JSON',				27);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -1001,10 +1003,15 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 
 // Problem and event tag constants.
-define('TAG_EVAL_TYPE_AND_OR',	0);
-define('TAG_EVAL_TYPE_OR',		2);
-define('TAG_OPERATOR_LIKE',		0);
-define('TAG_OPERATOR_EQUAL',	1);
+define('TAG_EVAL_TYPE_AND_OR',		0);
+define('TAG_EVAL_TYPE_OR',			2);
+
+define('TAG_OPERATOR_LIKE',			0);
+define('TAG_OPERATOR_EQUAL',		1);
+define('TAG_OPERATOR_NOT_LIKE',		2);
+define('TAG_OPERATOR_NOT_EQUAL',	3);
+define('TAG_OPERATOR_EXISTS',		4);
+define('TAG_OPERATOR_NOT_EXISTS',	5);
 
 define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
 
@@ -1365,6 +1372,9 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
+
+define('ZBX_AUTH_TOKEN_ENABLED', 0);
+define('ZBX_AUTH_TOKEN_DISABLED', 1);
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -1791,6 +1801,7 @@ define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
+define('ZBX_STYLE_WORDBREAK', 'wordbreak');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');

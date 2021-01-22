@@ -167,8 +167,8 @@ class CImageHelper {
 				$color = imagecolorallocate($image, $color[0], $color[1], $color[2]);
 			}
 
-			imagefilledrectangle($image, $region['x'], $region['y'], $region['x'] + $region['width'],
-					$region['y'] + $region['height'], $color
+			imagefilledrectangle($image, $region['x'] - 1, $region['y'] - 1, $region['x'] + $region['width'] + 2,
+					$region['y'] + $region['height'] + 2, $color
 			);
 		}
 

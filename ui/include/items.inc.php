@@ -1812,6 +1812,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('Structured data'),
 			'name' => _('CSV to JSON')
 		],
+		ZBX_PREPROC_XML_TO_JSON => [
+			'group' => _('Structured data'),
+			'name' => _('XML to JSON')
+		],
 		ZBX_PREPROC_MULTIPLIER => [
 			'group' => _('Arithmetic'),
 			'name' => _('Custom multiplier')

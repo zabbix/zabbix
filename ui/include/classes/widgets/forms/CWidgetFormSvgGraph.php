@@ -312,7 +312,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
 				'jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);'.
 				'jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);'.
-				'jQuery("input, button", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
+				'jQuery("input, button, z-select", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
 			);
 
 		if (array_key_exists('show_problems', $this->data)) {

@@ -80,7 +80,7 @@ var PageRefresh = {
 
 		if (this.delayLeft < 0 && !overlays_stack.length) {
 			if (ED) {
-				sessionStorage.scrollTop = jQuery(window).scrollTop();
+				sessionStorage.scrollTop = $('.wrapper').scrollTop();
 			}
 
 			location.reload();
@@ -794,7 +794,7 @@ function getConditionFormula(conditions, evalType) {
 
 			for (const name in data) {
 				// Set 'z-select' value.
-				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name])
+				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name]);
 
 				// Set 'radio' value.
 				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"][value="' + data[name] + '"]')
@@ -924,7 +924,7 @@ jQuery(function ($) {
 	};
 
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
-		$(window).scrollTop(sessionStorage.scrollTop);
+		$('.wrapper').scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');
 	}
 });

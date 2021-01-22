@@ -1,6 +1,14 @@
 Changes for 5.4.0alpha1
 
 New features:
+...G.....T [ZBXCTR-13] added custom query support for PostgreSQL plugin and template, fixed unix-socket support (afayantsev, Daria_V, vadimipatov)
+A.F....PS. [ZBXNEXT-5518] added support of XML parsing in JavaScript (akozlovs, Ivo)
+.........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
+.........T [ZBXNEXT-6389] added template for NetApp FAS3220 (tuskov)
+A.F.I..PS. [ZBXNEXT-6311] moved host availability from hosts to host interfaces (akozlovs, gcalenko)
+..F....... [ZBXNEXT-6295] added 3rd level sub-menu (ashubin)
+....I..... [ZBXNEXT-6285] modified Oracle initial scheme creating and image loading in to the BLOB fields (akozlovs)
+...G.....T [ZBXNEXT-6419] added tablespace metrics to Oracle Templates (ychukina)
 ...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
 ...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
 ..F.....S. [ZBXNEXT-6252] added support of LLD rule filter condition operators "exists" and "does not exist" (agriscenko, asestakovs)
@@ -47,6 +55,17 @@ A.F....... [ZBXNEXT-6387] changed method settings.getglobal work only from front
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
+.......PS. [ZBX-18860] fixed crash of log item during "Check for not supported value" preprocessing step (akozlovs)
+...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+.........T [ZBX-18853] removed hardcoded teams_endpoint check (tuskov)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18815] fixed displaying incomplete list of inherited trigger tags under rare circumstances (ozdancuka)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
+.........T [ZBX-18468] changed preprocessing for item "PHP-FPM: Ping" in PHP-FPM templates (mchudinov)
+...G...... [ZBX-17369] fixed retrieval of decimal values from WMI (dgoloscapov)
+........S. [ZBX-18410] fixed retrieval of Nth most recent values in trigger function strlen (dgoloscapov)
 A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
 ...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
 ...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)
@@ -134,6 +153,10 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 Changes for 5.2.4rc1
 
 New features:
+...G.....T [ZBXCTR-13] added custom query support for PostgreSQL plugin and template, fixed unix-socket support (afayantsev, Daria_V, vadimipatov)
+.........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
+.........T [ZBXNEXT-6389] added template for NetApp FAS3220 (tuskov)
+...G.....T [ZBXNEXT-6419] added tablespace metrics to Oracle Templates (ychukina)
 ...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
 ...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
@@ -146,6 +169,17 @@ New features:
 A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
 
 Bug fixes:
+..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
+.......PS. [ZBX-18860] fixed crash of log item during "Check for not supported value" preprocessing step (akozlovs)
+...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+.........T [ZBX-18853] removed hardcoded teams_endpoint check (tuskov)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18815] fixed displaying incomplete list of inherited trigger tags under rare circumstances (ozdancuka)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
+.........T [ZBX-18468] changed preprocessing for item "PHP-FPM: Ping" in PHP-FPM templates (mchudinov)
+...G...... [ZBX-17369] fixed retrieval of decimal values from WMI (dgoloscapov)
+........S. [ZBX-18410] fixed retrieval of Nth most recent values in trigger function strlen (dgoloscapov)
 A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
 ...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
 ...G...... [ZBX-18387] made directory error handling for the UserParameter command in C agent the same as in GO agent (arimdjonoks)
@@ -493,6 +527,10 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.8rc1
 
 New features:
+...G.....T [ZBXCTR-13] added custom query support for PostgreSQL plugin and template, fixed unix-socket support (afayantsev, Daria_V, vadimipatov)
+.........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
+.........T [ZBXNEXT-6389] added template for NetApp FAS3220 (tuskov)
+...G.....T [ZBXNEXT-6419] added tablespace metrics to Oracle Templates (ychukina)
 ...G...... [ZBXNEXT-6331] updated plugins: ceph, docker, memcached, mysql, oracle, redis — unified functionality (parameters describing and parsing, URI parsing, using sessions, errors handling) (vadimipatov)
 ...G...... [ZBXNEXT-6210] added native support for proc.mem key in Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-6367] added metrics to the official MySQL template (mchudinov)
@@ -502,6 +540,16 @@ New features:
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
+...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+.........T [ZBX-18853] removed hardcoded teams_endpoint check (tuskov)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18815] fixed displaying incomplete list of inherited trigger tags under rare circumstances (ozdancuka)
+.........T [ZBX-18468] changed preprocessing for item "PHP-FPM: Ping" in PHP-FPM templates (mchudinov)
+...G...... [ZBX-17369] fixed retrieval of decimal values from WMI (dgoloscapov)
+........S. [ZBX-18410] fixed retrieval of Nth most recent values in trigger function strlen (dgoloscapov)
 A......... [ZBX-18722] fixed runtime error when creating user group without users (talbergs)
 ...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
 ........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
@@ -2408,6 +2456,11 @@ New features:
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
+...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
+A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
+...G...... [ZBX-16216] fixed semaphore not being cleaned up when stopping Zabbix agent (vso)
+..F....... [ZBX-18556] fixed gaps in time labels of classic graphs related to DST transitions (averza, Sasha)
 ...G...PS. [ZBX-18644] replaced deprecated gethostbyname function with getaddrinfo (wiper)
 ........S. [ZBX-18802] fixed close problem task to be deleted when problem event is deleted (vso)
 ..F....... [ZBX-17865] fixed displaying of long problem names on problems and event pages (gcalenko)

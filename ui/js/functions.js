@@ -885,3 +885,23 @@ function downloadPngImage($dom_node, file_name) {
 	a.target = '_blank';
 	a.click();
 }
+
+/**
+ * Writes text into primary clipboard. Provides fallback for insecure context.
+ *
+ * @param {string} text  Text to write.
+ */
+function writeTextClipboard(text) {
+	if (window.isSecureContext) {
+		return window.navigator.clipboard.writeText(text);
+	}
+
+	const textarea = document.createElement('textarea');
+
+	textarea.value = text;
+	textarea.style.position = 'fixed';
+	document.body.appendChild(textarea);
+	textarea.select();
+	document.execCommand('copy');
+	textarea.remove();
+}

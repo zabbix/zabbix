@@ -149,9 +149,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps_inpupt = $this->getInput('steps', []);
+		$preprocessing_steps_input = $this->getInput('steps', []);
 		$preprocessing_steps = [];
-		foreach ($preprocessing_steps_inpupt as $preproc) {
+		foreach ($preprocessing_steps_input as $preproc) {
 			if ($preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 				array_unshift($preprocessing_steps, $preproc);
 			}
@@ -248,13 +248,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Extract macros and apply effective values for each of them.
 		$usermacros = CMacrosResolverHelper::extractItemTestMacros([
 			'steps' => $preprocessing_steps,
-			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : '',
-			'texts_support_macros' => $texts_support_macros,
-			'texts_support_lld_macros' => $texts_support_lld_macros,
-			'texts_support_user_macros' => $texts_support_user_macros,
 			'supported_macros' => $supported_macros,
 			'support_lldmacros' => $support_lldmacros,
+			'texts_support_macros' => $texts_support_macros,
+			'texts_support_user_macros' => $texts_support_user_macros,
+			'texts_support_lld_macros' => $texts_support_lld_macros,
+			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'macros_values' => $this->getSupportedMacros($inputs + ['interfaceid' => $this->getInput('interfaceid', 0)])
 		]);
 
