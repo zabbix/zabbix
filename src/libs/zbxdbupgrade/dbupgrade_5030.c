@@ -1072,8 +1072,8 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	DBfree_result(result);
 
-	/* when time functions are used without historical functions fake historical functions */
-	/* must be added to associate the trigger expression to a host                         */
+	/* ensure that with history time functions converted to common time functions */
+	/* the trigger is still linked to the same hosts                              */
 	if (0 != common_functions.values_num)
 	{
 		int	i, extended = 0;
