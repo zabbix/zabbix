@@ -1,8 +1,6 @@
 /* SHA256-based Unix crypt implementation.
 Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
-#include "sha256crypt.h"
-
 #ifdef __linux__
 	#include <endian.h>
 #else
@@ -17,6 +15,7 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #include <string.h>
 #include <sys/param.h>
 #include <sys/types.h>
+
 
 /* Structure to save state of computation between the single steps.  */
 struct sha256_ctx
@@ -78,8 +77,6 @@ sha256_process_block (const void *buffer, size_t len, struct sha256_ctx *ctx)
 	uint32_t e = ctx->H[4];
 	uint32_t f = ctx->H[5];
 	uint32_t g = ctx->H[6];
-
-	//#include "common.h"
 	uint32_t h = ctx->H[7];
 
 /* First increment the byte count.  FIPS 180-2 specifies the possible
@@ -114,7 +111,7 @@ the loop.  */
 /* It is unfortunate that C does not provide an operator for
 cyclic rotation.  Hope the C compiler is smart enough.  */
 #define CYCLIC(w, s) ((w >> s) | (w << (32 - s)))
-#include <sys/types.h>
+
 		unsigned int t = 0;
 
 		/* Compute the message schedule according to FIPS 180-2:6.2.2 step 2.  */
@@ -142,7 +139,8 @@ cyclic rotation.  Hope the C compiler is smart enough.  */
 			a = T1 + T2;
 		}
 
-		/* Add the starting values of the context according to FIPS 180-2:6.2.2 step 4.  */
+		/* Add the starting values of the context according to FIPS 180-2:6.2.2
+		 * step 4.  */
 		a += a_save;
 		b += b_save;
 		c += c_save;
@@ -204,13 +202,14 @@ sha256_finish_ctx (struct sha256_ctx *ctx, void *resbuf)
 	ctx->total[0] += bytes;
 	if (ctx->total[0] < bytes)
 		++ctx->total[1];
-#include <sys/types.h>
+
 	pad = bytes >= 56 ? 64 + 56 - bytes : 56 - bytes;
 	memcpy (&ctx->buffer[bytes], fillbuf, pad);
 
 	/* Put the 64-bit file length in *bits* at the end of the buffer.  */
 	*(uint32_t *) &ctx->buffer[bytes + pad + 4] = SWAP (ctx->total[0] << 3);
-	*(uint32_t *) &ctx->buffer[bytes + pad] = SWAP ((ctx->total[1] << 3) | (ctx->total[0] >> 29));
+	*(uint32_t *) &ctx->buffer[bytes + pad] = SWAP ((ctx->total[1] << 3) |
+							(ctx->total[0] >> 29));
 
 	/* Process last bytes.  */
 	sha256_process_block (ctx->buffer, bytes + pad + 8, ctx);
