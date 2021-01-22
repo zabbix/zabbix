@@ -638,7 +638,9 @@ function copyItems($srcHostId, $dstHostId) {
 		$valuemapids_map = [];
 
 		foreach ($src_valuemaps as $name => $valuemapid) {
-			$valuemapids_map[$valuemapid] = $dest_valuemaps[$name];
+			if (array_key_exists($name, $dest_valuemaps)) {
+				$valuemapids_map[$valuemapid] = $dest_valuemaps[$name];
+			}
 		}
 	}
 

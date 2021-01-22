@@ -508,12 +508,25 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$valuemaps = getRequest('valuemap', []);
-		$db_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'hostids' => [$hostId],
-			'selectMappings' => ['value', 'newvalue'],
-			'preservekeys' => true
-		]);
+
+		if ((getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone')
+				&& getRequest('clone_hostid', 0)) {
+			$db_valuemaps = [];
+
+			foreach ($valuemaps as &$valuemap) {
+				unset($valuemap['valuemapid']);
+			}
+			unset($valuemap);
+		}
+		else {
+			$db_valuemaps = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'hostids' => $hostId,
+				'selectMappings' => ['value', 'newvalue'],
+				'preservekeys' => true
+			]);
+		}
+
 		$valuemaps_create = [];
 		$valuemaps_update = [];
 		$valuemaps_delete = array_column($db_valuemaps, 'valuemapid');
