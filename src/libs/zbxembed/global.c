@@ -84,7 +84,7 @@ static duk_ret_t	es_atob(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_md5                                                           *
+ * Function: es_sha256                                                        *
  *                                                                            *
  * Purpose: compute a sha256 checksum                                         *
  *                                                                            *
