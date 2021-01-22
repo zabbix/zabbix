@@ -72,6 +72,9 @@ class OracleDbBackend extends DbBackend {
 		if ($host) {
 			$connect = '//'.$host.(($port) ? ':'.$port : '').(($dbname) ? '/'.$dbname : '');
 		}
+		elseif ($dbname) {
+			$connect = $dbname;
+		}
 
 		$resource = @oci_connect($user, $password, $connect, 'UTF8');
 
