@@ -65,7 +65,7 @@ class testLanguage extends CWebTest {
 			[
 				[
 					'field' => [
-						'Default language' => 'Английский (en_GB)'
+						'Язык по умолчанию' => 'Английский (en_GB)'
 					],
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
