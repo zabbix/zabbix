@@ -49,6 +49,7 @@ class CControllerPopupMassupdateHost extends CController {
 			'valuemap' => 'array',
 			'valuemap_remove' => 'array',
 			'valuemap_remove_except' => 'in 0,1',
+			'valuemap_remove_all' => 'in 0,1',
 			'valuemap_rename' => 'array',
 			'valuemap_update_existing' => 'in 0,1',
 			'valuemap_add_missing' => 'in 0,1',
