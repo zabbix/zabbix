@@ -234,7 +234,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 			goto fail;
 		}
 	}
-	else if (ZBX_SCRIPT_CTX_EVENT == ctx)
+	else if (ZBX_SCRIPT_CTX_EVENT == ctx || ZBX_SCRIPT_CTX_ACTION == ctx)
 	{
 		memset(&host, 0, sizeof(host));
 	}
