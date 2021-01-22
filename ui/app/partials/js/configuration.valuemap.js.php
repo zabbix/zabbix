@@ -106,6 +106,7 @@ var AddValueMap = class {
 	createMappingCell() {
 		let i = 0;
 		const cell = document.createElement('td');
+		cell.classList.add('valuemap-label');
 		for (let value of this.data.mappings) {
 			if (i <= 3) {
 				cell.append((i < 3) ? `${value.value} ⇒ ${value.newvalue}` : '...', document.createElement('br'));
