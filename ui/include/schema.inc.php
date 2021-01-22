@@ -1947,7 +1947,7 @@ return [
 			],
 			'command' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'host_access' => [
@@ -2010,7 +2010,7 @@ return [
 				'length' => 20
 			],
 			'scriptid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'scripts',
@@ -2027,7 +2027,7 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => ''
-			],
+			]
 		]
 	],
 	'actions' => [
