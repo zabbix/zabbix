@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-18 17:38+0200\n"
-"PO-Revision-Date: 2018-05-04 09:32+0300\n"
-"Last-Translator: Oscar <oscar.zabbix@linaresdigital.com>\n"
+"PO-Revision-Date: 2021-01-22 17:20+0300\n"
+"Last-Translator: Imagunet <soporte@imagunet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,14 +13,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1525419162.000000\n"
+"X-POOTLE-MTIME: 1611328831.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" en lugar de \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -34,7 +34,7 @@ msgstr ""
 #: include/classes/import/validators/C50XmlValidator.php:1884
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "se esperaba \"%1$s\""
+msgstr "\"%1$s\" era esperado"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:359
@@ -45,25 +45,25 @@ msgstr "se esperaba \"%1$s\""
 #: maintenance.php:133 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\" debe estar entre 1970.01.01 y 2038.01.18."
 
 #: include/classes/api/services/CItemGeneral.php:1367
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "El valor \"%1$s\" debe ser menor o igual que el valor \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:381
 #: include/classes/import/validators/C10XmlValidator.php:403
 #: include/classes/import/validators/C10XmlValidator.php:424
 msgid "\"host:key\" pair is expected"
-msgstr "Se espera un par \"equipo:clave\""
+msgstr "\"equipo:llave\" era la pareja esperada"
 
 #: include/forms.inc.php:1292
 #: include/views/configuration.host.discovery.edit.php:704
 #: include/views/js/configuration.host.discovery.edit.js.php:91
 #: include/views/js/item.preprocessing.js.php:148
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.ruta.a.nodo"
 
 #: include/classes/api/services/CDRule.php:549
 #, c-format
@@ -81,20 +81,20 @@ msgstr[1] "%1$d días"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d coincidencias para %2$s encontradas"
 
 #: app/controllers/CControllerWidgetProblemsView.php:57
 #: include/classes/screens/CScreenHostTriggers.php:211
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "Se muestra %1$d de %3$d%2$s problemas"
-msgstr[1] "Se muestran %1$d de %3$d%2$s problemas"
+msgstr[0] "%1$d de %3$d%2$s problema mostrado"
+msgstr[1] "%1$d de %3$d%2$s problemas mostrados"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problemas seleccionados."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -104,14 +104,14 @@ msgstr "%1$s (año %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - lanzado por el módulo ubicado en %2$s."
 
 #: app/partials/monitoring.latest.view.html.php:133
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] "%1$s ítem"
-msgstr[1] "%1$s ítems"
+msgstr[0] "%1$s Ítem"
+msgstr[1] "%1$s Ítems"
 
 #: include/classes/api/services/CItemGeneral.php:2328
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -124,8 +124,8 @@ msgstr "%1$s [Línea: %2$s | Columna: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s acción"
+msgstr[1] "%1$s acciones"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
@@ -139,8 +139,8 @@ msgstr[1] "%1$s eventos"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s equipo en mantenimiento"
+msgstr[1] "%1$s equipos en mantenimiento"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:32
@@ -155,8 +155,8 @@ msgstr[1] "%1$s elementos"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s mensaje"
+msgstr[1] "%1$s mensajes"
 
 #: include/classes/widgets/CWidgetConfig.php:162
 #: include/classes/widgets/CWidgetConfig.php:163
@@ -180,7 +180,7 @@ msgstr[1] "%1$s elementos de %2$s en estado de problema"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s preseleccionado, use las teclas de flecha hacia abajo y hacia arriba e introduzca para seleccionar"
 
 #: include/maps.inc.php:335 include/maps.inc.php:339 include/maps.inc.php:346
 #: include/maps.inc.php:395
@@ -203,8 +203,8 @@ msgstr[1] "%1$s problemas en total"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] "Queda %1$s intento"
-msgstr[1] "Quedan %1$s intentos"
+msgstr[0] "%1$s intento restante"
+msgstr[1] "%1$s intentos restantes"
 
 #: app/views/administration.user.edit.php:387
 #: include/classes/widgets/CWidgetConfig.php:160
@@ -219,40 +219,40 @@ msgstr[1] "%1$s segundos"
 #: jsLoader.php:257
 #, c-format
 msgid "%1$s symbols remaining"
-msgstr ""
+msgstr "%1$s símbolos restantes"
 
 #: include/maps.inc.php:363 include/maps.inc.php:366 include/maps.inc.php:373
 #: include/maps.inc.php:378
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problema no reconocido"
+msgstr[1] "%1$s problemas no reconocidos"
 
 #: app/views/monitoring.widget.problems.view.php:276
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s widget"
-msgstr ""
+msgstr "%1$s widget"
 
 #: app/views/monitoring.widget.problemhosts.view.php:102
 #: app/views/monitoring.widget.problems.view.php:193
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Severidad, %2$s"
 
 #: jsLoader.php:270
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, solo lectura"
 
 #: jsLoader.php:322
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, seleccionado"
 
 #: include/func.inc.php:1853
 #, c-format
@@ -336,11 +336,11 @@ msgstr "Los últimos 500 valores"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<cadena vacía>"
 
 #: include/forms.inc.php:1340 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
-msgstr ""
+msgstr "<Nombre de etiqueta>"
 
 #: include/views/monitoring.sysmap.edit.php:126
 msgid "<manual>"
@@ -350,7 +350,7 @@ msgstr "<manual>"
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<nombre de métrica> {<nombre de etiqueta> = \"<valor de etiqueta>\", ...} == <valor>"
 
 #: app/views/administration.script.edit.php:44
 msgid "<sub-menu/sub-menu/...>script"
@@ -358,7 +358,7 @@ msgstr "<sub-menu/sub-menu/...>script"
 
 #: include/classes/widgets/CWidgetHelper.php:770
 msgid "ADD OVERRIDE"
-msgstr ""
+msgstr "AÑADIR OVERRIDE"
 
 #: app/views/popup.discovery.check.php:113
 #: include/views/js/configuration.host.edit.js.php:134
@@ -2213,8 +2213,8 @@ msgstr "No es posible eliminar los iniciadores"
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
-msgstr[0] "No es posible eliminar al usuario"
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el usuario"
+msgstr[1] "No es posible eliminar los usuarios"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2893,11 +2893,10 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "No pude actualizar la configuración del cifrado del host. Debería ser especificada la configuración de la conexión en ambos sentidos."
 
 #: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:288
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de equipo"
-msgstr[1] "No se pudo actualizar el prototipo de equipo"
+msgstr[1] "No se pudo actualizar los prototipos de equipo"
 
 #: hosts.php:693
 msgid "Cannot update hosts"
@@ -2923,11 +2922,10 @@ msgid "Cannot update item"
 msgstr "No es posible actualizar el monitor"
 
 #: disc_prototypes.php:645 disc_prototypes.php:672
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de ítem"
-msgstr[1] "No se pudo actualizar el prototipo de ítem"
+msgstr[1] "No se pudo actualizar los prototipos de ítem"
 
 #: disc_prototypes.php:1119
 msgid "Cannot update item prototypes"
@@ -3027,11 +3025,10 @@ msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:350 trigger_prototypes.php:509
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de disparador"
-msgstr[1] "No se pudo actualizar el prototipo de disparador"
+msgstr[1] "No se pudo actualizar los prototipos de disparador"
 
 #: include/classes/api/services/CTriggerGeneral.php:1837
 #, c-format
@@ -4278,7 +4275,7 @@ msgstr ""
 
 #: app/views/administration.trigseverity.edit.php:85
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "Los nombres de gravedades personalizadas afectan a todos los locales y requieren traducción manual."
+msgstr "Los nombres de severidades personalizadas afectan a todos los locales y requieren traducción manual!"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Custom size"
@@ -4729,7 +4726,7 @@ msgstr "¿Desea eliminar los enlaces entre los elementos seleccionados?"
 
 #: include/views/configuration.maintenance.edit.php:261
 msgid "Delete maintenance period?"
-msgstr "¿Desea eliminar el periodo de mantenimiento"
+msgstr "¿Desea eliminar el periodo de mantenimiento?"
 
 #: app/views/administration.mediatype.edit.php:364
 msgid "Delete media type?"
@@ -5378,7 +5375,6 @@ msgstr "Estado del descubrimiento"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:635
-#, fuzzy
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Estadísticas de lectura de disco. Devuelve entero si tipo es sectores, operaciones, bytes; decimal si tipo es sps, ops, bps"
 
@@ -5390,7 +5386,7 @@ msgstr "Espacio en disco en bytes o porcentaje del total. Devuelve entero para b
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:639
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr "Estadísticas de escritura en disco. Devuelve un valor de tipo entero en sectores, operaciones y bytes; valor de tipo real para sps, ops y bps (sectores por segundo, operaciones por segundo y bytes por segundo)"
+msgstr "Estadísticas de escritura en disco. Devuelve un valor de tipo entero en sectores, operaciones y bytes; valor de tipo real para sps, ops y bps"
 
 #: app/views/administration.trigdisplay.edit.php:85
 msgid "Display OK triggers for"
@@ -6213,9 +6209,8 @@ msgid "Expired"
 msgstr "Caducado"
 
 #: app/views/popup.generic.php:527 include/graphs.inc.php:27
-#, fuzzy
 msgid "Exploded"
-msgstr "Separado"
+msgstr "Expandido"
 
 #: app/views/administration.mediatype.list.php:164
 #: app/views/administration.valuemap.list.php:90
@@ -6836,7 +6831,7 @@ msgstr "La gráfica \"%1$s\" ya existe en \"%2$s\"."
 #: include/classes/api/services/CGraphPrototype.php:371
 #, fuzzy, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "La gráfica \"%1$s\" no puede ser heredada. No están los elementos requeridos en \"%2$s\" (elemento de valor Ymáx)."
+msgstr "La gráfica \"%1$s\" no puede ser heredada. No están los elementos requeridos en \"%2$s\" (valor de ítem Ymax)."
 
 #: include/classes/api/services/CGraph.php:375
 #: include/classes/api/services/CGraphPrototype.php:380
@@ -8256,9 +8251,8 @@ msgid "Incorrect action condition template. Template does not exist or you have 
 msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:154
-#, fuzzy
 msgid "Incorrect action condition trigger severity."
-msgstr "Gravedad del iniciador de la acción de la condición incorrecta"
+msgstr "Severidad del disparador en la condición de la acción incorrecta."
 
 #: include/classes/api/services/CAction.php:3245
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
@@ -8669,7 +8663,7 @@ msgstr "Lista de elementos incorrecta."
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:89
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Mantenimiento incorrecto - la fecha debe estar entre 01/01/1970 y 18/01/2038"
+msgstr "Mantenimiento incorrecto - la fecha debe estar entre 01.01.1970 y 18.01.2038"
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:125
 msgid "Incorrect maintenance period (minimum 5 minutes)"
@@ -15977,7 +15971,7 @@ msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
-msgstr "Código postal"
+msgstr "Código postal / ZIP"
 
 #: include/hosts.inc.php:334
 msgid "Site address A"
@@ -16009,7 +16003,7 @@ msgstr "Localización del rack"
 
 #: include/hosts.inc.php:354
 msgid "Site state / province"
-msgstr "Estado/Provincia/Departamento"
+msgstr "Estado/Departamento"
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "Size"
@@ -18184,7 +18178,7 @@ msgstr ""
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Usuario eliminado"
-msgstr[1] ""
+msgstr[1] "Usuarios eliminados"
 
 #: app/controllers/CControllerAuditLogList.php:194
 #: app/partials/popup.operations.php:83
