@@ -70,6 +70,7 @@ class CControllerPopupScriptExec extends CController {
 		$scriptid = $this->getInput('scriptid');
 		$hostid = $this->getInput('hostid', '');
 		$eventid = $this->getInput('eventid', '');
+		$msg_title = _('Cannot execute script.');
 
 		$data = [
 			'title' => _('Scripts'),
@@ -103,12 +104,8 @@ class CControllerPopupScriptExec extends CController {
 			}
 
 			$result = API::Script()->execute($execution_params);
-			$msg_title = null;
 
-			if (!$result) {
-				$msg_title = _('Cannot execute script.');
-			}
-			else {
+			if ($result) {
 				if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 					$value = json_decode($result['value']);
 					$result['value'] = json_last_error() ? $result['value'] : json_encode($value, JSON_PRETTY_PRINT);
@@ -117,6 +114,7 @@ class CControllerPopupScriptExec extends CController {
 				$data['output'] = $result['value'];
 				$data['debug'] = $result['debug'];
 				$data['success'] = true;
+				$msg_title = null;
 				info(_('Script execution successful.'));
 			}
 		}
