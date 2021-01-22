@@ -3,7 +3,12 @@ SERVER_tests = \
 	get_trigger_expression_constant \
 	evaluate_function \
 	substitute_lld_macros \
-	macro_fmttime
+	macro_fmttime \
+	zbx_eval_parse_expression \
+	zbx_eval_serialize \
+	zbx_eval_compose_expression \
+	zbx_eval_execute \
+	zbx_eval_execute_ext
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -40,7 +45,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
@@ -60,6 +64,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
@@ -160,5 +165,75 @@ evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-I@top_srcdir@/src/libs/zbxhistory
+
+	
+zbx_eval_parse_expression_SOURCES = \
+	zbx_eval_parse_expression.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_parse_expression_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_parse_expression_LDADD += @SERVER_LIBS@
+
+zbx_eval_parse_expression_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_parse_expression_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_eval_serialize_SOURCES = \
+	zbx_eval_serialize.c
+
+zbx_eval_serialize_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_serialize_LDADD += @SERVER_LIBS@
+
+zbx_eval_serialize_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_serialize_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_eval_compose_expression_SOURCES = \
+	zbx_eval_compose_expression.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_compose_expression_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_compose_expression_LDADD += @SERVER_LIBS@
+
+zbx_eval_compose_expression_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_compose_expression_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_eval_execute_SOURCES = \
+	zbx_eval_execute.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_execute_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_execute_LDADD += @SERVER_LIBS@
+
+zbx_eval_execute_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_execute_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_eval_execute_ext_SOURCES = \
+	zbx_eval_execute_ext.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_execute_ext_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_execute_ext_LDADD += @SERVER_LIBS@
+
+zbx_eval_execute_ext_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_execute_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 endif
 

@@ -330,6 +330,7 @@ ZBX_PTR_VECTOR_DECL(str, char *)
 ZBX_PTR_VECTOR_DECL(ptr, void *)
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
+ZBX_VECTOR_DECL(dbl, double)
 
 /* this function is only for use with zbx_vector_XXX_clear_ext() */
 /* and only if the vector does not contain nested allocations */

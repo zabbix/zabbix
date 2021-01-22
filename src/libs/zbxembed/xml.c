@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxembed.h"
+#include "zbxvariant.h"
 
 #include "embed.h"
 #include "xml.h"

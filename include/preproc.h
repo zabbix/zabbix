@@ -23,6 +23,7 @@
 #include "common.h"
 #include "module.h"
 #include "dbcache.h"
+#include "zbxvariant.h"
 
 /* preprocessing step execution result */
 typedef struct

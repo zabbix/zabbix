@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxvariant.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>

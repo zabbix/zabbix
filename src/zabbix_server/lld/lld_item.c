@@ -24,6 +24,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
+#include "zbxvariant.h"
 
 typedef struct
 {

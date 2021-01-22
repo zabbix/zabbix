@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "module.h"
+#include "zbxvariant.h"
 
 #include <malloc.h>
 

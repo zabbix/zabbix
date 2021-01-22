@@ -39,6 +39,7 @@
 #include "daemon.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
+#include "zbxvariant.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;

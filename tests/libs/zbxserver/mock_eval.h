@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,24 +18,11 @@
 **/
 
 #include "common.h"
-#include "log.h"
 
-#include "zbxalgo.h"
-#include "vectorimpl.h"
+#ifndef ZABBIX_MOCK_EXPRESSION_EVAL_H
+#define ZABBIX_MOCK_EXPRESSION_EVAL_H
 
-ZBX_VECTOR_IMPL(uint64, zbx_uint64_t)
-ZBX_PTR_VECTOR_IMPL(str, char *)
-ZBX_PTR_VECTOR_IMPL(ptr, void *)
-ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t)
-ZBX_VECTOR_IMPL(uint64_pair, zbx_uint64_pair_t)
-ZBX_VECTOR_IMPL(dbl, double)
+zbx_uint64_t	mock_eval_read_rules(const char *path);
+void	mock_eval_read_values(zbx_eval_context_t *ctx, const char *path);
 
-void	zbx_ptr_free(void *data)
-{
-	zbx_free(data);
-}
-
-void	zbx_str_free(char *data)
-{
-	zbx_free(data);
-}
+#endif

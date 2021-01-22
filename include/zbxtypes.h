@@ -218,4 +218,6 @@ zbx_uint128_t;
 	#define localtime_r(x, y)	localtime_s(y, x)
 #endif
 
+typedef struct zbx_variant zbx_variant_t;
+
 #endif

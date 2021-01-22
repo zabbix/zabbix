@@ -187,6 +187,8 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 		metric.function = &EXECUTE_USER_PARAMETER;
 		metric.test_param = command;
 
+		printf("[WDN] itemkey=%s, command=%s, metric.key=%s\n", itemkey, command, metric.key);
+
 		ret = add_metric(&metric, error, max_error_len);
 	}
 	else
