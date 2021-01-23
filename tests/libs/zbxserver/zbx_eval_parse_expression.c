@@ -209,7 +209,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == expected_ret)
 		compare_stack(&ctx, "out.stack");
 
-	zbx_eval_clean(&ctx);
+	zbx_eval_clear(&ctx);
 	zbx_free(error);
 
 }

@@ -187,5 +187,5 @@ out:
 	zbx_free(error);
 	zbx_vector_ptr_clear_ext(&callbacks, (zbx_clean_func_t)mock_callback_free);
 	zbx_vector_ptr_destroy(&callbacks);
-	zbx_eval_clean(&ctx);
+	zbx_eval_clear(&ctx);
 }

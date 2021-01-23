@@ -83,5 +83,5 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_str_eq("invalid composed expression", exp_expression, ret_expression);
 
 	zbx_free(ret_expression);
-	zbx_eval_clean(&ctx);
+	zbx_eval_clear(&ctx);
 }

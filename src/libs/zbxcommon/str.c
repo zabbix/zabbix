@@ -6094,3 +6094,47 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
 
 	return buffer;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strloc_unquote_dyn                                           *
+ *                                                                            *
+ * Purpose: unquotes substring at the specified location                      *
+ *                                                                            *
+ * Parameters: src - [IN] the source string                                   *
+ *             loc - [IN] the substring location                              *
+ *                                                                            *
+ * Return value: The unquoted and copied substring.                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_strloc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
+{
+	char		*str, *ptr;
+
+	src += loc->l + 1;
+
+	str = ptr = zbx_malloc(NULL, loc->r - loc->l);
+
+	while ('"' != *src)
+	{
+		if ('\\' == *src)
+		{
+			switch (*(++src))
+			{
+				case '\\':
+					*ptr++ = '\\';
+					break;
+				case '"':
+					*ptr++ = '"';
+					break;
+			}
+		}
+		else
+			*ptr++ = *src;
+		src++;
+	}
+	*ptr = '\0';
+
+	return str;
+}
+

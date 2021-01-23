@@ -33,6 +33,7 @@
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "base64.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -41,6 +42,7 @@
 #include "actions.h"
 #include "zbxtrends.h"
 #include "zbxvault.h"
+#include "zbxserialize.h"
 
 int	sync_in_progress = 0;
 
@@ -3585,6 +3587,40 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static unsigned char	*dup_serialized_expression(const unsigned char *src)
+{
+	zbx_uint32_t	offset, len;
+	unsigned char	*dst;
+
+	if (NULL == src || '\0' == *src)
+		return NULL;
+
+	offset = zbx_deserialize_uint31_compact(src, &len);
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] dup: offset:%d len:%d", offset, len);
+	if (0 == len)
+		return NULL;
+
+	dst = (unsigned char *)zbx_malloc(NULL, offset + len);
+	memcpy(dst, src, offset + len);
+
+	return dst;
+}
+
+static unsigned char	*config_decode_serialized_expression(const char *src)
+{
+	unsigned char	*dst;
+	int		data_len, src_len;
+
+	if (NULL == src || '\0' == *src)
+		return NULL;
+
+	src_len = strlen(src) * 3 / 4;
+	dst = __config_mem_malloc_func(NULL, src_len);
+	str_base64_decode(src, (char *)dst, src_len, &data_len);
+
+	return dst;
+}
+
 static void	DCsync_triggers(zbx_dbsync_t *sync)
 {
 	char		**row;
@@ -3634,6 +3670,16 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 					__config_mem_free_func);
 			trigger->topoindex = 1;
 		}
+		else
+		{
+			if (NULL != trigger->expression_bin)
+				__config_mem_free_func((void *)trigger->expression_bin);
+			if (NULL != trigger->recovery_expression_bin)
+				__config_mem_free_func((void *)trigger->recovery_expression_bin);
+		}
+
+		trigger->expression_bin = config_decode_serialized_expression(row[16]);
+		trigger->recovery_expression_bin = config_decode_serialized_expression(row[17]);
 	}
 
 	/* remove deleted triggers from buffer */
@@ -3684,6 +3730,11 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			zbx_strpool_release(trigger->event_name);
 
 			zbx_vector_ptr_destroy(&trigger->tags);
+
+			if (NULL != trigger->expression_bin)
+				__config_mem_free_func((void *)trigger->expression_bin);
+			if (NULL != trigger->recovery_expression_bin)
+				__config_mem_free_func((void *)trigger->recovery_expression_bin);
 
 			zbx_hashset_remove_direct(&config->triggers, trigger);
 		}
@@ -7729,6 +7780,9 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
 	dst_trigger->recovery_expression = zbx_strdup(NULL, src_trigger->recovery_expression);
 
+	dst_trigger->expression_bin = dup_serialized_expression(src_trigger->expression_bin);
+	dst_trigger->recovery_expression_bin = dup_serialized_expression(src_trigger->recovery_expression_bin);
+
 	zbx_vector_ptr_create(&dst_trigger->tags);
 
 	if (0 != src_trigger->tags.values_num)
@@ -7775,6 +7829,8 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->correlation_tag);
 	zbx_free(trigger->opdata);
 	zbx_free(trigger->event_name);
+	zbx_free(trigger->expression_bin);
+	zbx_free(trigger->recovery_expression_bin);
 
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&trigger->tags);
@@ -10614,6 +10670,68 @@ void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *
 	zbx_free(name);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_expand_user_macros                                            *
+ *                                                                            *
+ * Purpose: expand user macros in the specified text value                    *
+ *                                                                            *
+ * Parameters: text           - [IN] the text value to expand                 *
+ *             len            - [IN] the text length                          *
+ *             hostids        - [IN] an array of related hostids              *
+ *             hostids_num    - [IN] the number of hostids                    *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *           This function must be used only by configuration syncer          *
+ *                                                                            *
+ ******************************************************************************/
+char	*dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num)
+{
+	zbx_token_t	token;
+	int		pos = 0, len, last_pos = 0;
+	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	size_t		str_alloc = 0, str_offset = 0;
+
+	if ('\0' == *text)
+		return zbx_strdup(NULL, text);
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC) && token.loc.r < text_len; pos++)
+	{
+		if (ZBX_TOKEN_USER_MACRO != token.type)
+			continue;
+
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
+			continue;
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
+		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+
+		if (NULL != value)
+		{
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
+			zbx_free(value);
+		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		zbx_free(name);
+		zbx_free(context);
+
+		pos = token.loc.r;
+		last_pos = pos + 1;
+	}
+
+	zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, text_len - last_pos);
+
+	return str;
 }
 
 /******************************************************************************

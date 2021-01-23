@@ -117,4 +117,10 @@
 	)
 #endif
 
+
+/* complex serialization/deserialization functions */
+
+zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value);
+zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32_t *value);
+
 /* ZABBIX_SERIALIZE_H */

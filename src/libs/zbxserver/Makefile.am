@@ -11,7 +11,8 @@ libzbxserver_a_SOURCES = \
 	zabbix_stats.c \
 	zabbix_stats.h \
 	eval.c \
-	eval_execute.c
+	eval_execute.c \
+	eval_misc.c
 
 libzbxserver_server_a_SOURCES = \
 	zabbix_stats.h \

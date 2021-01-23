@@ -1057,6 +1057,7 @@ static void	serialize_variant(unsigned char **buffer, size_t *size, const zbx_va
 		case ZBX_VARIANT_NONE:
 			break;
 		default:
+			zabbix_log(LOG_LEVEL_DEBUG, "TYPE: %d", value->type);
 			THIS_SHOULD_NEVER_HAPPEN;
 			(*ptr)[-1] = ZBX_VARIANT_NONE;
 			break;
@@ -1125,14 +1126,14 @@ int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, z
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_expression_eval_clean                                        *
+ * Function: zbx_eval_clear                                                   *
  *                                                                            *
  * Purpose: free resources allocated by evaluation context                    *
  *                                                                            *
  * Parameters: ctx   - [IN] the evaluation context                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_clean(zbx_eval_context_t *ctx)
+void	zbx_eval_clear(zbx_eval_context_t *ctx)
 {
 	eval_clean(ctx);
 }
@@ -1155,15 +1156,16 @@ void	zbx_eval_clean(zbx_eval_context_t *ctx)
  *           Context serialization/deserialization must be used for           *
  *           context caching.                                                 *
  *                                                                            *
+ * Return value: The size of serialized data.                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func,
+size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func,
 		unsigned char **data)
 {
 	int		i;
-	unsigned char	buffer_static[ZBX_EVAL_STATIC_BUFFER_SIZE], *buffer = buffer_static, *ptr = buffer;
+	unsigned char	buffer_static[ZBX_EVAL_STATIC_BUFFER_SIZE], *buffer = buffer_static, *ptr = buffer, len_buff[4];
 	size_t		buffer_size = ZBX_EVAL_STATIC_BUFFER_SIZE;
-	zbx_uint32_t	len;
+	zbx_uint32_t	len, len_offset;
 
 	if (NULL == malloc_func)
 		malloc_func = ZBX_DEFAULT_MEM_MALLOC_FUNC;
@@ -1189,11 +1191,17 @@ void	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t mal
 	}
 
 	len = ptr - buffer;
-	*data = malloc_func(NULL, len);
-	memcpy(*data, buffer, len);
+
+	len_offset = serialize_uint31_compact(len_buff, len);
+
+	*data = malloc_func(NULL, len + len_offset);
+	memcpy(*data, len_buff, len_offset);
+	memcpy(*data + len_offset, buffer, len);
 
 	if (buffer != buffer_static)
 		zbx_free(buffer);
+
+	return len + len_offset;
 }
 
 /******************************************************************************
@@ -1212,12 +1220,13 @@ void	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t mal
 void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
 		const unsigned char *data)
 {
-	zbx_uint32_t	i, tokens_num;
+	zbx_uint32_t	i, tokens_num, len;
 
 	memset(ctx, 0, sizeof(zbx_eval_context_t));
 	ctx->expression = expression;
 	ctx->rules = rules;
 
+	data += deserialize_uint31_compact(data, &len);
 	data += deserialize_uint31_compact(data, &tokens_num);
 	zbx_vector_eval_token_create(&ctx->stack);
 	zbx_vector_eval_token_reserve(&ctx->stack, tokens_num);

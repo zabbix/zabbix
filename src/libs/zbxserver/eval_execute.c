@@ -1120,6 +1120,40 @@ static int	eval_execute_hist_function(const zbx_eval_context_t *ctx, const zbx_e
 
 /******************************************************************************
  *                                                                            *
+ * Function: eval_throw_execption                                             *
+ *                                                                            *
+ * Purpose: throw exception by returning the specified error                  *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the evaluation context                           *
+ *             token  - [IN] the function token                               *
+ *             output - [IN/OUT] the output value stack                       *
+ *             error  - [OUT] the error message in the case of failure        *
+ *                                                                            *
+ * Return value:  FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	eval_throw_execption(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
+		zbx_vector_var_t *output, char **error)
+{
+	zbx_variant_t	*arg;
+
+	if (1 != output->values_num || 1 != token->opt)
+	{
+		*error = zbx_dsprintf(*error, "exception must have one argument at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
+	}
+
+	arg = &output->values[output->values_num - 1];
+	zbx_variant_convert(arg, ZBX_VARIANT_STR);
+	*error = arg->data.str;
+	zbx_variant_set_none(arg);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: eval_execute                                                     *
  *                                                                            *
  * Purpose: evaluate pre-parsed expression                                    *
@@ -1187,6 +1221,10 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 					if (SUCCEED != eval_execute_push_value(ctx, token, &output, error))
 						goto out;
 					break;
+				case ZBX_EVAL_TOKEN_EXCEPTION:
+					eval_throw_execption(ctx, token, &output, error);
+					ret = FAIL;
+					goto out;
 				default:
 					*error = zbx_dsprintf(*error, "unknown token at \"%s\"",
 							ctx->expression + token->loc.l);

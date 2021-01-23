@@ -149,6 +149,6 @@ void	zbx_mock_test_entry(void **state)
 
 	mock_compare_stacks(&ctx1.stack, &ctx2.stack);
 
-	zbx_eval_clean(&ctx1);
-	zbx_eval_clean(&ctx2);
+	zbx_eval_clear(&ctx1);
+	zbx_eval_clear(&ctx2);
 }

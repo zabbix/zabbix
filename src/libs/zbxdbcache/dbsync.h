@@ -46,6 +46,8 @@
 #	define ZBX_HOST_TLS_OFFSET	0
 #endif
 
+#define ZBX_DBSYNC_TRIGGER_ERROR	0x80
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbsync_preproc_row_func_t                                    *

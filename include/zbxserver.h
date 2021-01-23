@@ -158,6 +158,7 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 #define ZBX_EVAL_TOKEN_ARG_TIME		(28 | ZBX_EVAL_CLASS_OPERAND)
 #define ZBX_EVAL_TOKEN_ARG_NULL		(29 | ZBX_EVAL_CLASS_OPERAND)
 #define ZBX_EVAL_TOKEN_ARG_RAW		(30 | ZBX_EVAL_CLASS_OPERAND)
+#define ZBX_EVAL_TOKEN_EXCEPTION	(31 | ZBX_EVAL_CLASS_FUNCTION)
 
 /* expression parsing rules */
 
@@ -241,14 +242,20 @@ typedef struct
 }
 zbx_eval_context_t;
 
+typedef char *(*zbx_macro_resolve_func_t)(const char *str, size_t length, zbx_uint64_t *hostids,
+		int hostids_num);
+
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
-void	zbx_eval_clean(zbx_eval_context_t *ctx);
-void	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func, unsigned char **data);
+void	zbx_eval_clear(zbx_eval_context_t *ctx);
+size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func, unsigned char **data);
 void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
 		const unsigned char *data);
 void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expression);
 int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_eval_function_cb_t function_cb,
 		zbx_variant_t *value, char **error);
-
+void	zbx_eval_get_functionids(const zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
+void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx,  zbx_uint64_t *hostids, int hostids_num,
+		zbx_macro_resolve_func_t resolver_cb);
+void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
 #endif

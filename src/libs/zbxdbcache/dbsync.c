@@ -22,6 +22,8 @@
 #include "dbcache.h"
 #include "zbxserver.h"
 #include "mutexs.h"
+#include "zbxserialize.h"
+#include "base64.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -2060,6 +2062,56 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbsync_compare_serialized_expression                             *
+ *                                                                            *
+ * Purpose: compare serialized expression                                     *
+ *                                                                            *
+ * Parameter: data1 - [IN] the base64 encoded expression                      *
+ *            data2 - [IN] the serialized expression in cache                 *
+ *                                                                            *
+ * Return value: SUCCEED - the expressions are identical                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_serialized_expression(const char *col, const unsigned char *data2)
+{
+	zbx_uint32_t	offset1, len1, offset2, len2;
+	unsigned char	*data1;
+	int		col_len, data1_len, ret = FAIL;
+
+	if (NULL == data2)
+	{
+		if (NULL == col || '\0' == *col)
+			return SUCCEED;
+		return FAIL;
+	}
+
+	if (NULL == col || '\0' == *col)
+		return FAIL;
+
+	col_len = strlen(col);
+	data1 = zbx_malloc(NULL, col_len);
+
+	str_base64_decode(col, (char *)data1, col_len, &data1_len);
+
+	offset1 = zbx_deserialize_uint31_compact((const unsigned char *)data1, &len1);
+	offset2 = zbx_deserialize_uint31_compact((const unsigned char *)data2, &len2);
+
+	if (offset1 != offset2 || len1 != len2)
+		goto out;
+
+	if (0 != memcmp(data1 + offset1, data2 + offset2, len1))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zbx_free(data1);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dbsync_compare_trigger                                           *
  *                                                                            *
  * Purpose: compares triggers table row with cached configuration data        *
@@ -2106,11 +2158,30 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	if (FAIL == dbsync_compare_str(dbrow[15], trigger->event_name))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_serialized_expression(dbrow[16], trigger->expression_bin))
+		return FAIL;
+
+	if (TRIGGER_RECOVERY_MODE_EXPRESSION == atoi(dbrow[10]) &&
+			FAIL == dbsync_compare_serialized_expression(dbrow[17], trigger->recovery_expression_bin))
+	{
+		return FAIL;
+	}
+
 	return SUCCEED;
 }
 
-#define ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION		0x01
-#define ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION	0x02
+static char	*encode_expression(const zbx_eval_context_t *ctx)
+{
+	unsigned char	*data;
+	size_t		len;
+	char		*str = NULL;
+
+	len = zbx_eval_serialize(ctx, NULL, &data);
+	str_base64_encode_dyn((const char *)data, &str, len);
+	zbx_free(data);
+
+	return str;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -2124,41 +2195,61 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
  *                                                                            *
  * Comments: The row preprocessing can be used to expand user macros in       *
  *           some columns.                                                    *
+ *           During preprocessing trigger expression/recovery expression are  *
+ *           parsed, serialized and stored as base64 strings into 16,17       *
+ *           columns.                                                         *
  *                                                                            *
  ******************************************************************************/
 static char	**dbsync_trigger_preproc_row(char **row)
 {
 	zbx_vector_uint64_t	hostids, functionids;
-	unsigned char		flags = 0;
-
-	/* return the original row if user macros are not used in target columns */
-
-	if (SUCCEED == dbsync_check_row_macros(row, 2))
-		flags |= ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION;
-
-	if (SUCCEED == dbsync_check_row_macros(row, 11))
-		flags |= ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION;
-
-	if (0 == flags)
-		return row;
-
-	/* get associated host identifiers */
+	zbx_eval_context_t	ctx, ctx_r;
+	char			*error;
+	unsigned char		mode;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&functionids);
 
-	get_functionids(&functionids, row[2]);
-	get_functionids(&functionids, row[11]);
+	if (FAIL == zbx_eval_parse_expression(&ctx, row[2], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
+	{
+		zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "cannot parse trigger expression: %s", error));
+		zbx_free(error);
+	}
+	else
+		zbx_eval_get_functionids(&ctx, &functionids);
+
+	ZBX_STR2UCHAR(mode, row[10]);
+
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == mode)
+	{
+		if (FAIL == zbx_eval_parse_expression(&ctx_r, row[2], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
+		{
+			zbx_eval_set_exception(&ctx_r, zbx_dsprintf(NULL, "cannot parse trigger recovery"
+					" expression: %s", error));
+			zbx_free(error);
+		}
+		else
+			zbx_eval_get_functionids(&ctx, &functionids);
+	}
 
 	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	/* expand user macros */
+	if (NULL != ctx.expression)
+		zbx_eval_expand_user_macros(&ctx, hostids.values, hostids.values_num, dc_expand_user_macros_len);
 
-	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-		row[2] = dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
+	row[16] = encode_expression(&ctx);
+	zbx_eval_clear(&ctx);
 
-	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
-		row[11] = dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == mode)
+	{
+		if (NULL != ctx_r.expression)
+		{
+			zbx_eval_expand_user_macros(&ctx_r, hostids.values, hostids.values_num,
+					dc_expand_user_macros_len);
+		}
+		row[17] = encode_expression(&ctx_r);
+		zbx_eval_clear(&ctx_r);
+	}
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
@@ -2177,6 +2268,9 @@ static char	**dbsync_trigger_preproc_row(char **row)
  * Return value: SUCCEED - the changeset was successfully calculated          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
+ * Comment: The 16th and 17th fields (starting with 0) are placeholders for   *
+ *          serialized expression/recovery expression                         *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 {
@@ -2191,7 +2285,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
 				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
-				"t.correlation_mode,t.correlation_tag,opdata,event_name"
+				"t.correlation_mode,t.correlation_tag,t.opdata,t.event_name,null,null"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -2204,7 +2298,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 16, dbsync_trigger_preproc_row);
+	dbsync_prepare(sync, 18, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -2382,6 +2476,13 @@ static int	dbsync_compare_function(const ZBX_DC_FUNCTION *function, const DB_ROW
 static char	**dbsync_function_preproc_row(char **row)
 {
 	zbx_uint64_t	hostid;
+	const char	*row3;
+
+	/* first parameter is /host/key placeholder $, don't cache it */
+	if (NULL == (row3 = strchr(row[3], ',')))
+		row3 = "";
+	else
+		row3++;
 
 	/* return the original row if user macros are not used in target columns */
 	if (SUCCEED == dbsync_check_row_macros(row, 3))
@@ -2389,8 +2490,10 @@ static char	**dbsync_function_preproc_row(char **row)
 		/* get associated host identifier */
 		ZBX_STR2UINT64(hostid, row[5]);
 
-		row[3] = dc_expand_user_macros_in_func_params(row[3], hostid);
+		row[3] = dc_expand_user_macros_in_func_params(row3, hostid);
 	}
+	else
+		row[3] = zbx_strdup(NULL, row3);
 
 	return row;
 }

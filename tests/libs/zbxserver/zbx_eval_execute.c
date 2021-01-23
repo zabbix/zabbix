@@ -83,5 +83,5 @@ void	zbx_mock_test_entry(void **state)
 	}
 out:
 	zbx_free(error);
-	zbx_eval_clean(&ctx);
+	zbx_eval_clear(&ctx);
 }
