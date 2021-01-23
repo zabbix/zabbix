@@ -24,6 +24,7 @@
 #include "mutexs.h"
 #include "zbxserialize.h"
 #include "base64.h"
+#include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"

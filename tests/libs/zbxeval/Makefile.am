@@ -1,9 +1,10 @@
 if SERVER
 SERVER_tests = \
-	get_trigger_expression_constant \
-	evaluate_function \
-	substitute_lld_macros \
-	macro_fmttime
+	zbx_eval_parse_expression \
+	zbx_eval_serialize \
+	zbx_eval_compose_expression \
+	zbx_eval_execute \
+	zbx_eval_execute_ext
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -35,6 +36,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -46,7 +48,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
@@ -83,84 +84,74 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
+	
+zbx_eval_parse_expression_SOURCES = \
+	zbx_eval_parse_expression.c \
+	mock_eval.c mock_eval.h
 
-get_trigger_expression_constant_SOURCES = \
-	get_trigger_expression_constant.c
-
-get_trigger_expression_constant_LDADD = \
+zbx_eval_parse_expression_LDADD = \
 	$(COMMON_LIB_FILES)
 
-get_trigger_expression_constant_LDADD += @SERVER_LIBS@
+zbx_eval_parse_expression_LDADD += @SERVER_LIBS@
 
-get_trigger_expression_constant_LDFLAGS = @SERVER_LDFLAGS@
+zbx_eval_parse_expression_LDFLAGS = @SERVER_LDFLAGS@
 
-get_trigger_expression_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_eval_parse_expression_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
-substitute_lld_macros_SOURCES = \
-	substitute_lld_macros.c
+zbx_eval_serialize_SOURCES = \
+	zbx_eval_serialize.c
 
-substitute_lld_macros_LDADD = \
+zbx_eval_serialize_LDADD = \
 	$(COMMON_LIB_FILES)
 
-substitute_lld_macros_LDADD += @SERVER_LIBS@
+zbx_eval_serialize_LDADD += @SERVER_LIBS@
 
-substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@
+zbx_eval_serialize_LDFLAGS = @SERVER_LDFLAGS@
 
-substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_eval_serialize_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
-macro_fmttime_SOURCES = \
-	macro_fmttime.c \
-	$(COMMON_SRC_FILES)
+zbx_eval_compose_expression_SOURCES = \
+	zbx_eval_compose_expression.c \
+	mock_eval.c mock_eval.h
 
-macro_fmttime_LDADD = \
-	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+zbx_eval_compose_expression_LDADD = \
+	$(COMMON_LIB_FILES)
 
-macro_fmttime_LDADD += $(COMMON_LIB_FILES)
+zbx_eval_compose_expression_LDADD += @SERVER_LIBS@
 
-macro_fmttime_LDADD += @SERVER_LIBS@
+zbx_eval_compose_expression_LDFLAGS = @SERVER_LDFLAGS@
 
-macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
+zbx_eval_compose_expression_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) \
-	-I@top_srcdir@/src/libs/zbxdbcache \
-	-I@top_srcdir@/src/libs/zbxserver
 
-evaluate_function_SOURCES = \
-	evaluate_function.c \
-	$(COMMON_SRC_FILES)
+zbx_eval_execute_SOURCES = \
+	zbx_eval_execute.c \
+	mock_eval.c mock_eval.h
 
-evaluate_function_LDADD = \
-	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+zbx_eval_execute_LDADD = \
+	$(COMMON_LIB_FILES)
 
-evaluate_function_LDADD += $(COMMON_LIB_FILES)
+zbx_eval_execute_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDADD += @SERVER_LIBS@
+zbx_eval_execute_LDFLAGS = @SERVER_LDFLAGS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
+zbx_eval_execute_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-VALUECACHE_WRAP_FUNCS = \
-	-Wl,--wrap=zbx_mutex_create \
-	-Wl,--wrap=zbx_mutex_destroy \
-	-Wl,--wrap=zbx_mem_create \
-	-Wl,--wrap=__zbx_mem_malloc \
-	-Wl,--wrap=__zbx_mem_realloc \
-	-Wl,--wrap=__zbx_mem_free \
-	-Wl,--wrap=zbx_mem_dump_stats \
-	-Wl,--wrap=zbx_history_get_values \
-	-Wl,--wrap=zbx_history_add_values \
-	-Wl,--wrap=zbx_history_sql_init \
-	-Wl,--wrap=zbx_history_elastic_init \
-	-Wl,--wrap=time \
-	-Wl,--wrap=substitute_simple_macros \
-	-Wl,--wrap=DCget_data_expected_from \
-	-Wl,--wrap=zbx_timespec
 
-evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
-	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
-	-I@top_srcdir@/src/libs/zbxhistory
+zbx_eval_execute_ext_SOURCES = \
+	zbx_eval_execute_ext.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_execute_ext_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_eval_execute_ext_LDADD += @SERVER_LIBS@
+
+zbx_eval_execute_ext_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_eval_execute_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
 

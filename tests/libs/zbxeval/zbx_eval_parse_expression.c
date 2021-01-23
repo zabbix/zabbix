@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "zbxserver.h"
+#include "zbxeval.h"
 #include "mock_eval.h"
 
 static const char	*mock_token_type2str(zbx_uint32_t type)

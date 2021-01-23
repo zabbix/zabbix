@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "zbxserver.h"
+#include "zbxeval.h"
 #include "mock_eval.h"
 
 typedef struct

@@ -163,6 +163,11 @@ tests/libs/zbxdbcache/zbx_vc_get_values
 tests/libs/zbxdbcache/dc_function_calculate_nextcheck
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
+tests/libs/zbxeval/zbx_eval_compose_expression
+tests/libs/zbxeval/zbx_eval_execute
+tests/libs/zbxeval/zbx_eval_execute_ext
+tests/libs/zbxeval/zbx_eval_parse_expression
+tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
@@ -178,11 +183,6 @@ tests/libs/zbxserver/evaluate_function
 tests/libs/zbxserver/get_trigger_expression_constant
 tests/libs/zbxserver/macro_fmttime
 tests/libs/zbxserver/substitute_lld_macros
-tests/libs/zbxserver/zbx_eval_compose_expression
-tests/libs/zbxserver/zbx_eval_execute
-tests/libs/zbxserver/zbx_eval_execute_ext
-tests/libs/zbxserver/zbx_eval_parse_expression
-tests/libs/zbxserver/zbx_eval_serialize
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
 tests/libs/zbxsysinfo/common/VFS_FILE_EXISTS

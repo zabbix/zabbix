@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "zbxserver.h"
+#include "zbxeval.h"
 
 static void	mock_read_token(zbx_eval_token_t *token, zbx_mock_handle_t htoken)
 {

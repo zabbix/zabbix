@@ -34,6 +34,7 @@
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "../zbxalgo/vectorimpl.h"
 #include "base64.h"
+#include "zbxeval.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -7782,6 +7783,9 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 
 	dst_trigger->expression_bin = dup_serialized_expression(src_trigger->expression_bin);
 	dst_trigger->recovery_expression_bin = dup_serialized_expression(src_trigger->recovery_expression_bin);
+
+	dst_trigger->eval_ctx = NULL;
+	dst_trigger->eval_ctx_r = NULL;
 
 	zbx_vector_ptr_create(&dst_trigger->tags);
 

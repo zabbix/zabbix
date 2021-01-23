@@ -26,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "memalloc.h"
+#include "zbxeval.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -257,6 +258,9 @@ typedef struct _DC_TRIGGER
 	unsigned char		flags;
 
 	zbx_vector_ptr_t	tags;
+
+	zbx_eval_context_t	*eval_ctx;
+	zbx_eval_context_t	*eval_ctx_r;
 }
 DC_TRIGGER;
 
