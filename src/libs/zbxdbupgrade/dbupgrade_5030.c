@@ -476,6 +476,328 @@ static int	DBpatch_5030038(void)
 
 	return DBset_default("scripts", &field);
 }
+
+static int	DBpatch_5030039(void)
+{
+	const ZBX_TABLE table =
+			{"item_tag", "itemtagid", 0,
+				{
+					{"itemtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030040(void)
+{
+	return DBcreate_index("item_tag", "item_tag_1", "itemid", 0);
+}
+
+static int	DBpatch_5030041(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_tag", 1, &field);
+}
+
+static int	DBpatch_5030042(void)
+{
+	const ZBX_TABLE table =
+			{"httptest_tag", "httptesttagid", 0,
+				{
+					{"httptesttagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030043(void)
+{
+	return DBcreate_index("httptest_tag", "httptest_tag_1", "httptestid", 0);
+}
+
+static int	DBpatch_5030044(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("httptest_tag", 1, &field);
+}
+
+static int	DBpatch_5030045(void)
+{
+	const ZBX_TABLE table =
+			{"sysmaps_element_tag", "selementtagid", 0,
+				{
+					{"selementtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"selementid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030046(void)
+{
+	return DBcreate_index("sysmaps_element_tag", "sysmaps_element_tag_1", "selementid", 0);
+}
+
+static int	DBpatch_5030047(void)
+{
+	const ZBX_FIELD	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmaps_element_tag", 1, &field);
+}
+
+static int	DBpatch_5030048(void)
+{
+	const ZBX_FIELD	field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
+static int	DBpatch_5030049(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	itemid, itemtagid = 1;
+	int		ret = SUCCEED;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	result = DBselect(
+			"select i.itemid,a.name from items i"
+			" join items_applications ip on i.itemid=ip.itemid"
+			" join applications a on ip.applicationid=a.applicationid;");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, itemtagid++, itemid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030050(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	itemid;
+	int		ret = SUCCEED;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select i.itemid,ap.name from items i"
+			" join item_application_prototype ip on i.itemid=ip.itemid"
+			" join application_prototype ap on ip.application_prototypeid=ap.application_prototypeid;");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030051(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	httptestid, httptesttagid = 1;
+	int		ret = SUCCEED;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
+	result = DBselect(
+			"select h.httptestid,a.name from httptest h"
+			" join applications a on h.applicationid=a.applicationid;");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(httptestid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, httptesttagid++, httptestid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030052(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	selementid, selementtagid = 1;
+	int		ret = SUCCEED;
+	char		*value;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
+	result = DBselect(
+			"select selementid,application from sysmaps_elements"
+			" where elementtype in (0,3) and application<>'';");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(selementid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+		zbx_db_insert_add_values(&db_insert, selementtagid++, selementid, "Application", value);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030053(void)
+{
+#define CONDITION_TYPE_APPLICATION	15
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d where conditiontype=%d",
+			CONDITION_TYPE_ITEM_TAG, CONDITION_TYPE_APPLICATION))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef CONDITION_TYPE_APPLICATION
+}
+
+static int	DBpatch_5030054(void)
+{
+#define AUDIT_RESOURCE_APPLICATION	12
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
+		return FAIL;
+
+	return SUCCEED;
+#undef AUDIT_RESOURCE_APPLICATION
+}
+
+static int	DBpatch_5030055(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx in ("
+			"'web.items.subfilter_apps','web.latest.filter.application',"
+			"'web.overview.filter.application','web.applications.filter.active',"
+			"'web.applications.filter_groups','web.applications.filter_hostids',"
+			"'web.applications.php.sort','web.applications.php.sortorder')"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030056(void)
+{
+	return DBdrop_foreign_key("httptest", 1);
+}
+
+static int	DBpatch_5030057(void)
+{
+	return DBdrop_index("httptest", "httptest_1");
+}
+
+static int	DBpatch_5030058(void)
+{
+	return DBdrop_field("httptest", "applicationid");
+}
+
+static int	DBpatch_5030059(void)
+{
+	return DBdrop_field("sysmaps_elements", "application");
+}
+
+static int	DBpatch_5030060(void)
+{
+	return DBdrop_table("application_discovery");
+}
+
+static int	DBpatch_5030061(void)
+{
+	return DBdrop_table("item_application_prototype");
+}
+
+static int	DBpatch_5030062(void)
+{
+	return DBdrop_table("application_prototype");
+}
+
+static int	DBpatch_5030063(void)
+{
+	return DBdrop_table("application_template");
+}
+
+static int	DBpatch_5030064(void)
+{
+	return DBdrop_table("items_applications");
+}
+
+static int	DBpatch_5030065(void)
+{
+	return DBdrop_table("applications");
+}
+
 #endif
 
 DBPATCH_START(5030)
@@ -521,5 +843,32 @@ DBPATCH_ADD(5030035, 0, 1)
 DBPATCH_ADD(5030036, 0, 1)
 DBPATCH_ADD(5030037, 0, 1)
 DBPATCH_ADD(5030038, 0, 1)
+DBPATCH_ADD(5030039, 0, 1)
+DBPATCH_ADD(5030040, 0, 1)
+DBPATCH_ADD(5030041, 0, 1)
+DBPATCH_ADD(5030042, 0, 1)
+DBPATCH_ADD(5030043, 0, 1)
+DBPATCH_ADD(5030044, 0, 1)
+DBPATCH_ADD(5030045, 0, 1)
+DBPATCH_ADD(5030046, 0, 1)
+DBPATCH_ADD(5030047, 0, 1)
+DBPATCH_ADD(5030048, 0, 1)
+DBPATCH_ADD(5030049, 0, 1)
+DBPATCH_ADD(5030050, 0, 1)
+DBPATCH_ADD(5030051, 0, 1)
+DBPATCH_ADD(5030052, 0, 1)
+DBPATCH_ADD(5030053, 0, 1)
+DBPATCH_ADD(5030054, 0, 1)
+DBPATCH_ADD(5030055, 0, 1)
+DBPATCH_ADD(5030056, 0, 1)
+DBPATCH_ADD(5030057, 0, 1)
+DBPATCH_ADD(5030058, 0, 1)
+DBPATCH_ADD(5030059, 0, 1)
+DBPATCH_ADD(5030060, 0, 1)
+DBPATCH_ADD(5030061, 0, 1)
+DBPATCH_ADD(5030062, 0, 1)
+DBPATCH_ADD(5030063, 0, 1)
+DBPATCH_ADD(5030064, 0, 1)
+DBPATCH_ADD(5030065, 0, 1)
 
 DBPATCH_END()

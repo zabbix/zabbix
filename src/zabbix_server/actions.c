@@ -821,9 +821,9 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: check_application_condition                                      *
+ * Function: check_item_tag_condition                                         *
  *                                                                            *
- * Purpose: check application condition                                       *
+ * Purpose: check item tag condition                                          *
  *                                                                            *
  * Parameters: esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] condition for matching, outputs          *
@@ -833,7 +833,7 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+static int	check_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -855,8 +855,8 @@ static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,a.name"
-			" from applications a,items_applications i,functions f,triggers t"
-			" where a.applicationid=i.applicationid"
+			" from item_tag it,functions f,triggers t"
+			" where it.itemid=i.itemid"
 			" and i.itemid=f.itemid"
 			" and f.triggerid=t.triggerid"
 			" and");
@@ -1043,8 +1043,8 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 			ret = check_acknowledged_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_APPLICATION:
-			ret = check_application_condition(esc_events, condition);
+		case CONDITION_TYPE_ITEM_TAG:
+			ret = check_item_tag_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_EVENT_TAG:
 			check_condition_event_tag(esc_events, condition);
@@ -2611,9 +2611,9 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 
 /******************************************************************************
  *                                                                            *
- * Function: check_intern_application_condition                               *
+ * Function: check_intern_item_tag_condition                                  *
  *                                                                            *
- * Purpose: check application condition for internal events                   *
+ * Purpose: check item tag condition for internal events                      *
  *                                                                            *
  * Parameters: esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] condition for matching, outputs          *
@@ -2623,7 +2623,7 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_application_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+static int	check_intern_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0;
@@ -2652,10 +2652,9 @@ static int	check_intern_application_condition(const zbx_vector_ptr_t *esc_events
 		if (EVENT_OBJECT_TRIGGER == objects[i])
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct t.triggerid,a.name"
-					" from applications a,items_applications i,functions f,triggers t"
-					" where a.applicationid=i.applicationid"
-						" and i.itemid=f.itemid"
+					"select distinct t.triggerid,it.tag"
+					" from item_tag it,functions f,triggers t"
+					" where it.itemid=f.itemid"
 						" and f.triggerid=t.triggerid"
 						" and");
 
@@ -2665,9 +2664,9 @@ static int	check_intern_application_condition(const zbx_vector_ptr_t *esc_events
 		else	/* EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE */
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct i.itemid,a.name"
-					" from applications a,items_applications i"
-					" where a.applicationid=i.applicationid"
+					"select distinct i.itemid,it.tag"
+					" from item_tag it"
+					" where it.itemid=i.itemid"
 						" and");
 
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
@@ -2759,8 +2758,8 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 		case CONDITION_TYPE_HOST:
 			ret = check_intern_host_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_APPLICATION:
-			ret = check_intern_application_condition(esc_events, condition);
+		case CONDITION_TYPE_ITEM_TAG:
+			ret = check_intern_item_tag_condition(esc_events, condition);
 			break;
 		default:
 			ret = FAIL;
