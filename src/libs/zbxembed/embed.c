@@ -418,13 +418,13 @@ out:
  *                                                                            *
  * Purpose: executes script                                                   *
  *                                                                            *
- * Parameters: es     - [IN] the embedded scripting engine                    *
- *             script - [IN] the script to execute                            *
- *             code   - [IN] the precompiled bytecode                         *
- *             size   - [IN] the size of precompiled bytecode                 *
- *             param  - [IN] the parameter to pass to the script              *
- *             output - [OUT] the result value                                *
- *             error  - [OUT] the error message                               *
+ * Parameters: es         - [IN] the embedded scripting engine                *
+ *             script     - [IN] the script to execute                        *
+ *             code       - [IN] the precompiled bytecode                     *
+ *             size       - [IN] the size of precompiled bytecode             *
+ *             param      - [IN] the parameter to pass to the script          *
+ *             script_ret - [OUT] the result value                            *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
@@ -435,10 +435,11 @@ out:
  *           bytecode parameters.                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
+int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **script_ret,
 	char **error)
 {
 	void		*buffer;
+	char		*output = NULL;
 	volatile int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
@@ -500,15 +501,26 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		if (0 != duk_check_type(es->env->ctx, -1, DUK_TYPE_NULL))
 		{
 			ret = SUCCEED;
-			*output = NULL;
+
+			if (NULL != script_ret)
+				*script_ret = NULL;
+
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() output: null", __func__);
 		}
 		else
 		{
-			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), output)))
+			if (NULL == script_ret)
+				script_ret = &output;
+
+			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), &output)))
+			{
 				*error = zbx_strdup(*error, "could not convert return value to utf8");
+			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *output);
+			{
+				*script_ret = zbx_strdup(NULL, output);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
+			}
 		}
 	}
 	else
@@ -517,6 +529,8 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 out:
+	zbx_free(output);
+
 	if (NULL != es->env->json)
 	{
 		zbx_json_close(es->env->json);
@@ -531,7 +545,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Function: zbx_es_set_timeout                                               *
- *                                              es_init_global_functions                              *
+ *                                                                            *
  * Purpose: sets script execution timeout                                     *
  *                                                                            *
  * Parameters: es      - [IN] the embedded scripting engine                   *
@@ -567,4 +581,79 @@ void	zbx_es_debug_disable(zbx_es_t *es)
 
 	zbx_json_free(es->env->json);
 	zbx_free(es->env->json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_es_execute_command                                           *
+ *                                                                            *
+ * Purpose: executes command (script in form of a text)                       *
+ *                                                                            *
+ * Parameters: command       - [IN] the command in form of a text             *
+ *             param         - [IN] the script parameters                     *
+ *             timeout       - [IN] the timeout for the execution (seconds)   *
+ *             result        - [OUT] the result of an execution               *
+ *             error         - [OUT] the error message                        *
+ *             max_error_len - [IN] the maximum length of an error            *
+ *             debug         - [OUT] the debug data (optional)                *
+ *                                                                            *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_es_execute_command(const char *command, const char *param, int timeout, char **result,
+		char *error, size_t max_error_len, char **debug)
+{
+	int		size, ret = SUCCEED;
+	char		*code = NULL, *errmsg = NULL;
+	zbx_es_t	es;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_es_init(&es);
+	if (FAIL == zbx_es_init_env(&es, &errmsg))
+	{
+		zbx_snprintf(error, max_error_len, "cannot initialize scripting environment: %s", errmsg);
+		zbx_free(errmsg);
+		ret = FAIL;
+		goto failure;
+	}
+
+	if (NULL != debug)
+		zbx_es_debug_enable(&es);
+
+	if (FAIL == zbx_es_compile(&es, command, &code, &size, &errmsg))
+	{
+		zbx_snprintf(error, max_error_len, "cannot compile script: %s", errmsg);
+		zbx_free(errmsg);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (0 != timeout)
+		zbx_es_set_timeout(&es, timeout);
+
+	if (FAIL == zbx_es_execute(&es, NULL, code, size, param, result, &errmsg))
+	{
+		zbx_snprintf(error, max_error_len, "cannot execute script: %s", errmsg);
+		zbx_free(errmsg);
+		ret = FAIL;
+		goto out;
+	}
+out:
+	if (NULL != debug)
+		*debug = zbx_strdup(NULL, zbx_es_debug_info(&es));
+
+	if (FAIL == zbx_es_destroy_env(&es, &errmsg))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot destroy embedded scripting engine environment: %s", errmsg);
+		zbx_free(errmsg);
+	}
+
+	zbx_free(code);
+	zbx_free(errmsg);
+failure:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }

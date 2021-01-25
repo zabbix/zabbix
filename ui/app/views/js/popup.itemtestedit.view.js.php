@@ -407,7 +407,7 @@ function saveItemTestInputs() {
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val(),
-			interface_details: interface ? interface['details'] : null
+			interface_details: (interface && 'details' in interface) ? interface['details'] : null
 		});
 	<?php endif ?>
 

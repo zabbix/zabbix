@@ -3768,6 +3768,9 @@ z-select[disabled] button,
     max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-medium {
       min-width: 450px; }
+    .overlay-dialogue.modal-popup.modal-popup-small {
+      max-width: 450px;
+      width: 100%; }
     .overlay-dialogue.modal-popup.modal-popup-static {
       max-width: 700px;
       width: 100%; }
@@ -5015,7 +5018,8 @@ svg {
   .sysmap-widget-container svg {
     flex-grow: 1; }
 
-.lld-overrides-operations-table {
+.lld-overrides-operations-table,
+.confirmation-msg {
   white-space: normal;
   word-break: break-word; }
 
@@ -5984,13 +5988,13 @@ svg {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
-.mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body {
+.debug-modal.overlay-dialogue.modal .overlay-dialogue-body {
   overflow-x: auto; }
-  .mediatypetest-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
+  .debug-modal.overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar {
     height: 9px; }
-.mediatypetest-modal .logitems pre {
+.debug-modal .logitems pre {
   white-space: nowrap; }
-.mediatypetest-modal .logtotalms {
+.debug-modal .logtotalms {
   color: #333333;
   float: left;
   line-height: 24px; }
@@ -6085,6 +6089,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .host-macros-table .table-col-value,
 .host-macros-table .table-col-template-value {
   width: 300px; }
+
+.active-readonly[readonly] {
+  color: #000000;
+  background-color: #ffffff !important;
+  border-color: #888888; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }

@@ -809,12 +809,31 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT
 	}
 }
 
+static int	get_scriptname_by_scriptid(zbx_uint64_t scriptid, char **script_name)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select name from scripts where scriptid=" ZBX_FS_UI64, scriptid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*script_name = zbx_strdup(NULL, row[0]);
+		DBfree_result(result);
+		return SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return FAIL;
+}
+
 static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const DC_HOST *host,
 		const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		const char *command, zbx_alert_status_t status, const char *error)
+		const zbx_script_t *script, zbx_alert_status_t status, const char *error)
 {
 	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
-	char	*tmp = NULL;
+	char	*tmp = NULL, *message;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -826,7 +845,23 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	now = (int)time(NULL);
-	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(command));
+
+	if (ZBX_SCRIPT_TYPE_IPMI == script->type || ZBX_SCRIPT_TYPE_SSH == script->type
+			|| ZBX_SCRIPT_TYPE_TELNET == script->type)
+	{
+		message = ZBX_NULL2EMPTY_STR(script->command_orig);
+	}
+	else
+	{
+		if (FAIL == get_scriptname_by_scriptid(script->scriptid, &message))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to find scriptname using script id " ZBX_FS_UI64,
+					script->scriptid);
+			message = NULL;
+		}
+	}
+
+	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(message));
 
 	if (NULL == r_event)
 	{
@@ -840,6 +875,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	zbx_free(tmp);
+	zbx_free(message);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1194,11 +1230,13 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 					break;
 			}
 
-			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, error, sizeof(error))))
+			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_ACTION,
+					event->eventid, error, sizeof(error), (DB_EVENT*)event)))
 			{
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 				{
-					rc = zbx_script_execute(&script, &host, NULL, error, sizeof(error));
+					rc = zbx_script_execute(&script, &host, NULL, event, ZBX_SCRIPT_CTX_EVENT,
+							NULL, error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else
@@ -1213,7 +1251,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				script.command_orig, status, error);
+				&script, status, error);
 skip:
 		zbx_script_clean(&script);
 	}

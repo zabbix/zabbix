@@ -79,6 +79,9 @@ foreach ($data['scripts'] as $script) {
 		case ZBX_SCRIPT_TYPE_IPMI:
 			$scriptType = _('IPMI');
 			break;
+		case ZBX_SCRIPT_TYPE_WEBHOOK:
+			$scriptType = _('Webhook');
+			break;
 	}
 
 	if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {

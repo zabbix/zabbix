@@ -141,22 +141,32 @@ class CZabbixServer {
 	}
 
 	/**
-	 * Executes a script on the given host and returns the result.
+	 * Executes a script on the given host or event and returns the result.
 	 *
-	 * @param $scriptId
-	 * @param $hostId
-	 * @param $sid
+	 * @param string      $scriptid
+	 * @param string      $sid
+	 * @param null|string $hostid
+	 * @param null|string $eventid
 	 *
 	 * @return bool|array
 	 */
-	public function executeScript($scriptId, $hostId, $sid) {
-		return $this->request([
+	public function executeScript(string $scriptid, string $sid, ?string $hostid = null, ?string $eventid = null) {
+		$params = [
 			'request' => 'command',
-			'scriptid' => $scriptId,
-			'hostid' => $hostId,
+			'scriptid' => $scriptid,
 			'sid' => $sid,
 			'clientip' => CWebUser::getIp()
-		]);
+		];
+
+		if ($hostid !== null) {
+			$params['hostid'] = $hostid;
+		}
+
+		if ($eventid !== null) {
+			$params['eventid'] = $eventid;
+		}
+
+		return $this->request($params);
 	}
 
 	/**
@@ -519,7 +529,7 @@ class CZabbixServer {
 		}
 
 		// An error on the server side occurred.
-		$this->error = $response['info'];
+		$this->error = rtrim($response['info']);
 
 		return false;
 	}

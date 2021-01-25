@@ -31,13 +31,15 @@ class testScripts extends CAPITest {
 			// Check script command.
 			[
 				'script' => [
-					'name' => 'API create script'
+					'name' => 'API create script',
+					'type' => 0
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "command" is missing.'
 			],
 			[
 				'script' => [
 					'name' => 'API create script',
+					'type' => 0,
 					'command' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/command": cannot be empty.'
@@ -45,6 +47,7 @@ class testScripts extends CAPITest {
 			// Check script name.
 			[
 				'script' => [
+					'type' => 0,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
@@ -52,6 +55,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => '',
+					'type' => 0,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
@@ -59,6 +63,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API/Script/',
+					'type' => 0,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1/name": directory or script name cannot be empty.'
@@ -66,6 +71,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'Ping',
+					'type' => 0,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Script "Ping" already exists.'
@@ -73,6 +79,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'Ping/test',
+					'type' => 0,
 					'command' => 'reboot server'
 				],
 				'expected_error' => 'Script menu path "Ping/test" already used in script name "Ping".'
@@ -81,10 +88,12 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'name' => 'Scripts with the same name',
+						'type' => 0,
 						'command' => 'reboot server'
 					],
 					[
 						'name' => 'Scripts with the same name',
+						'type' => 0,
 						'command' => 'reboot server'
 					]
 				],
@@ -94,10 +103,12 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'name' => 'test',
+						'type' => 0,
 						'command' => 'reboot server'
 					],
 					[
 						'name' => 'test/test/test test',
+						'type' => 0,
 						'command' => 'reboot server'
 					]
 				],
@@ -107,10 +118,12 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'name' => 'test/test',
+						'type' => 0,
 						'command' => 'reboot server'
 					],
 					[
 						'name' => 'test',
+						'type' => 0,
 						'command' => 'reboot server'
 					]
 				],
@@ -121,6 +134,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'name' => 'Апи скрипт создан утф-8',
+						'type' => 0,
 						'command' => 'reboot server 1'
 					]
 				],
@@ -130,10 +144,12 @@ class testScripts extends CAPITest {
 				'script' => [
 					[
 						'name' => 'API create one script',
+						'type' => 0,
 						'command' => 'reboot server 1'
 					],
 					[
 						'name' => 'æų',
+						'type' => 0,
 						'command' => 'æų'
 					]
 				],
@@ -613,7 +629,7 @@ class testScripts extends CAPITest {
 				$this->assertEquals($dbRow['groupid'], 0);
 				$this->assertEquals($dbRow['description'], '');
 				$this->assertEquals($dbRow['confirmation'], '');
-				$this->assertEquals($dbRow['type'], 0);
+				$this->assertEquals($dbRow['type'], 5);
 				$this->assertEquals($dbRow['execute_on'], 2);
 			}
 		}
@@ -632,6 +648,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API empty host_access',
+					'type' => 0,
 					'command' => 'reboot server',
 					'host_access' => ''
 				],
@@ -640,6 +657,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API host_access string',
+					'type' => 0,
 					'command' => 'reboot server',
 					'host_access' => 'abc'
 				],
@@ -648,6 +666,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API invalid host_access',
+					'type' => 0,
 					'command' => 'reboot server',
 					'host_access' => '0'
 				],
@@ -656,6 +675,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API invalid host_access ',
+					'type' => 0,
 					'command' => 'reboot server',
 					'host_access' => '1'
 				],
@@ -665,6 +685,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API empty usrgrpid',
+					'type' => 0,
 					'command' => 'reboot server',
 					'usrgrpid' => ''
 				],
@@ -673,6 +694,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API usrgrpid string',
+					'type' => 0,
 					'command' => 'reboot server',
 					'usrgrpid' => 'abc'
 				],
@@ -681,6 +703,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API invalid usrgrpid',
+					'type' => 0,
 					'command' => 'reboot server',
 					'usrgrpid' => '1.1'
 				],
@@ -689,6 +712,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API nonexistent usrgrpid ',
+					'type' => 0,
 					'command' => 'reboot server',
 					'usrgrpid' => '123456'
 				],
@@ -698,6 +722,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API empty groupid',
+					'type' => 0,
 					'command' => 'reboot server',
 					'groupid' => ''
 				],
@@ -706,6 +731,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API groupid string',
+					'type' => 0,
 					'command' => 'reboot server',
 					'groupid' => 'abc'
 				],
@@ -714,6 +740,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API invalid groupid',
+					'type' => 0,
 					'command' => 'reboot server',
 					'groupid' => '1.1'
 				],
@@ -722,6 +749,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API nonexistent groupid',
+					'type' => 0,
 					'command' => 'reboot server',
 					'groupid' => '123456'
 				],
@@ -731,6 +759,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API empty type',
+					'type' => 0,
 					'command' => 'reboot server',
 					'type' => ''
 				],
@@ -739,6 +768,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API type string',
+					'type' => 0,
 					'command' => 'reboot server',
 					'type' => 'abc'
 				],
@@ -747,6 +777,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API invalid type',
+					'type' => 0,
 					'command' => 'reboot server',
 					'type' => '1.1'
 				],
@@ -755,15 +786,17 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API nonexistent type',
+					'type' => 0,
 					'command' => 'reboot server',
 					'type' => '2'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
 			],
 			// Check execute_on.
 			[
 				'script' => [
 					'name' => 'API empty execute_on',
+					'type' => 0,
 					'command' => 'reboot server',
 					'execute_on' => ''
 				],
@@ -772,6 +805,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API execute_on string',
+					'type' => 0,
 					'command' => 'reboot server',
 					'execute_on' => 'abc'
 				],
@@ -780,6 +814,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API invalid execute_on',
+					'type' => 0,
 					'command' => 'reboot server',
 					'execute_on' => '1.1'
 				],
@@ -788,6 +823,7 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API nonexistent execute_on',
+					'type' => 0,
 					'command' => 'reboot server',
 					'execute_on' => '3'
 				],
@@ -796,16 +832,18 @@ class testScripts extends CAPITest {
 			[
 				'script' => [
 					'name' => 'API IPMI execute_on agent',
+					'type' => 0,
 					'command' => 'reboot server',
 					'type' => '1',
 					'execute_on' => '0'
 				],
-				'expected_error' => 'IPMI scripts can be executed only by server.'
+				'expected_error' => 'Only scripts of type "Script" can be executed by agent.'
 			],
 			// Check successfully creation and update with all properties.
 			[
 				'script' => [
 						'name' => 'API script with all properties',
+						'type' => 0,
 						'command' => 'reboot agent',
 						'host_access' => '3',
 						'usrgrpid' => '13',
@@ -964,7 +1002,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					'scriptid' => '1'
 				],
-				'expected_error' => 'Invalid parameter "/": the parameter "hostid" is missing.'
+				'expected_error' => 'Invalid parameter "/": the parameter "eventid" is missing.'
 			],
 			[
 				'script' => [
