@@ -105,7 +105,13 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
-		$this->driver = RemoteWebDriver::create('http://'.PHPUNIT_DRIVER_ADDRESS.':4444/wd/hub', $capabilities);
+		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
+
+		if (strpos($phpunit_driver_address, ':') === false) {
+			$phpunit_driver_address .= ':4444';
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
