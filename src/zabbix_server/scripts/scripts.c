@@ -438,21 +438,24 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (ZBX_SCRIPT_CTX_HOST == ctx && groupid > 0 &&
-					SUCCEED != check_script_permissions(groupid, host->hostid))
+			if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type && ZBX_SCRIPT_CTX_HOST != ctx)
+				goto skip_perm_check;
+
+			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
 				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
 						max_error_len);
 				goto out;
 			}
-			if (ZBX_SCRIPT_CTX_HOST == ctx && user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
+
+			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
 					SUCCEED != check_user_permissions(user->userid, host, script))
 			{
 				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
 						max_error_len);
 				goto out;
 			}
-
+skip_perm_check:
 			if (NULL != user)
 			{
 				/* zbx_script_prepare() receives 'user' as const-pointer but */

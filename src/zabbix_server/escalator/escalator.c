@@ -849,7 +849,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	if (ZBX_SCRIPT_TYPE_IPMI == script->type || ZBX_SCRIPT_TYPE_SSH == script->type
 			|| ZBX_SCRIPT_TYPE_TELNET == script->type)
 	{
-		message = ZBX_NULL2EMPTY_STR(script->command_orig);
+		message = script->command_orig;
 	}
 	else
 	{
@@ -875,7 +875,6 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	zbx_free(tmp);
-	zbx_free(message);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
