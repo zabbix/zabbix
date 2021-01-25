@@ -466,6 +466,7 @@ class CControllerPopupGeneric extends CController {
 			'with_httptests' => 					'in 1',
 			'with_hosts_and_templates' =>			'in 1',
 			'with_webitems' =>						'in 1',
+			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'show_host_name' =>						'in 1',
@@ -1366,58 +1367,81 @@ class CControllerPopupGeneric extends CController {
 			case 'valuemaps':
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
+				$options = [];
+				$db_valuemaps = [];
 
-				if ($hostids) {
-					$options += [
-						'output' => ['valuemapid', 'hostid', 'name'],
-						'selectMappings' => ['value', 'newvalue'],
-						'hostids' => $hostids,
-						'preservekeys' => true
-					];
-					$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get($options), ['valuemapid' => 'id']);
-
-					if ($this->getInput('multiselect', 0)) {
-						// In multiselect mode show only unique vlue maps names across all selected hosts.
-						$records = array_column($records, null, 'name');
-					}
-
-					// For multiple hosts show hostname as value map name prefix.
-					if ($this->getInput('show_host_name', 0)) {
-						$hosts = API::Host()->get([
-							'output' => ['name'],
-							'hostids' => $hostids,
-							'preservekeys' => true
-						]);
-
-						if (!$hosts) {
-							$hosts = API::Template()->get([
-								'output' => ['name'],
-								'templateids' => $hostids,
-								'preservekeys' => true
-							]);
-						}
-
-						foreach ($records as &$record) {
-							$record['hostname'] = $hosts[$record['hostid']]['name'];
-						}
-						unset($record);
-					}
-
-					if ($this->hasInput('disable_names')) {
-						$disable_names = $this->getInput('disable_names');
-
-						foreach ($records as &$record) {
-							if (in_array($record['name'], $disable_names)) {
-								$record['_disabled'] = true;
-							}
-						}
-						unset($record);
-					}
-
-					$records = array_column($records, null, 'id');
-					CArrayHelper::sort($records, ['name']);
+				if ($this->hasInput('with_inherited')) {
+					$options += ['selectInheritedValueMaps' => ['templateid', 'valuemapid', 'name']];
 				}
 
+				$hosts = API::Host()->get([
+					'output' => ['name'],
+					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+					'hostids' => $hostids,
+					'preservekeys' => true
+				] + $options);
+
+				if (!$hosts) {
+					$hosts = API::Template()->get([
+						'output' => ['name'],
+						'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+						'templateids' => $hostids,
+						'preservekeys' => true
+					] + $options);
+				}
+
+				$templateid_name = [];
+
+				if ($this->hasInput('with_inherited')) {
+					foreach ($hosts as $host) {
+						foreach ($host['inheritedValuemaps'] as $valuemap) {
+							$templateid_name[$valuemap['templateid']] = _('Inaccessible template');
+						}
+					}
+				}
+
+				if ($templateid_name) {
+					$templateid_name = array_column(API::Template()->get([
+						'output' => ['templateid', 'name'],
+						'templateids' => array_keys($templateid_name)
+					]), 'name', 'templateid') + $templateid_name;
+				}
+
+				foreach ($hosts as $host) {
+					foreach ($host['valuemaps'] as $valuemap) {
+						$db_valuemaps[] = $valuemap + ['hostname' => $host['name']];
+					}
+
+					if (array_key_exists('inheritedValuemaps', $host)) {
+						foreach ($host['inheritedValuemaps'] as $valuemap) {
+							$db_valuemaps[] = $valuemap + ['hostname' => $templateid_name[$valuemap['templateid']]];
+						}
+					}
+				}
+
+				if (!$db_valuemaps) {
+					break;
+				}
+
+				$disable_names = $this->getInput('disable_names', []);
+
+				foreach ($db_valuemaps as $db_valuemap) {
+					$records[$db_valuemap['valuemapid']] = [
+						'id' => $db_valuemap['valuemapid'],
+						'name' => $db_valuemap['name'],
+						'hostname' => $db_valuemap['hostname'],
+						'mappings' => array_key_exists('mappings', $db_valuemap) ? $db_valuemap['mappings'] : [],
+						'_disabled' => in_array($db_valuemap['name'], $disable_names)
+					];
+				}
+
+				if ($this->getInput('multiselect', 0)) {
+					// In multiselect mode show only unique vlue maps names across all selected hosts.
+					$records = array_column($records, null, 'name');
+				}
+
+				$records = array_column($records, null, 'id');
+				CArrayHelper::sort($records, ['name']);
 				break;
 		}
 

@@ -642,7 +642,7 @@ switch ($data['popup_type']) {
 				$name[] = NAME_DELIMITER;
 			}
 
-			if (array_key_exists('_disabled', $item)) {
+			if (array_key_exists('_disabled', $item) && $item['_disabled']) {
 				if ($data['multiselect']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);

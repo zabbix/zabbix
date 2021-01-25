@@ -548,25 +548,52 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 				$result = [];
+				$options = [];
+				$db_valuemaps = [];
 
-				$db_valuemaps = API::ValueMap()->get([
-					'output' => ['valuemapid', 'name'],
-					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'hostids' => $data['hostids'],
-					'preservekeys' => true
-				]);
-
-				if ($db_valuemaps) {
-					foreach ($db_valuemaps as $valuemap) {
-						$result[$valuemap['name']] = [
-							'id' => $valuemap['valuemapid'],
-							'name' => $valuemap['name'],
-						];
-					}
-					$result = array_column($result, null, 'id');
-
-					CArrayHelper::sort($result, ['name']);
+				if (array_key_exists('with_inherited', $data)) {
+					$options += ['selectInheritedValueMaps' => ['valuemapid', 'name']];
 				}
+
+				$hosts = API::Host()->get([
+					'output' => ['host'],
+					'selectValueMaps' => ['valuemapid', 'name'],
+					'hostids' => $data['hostids']
+				] + $options);
+
+				if (!$hosts) {
+					$hosts = API::Template()->get([
+						'output' => ['host'],
+						'selectValueMaps' => ['valuemapid', 'name'],
+						'templateids' => $data['hostids']
+					] + $options);
+				}
+
+				foreach ($hosts as $host) {
+					$db_valuemaps = array_merge($db_valuemaps, $host['valuemaps']);
+
+					if (array_key_exists('inheritedValuemaps', $host)) {
+						$db_valuemaps = array_merge($db_valuemaps, $host['inheritedValuemaps']);
+					}
+				}
+
+				if (!$db_valuemaps) {
+					break;
+				}
+
+				foreach ($db_valuemaps as $db_valuemap) {
+					if ($data['search'] && stripos($db_valuemap['name'], $data['search']) === false) {
+						continue;
+					}
+
+					$result[$db_valuemap['name']] = [
+						'id' => $db_valuemap['valuemapid'],
+						'name' => $db_valuemap['name'],
+					];
+				}
+
+				$result = array_column($result, null, 'id');
+				CArrayHelper::sort($result, ['name']);
 				break;
 		}
 		break;
