@@ -1022,14 +1022,20 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($options['selectInheritedValueMaps'] !== null) {
 			if ($options['selectInheritedValueMaps'] === API_OUTPUT_EXTEND) {
-				$options['selectInheritedValueMaps'] = ['valuemapid', 'name'];
+				$options['selectInheritedValueMaps'] = ['valuemapid', 'name', 'templateid'];
 			}
 
 			$hosts_templates = [];
 			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
 
 			$db_valuemaps = DB::select('valuemap', [
-				'output' => $this->outputExtend($options['selectInheritedValueMaps'], ['valuemapid', 'hostid', 'name']),
+				'output' => $this->outputExtend(
+					array_flip(
+						CArrayHelper::renameKeys(array_flip($options['selectInheritedValueMaps']),
+							['templateid' => 'hostid']
+						)
+					), ['valuemapid', 'hostid', 'name']
+				),
 				'filter' => ['hostid' => $templateids]
 			]);
 
@@ -1042,10 +1048,11 @@ abstract class CHostGeneral extends CHostBase {
 							$valuemaps[] = $db_valuemap;
 						}
 					}
-				}
+				};
 
-				$host['inheritedValuemaps'] = $this->unsetExtraFields($valuemaps, ['valuemapid', 'hostid', 'name'],
-					$options['selectInheritedValueMaps']
+				$host['inheritedValuemaps'] = $this->unsetExtraFields(
+					CArrayHelper::renameObjectsKeys($valuemaps, ['hostid' => 'templateid']),
+					['valuemapid', 'name', 'templateid'], $options['selectInheritedValueMaps']
 				);
 			}
 			unset($host);
