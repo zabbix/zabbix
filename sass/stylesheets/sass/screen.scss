@@ -944,6 +944,11 @@ form {
 	word-break: break-all;
 }
 
+.wordbreak {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
 .overflow-table {
 	overflow-x: auto;
 	position: relative;
@@ -4002,7 +4007,6 @@ $form-icon-btn: (
 
 			.table-forms {
 				.table-forms-td-right {
-					@extend %space-pre-wrap;
 					padding-right: 8px;
 				}
 
@@ -6774,7 +6778,7 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
-table.preprocessing-test-results {
+.preprocessing-test-results {
 	td {
 		vertical-align: top !important;
 	}

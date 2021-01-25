@@ -17,29 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package memcached
+package mysql
 
-import "strings"
+import (
+	"context"
+	"encoding/json"
 
-type zabbixError struct {
-	err string
-}
+	"zabbix.com/pkg/zbxerr"
+)
 
-func (e zabbixError) Error() string {
-	errText := e.err
-	if errText[len(errText)-1:] != "." {
-		errText += "."
+func replicationDiscoveryHandler(ctx context.Context, conn MyClient, _ map[string]string,
+	_ ...string) (interface{}, error) {
+	res := make([]map[string]string, 0)
+
+	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return strings.Title(errText)
-}
+	data, err := rows2data(rows)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
 
-var (
-	errorInvalidParams     = zabbixError{"invalid parameters"}
-	errorTooManyParameters = zabbixError{"too many parameters"}
-	errorCannotFetchData   = zabbixError{"cannot fetch data"}
-	errorCannotMarshalJSON = zabbixError{"cannot marshal JSON"}
-	errorUnsupportedMetric = zabbixError{"unsupported metric"}
-	errorEmptyResult       = zabbixError{"empty result"}
-	errorUnknownSession    = zabbixError{"unknown session"}
-)
+	for _, row := range data {
+		res = append(res, map[string]string{"Master_Host": row["Master_Host"]})
+	}
+
+	jsonRes, err := json.Marshal(res)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonRes), nil
+}

@@ -1,3 +1,22 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 package uri
 
 import (
@@ -68,10 +87,20 @@ func TestURI_String(t *testing.T) {
 		want   string
 	}{
 		{
-			"Should return URI with creds",
+			"Should return URI with creds. Test 1",
 			fields{scheme: "https", host: "127.0.0.1", port: "8003", user: "zabbix",
 				password: "a35c2787-6ab4-4f6b-b538-0fcf91e678ed"},
 			"https://zabbix:a35c2787-6ab4-4f6b-b538-0fcf91e678ed@127.0.0.1:8003",
+		},
+		{
+			"Should return URI with creds. Test 2",
+			fields{scheme: "unix", socket: "/tmp/redis.sock", user: "zabbix", password: "secret"},
+			"unix://zabbix:secret@/tmp/redis.sock",
+		},
+		{
+			"Should return URI with user only",
+			fields{scheme: "unix", socket: "/tmp/redis.sock", user: "zabbix"},
+			"unix://zabbix@/tmp/redis.sock",
 		},
 		{
 			"Should return URI with creds containing special characters",
@@ -100,7 +129,7 @@ func TestURI_String(t *testing.T) {
 			"https://127.0.0.1",
 		},
 		{
-			"Should return URI socket",
+			"Should return URI with socket",
 			fields{scheme: "unix", socket: "/var/lib/mysql/mysql.sock"},
 			"unix:///var/lib/mysql/mysql.sock",
 		},
@@ -223,7 +252,13 @@ func TestNew(t *testing.T) {
 			false,
 		},
 		{
-			"Parse URI with unix scheme",
+			"Parse URI with unix scheme. Test 1",
+			args{"unix:/var/run/memcached.sock", nil},
+			&URI{scheme: "unix", socket: "/var/run/memcached.sock", rawUri: "unix:/var/run/memcached.sock"},
+			false,
+		},
+		{
+			"Parse URI with unix scheme. Test 2",
 			args{"unix:///var/run/memcached.sock", nil},
 			&URI{scheme: "unix", socket: "/var/run/memcached.sock", rawUri: "unix:///var/run/memcached.sock"},
 			false,

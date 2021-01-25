@@ -17,22 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package postgres
+package mysql
 
 import (
-	"errors"
+	"context"
+	"fmt"
 )
 
-func validateHost(host string) (err error) {
-	if len(host) == 0 {
-		return errors.New("Hostname cannot be empty")
-	}
-	return
-}
+const (
+	pingFailed = 0
+	pingOk     = 1
+)
 
-func validateDatabase(database string) (err error) {
-	if len(database) < 1 || len(database) > 63 || database == "" {
-		return errors.New("size name of database must be between 1 and 63 bytes")
+// pingHandler queries 'SELECT 1' and returns pingOk if a connection is alive or pingFailed otherwise.
+func pingHandler(ctx context.Context, conn MyClient, params map[string]string, _ ...string) (interface{}, error) {
+	var res int
+
+	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d", pingOk))
+	if err != nil {
+		return pingFailed, nil
 	}
-	return
+
+	err = row.Scan(&res)
+
+	if err != nil || res != pingOk {
+		return pingFailed, nil
+	}
+
+	return pingOk, nil
 }

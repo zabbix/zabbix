@@ -36,8 +36,11 @@ func TestMain(m *testing.M) {
 
 	fixtures = make(map[command][]byte)
 
-	for _, cmd := range []command{cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus} {
-		fixtures[cmd], err = ioutil.ReadFile("testdata/" + strings.ReplaceAll(string(cmd), " ", "_") + ".json")
+	for _, cmd := range []command{
+		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus,
+	} {
+		fixtures[cmd], err = ioutil.ReadFile("testdata/" +
+			strings.ReplaceAll(string(cmd), " ", "_") + ".json")
 		if err != nil {
 			log.Fatal(err)
 		}

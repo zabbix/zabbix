@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyInstance = "oracle.instance.info"
-
-const instanceMaxParams = 0
-
-func instanceHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func instanceHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var instanceStats string
-
-	if len(params) > instanceMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

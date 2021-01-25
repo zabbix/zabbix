@@ -1267,6 +1267,7 @@ void	zbx_free_service_resources(int ret)
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
+	zbx_deinit_modbus();
 #ifdef _WINDOWS
 	free_perf_collector();
 	zbx_co_uninitialize();

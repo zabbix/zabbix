@@ -550,7 +550,11 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
-	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
+	if (-1 == fcntl(s->socket, F_SETFD, FD_CLOEXEC))
+	{
+		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
+				ip, port, strerror_from_system(zbx_socket_last_error()));
+	}
 #endif
 	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
 
@@ -674,7 +678,11 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
-	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
+	if (-1 == fcntl(s->socket, F_SETFD, FD_CLOEXEC))
+	{
+		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
+				ip, port, strerror_from_system(zbx_socket_last_error()));
+	}
 #endif
 	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
 
@@ -1019,7 +1027,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (0 != (err = getaddrinfo(ip, port, &hints, &ai)))
 		{
 			zbx_set_socket_strerror("cannot resolve address [[%s]:%s]: [%d] %s",
-					ip ? ip : "-", port, err, gai_strerror(err));
+					NULL != ip ? ip : "-", port, err, gai_strerror(err));
 			goto out;
 		}
 
@@ -1028,7 +1036,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			if (ZBX_SOCKET_COUNT == s->num_socks)
 			{
 				zbx_set_socket_strerror("not enough space for socket [[%s]:%s]",
-						ip ? ip : "-", port);
+						NULL != ip ? ip : "-", port);
 				goto out;
 			}
 
@@ -1047,7 +1055,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
 			{
 				zbx_set_socket_strerror("WSASocket() for [[%s]:%s] failed: %s",
-						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
+						NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
 				if (WSAEAFNOSUPPORT == zbx_socket_last_error())
 #else
 			if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] =
@@ -1055,7 +1064,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					current_ai->ai_protocol)))
 			{
 				zbx_set_socket_strerror("socket() for [[%s]:%s] failed: %s",
-						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
+						NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
 				if (EAFNOSUPPORT == zbx_socket_last_error())
 #endif
 					continue;
@@ -1064,7 +1074,12 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			}
 
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
-			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
+			if (-1 == fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC))
+			{
+				zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on "
+						"socket [[%s]:%s]: %s", NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
+			}
 #endif
 			on = 1;
 #ifdef _WINDOWS
@@ -1088,7 +1103,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					(void *)&on, sizeof(on)))
 			{
 				zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%s] failed: %s",
-						"SO_EXCLUSIVEADDRUSE", ip ? ip : "-", port,
+						"SO_EXCLUSIVEADDRUSE", NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
 			}
 #else
@@ -1099,7 +1114,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					(void *)&on, sizeof(on)))
 			{
 				zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%s] failed: %s",
-						"SO_REUSEADDR", ip ? ip : "-", port,
+						"SO_REUSEADDR", NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
 			}
 #endif
@@ -1110,7 +1125,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					IPV6_V6ONLY, (void *)&on, sizeof(on)))
 			{
 				zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%s] failed: %s",
-						"IPV6_V6ONLY", ip ? ip : "-", port,
+						"IPV6_V6ONLY", NULL != ip ? ip : "-", port,
 						strerror_from_system(zbx_socket_last_error()));
 			}
 #endif
@@ -1118,7 +1133,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					current_ai->ai_addrlen))
 			{
 				zbx_set_socket_strerror("bind() for [[%s]:%s] failed: %s",
-						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
+						NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
 				zbx_socket_close(s->sockets[s->num_socks]);
 #ifdef _WINDOWS
 				if (WSAEADDRINUSE == zbx_socket_last_error())
@@ -1133,7 +1149,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
 			{
 				zbx_set_socket_strerror("listen() for [[%s]:%s] failed: %s",
-						ip ? ip : "-", port, strerror_from_system(zbx_socket_last_error()));
+						NULL != ip ? ip : "-", port,
+						strerror_from_system(zbx_socket_last_error()));
 				zbx_socket_close(s->sockets[s->num_socks]);
 				goto out;
 			}
@@ -1157,7 +1174,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	if (0 == s->num_socks)
 	{
 		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				listen_ip ? listen_ip : "-", listen_port);
+				NULL != listen_ip ? listen_ip : "-", listen_port);
 		goto out;
 	}
 
@@ -1215,7 +1232,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (ZBX_SOCKET_COUNT == s->num_socks)
 		{
 			zbx_set_socket_strerror("not enough space for socket [[%s]:%hu]",
-					ip ? ip : "-", listen_port);
+					NULL != ip ? ip : "-", listen_port);
 			goto out;
 		}
 
@@ -1229,18 +1246,25 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (ZBX_SOCKET_ERROR == s->sockets[s->num_socks])
 		{
 			zbx_set_socket_strerror("WSASocket() for [[%s]:%hu] failed: %s",
-					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+					NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
 #else
 		if (ZBX_SOCKET_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 		{
 			zbx_set_socket_strerror("socket() for [[%s]:%hu] failed: %s",
-					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+					NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
 #endif
 			goto out;
 		}
 
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
-		fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
+		if (-1 == fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC))
+		{
+			zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on "
+					"socket [[%s]:%hu]: %s", NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
+		}
 #endif
 		on = 1;
 #ifdef _WINDOWS
@@ -1264,7 +1288,9 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 				(void *)&on, sizeof(on)))
 		{
 			zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%hu] failed: %s", "SO_EXCLUSIVEADDRUSE",
-					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+					NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
+
 		}
 #else
 		/* enable address reuse */
@@ -1274,7 +1300,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 				(void *)&on, sizeof(on)))
 		{
 			zbx_set_socket_strerror("setsockopt() with %s for [[%s]:%hu] failed: %s", "SO_REUSEADDR",
-					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+					NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
 		}
 #endif
 		memset(&serv_addr, 0, sizeof(serv_addr));
@@ -1286,7 +1313,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (ZBX_PROTO_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
 		{
 			zbx_set_socket_strerror("bind() for [[%s]:%hu] failed: %s",
-					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+					NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
 			zbx_socket_close(s->sockets[s->num_socks]);
 			goto out;
 		}
@@ -1294,7 +1322,8 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 		if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
 		{
 			zbx_set_socket_strerror("listen() for [[%s]:%hu] failed: %s",
-					ip ? ip : "-", listen_port, strerror_from_system(zbx_socket_last_error()));
+					NULL != ip ? ip : "-", listen_port,
+					strerror_from_system(zbx_socket_last_error()));
 			zbx_socket_close(s->sockets[s->num_socks]);
 			goto out;
 		}
@@ -1310,7 +1339,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	if (0 == s->num_socks)
 	{
 		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				listen_ip ? listen_ip : "-", listen_port);
+				NULL != listen_ip ? listen_ip : "-", listen_port);
 		goto out;
 	}
 
@@ -2040,6 +2069,15 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 	return SUCCEED;
 }
 
+#ifndef HAVE_IPV6
+static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
+{
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
+
+	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
+}
+#else
 static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name)
 {
 	/* Network Byte Order is ensured */
@@ -2053,14 +2091,10 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
 				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
 
-#ifdef HAVE_IPV6
-#	ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
+#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
 	if (current_ai->ai_family == name.ss_family)
-#	else
-	if (current_ai->ai_family == name.__ss_family)
-#	endif
 #else
-	if (current_ai->ai_family == name.sin_family)
+	if (current_ai->ai_family == name.__ss_family)
 #endif
 	{
 		switch (current_ai->ai_family)
@@ -2115,9 +2149,9 @@ static int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_a
 				break;
 		}
 	}
-
 	return FAIL;
 }
+#endif
 
 static int	validate_cidr(const char *ip, const char *cidr, void *value)
 {

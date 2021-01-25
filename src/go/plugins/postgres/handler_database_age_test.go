@@ -1,3 +1,5 @@
+// +build postgres_tests
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -17,52 +19,46 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package redis
+package postgres
 
 import (
+	"context"
+	"fmt"
 	"testing"
 )
 
-func Test_zabbixError_Error(t *testing.T) {
-	tests := []struct {
-		name string
-		e    zabbixError
-		want string
-	}{
-		{
-			"ZabbixError stringify",
-			zabbixError{"foobar"},
-			"foobar",
-		},
+func TestPlugin_databasesAgeHandler(t *testing.T) {
+	sharedPool, err := getConnPool()
+	if err != nil {
+		t.Fatal(err)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Error(); got != tt.want {
-				t.Errorf("zabbixError.Error() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
-func Test_formatZabbixError(t *testing.T) {
 	type args struct {
-		errText string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		p       *Plugin
+		args    args
+		wantErr bool
 	}{
 		{
-			"Should fix if wrong formatted error text is passed",
-			args{"foobar"},
-			"Foobar.",
+			fmt.Sprintf("databaseAgeHandler should return age of each database "),
+			&impl,
+			args{context.Background(), sharedPool, keyDatabaseAge, testParamDatabase, []string{}},
+			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := formatZabbixError(tt.args.errText); got != tt.want {
-				t.Errorf("formatZabbixError() = %v, want %v", got, tt.want)
+			_, err := databaseAgeHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Plugin.databaseAgeHandler() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}

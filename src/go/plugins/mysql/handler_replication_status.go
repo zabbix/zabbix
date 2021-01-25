@@ -1,5 +1,3 @@
-// +build postgres_tests
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,47 +17,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package postgres
+package mysql
 
 import (
-	"fmt"
-	"testing"
+	"context"
+	"encoding/json"
+	"errors"
+
+	"zabbix.com/pkg/zbxerr"
 )
 
-func TestPlugin_oldestHandler(t *testing.T) {
-
-	// create pool or aquare conn from old pool for test
-	sharedPool, err := getConnPool(t)
+func replicationSlaveStatusHandler(ctx context.Context, conn MyClient, _ map[string]string,
+	_ ...string) (interface{}, error) {
+	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
 	if err != nil {
-		t.Fatal(err)
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	type args struct {
-		conn   *postgresConn
-		params []string
-	}
-	tests := []struct {
-		name    string
-		p       *Plugin
-		args    args
-		wantErr bool
-	}{
-		{
-			fmt.Sprintf("oldestHandler() should return ptr to Pool for oldestHandler()"),
-			&impl,
-			args{conn: sharedPool},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.p.oldestHandler(tt.args.conn, keyPostgresOldestXid, tt.args.params)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.oldestHandler() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-		})
+	data, err := rows2data(rows)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
+	if len(data) == 0 {
+		return nil, zbxerr.ErrorEmptyResult.Wrap(errors.New("replication is not configured"))
+	}
+
+	jsonRes, err := json.Marshal(data[0])
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonRes), nil
 }

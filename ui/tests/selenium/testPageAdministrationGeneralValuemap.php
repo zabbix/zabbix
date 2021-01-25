@@ -32,12 +32,12 @@ class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
 		$strings = [];
 
-		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY name', 100) as $valuemap) {
+		foreach (CDBHelper::getAll('SELECT name FROM valuemaps ORDER BY lower(name)', 100) as $valuemap) {
 			$strings[] = $valuemap['name'];
 		}
 
 		foreach (CDBHelper::getAll('SELECT value,newvalue FROM mappings m'.
-				' INNER JOIN (SELECT valuemapid FROM valuemaps ORDER BY name LIMIT 100) v'.
+				' INNER JOIN (SELECT valuemapid FROM valuemaps ORDER BY lower(name) LIMIT 100) v'.
 				' ON m.valuemapid=v.valuemapid') as $mapping) {
 			$strings[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
 		}

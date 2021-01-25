@@ -1,6 +1,8 @@
+// +build linux
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,28 +19,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package memcached
+package proc
 
 import (
+	"regexp"
 	"testing"
 )
 
-func Test_zabbixError_Error(t *testing.T) {
+func Test_checkProccom(t *testing.T) {
+	type args struct {
+		cmd     string
+		cmdline string
+	}
 	tests := []struct {
 		name string
-		e    zabbixError
-		want string
+		args args
+		want bool
 	}{
-		{
-			"ZabbixError stringify",
-			zabbixError{"foobar"},
-			"Foobar.",
-		},
+		{"+base", args{"/foo/bar/foobar --start", "--start"}, true},
+		{"+empty_cmdline", args{"/foo/bar/foobar --start", ""}, true},
+		{"+complex_regex", args{"/foo/bar/foobar --start", "/.*/.*/.* --start"}, true},
+		{"+no_match", args{"/foo/bar/foobar --start", "--stop"}, false},
+		{"-fail_regex_compilation", args{"/foo/bar/foobar --start", "("}, true},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.e.Error(); got != tt.want {
-				t.Errorf("zabbixError.Error() = %v, want %v", got, tt.want)
+			cmdRgx, err := regexp.Compile(tt.args.cmdline)
+			if err != nil {
+				cmdRgx = nil
+			}
+			got := checkProccom(tt.args.cmd, cmdRgx)
+			if got != tt.want {
+				t.Errorf("checkProccom() = %v, want %v", got, tt.want)
 			}
 		})
 	}
