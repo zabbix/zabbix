@@ -18,161 +18,546 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup scripts
  */
-class testFormAdministrationScripts extends CLegacyWebTest {
-	// Data provider
-	public static function providerScripts() {
-		// data - values for form inputs
-		// saveResult - if save action should be successful
-		// dbValues - values which should be in db if saveResult is true
-		$data = [
-			[
-				[
-					['name' => 'name', 'value' => 'script', 'type' => 'text'],
-					['name' => 'type', 'value' => 'Script', 'type' => 'select'],
-					['name' => 'command', 'value' => 'run', 'type' => 'text']
-				],
-				true,
-				[
-					'name' => 'script',
-					'command' => 'run'
-				]
-			],
-			[
-				[
-					['name' => 'name', 'value' => 'script1', 'type' => 'text'],
-					['name' => 'type', 'value' => 'IPMI', 'type' => 'select'],
-					['name' => 'commandipmi', 'value' => 'run', 'type' => 'text']
+class testFormAdministrationScripts extends CWebTest {
 
-				],
-				true,
-				[
-					'name' => 'script1',
-					'command' => 'run',
-					'type' => 1
-				]
-			],
-			[
-				[
-					['name' => 'name', 'value' => 'script2', 'type' => 'text'],
-					['name' => 'type', 'value' => 'Script', 'type' => 'select'],
-					['name' => 'command', 'value' => 'run', 'type' => 'text'],
-					['name' => 'enable_confirmation', 'type' => 'check']
-				],
-				false,
-				[]
-			],
-			[
-				[
-					['name' => 'name', 'value' => 'script3', 'type' => 'text'],
-					['name' => 'type', 'value' => 'Script', 'type' => 'select'],
-					['name' => 'command', 'value' => '', 'type' => 'text']
-				],
-				false,
-				[]
-			]
+	private const ID_UPDATE = 200;	// Script for Update.
+
+	private const ID_CLONE = 201; // Script for Clone.
+	private const NAME_CLONE = 'Cloned Script for Clone';
+
+	private const ID_DELETE = 202;
+	private const NAME_DELETE = 'Script for Delete';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
 		];
-		return $data;
-	}
-
-	public function testFormAdministrationScripts_testLayout() {
-		$this->zbxTestLogin('zabbix.php?action=script.edit');
-		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestCheckHeader('Scripts');
-
-		$this->zbxTestTextPresent(['Name']);
-		$this->zbxTestAssertElementPresentId('name');
-
-		$this->zbxTestTextPresent(['Type']);
-		$this->zbxTestAssertElementPresentId('type');
-		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_0']", 'Webhook');
-		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_1']", 'Script');
-		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_2']", 'IPMI');
-
-		$this->zbxTestTextPresent(['Execute on', 'Zabbix agent', 'Zabbix server']);
-		$this->zbxTestAssertElementPresentId('execute_on_0');
-		$this->zbxTestAssertElementPresentId('execute_on_1');
-
-		$this->zbxTestTextPresent(['Commands']);
-		$this->zbxTestAssertElementPresentId('command');
-
-		$this->zbxTestTextPresent(['Description']);
-		$this->zbxTestAssertElementPresentId('description');
-
-		$this->zbxTestTextPresent(['User group']);
-		$this->zbxTestAssertElementPresentId('usrgrpid');
-		$this->zbxTestDropdownHasOptions('usrgrpid', ['All', 'Disabled', 'Enabled debug mode', 'Guests', 'No access to the frontend', 'Zabbix administrators']);
-
-		$this->zbxTestTextPresent(['Host group']);
-		$this->zbxTestAssertElementPresentId('hgstype');
-		$this->zbxTestDropdownHasOptions('hgstype', ['All', 'Selected']);
-
-		$this->zbxTestTextPresent(['Required host permissions']);
-		$this->zbxTestAssertElementPresentId('host_access');
-		$this->zbxTestAssertElementText("//ul[@id='host_access']//label[@for='host_access_0']", 'Read');
-		$this->zbxTestAssertElementText("//ul[@id='host_access']//label[@for='host_access_1']", 'Write');
-
-		$this->zbxTestTextPresent(['Enable confirmation']);
-		$this->zbxTestAssertElementPresentId('enable_confirmation');
-		$this->assertFalse($this->zbxTestCheckboxSelected('enable_confirmation'));
-
-		$this->zbxTestTextPresent(['Confirmation text']);
-		$this->zbxTestAssertElementPresentId('confirmation');
 	}
 
 	/**
-	 * @dataProvider providerScripts
+	 * Test data for GUI form.
 	 */
-	public function testFormAdministrationScripts_testCreate($data, $resultSave, $dbValues) {
-		$this->zbxTestLogin('zabbix.php?action=script.edit');
-		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestCheckHeader('Scripts');
+	public function getScriptsData() {
+		return [
+			// Webhook.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Minimal script',
+						'Script' => 'java script'
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max webhook',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '60s',
+						'Description' => 'Test description',
+						'User group' => 'Guests',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Templates',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'host',
+							'Value' => '{HOST.HOST}'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'var',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Test parameters',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script',
+						'Timeout' => '1s',
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '!@#$%^&*()_+<>,.\/',
+							'Value' => '!@#$%^&*()_+<>,.\/'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName Lon',
+							'Value' => 'LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValu'
+						],
+						[
+							'Name' => '{$MACRO:A}',
+							'Value' => '{$MACRO:A}'
+						],
+						[
+							'Name' => '{$USERMACRO}',
+							'Value' => ''
+						],
+						[
+							'Name' => '{HOST.HOST}'
+						],
+						[
+							'Name' => 'Имя',
+							'Value' => 'Значение'
+						]
+					]
+				]
+			],
+			// Uncomment following, when ZBX-18916 is fixed.
+//			// Remove trailing spaces.
+//			[
+//				[
+//					'expected' => TEST_GOOD,
+//					'trim' => true,
+//					'fields' =>  [
+//						'Name' => 'Test trailing spaces',
+//						'Type' => 'Webhook',
+//						'Script' => 'Webhook Script'
+//					],
+//					'Parameters' => [
+//						[
+//							'Name' => '   trimmed name    ',
+//							'Value' => '   trimmed value    '
+//						]
+//					]
+//				]
+//			],
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'trim' => true,
+//					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
+//					'fields' =>  [
+//						'Name' => 'Test trailing spaces',
+//						'Type' => 'Webhook',
+//						'Script' => 'Webhook Script'
+//					],
+//					'Parameters' => [
+//						[
+//							'Name' => '   ',
+//							'Value' => '   '
+//						]
+//					]
+//				]
+//			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Webhook false confirmation',
+						'Script' => 'webhook',
+						'Script' => 'java script',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Timeout test 1',
+						'Script' => 'java script',
+						'Timeout' => '1',
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Timeout test 60',
+						'Script' => 'java script',
+						'Timeout' => '60',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
+					'fields' =>  [
+						'Name' => 'Timeout test 0',
+						'Script' => 'java script',
+						'Timeout' => '0',
+					]
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Timeout test 1m',
+						'Script' => 'java script',
+						'Timeout' => '1m',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
+					'fields' =>  [
+						'Name' => 'Timeout test 1h',
+						'Script' => 'java script',
+						'Timeout' => '1h',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
+					'fields' =>  [
+						'Name' => 'Timeout test 70',
+						'Script' => 'java script',
+						'Timeout' => '70s',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
+					'fields' =>  [
+						'Name' => 'Timeout test -1',
+						'Script' => 'java script',
+						'Timeout' => '-1',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
+					'fields' =>  [
+						'Name' => 'Timeout test character',
+						'Script' => 'java script',
+						'Timeout' => 'char',
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Test empty parameters',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '',
+							'Value' => ''
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '',
+							'Value' => ''
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/parameters/2": value (name)=(Param1) already exists.',
+					'fields' =>  [
+						'Name' => 'Test empty parameter names',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'Param1',
+							'Value' => 'Value1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'Param1',
+							'Value' => 'Value'
+						]
+					]
+				]
+			],
 
-		foreach ($data as $field) {
-			switch ($field['type']) {
-				case 'text':
-					$this->zbxTestInputType($field['name'], $field['value']);
-					break;
-				case 'select':
-					$this->zbxTestClickXpathWait("//ul[@id='".$field['name']."']//label[text()='".$field['value']."']");
-					break;
-				case 'check':
-					$this->zbxTestCheckboxSelect($field['name']);
-					break;
+
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Webhook Empty script',
+						'Script' => ''
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Script' => 'Webhook: empty name'
+					]
+				]
+			],
+			// Script.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max script',
+						'Type' => 'Script',
+						'Execute on' => 'Zabbix server (proxy)',
+						'Commands' => 'Script command',
+						'Description' => 'Test description',
+						'User group' => 'Disabled',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => false
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Type' => 'Script',
+						'Commands' => 'Script empty name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Script empty command',
+						'Type' => 'Script',
+						'Commands' => ''
+					]
+				]
+			],
+			// IPMI.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Max IPMI',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI command',
+						'Description' => 'Test description',
+						'User group' => 'Selenium user group',
+						'Host group' => 'Selected',
+						'xpath://div[@id="groupid"]/..' => 'Discovered hosts',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Execute script?'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => '',
+						'Type' => 'IPMI',
+						'Command' => 'IPMI empty name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/command": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'IPMI empty command',
+						'Type' => 'IPMI',
+						'Command' => ''
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getScriptsData
+	 * @backup-once scripts
+	 */
+	public function testFormAdministrationScripts_Create($data) {
+		$this->checkScripts($data, false, 'zabbix.php?action=script.edit');
+	}
+
+	/**
+	 * @dataProvider getScriptsData
+	 */
+	public function testFormAdministrationScripts_Update($data) {
+		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+	}
+
+	private function checkScripts($data, $update, $link) {
+		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
+		$old_hash = CDBHelper::getHash($sql);
+
+		$this->page->login()->open($link);
+		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form->fill($data['fields']);
+
+		if (CTestArrayHelper::get($data, 'Parameters')) {
+
+			// Remove action and index fields for create case.
+			if ($update === false) {
+				foreach ($data['Parameters'] as &$parameter) {
+					unset($parameter['action'], $parameter['index']);
+				}
+				unset($parameter);
 			}
 
-			if ($field['name'] == 'name') {
-				$keyField = $field['value'];
-			}
+			$this->query('id:parameters_table')->asMultifieldTable()->one()->fill($data['Parameters']);
 		}
 
-		$sql = 'SELECT '.implode(', ', array_keys($dbValues)).' FROM scripts';
-		if ($resultSave && isset($keyField)) {
-			$sql .= ' WHERE name='.zbx_dbstr($keyField);
-		}
+		// Check testing confirmation while configuring.
+		$this->checkConfirmation($data, $form);
 
-		if (!$resultSave) {
-			$sql = 'SELECT * FROM scripts';
-			$hash = CDBHelper::getHash($sql);
-		}
+		$form->submit();
+		$this->page->waitUntilReady();
 
-		$this->zbxTestClickWait('add');
-
-		if ($resultSave) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Script added');
-
-			$dbres = DBfetch(DBselect($sql));
-			foreach ($dbres as $field => $value) {
-				$this->assertEquals($value, $dbValues[$field]);
-			}
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$title = ($update) ? 'Cannot update script' : 'Cannot add script';
+			$this->assertMessage(TEST_BAD, $title, $data['details']);
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 		else {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add script');
-			$this->assertEquals($hash, CDBHelper::getHash($sql));
+			$title = ($update) ? 'Script updated' : 'Script added';
+			$this->assertMessage(TEST_GOOD, $title);
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name'])));
+			// Check the results in form.
+			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
+			$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+
+			$form->invalidate();
+			$form->checkValue($data['fields']);
+
+			// Uncomment following, when ZBX-18916 is fixed.
+//			$expected = $data['Parameters'];
+//			if (CTestArrayHelper::get($data, 'trim', false) === true) {
+//				// Remove trailing spaces from name and value.
+//				foreach ($data['Parameters'] as $i => &$parameters) {
+//					foreach (['Name', 'Value'] as $parameter) {
+//						if (array_key_exists($parameter, $parameters)) {
+//							$parameters[$parameter] = trim($parameters[$parameter]);
+//						}
+//					}
+//				}
+//				unset($parameters);
+//			}
+
+			// Check testing confirmation in saved form.
+			$this->checkConfirmation($data, $form);
+
+			if (CTestArrayHelper::get($data, 'Parameters')) {
+
+				// Remove action and index fields fo asserting.
+				if ($update === true) {
+					foreach ($data['Parameters'] as &$parameter) {
+						unset($parameter['action'], $parameter['index']);
+					}
+					unset($parameter);
+				}
+
+				$this->query('id:parameters_table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
+			}
 		}
+	}
+
+	private function checkConfirmation($data, $form) {
+		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation') === false) {
+				$this->assertFalse($form->query('id:confirmation')->one()->isEnabled());
+				$this->assertFalse($form->query('id:testConfirmation')->one()->isEnabled());
+			}
+
+		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
+			$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->one();
+			$this->assertEquals('Execution confirmation', $dialog->getTitle());
+			$this->assertEquals($data['fields']['Confirmation text'],
+					$dialog->query('xpath://span[@class="confirmation-msg"]')->waitUntilReady()->one()->getText());
+			$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
+			$dialog->query('button:Cancel')->one()->click();
+		}
+	}
+
+	public function testFormAdministrationScripts_SimpleUpdate() {
+		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
+		$old_hash = CDBHelper::getHash($sql);
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Script updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+	}
+
+	public function testFormAdministrationScripts_Clone() {
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
+		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$values = $form->getFields()->asValues();
+		$values['Name'] = self::NAME_CLONE;
+		$this->query('button:Clone')->waitUntilReady()->one()->click();
+		$this->page->waitUntilReady();
+
+		$form->invalidate();
+		$form->fill(['Name' => self::NAME_CLONE]);
+		$form->submit();
+
+		$this->assertMessage(TEST_GOOD, 'Script added');
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Script for Clone')));
+
+		$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr(self::NAME_CLONE));
+		$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+		$cloned_values = $form->getFields()->asValues();
+		$this->assertEquals($values, $cloned_values);
+	}
+
+	public function testFormAdministrationScripts_Delete() {
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_DELETE);
+		$this->query('button:Delete')->waitUntilReady()->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Script deleted');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_DELETE)));
 	}
 }
