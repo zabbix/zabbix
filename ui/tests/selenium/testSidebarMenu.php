@@ -242,6 +242,7 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
+		$this->assertPageHeader('Global view');
 		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 
 		if ($data['section'] !== 'Monitoring') {
@@ -272,18 +273,23 @@ class testSidebarMenu extends CWebTest {
 				$id = 'sidebar-button-toggle';
 			}
 
+			// Clicking hide, collapse button.
 			$this->query('button:'.$hide)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
 			sleep(1);
+
+			// Checking that collapsed, hiden sidemenu appears on clicking.
 			$this->query('id:'.$id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
 			sleep(1);
+
+			// Returning standart sidemenu view clicking on unhide, expand button.
 			$this->query('button:'.$unhide)->one()->click();
 			$this->assertTrue($this->query('class:sidebar')->exists());
 		}
 	}
 
-	public static function getLinksData() {
+	public static function getUserData() {
 		return [
 			[
 				[
@@ -321,10 +327,11 @@ class testSidebarMenu extends CWebTest {
 	/**
 	 * Side menu bottom part.
 	 *
-	 * @dataProvider getLinksData
+	 * @dataProvider getUserData
 	 */
-	public function testSidebarMenu_Links($data) {
+	public function testSidebarMenu_User($data) {
 		$this->page->login()->open('')->waitUntilReady();
+
 		if (array_key_exists('link', $data)) {
 			$this->assertTrue($this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].
 					'" and @href="'.$data['link'].'"]')->exists());
