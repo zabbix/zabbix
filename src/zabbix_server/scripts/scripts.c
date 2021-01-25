@@ -600,6 +600,26 @@ out:
 	return ret;
 }
 
+static void	zbx_clean_event(DB_EVENT *event)
+{
+	zbx_free(event->name);
+
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_free(event->trigger.description);
+		zbx_free(event->trigger.expression);
+		zbx_free(event->trigger.recovery_expression);
+		zbx_free(event->trigger.correlation_tag);
+		zbx_free(event->trigger.opdata);
+		zbx_free(event->trigger.event_name);
+
+		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&event->tags);
+	}
+
+	zbx_free(event);
+}
+
 /**************************************************************************************************
  *                                                                                                *
  * Function: zbx_execute_webhook                                                                  *
@@ -634,6 +654,8 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
 		zabbix_log(LOG_LEVEL_WARNING, "failed to fetch script parameters for script id " ZBX_FS_UI64,
 				script->scriptid);
 	}
+
+	zbx_clean_event((DB_EVENT*)event);
 
 	ret = zbx_es_execute_command(script->command, params, script->timeout, result, error, max_error_len, debug);
 
