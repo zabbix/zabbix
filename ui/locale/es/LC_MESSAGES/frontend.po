@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-18 17:38+0200\n"
-"PO-Revision-Date: 2021-01-22 17:20+0300\n"
+"PO-Revision-Date: 2021-01-25 02:28+0300\n"
 "Last-Translator: Imagunet <soporte@imagunet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1611328831.000000\n"
+"X-POOTLE-MTIME: 1611534537.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -50,7 +50,7 @@ msgstr "\"%1$s\" debe estar entre 1970.01.01 y 2038.01.18."
 #: include/classes/api/services/CItemGeneral.php:1367
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr "El valor \"%1$s\" debe ser menor o igual que el valor \"%2$s\""
+msgstr "El valor \"%1$s\" debe ser menor o igual al valor \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:381
 #: include/classes/import/validators/C10XmlValidator.php:403
@@ -340,7 +340,7 @@ msgstr "<cadena vacía>"
 
 #: include/forms.inc.php:1340 include/views/js/item.preprocessing.js.php:197
 msgid "<label name>"
-msgstr "<Nombre de etiqueta>"
+msgstr "<nombre de etiqueta>"
 
 #: include/views/monitoring.sysmap.edit.php:126
 msgid "<manual>"
@@ -350,7 +350,7 @@ msgstr "<manual>"
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr "<nombre de métrica> {<nombre de etiqueta> = \"<valor de etiqueta>\", ...} == <valor>"
+msgstr "<nombre de métrica>{<nombre de etiqueta>=\"<valor de etiqueta>\", ...} == <valor>"
 
 #: app/views/administration.script.edit.php:44
 msgid "<sub-menu/sub-menu/...>script"
@@ -358,7 +358,7 @@ msgstr "<sub-menu/sub-menu/...>script"
 
 #: include/classes/widgets/CWidgetHelper.php:770
 msgid "ADD OVERRIDE"
-msgstr "AÑADIR OVERRIDE"
+msgstr "AGREGAR OVERRIDE"
 
 #: app/views/popup.discovery.check.php:113
 #: include/views/js/configuration.host.edit.js.php:134
@@ -381,7 +381,7 @@ msgstr "Acceso denegado"
 
 #: sysmap.php:76
 msgid "Access denied!"
-msgstr "¡Acceso negado!"
+msgstr "¡Acceso denegado!"
 
 #: app/views/monitoring.widget.problems.view.php:64
 #: include/actions.inc.php:157 include/blocks.inc.php:768
@@ -395,7 +395,7 @@ msgstr "Reconocer"
 
 #: app/views/popup.acknowledge.edit.php:82 jsLoader.php:280
 msgid "Acknowledge"
-msgstr "Aceptada"
+msgstr "Reconocer"
 
 #: app/views/popup.condition.common.php:667 include/actions.inc.php:2074
 #: include/events.inc.php:172
@@ -404,11 +404,11 @@ msgstr "Reconocida"
 
 #: app/views/administration.trigdisplay.edit.php:51
 msgid "Acknowledged PROBLEM events"
-msgstr "Eventos reconocidos en estado PROBLEMA"
+msgstr "Eventos PROBLEMA reconocidos"
 
 #: app/views/administration.trigdisplay.edit.php:73
 msgid "Acknowledged RESOLVED events"
-msgstr "Aceptar eventos RESUELTOS"
+msgstr "Eventos RESUELTO reconocidos"
 
 #: app/controllers/CControllerAuditLogList.php:190
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -743,7 +743,7 @@ msgstr "Agregar equipo"
 
 #: app/partials/massupdate.macros.tab.php:93
 msgid "Add missing"
-msgstr ""
+msgstr "Agregar faltante"
 
 #: jsLoader.php:343
 msgid "Add multiple maps"
@@ -751,11 +751,11 @@ msgstr "Agregar varios mapas"
 
 #: include/classes/widgets/CWidgetHelper.php:1197
 msgid "Add new data set"
-msgstr ""
+msgstr "Agregar nuevo conjunto de datos"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
-msgstr ""
+msgstr "Agregar nueva interfaz"
 
 #: include/classes/widgets/CWidgetHelper.php:724
 msgid "Add new override"
@@ -791,7 +791,7 @@ msgstr "Agregar widget"
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "Agregado, %1$s"
 
 #: include/hosts.inc.php:63
 msgid "Admin"
@@ -818,7 +818,7 @@ msgstr "Edad menor que"
 #: include/views/monitoring.overview.triggers.php:71
 #, c-format
 msgid "Age less than %1$s"
-msgstr ""
+msgstr "Edad menor que %1$s"
 
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:618
 #: include/hosts.inc.php:1407 include/items.inc.php:345
@@ -915,7 +915,7 @@ msgstr "Todos los problemas"
 #: include/views/configuration.trigger.prototype.edit.php:491
 #: include/views/configuration.triggers.edit.php:517
 msgid "All problems if tag values match"
-msgstr "Todos los problemas si los valores coinciden"
+msgstr "Todos los problemas si los valores de la etiqueta coinciden"
 
 #: include/views/monitoring.screen.php:49
 msgid "All screens"
@@ -927,7 +927,7 @@ msgstr "Todas las presentaciones"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr ""
+msgstr "Todas las etiquetas"
 
 #: include/html.inc.php:287
 msgid "All templates"
@@ -1037,7 +1037,7 @@ msgstr "Aplicación agregada"
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Aplicación eliminada"
-msgstr[1] "Aplicación eliminada"
+msgstr[1] "Aplicaciones eliminadas"
 
 #: include/classes/core/CJsonRpc.php:213
 msgid "Application error."
@@ -1097,7 +1097,7 @@ msgstr "Aplicar"
 
 #: include/views/configuration.hostgroups.edit.php:46
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Aplicar permisos y filtros de etiqueta a todos los subgrupos"
 
 #: include/views/configuration.maintenance.list.php:64
 #: include/views/configuration.maintenance.list.php:98
@@ -1119,7 +1119,7 @@ msgstr "¿Está seguro de que desea realizar esta acción?"
 
 #: app/views/js/administration.macros.edit.js.php:85
 msgid "Are you sure you want to delete"
-msgstr "¿Está seguro de que desea eliminar"
+msgstr "Está seguro de que desea eliminar"
 
 #: jsLoader.php:143
 msgid "Are you sure, you want to leave this page?"
@@ -1157,7 +1157,7 @@ msgstr ""
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
-msgstr "Etiqueta del recurso"
+msgstr "Etiqueta del activo"
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -1280,7 +1280,7 @@ msgstr "Algoritmo de autenticación"
 #: include/classes/api/services/CUser.php:1573
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "Autenticación fallida: %1$s."
 
 #: app/partials/popup.operations.php:250
 #: include/views/configuration.host.discovery.edit.php:423
@@ -1307,19 +1307,19 @@ msgstr "Protocolo de autenticación"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
 msgid "Authentication settings updated"
-msgstr ""
+msgstr "Configuración de autenticación actualizada"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:76
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: app/views/administration.user.edit.php:191
 msgid "Auto-login"
@@ -1358,11 +1358,11 @@ msgstr "Selección automática de iconos"
 #: app/views/popup.mediatype.message.php:61
 #: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:897
 msgid "Autoregistration"
-msgstr ""
+msgstr "Autoregistro"
 
 #: include/views/configuration.action.list.php:29
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Acciones de autoregistro"
 
 #: app/views/administration.housekeeping.edit.php:71
 msgid "Autoregistration data storage period"
@@ -1396,7 +1396,7 @@ msgstr "Promedio"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:291
 msgid "Axes"
-msgstr ""
+msgstr "Ejes"
 
 #: include/classes/setup/CSetupWizard.php:132
 #: include/classes/setup/CSetupWizard.php:419
@@ -1421,7 +1421,7 @@ msgstr "Imagen de fondo"
 #: include/classes/widgets/CWidgetHelper.php:789
 #: include/classes/widgets/CWidgetHelper.php:1038
 msgid "Bar"
-msgstr ""
+msgstr "Barra"
 
 #: app/views/administration.authentication.edit.php:106
 msgid "Base DN"
@@ -1430,7 +1430,7 @@ msgstr "DN Base"
 #: include/classes/widgets/CWidgetHelper.php:772
 #: include/classes/widgets/CWidgetHelper.php:1029
 msgid "Base colour"
-msgstr ""
+msgstr "Color base"
 
 #: include/httptest.inc.php:28
 #: include/views/configuration.host.discovery.edit.php:284
@@ -1460,14 +1460,14 @@ msgstr "Azul"
 #: include/views/configuration.item.edit.php:298
 #: include/views/configuration.item.prototype.edit.php:279
 msgid "Body"
-msgstr ""
+msgstr "Cuerpo"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:261
 #: include/views/configuration.item.edit.php:300
 #: include/views/configuration.item.prototype.edit.php:281
 msgid "Body and headers"
-msgstr ""
+msgstr "Cuerpo y encabezados"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:765
 #: include/views/js/monitoring.sysmaps.js.php:855
@@ -1496,7 +1496,7 @@ msgstr "Ancho del borde"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:93
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Ambos passwords deben ser iguales."
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:146
@@ -1560,11 +1560,11 @@ msgstr "Porcentaje de utilización de CPU. Devuelve un decimal"
 
 #: app/views/popup.itemtestedit.view.php:163
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1796
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV a JSON"
 
 #: include/views/configuration.services.edit.php:90 services.php:40
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1577,19 +1577,19 @@ msgstr "Calculado"
 
 #: include/classes/items/CHelpItems.php:733
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula el valor promedio, basado en los parámetros suministrados. El Zabbix server obtiene la información de agregación haciendo consultas directas a la base de datos."
 
 #: include/classes/items/CHelpItems.php:741
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula el valor máximo, basado en los parámetros suministrados. El Zabbix server obtiene la información de agregación haciendo consultas directas a la base de datos."
 
 #: include/classes/items/CHelpItems.php:737
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula el valor mínimo, basado en los parámetros suministrados. El Zabbix server obtiene la información de agregación haciendo consultas directas a la base de datos."
 
 #: include/classes/items/CHelpItems.php:745
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Calcula la suma de los valores, basado en los parámetros suministrados. El Zabbix server obtiene la información de agregación haciendo consultas directas a la base de datos."
 
 #: jsLoader.php:172
 msgid "Calendar"
@@ -1856,7 +1856,7 @@ msgstr "No se pudo eliminar el histórico"
 
 #: items.php:1293
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "No se pudo eliminar el histórico: al menos uno de los ítems seleccionados no pertenece a ningún equipo monitoreado"
 
 #: include/classes/api/services/CDiscoveryRule.php:2434
 msgid "Cannot clone graph prototypes."
@@ -1879,11 +1879,11 @@ msgstr "No se pudo clonar los prototipos de disparador."
 #: include/classes/api/services/CEvent.php:840
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr "No se pudo cerrar el problema: %1$s."
+msgstr "No es posible cerrar el problema: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "No es posible conectarse al servidor LDAP."
 
 #: include/classes/setup/CSetupWizard.php:321
 msgid "Cannot connect to the database."
@@ -1919,54 +1919,54 @@ msgstr "No se puede copiar el disparador \"%1$s:%2$s\" porque tiene varios equip
 #: include/classes/api/services/CHostPrototype.php:252
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr "No se puede crear un prototipo de equipo sobre el equipo descubierto \"%1$s\"."
+msgstr "No es posible crear un prototipo de equipo sobre el equipo descubierto \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
-msgstr "No se pudo crear otra conexión a la base de datos."
+msgstr "No es posible crear otra conexión a la base de datos."
 
 #: include/classes/api/services/CTrigger.php:992
 #: include/classes/api/services/CTriggerPrototype.php:815
 msgid "Cannot create circular dependencies."
-msgstr "No se pudo crear las dependencias de circular."
+msgstr "No es posible crear dependencias circulares."
 
 #: include/classes/api/services/CTrigger.php:964
 msgid "Cannot create dependency on trigger itself."
-msgstr "No se puede crear una dependencia sobre el mismo disparador."
+msgstr "No es posible crear una dependencia sobre el mismo disparador."
 
 #: include/classes/api/services/CTriggerPrototype.php:754
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr "No se puede crear una dependencia en un prototipo de iniciador a sí mismo."
+msgstr "No es posible crear una dependencia sobre el mismo prototipo de disparador."
 
 #: discoveryconf.php:133
 msgid "Cannot create discovery rule"
-msgstr "No se pudo crear la regla de descubrimiento"
+msgstr "No es posible crear la regla de descubrimiento"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
-msgstr "No se puede crear la asignación de icono"
+msgstr "No es posible crear el mapeo de icono"
 
 #: httpconf.php:208
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr "No se pudo crear la aplicación porque el escenario web ya está asignado a la aplicación."
+msgstr "No es posible crear la nueva aplicación, el escenario web ya está asignado a una aplicación."
 
 #: include/classes/api/services/CTemplate.php:366
 msgid "Cannot create template."
-msgstr "No se pudo crear la plantilla."
+msgstr "No es posible crear la plantilla."
 
 #: include/classes/setup/CSetupWizard.php:467
 msgid "Cannot create the configuration file."
-msgstr "No se pudo crear el archivo de configuración."
+msgstr "No es posible crear el archivo de configuración."
 
 #: include/classes/api/services/CDashboard.php:388
 #, c-format
 msgid "Cannot create widget: %1$s."
-msgstr "No pude crear el widget: %1$s."
+msgstr "No es posible crear el widget: %1$s."
 
 #: include/classes/api/services/CUser.php:993
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "No se puede borrar el usuario \"%1$s\", prueba deshabilitandolo primero."
+msgstr "No es posible eliminar el usuario \"%1$s\", pruebe deshabilitándolo."
 
 #: actionconf.php:202
 msgid "Cannot delete action"
@@ -1976,27 +1976,27 @@ msgstr "No es posible eliminar la acción"
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "No es posible eliminar la aplicación"
-msgstr[1] "No es posible eliminar la aplicación"
+msgstr[1] "No es posible eliminar las aplicaciones"
 
 #: correlation.php:160
 msgid "Cannot delete correlation"
-msgstr "No se pudo borrar la correlación"
+msgstr "No es posible eliminar la correlación"
 
 #: app/controllers/CControllerDashboardDelete.php:62
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] "No pude borrar el tablero"
-msgstr[1] "No pude borrar los tableros"
+msgstr[0] "No es posible eliminar el tablero"
+msgstr[1] "No es posible eliminar los tableros"
 
 #: include/classes/api/services/CTrigger.php:862
 #: include/classes/api/services/CTriggerPrototype.php:581
 msgid "Cannot delete dependency"
-msgstr "No es posible eliminar la dependecia"
+msgstr "No es posible eliminar la dependencia"
 
 #: include/classes/api/services/CApplication.php:461
 #, c-format
 msgid "Cannot delete discovered application \"%1$s\"."
-msgstr "No pude borrar la aplicación descubierta \"%1$s\"."
+msgstr "No es posible eliminar la aplicación descubierta \"%1$s\"."
 
 #: discoveryconf.php:157 host_discovery.php:376
 msgid "Cannot delete discovery rule"
@@ -2004,7 +2004,7 @@ msgstr "No es posible eliminar la regla"
 
 #: discoveryconf.php:199 host_discovery.php:701
 msgid "Cannot delete discovery rules"
-msgstr "No se pudo eliminar las reglas de descubrimiento"
+msgstr "No es posible eliminar las reglas de descubrimiento"
 
 #: graphs.php:291
 msgid "Cannot delete graph"
@@ -2012,11 +2012,11 @@ msgstr "No es posible eliminar el gráfico"
 
 #: graphs.php:283
 msgid "Cannot delete graph prototype"
-msgstr "No se pudo eliminar el prototipo de gráfica"
+msgstr "No es posible eliminar el prototipo de gráfico"
 
 #: graphs.php:324
 msgid "Cannot delete graph prototypes"
-msgstr "No se pudo eliminar los prototipos de gráficas"
+msgstr "No es posible eliminar los prototipos de gráfico"
 
 #: graphs.php:341
 msgid "Cannot delete graphs"
@@ -2026,33 +2026,33 @@ msgstr "No es posible eliminar los gráficos"
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "No es posible eliminar el grupo"
-msgstr[1] "No es posible eliminar el grupo"
+msgstr[1] "No es posible eliminar los grupos"
 
 #: hosts.php:959 hosts.php:980
 msgid "Cannot delete host"
-msgstr "No se pudo eliminar el equipo"
+msgstr "No es posible eliminar el equipo"
 
 #: include/classes/api/services/CHost.php:1424
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el equipo porque el mantenimiento \"%1$s\" debe contener al menos un equipo o grupo de equipos."
+msgstr[1] "No es posible eliminar los equipos seleccionados porque el mantenimiento \"%1$s\" debe contener al menos un equipo o grupo de equipos."
 
 #: include/classes/api/services/CHostGroup.php:1532
 #, c-format
 msgid "Cannot delete host group because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el grupo de equipos porque el mantenimiento \"%1$s\" debe contener al menos un equipo o grupo de equipos."
+msgstr[1] "No es posible eliminar los grupos de equipos seleccionados porque el mantenimiento \"%1$s\" debe contener al menos un equipo o grupo de equipos."
 
 #: host_prototypes.php:132 host_prototypes.php:303
 msgid "Cannot delete host prototypes"
-msgstr "No se pudo eliminar los prototipos de equipo"
+msgstr "No es posible eliminar los prototipos de equipo"
 
 #: app/controllers/CControllerIconMapDelete.php:68
 msgid "Cannot delete icon map"
-msgstr "No es posible eliminar la asignación de icono"
+msgstr "No es posible eliminar el mapeo de icono"
 
 #: app/controllers/CControllerImageDelete.php:74
 msgid "Cannot delete image"
@@ -2061,11 +2061,11 @@ msgstr "No es posible eliminar la imágen"
 #: include/classes/api/services/CHostInterface.php:622
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "No es posible eliminar la interfaz para el equipo descubierto \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1211
 msgid "Cannot delete inventory."
-msgstr "No se pudo eliminar el inventario."
+msgstr "No es posible eliminar el inventario."
 
 #: items.php:477
 msgid "Cannot delete item"
@@ -2073,15 +2073,15 @@ msgstr "No es posible eliminar el monitor"
 
 #: disc_prototypes.php:308
 msgid "Cannot delete item prototype"
-msgstr "No se pudo eliminar el prototipo de ítem"
+msgstr "No es posible eliminar el prototipo de ítem"
 
 #: disc_prototypes.php:685
 msgid "Cannot delete item prototypes"
-msgstr "No se pudo eliminar los prototipos de ítems"
+msgstr "No es posible eliminar los prototipos de ítem"
 
 #: items.php:1349
 msgid "Cannot delete items"
-msgstr "No es posible eliminar los monitores"
+msgstr "No es posible eliminar los ítems"
 
 #: maintenance.php:212
 msgid "Cannot delete maintenance"
@@ -2091,14 +2091,14 @@ msgstr "No es posible eliminar el periodo de mantenimiento"
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "No es posible eliminar el tipo de medio"
-msgstr[1] "No es posible eliminar el tipo de medio"
+msgstr[1] "No es posible eliminar los tipos de medio"
 
 #: app/controllers/CControllerModuleScan.php:122
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el módulo: %1$s."
+msgstr[1] "No es posible eliminar los módulos: %1$s."
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -2108,7 +2108,7 @@ msgstr "No es posible eliminar el mapa de red"
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "No es posible eliminar el proxy"
-msgstr[1] "No es posible eliminar el proxy"
+msgstr[1] "No es posible eliminar los proxies"
 
 #: app/controllers/CControllerRegExDelete.php:83
 msgid "Cannot delete regular expression"
@@ -2124,12 +2124,12 @@ msgstr "No es posible eliminar la pantalla"
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "No es posible eliminar el script"
-msgstr[1] "No es posible eliminar el script"
+msgstr[1] "No es posible eliminar los scripts"
 
 #: include/classes/api/services/CScript.php:594
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "No es posible eliminar los scripts. script \"%1$s\" es usado en accioón \"%2$s\"."
+msgstr "No es posible eliminar los scripts. Script \"%1$s\" es usado en la operación de la acción \"%2$s\"."
 
 #: actionconf.php:400
 msgid "Cannot delete selected actions"
@@ -2137,7 +2137,7 @@ msgstr "No es posible eliminar las acciones seleccionadas"
 
 #: correlation.php:331
 msgid "Cannot delete selected correlations"
-msgstr "No se pudo borrar las correlaciones seleccionadas"
+msgstr "No es posible eliminar las correlaciones seleccionadas"
 
 #: services.php:108
 msgid "Cannot delete service"
@@ -2149,66 +2149,66 @@ msgstr "No es posible eliminar la diapositiva"
 
 #: templates.php:709 templates.php:723 templates.php:756
 msgid "Cannot delete template"
-msgstr "No es posible eliminar las plantilla"
+msgstr "No es posible eliminar la plantilla"
 
 #: include/classes/api/services/CApplication.php:468
 msgid "Cannot delete templated application."
-msgstr "No se pudo eliminar la aplicación de la plantilla."
+msgstr "No es posible eliminar la aplicación de la plantilla."
 
 #: include/classes/api/services/CGraphPrototype.php:576
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "No es posible eliminar el prototipo de gráfico de la plantilla."
 
 #: include/classes/api/services/CGraph.php:559
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "No es posible eliminar el gráfico de la plantilla."
 
 #: include/classes/api/services/CHostPrototype.php:1154
 msgid "Cannot delete templated host prototype."
-msgstr "No se pudo eliminar el prototipo de plantilla de equipo."
+msgstr "No es posible eliminar el prototipo de equipo de la plantilla."
 
 #: include/classes/api/services/CItemPrototype.php:913
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "No es posible eliminar el prototipo de ítem de la plantilla."
 
 #: include/classes/api/services/CItem.php:753
 msgid "Cannot delete templated item."
-msgstr "No se pudo eliminar el ítem de la plantilla."
+msgstr "No es posible eliminar el ítem de la plantilla."
 
 #: include/classes/api/services/CDiscoveryRule.php:555
 msgid "Cannot delete templated items."
-msgstr "No se pudo eliminar los ítems de la plantilla."
+msgstr "No es posible eliminar los ítems de la plantilla."
 
 #: include/classes/api/services/CTrigger.php:655
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "No se pudo eliminar el disparador \"%1$s:%2$s\" de la plantilla."
+msgstr "No es posible eliminar el disparador \"%1$s:%2$s\" de la plantilla."
 
 #: include/classes/api/services/CTriggerPrototype.php:534
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "No es posible eliminar el prototipo de disparador \"%1$s:%2$s\" de la plantilla."
 
 #: include/classes/api/services/CHttpTest.php:547
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr "No se pudo eliminar el escenario web \"%1$s\" de la plantilla."
+msgstr "No es posible eliminar el escenario web \"%1$s\" de la plantilla."
 
 #: triggers.php:416
 msgid "Cannot delete trigger"
-msgstr "No es posible eliminar los iniciadores"
+msgstr "No es posible eliminar el disparador"
 
 #: trigger_prototypes.php:365
 msgid "Cannot delete trigger prototype"
-msgstr "No se pudo eliminar el prototipo de disparador"
+msgstr "No es posible eliminar el prototipo de disparador"
 
 #: trigger_prototypes.php:519
 msgid "Cannot delete trigger prototypes"
-msgstr "No se pudo eliminar los prototipos de disparador"
+msgstr "No es posible eliminar los prototipos de disparador"
 
 #: triggers.php:617
 msgid "Cannot delete triggers"
-msgstr "No es posible eliminar los iniciadores"
+msgstr "No es posible eliminar los disparadores"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -2219,8 +2219,8 @@ msgstr[1] "No es posible eliminar los usuarios"
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el grupo de usuarios"
+msgstr[1] "No es posible eliminar los grupos de usuarios"
 
 #: app/controllers/CControllerValuemapDelete.php:70
 msgid "Cannot delete value map"
@@ -2230,7 +2230,7 @@ msgstr[1] "No es posible eliminar la asignación"
 
 #: httpconf.php:150 httpconf.php:512
 msgid "Cannot delete web scenario"
-msgstr "No se pudo eliminar el escenario web"
+msgstr "No es posible eliminar el escenario web"
 
 #: actionconf.php:389
 msgid "Cannot disable action"
@@ -3936,7 +3936,7 @@ msgstr "Correlación agregada"
 
 #: correlation.php:160
 msgid "Correlation deleted"
-msgstr "Correlación borrada"
+msgstr "Correlación eliminada"
 
 #: correlation.php:315
 msgid "Correlation disabled"
@@ -4275,7 +4275,7 @@ msgstr ""
 
 #: app/views/administration.trigseverity.edit.php:85
 msgid "Custom severity names affect all locales and require manual translation!"
-msgstr "Los nombres de severidades personalizadas afectan a todos los locales y requieren traducción manual!"
+msgstr "¡Los nombres de severidades personalizadas afectan a todos los locales y requieren traducción manual!"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Custom size"
@@ -4394,7 +4394,7 @@ msgstr "Vistado general de los datos"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:288
 msgid "Data set"
-msgstr ""
+msgstr "Conjunto de datos"
 
 #: app/views/administration.housekeeping.edit.php:85
 #: app/views/administration.housekeeping.edit.php:99
@@ -6091,7 +6091,7 @@ msgstr "Monitorización del registro de eventos. Devuelve un log"
 
 #: include/correlation.inc.php:52
 msgid "Event tag pair"
-msgstr "Par de etiquetas de evento"
+msgstr "Par de etiqueta de evento"
 
 #: app/views/popup.condition.common.php:622 include/actions.inc.php:64
 msgid "Event type"
@@ -6782,7 +6782,7 @@ msgstr ""
 #: include/classes/helpers/CPagerHelper.php:200
 #, c-format
 msgid "Go to previous page, %1$s"
-msgstr ""
+msgstr "Ir a página anterior, %1$s"
 
 #: include/httptest.inc.php:423
 msgid "Google Chrome"
@@ -6829,9 +6829,9 @@ msgstr "La gráfica \"%1$s\" ya existe en \"%2$s\"."
 
 #: include/classes/api/services/CGraph.php:367
 #: include/classes/api/services/CGraphPrototype.php:371
-#, fuzzy, c-format
+#, c-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr "La gráfica \"%1$s\" no puede ser heredada. No están los elementos requeridos en \"%2$s\" (valor de ítem Ymax)."
+msgstr "El gráfico \"%1$s\" no se puede heredar. No están los elementos requeridos en \"%2$s\" (valor de ítem Ymax)."
 
 #: include/classes/api/services/CGraph.php:375
 #: include/classes/api/services/CGraphPrototype.php:380
@@ -6909,7 +6909,7 @@ msgstr "Prototipo de gráfica agregado"
 
 #: graphs.php:283
 msgid "Graph prototype deleted"
-msgstr "Prototipo de gráfico borrado"
+msgstr "Prototipo de gráfico eliminado"
 
 #: include/classes/screens/CScreenLldGraph.php:181
 msgid "Graph prototype not found."
@@ -6933,7 +6933,7 @@ msgstr "Prototipos de gráficos"
 
 #: graphs.php:324
 msgid "Graph prototypes deleted"
-msgstr ""
+msgstr "Prototipos de gráfico eliminados"
 
 #: include/views/js/configuration.graph.edit.js.php:202
 #: include/views/js/configuration.graph.edit.js.php:269
@@ -6994,7 +6994,7 @@ msgstr "Gráficos"
 
 #: graphs.php:341
 msgid "Graphs deleted"
-msgstr "Gráficas eliminadas"
+msgstr "Gráficos eliminadas"
 
 #: include/locales.inc.php:58
 msgid "Greek (el_GR)"
@@ -7026,7 +7026,7 @@ msgstr "El grupo \"%1$s\" no puede ser eliminado porque está siendo usado por u
 #: include/classes/api/services/CHostGroup.php:799
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr ""
+msgstr "El grupo \"%1$s\" no puede ser eliminado, porque está siendo usado en una condición de correlación."
 
 #: include/classes/import/importers/CTemplateImporter.php:297
 #, c-format
@@ -7046,7 +7046,7 @@ msgstr "Grupo añadido"
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Grupo eliminado"
-msgstr[1] "Grupo eliminado"
+msgstr[1] "Grupos eliminados"
 
 #: app/views/administration.miscconfig.edit.php:56
 msgid "Group for discovered hosts"
@@ -7387,7 +7387,6 @@ msgid "Host IP"
 msgstr "IP del equipo"
 
 #: app/views/administration.script.list.php:71
-#, fuzzy
 msgid "Host access"
 msgstr "Acceso al equipo"
 
@@ -7459,12 +7458,12 @@ msgstr "Ya existe el grupo de equipos \"%1$s\"."
 #: include/classes/api/services/CHostGroup.php:784
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "El grupo de equipos \"%1$s\" no puede ser eliminado, porque está siendo usado en un script global."
 
 #: include/classes/api/services/CHostGroup.php:741
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "El grupo de equipos \"%1$s\" es interno y no puede ser eliminado."
 
 #: include/views/js/monitoring.sysmaps.js.php:103
 msgid "Host group elements"
@@ -7613,11 +7612,10 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:226 host_prototypes.php:267 host_prototypes.php:287
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototipo de equipo actualizado"
-msgstr[1] "Prototipo de equipo actualizado"
+msgstr[1] "Prototipos de equipo actualizados"
 
 #: include/classes/api/services/CHostPrototype.php:176
 #, c-format
@@ -7638,7 +7636,7 @@ msgstr "Prototipos de equipo"
 
 #: host_prototypes.php:303
 msgid "Host prototypes deleted"
-msgstr ""
+msgstr "Prototipos de equipo eliminados"
 
 #: include/hosts.inc.php:294
 msgid "Host router"
@@ -7878,7 +7876,7 @@ msgstr ""
 #: include/classes/api/services/CIconMap.php:533
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr "No pudo ser borrada la asignación de icono \"%1$s\". En uso en el mapa \"%2$s\"."
+msgstr "No pudo ser borrada el mapeo de iconos \"%1$s\". Está en uso en el mapa \"%2$s\"."
 
 #: app/controllers/CControllerIconMapCreate.php:49
 msgid "Icon map created"
@@ -7886,7 +7884,7 @@ msgstr "Creada asignación de icono"
 
 #: app/controllers/CControllerIconMapDelete.php:61
 msgid "Icon map deleted"
-msgstr "Borrada asignación de icono"
+msgstr "Mapeo de iconos eliminado"
 
 #: app/controllers/CControllerIconMapUpdate.php:65
 msgid "Icon map updated"
@@ -8472,7 +8470,7 @@ msgstr "Datos incorrectos."
 #: include/classes/db/PostgresqlDbBackend.php:95
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
-msgstr ""
+msgstr "Charset por defecto incorrecto para base de datos Zabbix: %1$s."
 
 #: include/classes/api/services/CEvent.php:527
 #: include/classes/api/services/CProblem.php:394
@@ -8624,9 +8622,8 @@ msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CAction.php:1962
-#, fuzzy
 msgid "Incorrect inventory mode in action operation."
-msgstr "Modo de inventario incorrecto en operación de acción."
+msgstr "Modo de inventario incorrecto en operación de la acción."
 
 #: include/classes/api/services/CScreenItem.php:676
 #, c-format
@@ -9333,7 +9330,7 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:126
 msgid "Inherited and trigger tags"
-msgstr ""
+msgstr "Etiquetas de disparador y heredadas"
 
 #: include/forms.inc.php:306 include/forms.inc.php:490
 msgid "Inherited items"
@@ -9792,7 +9789,7 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidator.php:63
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Etiqueta inválida \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:314
 msgid "Invalid third parameter."
@@ -9847,7 +9844,6 @@ msgid "Is online?"
 msgstr "¿Está conectado?"
 
 #: include/classes/screens/CScreenHostTriggers.php:193
-#, fuzzy
 msgid "Issue"
 msgstr "Problema"
 
@@ -9943,7 +9939,7 @@ msgstr "Número de elementos"
 
 #: items.php:477
 msgid "Item deleted"
-msgstr "Monitor eliminado"
+msgstr "Ítem eliminado"
 
 #: applications.php:228 items.php:1233
 msgid "Item disabled"
@@ -10001,7 +9997,7 @@ msgstr ""
 
 #: disc_prototypes.php:308
 msgid "Item prototype deleted"
-msgstr ""
+msgstr "Prototipo de ítem eliminado"
 
 #: disc_prototypes.php:645 disc_prototypes.php:671
 msgid "Item prototype updated"
@@ -10024,7 +10020,7 @@ msgstr ""
 
 #: disc_prototypes.php:685
 msgid "Item prototypes deleted"
-msgstr ""
+msgstr "Prototipos de ítem eliminados"
 
 #: disc_prototypes.php:1119
 msgid "Item prototypes updated"
@@ -10121,7 +10117,7 @@ msgstr "Monitores"
 
 #: items.php:1349
 msgid "Items deleted"
-msgstr "Monitores eliminados"
+msgstr "Ítems eliminados"
 
 #: include/views/monitoring.history.php:145
 msgid "Items list"
@@ -10895,7 +10891,7 @@ msgstr ""
 
 #: maintenance.php:212
 msgid "Maintenance deleted"
-msgstr ""
+msgstr "Mantenimiento eliminado"
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
@@ -11184,7 +11180,7 @@ msgstr ""
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Tipo de medio eliminado"
-msgstr[1] "Tipo de medio eliminado"
+msgstr[1] "Tipos de medio eliminados"
 
 #: app/controllers/CControllerMediatypeDisable.php:72
 msgid "Media type disabled"
@@ -11452,8 +11448,8 @@ msgstr[1] ""
 #, c-format
 msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Módulo eliminado: %1$s."
+msgstr[1] "Módulos eliminados: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11815,11 +11811,11 @@ msgstr ""
 
 #: include/correlation.inc.php:50 include/correlation.inc.php:202
 msgid "New event tag name"
-msgstr ""
+msgstr "Nuevo nombre de etiqueta de evento"
 
 #: include/correlation.inc.php:54
 msgid "New event tag value"
-msgstr ""
+msgstr "Nuevo valor de etiqueta de evento"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -11835,7 +11831,7 @@ msgstr "Nuevo tiempo del servicio"
 
 #: app/views/popup.condition.common.php:121
 msgid "New tag name"
-msgstr ""
+msgstr "Nuevo nombre de etiqueta"
 
 #: include/views/js/monitoring.sysmaps.js.php:181
 msgid "New triggers"
@@ -12817,15 +12813,15 @@ msgstr "Ok"
 
 #: include/correlation.inc.php:49 include/correlation.inc.php:197
 msgid "Old event tag name"
-msgstr ""
+msgstr "Antiguo nombre de etiqueta de evento"
 
 #: include/correlation.inc.php:53
 msgid "Old event tag value"
-msgstr ""
+msgstr "Antiguo valor de etiqueta de evento"
 
 #: app/views/popup.condition.common.php:119
 msgid "Old tag name"
-msgstr ""
+msgstr "Antiguo nombre de etiqueta"
 
 #: app/views/administration.proxy.list.php:152
 #: include/views/monitoring.sysmap.constructor.php:52
@@ -13590,7 +13586,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:150
 msgid "Percentage"
-msgstr ""
+msgstr "Porcentaje"
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:145
 msgid "Percentile line (left)"
@@ -13687,7 +13683,7 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:330
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
-msgstr ""
+msgstr "Por favor cree la base de datos manualmente, y configure los parámetros para la conexión a esta base de datos. Presione el botón \"%1$s\" cuando termine."
 
 #: include/classes/setup/CSetupWizard.php:359
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
@@ -13804,23 +13800,23 @@ msgstr "Vista previa"
 
 #: include/func.inc.php:2524
 msgid "Previous month"
-msgstr ""
+msgstr "Mes anterior"
 
 #: jsLoader.php:149
 msgid "Previous page"
-msgstr ""
+msgstr "Página anterior"
 
 #: app/views/popup.itemtestedit.view.php:153
 msgid "Previous value"
-msgstr ""
+msgstr "Valor anterior"
 
 #: include/func.inc.php:2523
 msgid "Previous week"
-msgstr ""
+msgstr "Semana anterior"
 
 #: include/func.inc.php:2525
 msgid "Previous year"
-msgstr ""
+msgstr "Año anterior"
 
 #: include/hosts.inc.php:399
 msgid "Primary POC cell"
@@ -13994,7 +13990,7 @@ msgstr "Porcentaje de uso de CPU del proceso. Devuelve un decimal"
 
 #: app/views/administration.mediatype.edit.php:234
 msgid "Process tags"
-msgstr ""
+msgstr "Procesar etiquetas"
 
 #: include/items.inc.php:1859 include/items.inc.php:1863
 msgid "Prometheus"
@@ -14072,8 +14068,8 @@ msgstr "Dirección del proxy"
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
-msgstr[0] "Proxy borrado"
-msgstr[1] "Proxies borrados"
+msgstr[0] "Proxy eliminado"
+msgstr[1] "Proxies eliminados"
 
 #: include/classes/api/services/CProxy.php:234
 msgid "Proxy interface creation failed."
@@ -14323,8 +14319,8 @@ msgstr "Expresión regular agregada"
 #: app/controllers/CControllerRegExDelete.php:78
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
-msgstr[0] "Expresión regular borrada"
-msgstr[1] "Expresiones regulares borradas"
+msgstr[0] "Expresión regular eliminada"
+msgstr[1] "Expresiones regulares eliminadas"
 
 #: include/regexp.inc.php:83
 msgid "Regular expression does not exist."
@@ -14848,7 +14844,7 @@ msgstr ""
 
 #: include/screens.inc.php:156
 msgid "Row deleted"
-msgstr ""
+msgstr "Fila eliminada"
 
 #: include/views/monitoring.screen.constructor.edit.php:864 screenedit.php:73
 msgid "Row span"
@@ -15295,8 +15291,8 @@ msgstr ""
 #: app/controllers/CControllerScriptDelete.php:66
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Script eliminado"
+msgstr[1] "Scripts eliminados"
 
 #: include/classes/api/services/CScript.php:477
 #, c-format
@@ -15444,7 +15440,7 @@ msgstr ""
 
 #: actionconf.php:400
 msgid "Selected actions deleted"
-msgstr ""
+msgstr "Acciones seleccionadas eliminadas"
 
 #: app/views/popup.acknowledge.edit.php:62
 msgid "Selected and all other problems of related triggers"
@@ -15452,7 +15448,7 @@ msgstr ""
 
 #: correlation.php:331
 msgid "Selected correlations deleted"
-msgstr ""
+msgstr "Correlaciones seleccionadas eliminadas"
 
 #: include/views/js/monitoring.sysmaps.js.php:618
 msgid "Selected elements"
@@ -15574,7 +15570,7 @@ msgstr "Servicio"
 #: include/classes/api/services/CService.php:1043
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
-msgstr ""
+msgstr "Servicio \"%1$s\" no puede ser eliminado, porque depende de otro servicio."
 
 #: include/classes/api/services/CService.php:1062
 #, c-format
@@ -16044,7 +16040,7 @@ msgstr ""
 
 #: slideconf.php:187 slideconf.php:208
 msgid "Slide show deleted"
-msgstr ""
+msgstr "Diapositiva eliminada"
 
 #: include/screens.inc.php:307 include/screens.inc.php:436
 msgid "Slide show must contain slides."
@@ -16558,7 +16554,7 @@ msgstr "Etiqueta"
 #: include/classes/api/services/CTriggerGeneral.php:539
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr ""
+msgstr "Etiqueta \"%1$s\" con valor \"%2$s\" ya existe."
 
 #: app/views/monitoring.problem.view.php:300
 #: include/classes/widgets/forms/CWidgetFormProblems.php:151
@@ -16567,21 +16563,21 @@ msgstr ""
 
 #: app/views/administration.usergroup.edit.php:207
 msgid "Tag filter"
-msgstr ""
+msgstr "Filtro de etiqueta"
 
 #: include/views/configuration.trigger.prototype.edit.php:497
 #: include/views/configuration.triggers.edit.php:523
 msgid "Tag for matching"
-msgstr ""
+msgstr "Etiqueta para coincidencia"
 
 #: app/views/monitoring.problem.view.php:287 include/actions.inc.php:66
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
 msgid "Tag name"
-msgstr ""
+msgstr "Nombre de etiqueta"
 
 #: include/actions.inc.php:67
 msgid "Tag value"
-msgstr ""
+msgstr "Valor de etiqueta"
 
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -16684,7 +16680,7 @@ msgstr ""
 
 #: templates.php:709 templates.php:723 templates.php:756
 msgid "Template deleted"
-msgstr "Plantilla borrada"
+msgstr "Plantilla eliminada"
 
 #: report2.php:387
 msgid "Template group"
@@ -16871,11 +16867,11 @@ msgstr ""
 #: include/html.inc.php:701
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "La aplicación no fue descubierta nuevamente y será eliminada en %1$s (el %2$s a las %3$s)."
 
 #: include/html.inc.php:696
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "La aplicación no fue descubierta nuevamente y será eliminada la próxima vez que se ejecute la regla de descubrimiento."
 
 #: hosts.php:351
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -16892,29 +16888,29 @@ msgstr ""
 #: include/html.inc.php:728
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "El gráfico no fue descubierto nuevamente y será eliminado en %1$s (el %2$s a las %3$s)."
 
 #: include/html.inc.php:723
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "El gráfico no fue descubierto nuevamente y será eliminado la próxima vez que se ejecute la regla de descubrimiento."
 
 #: include/html.inc.php:647
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "El grupo de equipos no fue descubierto nuevamente y será eliminado en %1$s (el %2$s a las %3$s)."
 
 #: include/html.inc.php:642
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "El grupo de equipos no fue descubierto nuevamente y será eliminado la próxima vez que se ejecute la regla de descubrimiento."
 
 #: include/html.inc.php:674
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "El equipo no fue descubierto nuevamente y será eliminado en %1$s (el %2$s a las %3$s)."
 
 #: include/html.inc.php:669
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "El equipo no fue descubierto nuevamente y será eliminado la próxima vez que se ejecute la regla de descubrimiento."
 
 #: include/classes/api/services/CImage.php:366
 #, c-format
@@ -16933,11 +16929,11 @@ msgstr[1] ""
 #: include/html.inc.php:782
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "El ítem no fue descubierto nuevamente y será eliminado en %1$s (el %2$s a las %3$s)."
 
 #: include/html.inc.php:777
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "El ítem no fue descubierto nuevamente y será eliminado la próxima vez que se ejecute la regla de descubrimiento."
 
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:515
@@ -16960,11 +16956,11 @@ msgstr ""
 #: include/html.inc.php:755
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "El disparador no fue descubierto nuevamente y será eliminado en %1$s (el %2$s a las %3$s)."
 
 #: include/html.inc.php:750
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "El disparador no fue descubierto nuevamente y será eliminado la próxima vez que se ejecute la regla de descubrimiento."
 
 #: include/classes/api/services/CHttpTest.php:710
 msgid "The web scenario application belongs to a different host than the web scenario host."
@@ -17321,7 +17317,7 @@ msgstr "Periodo de almacenamiento de datos de iniciadores"
 
 #: triggers.php:416
 msgid "Trigger deleted"
-msgstr "Iniciador eliminado"
+msgstr "Disparador eliminado"
 
 #: tr_events.php:171
 msgid "Trigger details"
@@ -17431,7 +17427,7 @@ msgstr ""
 
 #: trigger_prototypes.php:365
 msgid "Trigger prototype deleted"
-msgstr ""
+msgstr "Prototipo de disparador eliminado"
 
 #: trigger_prototypes.php:350 trigger_prototypes.php:508
 msgid "Trigger prototype updated"
@@ -17449,7 +17445,7 @@ msgstr ""
 
 #: trigger_prototypes.php:519
 msgid "Trigger prototypes deleted"
-msgstr ""
+msgstr "Prototipos de disparador eliminado"
 
 #: trigger_prototypes.php:473
 msgid "Trigger prototypes updated"
@@ -17478,7 +17474,7 @@ msgstr ""
 
 #: app/partials/configuration.tags.tab.php:125
 msgid "Trigger tags"
-msgstr ""
+msgstr "Etiquetas de disparador"
 
 #: triggers.php:401 triggers.php:521
 msgid "Trigger updated"
@@ -17509,7 +17505,7 @@ msgstr "Iniciadores"
 
 #: triggers.php:617
 msgid "Triggers deleted"
-msgstr "Iniciadores eliminados"
+msgstr "Disparadores eliminados"
 
 #: include/menu.inc.php:75 include/menu.inc.php:134
 msgid "Triggers top 100"
@@ -18216,8 +18212,8 @@ msgstr ""
 #: app/controllers/CControllerUsergroupDelete.php:56
 msgid "User group deleted"
 msgid_plural "User groups deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Grupo de usuarios eliminado"
+msgstr[1] "Grupos de usuarios eliminados"
 
 #: app/views/administration.miscconfig.edit.php:64
 msgid "User group for database down message"
@@ -18713,8 +18709,8 @@ msgstr "Asignación añadida"
 #: app/controllers/CControllerValuemapDelete.php:67
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
-msgstr[0] "Asignación eliminada"
-msgstr[1] "Asignación eliminada"
+msgstr[0] "Mapeo de valores eliminado"
+msgstr[1] "Mapeos de valores eliminados"
 
 #: app/controllers/CControllerValuemapUpdate.php:95
 msgid "Value map updated"
@@ -18746,15 +18742,15 @@ msgstr ""
 
 #: include/correlation.inc.php:227
 msgid "Value of new event tag"
-msgstr ""
+msgstr "Valor de etiqueta de evento nuevo"
 
 #: include/correlation.inc.php:212 include/correlation.inc.php:220
 msgid "Value of old event tag"
-msgstr ""
+msgstr "Valor de etiqueta de evento antiguo"
 
 #: include/actions.inc.php:333
 msgid "Value of tag"
-msgstr ""
+msgstr "Valor de etiqueta"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:321
 msgid "Value: no data"
@@ -18924,7 +18920,7 @@ msgstr ""
 
 #: httpconf.php:150 httpconf.php:512
 msgid "Web scenario deleted"
-msgstr ""
+msgstr "Escenario Web eliminado"
 
 #: httpconf.php:453
 msgid "Web scenario disabled"
@@ -19206,7 +19202,7 @@ msgstr ""
 
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
-msgstr "Y-m-d H:i:s"
+msgstr "A-m-d H:i:s"
 
 #: include/views/js/monitoring.sysmaps.js.php:430
 msgid "Y1"
@@ -19286,7 +19282,7 @@ msgstr ""
 
 #: app/views/administration.user.edit.php:167
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
-msgstr "No puede elegir algunos idiomas porque las «locales» para ellos no están instalados en el servidor web."
+msgstr "No puede elegir algunos idiomas, porque las locales para ellos no están instalados en el servidor web."
 
 #: include/func.inc.php:1551 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
@@ -19572,7 +19568,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:257
 msgid "abschange() - Absolute difference between last and previous value"
-msgstr ""
+msgstr "abschange() - Diferencia absoluta entre último valor y el anterior"
 
 #: include/forms.inc.php:330
 msgid "affects only filtered data"
@@ -19858,7 +19854,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:274
 msgid "change() - Difference between last and previous value"
-msgstr ""
+msgstr "change() - Diferencia entre último valor y el anterior"
 
 #: include/classes/parsers/CConditionFormula.php:219
 #, c-format
@@ -20290,7 +20286,7 @@ msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
-msgstr ""
+msgstr "macro esta vacía"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "macro(s)"
@@ -20308,7 +20304,7 @@ msgstr "mapa"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:78
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:165
 msgid "matches"
-msgstr ""
+msgstr "coincide"
 
 #: include/classes/api/services/CItemGeneral.php:1367
 #: include/classes/graphdraw/CLineGraphDraw.php:1381
@@ -20325,7 +20321,7 @@ msgstr "máximo"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:296
 msgid "max() - Maximum value for period T"
-msgstr ""
+msgstr "max() - Máximo valor en periodo T"
 
 #: include/classes/api/services/CItemGeneral.php:2085
 msgid "maximum dependent items count reached"
@@ -20352,7 +20348,7 @@ msgstr "mínimo"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "min() - Minimum value for period T"
-msgstr ""
+msgstr "min() - Mínimo valor en periodo T"
 
 #: include/classes/api/services/CHost.php:1882
 #: include/classes/validators/CApiInputValidator.php:1001
@@ -20401,17 +20397,17 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:241
 #: include/views/js/configuration.httpconf.edit.js.php:68
 msgid "name"
-msgstr ""
+msgstr "nombre"
 
 #: include/classes/html/CMultiSelect.php:85 jsLoader.php:266
 msgid "new"
-msgstr ""
+msgstr "nuevo"
 
 #: disc_prototypes.php:1302 disc_prototypes.php:1326 hosts.php:1374
 #: include/views/configuration.item.massupdate.php:417 templates.php:957
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "nuevo"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1475
 #: include/classes/graphdraw/CPieGraphDraw.php:323
@@ -20445,7 +20441,7 @@ msgstr ""
 
 #: include/forms.inc.php:1273 include/views/js/item.preprocessing.js.php:126
 msgid "number"
-msgstr ""
+msgstr "número"
 
 #: app/views/monitoring.widget.problemhosts.view.php:120
 #: include/blocks.inc.php:413 include/blocks.inc.php:596
@@ -20521,7 +20517,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:314
 msgid "prev() - Previous value"
-msgstr ""
+msgstr "prev() - Valor anterior"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
 msgid "problem pattern"
@@ -20545,7 +20541,7 @@ msgstr ""
 #: include/views/js/configuration.host.discovery.edit.js.php:63
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:83
 msgid "regular expression"
-msgstr ""
+msgstr "expresión regular"
 
 #: include/forms.inc.php:1375 include/views/js/item.preprocessing.js.php:224
 msgid "replacement"
@@ -20574,7 +20570,7 @@ msgstr ""
 #: app/views/administration.mediatype.edit.php:220 include/forms.inc.php:1324
 #: include/views/js/item.preprocessing.js.php:182
 msgid "script"
-msgstr ""
+msgstr "script"
 
 #: include/forms.inc.php:1374 include/views/js/item.preprocessing.js.php:223
 msgid "search string"
@@ -20583,20 +20579,20 @@ msgstr ""
 #: app/views/popup.maintenance.period.php:125 include/maintenances.inc.php:106
 msgctxt "adjective"
 msgid "second"
-msgstr ""
+msgstr "segundo"
 
 #: include/classes/api/services/CItemGeneral.php:1325
 #: include/classes/api/services/CItemGeneral.php:1511
 msgid "second parameter is expected"
-msgstr ""
+msgstr "se espera segundo parámetro"
 
 #: include/forms.inc.php:1317 include/views/js/item.preprocessing.js.php:176
 msgid "seconds"
-msgstr ""
+msgstr "segundos"
 
 #: include/classes/html/CActionButtonList.php:123
 msgid "selected"
-msgstr ""
+msgstr "seleccionado"
 
 #: include/views/configuration.services.edit.php:254
 msgid "short description"
@@ -20627,7 +20623,7 @@ msgstr "descripción corta"
 #: include/classes/api/services/CTriggerGeneral.php:1170
 #: include/classes/validators/CActionCondValidator.php:145
 msgid "should be empty"
-msgstr ""
+msgstr "debe ser vacío"
 
 #: app/controllers/CControllerPopupItemTestSend.php:202
 msgid "should be less than current time"
@@ -20642,15 +20638,15 @@ msgstr "mostrar asignaciones de icono"
 #: include/views/configuration.item.prototype.edit.php:667
 #: include/views/configuration.item.prototype.massupdate.php:393
 msgid "show value mappings"
-msgstr "mostrar asignaciones de valor"
+msgstr "mostrar mapeos de valores"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:319
 msgid "str() - Find string V in last (most recent) value (1 - found, 0 - not found)"
-msgstr ""
+msgstr "str() - Encuentra palabra V en último (más reciente) valor (1 - encontrado, 0 - no encontrado)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:325
 msgid "strlen() - Length of last (most recent) T value in characters"
-msgstr ""
+msgstr "strlen() - Largo del último (más reciente) T valor en caracteres"
 
 #: include/graphs.inc.php:84
 msgid "sum"
@@ -20683,7 +20679,7 @@ msgstr ""
 #: include/views/js/configuration.template.list.js.php:30
 #: include/views/js/configuration.triggers.list.js.php:30
 msgid "tag"
-msgstr ""
+msgstr "etiqueta"
 
 #: include/classes/api/services/CHostBase.php:57
 #, c-format
@@ -20728,7 +20724,7 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr ""
+msgstr "falta la etiqueta \"%1$s\""
 
 #: app/views/popup.maintenance.period.php:126 include/maintenances.inc.php:107
 msgid "third"
@@ -20815,7 +20811,7 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidatorGeneral.php:199
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr ""
+msgstr "tag \"%1$s\" inesperado"
 
 #: include/classes/import/readers/CXmlImportReader.php:78
 #: include/classes/import/readers/CXmlImportReader.php:117
@@ -20957,7 +20953,7 @@ msgstr ""
 
 #: include/correlation.inc.php:215
 msgid "value of new event tag"
-msgstr ""
+msgstr "valor de etiqueta de evento nuevo"
 
 #: include/classes/api/services/CItemGeneral.php:1530
 msgid "value of second parameter is too long"
