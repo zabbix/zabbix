@@ -157,6 +157,11 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 .........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.4
+
+5.2.4rc1 was released as 5.2.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.2.4rc1
 
 New features:
