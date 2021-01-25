@@ -87,7 +87,7 @@ class C52ImportConverter extends CConverter {
 			$used_valuemaps = [];
 
 			if (array_key_exists('items', $host)) {
-				foreach ($host['items'] as &$item) {
+				foreach ($host['items'] as $item) {
 					if (array_key_exists('valuemap', $item) && !in_array($item['valuemap']['name'], $used_valuemaps)) {
 						if (array_key_exists($item['valuemap']['name'], $valuemaps)) {
 							$host['valuemaps'][] = $valuemaps[$item['valuemap']['name']];
@@ -95,16 +95,15 @@ class C52ImportConverter extends CConverter {
 						}
 					}
 				}
-				unset($item);
 			}
 
 			if (array_key_exists('discovery_rules', $host)) {
-				foreach ($host['discovery_rules'] as &$drule) {
+				foreach ($host['discovery_rules'] as $drule) {
 					if (!array_key_exists('item_prototypes', $drule)) {
 						continue;
 					}
 
-					foreach ($drule['item_prototypes'] as $key => $item_prototype) {
+					foreach ($drule['item_prototypes'] as $item_prototype) {
 						if (array_key_exists('valuemap', $item_prototype)
 								&& !in_array($item_prototype['valuemap']['name'], $used_valuemaps)) {
 							if (array_key_exists($item_prototype['valuemap']['name'], $valuemaps)) {
@@ -114,7 +113,6 @@ class C52ImportConverter extends CConverter {
 						}
 					}
 				}
-				unset($drule);
 			}
 		}
 		unset($host);
