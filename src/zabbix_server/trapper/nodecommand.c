@@ -293,8 +293,7 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	char			clientip[MAX_STRING_LEN], tmp[64], *result = NULL, *send = NULL,
-				*debug = NULL;
+	char			clientip[MAX_STRING_LEN], tmp[64], *result = NULL, *send = NULL, *debug = NULL;
 	int			ret = FAIL;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	zbx_script_exec_context ctx;
