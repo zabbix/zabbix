@@ -347,6 +347,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		obj.querySelectorAll('[data-type]').forEach((elm) => {
 			elm.style.display = (elm.getAttribute('data-type').split(',').indexOf(data_type) != -1) ? 'block' : 'none';
 		});
+		$(window).resize();
 	}
 
 	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);
