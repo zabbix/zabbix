@@ -36,7 +36,7 @@
  *                FAIL    - an error occurred                                 *
  *                                                                            *
  ******************************************************************************/
-static int	execute_remote_script(zbx_script_t *script, DC_HOST *host, char **info, char *error,
+static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host, char **info, char *error,
 		size_t max_error_len)
 {
 	int		ret = FAIL, time_start;
@@ -156,7 +156,7 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
  *                FAIL    - the access is denied                              *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_check_user_administration_actions_permissions(zbx_user_t *user, const char *role_rule)
+static int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule)
 {
 	int		ret = FAIL;
 	DB_RESULT	result;
