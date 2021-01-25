@@ -1,3 +1,10 @@
+Changes for 5.0.9rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.0.8
 
 5.0.8rc1 was released as 5.0.8 without any changes
@@ -2547,6 +2554,13 @@ Changes for 4.0.9
 
 Bug fixes:
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.8
