@@ -294,8 +294,10 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
+		$this->assertPageHeader('Global view');
 		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 
+		// When login in zabbix, Monitoring section is opened.
 		if ($data['section'] !== 'Monitoring') {
 			$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
 			$this->query('xpath://ul[@class="menu-'.$menu.'"]/li/a[text()="'.$data['section'].'"]')->waitUntilReady()->one()->click();
@@ -304,6 +306,8 @@ class testSidebarMenu extends CWebTest {
 
 		$this->query('xpath:'.$xpath.'/a[text()="'.$data['section'].'"]/following::ul/li/a[text()="'.
 				$data['page'].'"]')->waitUntilVisible()->one()->click();
+
+		// Checking if 3rd level side menu exists.
 		if (array_key_exists('third_level', $data)) {
 			foreach ($data['third_level'] as $submenu) {
 				$this->query('xpath://li[contains(@class, "has-submenu")]/a[text()="'.$data['page'].
@@ -338,18 +342,23 @@ class testSidebarMenu extends CWebTest {
 				$id = 'sidebar-button-toggle';
 			}
 
+			// Clicking hide, collapse button.
 			$this->query('button:'.$hide)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
 			sleep(1);
+
+			// Checking that collapsed, hiden sidemenu appears on clicking.
 			$this->query('id:'.$id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
 			sleep(1);
+
+			// Returning standart sidemenu view clicking on unhide, expand button.
 			$this->query('button:'.$unhide)->one()->click();
 			$this->assertTrue($this->query('class:sidebar')->exists());
 		}
 	}
 
-	public static function getLinksData() {
+	public static function getUserData() {
 		return [
 			[
 				[
@@ -380,10 +389,11 @@ class testSidebarMenu extends CWebTest {
 	/**
 	 * Pages that transfer you to another webpage and logout button.
 	 *
-	 * @dataProvider getLinksData
+	 * @dataProvider getUserData
 	 */
-	public function testSidebarMenu_Links($data) {
+	public function testSidebarMenu_User($data) {
 		$this->page->login()->open('')->waitUntilReady();
+
 		if (array_key_exists('link', $data)) {
 			$this->assertTrue($this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].
 					'" and @href="'.$data['link'].'"]')->exists());
