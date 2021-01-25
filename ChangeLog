@@ -1,6 +1,13 @@
 Changes for 5.4.0alpha1
 
 New features:
+..F....PS. [ZBXNEXT-5759] added Oracle DB tnsnames.ora service name lookup support (viktors, vmaksimovs)
+A.F.I...S. [ZBXNEXT-6360] added support of JavaScript for global scripts (dgoloscapov, vmaksimovs)
+.......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
+A.F....... [ZBXNEXT-6376] implemented support of negative filtering for tags (Ivo, miks)
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+..F.....S. [ZBXNEXT-6399] added support of host and item macros for Script item parameters (viktors, vmaksimovs)
+A.F.I...S. [ZBXNEXT-6207,ZBXNEXT-6318] added support of API tokens (arimdjonoks, averza, talbergs)
 ...G.....T [ZBXCTR-13] added custom query support for PostgreSQL plugin and template, fixed unix-socket support (afayantsev, Daria_V, vadimipatov)
 A.F....PS. [ZBXNEXT-5518] added support of XML parsing in JavaScript (akozlovs, Ivo)
 .........T [ZBXNEXT-5862] added Rocket.Chat media (tuskov)
@@ -148,6 +155,18 @@ A......... [ZBX-18163] fixed being able to delete interfaces on discovered hosts
 .........T [ZBX-18531] fixed template "Ceph by Zabbix Agent2" pool discovery (ychukina)
 .........T [ZBX-18476] changed Fan, Temperature, Voltage LLD rules in Template Net Arista (mchudinov)
 .........T [ZBX-16155] fixed "Template Net TP-LINK" readme (ychukina)
+
+--------------------------------------------------------------------------------
+Changes for 5.2.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.2.4
+
+5.2.4rc1 was released as 5.2.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.2.4rc1
@@ -522,6 +541,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.8
+
+5.0.8rc1 was released as 5.0.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.8rc1
@@ -2447,6 +2478,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.28
+
+4.0.28rc1 was released as 4.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.28rc1
