@@ -863,6 +863,9 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(message));
 
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type || ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
+		zbx_free(message);
+
 	if (NULL == r_event)
 	{
 		zbx_db_insert_add_values(db_insert, alertid, actionid, event->eventid, now, tmp, alert_status,

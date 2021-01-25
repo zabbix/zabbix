@@ -439,7 +439,16 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			}
 
 			if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type && ZBX_SCRIPT_CTX_HOST != ctx)
-				goto skip_perm_check;
+			{
+				if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type)
+				{
+					zbx_strlcpy(error, "Cannot determine permission of a script.",
+							max_error_len);
+					goto out;
+				}
+				else
+					goto skip_perm_check;
+			}
 
 			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
