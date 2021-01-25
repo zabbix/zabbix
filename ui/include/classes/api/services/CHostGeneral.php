@@ -1044,7 +1044,7 @@ abstract class CHostGeneral extends CHostBase {
 					}
 				}
 
-				$host['inheritedValuemaps'][] = $this->unsetExtraFields($valuemaps, ['valuemapid', 'hostid', 'name'],
+				$host['inheritedValuemaps'] = $this->unsetExtraFields($valuemaps, ['valuemapid', 'hostid', 'name'],
 					$options['selectInheritedValueMaps']
 				);
 			}
