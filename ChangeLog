@@ -1935,6 +1935,13 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.0.28
 
 4.0.28rc1 was released as 4.0.28 without any changes
@@ -2554,13 +2561,6 @@ Changes for 4.0.9
 
 Bug fixes:
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
-
---------------------------------------------------------------------------------
-Changes for 4.0.29rc1
-
-New features:
-
-Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.8
