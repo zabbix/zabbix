@@ -40,47 +40,10 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter_tags_table = (new CTable())
-		->setId('filter-tags')
-		->addRow(
-			(new CCol(
-				(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-					->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-					->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-					->setModern(true)
-					->setId('filter_evaltype')
-			))->setColSpan(4)
-		);
-
-	foreach ($data['filter']['tags'] as $i => $tag) {
-		$filter_tags_table->addRow([
-			(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-					->removeId()
-			))->addClass(ZBX_STYLE_NOWRAP)
-		], 'form_row');
-	}
-
-	$filter_tags_table->addRow(
-		(new CCol(
-			(new CButton('tags_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-				->removeId()
-		))->setColSpan(3)
-	);
+	$filter_tags_table = CTagFilterFieldHelper::get([], [
+		'evaltype' => $data['filter']['evaltype'],
+		'tags' => $data['filter']['tags']
+	]);
 
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
 		->setProfile('web.latest.filter')

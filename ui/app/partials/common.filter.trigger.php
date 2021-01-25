@@ -149,51 +149,14 @@ $inventoryFilterTable->addRow(
 	))->setColSpan(2)
 );
 
-$filter_tags_table = (new CTable())
-	->setId('filter-tags_#{uniqid}')
-	->addRow(
-		(new CCol(
-			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
-				->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
-				->setModern(true)
-				->setId('evaltype_#{uniqid}')
-		))->setColSpan(4)
-	);
-
-foreach ($data['filter']['tags'] as $i => $tag) {
-	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setModern(true),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->removeId()
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-}
-
-$filter_tags_table->addRow(
-	(new CCol(
-		(new CButton('tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-			->removeId()
-	))->setColSpan(3)
-);
-
 $column2 = (new CFormList())
 	->addRow(_('Host inventory'), $inventoryFilterTable)
-	->addRow(_('Tags'), $filter_tags_table)
+	->addRow(_('Tags'),
+		CTagFilterFieldHelper::get([], [
+			'evaltype' => $data['filter']['evaltype'],
+			'tags' => $data['filter']['tags']
+		])
+	)
 	->addRow(_('Show unacknowledged only'),
 		(new CCheckBox('ack_status'))
 			->setChecked($data['filter']['ackStatus'] == 1)

@@ -1517,7 +1517,7 @@ class CMap extends CMapElement {
 			'tags'		=>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag'		=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
 				'value'		=>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
-				'operator'	=>		['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
+				'operator'	=>		['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
 			]]
 		]];
 

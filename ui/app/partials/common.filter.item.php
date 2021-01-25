@@ -23,6 +23,8 @@
  * @var CPartial $this
  */
 
+$this->includeJsFile('common.filter.item.js.php');
+
 $filter_column_left = (new CFormList())
 	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 		(new CMultiSelect([
@@ -63,50 +65,13 @@ $filter_column_left = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	);
 
-$filter_tags_table = (new CTable())
-	->setId('filter-tags_#{uniqid}')
-	->addRow(
-		(new CCol(
-			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
-				->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
-				->setModern(true)
-				->setId('evaltype_#{uniqid}')
-		))->setColSpan(4)
-	);
-
-foreach ($data['filter']['tags'] as $i => $tag) {
-	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setModern(true),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->removeId()
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-}
-
-$filter_tags_table->addRow(
-	(new CCol(
-		(new CButton('tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-			->removeId()
-	))->setColSpan(3)
-);
-
 $filter_column_right = (new CFormList())
-	->addRow(_('Tags'), $filter_tags_table)
+	->addRow(_('Tags'),
+		CTagFilterFieldHelper::get([], [
+			'evaltype' => $data['filter']['evaltype'],
+			'tags' => $data['filter']['tags']
+		])
+	)
 	->addRow(_('Show suppressed problems'),
 		(new CCheckBox('show_suppressed'))->setChecked(
 			$data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE

@@ -25,35 +25,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('filter_tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CSelect('filter_tags[#{rowNum}][operator]'))
-				->addOptions(CSelect::createOptionsFromArray([
-					TAG_OPERATOR_EXISTS => _('Exists'),
-					TAG_OPERATOR_EQUAL => _('Equals'),
-					TAG_OPERATOR_LIKE => _('Contains'),
-					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
-					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
-					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
-				]))
-				->setValue(TAG_OPERATOR_LIKE)
-				->setFocusableElementId('filter-tags-#{rowNum}-operator-select')
-				->setId('filter_tags_#{rowNum}_operator'),
-			(new CTextBox('filter_tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setId('filter_tags_#{rowNum}_value'),
-			(new CCol(
-				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
+	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
 <script type="text/javascript">

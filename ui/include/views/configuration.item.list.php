@@ -52,7 +52,8 @@ if ($data['hostid'] != 0) {
 
 $widget->addItem(new CPartial('configuration.filter.items', [
 	'filter_data' => $data['filter_data'],
-	'items' => $data['items']
+	'items' => $data['items'],
+	'context' => $data['context']
 ]));
 
 $url = (new CUrl('items.php'))
@@ -278,7 +279,7 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		$status,
 		$data['tags'][$item['itemid']],
-		($data['context'] === 'host') ? makeInformationList($info_icons) : null		
+		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }
 

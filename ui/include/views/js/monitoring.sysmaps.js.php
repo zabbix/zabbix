@@ -233,7 +233,7 @@ function createFontSelect(string $name): CSelect {
 								->setId('selement-tags')
 								->addRow(
 									(new CCol(
-										(new CRadioButtonList('operator', TAG_EVAL_TYPE_AND_OR))
+										(new CRadioButtonList('evaltype', TAG_EVAL_TYPE_AND_OR))
 											->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 											->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 											->setModern(true)
@@ -902,26 +902,7 @@ function createFontSelect(string $name): CSelect {
 </script>
 
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
+	<?= CTagFilterFieldHelper::getTemplate(['tag_field_name' => 'tags']); ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">

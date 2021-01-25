@@ -857,7 +857,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $http_tests, $sortOrder, 
+	$data['paging'] = CPagerHelper::paginate($page_num, $http_tests, $sortOrder,
 		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
 	);
 

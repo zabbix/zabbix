@@ -20,6 +20,9 @@
 
 ZABBIX.namespace('classes.Observer');
 
+const TAG_OPERATOR_EXISTS = '4';
+const TAG_OPERATOR_NOT_EXISTS = '5';
+
 ZABBIX.classes.Observer = (function() {
 	var Observer = function() {
 		this.listeners = {};
@@ -847,6 +850,18 @@ ZABBIX.apps.map = (function($) {
 					})
 					.on('afteradd.dynamicRows', function() {
 						$('.textarea-flexible', $('#selement-tags')).textareaFlexible();
+
+						// Hide tag value field if operator is "Exists" or "Does not exist".
+						$(this)
+							.find('z-select')
+							.on('change', function() {
+								let num = this.id.match(/tags_(\d+)_operator/);
+								if (num !== null) {
+									let show = $(this).val() !== TAG_OPERATOR_EXISTS
+											&& $(this).val() !== TAG_OPERATOR_NOT_EXISTS;
+									$('#tags_' + num[1] + '_value').toggle(show);
+								}
+							});
 					});
 
 				// mass update form
@@ -2188,7 +2203,7 @@ ZABBIX.apps.map = (function($) {
 					urls: {},
 					elementName: this.sysmap.defaultIconName, // first image name
 					use_iconmap: '1',
-					operator: 0, // TAG_EVAL_TYPE_AND_OR
+					evaltype: 0, // TAG_EVAL_TYPE_AND_OR
 					tags: [],
 					inherited_label: null
 				};
@@ -2358,7 +2373,7 @@ ZABBIX.apps.map = (function($) {
 				var fieldName,
 					dataFelds = ['elementtype', 'elements', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'operator', 'tags'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap', 'evaltype', 'tags'
 					],
 					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
@@ -2808,23 +2823,33 @@ ZABBIX.apps.map = (function($) {
 					var tag = jQuery.extend({tag: '', operator: 0, value: '', rowNum: ++counter}, tags[i]),
 						row = $(tpl.evaluate(tag));
 
-					row.find('[name="tags[' + tag.rowNum + '][tag]"]').val(tag.tag);
-					row.find('[name="tags[' + tag.rowNum + '][operator]"][value="' + tag.operator + '"]')
-						.prop('checked', true);
-					row.find('[name="tags[' + tag.rowNum + '][value]"]').val(tag.value);
 					row.insertBefore($add_btn_row);
+					row.find('[name="tags[' + tag.rowNum + '][tag]"]').val(tag.tag);
+					row.find('[name="tags[' + tag.rowNum + '][operator]"]')
+						.on('change', function() {
+							let num = this.id.match(/tags_(\d+)_operator/);
+							if (num !== null) {
+								let show = $(this).val() !== TAG_OPERATOR_EXISTS
+										&& $(this).val() !== TAG_OPERATOR_NOT_EXISTS;
+								$('#tags_' + num[1] + '_value').toggle(show);
+							}
+						})
+						.val(tag.operator)
+						.trigger('change');
+
+					row.find('[name="tags[' + tag.rowNum + '][value]"]').val(tag.value);
 				}
 
 				$('#selement-tags').data('dynamicRows').counter = counter;
 			},
 
 			/**
-			 * Set operator field value.
+			 * Set evaltype field value.
 			 *
 			 * @param {integer} value
 			 */
-			setOperator: function(value) {
-				$('#operator [name="operator"][value='+value+']').prop('checked', true);
+			setEvaltype: function(value) {
+				$('#operator [name="evaltype"][value='+value+']').prop('checked', true);
 			},
 
 			/**
@@ -2925,7 +2950,7 @@ ZABBIX.apps.map = (function($) {
 						tags = {0: {}};
 					}
 					this.addTags(tags);
-					this.setOperator(selement.operator);
+					this.setEvaltype(selement.evaltype);
 				}
 
 				// Iconmap.
@@ -3014,17 +3039,17 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				if (data.elementtype == '0' || data.elementtype == '3') {
-					data.tags = [];
-					$('input', '#selementForm').filter(function() {
+					data.tags = {};
+					$('input, z-select', '#selementForm').filter(function() {
 						return this.name.match(/tags\[\d+\]\[tag\]/i);
 					}).each(function() {
 						if (this.value !== '') {
 							var nr = parseInt(this.name.match(/^tags\[(\d+)\]\[tag\]$/)[1]);
-							data.tags.push({
+							data.tags[Object.getOwnPropertyNames(data.tags).length] = {
 								tag: this.value,
-								operator: $('[name="tags['+nr+'][operator]"]:checked').val(),
+								operator: $('[name="tags['+nr+'][operator]"]').val(),
 								value: $('[name="tags['+nr+'][value]"]').val()
-							});
+							};
 						}
 					});
 				}

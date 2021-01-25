@@ -24,21 +24,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="inventory-filter-row">
-	<?=
-		(new CRow([
-			(new CSelect('inventory[#{rowNum}][field]'))
-				->addOptions(CSelect::createOptionsFromArray($data['inventory_fields'])),
-			(new CTextBox('inventory[#{rowNum}][value]', ''))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('inventory[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-	?>
-</script>
-
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
@@ -46,8 +31,6 @@
 <script type="text/javascript">
 	(function($) {
 		$(function() {
-			$('#inventory-filter').dynamicRows({ template: '#inventory-filter-row' });
-
 			$('#filter-tags')
 				.dynamicRows({ template: '#filter-tag-row-tmpl' })
 				.on('afteradd.dynamicRows', function() {
@@ -62,7 +45,7 @@
 								$('#filter_tags_' + num[1] + '_value').toggle(show);
 							}
 						});
-			});
+				});
 
 			// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
 			$('#filter-tags z-select')

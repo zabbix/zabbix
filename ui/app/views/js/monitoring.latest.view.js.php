@@ -25,26 +25,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= (new CRow([
-			(new CTextBox('filter_tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('filter_tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->toString()
-	?>
+	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
 <script type="text/javascript">
@@ -183,6 +164,32 @@
 		window.latest_page = new latestPage();
 		window.latest_page.liveFilter();
 
-		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
+		$('#filter-tags')
+			.dynamicRows({template: '#filter-tag-row-tmpl'})
+			.on('afteradd.dynamicRows', function() {
+				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
+				$(this)
+					.find('z-select')
+					.on('change', function() {
+						let num = this.id.match(/filter_tags_(\d+)_operator/);
+						if (num !== null) {
+							let show = $(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>;
+							$('#filter_tags_' + num[1] + '_value').toggle(show);
+						}
+					});
+			});
+
+		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
+		$('#filter-tags z-select')
+			.on('change', function() {
+				let num = this.id.match(/filter_tags_(\d+)_operator/);
+				if (num !== null) {
+					let show = $(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>;
+					$('#filter_tags_' + num[1] + '_value').toggle(show);
+				}
+			})
+			.trigger('change');
 	});
 </script>

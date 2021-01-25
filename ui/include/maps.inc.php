@@ -678,12 +678,14 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		}
 
 		// TODO miks: rework.
+		/*
 		$subSysmapHostApplicationFilters = getSelementHostApplicationFilters($selements, $selementIdToSubSysmaps,
 			$hostsFromHostGroups
 		);
 		$selements = filterSysmapTriggers($selements, $subSysmapHostApplicationFilters, $triggers,
 			$subSysmapTriggerIdToSelementIds
 		);
+		*/
 	}
 
 	// Get problems by triggerids.

@@ -36,9 +36,6 @@ zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 $item_types = item_type2str();
 unset($item_types[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
 
-$filter_type = new CComboBox('filter_type', $data['filter_data']['filter_type'], null, [-1 => _('all')]);
-$filter_type->addItems($item_types);
-
 foreach (array_keys($item_types) as $type) {
 	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
 		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay_row');
@@ -51,34 +48,36 @@ foreach (array_keys($item_types) as $type) {
 
 zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($filter_type_visibility, true).');');
 
+// First column
 $filter_column_1
 	->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
-			'data' => $data['filter_data']['groupids'],
+			'data' => $data['filter_data']['groups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
-					'editable' => true
+					'editable' => true,
+					'enrich_parent_groups' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	)
-	->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
+	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'host_templates',
-			'data' => $data['filter_data']['hostids'],
+			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+			'data' => $data['filter_data']['hosts'],
 			'popup' => [
 				'filter_preselect_fields' => [
 					'hostgroups' => 'filter_groupids_'
 				],
 				'parameters' => [
-					'srctbl' => 'host_templates',
+					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostids_',
@@ -94,112 +93,101 @@ $filter_column_1
 		(new CTextBox('filter_key', $data['filter_data']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
+// Second column
+$type_select = (new CSelect('filter_type'))
+	->setId('filter_type')
+	->setValue((int) $data['filter_data']['filter_type'])
+	->setFocusableElementId('label-filter-type')
+	->addOption(new CSelectOption(-1, _('all')))
+	->addOptions(CSelect::createOptionsFromArray($item_types));
+
+$info_type_select = (new CSelect('filter_value_type'))
+	->setFocusableElementId('label-filter-value-type')
+	->setValue($data['filter_data']['filter_value_type'])
+	->addOptions(CSelect::createOptionsFromArray([
+		-1 => _('all'),
+		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+		ITEM_VALUE_TYPE_STR => _('Character'),
+		ITEM_VALUE_TYPE_LOG => _('Log'),
+		ITEM_VALUE_TYPE_TEXT => _('Text')
+	]));
+
 $filter_column_2
-	->addRow(_('Type'), $filter_type)
-	->addRow(_('Type of information'),
-		new CComboBox('filter_value_type', $data['filter_data']['filter_value_type'], null, [
-			-1 => _('all'),
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
-	)
+	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select)
+	->addRow(new CLabel(_('Type of information'), $info_type_select->getFocusableElementId()), $info_type_select)
 	->addRow(_('SNMP OID'),
-		(new CTextBox('filter_snmp_oid', $data['filter_data']['filter_snmp_oid'], '', 255))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CTextBox('filter_snmp_oid', $data['filter_data']['filter_snmp_oid'], '', 255))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	)
 	->addRow(_('History'),
-		(new CTextBox('filter_history', $data['filter_data']['filter_history']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		(new CTextBox('filter_history', $data['filter_data']['filter_history']))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	)
 	->addRow(_('Trends'),
-		(new CTextBox('filter_trends', $data['filter_data']['filter_trends']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		(new CTextBox('filter_trends', $data['filter_data']['filter_trends']))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	)
 	->addRow(_('Update interval'),
 		(new CTextBox('filter_delay', $data['filter_data']['filter_delay']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
 	);
 
-$filter_tags_table = (new CTable())
-	->setId('filter-tags')
-	->addRow(
-		(new CCol(
-			(new CRadioButtonList('filter_evaltype', (int) $data['filter_data']['filter_evaltype']))
-				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-				->setModern(true)
-				->setId('filter_evaltype')
-		))->setColSpan(4)
-	);
-
-foreach ($data['filter_data']['filter_tags'] as $i => $tag) {
-	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
-			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setModern(true),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
-			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->removeId()
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
-}
-
-$filter_tags_table->addRow(
-	(new CCol(
-		(new CButton('tags_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-			->removeId()
-	))->setColSpan(3)
+// Third column
+$filter_column_3->addRow(_('Tags'),
+	CTagFilterFieldHelper::get([
+			'tag_field_name' => 'filter_tags',
+			'evaltype_field_name' => 'filter_evaltype'
+		], [
+			'evaltype' => $data['filter_data']['filter_evaltype'],
+			'tags' => $data['filter_data']['filter_tags']
+		]
+	)
 );
 
+if ($data['context'] === 'host') {
+	$filter_column_3->addRow(_('State'),
+		(new CRadioButtonList('filter_state', (int) $data['filter_data']['filter_state']))
+			->addValue(_('all'), -1)
+			->addValue(_('Normal'), ITEM_STATE_NORMAL)
+			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
+			->setModern(true)
+	);
+}
+
 $filter_column_3
-	->addRow(_('Tags'), $filter_tags_table)
-	->addRow(_('State'),
-		new CComboBox('filter_state', $data['filter_data']['filter_state'], null, [
-			-1 => _('all'),
-			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
-			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
-		])
-	)
 	->addRow(_('Status'),
-		new CComboBox('filter_status', $data['filter_data']['filter_status'], null, [
-			-1 => _('all'),
-			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
-			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
-		])
+		(new CRadioButtonList('filter_status', (int) $data['filter_data']['filter_status']))
+			->addValue(_('all'), -1)
+			->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
+			->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+			->setModern(true)
 	)
 	->addRow(_('Triggers'),
-		new CComboBox('filter_with_triggers', $data['filter_data']['filter_with_triggers'], null, [
-			-1 => _('all'),
-			1 => _('With triggers'),
-			0 => _('Without triggers')
-		])
+		(new CRadioButtonList('filter_with_triggers', (int) $data['filter_data']['filter_with_triggers']))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
 	)
-	->addRow(_('Template'),
-		new CComboBox('filter_templated_items', $data['filter_data']['filter_templated_items'], null, [
-			-1 => _('all'),
-			1 => _('Inherited items'),
-			0 => _('Not inherited items')
-		])
-	)
-	->addRow(_('Discovery'),
-		new CComboBox('filter_discovery', $data['filter_data']['filter_discovery'], null, [
-			-1 => _('all'),
-			ZBX_FLAG_DISCOVERY_CREATED => _('Discovered items'),
-			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
-		])
+	->addRow(_('Inherited'),
+		(new CRadioButtonList('filter_inherited', (int) $data['filter_data']['filter_inherited']))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), 1)
+			->addValue(_('No'), 0)
+			->setModern(true)
 	);
+
+if ($data['context'] === 'host') {
+	$filter_column_3->addRow(_('Discovered'),
+		(new CRadioButtonList('filter_discovered', (int) $data['filter_data']['filter_discovered']))
+			->addValue(_('all'), -1)
+			->addValue(_('Yes'), ZBX_FLAG_DISCOVERY_CREATED)
+			->addValue(_('No'), ZBX_FLAG_DISCOVERY_NORMAL)
+			->setModern(true)
+	);
+}
 
 $filter
 	->setProfile('web.items.filter')
@@ -211,13 +199,13 @@ $filter
 	->addVar('subfilter_state', $data['filter_data']['subfilter_state'])
 	->addVar('subfilter_templated_items', $data['filter_data']['subfilter_templated_items'])
 	->addVar('subfilter_with_triggers', $data['filter_data']['subfilter_with_triggers'])
-	->addVar('subfilter_discovery', $data['filter_data']['subfilter_discovery'])
+	->addVar('subfilter_discovered', $data['filter_data']['subfilter_discovered'])
 	->addVar('subfilter_history', $data['filter_data']['subfilter_history'])
 	->addVar('subfilter_trends', $data['filter_data']['subfilter_trends'])
 	->addVar('subfilter_interval', $data['filter_data']['subfilter_interval'])
 	->addFilterTab(_('Filter'),
 		[$filter_column_1, $filter_column_2, $filter_column_3],
-		makeItemSubfilter($data['filter_data'], $data['items'])
+		makeItemSubfilter($data['filter_data'], $data['items'], $data['context'])
 	);
 
 $filter->show();

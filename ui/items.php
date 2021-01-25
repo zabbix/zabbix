@@ -1557,25 +1557,34 @@ else {
 		}
 	}
 
-<<<<<<< HEAD
-	$data['main_filter'] = getItemFilterForm($data);
-=======
+	if ($data['context'] === 'host') {
+		$host_template_filter = $filter_hostids
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter_hostids,
+				'editable' => true
+			]), ['hostid' => 'id'])
+			: [];
+	}
+	else {
+		$host_template_filter = $filter_hostids
+			? CArrayHelper::renameObjectsKeys(API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter_hostids,
+				'editable' => true
+			]), ['templateid' => 'id'])
+			: [];
+	}
+
 	$data['filter_data'] = [
-		'groupids' => hasRequest('filter_groupids')
+		'groups' => hasRequest('filter_groupids')
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => getRequest('filter_groupids'),
 				'editable' => true
 			]), ['groupid' => 'id'])
 			: [],
-		'hostids' => hasRequest('filter_hostids')
-			? CArrayHelper::renameObjectsKeys(API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'hostids' => getRequest('filter_hostids'),
-				'templated_hosts' => true,
-				'editable' => true
-			]), ['hostid' => 'id'])
-			: [],
+		'hosts' => $host_template_filter,
 		'filter_name' => getRequest('filter_name'),
 		'filter_key' => getRequest('filter_key'),
 		'filter_type' => getRequest('filter_type'),
@@ -1586,9 +1595,9 @@ else {
 		'filter_trends' => getRequest('filter_trends'),
 		'filter_status' => getRequest('filter_status'),
 		'filter_state' => getRequest('filter_state'),
-		'filter_templated_items' => getRequest('filter_templated_items'),
+		'filter_inherited' => getRequest('filter_inherited'),
 		'filter_with_triggers' => getRequest('filter_with_triggers'),
-		'filter_discovery' => getRequest('filter_discovery'),
+		'filter_discovered' => getRequest('filter_discovered'),
 		'filter_evaltype' => $filter_evaltype,
 		'filter_tags' => $filter_tags,
 		'subfilter_hosts' => getRequest('subfilter_hosts'),
@@ -1598,7 +1607,7 @@ else {
 		'subfilter_value_types' => getRequest('subfilter_value_types'),
 		'subfilter_templated_items' => getRequest('subfilter_templated_items'),
 		'subfilter_with_triggers' => getRequest('subfilter_with_triggers'),
-		'subfilter_discovery' => getRequest('subfilter_discovery'),
+		'subfilter_discovered' => getRequest('subfilter_discovered'),
 		'subfilter_history' => getRequest('subfilter_history'),
 		'subfilter_trends' => getRequest('subfilter_trends'),
 		'subfilter_interval' => getRequest('subfilter_interval'),
@@ -1611,7 +1620,6 @@ else {
 			'operator' => TAG_OPERATOR_LIKE
 		]];
 	}
->>>>>>> b3b2be6063... ..F....... [ZBXNEXT-2976] added tags column and filter fields in multiple places
 
 	// Remove subfiltered items.
 	foreach ($data['items'] as $number => $item) {
