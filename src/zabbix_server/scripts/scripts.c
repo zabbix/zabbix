@@ -30,6 +30,7 @@
 #include "scripts.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
+#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -598,26 +599,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-}
-
-static void	zbx_clean_event(DB_EVENT *event)
-{
-	zbx_free(event->name);
-
-	if (EVENT_SOURCE_TRIGGERS == event->source)
-	{
-		zbx_free(event->trigger.description);
-		zbx_free(event->trigger.expression);
-		zbx_free(event->trigger.recovery_expression);
-		zbx_free(event->trigger.correlation_tag);
-		zbx_free(event->trigger.opdata);
-		zbx_free(event->trigger.event_name);
-
-		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
-		zbx_vector_ptr_destroy(&event->tags);
-	}
-
-	zbx_free(event);
 }
 
 /**************************************************************************************************

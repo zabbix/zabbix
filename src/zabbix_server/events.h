@@ -32,6 +32,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid);
 
 int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+void	zbx_clean_event(DB_EVENT *event);
 void	zbx_clean_events(void);
 void	zbx_reset_event_recovery(void);
 void	zbx_export_events(void);
