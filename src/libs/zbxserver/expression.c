@@ -71,10 +71,10 @@ zbx_libxml_error_t;
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY		206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
 
-static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
+		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
+		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen);
 
 static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
@@ -3020,9 +3020,10 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char 
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error, int maxerrlen)
+static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_EVENT *event,
+		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
+		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen)
 {
 	char			c, *replace_to = NULL, sql[64];
 	const char		*m;
@@ -6747,10 +6748,10 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
  *          (default setting)                                                 *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen)
+int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type,
+		char *error, int maxerrlen)
 {
 	return substitute_simple_macros_impl(actionid, event, r_event, userid, hostid, dc_host, dc_item, alert, ack,
 			tz, data, macro_type, error, maxerrlen);
@@ -6764,10 +6765,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
  * Purpose: substitute_simple_macros with unmasked secret macros              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros_unmasked(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen)
+int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const char *tz, char **data, int macro_type,
+		char *error, int maxerrlen)
 {
 	unsigned char	old_macro_env;
 	int		ret;
