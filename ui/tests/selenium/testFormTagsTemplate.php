@@ -42,13 +42,6 @@ class testFormTagsTemplate extends testFormTags {
 	}
 
 	/**
-	 * Check tag fields.
-	 */
-	public function testFormTagsTemplate_Screenshot() {
-		$this->checkTagScreenshot('template');
-	}
-
-	/**
 	 * Test update of Template with tags
 	 *
 	 * @dataProvider getUpdateData

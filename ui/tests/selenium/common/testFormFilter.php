@@ -69,24 +69,17 @@ class testFormFilter extends CWebTest {
 				}
 
 				$this->checkName($data['filter']['Name']);
-				$this->query('xpath://a[@class="icon-home tabfilter-item-link"]')->one()->click();
-				$this->query('xpath://li[@data-target="tabfilter_0" and contains(@class, "selected")]')->waitUntilPresent();
-
-				// Checking that dropdown/popup tab works.
-				$this->query('xpath://button[@data-action="toggleTabsList"]')->waitUntilPresent()->one()->click();
-				$this->query('xpath://ul[contains(@class, "menu-popup")]')->waitUntilPresent();
-//				sleep(2);
-//				$this->query('xpath://a[@aria-label="Home" and @role="menuitem"]')->waitUntilPresent();
 
 				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
+					$this->query('xpath://a[@class="icon-home tabfilter-item-link"]')->one()->click();
 					$this->assertEquals($filtered_rows_count, $this->query('xpath://li[@data-target="tabfilter_'.
-							$data['tab_id'].'"]/a')->waitUntilPresent()->one()->getAttribute('data-counter'));
-					$this->assertEquals($filtered_rows_count, $this->query('xpath://a[@role="menuitem" and @aria-label="'.
-							$data['filter']['Name'].'"]')->waitUntilPresent()->one()->getAttribute('data-counter'));
+							$data['tab_id'].'"]/a')->one()->getAttribute('data-counter'));
 				}
 
-				$this->query('xpath://a[@aria-label="'.$data['filter']['Name'].'"]')->waitUntilPresent()->one()->click();
+				// Checking that dropdown/popup tab works.
+				$dropdown = $this->query('class:btn-widget-expand')->asPopupButton()->one();
+				$dropdown->fill($data['filter']['Name']);
 				$this->assertEquals($data['filter']['Name'], $filter_container->getSelectedTabName());
 				break;
 
@@ -283,5 +276,6 @@ class testFormFilter extends CWebTest {
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->checkValue(['Name' => $filter_name]);
 		$this->query('button:Cancel')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 	}
 }

@@ -41,13 +41,6 @@ class testFormTagsHost extends testFormTags {
 	}
 
 	/**
-	 * Check tag fields.
-	 */
-	public function testFormTagsHost_Screenshot() {
-		$this->checkTagScreenshot('host');
-	}
-
-	/**
 	 * Test update of Host with tags.
 	 *
 	 * @dataProvider getUpdateData
