@@ -3190,7 +3190,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					ret = get_trigger_function_value(c_event->trigger.expression, &replace_to,
 							*data, &token.data.simple_macro, ZBX_FORMAT_HUMAN);
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3198,7 +3199,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
-				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
+				else if (NULL != actionid && 0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
 					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
@@ -3505,7 +3506,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.loc.r;
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3513,7 +3515,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
-				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
+				else if (NULL != actionid && 0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
 					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
@@ -3722,7 +3724,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					DCget_user_macro(NULL, 0, m, &replace_to);
 					pos = token.loc.r;
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3862,7 +3865,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					DCget_user_macro(NULL, 0, m, &replace_to);
 					pos = token.loc.r;
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3955,7 +3959,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.loc.r;
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -3963,7 +3968,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
-				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
+				else if (NULL != actionid && 0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
 					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
@@ -4101,7 +4106,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.loc.r;
 				}
-				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
+				else if (NULL != actionid &&
+						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
 				{
 					ret = get_action_value(m, *actionid, &replace_to);
 				}
@@ -4109,7 +4115,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
-				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
+				else if (NULL != actionid && 0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
 					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
