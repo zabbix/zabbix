@@ -114,6 +114,7 @@ type runner struct {
 	names          chan string
 	err            chan error
 	done           chan struct{}
+	raidDone       chan struct{}
 	raids          chan raidParameters
 	devices        []deviceParser
 	jsonDevices    map[string]string
@@ -133,20 +134,19 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	}
 
 	r := &runner{
-		names:  make(chan string, len(basicDev)),
-		err:    make(chan error, cpuCount),
-		done:   make(chan struct{}),
-		plugin: p,
-		found:  make(map[string]bool),
+		names:    make(chan string, len(basicDev)),
+		err:      make(chan error, cpuCount),
+		done:     make(chan struct{}),
+		raidDone: make(chan struct{}),
+		plugin:   p,
+		found:    make(map[string]bool),
 	}
 
 	if jsonRunner {
 		r.jsonDevices = make(map[string]string)
 	}
 
-	r.startRunners(jsonRunner)
-
-	r.wg.Add(cpuCount)
+	r.startBasicRunners(jsonRunner)
 
 	for _, dev := range basicDev {
 		r.names <- dev.Name
@@ -163,9 +163,9 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		raidDev = append(raidDev, deviceInfo{Name: dev})
 	}
 
-	r.raids = make(chan raidParameters, len(raidDev))
+	r.raids = make(chan raidParameters, len(raidDev)*5)
 
-	r.wg.Add(cpuCount)
+	r.startRaidRunners(jsonRunner)
 
 	raidTypes := []string{"3ware", "areca", "cciss", "megaraid", "sat"}
 
@@ -177,19 +177,27 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 	close(r.raids)
 
-	err = r.waitForExecution()
-	if err != nil {
-		return nil, err
-	}
+	r.waitForRaidExecution()
 
 	return r, err
 }
 
-// startRunners starts runners to get basic and raid device information.
+// startBasicRunners starts runners to get basic device information.
 // Runner count is based on cpu core count.
-func (r *runner) startRunners(jsonRunner bool) {
+func (r *runner) startBasicRunners(jsonRunner bool) {
+	r.wg.Add(cpuCount)
+
 	for i := 0; i < cpuCount; i++ {
 		go r.getBasicDevices(jsonRunner)
+	}
+}
+
+// startRaidRunners starts runners to get raid device information.
+// Runner count is based on cpu core count.
+func (r *runner) startRaidRunners(jsonRunner bool) {
+	r.wg.Add(cpuCount)
+
+	for i := 0; i < cpuCount; i++ {
 		go r.getRaidDevices(jsonRunner)
 	}
 }
@@ -203,14 +211,24 @@ func (r *runner) waitForExecution() error {
 		close(r.done)
 	}()
 
-	for {
-		select {
-		case <-r.done:
-			return nil
-		case err := <-r.err:
-			return err
-		}
+	select {
+	case <-r.done:
+		return nil
+	case err := <-r.err:
+		return err
 	}
+}
+
+// waitForRaidExecution waits for all execution to stop.
+// Returns the first error a runner sends.
+func (r *runner) waitForRaidExecution() {
+	go func() {
+		r.wg.Wait()
+
+		close(r.raidDone)
+	}()
+
+	<-r.raidDone
 }
 
 // checkVersion checks the version of smartctl.

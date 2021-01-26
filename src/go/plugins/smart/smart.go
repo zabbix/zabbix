@@ -21,6 +21,8 @@ package smart
 
 import (
 	"encoding/json"
+	"fmt"
+	"runtime"
 	"strings"
 
 	"zabbix.com/pkg/conf"
@@ -64,7 +66,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if err = p.checkVersion(); err != nil {
 		return
 	}
-
+	fmt.Println(runtime.NumGoroutine())
 	var jsonArray []byte
 
 	switch key {
