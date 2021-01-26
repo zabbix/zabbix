@@ -1690,7 +1690,7 @@ void	zbx_reset_event_recovery(void)
  * Purpose: cleans single event                                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_clean_event(DB_EVENT *event)
+static void	zbx_clean_event(DB_EVENT *event)
 {
 	zbx_free(event->name);
 

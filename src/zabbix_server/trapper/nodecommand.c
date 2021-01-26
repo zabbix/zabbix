@@ -259,14 +259,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 		{
-			if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+			if (ZBX_SCRIPT_CTX_HOST != ctx && ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 				zbx_db_free_event(event);
 
 			ret = zbx_script_execute(&script, &host, user, event, ctx, result, error, sizeof(error), debug);
 		}
 		else
 		{
-			zbx_db_free_event(event);
+			if (ZBX_SCRIPT_CTX_HOST != ctx)
+				zbx_db_free_event(event);
 
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 		}

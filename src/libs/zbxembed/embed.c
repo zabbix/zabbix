@@ -439,7 +439,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	char **error)
 {
 	void		*buffer;
-	char		*output = NULL;
 	volatile int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
@@ -507,24 +506,12 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() output: null", __func__);
 		}
-		else
+		else if (NULL != script_ret)
 		{
-			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), &output)))
-			{
+			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), script_ret)))
 				*error = zbx_strdup(*error, "could not convert return value to utf8");
-			}
 			else
-			{
-				if (NULL != script_ret)
-				{
-					*script_ret = zbx_strdup(NULL, output);
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
-				}
-			}
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
 		}
 	}
 	else
@@ -533,8 +520,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 out:
-	zbx_free(output);
-
 	if (NULL != es->env->json)
 	{
 		zbx_json_close(es->env->json);
