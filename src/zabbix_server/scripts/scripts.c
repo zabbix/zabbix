@@ -639,7 +639,7 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
 	}
 
 	if (ZBX_SCRIPT_CTX_ACTION != ctx && NULL != event)
-		zbx_clean_event((DB_EVENT*)event);
+		zbx_db_free_event((DB_EVENT*)event);
 
 	ret = zbx_es_execute_command(script->command, params, script->timeout, result, error, max_error_len, debug);
 
