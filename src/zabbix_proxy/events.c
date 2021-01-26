@@ -83,6 +83,8 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 void	zbx_clean_event(DB_EVENT *event)
 {
+	ZBX_UNUSED(event);
+
 	THIS_SHOULD_NEVER_HAPPEN;
 }
 
