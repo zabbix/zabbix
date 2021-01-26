@@ -99,6 +99,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectGraphs'					=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectPreprocessing'			=> null,
+			'selectValueMap'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -108,6 +109,7 @@ class CItemPrototype extends CItemGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
+		$this->validateGet($options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -285,7 +287,7 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
@@ -306,6 +308,24 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid
+	 */
+	protected function validateGet(array $options) {
+		// Validate input parameters.
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
+		]];
+		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -1013,6 +1033,10 @@ class CItemPrototype extends CItemGeneral {
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			}
+
+			if ($options['selectValueMap'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.valuemapid', $sqlParts);
 			}
 		}
 

@@ -1983,6 +1983,50 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		// Add value mapping.
+		if ($options['selectValueMap'] !== null && ($this instanceof CItemPrototype || $this instanceof CItem)) {
+			if ($options['selectValueMap'] === API_OUTPUT_EXTEND) {
+				$options['selectValueMap'] = ['valuemapid', 'name', 'mappings'];
+			}
+
+			foreach ($result as &$item) {
+				$item['valuemap'] = [];
+			}
+			unset($item);
+
+			$valuemaps = DB::select('valuemap', [
+				'output' => array_diff($this->outputExtend($options['selectValueMap'], ['valuemapid', 'hostid']),
+					['mappings']
+				),
+				'filter' => ['valuemapid' => array_keys(array_flip(array_column($result, 'valuemapid')))],
+				'preservekeys' => true
+			]);
+
+			if ($this->outputIsRequested('mappings', $options['selectValueMap']) && $valuemaps) {
+				$params = [
+					'output' => ['valuemapid', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)]
+				];
+				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
+
+				while ($mapping = DBfetch($query)) {
+					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'value' => $mapping['value'],
+						'newvalue' => $mapping['newvalue']
+					];
+				}
+			}
+
+			foreach ($result as &$item) {
+				if (array_key_exists('valuemapid', $item) && array_key_exists($item['valuemapid'], $valuemaps)) {
+					$item['valuemap'] = array_intersect_key($valuemaps[$item['valuemapid']],
+						array_flip($options['selectValueMap'])
+					);
+				}
+			}
+			unset($item);
+		}
+
 		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {
 			$item_parameters = DBselect(
 				'SELECT ip.itemid,ip.name,ip.value'.
