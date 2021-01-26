@@ -419,14 +419,16 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				p_userid = &userid;
 			}
 
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, (event != NULL ? *event : NULL), NULL, p_userid, NULL, host, NULL,
-					NULL, NULL, NULL, &script->command, macro_mask, error, max_error_len))
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, (event != NULL ? *event : NULL), NULL,
+					p_userid, NULL, host, NULL, NULL, NULL, NULL, &script->command, macro_mask,
+					error, max_error_len))
 			{
 				goto out;
 			}
 
-			if (SUCCEED != substitute_simple_macros(NULL, (event != NULL ? *event : NULL), NULL, p_userid, NULL, host, NULL, NULL,
-					NULL, NULL, &script->command_orig, macro_mask, error, max_error_len))
+			if (SUCCEED != substitute_simple_macros(NULL, (event != NULL ? *event : NULL), NULL, p_userid,
+					NULL, host, NULL, NULL, NULL, NULL, &script->command_orig, macro_mask,
+					error, max_error_len))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 			}
