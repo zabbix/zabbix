@@ -32,6 +32,7 @@
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
 #include "comms.h"
+#include "../../libs/zbxserver/zabbix_users.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -88,39 +89,6 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const DB_ACKNOWLEDGE *ack, int err_type, const char *tz);
 
-/******************************************************************************
- *                                                                            *
- * Function: check_perm2system                                                *
- *                                                                            *
- * Purpose: Check user permissions to access system                           *
- *                                                                            *
- * Parameters: userid - user ID                                               *
- *                                                                            *
- * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
- *                                                                            *
- ******************************************************************************/
-static int	check_perm2system(zbx_uint64_t userid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res = SUCCEED;
-
-	result = DBselect(
-			"select count(*)"
-			" from usrgrp g,users_groups ug"
-			" where ug.userid=" ZBX_FS_UI64
-				" and g.usrgrpid=ug.usrgrpid"
-				" and g.users_status=%d",
-			userid, GROUP_STATUS_DISABLED);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
-		res = FAIL;
-
-	DBfree_result(result);
-
-	return res;
-}
-
 static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 {
 	int		user_type = -1;
@@ -141,24 +109,6 @@ static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 	DBfree_result(result);
 
 	return user_type;
-}
-
-static char	*get_user_timezone(zbx_uint64_t userid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*user_timezone;
-
-	result = DBselect("select timezone from users where userid=" ZBX_FS_UI64, userid);
-
-	if (NULL != (row = DBfetch(result)))
-		user_timezone = zbx_strdup(NULL, row[0]);
-	else
-		user_timezone = NULL;
-
-	DBfree_result(result);
-
-	return user_timezone;
 }
 
 /******************************************************************************
