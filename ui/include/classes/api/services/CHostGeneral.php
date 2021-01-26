@@ -1020,44 +1020,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		if ($options['selectInheritedValueMaps'] !== null) {
-			if ($options['selectInheritedValueMaps'] === API_OUTPUT_EXTEND) {
-				$options['selectInheritedValueMaps'] = ['valuemapid', 'name', 'templateid'];
-			}
-
-			$hosts_templates = [];
-			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
-
-			$db_valuemaps = DB::select('valuemap', [
-				'output' => $this->outputExtend(
-					array_flip(
-						CArrayHelper::renameKeys(array_flip($options['selectInheritedValueMaps']),
-							['templateid' => 'hostid']
-						)
-					), ['valuemapid', 'hostid', 'name']
-				),
-				'filter' => ['hostid' => $templateids]
-			]);
-
-			foreach ($result as $hostid => &$host) {
-				$valuemaps = [];
-
-				foreach ($hosts_templates[$hostid] as $templateid) {
-					foreach ($db_valuemaps as $db_valuemap) {
-						if (bccomp($db_valuemap['hostid'], $templateid) == 0) {
-							$valuemaps[] = $db_valuemap;
-						}
-					}
-				};
-
-				$host['inheritedValuemaps'] = $this->unsetExtraFields(
-					CArrayHelper::renameObjectsKeys($valuemaps, ['hostid' => 'templateid']),
-					['valuemapid', 'name', 'templateid'], $options['selectInheritedValueMaps']
-				);
-			}
-			unset($host);
-		}
-
 		return $result;
 	}
 
