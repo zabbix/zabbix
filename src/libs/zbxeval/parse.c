@@ -677,14 +677,14 @@ static void	eval_append_arg_null(zbx_eval_context_t *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_clean                                                       *
+ * Function: eval_clear                                                       *
  *                                                                            *
  * Purpose: free resources allocated by evaluation context                    *
  *                                                                            *
  * Parameters: ctx   - [IN] the evaluation context                            *
  *                                                                            *
  ******************************************************************************/
-static void	eval_clean(zbx_eval_context_t *ctx)
+static void	eval_clear(zbx_eval_context_t *ctx)
 {
 	int	i;
 
@@ -902,206 +902,9 @@ out:
 	zbx_vector_eval_token_destroy(&ctx->ops);
 
 	if (SUCCEED != ret)
-		eval_clean(ctx);
+		eval_clear(ctx);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: serialize_uint31_compact                                         *
- *                                                                            *
- * Purpose: serialize 31 bit unsigned integer into utf-8 like byte stream     *
- *                                                                            *
- * Parameters: ptr   - [OUT] the output buffer                                *
- *             value - [IN] the value to serialize                            *
- *                                                                            *
- * Return value: The number of bytes written to the buffer.                   *
- *                                                                            *
- * Comments: This serialization method should be used with variables usually  *
- *           having small value while still supporting larger values.         *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint32_t	serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value)
-{
-	if (0x7f >= value)
-	{
-		ptr[0] = (unsigned char)value;
-		return 1;
-	}
-	else
-	{
-		unsigned char	buf[6];
-		int		pos = sizeof(buf) - 1;
-		zbx_uint32_t	len;
-
-		while (value > (zbx_uint32_t)(0x3f >> (sizeof(buf) - pos)))
-		{
-			buf[pos] = 0x80 | (value & 0x3f);
-			value >>= 6;
-			pos--;
-		}
-
-		buf[pos] = value | (0xfe << (pos + 1));
-
-		len = sizeof(buf) - pos;
-		memcpy(ptr, buf + pos, len);
-		return len;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: deserialize_uint31_compact                                       *
- *                                                                            *
- * Purpose: deserialize 31 bit unsigned integer from utf-8 like byte stream   *
- *                                                                            *
- * Parameters: ptr   - [IN] the byte strem                                    *
- *             value - [OUT] the deserialized value                           *
- *                                                                            *
- * Return value: The number of bytes read from byte strean.                   *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint32_t	deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32_t *value)
-{
-	if (0 == (*ptr & 0x80))
-	{
-		*value = *ptr;
-		return 1;
-	}
-	else
-	{
-		int	pos = 2, i;
-
-		while (0 != (*ptr & (0x80 >> pos)))
-			pos++;
-
-		*value = *ptr & (0xff >> (pos + 1));
-
-		for (i = 1; i < pos; i++)
-		{
-			*value <<= 6;
-			*value |= (*(++ptr)) & 0x3f;
-		}
-
-		return pos;
-	}
-}
-
-#define ZBX_EVAL_STATIC_BUFFER_SIZE	4096
-
-/******************************************************************************
- *                                                                            *
- * Function: reserve_buffer                                                   *
- *                                                                            *
- * Purpose: reserve number of bytes in the specified buffer, reallocating if  *
- *          necessary                                                         *
- *                                                                            *
- * Parameters: buffer      - [IN/OUT] the buffer                              *
- *             buffer_size - [INT/OUT] the deserialized value                 *
- *             reserve     - [IN] the number of bytes to reserve              *
- *             ptr         - [IN/OUT] a pointer to an offset in buffer        *
- *                                                                            *
- * Comments: Initially static buffer is used, allocating dynamic buffer when  *
- *           static buffer is too small.                                      *
- *                                                                            *
- ******************************************************************************/
-static	void	reserve_buffer(unsigned char **buffer, size_t *buffer_size, size_t reserve, unsigned char **ptr)
-{
-	size_t		offset = *ptr - *buffer, new_size;
-
-	if (offset + reserve <= *buffer_size)
-		return;
-
-	new_size = *buffer_size * 1.5;
-
-	if (ZBX_EVAL_STATIC_BUFFER_SIZE == *buffer_size)
-	{
-		unsigned char	*old = *buffer;
-
-		*buffer = zbx_malloc(NULL, new_size);
-		memcpy(*buffer, old, offset);
-	}
-	else
-		*buffer = zbx_realloc(*buffer, new_size);
-
-	*buffer_size = new_size;
-	*ptr = *buffer + offset;
-}
-
-static void	serialize_variant(unsigned char **buffer, size_t *size, const zbx_variant_t *value,
-		unsigned char **ptr)
-{
-	size_t		len;
-
-	reserve_buffer(buffer, size, 1, ptr);
-	**ptr = value->type;
-	(*ptr)++;
-
-	switch (value->type)
-	{
-		case ZBX_VARIANT_UI64:
-			reserve_buffer(buffer, size, sizeof(value->data.ui64), ptr);
-			*ptr += zbx_serialize_uint64(*ptr, value->data.ui64);
-			break;
-		case ZBX_VARIANT_DBL:
-			reserve_buffer(buffer, size, sizeof(value->data.dbl), ptr);
-			*ptr += zbx_serialize_double(*ptr, value->data.dbl) + 1;
-			break;
-		case ZBX_VARIANT_STR:
-			len = strlen(value->data.str) + 1;
-			reserve_buffer(buffer, size, len, ptr);
-			memcpy(*ptr, value->data.str, len);
-			*ptr += len;
-			break;
-		case ZBX_VARIANT_NONE:
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_DEBUG, "TYPE: %d", value->type);
-			THIS_SHOULD_NEVER_HAPPEN;
-			(*ptr)[-1] = ZBX_VARIANT_NONE;
-			break;
-	}
-}
-
-static zbx_uint32_t	deserialize_variant(const unsigned char *ptr,  zbx_variant_t *value)
-{
-	const unsigned char	*start = ptr;
-	unsigned char		type;
-	zbx_uint64_t		ui64;
-	double			dbl;
-	char			*str;
-	size_t			len;
-
-	ptr += zbx_deserialize_char(ptr, &type);
-
-	switch (type)
-	{
-		case ZBX_VARIANT_UI64:
-			ptr += zbx_deserialize_uint64(ptr, &ui64);
-			zbx_variant_set_ui64(value, ui64);
-			break;
-		case ZBX_VARIANT_DBL:
-			ptr += zbx_deserialize_uint64(ptr, &dbl);
-			zbx_variant_set_dbl(value, dbl);
-			break;
-		case ZBX_VARIANT_STR:
-			len = strlen((const char *)ptr) + 1;
-			str = zbx_malloc(NULL, len);
-			memcpy(str, ptr, len);
-			zbx_variant_set_str(value, str);
-			ptr += len;
-			break;
-		case ZBX_VARIANT_NONE:
-			zbx_variant_set_none(value);
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_variant_set_none(value);
-			break;
-	}
-
-	return ptr - start;
 }
 
 /******************************************************************************
@@ -1126,6 +929,30 @@ int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, z
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_eval_parse_expression                                        *
+ *                                                                            *
+ * Purpose: parse expression into tokens in postfix notation order            *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to parse                      *
+ *             rules      - [IN] the parsing rules                            *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: The evaluation context or NULL in the case of error.         *
+ *                                                                            *
+ ******************************************************************************/
+zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error)
+{
+	zbx_eval_context_t	*ctx;
+
+	ctx = (zbx_eval_context_t *)zbx_malloc(NULL, sizeof(zbx_eval_context_t));
+	if (SUCCEED != zbx_eval_parse_expression(ctx, expression, rules, error))
+		zbx_free(ctx);
+
+	return ctx;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_eval_clear                                                   *
  *                                                                            *
  * Purpose: free resources allocated by evaluation context                    *
@@ -1135,282 +962,5 @@ int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, z
  ******************************************************************************/
 void	zbx_eval_clear(zbx_eval_context_t *ctx)
 {
-	eval_clean(ctx);
+	eval_clear(ctx);
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_eval_serialize                                               *
- *                                                                            *
- * Purpose: serialize evaluation context into buffer                          *
- *                                                                            *
- * Parameters: ctx         - [IN] the evaluation context                      *
- *             malloc_func - [IN] the buffer memory allocation function,      *
- *                                optional (by default the buffer is          *
- *                                allocated in heap)                          *
- *             data  - [OUT] the buffer with serialized evaluation context    *
- *                                                                            *
- * Comments: Location of the replaced tokens (with token.value set) are not   *
- *           serialized, making it impossible to reconstruct the expression   *
- *           text with replaced tokens.                                       *
- *           Context serialization/deserialization must be used for           *
- *           context caching.                                                 *
- *                                                                            *
- * Return value: The size of serialized data.                                 *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func,
-		unsigned char **data)
-{
-	int		i;
-	unsigned char	buffer_static[ZBX_EVAL_STATIC_BUFFER_SIZE], *buffer = buffer_static, *ptr = buffer, len_buff[4];
-	size_t		buffer_size = ZBX_EVAL_STATIC_BUFFER_SIZE;
-	zbx_uint32_t	len, len_offset;
-
-	if (NULL == malloc_func)
-		malloc_func = ZBX_DEFAULT_MEM_MALLOC_FUNC;
-
-	ptr += serialize_uint31_compact(ptr, ctx->stack.values_num);
-
-	for (i = 0; i < ctx->stack.values_num; i++)
-	{
-		const zbx_eval_token_t	*token = &ctx->stack.values[i];
-
-		reserve_buffer(&buffer, &buffer_size, 20, &ptr);
-
-		ptr += zbx_serialize_value(ptr, token->type);
-		ptr += serialize_uint31_compact(ptr, token->opt);
-
-		serialize_variant(&buffer, &buffer_size, &token->value, &ptr);
-
-		if (ZBX_VARIANT_NONE == token->value.type)
-		{
-			ptr += serialize_uint31_compact(ptr, token->loc.l);
-			ptr += serialize_uint31_compact(ptr, token->loc.r);
-		}
-	}
-
-	len = ptr - buffer;
-
-	len_offset = serialize_uint31_compact(len_buff, len);
-
-	*data = malloc_func(NULL, len + len_offset);
-	memcpy(*data, len_buff, len_offset);
-	memcpy(*data + len_offset, buffer, len);
-
-	if (buffer != buffer_static)
-		zbx_free(buffer);
-
-	return len + len_offset;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_eval_deserialize                                             *
- *                                                                            *
- * Purpose: deserialize evaluation context from buffer                        *
- *                                                                            *
- * Parameters: ctx        - [OUT] the evaluation context                      *
- *             expression - [IN] the expression the evaluation context was    *
- *                               created from                                 *
- *             rules      - [IN] the composition and evaluation rules         *
- *             data       - [IN] the buffer with serialized context           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
-		const unsigned char *data)
-{
-	zbx_uint32_t	i, tokens_num, len;
-
-	memset(ctx, 0, sizeof(zbx_eval_context_t));
-	ctx->expression = expression;
-	ctx->rules = rules;
-
-	data += deserialize_uint31_compact(data, &len);
-	data += deserialize_uint31_compact(data, &tokens_num);
-	zbx_vector_eval_token_create(&ctx->stack);
-	zbx_vector_eval_token_reserve(&ctx->stack, tokens_num);
-	ctx->stack.values_num = tokens_num;
-
-	for (i = 0; i < tokens_num; i++)
-	{
-		zbx_eval_token_t	*token = &ctx->stack.values[i];
-
-		data += zbx_deserialize_value(data, &token->type);
-		data += deserialize_uint31_compact(data, &token->opt);
-		data += deserialize_variant(data, &token->value);
-
-		if (ZBX_VARIANT_NONE == token->value.type)
-		{
-			zbx_uint32_t	pos;
-
-			data += deserialize_uint31_compact(data, &pos);
-			token->loc.l = pos;
-			data += deserialize_uint31_compact(data, &pos);
-			token->loc.r = pos;
-		}
-		else
-			token->loc.l = token->loc.r = 0;
-	}
-}
-
-static int	compare_tokens_by_loc(const void *d1, const void *d2)
-{
-	const zbx_eval_token_t	*t1 = *(const zbx_eval_token_t **)d1;
-	const zbx_eval_token_t	*t2 = *(const zbx_eval_token_t **)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(t1->loc.l, t2->loc.l);
-	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: eval_token_print_alloc                                           *
- *                                                                            *
- * Purpose: print token into string quoting/escaping if necessary             *
- *                                                                            *
- * Parameters: ctx        - [IN] the evaluation context                       *
- *             str        - [IN/OUT] the output buffer                        *
- *             str_alloc  - [IN/OUT] the output buffer size                   *
- *             str_offset - [IN/OUT] the output buffer offset                 *
- *             token      - [IN] the token to print                           *
- *                                                                            *
- ******************************************************************************/
-static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc, size_t *str_offset,
-		const zbx_eval_token_t *token)
-{
-	int		quoted = 0, len, check_value = 0;
-	const char	*src, *value_str;
-	char		*dst;
-	size_t		size;
-
-	if (ZBX_VARIANT_NONE == token->value.type)
-		return;
-
-	switch (token->type)
-	{
-		case ZBX_EVAL_TOKEN_VAR_STR:
-			quoted = 1;
-			break;
-		case ZBX_EVAL_TOKEN_VAR_MACRO:
-			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_MACRO))
-				check_value = 1;
-			break;
-		case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_USERMACRO))
-				check_value = 1;
-			break;
-		case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
-			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_LLDMACRO))
-				check_value = 1;
-			break;
-	}
-
-	if (0 != check_value)
-	{
-		if (ZBX_VARIANT_STR == token->value.type && (SUCCEED != zbx_number_parse(token->value.data.str, &len) ||
-				strlen(token->value.data.str) != (size_t)len))
-		{
-			quoted = 1;
-		}
-	}
-
-	value_str = zbx_variant_value_desc(&token->value);
-
-	if (0 == quoted)
-	{
-		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
-		return;
-	}
-
-	for (size = 2, src = value_str; '\0' != *src; src++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				size++;
-		}
-		size++;
-	}
-
-	if (*str_alloc - *str_offset <= size)
-	{
-		do
-		{
-			*str_alloc *= 2;
-		}
-		while (*str_alloc - *str_offset <= size);
-
-		*str = zbx_realloc(*str, *str_alloc);
-	}
-
-	dst = *str + *str_offset;
-	*dst++ = '"';
-
-	for (src = value_str; '\0' != *src; src++, dst++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				*dst++ = '\\';
-				break;
-		}
-
-		*dst = *src;
-	}
-
-	*dst++ = '"';
-	*dst = '\0';
-	*str_offset += size;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_eval_compose_expression                                      *
- *                                                                            *
- * Purpose: compose expression by replacing processed tokens (with values) in *
- *          the original expression                                           *
- *                                                                            *
- * Parameters: ctx        - [IN] the evaluation context                       *
- *             expression - [OUT] the composed expression                     *
- *                                                                            *
- ******************************************************************************/
-void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expression)
-{
-	zbx_vector_ptr_t	tokens;
-	const zbx_eval_token_t	*token;
-	int			i;
-	size_t			pos = 0, expression_alloc = 0, expression_offset = 0;
-
-	zbx_vector_ptr_create(&tokens);
-
-	for (i = 0; i < ctx->stack.values_num; i++)
-	{
-		if (ZBX_VARIANT_NONE != ctx->stack.values[i].value.type)
-			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
-	}
-
-	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
-
-	for (i = 0; i < tokens.values_num; i++)
-	{
-		token = (const zbx_eval_token_t *)tokens.values[i];
-
-		if (0 != token->loc.l)
-		{
-			zbx_strncpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos,
-					token->loc.l - pos);
-		}
-		pos = token->loc.r + 1;
-		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token);
-	}
-
-	if ('\0' != ctx->expression[pos])
-		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos);
-
-	zbx_vector_ptr_destroy(&tokens);
-}
-
-

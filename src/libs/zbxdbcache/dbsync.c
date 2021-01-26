@@ -2206,7 +2206,7 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	zbx_vector_uint64_t	hostids, functionids;
 	zbx_eval_context_t	ctx, ctx_r;
 	char			*error;
-	unsigned char		mode;
+	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&functionids);
@@ -2217,20 +2217,30 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		zbx_free(error);
 	}
 	else
+	{
 		zbx_eval_get_functionids(&ctx, &functionids);
+
+		if (SUCCEED == zbx_eval_check_timer_functions(&ctx))
+			timer |= ZBX_TRIGGER_TIMER_EXPRESSION;
+	}
 
 	ZBX_STR2UCHAR(mode, row[10]);
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == mode)
 	{
-		if (FAIL == zbx_eval_parse_expression(&ctx_r, row[2], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
+		if (FAIL == zbx_eval_parse_expression(&ctx_r, row[11], ZBX_EVAL_TRIGGER_EXPRESSION, &error))
 		{
 			zbx_eval_set_exception(&ctx_r, zbx_dsprintf(NULL, "cannot parse trigger recovery"
 					" expression: %s", error));
 			zbx_free(error);
 		}
 		else
+		{
 			zbx_eval_get_functionids(&ctx, &functionids);
+
+			if (SUCCEED == zbx_eval_check_timer_functions(&ctx))
+				timer |= ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION;
+		}
 	}
 
 	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
@@ -2252,6 +2262,8 @@ static char	**dbsync_trigger_preproc_row(char **row)
 		zbx_eval_clear(&ctx_r);
 	}
 
+	row[18] = zbx_dsprintf(NULL, "%d", timer);
+
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
 
@@ -2270,7 +2282,9 @@ static char	**dbsync_trigger_preproc_row(char **row)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comment: The 16th and 17th fields (starting with 0) are placeholders for   *
- *          serialized expression/recovery expression                         *
+ *          serialized expression/recovery expression.                        *
+ *          The 18th field is placeholder for trigger timer flag (set if      *
+ *          expression/recovery expression contains timer functions).         *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
@@ -2286,7 +2300,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
 				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
-				"t.correlation_mode,t.correlation_tag,t.opdata,t.event_name,null,null"
+				"t.correlation_mode,t.correlation_tag,t.opdata,t.event_name,null,null,null"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -2299,7 +2313,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 18, dbsync_trigger_preproc_row);
+	dbsync_prepare(sync, 19, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

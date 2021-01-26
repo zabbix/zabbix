@@ -4296,7 +4296,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 		for (; '{' != *ptr || 0 != quoted; ptr++)
 		{
 			if ('\0' == *ptr)
-				return FAIL;
+				break;
 
 			if (0 != (token_search & ZBX_TOKEN_SEARCH_FUNCTIONID))
 			{
@@ -4337,7 +4337,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				token_search &= ~ZBX_TOKEN_SEARCH_REFERENCES;
 		}
 
-		if (NULL == ptr)
+		if (NULL == ptr || '\0' == *ptr)
 			return FAIL;
 
 		if ('\0' == ptr[1])
@@ -6097,7 +6097,7 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strloc_unquote_dyn                                           *
+ * Function: zbx_strloc_unquote                                               *
  *                                                                            *
  * Purpose: unquotes substring at the specified location                      *
  *                                                                            *
@@ -6107,34 +6107,41 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_strloc_unquote_dyn(const char *src, const zbx_strloc_t *loc)
+char	*zbx_strloc_get(const char *src, const zbx_strloc_t *loc)
 {
-	char		*str, *ptr;
+	char	*str, *ptr;
 
-	src += loc->l + 1;
-
-	str = ptr = zbx_malloc(NULL, loc->r - loc->l);
-
-	while ('"' != *src)
+	if ('"' == src[loc->l])
 	{
-		if ('\\' == *src)
+		src += loc->l + 1;
+		str = ptr = zbx_malloc(NULL, loc->r - loc->l);
+
+		while ('"' != *src)
 		{
-			switch (*(++src))
+			if ('\\' == *src)
 			{
-				case '\\':
-					*ptr++ = '\\';
-					break;
-				case '"':
-					*ptr++ = '"';
-					break;
+				switch (*(++src))
+				{
+					case '\\':
+						*ptr++ = '\\';
+						break;
+					case '"':
+						*ptr++ = '"';
+						break;
+				}
 			}
+			else
+				*ptr++ = *src;
+			src++;
 		}
-		else
-			*ptr++ = *src;
-		src++;
+		*ptr = '\0';
 	}
-	*ptr = '\0';
+	else
+	{
+		str = zbx_malloc(NULL, loc->r - loc->l + 2);
+		memcpy(str, src + loc->l, loc->r - loc->l + 1);
+		str[loc->r - loc->l + 1] = '\0';
+	}
 
 	return str;
 }
-

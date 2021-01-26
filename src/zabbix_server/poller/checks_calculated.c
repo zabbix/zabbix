@@ -240,7 +240,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 		/*     NOTSUPPORTED items. */
 		/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
-		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == evaluatable_for_notsupported(f->func))
+		if (ITEM_STATE_NOTSUPPORTED == items[i].state && FAIL == zbx_evaluatable_for_notsupported(f->func))
 		{
 			/* compose and store 'unknown' message for future use */
 			unknown_msg = zbx_dsprintf(NULL,

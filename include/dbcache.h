@@ -230,9 +230,6 @@ typedef struct _DC_TRIGGER
 {
 	zbx_uint64_t		triggerid;
 	char			*description;
-	char			*expression_orig;
-	char			*recovery_expression_orig;
-	/* temporary values, allocated during processing and freed right after */
 	char			*expression;
 	char			*recovery_expression;
 
@@ -750,7 +747,6 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 #define ZBX_MACRO_SECRET_MASK	"******"
 
 void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to);
-char	*DCexpression_expand_user_macros(const char *expression);
 char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params);
 
 int	DCinterface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
@@ -990,10 +986,10 @@ typedef struct
 {
 	zbx_uint64_t		objectid;
 	zbx_uint64_t		triggerid;
-	zbx_function_type_t	type;
+	zbx_uint32_t		type;
 	zbx_time_unit_t		trend_base;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
-	int			revision;	/* function revision */
+	int			revision;	/* revision */
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
 	zbx_timespec_t		exec_ts;	/* real time when the timer must be executed */
 	const char		*parameter;	/* function parameters (for trend functions) */
@@ -1011,5 +1007,7 @@ int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);
 
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
+
+void	zbx_dc_eval_expand_user_macros(zbx_eval_context_t *ctx);
 
 #endif

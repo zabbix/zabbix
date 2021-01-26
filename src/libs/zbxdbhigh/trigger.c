@@ -32,6 +32,14 @@
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
+/* DB_TRIGGER cached objects */
+typedef enum
+{
+	ZBX_DB_TRIGGER_CACHE_EVAL_CTX,
+	ZBX_DB_TRIGGER_CACHE_EVAL_CTX_R,
+	ZBX_DB_TRIGGER_CACHE_EVAL_CTX_MACROS,
+}
+zbx_db_trigger_cache_t;
 
 /******************************************************************************
  *                                                                            *
@@ -119,7 +127,7 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 	{
 		zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 				&trigger->timespec, new_value, trigger->description,
-				trigger->expression_orig, trigger->recovery_expression_orig,
+				trigger->expression, trigger->recovery_expression,
 				trigger->priority, trigger->type, &trigger->tags,
 				trigger->correlation_mode, trigger->correlation_tag, trigger->value, trigger->opdata,
 				trigger->event_name, NULL);
@@ -302,4 +310,378 @@ void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t trigge
 	diff->problem_count = 0;
 
 	zbx_vector_ptr_append(trigger_diff, diff);
+}
+
+
+/* temporary cache of trigger related data */
+typedef struct
+{
+	zbx_uint64_t		flags;
+	zbx_eval_context_t	eval_ctx;
+	zbx_eval_context_t	eval_ctx_r;
+	zbx_vector_uint64_t	hostids;
+}
+zbx_trigger_cache_t;
+
+/* related trigger data caching states */
+typedef enum
+{
+	ZBX_TRIGGER_CACHE_EVAL_CTX,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_R,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS,
+	ZBX_TRIGGER_CACHE_HOSTIDS,
+}
+zbx_trigger_cache_state_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_trigger_get_cache                                             *
+ *                                                                            *
+ * Purpose: get trigger cache with the requested data cached                  *
+ *                                                                            *
+ * Parameters: trigger - [IN] the trigger                                     *
+ *             state   - [IN] the required cache state                        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_trigger_cache_state_t state)
+{
+	zbx_trigger_cache_t	*cache;
+	char			*error = NULL;
+	zbx_uint64_t		flag = __UINT64_C(1) << state;
+	zbx_vector_uint64_t	functionids;
+
+	if (NULL == trigger->cache)
+	{
+		cache = (zbx_trigger_cache_t *)zbx_malloc(NULL, sizeof(zbx_trigger_cache_t));
+		cache->flags = 0;
+		((DB_TRIGGER *)trigger)->cache = cache;
+	}
+	else
+		cache = (zbx_trigger_cache_t *)trigger->cache;
+
+	if (0 != (cache->flags & flag))
+		return 0 != (cache->flags & (flag << 32)) ? cache : NULL;
+
+	cache->flags |= flag;
+
+	switch (state)
+	{
+		case ZBX_TRIGGER_CACHE_EVAL_CTX:
+			if ('\0' == *trigger->expression)
+				return NULL;
+
+			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx, trigger->expression,
+					ZBX_EVAL_TRIGGER_EXPRESSION, &error))
+			{
+				zbx_free(error);
+				return NULL;
+			}
+			break;
+		case ZBX_TRIGGER_CACHE_EVAL_CTX_R:
+			if ('\0' == *trigger->recovery_expression)
+				return NULL;
+
+			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx_r, trigger->recovery_expression,
+					ZBX_EVAL_TRIGGER_EXPRESSION, &error))
+			{
+				zbx_free(error);
+				return NULL;
+			}
+			break;
+		case ZBX_DB_TRIGGER_CACHE_EVAL_CTX_MACROS:
+			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX))
+					return NULL;
+			zbx_dc_eval_expand_user_macros(&cache->eval_ctx);
+			break;
+		case ZBX_TRIGGER_CACHE_HOSTIDS:
+			zbx_vector_uint64_create(&cache->hostids);
+			zbx_vector_uint64_create(&functionids);
+			zbx_db_trigger_get_all_functionids(trigger, &functionids);
+			DCget_hostids_by_functionids(&functionids, &cache->hostids);
+			zbx_vector_uint64_destroy(&functionids);
+			break;
+		default:
+			return NULL;
+	}
+
+	cache->flags |= (flag << 32);
+
+	return cache;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: trigger_cache_free                                               *
+ *                                                                            *
+ * Purpose: free trigger cache                                                *
+ *                                                                            *
+ * Parameters: cache - [IN] the trigger cache                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	trigger_cache_free(zbx_trigger_cache_t *cache)
+{
+	if (0 != (cache->flags & (__UINT64_C(1) << ZBX_TRIGGER_CACHE_EVAL_CTX << 32)))
+		zbx_eval_clear(&cache->eval_ctx);
+
+	if (0 != (cache->flags & (__UINT64_C(1) << ZBX_TRIGGER_CACHE_EVAL_CTX_R << 32)))
+		zbx_eval_clear(&cache->eval_ctx_r);
+
+	if (0 != (cache->flags & (__UINT64_C(1) << ZBX_TRIGGER_CACHE_HOSTIDS << 32)))
+		zbx_vector_uint64_destroy(&cache->hostids);
+
+	zbx_free(cache);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_all_functionids                               *
+ *                                                                            *
+ * Purpose: get functionids from trigger expression and recovery expression   *
+ *                                                                            *
+ * Parameters: trigger     - [IN] the trigger                                 *
+ *             functionids - [OUT] the extracted functionids                  *
+ *                                                                            *
+ * Comments: This function will cache parsed expressions in the trigger.      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids)
+{
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+		zbx_eval_get_functionids(&cache->eval_ctx, functionids);
+
+	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
+		zbx_eval_get_functionids(&cache->eval_ctx_r, functionids);
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_functionids                                   *
+ *                                                                            *
+ * Purpose: get functionids from trigger expression                           *
+ *                                                                            *
+ * Parameters: trigger     - [IN] the trigger                                 *
+ *             functionids - [OUT] the extracted functionids                  *
+ *                                                                            *
+ * Comments: This function will cache parsed expressions in the trigger.      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids)
+{
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL != (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+		zbx_eval_get_functionids(&cache->eval_ctx, functionids);
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_constant                                      *
+ *                                                                            *
+ * Purpose: get trigger expression constant at the specified location         *
+ *                                                                            *
+ * Parameters: trigger - [IN] the trigger                                     *
+ *             index   - [IN] the constant index, starting with 1             *
+ *             out     - [IN] the constant value, if exists                   *
+ *                                                                            *
+ * Return value: SUCCEED - the expression was parsed and constant extracted   *
+ *                         (if the index was valid)                           *
+ *               FAIL    - the expression failed to parse                     *
+ *                                                                            *
+ * Comments: This function will cache parsed expressions in the trigger.      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out)
+{
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS)))
+		return FAIL;
+
+	zbx_eval_get_constant(&cache->eval_ctx, index, out);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_itemid                                        *
+ *                                                                            *
+ * Purpose: get the Nth function item from trigger expression                 *
+ *                                                                            *
+ * Parameters: trigger - [IN] the trigger                                     *
+ *             index   - [IN] the function index                              *
+ *             itemid  - [IN] the function itemid                             *
+ *                                                                            *
+ * Comments: SUCCEED - the itemid was extracted successfully                  *
+ *           FAIL    - otherwise                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid)
+{
+	int			i, ret = FAIL;
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+		return FAIL;
+
+	for (i = 0; i < cache->eval_ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &cache->eval_ctx.stack.values[i];
+		zbx_uint64_t		functionid;
+		DC_FUNCTION		function;
+		int			errcode;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type || (int)token->opt + 1 != index)
+			continue;
+
+		switch (token->value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				functionid = token->value.data.ui64;
+				break;
+			case ZBX_VARIANT_NONE:
+				if (SUCCEED != is_uint64_n(cache->eval_ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					return FAIL;
+				}
+				zbx_variant_set_ui64(&token->value, functionid);
+				break;
+			default:
+				return FAIL;
+		}
+
+		DCconfig_get_functions_by_functionids(&function, &functionid, &errcode, 1);
+
+		if (SUCCEED == errcode)
+		{
+			*itemid = function.itemid;
+			ret = SUCCEED;
+		}
+
+		DCconfig_clean_functions(&function, &errcode, 1);
+		break;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_itemids                                       *
+ *                                                                            *
+ * Purpose: get unique itemids of trigger functions in the order at they are  *
+ *          written in expression                                             *
+ *                                                                            *
+ * Parameters: trigger - [IN] the trigger                                     *
+ *             itemids - [IN] the function itemids                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids)
+{
+	zbx_vector_uint64_t	functionids, functionids_ordered;
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX)))
+		return;
+
+	zbx_vector_uint64_create(&functionids);
+	zbx_vector_uint64_create(&functionids_ordered);
+
+	zbx_eval_get_functionids_ordered(&cache->eval_ctx, &functionids_ordered);
+
+	if (0 != functionids_ordered.values_num)
+	{
+		DC_FUNCTION	*function, *functions;
+		int		i, *errcodes;
+
+		zbx_vector_uint64_append_array(&functionids, functionids_ordered.values,
+				functionids_ordered.values_num);
+
+		zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		functions = (DC_FUNCTION *)zbx_malloc(NULL, sizeof(DC_FUNCTION) * functionids.values_num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * functionids.values_num);
+
+		DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes,
+				functionids.values_num);
+
+		for (i = 0; i < functionids_ordered.values_num; i++)
+		{
+			if (NULL != (function = bsearch(&functionids_ordered.values[i], functions,
+					functionids.values_num, sizeof(DC_FUNCTION),
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				if (FAIL == zbx_vector_uint64_search(itemids, function->itemid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
+					zbx_vector_uint64_append(itemids, function->itemid);
+				}
+			}
+		}
+
+		DCconfig_clean_functions(functions, errcodes, functionids.values_num);
+		zbx_free(functions);
+		zbx_free(errcodes);
+	}
+
+	zbx_vector_uint64_destroy(&functionids_ordered);
+	zbx_vector_uint64_destroy(&functionids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_get_all_hostids                                   *
+ *                                                                            *
+ * Purpose: get hostids from trigger expression and recovery expression       *
+ *                                                                            *
+ * Parameters: trigger - [IN] the trigger                                     *
+ *             hostids - [OUT] the extracted hostids                          *
+ *                                                                            *
+ * Return value: SUCCEED - the hostids vector was returned (but can be empty  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function will cache parsed expressions in the trigger.      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids)
+{
+	zbx_trigger_cache_t	*cache;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_HOSTIDS)))
+		return FAIL;
+
+	*hostids = &cache->hostids;
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_trigger_clean                                             *
+ *                                                                            *
+ * Purpose: frees resources allocated to store trigger data                   *
+ *                                                                            *
+ * Parameters: trigger -                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
+{
+	zbx_free(trigger->description);
+	zbx_free(trigger->expression);
+	zbx_free(trigger->recovery_expression);
+	zbx_free(trigger->comments);
+	zbx_free(trigger->url);
+	zbx_free(trigger->opdata);
+	zbx_free(trigger->event_name);
+
+	if (NULL != trigger->cache)
+		trigger_cache_free((zbx_trigger_cache_t *)trigger->cache);
 }

@@ -3569,7 +3569,7 @@ zbx_function_type_t	zbx_get_function_type(const char *func)
 	if (0 == strncmp(func, "trend", 5))
 		return ZBX_FUNCTION_TYPE_TRENDS;
 
-	if (SUCCEED == str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ','))
+	if (0 == strcmp(func, "nodata"))
 		return ZBX_FUNCTION_TYPE_TIMER;
 
 	return ZBX_FUNCTION_TYPE_HISTORY;

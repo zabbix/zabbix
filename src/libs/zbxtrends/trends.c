@@ -90,17 +90,16 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
  ******************************************************************************/
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
 {
-	char		*period_shift;
+	const char	*period_shift;
 	int		ret = FAIL;
 
-	if (NULL == (period_shift = zbx_function_get_param_dyn(params, 2)))
+	if (NULL == (period_shift = strchr(params, ':')))
 	{
 		*error = zbx_strdup(*error, "missing period shift parameter");
 		return FAIL;
 	}
 
-	ret = trends_parse_base(period_shift, base, error);
-	zbx_free(period_shift);
+	ret = trends_parse_base(period_shift + 1, base, error);
 
 	return ret;
 }

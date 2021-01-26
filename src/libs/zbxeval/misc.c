@@ -25,36 +25,393 @@
 #include "zbxvariant.h"
 #include "zbxserialize.h"
 #include "zbxserver.h"
+#include "eval.h"
+
+#define ZBX_EVAL_STATIC_BUFFER_SIZE	4096
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_get_functionids                                         *
+ * Function: reserve_buffer                                                   *
  *                                                                            *
- * Purpose: extract functionids from the parsed expression                    *
+ * Purpose: reserve number of bytes in the specified buffer, reallocating if  *
+ *          necessary                                                         *
  *                                                                            *
- * Parameters: ctx         - [IN] the evaluation context                      *
- *             functionids - [OUT] the extracted functionids                  *
+ * Parameters: buffer      - [IN/OUT] the buffer                              *
+ *             buffer_size - [INT/OUT] the deserialized value                 *
+ *             reserve     - [IN] the number of bytes to reserve              *
+ *             ptr         - [IN/OUT] a pointer to an offset in buffer        *
+ *                                                                            *
+ * Comments: Initially static buffer is used, allocating dynamic buffer when  *
+ *           static buffer is too small.                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eval_get_functionids(const zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids)
+static	void	reserve_buffer(unsigned char **buffer, size_t *buffer_size, size_t reserve, unsigned char **ptr)
 {
-	int	i;
+	size_t		offset = *ptr - *buffer, new_size;
+
+	if (offset + reserve <= *buffer_size)
+		return;
+
+	new_size = *buffer_size * 1.5;
+
+	if (ZBX_EVAL_STATIC_BUFFER_SIZE == *buffer_size)
+	{
+		unsigned char	*old = *buffer;
+
+		*buffer = zbx_malloc(NULL, new_size);
+		memcpy(*buffer, old, offset);
+	}
+	else
+		*buffer = zbx_realloc(*buffer, new_size);
+
+	*buffer_size = new_size;
+	*ptr = *buffer + offset;
+}
+
+static void	serialize_variant(unsigned char **buffer, size_t *size, const zbx_variant_t *value,
+		unsigned char **ptr)
+{
+	size_t		len;
+
+	reserve_buffer(buffer, size, 1, ptr);
+	**ptr = value->type;
+	(*ptr)++;
+
+	switch (value->type)
+	{
+		case ZBX_VARIANT_UI64:
+			reserve_buffer(buffer, size, sizeof(value->data.ui64), ptr);
+			*ptr += zbx_serialize_uint64(*ptr, value->data.ui64);
+			break;
+		case ZBX_VARIANT_DBL:
+			reserve_buffer(buffer, size, sizeof(value->data.dbl), ptr);
+			*ptr += zbx_serialize_double(*ptr, value->data.dbl) + 1;
+			break;
+		case ZBX_VARIANT_STR:
+			len = strlen(value->data.str) + 1;
+			reserve_buffer(buffer, size, len, ptr);
+			memcpy(*ptr, value->data.str, len);
+			*ptr += len;
+			break;
+		case ZBX_VARIANT_NONE:
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_DEBUG, "TYPE: %d", value->type);
+			THIS_SHOULD_NEVER_HAPPEN;
+			(*ptr)[-1] = ZBX_VARIANT_NONE;
+			break;
+	}
+}
+
+static zbx_uint32_t	deserialize_variant(const unsigned char *ptr,  zbx_variant_t *value)
+{
+	const unsigned char	*start = ptr;
+	unsigned char		type;
+	zbx_uint64_t		ui64;
+	double			dbl;
+	char			*str;
+	size_t			len;
+
+	ptr += zbx_deserialize_char(ptr, &type);
+
+	switch (type)
+	{
+		case ZBX_VARIANT_UI64:
+			ptr += zbx_deserialize_uint64(ptr, &ui64);
+			zbx_variant_set_ui64(value, ui64);
+			break;
+		case ZBX_VARIANT_DBL:
+			ptr += zbx_deserialize_double(ptr, &dbl);
+			zbx_variant_set_dbl(value, dbl);
+			break;
+		case ZBX_VARIANT_STR:
+			len = strlen((const char *)ptr) + 1;
+			str = zbx_malloc(NULL, len);
+			memcpy(str, ptr, len);
+			zbx_variant_set_str(value, str);
+			ptr += len;
+			break;
+		case ZBX_VARIANT_NONE:
+			zbx_variant_set_none(value);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_variant_set_none(value);
+			break;
+	}
+
+	return ptr - start;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_serialize                                               *
+ *                                                                            *
+ * Purpose: serialize evaluation context into buffer                          *
+ *                                                                            *
+ * Parameters: ctx         - [IN] the evaluation context                      *
+ *             malloc_func - [IN] the buffer memory allocation function,      *
+ *                                optional (by default the buffer is          *
+ *                                allocated in heap)                          *
+ *             data  - [OUT] the buffer with serialized evaluation context    *
+ *                                                                            *
+ * Comments: Location of the replaced tokens (with token.value set) are not   *
+ *           serialized, making it impossible to reconstruct the expression   *
+ *           text with replaced tokens.                                       *
+ *           Context serialization/deserialization must be used for           *
+ *           context caching.                                                 *
+ *                                                                            *
+ * Return value: The size of serialized data.                                 *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func,
+		unsigned char **data)
+{
+	int		i;
+	unsigned char	buffer_static[ZBX_EVAL_STATIC_BUFFER_SIZE], *buffer = buffer_static, *ptr = buffer, len_buff[4];
+	size_t		buffer_size = ZBX_EVAL_STATIC_BUFFER_SIZE;
+	zbx_uint32_t	len, len_offset;
+
+	if (NULL == malloc_func)
+		malloc_func = ZBX_DEFAULT_MEM_MALLOC_FUNC;
+
+	ptr += zbx_serialize_uint31_compact(ptr, ctx->stack.values_num);
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
+		const zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		reserve_buffer(&buffer, &buffer_size, 20, &ptr);
+
+		ptr += zbx_serialize_value(ptr, token->type);
+		ptr += zbx_serialize_uint31_compact(ptr, token->opt);
+
+		serialize_variant(&buffer, &buffer_size, &token->value, &ptr);
+
+		ptr += zbx_serialize_uint31_compact(ptr, token->loc.l);
+		ptr += zbx_serialize_uint31_compact(ptr, token->loc.r);
+	}
+
+	len = ptr - buffer;
+
+	len_offset = zbx_serialize_uint31_compact(len_buff, len);
+
+	*data = malloc_func(NULL, len + len_offset);
+	memcpy(*data, len_buff, len_offset);
+	memcpy(*data + len_offset, buffer, len);
+
+	if (buffer != buffer_static)
+		zbx_free(buffer);
+
+	return len + len_offset;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_deserialize                                             *
+ *                                                                            *
+ * Purpose: deserialize evaluation context from buffer                        *
+ *                                                                            *
+ * Parameters: ctx        - [OUT] the evaluation context                      *
+ *             expression - [IN] the expression the evaluation context was    *
+ *                               created from                                 *
+ *             rules      - [IN] the composition and evaluation rules         *
+ *             data       - [IN] the buffer with serialized context           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
+		const unsigned char *data)
+{
+	zbx_uint32_t	i, tokens_num, len, pos;
+
+	memset(ctx, 0, sizeof(zbx_eval_context_t));
+	ctx->expression = expression;
+	ctx->rules = rules;
+
+	data += zbx_deserialize_uint31_compact(data, &len);
+	data += zbx_deserialize_uint31_compact(data, &tokens_num);
+	zbx_vector_eval_token_create(&ctx->stack);
+	zbx_vector_eval_token_reserve(&ctx->stack, tokens_num);
+	ctx->stack.values_num = tokens_num;
+
+	for (i = 0; i < tokens_num; i++)
+	{
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 
-		if (ZBX_EVAL_TOKEN_FUNCTIONID == token->type)
-		{
-			zbx_uint64_t	functionid;
+		data += zbx_deserialize_value(data, &token->type);
+		data += zbx_deserialize_uint31_compact(data, &token->opt);
+		data += deserialize_variant(data, &token->value);
 
-			if (SUCCEED == is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
-					&functionid))
-			{
-				zbx_vector_uint64_append(functionids, functionid);
-			}
+		data += zbx_deserialize_uint31_compact(data, &pos);
+		token->loc.l = pos;
+		data += zbx_deserialize_uint31_compact(data, &pos);
+		token->loc.r = pos;
+	}
+}
+
+static int	compare_tokens_by_loc(const void *d1, const void *d2)
+{
+	const zbx_eval_token_t	*t1 = *(const zbx_eval_token_t **)d1;
+	const zbx_eval_token_t	*t2 = *(const zbx_eval_token_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1->loc.l, t2->loc.l);
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: eval_token_print_alloc                                           *
+ *                                                                            *
+ * Purpose: print token into string quoting/escaping if necessary             *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             str        - [IN/OUT] the output buffer                        *
+ *             str_alloc  - [IN/OUT] the output buffer size                   *
+ *             str_offset - [IN/OUT] the output buffer offset                 *
+ *             token      - [IN] the token to print                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc, size_t *str_offset,
+		const zbx_eval_token_t *token)
+{
+	int		quoted = 0, len, check_value = 0;
+	const char	*src, *value_str;
+	char		*dst;
+	size_t		size;
+
+	if (ZBX_VARIANT_NONE == token->value.type)
+		return;
+
+	switch (token->type)
+	{
+		case ZBX_EVAL_TOKEN_VAR_STR:
+			quoted = 1;
+			break;
+		case ZBX_EVAL_TOKEN_VAR_MACRO:
+			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_MACRO))
+				check_value = 1;
+			break;
+		case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_USERMACRO))
+				check_value = 1;
+			break;
+		case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
+			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_LLDMACRO))
+				check_value = 1;
+			break;
+		case ZBX_EVAL_TOKEN_FUNCTIONID:
+			check_value = 1;
+			break;
+	}
+
+	if (0 != check_value)
+	{
+		if (ZBX_VARIANT_STR == token->value.type && (SUCCEED != zbx_number_parse(token->value.data.str, &len) ||
+				strlen(token->value.data.str) != (size_t)len))
+		{
+			quoted = 1;
 		}
 	}
+
+	value_str = zbx_variant_value_desc(&token->value);
+
+	if (0 == quoted)
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
+		return;
+	}
+
+	for (size = 2, src = value_str; '\0' != *src; src++)
+	{
+		switch (*src)
+		{
+			case '\\':
+			case '"':
+				size++;
+		}
+		size++;
+	}
+
+	if (*str_alloc <= *str_offset + size)
+	{
+		if (0 == *str_alloc)
+			*str_alloc = size;
+
+		do
+		{
+			*str_alloc *= 2;
+		}
+		while (*str_alloc - *str_offset <= size);
+
+		*str = zbx_realloc(*str, *str_alloc);
+	}
+
+	dst = *str + *str_offset;
+	*dst++ = '"';
+
+	for (src = value_str; '\0' != *src; src++, dst++)
+	{
+		switch (*src)
+		{
+			case '\\':
+			case '"':
+				*dst++ = '\\';
+				break;
+		}
+
+		*dst = *src;
+	}
+
+	*dst++ = '"';
+	*dst = '\0';
+	*str_offset += size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_compose_expression                                      *
+ *                                                                            *
+ * Purpose: compose expression by replacing processed tokens (with values) in *
+ *          the original expression                                           *
+ *                                                                            *
+ * Parameters: ctx        - [IN] the evaluation context                       *
+ *             expression - [OUT] the composed expression                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expression)
+{
+	zbx_vector_ptr_t	tokens;
+	const zbx_eval_token_t	*token;
+	int			i;
+	size_t			pos = 0, expression_alloc = 0, expression_offset = 0;
+
+	zbx_vector_ptr_create(&tokens);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		if (ZBX_VARIANT_NONE != ctx->stack.values[i].value.type)
+			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
+	}
+
+	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
+
+	for (i = 0; i < tokens.values_num; i++)
+	{
+		token = (const zbx_eval_token_t *)tokens.values[i];
+
+		if (0 != token->loc.l)
+		{
+			zbx_strncpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos,
+					token->loc.l - pos);
+		}
+		pos = token->loc.r + 1;
+		eval_token_print_alloc(ctx, expression, &expression_alloc, &expression_offset, token);
+	}
+
+	if ('\0' != ctx->expression[pos])
+		zbx_strcpy_alloc(expression, &expression_alloc, &expression_offset, ctx->expression + pos);
+
+	zbx_vector_ptr_destroy(&tokens);
 }
 
 /******************************************************************************
@@ -93,7 +450,7 @@ void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, zbx_uint64_t *ho
 
 					continue;
 				}
-				tmp = zbx_strloc_unquote_dyn(ctx->expression, &token->loc);
+				tmp = zbx_strloc_get(ctx->expression, &token->loc);
 				value = resolver_cb(tmp, strlen(tmp), hostids, hostids_num);
 				zbx_free(tmp);
 				break;
@@ -129,4 +486,309 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message)
 	token->type = ZBX_EVAL_TOKEN_VAR_STR;
 	zbx_variant_set_str(&token->value, message);
 	(++token)->type = ZBX_EVAL_TOKEN_EXCEPTION;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: expression_extract_functionid                                    *
+ *                                                                            *
+ * Purpose: extract functionid from token                                     *
+ *                                                                            *
+ * Parameters: expression - [IN] the original expression                      *
+ *             token      - [IN] the token                                    *
+ *             functionid - [OUT] the extracted functionid                    *
+ *             expression - [IN] the original expression                      *
+ *                                                                            *
+ * Return value: SUCCEED - functionid was extracted successfully              *
+ *               FAIL    - otherwise (incorrect token or invalid data)        *
+ *                                                                            *
+ * Comment: The extracted functionid will be cached as token value, so the    *
+ *          next time it can be used without extracting the value from        *
+ *          expression.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	expression_extract_functionid(const char *expression, zbx_eval_token_t *token, zbx_uint64_t *functionid)
+{
+	if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+		return FAIL;
+
+	switch (token->value.type)
+	{
+		case ZBX_VARIANT_UI64:
+			*functionid = token->value.data.ui64;
+			return SUCCEED;
+		case ZBX_VARIANT_NONE:
+			if (SUCCEED != is_uint64_n(expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+					functionid))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				break;
+			}
+			zbx_variant_set_ui64(&token->value, *functionid);
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_deserialize_dyn                                         *
+ *                                                                            *
+ * Purpose: deserialize expression and extract specified tokens into values   *
+ *                                                                            *
+ * Parameters: data       - [IN] serialized expression                        *
+ *             expression - [IN] the original expression                      *
+ *                             triggerids                                     *
+ *                                                                            *
+ * Return value: Expression evaluation context.                               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_eval_context_t	*zbx_eval_deserialize_dyn(const unsigned char *data, const char *expression,
+		zbx_uint64_t mask)
+{
+	zbx_eval_context_t	*ctx;
+	int			i;
+	zbx_uint64_t		functionid;
+	char			*value;
+
+	ctx = (zbx_eval_context_t *)zbx_malloc(NULL, sizeof(zbx_eval_context_t));
+	zbx_eval_deserialize(ctx, expression, ZBX_EVAL_TRIGGER_EXPRESSION, data);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_FUNCTIONID:
+				if (0 == (mask & ZBX_EVAL_EXTRACT_FUNCTIONID))
+					continue;
+				expression_extract_functionid(expression, token, &functionid);
+				break;
+			case ZBX_EVAL_TOKEN_VAR_STR:
+				if (0 != (mask & ZBX_EVAL_EXTRACT_VAR_STR) && ZBX_VARIANT_NONE == token->value.type)
+				{
+					/* extract string variable value for macro resolving */
+					value = zbx_strloc_get(expression, &token->loc);
+					zbx_variant_set_str(&token->value, value);
+				}
+				break;
+			case ZBX_EVAL_TOKEN_VAR_MACRO:
+				if (0 != (mask & ZBX_EVAL_EXTRACT_VAR_MACRO) && ZBX_VARIANT_NONE == token->value.type)
+				{
+					/* extract macro for resolving */
+					value = zbx_strloc_get(expression, &token->loc);
+					zbx_variant_set_str(&token->value, value);
+				}
+				break;
+		}
+	}
+
+	return ctx;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_get_functionids                                         *
+ *                                                                            *
+ * Purpose: get functionids from parsed expression                            *
+ *                                                                            *
+ * Parameters: ctx         - [IN] the evaluation context                      *
+ *             functionids - [OUT] the extracted functionids                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+		zbx_uint64_t		functionid;
+
+		if (SUCCEED == expression_extract_functionid(ctx->expression, token, &functionid))
+			zbx_vector_uint64_append(functionids, functionid);
+	}
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_get_functionids_ordered                                 *
+ *                                                                            *
+ * Purpose: get functionids from parsed expression in the order as they       *
+ *          were written
+ *                                                                            *
+ * Parameters: ctx         - [IN] the evaluation context                      *
+ *             functionids - [OUT] the extracted functionids                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids)
+{
+	int			i;
+	zbx_vector_ptr_t	tokens;
+
+	zbx_vector_ptr_create(&tokens);
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		if (ZBX_EVAL_TOKEN_FUNCTIONID == ctx->stack.values[i].type)
+			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
+	}
+
+	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
+
+	for (i = 0; i < tokens.values_num; i++)
+	{
+		zbx_eval_token_t	*token = (zbx_eval_token_t *)tokens.values[i];
+		zbx_uint64_t		functionid;
+
+		if (SUCCEED == expression_extract_functionid(ctx->expression, token, &functionid))
+			zbx_vector_uint64_append(functionids, functionid);
+	}
+
+	zbx_vector_ptr_destroy(&tokens);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_check_timer_functions                                   *
+ *                                                                            *
+ * Purpose: check if expression contains timer function calls (date, time,    *
+ *          now, dayofweek, dayofmonth)                                       *
+ *                                                                            *
+ * Parameters: ctx - [IN] the evaluation context                              *
+ *                                                                            *
+ * Return value: SUCCEED - expression contains timer function call(s)         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_check_timer_functions(const zbx_eval_context_t *ctx)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_FUNCTION != token->type)
+			continue;
+
+		if (SUCCEED == eval_compare_token(ctx, &token->loc, "date", ZBX_CONST_STRLEN("date")))
+			return SUCCEED;
+		if (SUCCEED == eval_compare_token(ctx, &token->loc, "time", ZBX_CONST_STRLEN("time")))
+			return SUCCEED;
+		if (SUCCEED == eval_compare_token(ctx, &token->loc, "now", ZBX_CONST_STRLEN("now")))
+			return SUCCEED;
+		if (SUCCEED == eval_compare_token(ctx, &token->loc, "dayofmonth", ZBX_CONST_STRLEN("dayofmonth")))
+			return SUCCEED;
+		if (SUCCEED == eval_compare_token(ctx, &token->loc, "dayofweek", ZBX_CONST_STRLEN("dayofweek")))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_serialized_expression_functionids                        *
+ *                                                                            *
+ * Purpose: extract functionids from serialized expression                    *
+ *                                                                            *
+ * Parameters: expression  - [IN] the original expression                     *
+ *             data        - [IN] the serialized expression                   *
+ *             functionids - [OUT] the extracted functionids                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
+	zbx_vector_uint64_t *functionids)
+{
+	zbx_uint32_t		i, tokens_num, len, loc_l, loc_r, opt;
+	zbx_token_type_t	type;
+	zbx_uint64_t		functionid;
+	unsigned char		var_type;
+
+	data += zbx_deserialize_uint31_compact(data, &len);
+	data += zbx_deserialize_uint31_compact(data, &tokens_num);
+
+	for (i = 0; i < tokens_num; i++)
+	{
+		data += zbx_deserialize_value(data, &type);
+		data += zbx_deserialize_uint31_compact(data, &opt);
+
+		data += zbx_deserialize_char(data, &var_type);
+
+		switch (var_type)
+		{
+			case ZBX_VARIANT_UI64:
+				data += sizeof(zbx_uint64_t);
+				break;
+			case ZBX_VARIANT_DBL:
+				data += sizeof(double);
+				break;
+			case ZBX_VARIANT_STR:
+				data += strlen((char *)data) + 1;
+				break;
+			case ZBX_VARIANT_NONE:
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				return;
+		}
+
+		data += zbx_deserialize_uint31_compact(data, &loc_l);
+		data += zbx_deserialize_uint31_compact(data, &loc_r);
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID == type)
+		{
+			if (SUCCEED == is_uint64_n(expression + loc_l + 1, loc_r - loc_l - 1, &functionid))
+				zbx_vector_uint64_append(functionids, functionid);
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_get_constant                                            *
+ *                                                                            *
+ * Purpose: the the Nth constant in expression                                *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *             index - [IN] the constant index                                *
+ *             value - [OUT] the constant value                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **value)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		switch (token->type)
+		{
+			case ZBX_EVAL_TOKEN_VAR_STR:
+			case ZBX_EVAL_TOKEN_VAR_NUM:
+			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
+				if (index == (int)token->opt + 1)
+				{
+					zbx_free(*value);
+					if (ZBX_VARIANT_NONE != token->value.type)
+						*value = zbx_strdup(NULL, zbx_variant_value_desc(&token->value));
+					else
+						*value = zbx_strloc_get(ctx->expression, &token->loc);
+					return;
+				}
+				break;
+		}
+	}
 }

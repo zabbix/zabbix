@@ -1684,6 +1684,6 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
 #endif
 
-char	*zbx_strloc_unquote_dyn(const char *src, const zbx_strloc_t *loc);
+char	*zbx_strloc_get(const char *src, const zbx_strloc_t *loc);
 
 #endif

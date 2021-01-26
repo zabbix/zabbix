@@ -74,6 +74,7 @@ int	substitute_simple_macros_unmasked(zbx_uint64_t *actionid, const DB_EVENT *ev
 		int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
+void	prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);

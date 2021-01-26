@@ -37,6 +37,8 @@ typedef struct
 	const unsigned char	*expression_bin;
 	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
+	int			revision;
+	int			timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -47,10 +49,17 @@ typedef struct
 	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines      */
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
+	unsigned char		timer;
 
 	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_TRIGGER;
+
+/* specifies if trigger expression/recovery expression has timer functions */
+/* (date, time, now, dayofweek or dayofmonth)                              */
+#define ZBX_TRIGGER_TIMER_DEFAULT		0x00
+#define ZBX_TRIGGER_TIMER_EXPRESSION		0x01
+#define ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION	0x02
 
 typedef struct zbx_dc_trigger_deplist
 {
@@ -912,5 +921,11 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
  ******************************************************************************/
 char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_len(const char *text, size_t len, zbx_uint64_t *hostids, int hostids_num);
+
+#define ZBX_TRIGGER_TIMER_NONE			0x0000
+#define ZBX_TRIGGER_TIMER_TRIGGER		0x0001
+#define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
+#define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
+#define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
 #endif

@@ -22,6 +22,7 @@
 
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "eval.h"
 
 static zbx_variant_t	var_zero = {.type = ZBX_VARIANT_DBL, .data = {.dbl = 0}};
 
@@ -360,7 +361,7 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_compare_token(const zbx_eval_context_t *ctx, const zbx_strloc_t *loc, const char *text,
+int	eval_compare_token(const zbx_eval_context_t *ctx, const zbx_strloc_t *loc, const char *text,
 		size_t len)
 {
 	if (loc->r - loc->l + 1 != len)

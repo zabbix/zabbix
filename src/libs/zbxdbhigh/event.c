@@ -198,6 +198,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 					event->trigger.opdata = zbx_strdup(NULL, row[9]);
 					event->trigger.event_name = ('\0' != *row[10] ? zbx_strdup(NULL, row[10]) :
 							NULL);
+					event->trigger.cache = NULL;
 				}
 			}
 		}
@@ -208,26 +209,6 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 	zbx_vector_uint64_destroy(&trigger_eventids);
 	zbx_vector_uint64_destroy(&triggerids);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_clean                                             *
- *                                                                            *
- * Purpose: frees resources allocated to store trigger data                   *
- *                                                                            *
- * Parameters: trigger -                                                      *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
-{
-	zbx_free(trigger->description);
-	zbx_free(trigger->expression);
-	zbx_free(trigger->recovery_expression);
-	zbx_free(trigger->comments);
-	zbx_free(trigger->url);
-	zbx_free(trigger->opdata);
-	zbx_free(trigger->event_name);
 }
 
 /******************************************************************************

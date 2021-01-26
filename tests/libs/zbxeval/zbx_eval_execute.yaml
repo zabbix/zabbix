@@ -207,6 +207,14 @@ out:
   result: SUCCEED
   value: '1'
 ---
+test case: Expression '3<2'
+in:
+  rules: []
+  expression: '3<2'
+out:
+  result: SUCCEED
+  value: '0'
+---
 test case: Expression '1<1'
 in:
   rules: []

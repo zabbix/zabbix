@@ -107,6 +107,7 @@
 
 #define ZBX_EVAL_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | \
 					ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION | \
+					ZBX_EVAL_PARSE_CONST_INDEX | \
 					ZBX_EVAL_PROCESS_ERROR)
 
 typedef zbx_uint32_t zbx_token_type_t;
@@ -160,6 +161,7 @@ typedef char *(*zbx_macro_resolve_func_t)(const char *str, size_t length, zbx_ui
 		int hostids_num);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
+zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error);
 void	zbx_eval_clear(zbx_eval_context_t *ctx);
 size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func, unsigned char **data);
 void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
@@ -168,9 +170,23 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
 int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_eval_function_cb_t function_cb,
 		zbx_variant_t *value, char **error);
-void	zbx_eval_get_functionids(const zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
+void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
+void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 void	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx,  zbx_uint64_t *hostids, int hostids_num,
 		zbx_macro_resolve_func_t resolver_cb);
 void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message);
+
+#define ZBX_EVAL_EXTRACT_FUNCTIONID	0x0001
+#define ZBX_EVAL_EXTRACT_VAR_STR	0x0002
+#define ZBX_EVAL_EXTRACT_VAR_MACRO	0x0004
+
+#define ZBX_EVAL_EXCTRACT_ALL	(ZBX_EVAL_EXTRACT_FUNCTIONID | ZBX_EVAL_EXTRACT_VAR_STR | ZBX_EVAL_EXTRACT_VAR_MACRO)
+
+zbx_eval_context_t *zbx_eval_deserialize_dyn(const unsigned char *data, const char *expression,
+		zbx_uint64_t mask);
+int	zbx_eval_check_timer_functions(const zbx_eval_context_t *ctx);
+void	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
+		zbx_vector_uint64_t *functionids);
+void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **value);
 
 #endif
