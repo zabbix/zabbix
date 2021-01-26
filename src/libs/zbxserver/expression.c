@@ -3010,6 +3010,44 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char 
 
 /******************************************************************************
  *                                                                            *
+ * Function: resolve_user_macros                                              *
+ *                                                                            *
+ * Purpose: resolve {USER.*} macros                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_alias, char **user_name,
+		char **user_surname, int *user_names_found, char **replace_to)
+{
+	/* use only one DB request for all occurrences of 4 macros */
+	if (0 == *user_names_found)
+	{
+		if (SUCCEED == DBget_user_names(userid, user_alias, user_name, user_surname))
+			*user_names_found = 1;
+		else
+			return;
+	}
+
+	if (0 == strcmp(m, MVAR_USER_ALIAS))
+	{
+		*replace_to = zbx_strdup(*replace_to, *user_alias);
+	}
+	else if (0 == strcmp(m, MVAR_USER_NAME))
+	{
+		*replace_to = zbx_strdup(*replace_to, *user_name);
+	}
+	else if (0 == strcmp(m, MVAR_USER_SURNAME))
+	{
+		*replace_to = zbx_strdup(*replace_to, *user_surname);
+	}
+	else if (0 == strcmp(m, MVAR_USER_FULLNAME))
+	{
+		zbx_free(*replace_to);
+		*replace_to = format_user_fullname(*user_name, *user_surname, *user_alias);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_simple_macros_impl                                    *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -3418,7 +3456,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
 				}
-				else if (0 == strcmp(m, MVAR_USER_FULLNAME))
+				else if (0 == strcmp(m, MVAR_USER_FULLNAME) && NULL == userid)
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 					{
@@ -3446,6 +3484,16 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
+				}
+				else if (NULL != userid)
+				{
+					if (0 == strcmp(m, MVAR_USER_ALIAS) || 0 == strcmp(m, MVAR_USER_NAME) ||
+							0 == strcmp(m, MVAR_USER_SURNAME) ||
+							0 == strcmp(m, MVAR_USER_FULLNAME))
+					{
+						resolve_user_macros(*userid, m, &user_alias, &user_name, &user_surname,
+							&user_names_found, &replace_to);
+					}
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
@@ -4513,37 +4561,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			}
 			else if (NULL != userid)
 			{
-				/* use only one DB request for all occurrences of 4 macros */
-				if (0 == user_names_found && (0 == strcmp(m, MVAR_USER_ALIAS) ||
-						0 == strcmp(m, MVAR_USER_NAME) || 0 == strcmp(m, MVAR_USER_SURNAME) ||
-						0 == strcmp(m, MVAR_USER_FULLNAME)))
+				if (0 == strcmp(m, MVAR_USER_ALIAS) || 0 == strcmp(m, MVAR_USER_NAME) ||
+						0 == strcmp(m, MVAR_USER_SURNAME) || 0 == strcmp(m, MVAR_USER_FULLNAME))
 				{
-					if (SUCCEED == DBget_user_names(*userid, &user_alias, &user_name,
-							&user_surname))
-					{
-						user_names_found = 1;
-					}
-				}
-
-				if (0 != user_names_found)
-				{
-					if (0 == strcmp(m, MVAR_USER_ALIAS))
-					{
-						replace_to = zbx_strdup(replace_to, user_alias);
-					}
-					else if (0 == strcmp(m, MVAR_USER_NAME))
-					{
-						replace_to = zbx_strdup(replace_to, user_name);
-					}
-					else if (0 == strcmp(m, MVAR_USER_SURNAME))
-					{
-						replace_to = zbx_strdup(replace_to, user_surname);
-					}
-					else if (0 == strcmp(m, MVAR_USER_FULLNAME))
-					{
-						zbx_free(replace_to);
-						replace_to = format_user_fullname(user_name, user_surname, user_alias);
-					}
+					resolve_user_macros(*userid, m, &user_alias, &user_name, &user_surname,
+							&user_names_found, &replace_to);
 				}
 			}
 		}
