@@ -218,7 +218,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 	char		error[MAX_STRING_LEN];
 	int		ret = FAIL, rc;
 	DC_HOST		host;
-	DB_EVENT	event;
+	DB_EVENT	*event = NULL;
 	zbx_script_t	script;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64,
@@ -258,7 +258,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 		const char	*poutput = NULL, *perror = NULL;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			ret = zbx_script_execute(&script, &host, user, &event, ctx, result, error, sizeof(error), debug);
+			ret = zbx_script_execute(&script, &host, user, event, ctx, result, error, sizeof(error), debug);
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 

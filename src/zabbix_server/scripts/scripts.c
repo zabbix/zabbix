@@ -320,7 +320,7 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->command_orig);
 }
 
-static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
+static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT **event_out)
 {
 	int			ret = SUCCEED;
 	zbx_vector_ptr_t	events;
@@ -333,7 +333,7 @@ static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
 	zbx_db_get_events_by_eventids(&eventids, &events);
 
 	if (0 < events.values_num)
-		memcpy(event_out, events.values[0], sizeof(DB_EVENT));
+		*event_out = (DB_EVENT*)events.values[0];
 	else
 		ret = FAIL;
 
@@ -369,7 +369,7 @@ static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
  ***********************************************************************************/
 int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user,
 		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error, size_t max_error_len,
-		DB_EVENT *event)
+		DB_EVENT **event)
 {
 	int			macro_mask, ret = FAIL;
 	zbx_uint64_t		groupid, userid, *p_userid = NULL;
@@ -419,13 +419,13 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				p_userid = &userid;
 			}
 
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, (event != NULL ? *event : NULL), NULL, p_userid, NULL, host, NULL,
 					NULL, NULL, NULL, &script->command, macro_mask, error, max_error_len))
 			{
 				goto out;
 			}
 
-			if (SUCCEED != substitute_simple_macros(NULL, event, NULL, p_userid, NULL, host, NULL, NULL,
+			if (SUCCEED != substitute_simple_macros(NULL, (event != NULL ? *event : NULL), NULL, p_userid, NULL, host, NULL, NULL,
 					NULL, NULL, &script->command_orig, macro_mask, error, max_error_len))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
