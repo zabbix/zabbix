@@ -861,6 +861,7 @@ else {
 		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
 	);
 
+	// Get the error column data only for hosts.
 	if ($data['context'] === 'host') {
 		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($http_tests));
 

@@ -32,6 +32,34 @@
 				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 			})
 			.trigger('change');
+
+		$('#filter-tags')
+			.dynamicRows({template: '#filter-tag-row-tmpl'})
+			.on('afteradd.dynamicRows', function() {
+				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
+				$(this)
+					.find('z-select')
+					.on('change', function() {
+						let num = this.id.match(/filter_tags_(\d+)_operator/);
+						if (num !== null) {
+							let show = $(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>;
+							$('#filter_tags_' + num[1] + '_value').toggle(show);
+						}
+					});
+			});
+
+		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
+		$('#filter-tags z-select')
+			.on('change', function() {
+				let num = this.id.match(/filter_tags_(\d+)_operator/);
+				if (num !== null) {
+					let show = $(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>;
+					$('#filter_tags_' + num[1] + '_value').toggle(show);
+				}
+			})
+			.trigger('change');
 	});
 </script>
 
@@ -70,3 +98,8 @@
 		->addClass('form_row')
 ?>
 </script>
+
+<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
+	<?= CTagFilterFieldHelper::getTemplate(); ?>
+</script>
+

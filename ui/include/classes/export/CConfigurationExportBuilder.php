@@ -1527,7 +1527,7 @@ class CConfigurationExportBuilder {
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
 				'urls' => $this->formatMapElementUrls($element['urls']),
-				'operator' => $element['operator'],
+				'evaltype' => $element['evaltype'],
 				'tags' => $this->formatTags($element['tags'])
 			];
 		}

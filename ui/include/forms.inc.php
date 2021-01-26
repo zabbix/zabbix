@@ -495,7 +495,6 @@ function makeItemSubfilter(array $filter_data, array $items = [], string $contex
 		$table_subfilter->addRow([$tags_output]);
 	}
 
-	// TODO miks: Does it actually work?
 	if ($filter_data['hosts'] && count($item_params['hosts']) > 1) {
 		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $filter_data['subfilter_hosts'],
 			'subfilter_hosts'

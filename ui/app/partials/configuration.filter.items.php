@@ -136,10 +136,7 @@ $filter_column_2
 
 // Third column
 $filter_column_3->addRow(_('Tags'),
-	CTagFilterFieldHelper::get([
-			'tag_field_name' => 'filter_tags',
-			'evaltype_field_name' => 'filter_evaltype'
-		], [
+	CTagFilterFieldHelper::get([], [
 			'evaltype' => $data['filter_data']['filter_evaltype'],
 			'tags' => $data['filter_data']['filter_tags']
 		]
@@ -192,6 +189,7 @@ if ($data['context'] === 'host') {
 $filter
 	->setProfile('web.items.filter')
 	->setActiveTab(CProfile::get('web.items.filter.active', 1))
+	->addVar('context', $data['context'])
 	->addVar('subfilter_hosts', $data['filter_data']['subfilter_hosts'])
 	->addVar('subfilter_types', $data['filter_data']['subfilter_types'])
 	->addVar('subfilter_value_types', $data['filter_data']['subfilter_value_types'])

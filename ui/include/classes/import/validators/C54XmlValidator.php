@@ -1867,7 +1867,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 									'url' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'operator' =>				['type' => XML_STRING],
+							'evaltype' =>				['type' => XML_STRING],
 							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
 								'tag' =>					['type' => XML_ARRAY, 'rules' => [
 									'tag' =>					['type' => XML_STRING | XML_REQUIRED],

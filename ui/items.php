@@ -242,9 +242,6 @@ $fields = [
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
-	'mass_update_tags'	=>			[T_ZBX_INT, O_OPT, null,
-										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]), null
-									],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -286,7 +283,7 @@ $fields = [
 	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_inherited' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'subfilter_inherited' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -500,20 +497,6 @@ if (hasRequest('preprocessing')) {
 	unset($step);
 }
 
-$tags = getRequest('tags', []);
-foreach ($tags as $key => $tag) {
-	if ($tag['tag'] === '' && $tag['value'] === '') {
-		unset($tags[$key]);
-		continue;
-	}
-	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-		unset($tags[$key]);
-	}
-	else {
-		unset($tags[$key]['type']);
-	}
-}
-
 /*
  * Actions
  */
@@ -540,6 +523,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 	$type = getRequest('type', ITEM_TYPE_ZABBIX);
+
+	$tags = getRequest('tags', []);
+	foreach ($tags as $key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($tags[$key]);
+			continue;
+		}
+		elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+			unset($tags[$key]);
+		}
+		else {
+			unset($tags[$key]['type']);
+		}
+	}
 
 	/*
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
@@ -1594,25 +1591,29 @@ else {
 		'filter_history' => getRequest('filter_history'),
 		'filter_trends' => getRequest('filter_trends'),
 		'filter_status' => getRequest('filter_status'),
-		'filter_state' => getRequest('filter_state'),
 		'filter_inherited' => getRequest('filter_inherited'),
 		'filter_with_triggers' => getRequest('filter_with_triggers'),
-		'filter_discovered' => getRequest('filter_discovered'),
 		'filter_evaltype' => $filter_evaltype,
 		'filter_tags' => $filter_tags,
 		'subfilter_hosts' => getRequest('subfilter_hosts'),
 		'subfilter_types' => getRequest('subfilter_types'),
 		'subfilter_status' => getRequest('subfilter_status'),
-		'subfilter_state' => getRequest('subfilter_state'),
 		'subfilter_value_types' => getRequest('subfilter_value_types'),
 		'subfilter_templated_items' => getRequest('subfilter_templated_items'),
 		'subfilter_with_triggers' => getRequest('subfilter_with_triggers'),
-		'subfilter_discovered' => getRequest('subfilter_discovered'),
 		'subfilter_history' => getRequest('subfilter_history'),
 		'subfilter_trends' => getRequest('subfilter_trends'),
 		'subfilter_interval' => getRequest('subfilter_interval'),
 		'subfilter_tags' => $subfilter_tags
 	];
+	if ($data['context'] === 'host') {
+		$data['filter_data'] += [
+			'filter_state' => getRequest('filter_state'),
+			'filter_discovered' => getRequest('filter_discovered'),
+			'subfilter_state' => getRequest('subfilter_state'),
+			'subfilter_discovered' => getRequest('subfilter_discovered')
+		];
+	}
 	if (!$data['filter_data']['filter_tags']) {
 		$data['filter_data']['filter_tags'] = [[
 			'tag' => '',
