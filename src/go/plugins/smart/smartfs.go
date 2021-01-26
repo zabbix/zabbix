@@ -353,13 +353,18 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 func (r *runner) getRaidDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
+	raid, ok := <-r.raids
+	if !ok {
+		return
+	}
+
 	var i int
 
-	for raid := range r.raids {
-		if i == 0 && raid.rType == "areca" {
-			i = 1
-		}
+	if raid.rType == "areca" {
+		i = 1
+	}
 
+	for {
 		var name string
 
 		if raid.rType == "sat" {
