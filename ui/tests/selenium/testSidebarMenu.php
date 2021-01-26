@@ -242,7 +242,7 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
-		$this->assertPageHeader('Dashboards');
+		$this->assertTrue($this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady()->exists());
 		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 
 		if ($data['section'] !== 'Monitoring') {
