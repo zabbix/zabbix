@@ -2945,9 +2945,6 @@ static const char	*zbx_dobject_status2str(int st)
  *                                                                            *
  * Purpose: resolve {EVENT.OPDATA} macro                                      *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
  ******************************************************************************/
 static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char *tz, char *error, int maxerrlen)
 {
