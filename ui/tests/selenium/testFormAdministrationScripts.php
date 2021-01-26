@@ -59,6 +59,33 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
+//			// Uncomment following, when ZBX-18916 is fixed.
+//			// Remove trailing spaces.
+//			[
+//				[
+//					'expected' => TEST_GOOD,
+//					'trim' => true,
+//					'fields' =>  [
+//						'Name' => 'Test trailing spaces',
+//						'Type' => 'Webhook',
+//						'Script' => 'Webhook Script'
+//					],
+//					'Parameters' => [
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 1,
+//							'Name' => 'name',
+//							'Value' => '   trimmed value    '
+//						],
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 0,
+//							'Name' => '   trimmed name    ',
+//							'Value' => 'value'
+//						]
+//					]
+//				]
+//			],
 			[
 				[
 					'fields' =>  [
@@ -129,43 +156,6 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
-			// Uncomment following, when ZBX-18916 is fixed.
-//			// Remove trailing spaces.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'trim' => true,
-//					'fields' =>  [
-//						'Name' => 'Test trailing spaces',
-//						'Type' => 'Webhook',
-//						'Script' => 'Webhook Script'
-//					],
-//					'Parameters' => [
-//						[
-//							'Name' => '   trimmed name    ',
-//							'Value' => '   trimmed value    '
-//						]
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'trim' => true,
-//					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
-//					'fields' =>  [
-//						'Name' => 'Test trailing spaces',
-//						'Type' => 'Webhook',
-//						'Script' => 'Webhook Script'
-//					],
-//					'Parameters' => [
-//						[
-//							'Name' => '   ',
-//							'Value' => '   '
-//						]
-//					]
-//				]
-//			],
 			[
 				[
 					'fields' =>  [
@@ -308,8 +298,27 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
-
-
+//			// Uncomment following, when ZBX-18916 is fixed.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'trim' => true,
+//					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
+//					'fields' =>  [
+//						'Name' => 'Test trailing spaces',
+//						'Type' => 'Webhook',
+//						'Script' => 'Webhook Script'
+//					],
+//					'Parameters' => [
+//						[
+//							'action' => USER_ACTION_UPDATE,
+//							'index' => 0,
+//							'Name' => '   ',
+//							'Value' => '   '
+//						]
+//					]
+//				]
+//			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -470,24 +479,22 @@ class testFormAdministrationScripts extends CWebTest {
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
-			// Uncomment following, when ZBX-18916 is fixed.
-//			$expected = $data['Parameters'];
-//			if (CTestArrayHelper::get($data, 'trim', false) === true) {
-//				// Remove trailing spaces from name and value.
-//				foreach ($data['Parameters'] as $i => &$parameters) {
-//					foreach (['Name', 'Value'] as $parameter) {
-//						if (array_key_exists($parameter, $parameters)) {
-//							$parameters[$parameter] = trim($parameters[$parameter]);
-//						}
-//					}
-//				}
-//				unset($parameters);
-//			}
-
 			// Check testing confirmation in saved form.
 			$this->checkConfirmation($data, $form);
 
 			if (CTestArrayHelper::get($data, 'Parameters')) {
+//				// Uncomment following, when ZBX-18916 is fixed.
+//				if (CTestArrayHelper::get($data, 'trim', false) === true) {
+//					// Remove trailing spaces from name and value.
+//					foreach ($data['Parameters'] as $i => &$fields) {
+//						foreach (['Name', 'Value'] as $parameter) {
+//							if (array_key_exists($parameter, $fields)) {
+//								$fields[$parameter] = trim($fields[$parameter]);
+//							}
+//						}
+//					}
+//					unset($parameters);
+//				}
 
 				// Remove action and index fields fo asserting.
 				if ($update === true) {
