@@ -71,12 +71,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "smart.disk.discovery":
 		out := []device{}
 
-		parsedDevices, err := p.getParsedDevices()
+		r, err := p.execute(false)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, dev := range parsedDevices {
+		for _, dev := range r.devices {
 			out = append(out, device{
 				Name:       cutPrefix(dev.Info.Name),
 				DeviceType: strings.ToUpper(getType(dev.Info.DevType, dev.RotationRate)),
@@ -90,12 +90,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 	case "smart.disk.get":
-		deviceJsons, err := p.getDeviceJsons()
+		r, err := p.execute(true)
 		if err != nil {
 			return nil, err
 		}
 
-		fields, err := setDiskFields(deviceJsons)
+		fields, err := setDiskFields(r.jsonDevices)
 		if err != nil {
 			return nil, err
 		}
@@ -117,12 +117,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "smart.attribute.discovery":
 		out := []attribute{}
 
-		parsedDevices, err := p.getParsedDevices()
+		r, err := p.execute(false)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, dev := range parsedDevices {
+		for _, dev := range r.devices {
 			var t string
 			if dev.RotationRate == 0 {
 				t = "SSD"
