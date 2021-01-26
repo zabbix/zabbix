@@ -242,7 +242,7 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
-		$this->assertPageHeader('Global view');
+		$this->assertPageHeader('Dashboards');
 		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 
 		if ($data['section'] !== 'Monitoring') {
