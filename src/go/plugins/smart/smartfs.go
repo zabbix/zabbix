@@ -163,11 +163,11 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		raidDev = append(raidDev, deviceInfo{Name: dev})
 	}
 
-	r.raids = make(chan raidParameters, len(raidDev)*5)
+	raidTypes := []string{"3ware", "areca", "cciss", "megaraid", "sat"}
+
+	r.raids = make(chan raidParameters, len(raidDev)*len(raidTypes))
 
 	r.startRaidRunners(jsonRunner)
-
-	raidTypes := []string{"3ware", "areca", "cciss", "megaraid", "sat"}
 
 	for _, rDev := range raidDev {
 		for _, rType := range raidTypes {
@@ -324,15 +324,18 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 			return
 		}
 
+		if dp.Smartctl.ExitStatus == 4 {
+			r.mux.Lock()
+			r.incompleteData = append(r.incompleteData, name)
+			r.mux.Unlock()
+
+			continue
+		}
+
 		if dp.SmartStatus != nil {
 			r.mux.Lock()
 			if !r.found[dp.SerialNumber] {
 				r.found[dp.SerialNumber] = true
-
-				if dp.Smartctl.ExitStatus == 4 {
-					r.incompleteData = append(r.incompleteData, name)
-					continue
-				}
 
 				if jsonRunner {
 					r.jsonDevices[name] = string(devices)
@@ -404,7 +407,11 @@ func (r *runner) getRaidDevices(jsonRunner bool) {
 		}
 
 		if dp.SmartStatus != nil {
-			dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
+			if raid.rType == "sat" {
+				dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+			} else {
+				dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
+			}
 
 			r.mux.Lock()
 
