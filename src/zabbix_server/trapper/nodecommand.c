@@ -25,6 +25,7 @@
 
 #include "trapper_auth.h"
 #include "nodecommand.h"
+#include "../../libs/zbxserver/zabbix_users.h"
 
 /******************************************************************************
  *                                                                            *
@@ -298,8 +299,9 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
 {
-	char			clientip[MAX_STRING_LEN], tmp[64], *result = NULL, *send = NULL, *debug = NULL;
-	int			ret = FAIL;
+	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
+				clientip[MAX_STRING_LEN];
+	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	zbx_script_exec_context ctx;
 	struct zbx_json		j;
@@ -309,6 +311,22 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
+	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
+		goto finish;
+
+	if (SUCCEED != check_perm2system(user.userid))
+	{
+		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
+		goto finish;
+	}
+
+	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
+			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
+	{
+		result = zbx_strdup(result, "Permission denied. No role access.");
+		goto finish;
+	}
+
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||
 			FAIL == is_uint64(tmp, &scriptid))
 	{
@@ -316,28 +334,60 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		goto finish;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_EVENTID, tmp, sizeof(tmp), NULL) &&
-		FAIL == is_uint64(tmp, &eventid))
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp_hostid, sizeof(tmp_hostid), NULL))
+		got_hostid = 1;
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_EVENTID, tmp_eventid, sizeof(tmp_eventid), NULL))
+		got_eventid = 1;
+
+	if (0 == got_hostid && 0 == got_eventid)
 	{
-		result = zbx_dsprintf(result, "Failed to parse eventid tag: %s.", ZBX_PROTO_TAG_EVENTID);
+		result = zbx_dsprintf(result, "Failed to parse command request tag %s or %s.",
+				ZBX_PROTO_TAG_HOSTID, ZBX_PROTO_TAG_EVENTID);
 		goto finish;
 	}
-	else
-		ctx = ZBX_SCRIPT_CTX_EVENT;
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp), NULL))
+	if (1 == got_hostid && 1 == got_eventid)
 	{
-		if (FAIL == is_uint64(tmp, &hostid))
+		result = zbx_dsprintf(result, "Command request tags %s and %s cannot be used together.",
+				ZBX_PROTO_TAG_HOSTID, ZBX_PROTO_TAG_EVENTID);
+		goto finish;
+	}
+
+	if (1 == got_hostid)
+	{
+		if (SUCCEED != is_uint64(tmp_hostid, &hostid))
 		{
-			result = zbx_dsprintf(result, "Failed to parse hostid tag: %s.", ZBX_PROTO_TAG_HOSTID);
+			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
+					ZBX_PROTO_TAG_HOSTID);
 			goto finish;
 		}
-		else
-			ctx = ZBX_SCRIPT_CTX_HOST;
-	}
 
-	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
-		goto finish;
+		if (0 == hostid)
+		{
+			result = zbx_dsprintf(result, "%s value cannot be 0.", ZBX_PROTO_TAG_HOSTID);
+			goto finish;
+		}
+
+		ctx = ZBX_SCRIPT_CTX_HOST;
+	}
+	else
+	{
+		if (SUCCEED != is_uint64(tmp_eventid, &eventid))
+		{
+			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
+					ZBX_PROTO_TAG_EVENTID);
+			goto finish;
+		}
+
+		if (0 == eventid)
+		{
+			result = zbx_dsprintf(result, "%s value cannot be 0.", ZBX_PROTO_TAG_EVENTID);
+			goto finish;
+		}
+
+		ctx = ZBX_SCRIPT_CTX_EVENT;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
