@@ -159,9 +159,10 @@ abstract class CControllerLatest extends CController {
 		if ($select_items) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
+					'value_type', 'units', 'description', 'state', 'error'
 				],
 				'selectApplications' => ['applicationid'],
+				'selectValueMap' => ['mappings'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true
@@ -194,6 +195,10 @@ abstract class CControllerLatest extends CController {
 				foreach ($item_applicationids as $applicationid) {
 					if ($applicationid != 0 && !array_key_exists($applicationid, $applications)) {
 						continue;
+					}
+
+					if ($item['valuemap']) {
+						$item['valuemap'] = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
 					}
 
 					$items_grouped[$item['hostid']][$applicationid][$itemid] = $item;

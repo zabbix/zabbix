@@ -253,6 +253,21 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
+		$valuemap = [];
+
+		if ($this->getInput('valuemapid', 0)) {
+			$valuemap = API::ValueMap()->get([
+				'output' => [],
+				'selectMappings' => ['newvalue', 'value'],
+				'valuemapids' => $this->getInput('valuemapid')
+			]);
+
+			if ($valuemap) {
+				$valuemap = reset($valuemap);
+				$valuemap = array_column($valuemap['mappings'], 'newvalue', 'value');
+			}
+		}
+
 		// Get value from host.
 		if ($this->get_value_from_host) {
 			// Get post data for particular item type.
@@ -401,11 +416,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if ($this->getInput('valuemapid', 0)) {
-							$mapped_value = getMappedValue($result['result'], $this->getInput('valuemapid'));
-							if ($mapped_value !== false) {
-								$output['mapped_value'] = $mapped_value;
-							}
+						if ($valuemap && array_key_exists($result['result'], $valuemap)) {
+							$output['mapped_value'] = $valuemap[$result['result']].' ('.$result['result'].')';
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

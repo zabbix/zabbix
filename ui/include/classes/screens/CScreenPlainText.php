@@ -44,10 +44,19 @@ class CScreenPlainText extends CScreenBase {
 			return $this->getOutput($table);
 		}
 
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($this->screenitem['resourceid'])]);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'key_', 'hostid', 'name', 'value_type'],
+			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
+			'itemids' => $this->screenitem['resourceid']
+		]);
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$item = reset($items);
+		$host = reset($item['hosts']);
 
-		$host = get_host_by_itemid($this->screenitem['resourceid']);
+		if ($item['valuemap']) {
+			$item['valuemap'] = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
+		}
 
 		$table = (new CTableInfo())
 			->setHeader([_('Timestamp'), _('Value')]);
@@ -79,8 +88,8 @@ class CScreenPlainText extends CScreenBase {
 					break;
 			}
 
-			if ($item['valuemapid'] > 0) {
-				$value = applyValueMap($value, $item['valuemapid']);
+			if ($item['valuemap'] && array_key_exists($value, $item['valuemap'])) {
+				$value = $item['valuemap'][$value].' ('.$value.')';
 			}
 
 			if ($this->screenitem['style'] == 0) {

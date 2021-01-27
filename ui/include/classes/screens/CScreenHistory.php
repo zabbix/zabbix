@@ -128,8 +128,9 @@ class CScreenHistory extends CScreenBase {
 		$output = [];
 
 		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid', 'history', 'trends'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
 			'itemids' => $this->itemids,
 			'webitems' => true,
 			'preservekeys' => true
@@ -142,6 +143,13 @@ class CScreenHistory extends CScreenBase {
 		}
 
 		$items = CMacrosResolverHelper::resolveItemNames($items);
+
+		foreach ($items as &$item) {
+			if ($item['valuemap']) {
+				$item['valuemap'] = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
+			}
+		}
+		unset($item);
 
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -423,8 +431,8 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
-					if ($item['valuemapid']) {
-						$value = applyValueMap($value, $item['valuemapid']);
+					if ($item['valuemap'] && array_key_exists($value, $item['valuemap'])) {
+						$value = $item['valuemap'][$value].' ('.$value.')';
 					}
 
 					$history_table->addRow([
@@ -509,8 +517,8 @@ class CScreenHistory extends CScreenBase {
 							$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 						}
 
-						if ($item['valuemapid']) {
-							$value = applyValueMap($value, $item['valuemapid']);
+						if ($item['valuemap'] && array_key_exists($value, $item['valuemap'])) {
+							$value = $item['valuemap'][$value].' ('.$value.')';
 						}
 
 						$row[] = ($value === '') ? '' : new CPre($value);

@@ -1471,29 +1471,17 @@ function formatHistoryValue($value, array $item, $trim = true) {
 		$value = _('Unknown value type');
 	}
 
-	// apply value mapping
-	switch ($item['value_type']) {
-		case ITEM_VALUE_TYPE_STR:
-			$mapping = getMappedValue($value, $item['valuemapid']);
-			// break; is not missing here
+	// Apply value mapping.
+	$mapping = ($item['valuemap'] && array_key_exists($value, $item['valuemap']))
+		? $item['valuemap'][$value]
+		: false;
 
-		case ITEM_VALUE_TYPE_TEXT:
-		case ITEM_VALUE_TYPE_LOG:
-			if ($trim && mb_strlen($value) > 20) {
-				$value = mb_substr($value, 0, 20).'...';
-			}
-
-			if ($mapping !== false) {
-				$value = $mapping.' ('.$value.')';
-			}
-
-			break;
-
-		default:
-			$value = applyValueMap($value, $item['valuemapid']);
+	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
+			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'...' : $value;
 	}
 
-	return $value;
+	return ($mapping === false) ? $value : $mapping.' ('.$value.')';
 }
 
 /**
