@@ -797,9 +797,9 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	now = (int)time(NULL);
 
 	if (ZBX_SCRIPT_TYPE_IPMI == script->type || ZBX_SCRIPT_TYPE_SSH == script->type
-			|| ZBX_SCRIPT_TYPE_TELNET == script->type)
+			|| ZBX_SCRIPT_TYPE_TELNET == script->type || ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type)
 	{
-		message = ZBX_NULL2EMPTY_STR(script->command_orig);
+		message = script->command_orig;
 	}
 	else
 	{
@@ -813,6 +813,9 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(message));
 
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type || ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
+		zbx_free(message);
+
 	if (NULL == r_event)
 	{
 		zbx_db_insert_add_values(db_insert, alertid, actionid, event->eventid, now, tmp, alert_status,
@@ -825,7 +828,6 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	}
 
 	zbx_free(tmp);
-	zbx_free(message);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1181,11 +1183,11 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			}
 
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_ACTION,
-					event->eventid, error, sizeof(error), (DB_EVENT*)event)))
+					event->eventid, error, sizeof(error), (DB_EVENT**)&event)))
 			{
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 				{
-					rc = zbx_script_execute(&script, &host, NULL, event, ZBX_SCRIPT_CTX_EVENT,
+					rc = zbx_script_execute(&script, &host, NULL, event, ZBX_SCRIPT_CTX_ACTION,
 							NULL, error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}

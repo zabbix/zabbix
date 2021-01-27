@@ -218,7 +218,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 	char		error[MAX_STRING_LEN];
 	int		ret = FAIL, rc;
 	DC_HOST		host;
-	DB_EVENT	event;
+	DB_EVENT	*event = NULL;
 	zbx_script_t	script;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64,
@@ -257,8 +257,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
+		if (NULL != event && ZBX_SCRIPT_CTX_HOST != ctx && ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
+			zbx_db_free_event(event);
+
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
-			ret = zbx_script_execute(&script, &host, user, &event, ctx, result, error, sizeof(error), debug);
+		{
+			ret = zbx_script_execute(&script, &host, user, event, ctx, result, error, sizeof(error), debug);
+		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
 
@@ -343,10 +348,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != debug)
-		{
 			zbx_json_addraw(&j, "debug", debug);
-			zbx_free(debug);
-		}
 
 		send = j.buffer;
 	}
@@ -368,6 +370,7 @@ finish:
 
 	zbx_json_free(&j);
 	zbx_free(result);
+	zbx_free(debug);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
