@@ -37,8 +37,8 @@ int		zbx_es_destroy_env(zbx_es_t *es, char **error);
 int		zbx_es_is_env_initialized(zbx_es_t *es);
 int		zbx_es_fatal_error(zbx_es_t *es);
 int		zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
-int		zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
-		char **error);
+int		zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param,
+		char **script_ret, char **error);
 void		zbx_es_set_timeout(zbx_es_t *es, int timeout);
 void		zbx_es_debug_enable(zbx_es_t *es);
 void		zbx_es_debug_disable(zbx_es_t *es);
