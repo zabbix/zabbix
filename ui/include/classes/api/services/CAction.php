@@ -462,6 +462,7 @@ class CAction extends CApiService {
 			$allowedScripts = API::Script()->get([
 				'output' => ['scriptid'],
 				'scriptids' => $scriptIds,
+				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 				'preservekeys' => true
 			]);
 			foreach ($scriptIds as $scriptId) {
@@ -1753,6 +1754,7 @@ class CAction extends CApiService {
 					$scripts = API::Script()->get([
 						'output' => ['scriptid', 'name'],
 						'scriptids' => $operation['opcommand']['scriptid'],
+						'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 						'preservekeys' => true
 					]);
 

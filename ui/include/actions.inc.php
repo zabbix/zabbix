@@ -826,8 +826,7 @@ function getActionOperationHints(array $operations) {
 	$scripts = [];
 
 	foreach ($operations as $operation) {
-		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
-				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
 			$scriptids[$operation['opcommand']['scriptid']] = true;
 		}
 	}
@@ -836,6 +835,7 @@ function getActionOperationHints(array $operations) {
 		$scripts = API::Script()->get([
 			'output' => ['name'],
 			'scriptids' => array_keys($scriptids),
+			'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 			'preservekeys' => true
 		]);
 	}
@@ -844,57 +844,12 @@ function getActionOperationHints(array $operations) {
 		$result[$key] = [];
 
 		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
-			switch ($operation['opcommand']['type']) {
-				case ZBX_SCRIPT_TYPE_IPMI:
-					$result[$key][] = [bold(_('Run IPMI command').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
+			$scriptid = $operation['opcommand']['scriptid'];
 
-				case ZBX_SCRIPT_TYPE_SSH:
-					$result[$key][] = [bold(_('Run SSH commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_TELNET:
-					$result[$key][] = [bold(_('Run TELNET commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
-					break;
-
-				case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-					if ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix agent')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					elseif ($operation['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY) {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server (proxy)')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					else {
-						$result[$key][] = [bold(_s('Run custom commands on %1$s', _('Zabbix server')).': '),
-							BR(), italic(zbx_nl2br($operation['opcommand']['command']))
-						];
-					}
-					break;
-
-				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					$scriptId = $operation['opcommand']['scriptid'];
-
-					if (isset($scripts[$scriptId])) {
-						$result[$key][] = [bold(_('Run global script').': '),
-							italic($scripts[$scriptId]['name'])
-						];
-					}
-					break;
-
-				default:
-					$result[$key][] = [bold(_('Run commands').': '), BR(),
-						italic(zbx_nl2br($operation['opcommand']['command']))
-					];
+			if (array_key_exists($scriptid, $scripts)) {
+				$result[$key][] = [bold(_('Run global script').': '),
+					italic($scripts[$scriptid]['name'])
+				];
 			}
 		}
 	}
