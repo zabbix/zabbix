@@ -1366,52 +1366,40 @@ class CControllerPopupGeneric extends CController {
 			case 'valuemaps':
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
-				$db_valuemaps = [];
+				$options = [];
 
 				if ($this->getInput('with_inherited', 0)) {
-					$hosts = API::Host()->get([
-						'output' => ['hostid', 'name'],
-						'selectParentTemplates' => ['templateid', 'host'],
-						'hostids' => $hostids
-					]);
-
-					if (!$hosts) {
-						$hosts = API::Template()->get([
-							'output' => ['templateid', 'host'],
-							'selectParentTemplates' => ['templateid', 'host'],
-							'templateids' => $hostids
-						]);
-					}
-					else {
-						CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'templateid']);
-					}
-
-					$host = reset($hosts);
-
-					if ($host) {
-						$templates = array_column($host['parentTemplates'], 'host', 'templateid');
-						$hosts = array_column($hosts, 'host', 'templateid') + $templates;
-						$hostids = array_keys($hosts);
-					}
+					$options['selectParentTemplates'] = ['templateid', 'host'];
 				}
-				else {
-					$hosts = array_column(API::Host()->get([
-						'output' => ['hostid', 'name'],
-						'hostids' => $hostids
-					]), 'host', 'hostid');
 
-					if (!$hosts) {
-						$hosts = array_column(API::Template()->get([
-							'output' => ['templateid', 'host'],
-							'templateids' => $hostids
-						]), 'host', 'templateid');
+				$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'host'],
+					'hostids' => $hostids,
+					'preservekeys' => true
+				] + $options), ['hostid' => 'templateid']);
+
+				if (!$hosts) {
+					$hosts = API::Template()->get([
+						'output' => ['templateid', 'host'],
+						'templateids' => $hostids,
+						'preservekeys' => true
+					] + $options);
+				}
+
+				if ($this->getInput('with_inherited', 0) && $hosts) {
+					$templates = [];
+
+					foreach ($hosts as $host) {
+						$templates += array_column($host['parentTemplates'], null, 'templateid');
 					}
+
+					$hosts += $templates;
 				}
 
 				$db_valuemaps = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name', 'hostid'],
 					'selectMappings' => ['value', 'newvalue'],
-					'hostids' => $hostids
+					'hostids' => $hosts ? array_keys($hosts) : null
 				]);
 
 				if (!$db_valuemaps) {
@@ -1421,17 +1409,22 @@ class CControllerPopupGeneric extends CController {
 				$disable_names = $this->getInput('disable_names', []);
 
 				foreach ($db_valuemaps as $db_valuemap) {
-					$records[$db_valuemap['valuemapid']] = [
+					$record = [
 						'id' => $db_valuemap['valuemapid'],
 						'name' => $db_valuemap['name'],
-						'hostname' => $hosts[$db_valuemap['hostid']],
 						'mappings' => array_key_exists('mappings', $db_valuemap) ? $db_valuemap['mappings'] : [],
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
 					];
+
+					if ($this->getInput('show_host_name', 0)) {
+						$record['hostname'] = $hosts[$db_valuemap['hostid']]['host'];
+					}
+
+					$records[$record['id']] = $record;
 				}
 
 				if ($this->getInput('multiselect', 0)) {
-					// In multiselect mode show only unique vlue maps names across all selected hosts.
+					// In multiselect mode show only unique value maps names across all selected hosts.
 					$records = array_column($records, null, 'name');
 				}
 
