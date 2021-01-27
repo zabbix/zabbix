@@ -296,7 +296,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
+int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
 {
 	char			clientip[MAX_STRING_LEN], tmp[64], *result = NULL, *send = NULL, *debug = NULL;
 	int			ret = FAIL;
