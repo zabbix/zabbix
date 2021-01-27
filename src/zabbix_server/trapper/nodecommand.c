@@ -348,10 +348,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != debug)
-		{
 			zbx_json_addraw(&j, "debug", debug);
-			zbx_free(debug);
-		}
 
 		send = j.buffer;
 	}
@@ -373,6 +370,7 @@ finish:
 
 	zbx_json_free(&j);
 	zbx_free(result);
+	zbx_free(debug);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
