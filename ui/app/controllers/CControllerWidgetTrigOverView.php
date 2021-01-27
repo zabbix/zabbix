@@ -49,14 +49,14 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'only_true' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'filter' => [
 				'value' => ($fields['show'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
-			],
-			'tags' => (array_key_exists('tags', $fields) && $fields['tags']) ? $fields['tags'] : null,
-			'evaltype' => array_key_exists('evaltype', $fields) ? $fields['evaltype'] : TAG_EVAL_TYPE_AND_OR
+			]
 		];
 
 		$problem_options = [
 			'show_suppressed' => $fields['show_suppressed'],
-			'show_recent' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null
+			'show_recent' => ($fields['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'tags' => (array_key_exists('tags', $fields) && $fields['tags']) ? $fields['tags'] : null,
+			'evaltype' => array_key_exists('evaltype', $fields) ? $fields['evaltype'] : TAG_EVAL_TYPE_AND_OR
 		];
 
 		$host_options = [

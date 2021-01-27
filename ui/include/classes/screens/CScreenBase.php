@@ -271,8 +271,7 @@ class CScreenBase {
 		}
 		elseif (array_key_exists('screenitemid', $options) && $options['screenitemid'] > 0) {
 			$screenitem_output = ['screenitemid', 'screenid', 'resourcetype', 'resourceid', 'width', 'height',
-				'elements', 'halign', 'valign', 'style', 'url', 'dynamic', 'sort_triggers', 'application',
-				'max_columns'
+				'elements', 'halign', 'valign', 'style', 'url', 'dynamic', 'sort_triggers', 'max_columns'
 			];
 
 			$this->screenitem = API::ScreenItem()->get([

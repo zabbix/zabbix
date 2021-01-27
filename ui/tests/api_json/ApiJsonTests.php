@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testAction.php';
-require_once dirname(__FILE__).'/testApplication.php';
 require_once dirname(__FILE__).'/testAuditLog.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
@@ -60,7 +59,6 @@ class ApiJsonTests {
 
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
-		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testAuditLog');
 		$suite->addTestSuite('testConfiguration');
 //		$suite->addTestSuite('testDependentItems'); TODO: To be fix later

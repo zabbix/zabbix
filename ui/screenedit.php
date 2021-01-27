@@ -86,7 +86,6 @@ $fields = [
 	'screen_type' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
 	'tr_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'tr_hostid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
-	'application' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
 	// actions
 	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
 	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
@@ -195,8 +194,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'max_columns' => getRequest('max_columns'),
 		'dynamic' => getRequest('dynamic'),
 		'elements' => getRequest('elements', 0),
-		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
-		'application' => getRequest('application', '')
+		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC)
 	];
 
 	if (hasRequest('resourceid')) {

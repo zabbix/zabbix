@@ -71,7 +71,6 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 		$filter = [
 			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
 			'hostids' => $this->hasInput('filter_hostids') ? $this->getInput('filter_hostids') : null,
-			'application' => $this->getInput('filter_application', ''),
 			'select' => $this->getInput('filter_select', ''),
 			'show_without_data' => $this->getInput('filter_show_without_data', 0),
 			'show_details' => $this->getInput('filter_show_details', 0),

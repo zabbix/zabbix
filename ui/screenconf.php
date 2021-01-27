@@ -163,7 +163,7 @@ if (hasRequest('add') || hasRequest('update')) {
 				'valign', 'haligh', 'style', 'url', 'max_columns'
 			];
 
-			array_push($output, 'dynamic', 'sort_triggers', 'application');
+			array_push($output, 'dynamic', 'sort_triggers');
 
 			$screen['screenitems'] = API::ScreenItem()->get([
 				'output' => $output,

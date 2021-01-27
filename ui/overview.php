@@ -192,8 +192,6 @@ if ($type == SHOW_TRIGGERS) {
 	$trigger_options = [
 		'search' => ($data['filter']['txtSelect'] !== '') ? ['description' => $data['filter']['txtSelect']] : null,
 		'only_true' => ($data['filter']['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-		'tags' => $data['filter']['tags'] ? $data['filter']['tags'] : null,
-		'evaltype' => $data['filter']['evaltype'] ? $data['filter']['evaltype'] : TAG_EVAL_TYPE_AND_OR,
 		'filter' => [
 			'value' => ($data['filter']['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
 		],
@@ -201,6 +199,8 @@ if ($type == SHOW_TRIGGERS) {
 	];
 
 	$problem_options = [
+		'tags' => $data['filter']['tags'] ? $data['filter']['tags'] : null,
+		'evaltype' => $data['filter']['evaltype'] ? $data['filter']['evaltype'] : TAG_EVAL_TYPE_AND_OR,
 		'show_recent' => ($data['filter']['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 		'show_suppressed' => $data['filter']['show_suppressed'],
 		'acknowledged' => ($data['filter']['ackStatus'] == EXTACK_OPTION_UNACK) ? false : null,

@@ -723,12 +723,12 @@ function getTriggersOverviewTableData(array $db_hosts, array $db_triggers): arra
  * @param array  $groupids
  * @param array  $host_options
  * @param array  $trigger_options
- * @param array  $trigger_options['tags']             (optional)
- * @param int    $trigger_options['evaltype']         (optional)
  * @param array  $problem_options
  * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
  * @param int    $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param array  $trigger_options['tags']             (optional)
+ * @param int    $trigger_options['evaltype']         (optional)
  *
  * @return array
  */
@@ -860,7 +860,11 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
-			'time_from' => $problem_options['time_from']
+			'time_from' => $problem_options['time_from'],
+			'tags' => array_key_exists('tags', $problem_options) ? $problem_options['tags'] : null,
+			'evaltype' => array_key_exists('evaltype', $problem_options)
+				? $problem_options['evaltype']
+				: TAG_EVAL_TYPE_AND_OR
 		]);
 
 		foreach ($problems as $problem) {
