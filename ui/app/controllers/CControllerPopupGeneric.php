@@ -1367,57 +1367,53 @@ class CControllerPopupGeneric extends CController {
 			case 'valuemaps':
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
-				$options = [];
 				$db_valuemaps = [];
 
-				if ($this->hasInput('with_inherited')) {
-					$options += ['selectInheritedValueMaps' => ['templateid', 'valuemapid', 'name']];
+				if ($this->getInput('with_inherited', 0)) {
+					$hosts = API::Host()->get([
+						'output' => ['hostid', 'name'],
+						'selectParentTemplates' => ['templateid', 'host'],
+						'hostids' => $hostids
+					]);
+
+					if (!$hosts) {
+						$hosts = API::Template()->get([
+							'output' => ['templateid', 'host'],
+							'selectParentTemplates' => ['templateid', 'host'],
+							'templateids' => $hostids
+						]);
+					}
+					else {
+						CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'templateid']);
+					}
+
+					$host = reset($hosts);
+
+					if ($host) {
+						$templates = array_column($host['parentTemplates'], 'host', 'templateid');
+						$hosts = array_column($hosts, 'host', 'templateid') + $templates;
+						$hostids = array_keys($hosts);
+					}
 				}
+				else {
+					$hosts = array_column(API::Host()->get([
+						'output' => ['hostid', 'name'],
+						'hostids' => $hostids
+					]), 'host', 'hostid');
 
-				$hosts = API::Host()->get([
-					'output' => ['name'],
-					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
-					'hostids' => $hostids,
-					'preservekeys' => true
-				] + $options);
-
-				if (!$hosts) {
-					$hosts = API::Template()->get([
-						'output' => ['name'],
-						'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
-						'templateids' => $hostids,
-						'preservekeys' => true
-					] + $options);
-				}
-
-				$templateid_name = [];
-
-				if ($this->hasInput('with_inherited')) {
-					foreach ($hosts as $host) {
-						foreach ($host['inheritedValuemaps'] as $valuemap) {
-							$templateid_name[$valuemap['templateid']] = _('Inaccessible template');
-						}
+					if (!$hosts) {
+						$hosts = array_column(API::Template()->get([
+							'output' => ['templateid', 'host'],
+							'templateids' => $hostids
+						]), 'host', 'templateid');
 					}
 				}
 
-				if ($templateid_name) {
-					$templateid_name = array_column(API::Template()->get([
-						'output' => ['templateid', 'name'],
-						'templateids' => array_keys($templateid_name)
-					]), 'name', 'templateid') + $templateid_name;
-				}
-
-				foreach ($hosts as $host) {
-					foreach ($host['valuemaps'] as $valuemap) {
-						$db_valuemaps[] = $valuemap + ['hostname' => $host['name']];
-					}
-
-					if (array_key_exists('inheritedValuemaps', $host)) {
-						foreach ($host['inheritedValuemaps'] as $valuemap) {
-							$db_valuemaps[] = $valuemap + ['hostname' => $templateid_name[$valuemap['templateid']]];
-						}
-					}
-				}
+				$db_valuemaps = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name', 'hostid'],
+					'selectMappings' => ['value', 'newvalue'],
+					'hostids' => $hostids
+				]);
 
 				if (!$db_valuemaps) {
 					break;
@@ -1429,7 +1425,7 @@ class CControllerPopupGeneric extends CController {
 					$records[$db_valuemap['valuemapid']] = [
 						'id' => $db_valuemap['valuemapid'],
 						'name' => $db_valuemap['name'],
-						'hostname' => $db_valuemap['hostname'],
+						'hostname' => $hosts[$db_valuemap['hostid']],
 						'mappings' => array_key_exists('mappings', $db_valuemap) ? $db_valuemap['mappings'] : [],
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
 					];

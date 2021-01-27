@@ -548,50 +548,37 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 				$result = [];
-				$options = [];
-				$db_valuemaps = [];
+				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
-					$options += ['selectInheritedValueMaps' => ['valuemapid', 'name']];
-				}
+					$host = API::Host()->get([
+						'output' => [],
+						'selectParentTemplates' => ['templateid'],
+						'hostids' => $hostids
+					]);
 
-				$hosts = API::Host()->get([
-					'output' => ['host'],
-					'selectValueMaps' => ['valuemapid', 'name'],
-					'hostids' => $data['hostids']
-				] + $options);
+					if (!$host) {
+						$host = API::Template()->get([
+							'output' => [],
+							'selectParentTemplates' => ['templateid'],
+							'templateids' => $hostids
+						]);
+					}
 
-				if (!$hosts) {
-					$hosts = API::Template()->get([
-						'output' => ['host'],
-						'selectValueMaps' => ['valuemapid', 'name'],
-						'templateids' => $data['hostids']
-					] + $options);
-				}
+					$host = reset($host);
 
-				foreach ($hosts as $host) {
-					$db_valuemaps = array_merge($db_valuemaps, $host['valuemaps']);
-
-					if (array_key_exists('inheritedValuemaps', $host)) {
-						$db_valuemaps = array_merge($db_valuemaps, $host['inheritedValuemaps']);
+					if ($host) {
+						$hostids = array_merge($hostids, array_column($host['parentTemplates'], 'templateid'));
 					}
 				}
 
-				if (!$db_valuemaps) {
-					break;
-				}
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					if ($data['search'] && stripos($db_valuemap['name'], $data['search']) === false) {
-						continue;
-					}
-
-					$result[$db_valuemap['name']] = [
-						'id' => $db_valuemap['valuemapid'],
-						'name' => $db_valuemap['name'],
-					];
-				}
-
+				$result = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'hostids' => array_unique($hostids),
+					'search' => ['name' => $data['search'] ? $data['search'] : null]
+				]);
+				$result = array_column($result, null, 'name');
+				$result = CArrayHelper::renameObjectsKeys($result, ['valuemapid' => 'id']);
 				$result = array_column($result, null, 'id');
 				CArrayHelper::sort($result, ['name']);
 				break;
