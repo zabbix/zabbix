@@ -1699,24 +1699,24 @@ FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
 UNIQUE		|1		|dashboardid,usrgrpid
 
 TABLE|dashboard_page|dashboard_pageid|ZBX_DASHBOARD
-FIELD		|dashboard_pageid	|t_id		|	|NOT NULL	|0
-FIELD		|dashboardid		|t_id		|	|NOT NULL	|0		|1|dashboard
-FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|display_period		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|sortorder		|t_integer	|'0'	|NOT NULL	|0
-INDEX		|1			|dashboardid
+FIELD		|dashboard_pageid|t_id		|	|NOT NULL	|0
+FIELD		|dashboardid	|t_id		|	|NOT NULL	|0		|1|dashboard
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|display_period	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|dashboardid
 
 TABLE|widget|widgetid|ZBX_DASHBOARD
-FIELD		|widgetid		|t_id		|	|NOT NULL	|0
-FIELD		|type			|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|x			|t_integer	|'0'	|NOT NULL	|0
-FIELD		|y			|t_integer	|'0'	|NOT NULL	|0
-FIELD		|width			|t_integer	|'1'	|NOT NULL	|0
-FIELD		|height			|t_integer	|'2'	|NOT NULL	|0
-FIELD		|view_mode		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|dashboard_pageid	|t_id		|	|NOT NULL	|0		|1|dashboard_page
-INDEX		|1			|dashboard_pageid
+FIELD		|widgetid	|t_id		|	|NOT NULL	|0
+FIELD		|type		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|x		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|y		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|width		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|height		|t_integer	|'2'	|NOT NULL	|0
+FIELD		|view_mode	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|dashboard_pageid|t_id		|	|NOT NULL	|0		|1|dashboard_page
+INDEX		|1		|dashboard_pageid
 
 TABLE|widget_field|widget_fieldid|ZBX_DASHBOARD
 FIELD		|widget_fieldid	|t_id		|	|NOT NULL	|0
