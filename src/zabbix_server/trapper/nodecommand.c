@@ -257,7 +257,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
-		if (ZBX_SCRIPT_CTX_HOST != ctx && ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
+		if (NULL != event && ZBX_SCRIPT_CTX_HOST != ctx && ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 			zbx_db_free_event(event);
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)

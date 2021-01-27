@@ -513,6 +513,8 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
 		}
+		else
+			ret = SUCCEED;
 	}
 	else
 		*error = zbx_strdup(*error, "undefined return value");
