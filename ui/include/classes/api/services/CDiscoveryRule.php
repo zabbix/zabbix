@@ -102,7 +102,6 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectLLDMacroPaths'			=> null,
 			'selectPreprocessing'			=> null,
 			'selectOverrides'				=> null,
-			'selectValueMap'				=> null, // Only to avoid undefined index.
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,

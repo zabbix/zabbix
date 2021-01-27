@@ -2049,7 +2049,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		// Add value mapping.
-		if ($options['selectValueMap'] !== null && ($this instanceof CItemPrototype || $this instanceof CItem)) {
+		if (($this instanceof CItemPrototype || $this instanceof CItem) && $options['selectValueMap'] !== null) {
 			if ($options['selectValueMap'] === API_OUTPUT_EXTEND) {
 				$options['selectValueMap'] = ['valuemapid', 'name', 'mappings'];
 			}
