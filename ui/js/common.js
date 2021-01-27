@@ -1003,7 +1003,7 @@ function openMassupdatePopup(elem, popup_name) {
 	const data = {};
 	const form = elem.closest('form');
 
-	data['ids'] = [...form.querySelectorAll('input:checked')].map((input) => input.value);
+	data['ids'] = [...form.querySelectorAll('tbody input:checked')].map((input) => input.value);
 
 	switch (popup_name) {
 		case 'popup.massupdate.item':
