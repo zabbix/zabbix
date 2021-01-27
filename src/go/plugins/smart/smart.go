@@ -61,6 +61,10 @@ func (p *Plugin) Validate(options interface{}) error {
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, zbxerr.ErrorTooManyParameters
+	}
+
 	if err = p.checkVersion(); err != nil {
 		return
 	}
