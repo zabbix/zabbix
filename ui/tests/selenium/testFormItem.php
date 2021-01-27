@@ -514,7 +514,7 @@ class testFormItem extends CLegacyWebTest {
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//z-select[@id="interface-select"]//li[text()="'.
-									$host_interface['ip'].' : '.$host_interface['port'].'"]');
+									$host_interface['ip'].':'.$host_interface['port'].'"]');
 						}
 					}
 					else {
@@ -949,9 +949,9 @@ class testFormItem extends CLegacyWebTest {
 			$dbResult = DBselect('SELECT * FROM item_preproc WHERE itemid='.$itemid);
 			$itemsPreproc = DBfetchArray($dbResult);
 			foreach ($itemsPreproc as $itemPreproc) {
-				// The array of allowed types must be synced with CItem::$supported_preprocessing_types.
+				// The array of allowed types must be synced with CItem::SUPPORTED_PREPROCESSING_TYPES.
 				$preprocessing_type = get_preprocessing_types($itemPreproc['type'], false,
-					CItem::$supported_preprocessing_types
+					CItem::SUPPORTED_PREPROCESSING_TYPES
 				);
 				$this->zbxTestAssertAttribute("//z-select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
 				$this->zbxTestDropdownAssertSelected("preprocessing_".($itemPreproc['step']-1)."_type", $preprocessing_type);

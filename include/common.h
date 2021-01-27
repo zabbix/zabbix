@@ -640,10 +640,10 @@ zbx_prototype_discover_t;
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
-/* host availability */
-#define HOST_AVAILABLE_UNKNOWN		0
-#define HOST_AVAILABLE_TRUE		1
-#define HOST_AVAILABLE_FALSE		2
+/* interface availability */
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
 
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0
@@ -839,6 +839,7 @@ typedef struct
 	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
+	int		timeout;
 }
 zbx_script_t;
 
@@ -847,6 +848,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_TYPE_SSH		2
 #define ZBX_SCRIPT_TYPE_TELNET		3
 #define ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT	4
+#define ZBX_SCRIPT_TYPE_WEBHOOK		5
 
 #define ZBX_SCRIPT_EXECUTE_ON_AGENT	0
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
@@ -1378,8 +1380,14 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 
-#define ZBX_SESSION_ACTIVE	0
-#define ZBX_SESSION_PASSIVE	1
+#define ZBX_SESSION_ACTIVE		0
+#define ZBX_SESSION_PASSIVE		1
+#define ZBX_AUTH_TOKEN_ENABLED		0
+#define ZBX_AUTH_TOKEN_DISABLED		1
+#define ZBX_AUTH_TOKEN_NEVER_EXPIRES	0
+
+#define	ZBX_SID_SESSION_LENGTH		32
+#define	ZBX_SID_AUTH_TOKEN_LENGTH	64
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
@@ -1584,6 +1592,7 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 #define ZBX_PREPROC_CSV_TO_JSON			24
 #define ZBX_PREPROC_STR_REPLACE			25
 #define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
+#define ZBX_PREPROC_XML_TO_JSON			27
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
@@ -1715,5 +1724,12 @@ typedef enum
 zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
+int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
+int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
+#ifdef HAVE_LIBXML2
+int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
+int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
+#endif
 
 #endif

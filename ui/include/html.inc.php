@@ -199,10 +199,10 @@ function get_icon($type, $params = []) {
 function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	$options = [
 		'output' => [
-			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'available', 'snmp_available',
-			'jmx_available', 'ipmi_available', 'error', 'snmp_error', 'jmx_error', 'ipmi_error'
+			'hostid', 'status', 'name', 'maintenance_status', 'flags'
 		],
 		'selectHostDiscovery' => ['ts_delete'],
+		'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available', 'error'],
 		'hostids' => [$hostid],
 		'editable' => true
 	];
@@ -310,7 +310,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		$list
 			->addItem(new CBreadcrumbs([new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))), $host]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host));
+			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
 			$info_icons = [getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete'])];
@@ -595,38 +595,46 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 }
 
 /**
- * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
+ * Create HTML helper element for host interfaces availability.
  *
- * @param array $host		an array of host data
+ * @param array $host_interfaces                              Array of arrays of host interfaces.
+ * @param int   $host_interfaces[]['type']                    Interface type.
+ * @param int   $host_interfaces[]['available']               Interface availability.
+ * @param int   $host_interfaces[]['useip']                   Interface use IP or DNS.
+ * @param int   $host_interfaces[]['ip']                      Interface IP address.
+ * @param int   $host_interfaces[]['dns']                     Interface domain name.
+ * @param int   $host_interfaces[]['port']                    Interface port.
+ * @param int   $host_interfaces[]['details']['version']      Interface SNMP version.
+ * @param int   $host_interfaces[]['details']['contextname']  Interface context name for SNMP version 3.
+ * @param int   $host_interfaces[]['details']['community']    Interface community for SNMP non version 3 interface.
+ * @param int   $host_interfaces[]['error']                   Interface error message.
  *
- * @return CDiv
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable($host) {
-	$container = (new CDiv())->addClass(ZBX_STYLE_STATUS_CONTAINER);
+function getHostAvailabilityTable($host_interfaces): CHostAvailability {
+	$interfaces = [];
 
-	foreach (['ZBX' => '', 'SNMP' => 'snmp_', 'JMX' => 'jmx_', 'IPMI' => 'ipmi_'] as $type => $prefix) {
-		switch ($host[$prefix.'available']) {
-			case HOST_AVAILABLE_TRUE:
-				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);
-				break;
-			case HOST_AVAILABLE_FALSE:
-				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_RED);
+	foreach ($host_interfaces as $interface) {
+		$description = null;
 
-				if ($host[$prefix.'error'] !== '') {
-					$ai
-						->addClass(ZBX_STYLE_CURSOR_POINTER)
-						->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
-				}
-
-				break;
-			case HOST_AVAILABLE_UNKNOWN:
-				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREY);
-				break;
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$version = $interface['details']['version'];
+			$description = vsprintf('%s, %s: %s', ($version == SNMP_V3)
+				? [_s('SNMPv%1$d', $version), _('Context name'), $interface['details']['contextname']]
+				: [_s('SNMPv%1$d', $version), _x('Community', 'SNMP Community'), $interface['details']['community']]
+			);
 		}
-		$container->addItem($ai);
+
+		$interfaces[] = [
+			'type' => $interface['type'],
+			'available' => $interface['available'],
+			'interface' => getHostInterface($interface),
+			'description' => $description,
+			'error' => ($interface['available'] == INTERFACE_AVAILABLE_TRUE) ? '' : $interface['error']
+		];
 	}
 
-	return $container;
+	return (new CHostAvailability())->setInterfaces($interfaces);
 }
 
 /**
@@ -835,6 +843,34 @@ function makePageFooter($with_version = true) {
 }
 
 /**
+ * Get drop-down submenu item list for the User settings section.
+ *
+ * @return array|null  Menu definition for CWidget::setTitleSubmenu.
+ */
+function getUserSettingsSubmenu(): ?array {
+	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+		return null;
+	}
+
+	$profile_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'userprofile.edit')
+		->getUrl();
+
+	$tokens_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'user.token.list')
+		->getUrl();
+
+	return [
+		'main_section' => [
+			'items' => array_filter([
+				$profile_url => _('User profile'),
+				$tokens_url  => _('API tokens')
+			])
+		]
+	];
+}
+
+/**
  * Get drop-down submenu item list for the Administration->General section.
  *
  * @return array  Menu definition for CWidget::setTitleSubmenu.
@@ -876,13 +912,19 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'module.list')
 		->getUrl();
 
+	$tokens_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'token.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
+	$can_access_tokens = (!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS));
+
 	return [
 		'main_section' => [
-			'items' => [
+			'items' => array_filter([
 				$gui_url          => _('GUI'),
 				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
@@ -892,8 +934,9 @@ function getAdministrationGeneralSubmenu() {
 				$macros_url       => _('Macros'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
+				$tokens_url       => $can_access_tokens ? _('API tokens') : null,
 				$miscconfig_url   => _('Other')
-			]
+			])
 		]
 	];
 }

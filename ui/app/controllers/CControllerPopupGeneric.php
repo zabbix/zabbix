@@ -377,8 +377,7 @@ class CControllerPopupGeneric extends CController {
 				],
 				'table_columns' => [
 					_('Name'),
-					_('Execute on'),
-					_('Commands')
+					_('Execute on')
 				]
 			],
 			'roles' => [
@@ -1315,7 +1314,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'scripts':
 				$options += [
-					'output' => ['scriptid', 'name', 'type', 'execute_on', 'command'],
+					'output' => ['scriptid', 'name', 'type', 'execute_on'],
 					'groupids' => (!$this->hostids && $this->groupids) ? $this->groupids : null
 				];
 

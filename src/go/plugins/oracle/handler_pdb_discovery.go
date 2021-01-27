@@ -25,16 +25,9 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyPDBDiscovery = "oracle.pdb.discovery"
-
-const PDBDiscoveryMaxParams = 0
-
-func PDBDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func pdbDiscoveryHandler(ctx context.Context, conn OraClient, params map[string]string,
+	_ ...string) (interface{}, error) {
 	var lld string
-
-	if len(params) > PDBDiscoveryMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT

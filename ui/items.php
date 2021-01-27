@@ -1217,7 +1217,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
-	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
+	$data['preprocessing_types'] = CItem::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	$history_in_seconds = timeUnitToSeconds($data['history']);

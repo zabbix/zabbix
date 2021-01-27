@@ -53,6 +53,9 @@ $menu-main-submenu-hover-bg-color: #0e0e0e;
 $menu-main-submenu-selected-bg-color: #1c1c1c;
 $menu-main-submenu-selected-border-color: #c5c5c5;
 
+$menu-main-submenu-next-level-bg: #454545 !default;
+$menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
+
 $menu-main-icons: (
 		dashboard: -570px -664px,
 		problems: -570px -688px,

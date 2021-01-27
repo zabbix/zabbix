@@ -202,6 +202,11 @@ class ZBase {
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 
+				$this->component_registry->get('menu.user')
+					->setSelectedByAction($action_name, $_GET,
+						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+					);
+
 				CProfiler::getInstance()->start();
 
 				$this->processRequest($router);

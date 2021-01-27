@@ -944,6 +944,11 @@ form {
 	word-break: break-all;
 }
 
+.wordbreak {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
 .overflow-table {
 	overflow-x: auto;
 	position: relative;
@@ -4069,6 +4074,11 @@ $form-icon-btn: (
 			min-width: 450px;
 		}
 
+		&.modal-popup-small {
+			max-width: 450px;
+			width: 100%;
+		}
+
 		&.modal-popup-static {
 			max-width: 700px;
 			width: 100%;
@@ -5103,16 +5113,14 @@ a.link-action {
 	span {
 		border-radius: 0;
 
-		&:only-child {
-			border-radius: 2px;
+		&:first-of-type {
+			border-top-left-radius: 2px;
+			border-bottom-left-radius: 2px;
 		}
 
-		&:first-of-type:not(:only-child) {
-			border-radius: 2px 0 0 2px;
-		}
-
-		&:last-of-type:not(:only-child) {
-			border-radius: 0 2px 2px 0;
+		&:last-of-type {
+			border-top-right-radius: 2px;
+			border-bottom-right-radius: 2px;
 		}
 	}
 
@@ -5879,7 +5887,8 @@ svg {
 	}
 }
 
-.lld-overrides-operations-table {
+.lld-overrides-operations-table,
+.confirmation-msg {
 	white-space: normal;
 	word-break: break-word;
 }
@@ -6788,7 +6797,7 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
-table.preprocessing-test-results {
+.preprocessing-test-results {
 	td {
 		vertical-align: top !important;
 	}
@@ -7299,8 +7308,8 @@ table.preprocessing-test-results {
 	}
 }
 
-// Media type test log popup
-.mediatypetest-modal {
+// Popup with debug data of request processing to Zabbix server.
+.debug-modal {
 	&.overlay-dialogue.modal {
 		.overlay-dialogue-body {
 			overflow-x: auto;
@@ -7445,6 +7454,14 @@ z-select,
 	.table-col-value,
 	.table-col-template-value {
 		width: 300px;
+	}
+}
+
+.active-readonly {
+	&[readonly] {
+		color: $font-color;
+		background-color: $form-bg-color !important;
+		border-color: $form-border-color;
 	}
 }
 

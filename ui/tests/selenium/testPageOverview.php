@@ -614,7 +614,18 @@ class testPageOverview extends CLegacyWebTest {
 						'triggers.php?form=update&triggerid',
 						'action=showgraph&itemid'
 					],
-					'links_text' => ['Problems', 'Acknowledge', 'Configuration', 'Trigger URL', 'Webhook url for all', '1_item']
+					'links_text' => [
+						'Problems',
+						'Acknowledge',
+						'Configuration',
+						'Trigger URL',
+						'Webhook url for all',
+						'1_item',
+						'Detect operating system',
+						'Ping',
+						'Selenium script',
+						'Traceroute'
+					]
 				]
 			],
 			[

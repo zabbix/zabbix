@@ -43,5 +43,7 @@ void		zbx_es_set_timeout(zbx_es_t *es, int timeout);
 void		zbx_es_debug_enable(zbx_es_t *es);
 void		zbx_es_debug_disable(zbx_es_t *es);
 const char	*zbx_es_debug_info(const zbx_es_t *es);
+int		zbx_es_execute_command(const char *command, const char *param, int timeout, char **result,
+		char *error, size_t max_error_len, char **debug);
 
 #endif /* ZABBIX_ZBXEMBED_H */

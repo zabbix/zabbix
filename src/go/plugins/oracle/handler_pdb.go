@@ -25,16 +25,8 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-const keyPDB = "oracle.pdb.info"
-
-const PDBMaxParams = 0
-
-func PDBHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var PDBInfo string
-
-	if len(params) > PDBMaxParams {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
 
 	row, err := conn.QueryRow(ctx, `
    		SELECT

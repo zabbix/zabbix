@@ -491,7 +491,7 @@ class CControllerPopupMassupdateItem extends CController {
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
-				'preprocessing_types' => CItemPrototype::$supported_preprocessing_types
+				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES
 			];
 		}
 		else {
@@ -500,7 +500,7 @@ class CControllerPopupMassupdateItem extends CController {
 					->setArgument('context', $this->getInput('context'))
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
-				'preprocessing_types' => CItem::$supported_preprocessing_types
+				'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES
 			];
 		}
 

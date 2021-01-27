@@ -31,8 +31,6 @@ class CControllerAuthenticationUpdate extends CController {
 			->setArgument('action', 'authentication.edit')
 			->getUrl()
 		);
-
-		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {

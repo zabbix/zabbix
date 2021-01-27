@@ -185,7 +185,7 @@ class CMenuItem extends CTag {
 	 *
 	 * @return bool  True, if menu item was selected.
 	 */
-	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
+	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = false): bool {
 		if (array_key_exists($action_name, $this->aliases)) {
 			foreach ($this->aliases[$action_name] as $alias_params) {
 				$no_unacceptable_params = true;

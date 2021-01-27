@@ -555,6 +555,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			}
 
 			$this->page->logout();
+			$this->page->reset();
 			$this->page->open('index.php?form=default');
 		}
 	}

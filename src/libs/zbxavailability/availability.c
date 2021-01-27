@@ -45,16 +45,16 @@ void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 	}
 }
 
-void	zbx_availabilities_flush(const zbx_vector_ptr_t *host_availabilities)
+void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities)
 {
 	unsigned char	*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
 	int		i;
 
-	for (i = 0; i < host_availabilities->values_num; i++)
+	for (i = 0; i < interface_availabilities->values_num; i++)
 	{
 		zbx_availability_serialize(&data, &data_alloc, &data_offset,
-				(zbx_host_availability_t *)host_availabilities->values[i]);
+				interface_availabilities->values[i]);
 	}
 
 	zbx_availability_flush(data, data_offset);

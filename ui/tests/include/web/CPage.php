@@ -81,6 +81,14 @@ class CPage {
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
+		$this->connect();
+		CElementQuery::setPage($this);
+	}
+
+	/**
+	 * Web driver initialization.
+	 */
+	public function connect() {
 		$capabilities = DesiredCapabilities::chrome();
 		if (defined('PHPUNIT_BROWSER_NAME')) {
 			$capabilities->setBrowserName(PHPUNIT_BROWSER_NAME);
@@ -97,13 +105,17 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
-		$this->driver = RemoteWebDriver::create('http://'.PHPUNIT_DRIVER_ADDRESS.':4444/wd/hub', $capabilities);
+		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
+
+		if (strpos($phpunit_driver_address, ':') === false) {
+			$phpunit_driver_address .= ':4444';
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
 		);
-
-		CElementQuery::setPage($this);
 	}
 
 	/**
@@ -162,6 +174,14 @@ class CPage {
 	public function destroy() {
 		$this->driver->quit();
 		self::$cookie = null;
+	}
+
+	/**
+	 * Reconnect web driver.
+	 */
+	public function reset() {
+		$this->destroy();
+		$this->connect();
 	}
 
 	/**

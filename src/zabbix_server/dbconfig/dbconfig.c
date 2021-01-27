@@ -118,7 +118,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		else
 		{
 			DCsync_configuration(ZBX_DBSYNC_UPDATE, NULL);
-			DCupdate_hosts_availability();
+			DCupdate_interfaces_availability();
 			nextcheck = time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 		}
 

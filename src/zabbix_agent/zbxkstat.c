@@ -115,8 +115,11 @@ out:
 
 void	zbx_kstat_destroy(void)
 {
-	if (NULL != kc)
-		kstat_close(kc);
+	if (NULL == kc)
+		return;
+
+	kstat_close(kc);
+	zbx_mutex_destroy(&kstat_lock);
 }
 
 /******************************************************************************

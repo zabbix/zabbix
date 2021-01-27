@@ -205,6 +205,9 @@ static int	punycode_encode_part(zbx_uint32_t *codepoints, zbx_uint32_t count, ch
 	if (0 == count)
 		return SUCCEED;
 
+	if (MAX_STRING_LEN <= count)
+		return FAIL;
+
 	for (i = 0; i < count; i++)
 	{
 		if (0x80 <= codepoints[i])
