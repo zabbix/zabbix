@@ -59,33 +59,32 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
-//			// Uncomment following, when ZBX-18916 is fixed.
-//			// Remove trailing spaces.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'trim' => true,
-//					'fields' =>  [
-//						'Name' => 'Test trailing spaces',
-//						'Type' => 'Webhook',
-//						'Script' => 'Webhook Script'
-//					],
-//					'Parameters' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 1,
-//							'Name' => 'name',
-//							'Value' => '   trimmed value    '
-//						],
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'Name' => '   trimmed name    ',
-//							'Value' => 'value'
-//						]
-//					]
-//				]
-//			],
+			// Remove trailing spaces.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'trim' => true,
+					'fields' =>  [
+						'Name' => 'Test trailing spaces',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'name',
+							'Value' => '   trimmed    value    '
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   trimmed     name    ',
+							'Value' => 'value'
+						]
+					]
+				]
+			],
 			[
 				[
 					'fields' =>  [
@@ -135,8 +134,8 @@ class testFormAdministrationScripts extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
-							'Name' => 'LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName LongName Lon',
-							'Value' => 'LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValue LongValu'
+							'Name' => str_repeat('n', 255),
+							'Value' => str_repeat('v', 2048)
 						],
 						[
 							'Name' => '{$MACRO:A}',
@@ -298,27 +297,25 @@ class testFormAdministrationScripts extends CWebTest {
 					]
 				]
 			],
-//			// Uncomment following, when ZBX-18916 is fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'trim' => true,
-//					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
-//					'fields' =>  [
-//						'Name' => 'Test trailing spaces',
-//						'Type' => 'Webhook',
-//						'Script' => 'Webhook Script'
-//					],
-//					'Parameters' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'Name' => '   ',
-//							'Value' => '   '
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Test trailing spaces',
+						'Type' => 'Webhook',
+						'Script' => 'Webhook Script'
+					],
+					'Parameters' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   ',
+							'Value' => '   '
+						]
+					]
+				]
+			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -483,18 +480,18 @@ class testFormAdministrationScripts extends CWebTest {
 			$this->checkConfirmation($data, $form);
 
 			if (CTestArrayHelper::get($data, 'Parameters')) {
-//				// Uncomment following, when ZBX-18916 is fixed.
-//				if (CTestArrayHelper::get($data, 'trim', false) === true) {
-//					// Remove trailing spaces from name and value.
-//					foreach ($data['Parameters'] as $i => &$fields) {
-//						foreach (['Name', 'Value'] as $parameter) {
-//							if (array_key_exists($parameter, $fields)) {
-//								$fields[$parameter] = trim($fields[$parameter]);
-//							}
-//						}
-//					}
-//					unset($parameters);
-//				}
+
+				if (CTestArrayHelper::get($data, 'trim', false) === true) {
+					// Remove trailing spaces from name and value.
+					foreach ($data['Parameters'] as $i => &$fields) {
+						foreach (['Name', 'Value'] as $parameter) {
+							if (array_key_exists($parameter, $fields)) {
+								$fields[$parameter] = trim($fields[$parameter]);
+							}
+						}
+					}
+					unset($parameters);
+				}
 
 				// Remove action and index fields fo asserting.
 				if ($update === true) {
