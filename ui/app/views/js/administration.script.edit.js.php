@@ -139,7 +139,9 @@
 
 		// trim spaces on sumbit
 		$('#scriptForm').submit(function() {
-			$(this).trimValues(['#name', '#command', '#commandipmi', '#description']);
+			$(this).trimValues(['#name', '#command', '#commandipmi', '#description', 'input[name^="parameters"]',
+				'input[name="script"]'
+			]);
 		});
 
 		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
