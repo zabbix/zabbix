@@ -453,29 +453,29 @@ class testScripts extends CAPITest {
 				]
 			],
 			// Filter webhooks.
-//			[
-//				'params' => [
-//					'__auth' => ['Admin', 'zabbix'],
-//					'output' => [ 'scriptid', 'parameters'],
-//					'filter' => ['type' => 5]
-//				],
-//				'expect' => [
-//					'error' => null,
-//					'has.scriptid' => ['200'],
-//					'!has.scriptid' => ['201'],
-//					'result_keys' => ['scriptid', 'parameters'],
-//					'parameters' => [
-//						[
-//							'name' => 'parameter 1',
-//							'value' => 'value 1'
-//						],
-//						[
-//							'name' => 'parameter 2',
-//							'value' => 'value 2'
-//						]
-//					]
-//				]
-//			],
+			[
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => [ 'scriptid', 'parameters'],
+					'filter' => ['type' => 5]
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['200'],
+					'!has.scriptid' => ['201'],
+					'result_keys' => ['scriptid', 'parameters'],
+					'parameters' => [
+						[
+							'name' => 'parameter 1',
+							'value' => 'value 1'
+						],
+						[
+							'name' => 'parameter 2',
+							'value' => 'value 2'
+						]
+					]
+				]
+			],
 			// Filter IPMI.
 			[
 				'params' => [
