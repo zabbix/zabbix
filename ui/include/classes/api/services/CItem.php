@@ -514,7 +514,7 @@ class CItem extends CItemGeneral {
 
 		foreach ($items_rtdata as $key => &$value) {
 			$value['itemid'] = $itemids[$key];
-			$items[$key]['itemid'] = $itemids[$key]; // TODO miks: no need to pass $itemids to the function calls at the end of the function.
+			$items[$key]['itemid'] = $itemids[$key];
 		}
 		unset($value);
 

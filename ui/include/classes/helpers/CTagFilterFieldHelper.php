@@ -115,7 +115,8 @@ class CTagFilterFieldHelper {
 		return (new CRow([
 			(new CTextBox($options['tag_field_name'].'[#{rowNum}][tag]'))
 				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->removeId(),
 			(new CSelect($options['tag_field_name'].'[#{rowNum}][operator]'))
 				->addOptions(CSelect::createOptionsFromArray([
 					TAG_OPERATOR_EXISTS => _('Exists'),

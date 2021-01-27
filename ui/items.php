@@ -305,9 +305,9 @@ $valid_input = check_fields($fields);
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
-$subfiltersList = ['subfilter_types', 'subfilter_value_types', 'subfilter_status',
-	'subfilter_state', 'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-	'subfilter_history', 'subfilter_trends', 'subfilter_discovered'
+$subfiltersList = ['subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
+	'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history',
+	'subfilter_trends', 'subfilter_discovered'
 ];
 
 /*
@@ -385,26 +385,15 @@ if (hasRequest('filter_set')) {
 	CProfile::updateArray($prefix.'items.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 	unset($filter_tags);
 
-	// Subfilter tags.
-	$subf_tags = [];
-	if (hasRequest('subfilter_tags')) {
-		foreach (getRequest('subfilter_tags', []) as $tag) {
-			if ($tag['tag'] !== null) {
-				$subf_tags[$tag['tag'].':'.$tag['value']] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value'] ? $tag['value'] : ''
-				];
-			}
-		}
-	}
-	CProfile::updateArray($prefix.'items.subfilter_tags.tag', array_column($subf_tags, 'tag'), PROFILE_TYPE_STR);
-	CProfile::updateArray($prefix.'items.subfilter_tags.value', array_column($subf_tags, 'value'), PROFILE_TYPE_STR);
-
 	// subfilters
 	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
 		CProfile::update($prefix.'items.'.$name, '', PROFILE_TYPE_STR);
 	}
+
+	// Subfilter tags.
+	CProfile::updateArray($prefix.'items.subfilter_tags.tag', [], PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.subfilter_tags.value', [], PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -451,12 +440,28 @@ $_REQUEST['filter_discovered'] = CProfile::get($prefix.'items.filter_discovered'
 $_REQUEST['filter_with_triggers'] = CProfile::get($prefix.'items.filter_with_triggers', -1);
 
 // subfilters
-foreach ($subfiltersList as $name) {
-	if (isset($_REQUEST['subfilter_set'])) {
+if (hasRequest('subfilter_set')) {
+	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = getRequest($name, []);
 		CProfile::update($prefix.'items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
 	}
-	else {
+
+	$subf_tags = [];
+	if (hasRequest('subfilter_tags')) {
+		foreach (getRequest('subfilter_tags', []) as $tag) {
+			if ($tag['tag'] !== null) {
+				$subf_tags[json_encode([$tag['tag'], $tag['value']])] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value'] ? $tag['value'] : ''
+				];
+			}
+		}
+	}
+	CProfile::updateArray($prefix.'items.subfilter_tags.tag', array_column($subf_tags, 'tag'), PROFILE_TYPE_STR);
+	CProfile::updateArray($prefix.'items.subfilter_tags.value', array_column($subf_tags, 'value'), PROFILE_TYPE_STR);
+}
+else {
+	foreach ($subfiltersList as $name) {
 		$_REQUEST[$name] = [];
 		$subfilters_value = CProfile::get($prefix.'items.'.$name);
 		if (!zbx_empty($subfilters_value)) {
@@ -1312,8 +1317,8 @@ else {
 	}
 	$subfilter_tags = [];
 	foreach (CProfile::getArray($prefix.'items.subfilter_tags.tag', []) as $i => $tag) {
-		$val = CProfile::get($prefix.'items.filter.tags.value', '', $i);
-		$subfilter_tags[$tag.':'.$val] = [
+		$val = CProfile::get($prefix.'items.subfilter_tags.value', '', $i);
+		$subfilter_tags[json_encode([$tag, $val])] = [
 			'tag' => $tag,
 			'value' => $val
 		];
@@ -1523,7 +1528,7 @@ else {
 					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
 				'subfilter_tags' => (!$subfilter_tags
 					|| (bool) array_intersect_key($subfilter_tags, array_flip(array_map(function($tag) {
-							return $tag['tag'].':'.$tag['value'];
+							return json_encode([$tag['tag'], $tag['value']]);
 						}, $item['tags']))))
 			];
 		}

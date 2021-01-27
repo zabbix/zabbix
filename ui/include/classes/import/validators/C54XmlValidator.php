@@ -1773,14 +1773,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
 							'url' =>					['type' => XML_STRING | XML_REQUIRED],
-							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED],
-							// TODO miks:
-//							'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-//								'tag' =>					['type' => XML_ARRAY, 'rules' => [
-//									'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-//									'value' =>					['type' => XML_STRING, 'default' => '']
-//								]]
-//							]]
+							'max_columns' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]

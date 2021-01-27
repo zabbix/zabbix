@@ -50,7 +50,6 @@ class CControllerPopupMassupdateItem extends CController {
 			'post_type' => 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts' => 'string',
 			'delay_flex' => 'array',
-			'applications' => 'array',
 			'preprocessing' => 'array',
 			'headers' => 'array',
 			'status' => 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
@@ -60,10 +59,11 @@ class CControllerPopupMassupdateItem extends CController {
 			'valuemapid' => 'id',
 			'master_itemid' => 'id',
 			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
-			'massupdate_app_action' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'preprocessing_test_type' => 'int32',
 			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
 			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'tags' => 'array',
+			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'context' => 'required|string|in '.implode(',', ['host', 'template'])
 		];
 
@@ -110,10 +110,22 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	protected function doAction() {
+		$visible = $this->getInput('visible', []);
+
+		$tags = array_key_exists('tags', $visible) ? $this->getInput('tags', []) : [];
+		foreach ($tags as $key => $tag) {
+			if ($tag['tag'] === '' && $tag['value'] === '') {
+				unset($tags[$key]);
+				continue;
+			}
+			else {
+				unset($tags[$key]['type']);
+			}
+		}
+
 		if ($this->hasInput('update')) {
 			$output = [];
 
-			$visible = $this->getInput('visible', []);
 			$itemids = $this->getInput('ids');
 
 			$result = true;
@@ -170,9 +182,6 @@ class CControllerPopupMassupdateItem extends CController {
 				$delay = null;
 			}
 
-			$applications = $this->getInput('applications', []);
-			$applicationids = [];
-
 			if ($result) {
 				try {
 					DBstart();
@@ -213,7 +222,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 					$items = API::Item()->get([
 						'output' => ['itemid', 'flags', 'type'],
-						'selectApplications' => ['applicationid'],
+						'selectTags' => array_key_exists('tags', $visible) ? ['tag', 'value'] : null,
 						'itemids' => $itemids,
 						'preservekeys' => true
 					]);
@@ -244,7 +253,6 @@ class CControllerPopupMassupdateItem extends CController {
 							'password' => $this->getInput('password', ''),
 							'publickey' => $this->getInput('publickey', ''),
 							'privatekey' => $this->getInput('privatekey', ''),
-							'applications' => [],
 							'status' => $this->getInput('status', ITEM_STATUS_ACTIVE),
 							'master_itemid' => $this->getInput('master_itemid', 0),
 							'url' =>  $this->getInput('url', ''),
@@ -345,48 +353,45 @@ class CControllerPopupMassupdateItem extends CController {
 						foreach ($itemids as $itemid) {
 							if (array_key_exists($itemid, $items)) {
 								if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-									if ($item) {
-										if (array_key_exists('applications', $visible)) {
-											if ($applicationids) {
-												$db_applicationids = array_column($items[$itemid]['applications'],
-													'applicationid'
-												);
+									if (array_key_exists('tags', $visible)) {
+										switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
+											case ZBX_ACTION_ADD:
+												if ($tags) {
+													$unique_tags = [];
 
-												switch ($massupdate_app_action) {
-													case ZBX_ACTION_ADD:
-														$upd_applicationids = array_merge($applicationids,
-															$db_applicationids
-														);
-														break;
+													foreach (array_merge($items[$itemid]['tags'], $tags) as $tag) {
+														$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+													}
 
-													case ZBX_ACTION_REPLACE:
-														$upd_applicationids = $applicationids;
-														break;
-
-													case ZBX_ACTION_REMOVE:
-														$upd_applicationids = array_diff($db_applicationids,
-															$applicationids
-														);
-														break;
+													$item['tags'] = array_values($unique_tags);
 												}
+												break;
 
-												$item['applications'] = array_keys(array_flip($upd_applicationids));
-											}
-											else {
-												if ($massupdate_app_action == ZBX_ACTION_ADD
-														|| $massupdate_app_action == ZBX_ACTION_REMOVE) {
-													unset($item['applications']);
+											case ZBX_ACTION_REPLACE:
+												$item['tags'] = $tags;
+												break;
+
+											case ZBX_ACTION_REMOVE:
+												$diff_tags = [];
+												foreach ($items[$itemid]['tags'] as $a) {
+													foreach ($tags as $b) {
+														if ($a['tag'] === $b['tag']
+																&& $a['value'] === $b['value']) {
+															continue 2;
+														}
+													}
+
+													$diff_tags[] = $a;
 												}
-											}
+												$item['tags'] = $diff_tags;
+												break;
 										}
+									}
 
-										$items_to_update[] = ['itemid' => $itemid] + $item;
-									}
+									$items_to_update[] = ['itemid' => $itemid] + $item;
 								}
-								else {
-									if ($discovered_item) {
-										$items_to_update[] = ['itemid' => $itemid] + $discovered_item;
-									}
+								elseif ($discovered_item) {
+									$items_to_update[] = ['itemid' => $itemid] + $discovered_item;
 								}
 							}
 						}
@@ -451,7 +456,6 @@ class CControllerPopupMassupdateItem extends CController {
 				'initial_item_type' => null,
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 				'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,
-				'displayApplications' => true,
 				'display_interfaces' => true,
 				'displayMasteritems' => true,
 				'location_url' => (new CUrl('items.php'))
@@ -468,7 +472,6 @@ class CControllerPopupMassupdateItem extends CController {
 			$hostCount = count($data['hosts']);
 
 			if ($hostCount > 1) {
-				$data['displayApplications'] = false;
 				$data['display_interfaces'] = false;
 				$data['displayMasteritems'] = false;
 			}
@@ -484,17 +487,10 @@ class CControllerPopupMassupdateItem extends CController {
 					$data['display_interfaces'] = false;
 
 					if ($templateCount == 1 && $data['hostid'] == 0) {
-						// If selected from filter without 'hostid'.
-						$templates = reset($templates);
-						$data['hostid'] = $templates['templateid'];
+						$data['hostid'] = $templates[0]['templateid'];
 					}
 
-					/*
-					 * If items belong to single template and some belong to single host, don't display
-					 * application multiselect and don't display application multiselect for multiple templates.
-					 */
-					if ($hostCount == 1 && $templateCount == 1 || $templateCount > 1) {
-						$data['displayApplications'] = false;
+					if ($hostCount != 1) {
 						$data['displayMasteritems'] = false;
 					}
 				}
@@ -550,6 +546,18 @@ class CControllerPopupMassupdateItem extends CController {
 				foreach ($data['hosts']['interfaces'] as $interface) {
 					$data['interfaceids'][$interface['type']][] = $interface['interfaceid'];
 				}
+			}
+
+			// Tags update fields.
+			if (array_key_exists('tags', $visible)) {
+				$data += [
+					'mass_update_tags' => $this->getInput('mass_update_tags', ZBX_ACTION_ADD),
+					'tags' => $tags
+				];
+			}
+
+			if (!$data['tags']) {
+				$data['tags'][] = ['tag' => '', 'value' => ''];
 			}
 
 			$this->setResponse(new CControllerResponseData($data));

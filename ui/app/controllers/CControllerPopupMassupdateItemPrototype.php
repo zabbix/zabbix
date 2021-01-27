@@ -51,7 +51,6 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 			'post_type' => 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts' => 'string',
 			'delay_flex' => 'array',
-			'applications' => 'array',
 			'preprocessing' => 'array',
 			'headers' => 'array',
 			'status' => 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
@@ -62,10 +61,11 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 			'master_itemid' => 'id',
 			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
 			'discover' => 'in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
-			'massupdate_app_action' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'preprocessing_test_type' => 'int32',
 			'trends_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
 			'history_mode' => 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'tags' => 'array',
+			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 			'context' => 'required|string|in '.implode(',', ['host', 'template'])
 		];
 
@@ -100,18 +100,24 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 	}
 
 	protected function doAction() {
+		$visible = $this->getInput('visible', []);
+
+		$tags = array_key_exists('tags', $visible) ? $this->getInput('tags', []) : [];
+		foreach ($tags as $key => $tag) {
+			if ($tag['tag'] === '' && $tag['value'] === '') {
+				unset($tags[$key]);
+				continue;
+			}
+			else {
+				unset($tags[$key]['type']);
+			}
+		}
+
 		if ($this->hasInput('update')) {
 			$output = [];
 			$item_prototypeids = $this->getInput('ids', []);
-			$visible = $this->getInput('visible', []);
-			$applications = $this->getInput('applications', []);
 
 			$result = true;
-
-			$applicationids = [];
-
-			$application_prototypes = $this->getInput('application_prototypes', []);
-			$application_prototypeids = [];
 
 			if (isset($visible['delay'])) {
 				$delay = $this->getInput('delay', DB::getDefault('items', 'delay'));
@@ -169,72 +175,9 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				try {
 					DBstart();
 
-					// Collect submitted applications and create new applications if necessary.
-					if (array_key_exists('applications', $visible)) {
-						$massupdate_app_action = $this->getInput('massupdate_app_action');
-
-						if ($massupdate_app_action == ZBX_ACTION_ADD || $massupdate_app_action == ZBX_ACTION_REPLACE) {
-							$new_applications = [];
-
-							foreach ($applications as $application) {
-								if (is_array($application) && array_key_exists('new', $application)) {
-									$new_applications[] = [
-										'name' => $application['new'],
-										'hostid' => $this->getInput('hostid')
-									];
-								}
-								else {
-									$applicationids[] = $application;
-								}
-							}
-
-							if ($new_applications) {
-								if ($new_application = API::Application()->create($new_applications)) {
-									$applicationids = array_merge($applicationids, $new_application['applicationids']);
-								}
-								else {
-									throw new Exception();
-								}
-							}
-						}
-						else {
-							foreach ($applications as $application) {
-								$applicationids[] = $application;
-							}
-						}
-					}
-
-					// Collect submitted application prototypes.
-					if (array_key_exists('applicationPrototypes', $visible)) {
-						$massupdate_app_prot_action = $this->getInput('massupdate_app_prot_action');
-
-						if ($massupdate_app_prot_action == ZBX_ACTION_ADD
-								|| $massupdate_app_prot_action == ZBX_ACTION_REPLACE) {
-							$new_application_prototypes = [];
-
-							foreach ($application_prototypes as $application_prototype) {
-								if (is_array($application_prototype)
-										&& array_key_exists('new', $application_prototype)) {
-									$new_application_prototypes[] = [
-										'name' => $application_prototype['new'],
-									];
-								}
-								else {
-									$application_prototypeids[] = $application_prototype;
-								}
-							}
-						}
-						else {
-							foreach ($application_prototypes as $application_prototype) {
-								$application_prototypeids[] = $application_prototype;
-							}
-						}
-					}
-
 					$item_prototypes = API::ItemPrototype()->get([
 						'output' => ['itemid', 'type'],
-						'selectApplications' => ['applicationid'],
-						'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
+						'selectTags' => array_key_exists('tags', $visible) ? ['tag', 'value'] : null,
 						'itemids' => $item_prototypeids,
 						'preservekeys' => true
 					]);
@@ -265,8 +208,6 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 							'password' => $this->getInput('password', ''),
 							'publickey' => $this->getInput('publickey', ''),
 							'privatekey' => $this->getInput('privatekey', ''),
-							'applications' => [],
-							'applicationPrototypes' => [],
 							'status' => $this->getInput('status', ITEM_STATUS_ACTIVE),
 							'discover' => $this->getInput('discover', ZBX_PROTOTYPE_DISCOVER),
 							'master_itemid' => $this->getInput('master_itemid', 0),
@@ -363,160 +304,43 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 						$item_prototype = array_intersect_key($item_prototype, $visible);
 
 						foreach ($item_prototypeids as $item_prototypeid) {
-							if (array_key_exists($item_prototypeid, $item_prototypes)) {
-								if ($item_prototype) {
-									// Process applications.
-									if (array_key_exists('applications', $visible)) {
-										if ($applicationids) {
-											// If there are existing applications submitted.
-											$db_applicationids = array_column(
-												$item_prototypes[$item_prototypeid]['applications'],
-												'applicationid'
-											);
+							if (array_key_exists($item_prototypeid, $item_prototypes)
+									&& array_key_exists('tags', $visible)) {
+								$db_tags = $item_prototypes[$item_prototypeid]['tags'];
 
-											switch ($massupdate_app_action) {
-												case ZBX_ACTION_ADD:
-													$upd_applicationids = array_merge($applicationids,
-														$db_applicationids
-													);
-													break;
+								switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
+									case ZBX_ACTION_ADD:
+										if ($tags) {
+											$unique_tags = [];
 
-												case ZBX_ACTION_REPLACE:
-													$upd_applicationids = $applicationids;
-													break;
-
-												case ZBX_ACTION_REMOVE:
-													$upd_applicationids = array_diff($db_applicationids,
-														$applicationids
-													);
-													break;
+											foreach (array_merge($db_tags, $tags) as $tag) {
+												$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
 											}
 
-											/*
-											 * $upd_applicationids now contains new and existing application IDs
-											 * depending on operation we want to perform.
-											 */
-											$item_prototype['applications'] = array_keys(
-												array_flip($upd_applicationids)
-											);
+											$item_prototype['tags'] = array_values($unique_tags);
 										}
-										else {
-											/*
-											 * No applications were submitted in form. In case we want to replace
-											 *  applications, leave $item['applications'] empty, remove it otherwise.
-											 */
-											if ($massupdate_app_action == ZBX_ACTION_ADD
-													|| $massupdate_app_action == ZBX_ACTION_REMOVE) {
-												unset($item_prototype['applications']);
-											}
-										}
-									}
+										break;
 
-									// Process application prototypes.
-									if (array_key_exists('applicationPrototypes', $visible)) {
-										$ex_application_prototypes
-											= $item_prototypes[$item_prototypeid]['applicationPrototypes'];
-										$ex_application_prototypeids = array_column($ex_application_prototypes,
-											'application_prototypeid'
-										);
-										$upd_application_prototypeids = [];
-										$application_prototypes = [];
+									case ZBX_ACTION_REPLACE:
+										$item_prototype['tags'] = $tags;
+										break;
 
-										switch ($massupdate_app_prot_action) {
-											case ZBX_ACTION_ADD:
-												// Append submitted existing application prototypes.
-												if ($application_prototypeids) {
-													$upd_application_prototypeids = array_unique(
-														array_merge($application_prototypeids,
-															$ex_application_prototypeids
-														)
-													);
-												}
-
-												// Append new application prototypes.
-												if ($new_application_prototypes) {
-													foreach ($new_application_prototypes as $new_application_prototype) {
-														if (!in_array($new_application_prototype['name'],
-																array_column($application_prototypes, 'name'))) {
-															$application_prototypes[] = $new_application_prototype;
-														}
-													}
-												}
-
-												// Append already existing application prototypes so that they are
-												// not deleted.
-												if (($upd_application_prototypeids || $new_application_prototypes)
-														&& $ex_application_prototypes) {
-													foreach ($ex_application_prototypes as $db_application_prototype) {
-														$application_prototypes[] = $db_application_prototype;
-													}
-												}
-												break;
-
-											case ZBX_ACTION_REPLACE:
-												if ($application_prototypeids) {
-													$upd_application_prototypeids = $application_prototypeids;
-												}
-
-												if ($new_application_prototypes) {
-													foreach ($new_application_prototypes as $new_application_prototype) {
-														if (!in_array($new_application_prototype['name'],
-																array_column($application_prototypes, 'name'))) {
-															$application_prototypes[] = $new_application_prototype;
-														}
-													}
-												}
-												break;
-
-											case ZBX_ACTION_REMOVE:
-												if ($application_prototypeids) {
-													$upd_application_prototypeids = array_diff(
-														$ex_application_prototypeids, $application_prototypeids
-													);
-												}
-												break;
-										}
-
-										/*
-										 * There might be added an existing application prototype that belongs
-										 * to the discovery rule, not just chosen application prototypes
-										 * ($ex_application_prototypes).
-										 */
-										if ($upd_application_prototypeids) {
-											// Collect existing application prototype names. Those are required by API.
-											$db_application_prototypes = DBfetchArray(DBselect(
-												'SELECT ap.application_prototypeid,ap.name'.
-												' FROM application_prototype ap'.
-												' WHERE '.dbConditionId('ap.application_prototypeid',
-													$upd_application_prototypeids
-												)
-											));
-
-											// Append those application prototypes to update list.
-											foreach ($db_application_prototypes as $db_application_prototype) {
-												if (!in_array($db_application_prototype['application_prototypeid'],
-														array_column($application_prototypes,
-															'application_prototypeid'))) {
-													$application_prototypes[] = $db_application_prototype;
+									case ZBX_ACTION_REMOVE:
+										$diff_tags = [];
+										foreach ($db_tags as $a) {
+											foreach ($tags as $b) {
+												if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+													continue 2;
 												}
 											}
-										}
 
-										if ($application_prototypes) {
-											$item_prototype['applicationPrototypes'] = $application_prototypes;
+											$diff_tags[] = $a;
 										}
-										else {
-											if ($massupdate_app_prot_action == ZBX_ACTION_REPLACE) {
-												$item_prototype['applicationPrototypes'] = [];
-											}
-											else {
-												unset($item_prototype['applicationPrototypes']);
-											}
-										}
-									}
-
-									$item_prototypes_to_update[] = ['itemid' => $item_prototypeid] + $item_prototype;
+										$item_prototype['tags'] = $diff_tags;
+										break;
 								}
+
+								$item_prototypes_to_update[] = ['itemid' => $item_prototypeid] + $item_prototype;
 							}
 						}
 					}
@@ -581,7 +405,6 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'initial_item_type' => null,
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES,
-				'displayApplications' => true,
 				'display_interfaces' => true,
 				'displayMasteritems' => true,
 				'location_url' => (new CUrl('disc_prototypes.php'))
@@ -667,6 +490,18 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				foreach ($data['hosts']['interfaces'] as $interface) {
 					$data['interfaceids'][$interface['type']][] = $interface['interfaceid'];
 				}
+			}
+
+			// Tags update fields.
+			if (array_key_exists('tags', $visible)) {
+				$data += [
+					'mass_update_tags' => $this->getInput('mass_update_tags', ZBX_ACTION_ADD),
+					'tags' => $tags
+				];
+			}
+
+			if (!$data['tags']) {
+				$data['tags'][] = ['tag' => '', 'value' => ''];
 			}
 
 			$this->setResponse(new CControllerResponseData($data));
