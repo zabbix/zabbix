@@ -86,14 +86,30 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	protected function checkPermissions() {
-		$ids = $this->getInput('ids');
-		$entity = ($this->getInput('prototype')) ? API::ItemPrototype() : API::Item();
+		if ($this->getInput('prototype', 0)) {
+			$items = API::ItemPrototype()->get([
+				'output' => [],
+				'itemids' => $this->getInput('ids'),
+				'editable' => true
+			]);
 
-		return count($ids) == count($entity->get([
-			'output' => [],
-			'itemids' => $ids,
-			'editable' => true
-		]));
+			if (!$items) {
+				return false;
+			}
+		}
+		else {
+			$items = API::Item()->get([
+				'output' => [],
+				'itemids' => $this->getInput('ids'),
+				'editable' => true
+			]);
+
+			if (!$items) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
