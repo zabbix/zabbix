@@ -468,6 +468,291 @@ class testPageMonitoringHosts extends CWebTest {
 					],
 					'result' => []
 				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'Simple form test host'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'Simple form test host'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'tag', 'operator' => 'Exists'],
+							['name' => 'test', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'Simple form test host'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'tag', 'operator' => 'Exists'],
+							['name' => 'test', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'Host with tags for cloning',
+						'Host with tags for updating',
+						'Simple form test host'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'Host with tags for cloning',
+						'Host with tags for updating',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'Host with tags for cloning',
+						'Host with tags for updating',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'action', 'operator' => 'Does not exist'],
+							['name' => 'tag', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'action', 'operator' => 'Does not exist'],
+							['name' => 'tag', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
+						]
+					],
+					'result' => [
+						'Host with tags for cloning',
+						'Host with tags for updating',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag']
+						]
+					],
+					'result' => [
+						'Host with tags for cloning',
+						'Host with tags for updating',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag'],
+							['name' => 'action', 'operator' => 'Does not equal', 'value' => 'clone']
+						]
+					],
+					'result' => [
+						'Host with tags for updating',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'test', 'operator' => 'Does not equal', 'value' => 'test_tag'],
+							['name' => 'action', 'operator' => 'Does not equal', 'value' => 'clone']
+						]
+					],
+					'result' => [
+						'Host with tags for cloning',
+						'Host with tags for updating',
+						'Simple form test host',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'host']
+						]
+					],
+					'result' => [
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'host']
+						]
+					],
+					'result' => [
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone'],
+							['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'host']
+						]
+					],
+					'result' => [
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'Or',
+						'tags' => [
+							['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone'],
+							['name' => 'tag', 'operator' => 'Does not contain', 'value' => 'host']
+						]
+					],
+					'result' => [
+						'Host with tags for updating',
+						'Simple form test host',
+						'SLA reports host',
+						'Template inheritance test host',
+						'ЗАББИКС Сервер'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone'],
+							['name' => 'tag', 'operator' => 'Equals', 'value' => 'host']
+						]
+					],
+					'result' => [
+						'Host with tags for updating'
+					]
+				]
+			],
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'action', 'operator' => 'Does not contain', 'value' => 'clone'],
+							['name' => 'tag', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						'Host with tags for updating',
+						'Simple form test host'
+					]
+				]
 			]
 		];
 	}
@@ -476,7 +761,9 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageMonitoringHosts_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?name=&ip=&dns=&port=10051&status=-1&evaltype=0&tags%5B0%5D%5Btag%5D=&tags'.
+				'%5B0%5D%5Boperator%5D=0&tags%5B0%5D%5Bvalue%5D=&maintenance_status=1&filter_name=&filter_show_counter'.
+				'=0&filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setFilterSelector('id:tags_0');
@@ -484,6 +771,9 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->query('button:Apply')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+
+		// Reset filter due to not influence further tests.
+		$this->query('button:Reset')->one()->click();
 	}
 
 	public function testPageMonitoringHosts_ResetButtonCheck() {
