@@ -351,7 +351,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$this->query('button:Apply')->one()->click();
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn($data['expected']);
 	}
