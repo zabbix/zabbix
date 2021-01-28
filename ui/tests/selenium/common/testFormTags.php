@@ -178,7 +178,7 @@ class testFormTags extends CWebTest {
 						]
 					]
 				]
-			],
+			]
 		];
 	}
 
