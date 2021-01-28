@@ -50,6 +50,7 @@ $form_grid = (new CFormGrid())->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_1_1);
 
 $table = (new CTable())
 	->setId('mappings_table')
+	->addClass(ZBX_STYLE_TABLE_FORMS)
 	->setHeader([_('Value'), '', _('Mapped to'), _('Action')])
 	->addStyle('width: 100%;');
 
