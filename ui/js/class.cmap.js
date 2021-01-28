@@ -3007,7 +3007,6 @@ ZABBIX.apps.map = (function($) {
 			 * @retrurns {Object|Boolean}
 			 */
 			getValues: function() {
-				$('[type="checkbox"]:not([name^="field_"])');
 				var values = $(':input', '#selementForm')
 						.not(this.actionProcessor.hidden)
 						.not('[name^="tags"]')
