@@ -195,7 +195,7 @@ $filter
 	->addVar('subfilter_value_types', $data['filter_data']['subfilter_value_types'])
 	->addVar('subfilter_status', $data['filter_data']['subfilter_status'])
 	->addVar('subfilter_state', $data['filter_data']['subfilter_state'])
-	->addVar('subfilter_templated_items', $data['filter_data']['subfilter_templated_items'])
+	->addVar('subfilter_inherited', $data['filter_data']['subfilter_inherited'])
 	->addVar('subfilter_with_triggers', $data['filter_data']['subfilter_with_triggers'])
 	->addVar('subfilter_discovered', $data['filter_data']['subfilter_discovered'])
 	->addVar('subfilter_history', $data['filter_data']['subfilter_history'])

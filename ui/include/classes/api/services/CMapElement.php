@@ -846,7 +846,7 @@ abstract class CMapElement extends CApiService {
 	protected function updateElementsTags(array $selements): void {
 		// Select tags from database.
 		$db_tags = API::getApiService()->select('sysmaps_element_tag', [
-			'output' => ['selementtagid', 'selementid', 'tag', 'operator'],
+			'output' => ['selementtagid', 'selementid', 'tag', 'value', 'operator'],
 			'filter' => ['selementid' => array_column($selements, 'selementid')],
 			'preservekeys' => true
 		]);

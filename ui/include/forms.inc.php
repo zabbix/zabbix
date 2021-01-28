@@ -495,7 +495,7 @@ function makeItemSubfilter(array $filter_data, array $items = [], string $contex
 		$table_subfilter->addRow([$tags_output]);
 	}
 
-	if ($filter_data['hosts'] && count($item_params['hosts']) > 1) {
+	if (!$filter_data['hosts'] && $filter_data['subfilter_hosts'] != -1 && count($item_params['hosts']) > 1) {
 		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $filter_data['subfilter_hosts'],
 			'subfilter_hosts'
 		);
@@ -532,7 +532,7 @@ function makeItemSubfilter(array $filter_data, array $items = [], string $contex
 
 	if ($filter_data['filter_inherited'] == -1 && count($item_params['templated_items']) > 1) {
 		$templated_items_output = prepareSubfilterOutput(_('Template'), $item_params['templated_items'],
-			$filter_data['filter_inherited'], 'subfilter_templated_items'
+			$filter_data['subfilter_inherited'], 'subfilter_inherited'
 		);
 		$table_subfilter->addRow([$templated_items_output]);
 	}

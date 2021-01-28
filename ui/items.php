@@ -1604,7 +1604,7 @@ else {
 		'subfilter_types' => getRequest('subfilter_types'),
 		'subfilter_status' => getRequest('subfilter_status'),
 		'subfilter_value_types' => getRequest('subfilter_value_types'),
-		'subfilter_templated_items' => getRequest('subfilter_templated_items'),
+		'subfilter_inherited' => getRequest('subfilter_inherited'),
 		'subfilter_with_triggers' => getRequest('subfilter_with_triggers'),
 		'subfilter_history' => getRequest('subfilter_history'),
 		'subfilter_trends' => getRequest('subfilter_trends'),
