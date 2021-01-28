@@ -2943,15 +2943,13 @@ ZABBIX.apps.map = (function($) {
 				this.addUrls(selement.urls);
 
 				// Set tag properties.
-				this.cleanTagsField();
-				if (selement.elementtype === '0' || selement.elementtype === '3') {
-					var tags = selement.tags;
-					if (!tags || Object.getOwnPropertyNames(tags).length == 0) {
-						tags = {0: {}};
-					}
-					this.addTags(tags);
-					this.setEvaltype(selement.evaltype);
+				var tags = selement.tags;
+				if (!tags || Object.getOwnPropertyNames(tags).length == 0) {
+					tags = {0: {}};
 				}
+				this.cleanTagsField();
+				this.addTags(tags);
+				this.setEvaltype(selement.evaltype);
 
 				// Iconmap.
 				if (this.sysmap.data.iconmapid === '0') {
