@@ -276,7 +276,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						// Authorization.
-						'Login blocking interval' => '1h',
+						'Login blocking interval' => '1h'
 					],
 					'db' => [
 						// Authorization.
