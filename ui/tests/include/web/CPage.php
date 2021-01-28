@@ -512,9 +512,11 @@ class CPage {
 	 */
 	public function removeFocus() {
 		try {
-			$this->driver->executeScript('document.activeElement.blur();');
-		} catch (Exception $ex) {
-			// Code is not missing here.
+			$this->driver->executeScript('for (var i = 0; i < 5; i++) if (document.activeElement.tagName !== "BODY")'.
+					' document.activeElement.blur(); else break;');
+		}
+		catch (\Exception $ex) {
+			throw new \Exception('Cannot remove focus.');
 		}
 	}
 
