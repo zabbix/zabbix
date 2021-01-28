@@ -848,7 +848,7 @@ abstract class CControllerPopupItemTest extends CController {
 					unset($data[$key]);
 				}
 			}
-			elseif ($key !== 'status_codes' && ($value === '' || $value === null)) {
+			elseif ($value === '' || $value === null) {
 				unset($data[$key]);
 			}
 		}

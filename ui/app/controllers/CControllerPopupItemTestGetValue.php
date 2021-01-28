@@ -174,6 +174,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		// Only non-empty fields need to be sent to server.
 		$data = $this->unsetEmptyValues($data);
 
+		if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $data)) {
+			$data['status_codes'] = '';
+		}
+
 		$output = [
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
