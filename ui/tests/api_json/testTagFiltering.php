@@ -527,7 +527,7 @@ class testTagFiltering extends CAPITest {
 					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Windows',
 					'Workstation'
 				]
-			],
+			]
 		];
 	}
 

@@ -216,7 +216,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 								if (is_array($application_prototype)
 										&& array_key_exists('new', $application_prototype)) {
 									$new_application_prototypes[] = [
-										'name' => $application_prototype['new'],
+										'name' => $application_prototype['new']
 									];
 								}
 								else {

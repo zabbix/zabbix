@@ -932,7 +932,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Limit for search and filter results' => '2'
 					],
 					'link' => 'templates.php?filter_name=cisco',
-					'row_count' => 2,
+					'row_count' => 2
 				]
 			],
 			[
