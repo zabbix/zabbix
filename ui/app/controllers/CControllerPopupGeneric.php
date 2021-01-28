@@ -1409,7 +1409,7 @@ class CControllerPopupGeneric extends CController {
 				$disable_names = $this->getInput('disable_names', []);
 
 				foreach ($db_valuemaps as $db_valuemap) {
-					$record = [
+					$records[$db_valuemap['valuemapid']] = [
 						'id' => $db_valuemap['valuemapid'],
 						'name' => $db_valuemap['name'],
 						'mappings' => array_key_exists('mappings', $db_valuemap) ? $db_valuemap['mappings'] : [],
@@ -1417,10 +1417,8 @@ class CControllerPopupGeneric extends CController {
 					];
 
 					if ($this->getInput('show_host_name', 0)) {
-						$record['hostname'] = $hosts[$db_valuemap['hostid']]['host'];
+						$records[$db_valuemap['valuemapid']]['hostname'] = $hosts[$db_valuemap['hostid']]['host'];
 					}
-
-					$records[$record['id']] = $record;
 				}
 
 				if ($this->getInput('multiselect', 0)) {
