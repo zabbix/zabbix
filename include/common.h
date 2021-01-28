@@ -1646,6 +1646,8 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 typedef enum
 {
 	ZBX_TIME_UNIT_UNKNOWN,
+	ZBX_TIME_UNIT_SECOND,
+	ZBX_TIME_UNIT_MINUTE,
 	ZBX_TIME_UNIT_HOUR,
 	ZBX_TIME_UNIT_DAY,
 	ZBX_TIME_UNIT_WEEK,

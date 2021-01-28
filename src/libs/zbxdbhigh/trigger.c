@@ -32,15 +32,6 @@
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
-/* DB_TRIGGER cached objects */
-typedef enum
-{
-	ZBX_DB_TRIGGER_CACHE_EVAL_CTX,
-	ZBX_DB_TRIGGER_CACHE_EVAL_CTX_R,
-	ZBX_DB_TRIGGER_CACHE_EVAL_CTX_MACROS,
-}
-zbx_db_trigger_cache_t;
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_process_trigger                                              *
@@ -316,7 +307,8 @@ void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t trigge
 /* temporary cache of trigger related data */
 typedef struct
 {
-	zbx_uint64_t		flags;
+	zbx_uint32_t		init;
+	zbx_uint32_t		done;
 	zbx_eval_context_t	eval_ctx;
 	zbx_eval_context_t	eval_ctx_r;
 	zbx_vector_uint64_t	hostids;
@@ -347,22 +339,22 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 {
 	zbx_trigger_cache_t	*cache;
 	char			*error = NULL;
-	zbx_uint64_t		flag = __UINT64_C(1) << state;
+	zbx_uint32_t		flag = 1 << state;
 	zbx_vector_uint64_t	functionids;
 
 	if (NULL == trigger->cache)
 	{
 		cache = (zbx_trigger_cache_t *)zbx_malloc(NULL, sizeof(zbx_trigger_cache_t));
-		cache->flags = 0;
+		cache->init = cache->done = 0;
 		((DB_TRIGGER *)trigger)->cache = cache;
 	}
 	else
 		cache = (zbx_trigger_cache_t *)trigger->cache;
 
-	if (0 != (cache->flags & flag))
-		return 0 != (cache->flags & (flag << 32)) ? cache : NULL;
+	if (0 != (cache->init & flag))
+		return 0 != (cache->done & flag) ? cache : NULL;
 
-	cache->flags |= flag;
+	cache->init |= flag;
 
 	switch (state)
 	{
@@ -388,7 +380,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 				return NULL;
 			}
 			break;
-		case ZBX_DB_TRIGGER_CACHE_EVAL_CTX_MACROS:
+		case ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS:
 			if (NULL == db_trigger_get_cache(trigger, ZBX_TRIGGER_CACHE_EVAL_CTX))
 					return NULL;
 			zbx_dc_eval_expand_user_macros(&cache->eval_ctx);
@@ -404,7 +396,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 			return NULL;
 	}
 
-	cache->flags |= (flag << 32);
+	cache->done |= flag;
 
 	return cache;
 }
@@ -420,13 +412,13 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
  ******************************************************************************/
 static void	trigger_cache_free(zbx_trigger_cache_t *cache)
 {
-	if (0 != (cache->flags & (__UINT64_C(1) << ZBX_TRIGGER_CACHE_EVAL_CTX << 32)))
+	if (0 != (cache->done & (1 << ZBX_TRIGGER_CACHE_EVAL_CTX)))
 		zbx_eval_clear(&cache->eval_ctx);
 
-	if (0 != (cache->flags & (__UINT64_C(1) << ZBX_TRIGGER_CACHE_EVAL_CTX_R << 32)))
+	if (0 != (cache->done & (1 << ZBX_TRIGGER_CACHE_EVAL_CTX_R)))
 		zbx_eval_clear(&cache->eval_ctx_r);
 
-	if (0 != (cache->flags & (__UINT64_C(1) << ZBX_TRIGGER_CACHE_HOSTIDS << 32)))
+	if (0 != (cache->done & (1 << ZBX_TRIGGER_CACHE_HOSTIDS)))
 		zbx_vector_uint64_destroy(&cache->hostids);
 
 	zbx_free(cache);

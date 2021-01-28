@@ -2697,6 +2697,167 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: trends_parse_range                                               *
+ *                                                                            *
+ * Purpose: parse trend function period arguments into time range using old   *
+ *          parameter format                                                  *
+ *                                                                            *
+ * Parameters: from         - [IN] the time the period shift is calculated    *
+ *                                 from                                       *
+ *             period       - [IN] the history period                         *
+ *             period_shift - [IN] the history period shift                   *
+ *             start        - [OUT] the period start time in seconds since    *
+ *                                  Epoch                                     *
+ *             end          - [OUT] the period end time in seconds since      *
+ *                                  Epoch                                     *
+ *             error        - [OUT] the error message if parsing failed       *
+ *                                                                            *
+ * Return value: SUCCEED - period was parsed successfully                     *
+ *               FAIL    - invalid time period was specified                  *
+ *                                                                            *
+ * Comments: Daylight saving changes are applied when parsing ranges with     *
+ *           day+ used as period base (now/?).                                *
+ *                                                                            *
+ *           Example period_shift values:                                     *
+ *             now/d                                                          *
+ *             now/d-1h                                                       *
+ *             now/d+1h                                                       *
+ *             now/d+1h/w                                                     *
+ *             now/d/w/h+1h+2h                                                *
+ *             now-1d/h                                                       *
+ *                                                                            *
+ *  Comments: This is temporary solution to keep calculated checks working    *
+ *            until they are updated.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
+		char **error)
+{
+	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
+	zbx_time_unit_t	period_unit;
+	size_t		len;
+	struct tm	tm_end, tm_start;
+	const char	*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:%s shift:%s", __func__, period, period_shift);
+
+	/* parse period */
+
+	if (SUCCEED != zbx_tm_parse_period(period, &len, &period_num, &period_unit, error))
+		return FAIL;
+
+	if ('\0' != period[len])
+	{
+		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", period + len);
+		return FAIL;
+	}
+
+	if (period_hours[period_unit] * period_num > 24 * 366)
+	{
+		*error = zbx_strdup(*error, "period is too large");
+		return FAIL;
+	}
+
+	/* parse period shift */
+
+	p = period_shift;
+
+	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
+	{
+		*error = zbx_strdup(*error, "period shift must begin with \"now\"");
+		return FAIL;
+	}
+
+	p += ZBX_CONST_STRLEN("now");
+
+	localtime_r(&from, &tm_end);
+
+	while ('\0' != *p)
+	{
+		zbx_time_unit_t	unit;
+
+		if ('/' == *p)
+		{
+			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+			{
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+				return FAIL;
+			}
+
+			if (unit < period_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			zbx_tm_round_down(&tm_end, unit);
+
+			/* unit is single character */
+			p++;
+		}
+		else if ('+' == *p || '-' == *p)
+		{
+			int	num;
+			char	op = *(p++);
+
+			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
+				return FAIL;
+
+			if (unit < period_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			if ('+' == op)
+				zbx_tm_add(&tm_end, num, unit);
+			else
+				zbx_tm_sub(&tm_end, num, unit);
+
+			p += len;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+			return FAIL;
+		}
+	}
+
+	tm_start = tm_end;
+
+	/* trends clock refers to the beginning of the hourly interval - subtract */
+	/* one hour to get the trends clock for the last hourly interval          */
+	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
+
+	if (-1 == (*end = mktime(&tm_end)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period end time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (abs((int)from - *end) > SEC_PER_YEAR * 26)
+	{
+		*error = zbx_strdup(*error, "period shift is too large");
+		return FAIL;
+	}
+
+	zbx_tm_sub(&tm_start, period_num, period_unit);
+	if (-1 == (*start = mktime(&tm_start)))
+	{
+		*error = zbx_dsprintf(*error, "cannot calculate the period start time: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
+
+	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_TREND                                                   *
  *                                                                            *
  * Purpose: evaluate trend* functions for the item                            *
@@ -2735,7 +2896,7 @@ static int	evaluate_TREND(char **value, DC_ITEM *item, const char *func, const c
 		goto out;
 	}
 
-	if (SUCCEED != zbx_trends_parse_range(ts->sec, period, period_shift, &start, &end, error))
+	if (SUCCEED != trends_parse_range(ts->sec, period, period_shift, &start, &end, error))
 		goto out;
 
 	switch (item->value_type)

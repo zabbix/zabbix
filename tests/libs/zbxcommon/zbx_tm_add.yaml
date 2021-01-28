@@ -166,5 +166,53 @@ in:
   param: 1d
 out:
   time: 2020-01-30 00:00:00 +00:00
+---
+test case: 2020-09-01 00:00:00 +03:00 + 1m
+in:
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00 +03:00
+  param: 1m
+out:
+  time: 2020-09-01 00:01:00 +03:00
+---
+test case: 2020-09-01 00:59:00 +03:00 + 1m
+in:
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:59:00 +03:00
+  param: 1m
+out:
+  time: 2020-09-01 01:00:00 +03:00
+---
+test case: 2020-03-29 02:59:00 +02:00 + 1m
+in:
+  timezone: :Europe/Riga
+  time: 2020-03-29 02:59:00 +02:00
+  param: 1m
+out:
+  time: 2020-03-29 03:00:00 +03:00
+---
+test case: 2020-09-01 00:00:00 +03:00 + 1s
+in:
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00 +03:00
+  param: 1s
+out:
+  time: 2020-09-01 00:00:01 +03:00
+---
+test case: 2020-09-01 00:00:59 +03:00 + 1s
+in:
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:59 +03:00
+  param: 1s
+out:
+  time: 2020-09-01 00:01:00 +03:00
+---
+test case: 2020-03-29 02:59:59 +02:00 + 1s
+in:
+  timezone: :Europe/Riga
+  time: 2020-03-29 02:59:59 +02:00
+  param: 1s
+out:
+  time: 2020-03-29 03:00:00 +03:00
 ...
  

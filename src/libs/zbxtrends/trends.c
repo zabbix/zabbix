@@ -106,6 +106,121 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
 
 /******************************************************************************
  *                                                                            *
+ * Function: trends_parse_timeshift                                           *
+ *                                                                            *
+ * Purpose: parse timeshift                                                   *
+ *                                                                            *
+ * Parameters: from          - [IN] the start time                            *
+ *             timeshift     - [IN] the timeshift string                      *
+ *             min_time_unit - [IN] minimum time unit that can be used        *
+ *             tm            - [IN] the shifted time                          *
+ *             error         - [OUT] the error message if parsing failed      *
+ *                                                                            *
+ * Return value: SUCCEED - time shift was parsed successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_unit_t min_time_unit, struct tm *tm,
+		char **error)
+{
+	size_t		len;
+	const char	*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() shift:%s", __func__,  timeshift);
+
+	p = timeshift;
+
+	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
+	{
+		*error = zbx_strdup(*error, "time shift must begin with \"now\"");
+		return FAIL;
+	}
+
+	p += ZBX_CONST_STRLEN("now");
+
+	localtime_r(&from, tm);
+
+	while ('\0' != *p)
+	{
+		zbx_time_unit_t	unit;
+
+		if ('/' == *p)
+		{
+			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
+			{
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+				return FAIL;
+			}
+
+			if (unit < min_time_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in time shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			zbx_tm_round_down(tm, unit);
+
+			/* unit is single character */
+			p++;
+		}
+		else if ('+' == *p || '-' == *p)
+		{
+			int	num;
+			char	op = *(p++);
+
+			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
+				return FAIL;
+
+			if (unit < min_time_unit)
+			{
+				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
+						" to period time unit");
+				return FAIL;
+			}
+
+			if ('+' == op)
+				zbx_tm_add(tm, num, unit);
+			else
+				zbx_tm_sub(tm, num, unit);
+
+			p += len;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
+			return FAIL;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %04d.%02d.%02d %02d:%02d:%02d", __func__, tm->tm_year + 1900,
+			tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_parse_timeshift                                              *
+ *                                                                            *
+ * Purpose: parse timeshift                                                   *
+ *                                                                            *
+ * Parameters: from          - [IN] the start time                            *
+ *             timeshift     - [IN] the timeshift string                      *
+ *             tm            - [IN] the shifted time                          *
+ *             error         - [OUT] the error message if parsing failed      *
+ *                                                                            *
+ * Return value: SUCCEED - time shift was parsed successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error)
+{
+	return trends_parse_timeshift(from, timeshift, ZBX_TIME_UNIT_UNKNOWN, tm, error);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_trends_parse_range                                           *
  *                                                                            *
  * Purpose: parse trend function period arguments into time range             *
@@ -135,25 +250,23 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
  *             now-1d/h                                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_range(time_t from, const char *period, const char *period_shift, int *start, int *end,
-		char **error)
+int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error)
 {
-	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
+	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
 	zbx_time_unit_t	period_unit;
 	size_t		len;
 	struct tm	tm_end, tm_start;
-	const char	*p;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:%s shift:%s", __func__, period, period_shift);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
 
 	/* parse period */
 
-	if (SUCCEED != zbx_tm_parse_period(period, &len, &period_num, &period_unit, error))
+	if (SUCCEED != zbx_tm_parse_period(param, &len, &period_num, &period_unit, error))
 		return FAIL;
 
-	if ('\0' != period[len])
+	if ('\0' != param[len] && ':' != param[len])
 	{
-		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", period + len);
+		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", param + len);
 		return FAIL;
 	}
 
@@ -165,70 +278,8 @@ int	zbx_trends_parse_range(time_t from, const char *period, const char *period_s
 
 	/* parse period shift */
 
-	p = period_shift;
-
-	if (0 != strncmp(p, "now", ZBX_CONST_STRLEN("now")))
-	{
-		*error = zbx_strdup(*error, "period shift must begin with \"now\"");
+	if (SUCCEED != trends_parse_timeshift(from, param + len + 1, period_unit, &tm_end, error))
 		return FAIL;
-	}
-
-	p += ZBX_CONST_STRLEN("now");
-
-	localtime_r(&from, &tm_end);
-
-	while ('\0' != *p)
-	{
-		zbx_time_unit_t	unit;
-
-		if ('/' == *p)
-		{
-			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++p)))
-			{
-				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
-				return FAIL;
-			}
-
-			if (unit < period_unit)
-			{
-				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
-						" to period time unit");
-				return FAIL;
-			}
-
-			zbx_tm_round_down(&tm_end, unit);
-
-			/* unit is single character */
-			p++;
-		}
-		else if ('+' == *p || '-' == *p)
-		{
-			int	num;
-			char	op = *(p++);
-
-			if (FAIL == zbx_tm_parse_period(p, &len, &num, &unit, error))
-				return FAIL;
-
-			if (unit < period_unit)
-			{
-				*error = zbx_dsprintf(*error, "time units in period shift must be greater or equal"
-						" to period time unit");
-				return FAIL;
-			}
-
-			if ('+' == op)
-				zbx_tm_add(&tm_end, num, unit);
-			else
-				zbx_tm_sub(&tm_end, num, unit);
-
-			p += len;
-		}
-		else
-		{
-			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", p);
-			return FAIL;
-		}
-	}
 
 	tm_start = tm_end;
 
@@ -285,7 +336,7 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 	struct tm	tm;
 	zbx_time_unit_t	base;
 
-	if (SUCCEED != trends_parse_base(period_shift, &base, error))
+	if (SUCCEED != trends_parse_base(period_shift, &base, error) || ZBX_TIME_UNIT_HOUR > base)
 		return FAIL;
 
 	/* parse period shift */

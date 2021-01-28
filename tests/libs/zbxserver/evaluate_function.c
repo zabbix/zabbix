@@ -97,7 +97,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
 
-	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
+	if (SUCCEED != (returned_ret = evaluate_function2(&returned_value, &item, function, params, &ts, &error)))
 		printf("evaluate_function returned error: %s\n", error);
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
@@ -121,6 +121,8 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_assert_str_eq("function result", expected_value, returned_value);
 	}
 	zbx_free(returned_value);
+
+	zbx_vcmock_ds_destroy();
 
 	ZBX_UNUSED(state);
 }

@@ -70,5 +70,21 @@ in:
   base: y
 out:
   time: 2021-01-01 00:00:00 +02:00
+---
+test case: 2020-09-01 00:00:00 +03:00 / m
+in:
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00 +03:00
+  base: m
+out:
+  time: 2020-09-01 00:00:00 +03:00
+---
+test case: 2020-09-01 00:00:01 +03:00 / m
+in:
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:01 +03:00
+  base: m
+out:
+  time: 2020-09-01 00:01:00 +03:00
 ...
 

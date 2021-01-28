@@ -62,6 +62,9 @@ void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
 
 int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
+int	evaluate_function2(char **value, DC_ITEM *item, const char *function, const char *parameter,
+		const zbx_timespec_t *ts, char **error);
+
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
