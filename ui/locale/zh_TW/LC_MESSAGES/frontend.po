@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-18 17:40+0200\n"
+"POT-Creation-Date: 2021-01-28 10:43+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7576,7 +7576,7 @@ msgstr "主機存取"
 msgid "Host added"
 msgstr "已新增主機"
 
-#: app/controllers/CControllerPopupItemTest.php:1202
+#: app/controllers/CControllerPopupItemTest.php:1256
 #: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr ""
@@ -9196,9 +9196,9 @@ msgstr ""
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:91
 #: app/controllers/CControllerPopupItemTestGetValue.php:104
-#: app/controllers/CControllerPopupItemTest.php:1194
-#: app/controllers/CControllerPopupItemTest.php:1202
-#: app/controllers/CControllerPopupItemTest.php:1209
+#: app/controllers/CControllerPopupItemTest.php:1248
+#: app/controllers/CControllerPopupItemTest.php:1256
+#: app/controllers/CControllerPopupItemTest.php:1263
 #: app/controllers/CControllerPopupItemTestSend.php:143
 #: app/controllers/CControllerPopupItemTestSend.php:172
 #: app/controllers/CControllerPopupItemTestSend.php:181
@@ -13980,7 +13980,7 @@ msgstr "波蘭(pl_PL)"
 msgid "Populates host inventory field"
 msgstr "填入主機資產紀錄欄位"
 
-#: app/controllers/CControllerPopupItemTest.php:1209
+#: app/controllers/CControllerPopupItemTest.php:1263
 #: app/partials/monitoring.host.filter.php:106
 #: app/partials/popup.operations.php:308
 #: app/views/administration.authentication.edit.php:101
@@ -15272,7 +15272,7 @@ msgstr "SNMP OID"
 msgid "SNMP agent"
 msgstr ""
 
-#: app/controllers/CControllerPopupItemTest.php:1194
+#: app/controllers/CControllerPopupItemTest.php:1248
 #: app/views/popup.discovery.check.php:68
 #: app/views/popup.itemtestedit.view.php:140
 #: include/views/js/configuration.host.edit.js.php:89
@@ -20194,9 +20194,9 @@ msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:141
 #: app/controllers/CControllerAuthenticationUpdate.php:213
-#: app/controllers/CControllerPopupItemTest.php:1194
-#: app/controllers/CControllerPopupItemTest.php:1202
-#: app/controllers/CControllerPopupItemTest.php:1209
+#: app/controllers/CControllerPopupItemTest.php:1248
+#: app/controllers/CControllerPopupItemTest.php:1256
+#: app/controllers/CControllerPopupItemTest.php:1263
 #: app/controllers/CControllerPopupLldOperation.php:131
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/controllers/CControllerPopupLldOperation.php:143

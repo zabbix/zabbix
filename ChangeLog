@@ -1,3 +1,12 @@
+Changes for 5.2.5rc1
+
+New features:
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+..F.....S. [ZBXNEXT-6399] added support of host and item macros for Script item parameters (viktors, vmaksimovs)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.2.4
 
 5.2.4rc1 was released as 5.2.4 without any changes
@@ -375,6 +384,14 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc1
+
+New features:
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.8
@@ -2305,6 +2322,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.28
