@@ -1,6 +1,8 @@
 Changes for 5.2.5rc1
 
 New features:
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+..F.....S. [ZBXNEXT-6399] added support of host and item macros for Script item parameters (viktors, vmaksimovs)
 
 Bug fixes:
 
