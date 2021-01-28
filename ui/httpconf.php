@@ -724,7 +724,7 @@ if (isset($_REQUEST['form'])) {
 	if (!$data['tags']) {
 		$data['tags'][] = ['tag' => '', 'value' => ''];
 	}
-//
+
 	// render view
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();
 }
