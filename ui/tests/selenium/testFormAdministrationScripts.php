@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
@@ -46,7 +46,7 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
-	 * Test data for GUI form.
+	 * Test data for Scripts form.
 	 */
 	public function getScriptsData() {
 		return [
@@ -62,7 +62,6 @@ class testFormAdministrationScripts extends CWebTest {
 			// Remove trailing spaces.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'trim' => true,
 					'fields' =>  [
 						'Name' => 'Test trailing spaces',
@@ -432,9 +431,18 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
 	}
 
+	/**
+	 * Function for checking script configuration form.
+	 *
+	 * @param arary     $data     data provider
+	 * @param boolean   $update   is it update case, or not
+	 * @param string    $link     link to script form
+	 */
 	private function checkScripts($data, $update, $link) {
-		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
-		$old_hash = CDBHelper::getHash($sql);
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$sql = 'SELECT * FROM scripts ORDER BY scriptid';
+			$old_hash = CDBHelper::getHash($sql);
+		}
 
 		$this->page->login()->open($link);
 		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
@@ -454,7 +462,9 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 
 		// Check testing confirmation while configuring.
-		$this->checkConfirmation($data, $form);
+		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation')) {
+			$this->checkConfirmation($data, $form);
+		}
 
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -477,7 +487,9 @@ class testFormAdministrationScripts extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			// Check testing confirmation in saved form.
-			$this->checkConfirmation($data, $form);
+			if (CTestArrayHelper::get($data['fields'], 'Enable confirmation')) {
+				$this->checkConfirmation($data, $form);
+			}
 
 			if (CTestArrayHelper::get($data, 'Parameters')) {
 
@@ -490,10 +502,10 @@ class testFormAdministrationScripts extends CWebTest {
 							}
 						}
 					}
-					unset($parameters);
+					unset($fields);
 				}
 
-				// Remove action and index fields fo asserting.
+				// Remove action and index fields for asserting.
 				if ($update === true) {
 					foreach ($data['Parameters'] as &$parameter) {
 						unset($parameter['action'], $parameter['index']);
@@ -506,11 +518,17 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function for checking execution confirmation popup.
+	 *
+	 * @param arary     $data    data provider
+	 * @param element   $form    script configuration form
+	 */
 	private function checkConfirmation($data, $form) {
 		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation') === false) {
-				$this->assertFalse($form->query('id:confirmation')->one()->isEnabled());
-				$this->assertFalse($form->query('id:testConfirmation')->one()->isEnabled());
-			}
+			$this->assertFalse($form->query('id:confirmation')->one()->isEnabled());
+			$this->assertFalse($form->query('id:testConfirmation')->one()->isEnabled());
+		}
 
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
 			$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
@@ -523,17 +541,22 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 	}
 
+	/**
+	 * Function for checking script form update without any changes.
+	 */
 	public function testFormAdministrationScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
-		$form->submit();
+		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
+	/**
+	 * Function for checking script cloning.
+	 */
 	public function testFormAdministrationScripts_Clone() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
 		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
@@ -556,6 +579,9 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->assertEquals($values, $cloned_values);
 	}
 
+	/**
+	 * Function for checking script deleting.
+	 */
 	public function testFormAdministrationScripts_Delete() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_DELETE);
 		$this->query('button:Delete')->waitUntilReady()->one()->click();

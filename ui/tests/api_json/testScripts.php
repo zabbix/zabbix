@@ -162,7 +162,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of 0, 1, 5.'
 			],
 			// Webhook script validation.
-						[
+			[
 				'script' => [
 					[
 						'name' => 'Webhook validate script',
