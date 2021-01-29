@@ -330,14 +330,14 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 				curl_easy_strerror(err));
 		goto out;
 	}
-
-	duk_push_string(ctx, request->data);
 out:
 	zbx_free(url);
 	zbx_free(contents);
 
 	if (-1 != err_index)
 		return duk_throw(ctx);
+
+	duk_push_string(ctx, request->data);
 
 	return 1;
 }
