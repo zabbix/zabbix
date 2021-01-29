@@ -106,15 +106,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		var s []string
 
 		if tmp != "" {
-			if m.parser != nil {
-				s, err = m.parser(strings.Split(tmp, "\n"), regex)
-				if err != nil {
-					p.Errf("Failed to parse '%s' output, err: %s", m.cmd, err.Error())
+			s, err = m.parser(strings.Split(tmp, "\n"), regex)
+			if err != nil {
+				p.Errf("Failed to parse '%s' output, err: %s", m.cmd, err.Error())
 
-					continue
-				}
-			} else {
-				s = strings.Split(tmp, "\n")
+				continue
 			}
 		}
 
@@ -135,7 +131,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if result == nil {
 			result = out
 		} else {
-			result = fmt.Sprintf("%s\n%s", result, out)
+			if out != "" {
+				result = fmt.Sprintf("%s\n%s", result, out)
+			}
 		}
 	}
 
@@ -149,10 +147,31 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func getManagers() []manager {
 	return []manager{
 		{"dpkg", "dpkg --version 2> /dev/null", "dpkg --get-selections", parseDpkg},
-		{"pkgtools", "[ -d /var/log/packages ] && echo true", "ls /var/log/packages", nil},
-		{"rpm", "rpm --version 2> /dev/null", "rpm -qa", nil},
-		{"pacman", "pacman --version 2> /dev/null", "pacman -Q", nil},
+		{"pkgtools", "[ -d /var/log/packages ] && echo true", "ls /var/log/packages", parseRegex},
+		{"rpm", "rpm --version 2> /dev/null", "rpm -qa", parseRegex},
+		{"pacman", "pacman --version 2> /dev/null", "pacman -Q", parseRegex},
 	}
+}
+
+func parseRegex(in []string, regex string) (out []string, err error) {
+	if regex == "" {
+		return in, nil
+	}
+
+	for _, s := range in {
+		matched, err := regexp.MatchString(regex, s)
+		if err != nil {
+			return nil, err
+		}
+
+		if !matched {
+			continue
+		}
+
+		out = append(out, s)
+	}
+
+	return
 }
 
 func parseDpkg(in []string, regex string) (out []string, err error) {
