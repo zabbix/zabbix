@@ -325,7 +325,7 @@ class testSidebarMenu extends CWebTest {
 	}
 
 	/**
-	 * Side menu bottom part.
+	 * Side menu for bottom part.
 	 *
 	 * @dataProvider getUserData
 	 */
