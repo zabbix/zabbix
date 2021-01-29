@@ -457,24 +457,23 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 	unset($src_valuemaps[0]);
 
 	if ($src_valuemaps) {
-		$src_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $src_valuemaps
-		]);
-		$src_valuemaps = array_column($src_valuemaps, 'name', 'valuemapid');
-		$dest_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name', 'hostid'],
-			'hostids' => $dst_hostids
-		]);
 		$valuemapids_map = [];
+		$src_valuemaps = API::ValueMap()->get([
+			'output' => ['name'],
+			'valuemapids' => $src_valuemaps,
+			'preservekeys' => true
+		]);
+		$dest_valuemaps = API::ValueMap()->get([
+			'output' => ['name', 'hostid'],
+			'hostids' => $dst_hostids,
+			'preservekeys' => true
+		]);
 
-		foreach ($src_valuemaps as $valuemapid => $name) {
-			foreach ($dest_valuemaps as $dest_valuemap) {
-				if ($dest_valuemap['name'] !== $name) {
-					continue;
+		foreach ($src_valuemaps as $src_valuemapid => $src_valuemap) {
+			foreach ($dest_valuemaps as $dest_valuemapid => $dest_valuemap) {
+				if ($dest_valuemap['name'] === $src_valuemap['name']) {
+					$valuemapids_map[$src_valuemapid][$dest_valuemap['hostid']] = $dest_valuemapid;
 				}
-
-				$valuemapids_map[$valuemapid][$dest_valuemap['hostid']] = $dest_valuemap['valuemapid'];
 			}
 		}
 	}
