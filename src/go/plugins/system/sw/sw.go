@@ -58,8 +58,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	var short bool
+
 	var regex string
-	var manager = "all"
+
+	manager := "all"
 
 	switch len(params) {
 	case 3:
@@ -84,7 +86,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	managers := getManagers()
 
-	for i, m := range managers {
+	for _, m := range managers {
 		if manager != "all" && m.name != manager {
 			continue
 		}
@@ -102,19 +104,16 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		var s []string
-		if i == 1 {
-			fmt.Printf("tmp '%s'", tmp)
-		}
 
-		if m.parser != nil {
-			s, err = m.parser(strings.Split(tmp, "\n"), regex)
-			if err != nil {
-				p.Errf("Failed to parse '%s' output, err: %s", m.cmd, err.Error())
+		if tmp != "" {
+			if m.parser != nil {
+				s, err = m.parser(strings.Split(tmp, "\n"), regex)
+				if err != nil {
+					p.Errf("Failed to parse '%s' output, err: %s", m.cmd, err.Error())
 
-				continue
-			}
-		} else {
-			if len(s) > 0 {
+					continue
+				}
+			} else {
 				s = strings.Split(tmp, "\n")
 			}
 		}
@@ -133,7 +132,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			}
 		}
 
-		if i == 0 {
+		if result == nil {
 			result = out
 		} else {
 			result = fmt.Sprintf("%s\n%s", result, out)
