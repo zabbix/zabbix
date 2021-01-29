@@ -37,6 +37,12 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	options Options
+}
+
+// Options -
+type Options struct {
+	Timeout int
 }
 
 type manager struct {
@@ -48,6 +54,15 @@ type manager struct {
 
 var impl Plugin
 
+// Configure -
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+	p.options.Timeout = global.Timeout
+}
+
+// Validate -
+func (p *Plugin) Validate(options interface{}) error { return nil }
+
+// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if key != "system.sw.packages" {
 		return nil, plugin.UnsupportedMetricError
@@ -91,12 +106,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			continue
 		}
 
-		test, err := zbxcmd.Execute(m.testCmd, time.Second*3)
+		test, err := zbxcmd.Execute(m.testCmd, time.Second*time.Duration(p.options.Timeout))
 		if err != nil || test == "" {
 			continue
 		}
 
-		tmp, err := zbxcmd.Execute(m.cmd, time.Second*3)
+		tmp, err := zbxcmd.Execute(m.cmd, time.Second*time.Duration(p.options.Timeout))
 		if err != nil {
 			p.Errf("Failed to execute command '%s', err: %s", m.cmd, err.Error())
 
@@ -130,10 +145,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		if result == nil {
 			result = out
-		} else {
-			if out != "" {
-				result = fmt.Sprintf("%s\n%s", result, out)
-			}
+		} else if out != "" {
+			result = fmt.Sprintf("%s\n%s", result, out)
 		}
 	}
 
