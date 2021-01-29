@@ -547,7 +547,6 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemaps':
-				$result = [];
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
@@ -574,7 +573,7 @@ switch ($data['method']) {
 
 				$result = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name'],
-					'hostids' => array_unique($hostids),
+					'hostids' => array_keys(array_flip($hostids)),
 					'search' => ['name' => $data['search'] ? $data['search'] : null]
 				]);
 				$result = array_column($result, null, 'name');
