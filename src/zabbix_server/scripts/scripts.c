@@ -536,7 +536,7 @@ out:
  *                FAIL - an error occurred                                                        *
  *                                                                                                *
  **************************************************************************************************/
-static int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
+int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
 		const zbx_user_t *user, zbx_script_exec_context ctx, char **params)
 {
 	int		ret = SUCCEED;
