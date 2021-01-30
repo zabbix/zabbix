@@ -194,6 +194,105 @@ static int	zbx_check_user_administration_actions_permissions(const zbx_user_t *u
 	return ret;
 }
 
+static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, int *scope, zbx_uint64_t *usrgrpid,
+		zbx_uint64_t *groupid, char *error, size_t error_len)
+{
+	int		ret = FAIL;
+	DB_RESULT	db_result;
+	DB_ROW		row;
+	zbx_uint64_t	usrgrpid_l, groupid_l;
+
+	db_result = DBselect("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
+			",username,password,publickey,privatekey"
+			" from scripts"
+			" where scriptid=" ZBX_FS_UI64, scriptid);
+
+	if (NULL == db_result)
+	{
+		zbx_strlcpy(error, "Cannot select from table 'scripts'.", error_len);
+		return FAIL;
+	}
+
+	if (NULL == (row = DBfetch(db_result)))
+	{
+		zbx_strlcpy(error, "Script not found.", error_len);
+		goto fail;
+	}
+
+	ZBX_DBROW2UINT64(usrgrpid_l, row[2]);
+	*usrgrpid = usrgrpid_l;
+
+	ZBX_DBROW2UINT64(groupid_l, row[3]);
+	*groupid = groupid_l;
+
+	ZBX_STR2UCHAR(script->type, row[4]);
+
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type || ZBX_SCRIPT_TYPE_WEBHOOK == script->type)
+		ZBX_STR2UCHAR(script->execute_on, row[5]);
+
+	if (ZBX_SCRIPT_TYPE_SSH == script->type)
+	{
+		ZBX_STR2UCHAR(script->authtype, row[9]);
+		script->publickey = zbx_strdup(script->publickey, row[12]);
+		script->privatekey = zbx_strdup(script->privatekey, row[13]);
+	}
+
+	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
+	{
+		script->port = zbx_strdup(script->port, row[8]);
+		script->username = zbx_strdup(script->username, row[10]);
+		script->password = zbx_strdup(script->password, row[11]);
+	}
+
+	script->command = zbx_strdup(script->command, row[0]);
+	script->command_orig = zbx_strdup(script->command_orig, row[0]);
+
+	script->scriptid = scriptid;
+
+	ZBX_STR2UCHAR(script->host_access, row[1]);
+
+	if (SUCCEED != is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
+	{
+		zbx_strlcpy(error, "Invalid timeout value in script configuration.", error_len);
+		goto fail;
+	}
+
+	*scope = atoi(row[7]);
+
+	ret = SUCCEED;
+fail:
+	DBfree_result(db_result);
+
+	return ret;
+}
+
+static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, char *error, size_t error_len)
+{
+	DB_RESULT	result;
+	int		ret = FAIL;
+
+	result = DBselect("select null"
+			" from users_groups"
+			" where usrgrpid=" ZBX_FS_UI64
+			" and userid=" ZBX_FS_UI64,
+			usrgrpid, userid);
+
+	if (NULL == result)
+	{
+		zbx_strlcpy(error, "Database error, cannot get user rights.", error_len);
+		goto fail;
+	}
+
+	if (NULL == DBfetch(result))
+		zbx_strlcpy(error, "User has no rights to execute this script.", error_len);
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+fail:
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: execute_script                                                   *
