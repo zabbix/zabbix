@@ -242,13 +242,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	if (SUCCEED != (rc = zbx_check_user_administration_actions_permissions(user,
-			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS)))
-	{
-		zbx_strlcpy(error, "Permission denied. No role access.", sizeof(error));
-		goto fail;
-	}
-
 	zbx_script_init(&script);
 
 	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
@@ -311,6 +304,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
+	/* check who is connecting, get user details, check access rights */
+
 	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
@@ -326,6 +321,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. No role access.");
 		goto finish;
 	}
+
+	/* extract and validate other JSON elements */
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||
 			FAIL == is_uint64(tmp, &scriptid))
