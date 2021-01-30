@@ -694,5 +694,15 @@ in:
 out:
   result: SUCCEED
   value: '2'
+---
+test case: Expression '1K'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: '1K'
+  timezone: :Europe/Riga
+  time: 2020-09-01 01:02:03 +03:00
+out:
+  result: SUCCEED
+  value: '1024'
 ...
 

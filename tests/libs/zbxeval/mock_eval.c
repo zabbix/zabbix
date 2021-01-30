@@ -54,10 +54,10 @@ zbx_uint64_t	mock_eval_read_rules(const char *path)
 			rules |= ZBX_EVAL_PARSE_LLDMACRO;
 		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_CONST_INDEX"))
 			rules |= ZBX_EVAL_PARSE_CONST_INDEX;
-		else if (0 == strcmp(flag, "ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION"))
-			rules |= ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION;
-		else if (0 == strcmp(flag, "ZBX_EVAL_COMPOSE_LLD_EXPRESSION"))
-			rules |= ZBX_EVAL_COMPOSE_LLD_EXPRESSION;
+		else if (0 == strcmp(flag, "ZBX_EVAL_COMPOSE_LLD"))
+			rules |= ZBX_EVAL_COMPOSE_LLD;
+		else if (0 == strcmp(flag, "ZBX_EVAL_COMPOSE_FUNCTIONID"))
+			rules |= ZBX_EVAL_COMPOSE_FUNCTIONID;
 		else if (0 == strcmp(flag, "ZBX_EVAL_PROCESS_ERROR"))
 			rules |= ZBX_EVAL_PROCESS_ERROR;
 		else

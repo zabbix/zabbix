@@ -310,25 +310,34 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 
 	if (ZBX_VARIANT_NONE == token->value.type)
 	{
-		dst = zbx_malloc(NULL, token->loc.r - token->loc.l + 2);
-		zbx_variant_set_str(&value, dst);
-
-		if (ZBX_EVAL_TOKEN_VAR_STR == token->type)
+		if (ZBX_EVAL_TOKEN_VAR_NUM == token->type)
 		{
-			for (src = ctx->expression + token->loc.l + 1; src < ctx->expression + token->loc.r; src++)
-			{
-				if ('\\' == *src)
-					src++;
-				*dst++ = *src;
-			}
+			zbx_variant_set_dbl(&value, atof(ctx->expression + token->loc.l) *
+					suffix2factor(ctx->expression[token->loc.r]));
 		}
 		else
 		{
-			memcpy(dst, ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1);
-			dst += token->loc.r - token->loc.l + 1;
-		}
+			dst = zbx_malloc(NULL, token->loc.r - token->loc.l + 2);
+			zbx_variant_set_str(&value, dst);
 
-		*dst = '\0';
+			if (ZBX_EVAL_TOKEN_VAR_STR == token->type)
+			{
+				for (src = ctx->expression + token->loc.l + 1; src < ctx->expression + token->loc.r;
+						src++)
+				{
+					if ('\\' == *src)
+						src++;
+					*dst++ = *src;
+				}
+			}
+			else
+			{
+				memcpy(dst, ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1);
+				dst += token->loc.r - token->loc.l + 1;
+			}
+
+			*dst = '\0';
+		}
 	}
 	else
 	{

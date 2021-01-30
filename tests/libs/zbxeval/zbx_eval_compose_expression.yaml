@@ -1,7 +1,7 @@
 ---
 test case: Replace '{$U} -> 10'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '1 + {$U}'
   replace: 
   - {token: '{$U}', value: 10}
@@ -10,7 +10,7 @@ out:
 ---
 test case: Replace '{$U} -> xyz'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '1 + {$U}'
   replace: 
   - {token: '{$U}', value: 'xyz'}
@@ -19,7 +19,7 @@ out:
 ---
 test case: Replace '{$U} -> x\y/z'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '1 + {$U}'
   replace: 
   - {token: '{$U}', value: 'x\y/z'}
@@ -28,7 +28,7 @@ out:
 ---
 test case: Replace '{$U} -> xyz'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION]
   expression: 'strlen({$U})'
   replace: 
   - {token: '{$U}', value: 'xyz'}
@@ -37,7 +37,7 @@ out:
 ---
 test case: Replace '"{$U}" -> 123'
 in:
-  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_FUNCTION]
   expression: 'strlen("{$U}")'
   replace: 
   - {token: '"{$U}"', value: '123'}
@@ -46,7 +46,7 @@ out:
 ---
 test case: Replace '"{#LLD}" -> c:\data'
 in:
-  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_LLD_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_LLD]
   expression: '{123} < {$LIMIT:"{#LLD}"}'
   replace: 
   - {token: '{$LIMIT:"{#LLD}"}', value: '{$LIMIT:"c:\\data"}'}
@@ -55,12 +55,21 @@ out:
 ---
 test case: Replace '"{$U}" -> 123'
 in:
-  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_LLD_EXPRESSION]
+  rules: [ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_COMPOSE_LLD]
   expression: 'strlen({#U})'
   replace: 
   - {token: '{#U}', value: 'xyz'}
 out:
   expression: 'strlen("xyz")'
+---
+test case: Replace '{123} -> {456}'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_COMPOSE_FUNCTIONID]
+  expression: '{123} < 0'
+  replace: 
+  - {token: '{123}', value: '456'}
+out:
+  expression: '{456} < 0'
 ...
 
 

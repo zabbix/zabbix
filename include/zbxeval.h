@@ -92,12 +92,8 @@
 
 /* expression composition rules */
 
-#define ZBX_EVAL_QUOTE_MACRO			__UINT64_C(0x00010000)
-#define ZBX_EVAL_QUOTE_USERMACRO		__UINT64_C(0x00020000)
-#define ZBX_EVAL_QUOTE_LLDMACRO			__UINT64_C(0x00040000)
-
-#define ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION	(ZBX_EVAL_QUOTE_MACRO | ZBX_EVAL_QUOTE_USERMACRO)
-#define ZBX_EVAL_COMPOSE_LLD_EXPRESSION		ZBX_EVAL_QUOTE_LLDMACRO
+#define ZBX_EVAL_COMPOSE_LLD			__UINT64_C(0x00010000)
+#define ZBX_EVAL_COMPOSE_FUNCTIONID		__UINT64_C(0x00020000)
 
 /* expression evaluation rules */
 
@@ -106,7 +102,6 @@
 /* composite rules */
 
 #define ZBX_EVAL_TRIGGER_EXPRESSION	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | \
-					ZBX_EVAL_COMPOSE_TRIGGER_EXPRESSION | \
 					ZBX_EVAL_PARSE_CONST_INDEX | \
 					ZBX_EVAL_PROCESS_ERROR)
 
@@ -188,5 +183,7 @@ int	zbx_eval_check_timer_functions(const zbx_eval_context_t *ctx);
 void	zbx_get_serialized_expression_functionids(const char *expression, const unsigned char *data,
 		zbx_vector_uint64_t *functionids);
 void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **value);
+void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_functionid, zbx_uint64_t new_functionid);
+int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error);
 
 #endif

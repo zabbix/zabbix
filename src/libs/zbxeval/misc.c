@@ -284,23 +284,37 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 
 	switch (token->type)
 	{
+		case ZBX_EVAL_TOKEN_FUNCTIONID:
+			if (0 != (ctx->rules & ZBX_EVAL_COMPOSE_FUNCTIONID))
+			{
+				zbx_variant_t	functionid;
+
+				zbx_variant_copy(&functionid, &token->value);
+
+				if (SUCCEED == zbx_variant_convert(&functionid, ZBX_VARIANT_UI64))
+				{
+					zbx_snprintf_alloc(str, str_alloc, str_offset, "{" ZBX_FS_UI64 "}",
+							functionid.data.ui64);
+					return;
+				}
+				zbx_variant_clear(&functionid);
+			}
+			check_value = 1;
+			break;
 		case ZBX_EVAL_TOKEN_VAR_STR:
 			quoted = 1;
 			break;
 		case ZBX_EVAL_TOKEN_VAR_MACRO:
-			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_MACRO))
+			if (0 == (ctx->rules & ZBX_EVAL_COMPOSE_LLD))
 				check_value = 1;
 			break;
 		case ZBX_EVAL_TOKEN_VAR_USERMACRO:
-			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_USERMACRO))
+			if (0 == (ctx->rules & ZBX_EVAL_COMPOSE_LLD))
 				check_value = 1;
 			break;
 		case ZBX_EVAL_TOKEN_VAR_LLDMACRO:
-			if (0 != (ctx->rules & ZBX_EVAL_QUOTE_LLDMACRO))
+			if (0 != (ctx->rules & ZBX_EVAL_COMPOSE_LLD))
 				check_value = 1;
-			break;
-		case ZBX_EVAL_TOKEN_FUNCTIONID:
-			check_value = 1;
 			break;
 	}
 
@@ -791,4 +805,83 @@ void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **valu
 				break;
 		}
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_replace_functionid                                      *
+ *                                                                            *
+ * Purpose: replace functionid in parsed expression with new functionid macro *
+ *                                                                            *
+ * Parameters: ctx            - [IN] the evaluation context                   *
+ *             old_functionid - [IN] the constant index                       *
+ *             new_functionid - [OUT] the constant value                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_functionid, zbx_uint64_t new_functionid)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+		zbx_uint64_t		token_functionid;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
+
+		if (ZBX_VARIANT_UI64 != token->value.type)
+		{
+			if (ZBX_VARIANT_NONE != token->value.type)
+				continue;
+
+			if (SUCCEED != is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+					&token_functionid))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			zbx_variant_set_ui64(&token->value, token_functionid);
+		}
+
+		if (token->value.data.ui64 == old_functionid)
+		{
+			zbx_variant_set_ui64(&token->value, new_functionid);
+
+			/* mark functionid as replaced to check if any non-replaced functionids are left */
+			token->opt = ZBX_MAX_UINT31_1;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_validate_replaced_functionids                           *
+ *                                                                            *
+ * Purpose: validate parsed expression to check if all functionids were       *
+ *          replaced                                                          *
+ *                                                                            *
+ * Parameters: ctx - [IN] the evaluation context                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+			continue;
+
+		if (ZBX_MAX_UINT31_1 != token->opt)
+		{
+			*error = zbx_dsprintf(*error, "non-updated functionid found at \"%s\"",
+					ctx->expression + token->loc.l);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
 }

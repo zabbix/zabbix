@@ -289,22 +289,26 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 	char		*end;
 	double		tmp;
 
-	if (FAIL == zbx_number_parse(ctx->expression + pos, &len))
+	if (FAIL == zbx_suffixed_number_parse(ctx->expression + pos, &len))
 		goto error;
 
-	if (SUCCEED == is_time_suffix(ctx->expression + pos, NULL, len + 1))
+	switch (ctx->expression[pos + len - 1])
 	{
-		len++;
-		token->type = ZBX_EVAL_TOKEN_VAR_TIME;
-	}
-	else
-	{
-		tmp = strtod(ctx->expression + pos, &end);
+		case 's':
+		case 'm':
+		case 'h':
+		case 'd':
+		case 'w':
+			token->type = ZBX_EVAL_TOKEN_VAR_TIME;
+			break;
+		default:
+			tmp = strtod(ctx->expression + pos, &end);
 
-		if (ctx->expression + pos + len != end || HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
-			goto error;
+			if (HUGE_VAL == tmp || -HUGE_VAL == tmp || EDOM == errno)
+				goto error;
 
-		token->type = ZBX_EVAL_TOKEN_VAR_NUM;
+			token->type = ZBX_EVAL_TOKEN_VAR_NUM;
+			break;
 	}
 
 	token->loc.l = pos;
