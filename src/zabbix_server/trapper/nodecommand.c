@@ -217,20 +217,21 @@ static int	zbx_check_user_administration_actions_permissions(const zbx_user_t *u
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
 		const char *clientip, char **result, char **debug)
 {
-	char		error[MAX_STRING_LEN];
-	int		ret = FAIL, rc;
+	int		ret = FAIL;
 	DC_HOST		host;
 	DB_EVENT	*event = NULL;
 	zbx_script_t	script;
+	char		error[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64,
-			__func__, scriptid, hostid, user->userid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
+			" userid:" ZBX_FS_UI64 " clientip:%s",
+			__func__, scriptid, hostid, eventid, user->userid, clientip);
 
 	*error = '\0';
 
 	if (0 != hostid)
 	{
-		if (SUCCEED != (rc = DCget_host_by_hostid(&host, hostid)))
+		if (SUCCEED != DCget_host_by_hostid(&host, hostid))
 		{
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;
