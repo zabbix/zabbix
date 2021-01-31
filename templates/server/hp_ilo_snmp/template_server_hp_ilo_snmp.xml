@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-22T10:53:15Z</date>
+   <date>2021-01-29T09:33:59Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -315,7 +315,7 @@ Read Cache Could Not Be Mapped (9)&#13;
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1</expression>
+                           <expression>{count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1 and {last()}&lt;&gt;{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}</expression>
                            <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
