@@ -632,14 +632,14 @@ class CItem extends CItemGeneral {
 		self::validateInventoryLinks($items, true);
 
 		$db_items = $this->get([
-			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
+			'output' => ['flags', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode', 'value_type'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'authtype',
-			'master_itemid'
+			'master_itemid', 'value_type'
 		]);
 
 		$this->validateDependentItems($items);
@@ -729,6 +729,12 @@ class CItem extends CItemGeneral {
 				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
 					$item['timeout'] = $defaults['timeout'];
 				}
+			}
+
+			// Reset valuemapid when value_type is LOG or TEXT.
+			if (($item['value_type'] != $db_items[$item['itemid']]['value_type'])
+					&& ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT)) {
+				$item['valuemapid'] = null;
 			}
 		}
 		unset($item);
