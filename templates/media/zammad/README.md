@@ -52,7 +52,7 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.06.png?raw=true)](images/06.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Zammad](https://zammad.org/documentation) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Zammad](https://zammad.org/documentation) documentations.
 
 ## Supported Versions
 
