@@ -140,8 +140,29 @@ class CApiTagHelper {
 		}
 
 		$sql_where_cnt = count($sql_where);
+
+		$sql_where_negated = [];
+		if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
+			$sql_where = array_filter($sql_where, function($statement) use (&$sql_where_negated) {
+				if (substr($statement, 0, 3) === 'NOT') {
+					$sql_where_negated[] = substr($statement, 4);
+					return false;
+				}
+				return true;
+			});
+		}
+
 		$evaltype_glue = ($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
 		$sql_where = implode($evaltype_glue, $sql_where);
+
+		if ($sql_where_negated) {
+			if ($sql_where !== '') {
+				$sql_where .= ' AND ';
+			}
+			$sql_where .= (count($sql_where_negated) == 1)
+				? 'NOT '.$sql_where_negated[0]
+				: 'NOT ('.implode(' AND ', $sql_where_negated).')';
+		}
 
 		return ($sql_where_cnt > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
 	}
