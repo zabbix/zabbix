@@ -40,6 +40,8 @@
 })();
 </script>
 <script type="text/javascript">
+const MAX_MAPPINGS = 3;
+
 var valuemap_number = 0;
 
 var AddValueMap = class {
@@ -108,8 +110,12 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		cell.classList.add('valuemap-label');
 		for (let value of this.data.mappings) {
-			if (i <= 3) {
-				cell.append((i < 3) ? `${value.value} ⇒ ${value.newvalue}` : '...', document.createElement('br'));
+			if (i <= MAX_MAPPINGS) {
+				cell.append((i < MAX_MAPPINGS)
+					? `${value.value} ⇒ ${value.newvalue}`
+					: '...',
+					document.createElement('br')
+				);
 			}
 
 			cell.appendChild(this.createHiddenInput(`[mappings][${i}][value]`, value.value));
