@@ -487,7 +487,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => '{Simple form test host}',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Incorrect trigger expression. Check expression part starting from "{Simple form test host}".'
+						'Invalid parameter "/1/expression": incorrect trigger expression starting from "{Simple form test host}".'
 					]
 				]
 			],
@@ -589,7 +589,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'url' => 'javascript:alert(123);',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Wrong value for url field.'
+						'Invalid parameter "/1/url": unacceptable URL.'
 					]
 				]
 			],
