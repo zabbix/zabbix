@@ -888,6 +888,18 @@ static int	DBpatch_5030049(void)
 	return DBdrop_table("valuemaps");
 }
 
+static int	DBpatch_5030050(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.valuemap.list.sort' or idx='web.valuemap.list.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
 #endif
 
 DBPATCH_START(5030)
@@ -944,5 +956,6 @@ DBPATCH_ADD(5030046, 0, 1)
 DBPATCH_ADD(5030047, 0, 1)
 DBPATCH_ADD(5030048, 0, 1)
 DBPATCH_ADD(5030049, 0, 1)
+DBPATCH_ADD(5030050, 0, 1)
 
 DBPATCH_END()
