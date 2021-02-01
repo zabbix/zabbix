@@ -895,7 +895,9 @@ static int	DBpatch_5030050(void)
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where"
 			" idx in ('web.valuemap.list.sort', 'web.valuemap.list.sortorder')"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
