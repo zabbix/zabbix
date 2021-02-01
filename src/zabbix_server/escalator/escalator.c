@@ -814,7 +814,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(message));
 
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type || ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT == script->type)
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type)
 		zbx_free(message);
 
 	if (NULL == r_event)
@@ -1091,15 +1091,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		else
 			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
 
-		/* substitute macros */
-
-		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
-		{
-			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, default_timezone, &script.command, macro_type, NULL, 0);
-			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, NULL, 0);
-		}
 fail:
 		alertid = DBget_maxid("alerts");
 
