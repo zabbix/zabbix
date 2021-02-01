@@ -690,12 +690,17 @@ static void	eval_append_arg_null(zbx_eval_context_t *ctx)
  ******************************************************************************/
 static void	eval_clear(zbx_eval_context_t *ctx)
 {
-	int	i;
+	if (NULL != ctx->expression)
+	{
+		int	i;
 
-	for (i = 0; i < ctx->stack.values_num; i++)
-		zbx_variant_clear(&ctx->stack.values[i].value);
+		ctx->expression = NULL;
 
-	zbx_vector_eval_token_destroy(&ctx->stack);
+		for (i = 0; i < ctx->stack.values_num; i++)
+			zbx_variant_clear(&ctx->stack.values[i].value);
+
+		zbx_vector_eval_token_destroy(&ctx->stack);
+	}
 }
 
 /******************************************************************************
@@ -957,6 +962,20 @@ zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_ui
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_eval_init                                                    *
+ *                                                                            *
+ * Purpose: initialize context so it can be cleared without parsing           *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_init(zbx_eval_context_t *ctx)
+{
+	ctx->expression = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_eval_clear                                                   *
  *                                                                            *
  * Purpose: free resources allocated by evaluation context                    *
@@ -967,4 +986,22 @@ zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_ui
 void	zbx_eval_clear(zbx_eval_context_t *ctx)
 {
 	eval_clear(ctx);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_status                                                  *
+ *                                                                            *
+ * Purpose: return evaluation context status                                  *
+ *                                                                            *
+ * Parameters: ctx   - [IN] the evaluation context                            *
+ *                                                                            *
+ * Return value: SUCCEED - contains parsed expression                         *
+ *               FAIL    - empty, either parsing failed or was initialized    *
+ *                         without parsing                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_eval_status(const zbx_eval_context_t *ctx)
+{
+	return (NULL == ctx->expression ? FAIL : SUCCEED);
 }

@@ -105,6 +105,11 @@
 					ZBX_EVAL_PARSE_CONST_INDEX | \
 					ZBX_EVAL_PROCESS_ERROR)
 
+#define ZBX_EVAL_TRIGGER_EXPRESSION_LLD	(ZBX_EVAL_PARSE_TRIGGER_EXPRESSSION | \
+					ZBX_EVAL_PARSE_LLDMACRO | \
+					ZBX_EVAL_COMPOSE_LLD | \
+					ZBX_EVAL_COMPOSE_FUNCTIONID)
+
 typedef zbx_uint32_t zbx_token_type_t;
 
 /******************************************************************************
@@ -157,7 +162,9 @@ typedef char *(*zbx_macro_resolve_func_t)(const char *str, size_t length, zbx_ui
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
 zbx_eval_context_t	*zbx_eval_parse_expression_dyn(const char *expression, zbx_uint64_t rules, char **error);
+void	zbx_eval_init(zbx_eval_context_t *ctx);
 void	zbx_eval_clear(zbx_eval_context_t *ctx);
+int	zbx_eval_status(const zbx_eval_context_t *ctx);
 size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t malloc_func, unsigned char **data);
 void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
 		const unsigned char *data);
@@ -185,5 +192,6 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 void	zbx_eval_get_constant(const zbx_eval_context_t *ctx, int index, char **value);
 void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_functionid, zbx_uint64_t new_functionid);
 int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error);
+void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const char *expression);
 
 #endif

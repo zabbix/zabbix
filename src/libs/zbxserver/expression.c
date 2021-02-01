@@ -5710,36 +5710,6 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		zbx_free(replace_to);
 		replace_to = replace_to_esc;
 	}
-	else if (0 != (flags & ZBX_TOKEN_TRIGGER))
-	{
-		char	*tmp;
-		size_t	sz;
-
-		sz = zbx_get_escape_string_len(replace_to, "\"\\");
-
-		if (0 == cur_token_inside_quote && ZBX_INFINITY == evaluate_string_to_double(replace_to))
-		{
-			/* autoquote */
-			tmp = zbx_malloc(NULL, sz + 3);
-			tmp[0] = '\"';
-			zbx_escape_string(tmp + 1, sz + 1, replace_to, "\"\\");
-			tmp[sz + 1] = '\"';
-			tmp[sz + 2] = '\0';
-			zbx_free(replace_to);
-			replace_to = tmp;
-		}
-		else
-		{
-			if (sz != strlen(replace_to))
-			{
-				tmp = zbx_malloc(NULL, sz + 1);
-				zbx_escape_string(tmp, sz + 1, replace_to, "\"\\");
-				tmp[sz] = '\0';
-				zbx_free(replace_to);
-				replace_to = tmp;
-			}
-		}
-	}
 
 	if (NULL != replace_to)
 	{

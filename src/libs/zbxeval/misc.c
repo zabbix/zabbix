@@ -885,3 +885,32 @@ int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_copy                                                    *
+ *                                                                            *
+ * Purpose: copy parsed expression                                            *
+ *                                                                            *
+ * Parameters: dst        - [IN] the destination evaluation context           *
+ *             src        - [IN] the source evaluation context                *
+ *             expression - [IN] copied destination expression                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const char *expression)
+{
+	int	i;
+
+	dst->expression = expression;
+	dst->rules = src->rules;
+	zbx_vector_eval_token_create(&dst->stack);
+	zbx_vector_eval_token_reserve(&dst->stack, src->stack.values_num);
+	zbx_vector_eval_token_create(&dst->ops);
+
+	zbx_vector_eval_token_append_array(&dst->stack, src->stack.values, src->stack.values_num);
+	for (i = 0; i < dst->stack.values_num; i++)
+	{
+		if (ZBX_VARIANT_NONE != src->stack.values[i].value.type)
+			zbx_variant_copy(&dst->stack.values[i].value, &src->stack.values[i].value);
+	}
+}
