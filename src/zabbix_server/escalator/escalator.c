@@ -894,8 +894,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 	{
 		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				/* the 1st 'select' works if remote command target is "Host group" */
-				"select distinct h.hostid,h.proxy_hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-					",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
+				"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+					",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
+					",s.scope,s.timeout,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 				/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
@@ -906,8 +907,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				" from opcommand o,hosts_groups hg,hosts h"
+				" from opcommand o,hosts_groups hg,hosts h,scripts s"
 				" where o.operationid=" ZBX_FS_UI64
+					" and o.scriptid=s.scriptid"
 					" and hg.hostid=h.hostid"
 					" and h.status=%d"
 					" and",
@@ -923,8 +925,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			/* the 2nd 'select' works if remote command target is "Host" */
-			"select distinct h.hostid,h.proxy_hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
+			"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
+				",s.scope,s.timeout,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
@@ -933,15 +936,17 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 #endif
 			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh,hosts h"
+			" from opcommand o,opcommand_hst oh,hosts h,scripts s"
 			" where o.operationid=oh.operationid"
+				" and o.scriptid=s.scriptid"
 				" and oh.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
 			/* the 3rd 'select' works if remote command target is "Current host" */
-			"select distinct 0,0,null,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,%d",
+			"select distinct 0,0,null,s.type,s.scriptid,s.execute_on,s.port"
+				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
+				",s.scope,s.timeout,%d",
 			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
 #ifdef HAVE_OPENIPMI
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -952,8 +957,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				",null,null,null,null");
 #endif
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			" from opcommand o,opcommand_hst oh"
+			" from opcommand o,opcommand_hst oh,scripts s"
 			" where o.operationid=oh.operationid"
+				" and o.scriptid=s.scriptid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and oh.hostid is null",
 			operationid);
@@ -965,34 +971,86 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int			rc = SUCCEED;
-		char			error[ALERT_ERROR_LEN_MAX];
+		int			rc = SUCCEED, scope;
 		DC_HOST			host;
 		zbx_script_t		script;
 		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
-		zbx_uint64_t		alertid;
+		zbx_uint64_t		alertid, groupid;
+		char			*webhook_params = NULL, error[ALERT_ERROR_LEN_MAX];
 
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
 		zbx_script_init(&script);
 
-		script.type = (unsigned char)atoi(row[3]);
+		/* fill 'script' elements */
 
-		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
+		ZBX_STR2UCHAR(script.type, row[3]);
+
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type || ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+			ZBX_STR2UCHAR(script.execute_on, row[5]);
+
+		if (ZBX_SCRIPT_TYPE_SSH == script.type)
 		{
-			script.command = zbx_strdup(script.command, row[12]);
-			script.command_orig = zbx_strdup(script.command_orig, row[12]);
-			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, default_timezone, &script.command, macro_type, NULL, 0);
-			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, NULL, 0);
+			ZBX_STR2UCHAR(script.authtype, row[7]);
+			script.publickey = zbx_strdup(script.publickey, row[10]);
+			script.privatekey = zbx_strdup(script.privatekey, row[11]);
 		}
 
-		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
-			script.execute_on = (unsigned char)atoi(row[5]);
+		if (ZBX_SCRIPT_TYPE_SSH == script.type || ZBX_SCRIPT_TYPE_TELNET == script.type)
+		{
+			script.port = zbx_strdup(script.port, row[6]);
+			script.username = zbx_strdup(script.username, row[8]);
+			script.password = zbx_strdup(script.password, row[9]);
+		}
+
+		script.command = zbx_strdup(script.command, row[12]);
+		script.command_orig = zbx_strdup(script.command_orig, row[12]);
+
+		ZBX_DBROW2UINT64(script.scriptid, row[4]);
+
+		if (SUCCEED != is_time_suffix(row[15], &script.timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			zbx_strlcpy(error, "Invalid timeout value in script configuration.", sizeof(error));
+			rc = FAIL;
+			goto fail;
+		}
+
+		/* validate script permissions */
+
+		scope = atoi(row[14]);
+		ZBX_DBROW2UINT64(groupid, row[13]);
 
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		ZBX_DBROW2UINT64(host.proxy_hostid, row[1]);
+
+		if (ZBX_SCRIPT_SCOPE_ACTION != scope)
+		{
+			zbx_snprintf(error, sizeof(error), "Script is not allowed in action operations: scope:%d",
+					scope);
+			rc = FAIL;
+			goto fail;
+		}
+
+		if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
+		{
+			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
+					sizeof(error));
+			rc = FAIL;
+			goto fail;
+		}
+
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		{
+			if (SUCCEED != DBfetch_webhook_params(&script, &host, (NULL != r_event) ? r_event : event,
+					NULL, ZBX_SCRIPT_CTX_ACTION, &webhook_params))
+			{
+				zbx_strlcpy(error, "Cannot fetch webhook script parameters.", sizeof(error));
+				rc = FAIL;
+				goto fail;
+			}
+		}
+
+		/* get host details */
 
 		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 		{
@@ -1006,22 +1064,22 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[2]);
-				host.tls_connect = (unsigned char)atoi(row[13]);
+				host.tls_connect = (unsigned char)atoi(row[16]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[14]);
-				host.ipmi_privilege = (unsigned char)atoi(row[15]);
-				strscpy(host.ipmi_username, row[16]);
-				strscpy(host.ipmi_password, row[17]);
+				host.ipmi_authtype = (signed char)atoi(row[17]);
+				host.ipmi_privilege = (unsigned char)atoi(row[18]);
+				strscpy(host.ipmi_username, row[19]);
+				strscpy(host.ipmi_password, row[20]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[14 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[15 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[16 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[17 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_issuer, row[17 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[20 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 			else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-						sizeof(error))))
+					sizeof(error))))
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -1035,27 +1093,20 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		else
 			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
 
+		/* substitute macros */
+
+		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
+		{
+			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
+					NULL, NULL, NULL, ack, default_timezone, &script.command, macro_type, NULL, 0);
+			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+					NULL, NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, NULL, 0);
+		}
+fail:
 		alertid = DBget_maxid("alerts");
 
 		if (SUCCEED == rc)
 		{
-			switch (script.type)
-			{
-				case ZBX_SCRIPT_TYPE_SSH:
-					script.authtype = (unsigned char)atoi(row[7]);
-					script.publickey = zbx_strdup(script.publickey, row[10]);
-					script.privatekey = zbx_strdup(script.privatekey, row[11]);
-					ZBX_FALLTHROUGH;
-				case ZBX_SCRIPT_TYPE_TELNET:
-					script.port = zbx_strdup(script.port, row[6]);
-					script.username = zbx_strdup(script.username, row[8]);
-					script.password = zbx_strdup(script.password, row[9]);
-					break;
-				case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-					ZBX_DBROW2UINT64(script.scriptid, row[4]);
-					break;
-			}
-
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_ACTION,
 					event->eventid, error, sizeof(error), (DB_EVENT**)&event)))
 			{
@@ -1079,6 +1130,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
 				&script, status, error);
 skip:
+		zbx_free(webhook_params);
 		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
