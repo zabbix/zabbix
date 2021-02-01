@@ -462,7 +462,7 @@ class testFormAdministrationScripts extends CWebTest {
 		}
 
 		// Check testing confirmation while configuring.
-		if (CTestArrayHelper::get($data['fields'], 'Enable confirmation')) {
+		if (array_key_exists('Enable confirmation', $data['fields'])) {
 			$this->checkConfirmation($data, $form);
 		}
 
@@ -487,7 +487,7 @@ class testFormAdministrationScripts extends CWebTest {
 			$form->checkValue($data['fields']);
 
 			// Check testing confirmation in saved form.
-			if (CTestArrayHelper::get($data['fields'], 'Enable confirmation')) {
+			if (array_key_exists('Enable confirmation', $data['fields'])) {
 				$this->checkConfirmation($data, $form);
 			}
 
@@ -555,7 +555,7 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
-	 * Function for checking script cloning.
+	 * Function for checking script cloning with only changed name.
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_CLONE);
@@ -580,7 +580,7 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
-	 * Function for checking script deleting.
+	 * Function for testing script delete from configuration form.
 	 */
 	public function testFormAdministrationScripts_Delete() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_DELETE);
