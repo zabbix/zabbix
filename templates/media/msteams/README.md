@@ -27,7 +27,7 @@ http://zabbix/<br>
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-2\. In the *Administration > Media types* section, import the [media_ms_teams.xml](media_ms_teams.xml)
+2\. In the *Administration > Media types* section, import the [media_ms_teams.yaml](media_ms_teams.yaml)
 
 3\. Open the newly added **MS Teams** media type and replace placeholder *&lt;PLACE WEBHOOK URL HERE&gt;* with the **incoming webhook URL**, created during the webhook setup in MS Teams.
 
@@ -53,7 +53,7 @@ Make sure this user has access to all hosts for which you would like problem not
 
 6\. Great! You can now start receiving alerts!
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [MS Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [MS Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentations.
 
 ## Supported Versions
 Zabbix 5.0
