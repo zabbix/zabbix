@@ -1463,7 +1463,6 @@ INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027,
 -- test trigger validation
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99013, 'Trigger validation test host', 'Trigger validation test host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99014, 'Trigger validation test template', 'Trigger validation test template', 3, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50028, 99013, 1, 1, 1, '127.0.0.1', '', '10050');
 INSERT INTO hstgrp (groupid, name, internal) VALUES (50027, 'Trigger validation test host group', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50023, 99013, 50027);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50024, 99014, 50027);
