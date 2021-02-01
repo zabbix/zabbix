@@ -1107,8 +1107,7 @@ fail:
 
 		if (SUCCEED == rc)
 		{
-			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, NULL, ZBX_SCRIPT_CTX_ACTION,
-					event->eventid, error, sizeof(error), (DB_EVENT**)&event)))
+			if (SUCCEED == (rc = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 			{
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 				{

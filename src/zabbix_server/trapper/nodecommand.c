@@ -397,6 +397,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 	}
 
+	if (USER_TYPE_SUPER_ADMIN != user->type &&
+			SUCCEED != zbx_check_script_user_permissions(user->userid, host.hostid, &script))
+	{
+		zbx_strlcpy(error, "User does not have permission to execute this script on the host.", sizeof(error));
+		goto fail;
+	}
+
 	user_timezone = get_user_timezone(user->userid);
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
@@ -409,9 +416,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		}
 	}
 
-	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, user,
-			(0 != hostid) ? ZBX_SCRIPT_CTX_HOST : ZBX_SCRIPT_CTX_EVENT,
-			eventid, error, sizeof(error), &event)))
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
