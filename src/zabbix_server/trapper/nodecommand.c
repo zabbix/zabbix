@@ -319,7 +319,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 {
 	int			ret = FAIL, scope = 0;
 	DC_HOST			host;
-	DB_EVENT		*event = NULL;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
 	zbx_vector_uint64_t	eventids;
@@ -415,9 +414,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
-
-		if (NULL != event && 0 != eventid && ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
-			zbx_db_free_event(event);
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 		{
