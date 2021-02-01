@@ -5,6 +5,7 @@
 
 For Zabbix version: 5.0 and higher  
 Official JMX Template for Apache Ignite and Gridgain computing platform.
+This template is based on the original template developed by Igor Akkuratov, Senior Engineer at GridGain Systems and Apache Ignite Contributor.
 
 
 This template was tested on:

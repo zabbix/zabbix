@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-26T09:38:14Z</date>
+   <date>2021-02-01T08:34:21Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -13,12 +13,9 @@
          <name>Template DB Ignite by JMX</name>
          <description>The template to monitor Apache Ignite and Gridgain by Zabbix that work without any external scripts.&#13;
   It works with both standalone and cluster instances.&#13;
-  The metrics are discoverable and collected by JMX.&#13;
-        add the following jvm option to -DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false&#13;
-&#13;
+  The metrics are discoverable and collected by JMX.  &#13;
+  Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.&#13;
   You can set {$IGNITE.USER} and {$IGNITE.PASSWORD} macros in the template for using on the host level.&#13;
-&#13;
-add the following jvm option to -DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
