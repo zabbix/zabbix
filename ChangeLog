@@ -1,3 +1,18 @@
+Changes for 5.0.9rc1
+
+New features:
+.......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
+.......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.8
+
+5.0.8rc1 was released as 5.0.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.8rc1
 
 New features:
@@ -14,6 +29,7 @@ New features:
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
 ..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
 ...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
 A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
@@ -1923,6 +1939,18 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.29rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.28
+
+4.0.28rc1 was released as 4.0.28 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.28rc1
 
 New features:
@@ -1930,6 +1958,7 @@ New features:
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
 ..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
 ...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
 A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)

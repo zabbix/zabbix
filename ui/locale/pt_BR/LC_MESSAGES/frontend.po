@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-18 17:38+0200\n"
-"PO-Revision-Date: 2020-05-19 11:56+0300\n"
-"Last-Translator: Anderson <anderson.graf@eximioti.com.br>\n"
+"PO-Revision-Date: 2021-01-25 11:38+0300\n"
+"Last-Translator: Marlon <Marlon@outlook.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1589882215.000000\n"
+"X-POOTLE-MTIME: 1611567482.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -94,7 +94,7 @@ msgstr[1] "%1$d de %3$d%2$s incidentes são apresentados"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr "%1$d problemas selecionados."
+msgstr "%1$d incidentes selecionados."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -226,8 +226,8 @@ msgstr "%1$s símbolos restantes"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] "%1$s problema não reconhecido"
-msgstr[1] "%1$s problemas não reconhecidos"
+msgstr[0] "%1$s incidente não reconhecido"
+msgstr[1] "%1$s incidentes não reconhecidos"
 
 #: app/views/monitoring.widget.problems.view.php:276
 #, c-format
@@ -7223,7 +7223,7 @@ msgstr "Ocultar depuração"
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:112
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:164
 msgid "Hide groups without problems"
-msgstr "Ocultar grupos sem problemas"
+msgstr "Ocultar grupos sem incidentes"
 
 #: include/views/monitoring.history.php:174
 msgid "Hide selected"
@@ -9466,7 +9466,7 @@ msgstr "Problema interno"
 #: app/views/popup.mediatype.message.php:67
 #: include/classes/helpers/CMediatypeHelper.php:141
 msgid "Internal problem recovery"
-msgstr "Recuperação de problemas internos"
+msgstr "Recuperação de incidentes internos"
 
 #: include/httptest.inc.php:412
 msgid "Internet Explorer"
@@ -12621,11 +12621,11 @@ msgstr "Número de colisões fora da janela. Retorna: número inteiro"
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Number of problems"
-msgstr "Quantidade de problemas"
+msgstr "Quantidade de incidentes"
 
 #: include/views/monitoring.sysmap.edit.php:153
 msgid "Number of problems and expand most critical one"
-msgstr "Quantidade de problemas e expansão do mais crítico"
+msgstr "Quantidade de incidentes e expansão do mais crítico"
 
 #: include/classes/items/CHelpItems.php:867
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -13960,7 +13960,7 @@ msgstr "Incidente em"
 #: app/views/popup.mediatype.message.php:52
 #: include/classes/helpers/CMediatypeHelper.php:61
 msgid "Problem recovery"
-msgstr "Recuperação de problemas"
+msgstr "Recuperação de incidente"
 
 #: include/actions.inc.php:2061
 msgid "Problem resolved"
@@ -14005,7 +14005,7 @@ msgstr "Incidentes"
 #: include/classes/screens/CScreenSystemStatus.php:56
 #: include/classes/widgets/CWidgetConfig.php:48 include/screens.inc.php:40
 msgid "Problems by severity"
-msgstr "Problemas por severidade"
+msgstr "Incidente por severidade"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:507
@@ -15468,7 +15468,7 @@ msgstr "A ação selecionada foi excluída"
 
 #: app/views/popup.acknowledge.edit.php:62
 msgid "Selected and all other problems of related triggers"
-msgstr "Selecionado e todos os outros problemas de triggers relacionadas"
+msgstr "Selecionado e todos os outros incidentes de triggers relacionadas"
 
 #: correlation.php:331
 msgid "Selected correlations deleted"

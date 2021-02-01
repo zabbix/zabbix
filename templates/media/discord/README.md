@@ -54,7 +54,7 @@ The "Send to" field must contain Discord webhook URL created before.
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
 
 ## Supported Versions
 Zabbix 4.4

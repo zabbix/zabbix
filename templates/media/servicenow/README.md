@@ -37,7 +37,7 @@ To export information into a ServiceNow custom field, add a parameter with the c
 The **Send to** field must contain the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/).<br>
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into ServiceNow tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
 
 ## Supported Versions
 Zabbix 5.0

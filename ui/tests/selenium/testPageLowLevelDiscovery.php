@@ -437,7 +437,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'Containers discovery',
-						'Images discovery'
+						'Images discovery',
+						'Replication Discovery'
 					]
 				]
 			],

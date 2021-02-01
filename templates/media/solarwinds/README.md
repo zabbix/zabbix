@@ -44,7 +44,7 @@ _Example:_<br>
 Though a "Send to" field is not used in SolarWinds Service Desk webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into SolarWinds Service Desk tickets.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [SOLARWINDS](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/SWSD_Getting_Started_Guide.htm) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [SOLARWINDS](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/SWSD_Getting_Started_Guide.htm) documentations.
 
 ## Supported Versions
 Zabbix 5.0
