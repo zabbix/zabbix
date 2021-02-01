@@ -242,16 +242,20 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
+		$driver = CElementQuery::getDriver();
+		$driver->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
+				'.menu-main *{transition: none !important;}\'; document.body.appendChild(style);');
+
 		$this->assertTrue($this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady()->exists());
 		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 
+		// When login in zabbix, Monitoring section is opened.
 		if ($data['section'] !== 'Monitoring') {
 			$this->query('xpath://ul[@class="menu-main"]/li/a[text()="'.$data['section'].'"]')->waitUntilReady()->one()->click();
-			sleep (1);
 		}
 
 		$this->query('xpath:'.$xpath.'/a[text()="'.$data['section'].'"]/following::ul/li/a[text()="'.
-				$data['page'].'"]')->waitUntilVisible()->one()->click();
+				$data['page'].'"]')->waitUntilClickable()->one()->click();
 		$header = (array_key_exists('header', $data)) ? $data['header'] : $data['page'];
 		$this->assertPageHeader($header);
 	}
