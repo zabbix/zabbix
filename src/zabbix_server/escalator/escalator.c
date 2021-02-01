@@ -1112,8 +1112,9 @@ fail:
 			{
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 				{
-					rc = zbx_script_execute(&script, &host, NULL, event, ZBX_SCRIPT_CTX_ACTION,
-							NULL, error, sizeof(error), NULL);
+					rc = zbx_script_execute(&script, &host,
+							(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ?
+							webhook_params : NULL, NULL, error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else

@@ -38,8 +38,7 @@ int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, cons
 		const zbx_user_t *user, zbx_script_exec_context ctx, char **params);
 int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user,
 		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error, size_t max_error_len, DB_EVENT **event);
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user,
-		const DB_EVENT *event, zbx_script_exec_context ctx, char **result, char *error, size_t max_error_len,
-		char **debug);
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, char **result,
+		char *error, size_t max_error_len, char **debug);
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now);
 #endif

@@ -610,40 +610,25 @@ out:
  * Purpose: executes webhook                                                                      *
  *                                                                                                *
  * Parameters:  script         - [IN] the script to be executed                                   *
- *              host           - [IN] the host the script will be executed on                     *
- *              event          - [IN] the event for the execution case                            *
- *              ctx            - [IN] the script execution context                                *
- *              user           - [IN] the user executing script (can be NULL)                     *
+ *              params         - [IN] parameters for the script                                   *
+ *              result         - [OUT] the result of a script execution                           *
  *              error          - [IN/OUT] the error reported by the script (or the script engine) *
  *              max_error_len  - [IN] the maximum error length                                    *
- *              result         - [OUT] the result of a script execution                           *
  *              debug          - [OUT] the debug data (optional)                                  *
  *                                                                                                *
  * Return value:  SUCCEED - processed successfully                                                *
  *                FAIL - an error occurred                                                        *
  *                                                                                                *
  **************************************************************************************************/
-static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
-		zbx_script_exec_context ctx, const zbx_user_t *user, char *error, size_t max_error_len, char **result,
-		char **debug)
+static int	zbx_execute_webhook(const zbx_script_t *script, const char *params, char **result, char *error,
+		size_t max_error_len, char **debug)
 {
 	int	ret;
-	char	*params;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == DBfetch_webhook_params(script, host, event, user, ctx, &params))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to fetch script parameters for script id " ZBX_FS_UI64,
-				script->scriptid);
-	}
-
-	if (ZBX_SCRIPT_CTX_ACTION != ctx && NULL != event)
-		zbx_db_free_event((DB_EVENT*)event);
-
 	ret = zbx_es_execute_command(script->command, params, script->timeout, result, error, max_error_len, debug);
 
-	zbx_free(params);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -657,9 +642,7 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
  *                                                                            *
  * Parameters:  script         - [IN] the script to be executed               *
  *              host           - [IN] the host the script will be executed on *
- *              user           - [IN] the user executing script (can be NULL) *
- *              event          - [IN] the event for the execution case        *
- *              ctx            - [IN] the script execution context            *
+ *              params         - [IN] parameters for the script               *
  *              result         - [OUT] the result of a script execution       *
  *              error          - [OUT] the error reported by the script       *
  *              max_error_len  - [IN] the maximum error length                *
@@ -670,8 +653,8 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user, const DB_EVENT *event,
-		zbx_script_exec_context ctx, char **result, char *error, size_t max_error_len, char **debug)
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, char **result,
+		char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -682,7 +665,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const zb
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_execute_webhook(script, host, event, ctx, user, error, max_error_len, result, debug);
+			ret = zbx_execute_webhook(script, params, result, error, max_error_len, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
