@@ -909,7 +909,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
 				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata', 'discover', 'event_name'
+				'manual_close', 'opdata', 'event_name'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
