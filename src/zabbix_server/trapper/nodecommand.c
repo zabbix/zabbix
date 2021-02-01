@@ -368,6 +368,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		goto fail;
 	}
 
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type &&
+			SUCCEED != zbx_check_webhook_script_permissions(&script, error, sizeof(error)))
+	{
+		goto fail;
+	}
+
 	/* get host or event details */
 
 	if (0 != hostid)

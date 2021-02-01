@@ -1039,6 +1039,13 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			goto fail;
 		}
 
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type &&
+				SUCCEED != zbx_check_webhook_script_permissions(&script, error, sizeof(error)))
+		{
+			rc = FAIL;
+			goto fail;
+		}
+
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
