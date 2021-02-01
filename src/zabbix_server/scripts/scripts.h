@@ -23,19 +23,11 @@
 #include "common.h"
 #include "dbcache.h"
 
-typedef enum
-{
-	ZBX_SCRIPT_CTX_HOST,
-	ZBX_SCRIPT_CTX_EVENT,
-	ZBX_SCRIPT_CTX_ACTION
-} zbx_script_exec_context;
-
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid);
 int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, zbx_script_t *script);
-int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
-		const zbx_user_t *user, zbx_script_exec_context ctx, char **params);
+int	DBfetch_webhook_params(zbx_uint64_t scriptid, char **params, char *error, size_t error_len);
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len);
 int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, char **result,
 		char *error, size_t max_error_len, char **debug);

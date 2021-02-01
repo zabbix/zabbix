@@ -349,39 +349,35 @@ out:
 	return ret;
 }
 
-/**************************************************************************************************
- *                                                                                                *
- * Function: DBfetch_webhook_params                                                               *
- *                                                                                                *
- * Purpose: fetch webhook parameters and expand macros inside them                                *
- *                                                                                                *
- * Parameters:  script         - [IN] the script to be executed                                   *
- *              host           - [IN] the host the script will be executed on                     *
- *              event          - [IN] the event for the execution case                            *
- *              user           - [IN] the user executing script (can be NULL)                     *
- *              ctx            - [IN] the script execution context                                *
- *              params         - [OUT] parsed parameters with expanded macros                     *
- *                                                                                                *
- * Return value:  SUCCEED - processed successfully                                                *
- *                FAIL - an error occurred                                                        *
- *                                                                                                *
- **************************************************************************************************/
-int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, const DB_EVENT *event,
-		const zbx_user_t *user, zbx_script_exec_context ctx, char **params)
+/******************************************************************************
+ *                                                                            *
+ * Function: DBfetch_webhook_params                                           *
+ *                                                                            *
+ * Purpose: fetch webhook parameters                                          *
+ *                                                                            *
+ * Parameters:  scriptid  - [IN] the id of script to be executed              *
+ *              params    - [OUT] parsed parameters                           *
+ *              error     - [IN/OUT] the error message                        *
+ *              error_len - [IN] the maximum error length                     *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	DBfetch_webhook_params(zbx_uint64_t scriptid, char **params, char *error, size_t error_len)
 {
 	int		ret = SUCCEED;
-	zbx_uint64_t	userid, *p_userid = NULL;
-	char		error[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
 	struct zbx_json	json_data;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64, __func__, scriptid);
 
-	result = DBselect("select name,value from script_param where scriptid=" ZBX_FS_UI64, script->scriptid);
+	result = DBselect("select name,value from script_param where scriptid=" ZBX_FS_UI64, scriptid);
 
 	if (NULL == result)
 	{
+		zbx_strlcpy(error, "Database error, cannot get webhook script parameters.", error_len);
 		ret = FAIL;
 		goto out;
 	}
@@ -390,44 +386,19 @@ int	DBfetch_webhook_params(const zbx_script_t *script, const DC_HOST *host, cons
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*name, *value;
+		const char	*name = row[0];
+		const char	*value = row[1];
 
-		name = zbx_strdup(NULL, row[0]);
-		value = zbx_strdup(NULL, row[1]);
 		zbx_json_addstring(&json_data, name, value, ZBX_JSON_TYPE_STRING);
-		zbx_free(name);
-		zbx_free(value);
 	}
 
 	zbx_json_close(&json_data);
 
-	if (NULL != user)
-	{
-		userid = user->userid;
-		p_userid = &userid;
-	}
-
-	*params = zbx_strdup(NULL, json_data.buffer);
-
-	if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL, NULL,
-			NULL, params, MACRO_TYPE_SCRIPT, error, sizeof(error)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to expand macros for script '%s'", script->command_orig);
-	}
-
-	if (ZBX_SCRIPT_CTX_EVENT == ctx)
-	{
-		if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL, NULL,
-				NULL, NULL, params, (MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_MESSAGE_NORMAL |
-				MACRO_TYPE_MESSAGE_RECOVERY), error, sizeof(error)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to expand macros for script '%s'", script->command_orig);
-		}
-	}
+	*params = zbx_strdup(*params, json_data.buffer);
 
 	zbx_json_free(&json_data);
-out:
 	DBfree_result(result);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

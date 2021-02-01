@@ -1041,10 +1041,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			if (SUCCEED != DBfetch_webhook_params(&script, &host, (NULL != r_event) ? r_event : event,
-					NULL, ZBX_SCRIPT_CTX_ACTION, &webhook_params))
+			if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
 			{
-				zbx_strlcpy(error, "Cannot fetch webhook script parameters.", sizeof(error));
 				rc = FAIL;
 				goto fail;
 			}

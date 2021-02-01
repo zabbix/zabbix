@@ -408,12 +408,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 	{
-		if (SUCCEED != DBfetch_webhook_params(&script, &host, (0 != eventid) ? events.values[0] : NULL, user,
-				(0 != hostid) ? ZBX_SCRIPT_CTX_HOST : ZBX_SCRIPT_CTX_EVENT, &webhook_params))
-		{
-			zbx_strlcpy(error, "Cannot fetch webhook script parameters.", sizeof(error));
+		if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
 			goto fail;
-		}
 	}
 
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
