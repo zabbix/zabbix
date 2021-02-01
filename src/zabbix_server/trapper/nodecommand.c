@@ -25,6 +25,7 @@
 
 #include "trapper_auth.h"
 #include "nodecommand.h"
+#include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 
 /******************************************************************************
@@ -316,17 +317,59 @@ fail:
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
 		const char *clientip, char **result, char **debug)
 {
-	int		ret = FAIL;
-	DC_HOST		host;
-	DB_EVENT	*event = NULL;
-	zbx_script_t	script;
-	char		error[MAX_STRING_LEN];
+	int			ret = FAIL, scope = 0;
+	DC_HOST			host;
+	DB_EVENT		*event = NULL;
+	zbx_script_t		script;
+	zbx_uint64_t		usrgrpid, groupid;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_ptr_t	events;
+	char			*user_timezone = NULL, *webhook_params = NULL, error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s",
 			__func__, scriptid, hostid, eventid, user->userid, clientip);
 
 	*error = '\0';
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_ptr_create(&events);
+
+	zbx_script_init(&script);
+
+	if (SUCCEED != zbx_get_script_details(scriptid, &script, &scope, &usrgrpid, &groupid, error, sizeof(error)))
+		goto fail;
+
+	/* validate script permissions */
+
+	if (0 < usrgrpid &&
+			USER_TYPE_SUPER_ADMIN != user->type &&
+			SUCCEED != is_user_in_allowed_group(user->userid, usrgrpid, error, sizeof(error)))
+	{
+		goto fail;
+	}
+
+	if (0 != hostid)
+	{
+		if (ZBX_SCRIPT_SCOPE_HOST != scope)
+		{
+			zbx_snprintf(error, sizeof(error), "Script is not allowed in manual host action: scope:%d",
+					scope);
+			goto fail;
+		}
+	}
+	else if (ZBX_SCRIPT_SCOPE_EVENT != scope)
+	{
+		zbx_snprintf(error, sizeof(error), "Script is not allowed in manual event action: scope:%d", scope);
+		goto fail;
+	}
+
+	if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, hostid))
+	{
+		zbx_strlcpy(error, "Script does not have permission to be executed on the host.", sizeof(error));
+		goto fail;
+	}
+
+	/* get host or event details */
 
 	if (0 != hostid)
 	{
@@ -336,13 +379,35 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 	}
-	else
-		memset(&host, 0, sizeof(host));
+	else /* eventid */
+	{
+		zbx_vector_uint64_reserve(&eventids, 1);
+		zbx_vector_ptr_reserve(&events, 1);
+		zbx_vector_uint64_append(&eventids, eventid);
 
-	zbx_script_init(&script);
+		zbx_db_get_events_by_eventids(&eventids, &events);
 
-	script.type = ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT;
-	script.scriptid = scriptid;
+		if (0 == events.values_num)
+		{
+			zbx_strlcpy(error, "Unknown event identifier.", sizeof(error));
+			goto fail;
+		}
+
+		if (SUCCEED != get_host_from_event(events.values[0], &host, error, sizeof(error)))
+			goto fail;
+	}
+
+	user_timezone = get_user_timezone(user->userid);
+
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+	{
+		if (SUCCEED != DBfetch_webhook_params(&script, &host, (0 != eventid) ? events.values[0] : NULL, user,
+				(0 != hostid) ? ZBX_SCRIPT_CTX_HOST : ZBX_SCRIPT_CTX_EVENT, &webhook_params))
+		{
+			zbx_strlcpy(error, "Cannot fetch webhook script parameters.", sizeof(error));
+			goto fail;
+		}
+	}
 
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, user,
 			(0 != hostid) ? ZBX_SCRIPT_CTX_HOST : ZBX_SCRIPT_CTX_EVENT,
@@ -370,11 +435,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		auditlog_global_script(scriptid, hostid, host.proxy_hostid, user->userid, clientip, script.command_orig,
 				script.execute_on, poutput, perror);
 	}
-
-	zbx_script_clean(&script);
 fail:
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);
+
+	zbx_script_clean(&script);
+	zbx_free(webhook_params);
+	zbx_free(user_timezone);
+	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
+	zbx_vector_ptr_destroy(&events);
+	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
