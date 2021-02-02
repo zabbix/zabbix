@@ -376,15 +376,17 @@ class CItemPrototype extends CItemGeneral {
 		$itemids = DB::insert('items', $items);
 
 		foreach ($items as $key => $item) {
+			$items[$key]['itemid'] = $itemids[$key];
+
 			$insertItemDiscovery[] = [
-				'itemid' => $itemids[$key],
+				'itemid' => $items[$key]['itemid'],
 				'parent_itemid' => $item['ruleid']
 			];
 		}
 		DB::insertBatch('item_discovery', $insertItemDiscovery);
 
 		$this->createItemParameters($items, $itemids);
-		$this->createItemPreprocessing($items, $itemids);
+		$this->createItemPreprocessing($items);
 		$this->createItemTags($items, $itemids);
 	}
 

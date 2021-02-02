@@ -969,7 +969,7 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
 		$this->createItemParameters($items, $itemids);
-		$this->createItemPreprocessing($items, $itemids);
+		$this->createItemPreprocessing($items);
 		$this->createOverrides($items);
 	}
 

@@ -1647,11 +1647,11 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Insert item pre-processing data into DB.
 	 *
-	 * @param array $items                     An array of items.
-	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
-	 * @param array $itemids                   An array of itemids.
+	 * @param array  $items                     An array of items.
+	 * @param string $items[]['itemid']
+	 * @param array  $items[]['preprocessing']  An array of item pre-processing data.
 	 */
-	protected function createItemPreprocessing(array $items, array $itemids) {
+	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
 
 		foreach ($items as $item) {
@@ -1660,7 +1660,7 @@ abstract class CItemGeneral extends CApiService {
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
-						'itemid' => $itemids[$key],
+						'itemid' => $item['itemid'],
 						'step' => ($preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++,
 						'type' => $preprocessing['type'],
 						'params' => $preprocessing['params'],

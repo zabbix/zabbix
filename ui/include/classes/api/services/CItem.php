@@ -521,7 +521,7 @@ class CItem extends CItemGeneral {
 		DB::insert('item_rtdata', $items_rtdata, false);
 
 		$this->createItemParameters($items, $itemids);
-		$this->createItemPreprocessing($items, $itemids);
+		$this->createItemPreprocessing($items);
 		$this->createItemTags($items, $itemids);
 	}
 
@@ -740,8 +740,6 @@ class CItem extends CItemGeneral {
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {
-			$tpl_item['applications'] = zbx_objectValues($tpl_item['applications'], 'applicationid');
-
 			if ($tpl_item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('query_fields', $tpl_item) && is_array($tpl_item['query_fields'])) {
 					$tpl_item['query_fields'] = $tpl_item['query_fields']
