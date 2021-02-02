@@ -52,7 +52,7 @@ if ($data['hostid'] != 0) {
 
 $widget->addItem(new CPartial('configuration.filter.items', [
 	'filter_data' => $data['filter_data'],
-	'items' => $data['items'],
+	'subfilter' => $data['subfilter'],
 	'context' => $data['context']
 ]));
 

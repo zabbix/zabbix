@@ -201,9 +201,10 @@ $filter
 	->addVar('subfilter_history', $data['filter_data']['subfilter_history'])
 	->addVar('subfilter_trends', $data['filter_data']['subfilter_trends'])
 	->addVar('subfilter_interval', $data['filter_data']['subfilter_interval'])
+	->addVar('subfilter_tags', $data['filter_data']['subfilter_tags'])
 	->addFilterTab(_('Filter'),
 		[$filter_column_1, $filter_column_2, $filter_column_3],
-		makeItemSubfilter($data['filter_data'], $data['items'], $data['context'])
+		$data['subfilter']
 	);
 
 $filter->show();

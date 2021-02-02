@@ -418,8 +418,6 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx($prefix.'items.filter.tags.value');
 	CProfile::deleteIdx($prefix.'items.filter.tags.operator');
 	CProfile::deleteIdx($prefix.'items.filter.evaltype');
-	CProfile::deleteIdx($prefix.'items.subfilter_tags.tag');
-	CProfile::deleteIdx($prefix.'items.subfilter_tags.value');
 	DBend();
 }
 
@@ -1625,6 +1623,17 @@ else {
 			'value' => '',
 			'operator' => TAG_OPERATOR_LIKE
 		]];
+	}
+
+	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
+
+	// Replace hash keys by numeric index used in subfilter.
+	foreach ($data['filter_data']['subfilter_tags'] as $hash => $tag) {
+		$data['filter_data']['subfilter_tags'][$tag['num']] = [
+			'tag' => $tag['tag'],
+			'value' => $tag['value']
+		];
+		unset($data['filter_data']['subfilter_tags'][$hash]);
 	}
 
 	// Remove subfiltered items.

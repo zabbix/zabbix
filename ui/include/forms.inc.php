@@ -85,7 +85,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
  *
  * @return array
  */
-function prepareTagsSubfilterOutput(array $data, array $subfilter): array {
+function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	$output = [new CTag('h3', true, _('Tags'))];
 	CArrayHelper::sort($data, ['tag', 'value']);
 
@@ -99,6 +99,8 @@ function prepareTagsSubfilterOutput(array $data, array $subfilter): array {
 
 		// is activated
 		if (array_key_exists($tag_hash, $subfilter)) {
+			$subfilter[$tag_hash]['num'] = $i;
+
 			$output[] = (new CSpan([
 				(new CLinkAction($element_name))
 					->onClick(CHtml::encode(
@@ -147,7 +149,7 @@ function prepareTagsSubfilterOutput(array $data, array $subfilter): array {
 	return $output;
 }
 
-function makeItemSubfilter(array $filter_data, array $items = [], string $context) {
+function makeItemSubfilter(array &$filter_data, array $items = [], string $context) {
 	// subfilters
 	$table_subfilter = (new CTableInfo())
 		->addRow([
@@ -185,7 +187,7 @@ function makeItemSubfilter(array $filter_data, array $items = [], string $contex
 		// tags
 		if (!$filter_data['filter_tags']) {
 			foreach ($item['tags'] as $tag) {
-				$tag_hash = $tag['tag'].':'.$tag['value'];
+				$tag_hash = json_encode([$tag['tag'], $tag['value']]);
 				if (!array_key_exists($tag_hash, $item_params['tags'])) {
 					$item_params['tags'][$tag_hash] = $tag + ['count' => 0];
 				}
