@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "comms.h"
+#include "zbxserver.h"
 #include "db.h"
 #include "log.h"
 #include "../scripts/scripts.h"
@@ -415,6 +416,37 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	{
 		if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
 			goto fail;
+	}
+
+	/* substitute macros in script body and webhook parameters */
+
+	if (0 != hostid)	/* script on host */
+	{
+		if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host, NULL,
+				NULL, NULL, user_timezone, &script.command, MACRO_TYPE_SCRIPT, error, sizeof(error)))
+		{
+			goto fail;
+		}
+
+		/* expand macros in command_orig used for non-secure logging */
+		if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, &user->userid, NULL, &host, NULL, NULL, NULL,
+				user_timezone, &script.command_orig, MACRO_TYPE_SCRIPT, error, sizeof(error)))
+		{
+			/* script command_orig is a copy of script command - if the script command  */
+			/* macro substitution succeeded, then it will succeed also for command_orig */
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto fail;
+		}
+
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		{
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host,
+					NULL, NULL, NULL, user_timezone, &webhook_params, MACRO_TYPE_SCRIPT, error,
+					sizeof(error)))
+			{
+				goto fail;
+			}
+		}
 	}
 
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
