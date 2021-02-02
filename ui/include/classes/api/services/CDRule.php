@@ -588,7 +588,7 @@ class CDRule extends CApiService {
 				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
 						|| $dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					if (!array_key_exists('snmpv3_authprotocol', $dcheck)
-							|| !in_array($dcheck['snmpv3_authprotocol'], array_keys(getSnmpV3AuthProtocols()))) {
+							|| !array_key_exists($dcheck['snmpv3_authprotocol'], getSnmpV3AuthProtocols())) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value "%1$s" for "%2$s" field.',
 								$dcheck['snmpv3_authprotocol'], 'snmpv3_authprotocol'
@@ -600,7 +600,7 @@ class CDRule extends CApiService {
 				// snmpv3 privprotocol
 				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					if (!array_key_exists('snmpv3_privprotocol', $dcheck)
-							|| !in_array($dcheck['snmpv3_privprotocol'], array_keys(getSnmpV3PrivProtocols()))) {
+							|| !array_key_exists($dcheck['snmpv3_privprotocol'], getSnmpV3PrivProtocols())) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value "%1$s" for "%2$s" field.',
 								$dcheck['snmpv3_privprotocol'], 'snmpv3_privprotocol'
