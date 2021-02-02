@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-29T22:51:17Z'
+  date: '2021-02-02T13:28:33Z'
   groups:
     -
       name: 'Templates/Video surveillance'
@@ -380,7 +380,7 @@ zabbix_export:
           history: 7d
           applications:
             -
-              name: 'Zabbix raw items'
+              name: Status
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -440,7 +440,7 @@ zabbix_export:
           history: 7d
           applications:
             -
-              name: 'Zabbix raw items'
+              name: Status
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -500,7 +500,7 @@ zabbix_export:
           history: 7d
           applications:
             -
-              name: 'Zabbix raw items'
+              name: Status
           valuemap:
             name: 'Login status'
           preprocessing:
