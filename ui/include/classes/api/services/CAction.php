@@ -113,7 +113,6 @@ class CAction extends CApiService {
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
 	 * @param array $options['actionids']
-	 * @param array $options['applicationids']
 	 * @param array $options['status']
 	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']

@@ -186,40 +186,6 @@ class CControllerPopupMassupdateItem extends CController {
 				try {
 					DBstart();
 
-					if (array_key_exists('applications', $visible)) {
-						$massupdate_app_action = $this->getInput('massupdate_app_action');
-
-						if ($massupdate_app_action == ZBX_ACTION_ADD || $massupdate_app_action == ZBX_ACTION_REPLACE) {
-							$new_applications = [];
-
-							foreach ($applications as $application) {
-								if (is_array($application) && array_key_exists('new', $application)) {
-									$new_applications[] = [
-										'name' => $application['new'],
-										'hostid' => $this->getInput('hostid')
-									];
-								}
-								else {
-									$applicationids[] = $application;
-								}
-							}
-
-							if ($new_applications) {
-								if ($new_application = API::Application()->create($new_applications)) {
-									$applicationids = array_merge($applicationids, $new_application['applicationids']);
-								}
-								else {
-									throw new Exception();
-								}
-							}
-						}
-						else {
-							foreach ($applications as $application) {
-								$applicationids[] = $application;
-							}
-						}
-					}
-
 					$items = API::Item()->get([
 						'output' => ['itemid', 'flags', 'type'],
 						'selectTags' => array_key_exists('tags', $visible) ? ['tag', 'value'] : null,
@@ -476,7 +442,7 @@ class CControllerPopupMassupdateItem extends CController {
 				$data['displayMasteritems'] = false;
 			}
 			else {
-				// Get template count to display applications multiselect only for single template.
+				// Get template count to hide fields available only when editing single template.
 				$templates = API::Template()->get([
 					'output' => ['templateid'],
 					'itemids' => $data['ids']

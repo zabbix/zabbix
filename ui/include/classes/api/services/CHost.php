@@ -38,7 +38,6 @@ class CHost extends CHostGeneral {
 	 * @param array         $options['triggerids']                         Select hosts by trigger IDs.
 	 * @param array         $options['maintenanceids']                     Select hosts by maintenance IDs.
 	 * @param array         $options['graphids']                           Select hosts by graph IDs.
-	 * @param array         $options['applicationids']                     Select hosts by application IDs.
 	 * @param array         $options['dserviceids']                        Select hosts by discovery service IDs.
 	 * @param array         $options['httptestids']                        Select hosts by web scenario IDs.
 	 * @param bool          $options['monitored_hosts']                    Return only monitored hosts.
@@ -109,7 +108,6 @@ class CHost extends CHostGeneral {
 			'triggerids'						=> null,
 			'maintenanceids'					=> null,
 			'graphids'							=> null,
-			'applicationids'					=> null,
 			'dserviceids'						=> null,
 			'httptestids'						=> null,
 			'monitored_hosts'					=> null,
@@ -275,15 +273,6 @@ class CHost extends CHostGeneral {
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
-
-		// applicationids
-		if (!is_null($options['applicationids'])) {
-			zbx_value2array($options['applicationids']);
-
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
-			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
 		// dserviceids
