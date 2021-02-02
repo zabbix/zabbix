@@ -194,10 +194,8 @@ $filter
 	->addVar('subfilter_types', $data['filter_data']['subfilter_types'])
 	->addVar('subfilter_value_types', $data['filter_data']['subfilter_value_types'])
 	->addVar('subfilter_status', $data['filter_data']['subfilter_status'])
-	->addVar('subfilter_state', $data['filter_data']['subfilter_state'])
 	->addVar('subfilter_inherited', $data['filter_data']['subfilter_inherited'])
 	->addVar('subfilter_with_triggers', $data['filter_data']['subfilter_with_triggers'])
-	->addVar('subfilter_discovered', $data['filter_data']['subfilter_discovered'])
 	->addVar('subfilter_history', $data['filter_data']['subfilter_history'])
 	->addVar('subfilter_trends', $data['filter_data']['subfilter_trends'])
 	->addVar('subfilter_interval', $data['filter_data']['subfilter_interval'])
@@ -206,5 +204,11 @@ $filter
 		[$filter_column_1, $filter_column_2, $filter_column_3],
 		$data['subfilter']
 	);
+
+if ($data['context'] === 'host') {
+	$filter
+		->addVar('subfilter_state', $data['filter_data']['subfilter_state'])
+		->addVar('subfilter_discovered', $data['filter_data']['subfilter_discovered']);
+}
 
 $filter->show();
