@@ -16,7 +16,7 @@ out:
   return: SUCCEED
   value: 0.2
 ---
-test case: Evaluate last(2) <- 0.1, 0.2
+test case: Evaluate last(#2) <- 0.1, 0.2
 in:
   history:
   - itemid: 1
@@ -28,7 +28,7 @@ in:
       ts: 2017-01-10 10:00:30.000000000 +00:00
   time: 2017-01-10 10:10:00.000000000 +00:00
   function: last
-  params: '2'
+  params: '#2'
 out:
   return: SUCCEED
   value: 0.1
@@ -131,7 +131,7 @@ out:
   return: SUCCEED
   value: 0.1
 ---
-test case: Evaluate avg(2) 
+test case: Evaluate avg(#2) 
 in:
   history:
   - itemid: 1
@@ -149,7 +149,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: avg
-  params: 2
+  params: '#2'
 out:
   return: SUCCEED
   value: 4.5
@@ -177,7 +177,7 @@ out:
   return: SUCCEED
   value: 4
 ---
-test case: Evaluate avg(2:now-1m) 
+test case: Evaluate avg(180) 
 in:
   history:
   - itemid: 1
@@ -195,12 +195,35 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: avg
-  params: 2:now-1m
+  params: 180
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate avg(#2:now-1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: avg
+  params: '#2:now-1m'
 out:
   return: SUCCEED
   value: 3.5
 ---
-test case: Evaluate band(1,1) 
+test case: Evaluate band(#1,1) 
 in:
   history:
   - itemid: 1
@@ -218,12 +241,12 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: band
-  params: '1,1'
+  params: '#1,1'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate band(2,1) 
+test case: Evaluate band(#2,1) 
 in:
   history:
   - itemid: 1
@@ -241,12 +264,12 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: band
-  params: '2,1'
+  params: '#2,1'
 out:
   return: SUCCEED
   value: 0
 ---
-test case: Evaluate band(2:now-1m,2) 
+test case: Evaluate band(#2:now-1m,2) 
 in:
   history:
   - itemid: 1
@@ -264,12 +287,12 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: band
-  params: '2:now-1m,2'
+  params: '#2:now-1m,2'
 out:
   return: SUCCEED
   value: 2
 ---
-test case: Evaluate count(3,ge,4) 
+test case: Evaluate count(#3,ge,4) 
 in:
   history:
   - itemid: 1
@@ -287,7 +310,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: count
-  params: '3,ge,4'
+  params: '#3,ge,4'
 out:
   return: SUCCEED
   value: 2
@@ -311,6 +334,29 @@ in:
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: count
   params: '5m,like,"o"'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate count(300,like,"o") 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '300,like,"o"'
 out:
   return: SUCCEED
   value: 2
@@ -361,7 +407,7 @@ out:
   return: SUCCEED
   value: 3
 ---
-test case: Evaluate count(3,band,1/3) 
+test case: Evaluate count(5m,band,1/3) 
 in:
   history:
   - itemid: 1
@@ -407,7 +453,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate forecast(5,1h) 
+test case: Evaluate forecast(#5,1h) 
 in:
   history:
   - itemid: 1
@@ -425,12 +471,12 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: forecast
-  params: '5,1h'
+  params: '#5,1h'
 out:
   return: SUCCEED
   value: 65
 ---
-test case: Evaluate forecast(5:now-1h,1h) 
+test case: Evaluate forecast(#5:now-1h,1h) 
 in:
   history:
   - itemid: 1
@@ -448,7 +494,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: forecast
-  params: '5:now-1h,1h'
+  params: '#5:now-1h,1h'
 out:
   return: SUCCEED
   value: -1
@@ -483,7 +529,7 @@ out:
   return: SUCCEED
   value: 0
 ---
-test case: Evaluate find(5,"iregexp","^o") 
+test case: Evaluate find(#5,"iregexp","^o") 
 in:
   history:
   - itemid: 1
@@ -495,12 +541,12 @@ in:
       ts: 2017-01-10 10:02:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: find
-  params: '5,"iregexp","^o"'
+  params: '#5,"iregexp","^o"'
 out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate find(5,"regexp","^o") 
+test case: Evaluate find(#5,"regexp","^o") 
 in:
   history:
   - itemid: 1
@@ -512,12 +558,12 @@ in:
       ts: 2017-01-10 10:02:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: find
-  params: '5,"regexp","^o"'
+  params: '#5,"regexp","^o"'
 out:
   return: SUCCEED
   value: 0
 ---
-test case: Evaluate find(5,"like","o") 
+test case: Evaluate find(#5,"like","o") 
 in:
   history:
   - itemid: 1
@@ -529,7 +575,7 @@ in:
       ts: 2017-01-10 10:02:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: find
-  params: '5,"like","o"'
+  params: '#5,"like","o"'
 out:
   return: SUCCEED
   value: 1
@@ -797,7 +843,7 @@ out:
   return: SUCCEED
   value: 3
 ---
-test case: Evaluate sum(4) 
+test case: Evaluate sum(#4) 
 in:
   history:
   - itemid: 1
@@ -815,7 +861,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: sum
-  params: '4'
+  params: '#4'
 out:
   return: SUCCEED
   value: 14
@@ -874,7 +920,7 @@ out:
   return: SUCCEED
   value: 30
 ---
-test case: Evaluate sum(2) 
+test case: Evaluate sum(#2) 
 in:
   history:
   - itemid: 1
@@ -900,7 +946,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: sum
-  params: '2'
+  params: '#2'
 out:
   return: SUCCEED
   value: 17
@@ -936,7 +982,7 @@ out:
   return: SUCCEED
   value: 22
 ---
-test case: Evaluate sum(2:now-1m) 
+test case: Evaluate sum(#2:now-1m) 
 in:
   history:
   - itemid: 1
@@ -962,7 +1008,7 @@ in:
       ts: 2017-01-10 10:05:00.000000000 +00:00
   time: 2017-01-10 10:05:00.000000000 +00:00
   function: sum
-  params: '2:now-1m'
+  params: '#2:now-1m'
 out:
   return: SUCCEED
   value: 13

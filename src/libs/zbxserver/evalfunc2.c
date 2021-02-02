@@ -239,7 +239,7 @@ static int	get_function_parameter_hist_range(time_t from, const char *parameters
 		*value = 0;
 		*type = ZBX_VALUE_NONE;
 	}
-	else if (0 == isdigit(parameter[strlen(parameter) - 1]))
+	else if ('#' != *parameter)
 	{
 		if (SUCCEED != is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED) || 0 > *value)
 			goto out;
@@ -248,7 +248,7 @@ static int	get_function_parameter_hist_range(time_t from, const char *parameters
 	}
 	else
 	{
-		if (SUCCEED != is_uint31(parameter, value))
+		if (SUCCEED != is_uint31(parameter + 1, value))
 			goto out;
 		*type = ZBX_VALUE_NVALUES;
 	}

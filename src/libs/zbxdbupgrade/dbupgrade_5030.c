@@ -552,11 +552,11 @@ static void	dbpatch_update_func_change(zbx_uint64_t functionid, zbx_uint64_t ite
 	zbx_uint64_t	functionid2;
 	char		*replace;
 
-	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$,1",
+	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$,#1",
 			ZBX_DBPATCH_FUNCTION_UPDATE));
 
 	functionid2 = DBget_maxid("functions");
-	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid2, itemid, "last", "$,2",
+	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid2, itemid, "last", "$,#2",
 			ZBX_DBPATCH_FUNCTION_CREATE));
 
 	replace = zbx_dsprintf(NULL, "%s({" ZBX_FS_UI64 "}-{" ZBX_FS_UI64 "})", prefix, functionid, functionid2);
@@ -588,11 +588,11 @@ static void	dbpatch_update_func_diff(zbx_uint64_t functionid, zbx_uint64_t itemi
 	zbx_uint64_t	functionid2;
 	char		*replace;
 
-	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$,1",
+	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$,#1",
 			ZBX_DBPATCH_FUNCTION_UPDATE));
 
 	functionid2 = DBget_maxid("functions");
-	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid2, itemid, "last", "$,2",
+	zbx_vector_ptr_append(functions, dbpatch_new_function(functionid2, itemid, "last", "$,#2",
 			ZBX_DBPATCH_FUNCTION_CREATE));
 
 	replace = zbx_dsprintf(NULL, "({" ZBX_FS_UI64 "}<>{" ZBX_FS_UI64 "})", functionid, functionid2);
@@ -721,8 +721,8 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 
 					if ('#' == parameter[loc->l])
 					{
-						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l + 1,
-								loc->r - loc->l);
+						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
+								loc->r - loc->l + 1);
 					}
 					else
 					{
@@ -739,6 +739,9 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 
 					if ('\0' != parameter[loc->l])
 					{
+						if (',' == (*out)[out_offset - 1])
+							zbx_strcpy_alloc(out, &out_alloc, &out_offset, "#1");
+
 						zbx_strcpy_alloc(out, &out_alloc, &out_offset, ":now-");
 						zbx_strncpy_alloc(out, &out_alloc, &out_offset, parameter + loc->l,
 								loc->r - loc->l + 1);
