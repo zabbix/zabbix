@@ -522,7 +522,7 @@ if ($data['displayMasteritems']) {
 		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
 		(new CDiv([
 			(new CVar('master_itemname')),
-			$master_item,
+			$master_item
 		]))->setId('master_item')
 	);
 }

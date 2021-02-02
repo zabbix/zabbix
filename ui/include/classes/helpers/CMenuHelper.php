@@ -232,7 +232,7 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
-					->setSubMenu(new CMenu([
+					->setSubMenu(new CMenu(array_filter([
 						(new CMenuItem(_('GUI')))
 							->setAction('gui.edit'),
 						(new CMenuItem(_('Autoregistration')))
@@ -258,9 +258,14 @@ class CMenuHelper {
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
+						(!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS))
+							? (new CMenuItem(_('API tokens')))
+								->setAction('token.list')
+								->setAliases(['token.edit', 'token.view'])
+							: null,
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
-					]))
+					])))
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				? (new CMenuItem(_('Proxies')))
@@ -366,6 +371,20 @@ class CMenuHelper {
 				(new CMenuItem(_('Guest user')))
 					->setIcon('icon-guest')
 					->setTitle(getUserFullname($user))
+			);
+		}
+		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+			$menu->add(
+				(new CMenuItem(_('User settings')))
+					->setIcon('icon-profile')
+					->setTitle(getUserFullname($user))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Profile')))
+							->setAction('userprofile.edit'),
+						(new CMenuItem(_('API tokens')))
+							->setAction('user.token.list')
+							->setAliases(['user.token.view', 'user.token.edit'])
+					]))
 			);
 		}
 		else {

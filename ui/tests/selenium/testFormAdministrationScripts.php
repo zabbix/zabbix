@@ -33,6 +33,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 			[
 				[
 					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'type', 'value' => 'Script', 'type' => 'select'],
 					['name' => 'command', 'value' => 'run', 'type' => 'text']
 				],
 				true,
@@ -44,8 +45,9 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 			[
 				[
 					['name' => 'name', 'value' => 'script1', 'type' => 'text'],
-					['name' => 'command', 'value' => 'run', 'type' => 'text'],
-					['name' => 'type', 'value' => 'IPMI', 'type' => 'select']
+					['name' => 'type', 'value' => 'IPMI', 'type' => 'select'],
+					['name' => 'commandipmi', 'value' => 'run', 'type' => 'text']
+
 				],
 				true,
 				[
@@ -57,6 +59,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 			[
 				[
 					['name' => 'name', 'value' => 'script2', 'type' => 'text'],
+					['name' => 'type', 'value' => 'Script', 'type' => 'select'],
 					['name' => 'command', 'value' => 'run', 'type' => 'text'],
 					['name' => 'enable_confirmation', 'type' => 'check']
 				],
@@ -66,6 +69,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 			[
 				[
 					['name' => 'name', 'value' => 'script3', 'type' => 'text'],
+					['name' => 'type', 'value' => 'Script', 'type' => 'select'],
 					['name' => 'command', 'value' => '', 'type' => 'text']
 				],
 				false,
@@ -85,8 +89,9 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent(['Type']);
 		$this->zbxTestAssertElementPresentId('type');
-		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_0']", 'IPMI');
+		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_0']", 'Webhook');
 		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_1']", 'Script');
+		$this->zbxTestAssertElementText("//ul[@id='type']//label[@for='type_2']", 'IPMI');
 
 		$this->zbxTestTextPresent(['Execute on', 'Zabbix agent', 'Zabbix server']);
 		$this->zbxTestAssertElementPresentId('execute_on_0');

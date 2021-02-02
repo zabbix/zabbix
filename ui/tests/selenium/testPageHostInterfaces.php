@@ -343,7 +343,7 @@ class testPageHostInterfaces extends CWebTest {
 									'Interface' => "zabbixzabbixzabbix.com:10050\nSNMPv2, Community: {\$SNMP_COMMUNITY}",
 									'Status' => [
 										'text' => 'Available',
-										'color' => self::GREEN,
+										'color' => self::GREEN
 									],
 									'Error' => ''
 								]

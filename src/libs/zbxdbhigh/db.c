@@ -3505,6 +3505,56 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_user_by_auth_token                                         *
+ *                                                                            *
+ * Purpose: validate that token is not expired and is active and then get     *
+ *          associated user data                                              *
+ *                                                                            *
+ * Parameters: formatted_auth_token_hash - [IN] auth token to validate        *
+ *             user                      - [OUT] user information             *
+ *                                                                            *
+ * Return value:  SUCCEED - token is valid and user data was retrieved        *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user)
+{
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() auth token:%s", __func__, formatted_auth_token_hash);
+
+	if (NULL == (result = DBselect(
+			"select u.userid,u.roleid,r.type"
+				" from token t,users u,role r"
+			" where t.userid=u.userid"
+				" and t.token='%s'"
+				" and u.roleid=r.roleid"
+				" and t.status=%d"
+				" and (t.expires_at=%d or t.expires_at > %lu)",
+			formatted_auth_token_hash, ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_NEVER_EXPIRES, time(NULL))))
+	{
+		goto out;
+	}
+
+	if (NULL == (row = DBfetch(result)))
+		goto out;
+
+	ZBX_STR2UINT64(user->userid, row[0]);
+	ZBX_STR2UINT64(user->roleid, row[1]);
+	user->type = atoi(row[2]);
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_db_mock_field_init                                           *
  *                                                                            *
  * Purpose: initializes mock field                                            *

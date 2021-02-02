@@ -623,8 +623,7 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				$check_box,
 				$description,
-				$script_execute_on,
-				zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'))
+				$script_execute_on
 			]);
 		}
 		unset($data['table_records']);
