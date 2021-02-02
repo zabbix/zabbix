@@ -539,7 +539,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 					$item['valuemapid'] = $valuemapids_map[$item['valuemapid']][$dstHost['hostid']];
 				}
 				else {
-					error(_s('Valuemap "%1$s" is not available on "%2$s".', $src_valuemaps[$item['valuemapid']],
+					error(_s('Valuemap "%1$s" is not available on "%2$s".', $src_valuemaps[$item['valuemapid']]['name'],
 						$dstHost['host']
 					));
 					return false;
