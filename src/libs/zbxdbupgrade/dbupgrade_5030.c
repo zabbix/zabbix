@@ -847,6 +847,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	zbx_vector_uint64_t		hostids;
 	zbx_dbpatch_common_function_t	*func;
 
+
 	zbx_vector_loc_create(&params);
 	zbx_vector_ptr_create(&common_functions);
 	zbx_vector_uint64_create(&hostids);
@@ -863,11 +864,13 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*parameter = NULL;
+		char		*parameter = NULL;
+		unsigned char	value_type;
 
 		ZBX_STR2UINT64(functionid, row[0]);
 		ZBX_STR2UINT64(itemid, row[1]);
 		ZBX_STR2UINT64(hostid, row[5]);
+		ZBX_STR2UCHAR(value_type, row[4]);
 
 		if (0 == strcmp(row[2], "date") || 0 == strcmp(row[2], "dayofmonth") ||
 				0 == strcmp(row[2], "dayofweek") || 0 == strcmp(row[2], "now") ||
@@ -893,7 +896,10 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 		if (0 == strcmp(row[2], "abschange"))
 		{
-			dbpatch_update_func_change(functionid, itemid, "abs", trigger, functions);
+			if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
+				dbpatch_update_func_change(functionid, itemid, "abs", trigger, functions);
+			else
+				dbpatch_update_func_diff(functionid, itemid, trigger, functions);
 		}
 		else if (0 == strcmp(row[2], "avg") || 0 == strcmp(row[2], "max") || 0 == strcmp(row[2], "min") ||
 				0 == strcmp(row[2], "sum"))
@@ -906,7 +912,10 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		}
 		else if (0 == strcmp(row[2], "change"))
 		{
-			dbpatch_update_func_change(functionid, itemid, "", trigger, functions);
+			if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
+				dbpatch_update_func_change(functionid, itemid, "", trigger, functions);
+			else
+				dbpatch_update_func_diff(functionid, itemid, trigger, functions);
 		}
 		else if (0 == strcmp(row[2], "delta"))
 		{
@@ -990,15 +999,12 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		}
 		else if (0 == strcmp(row[2], "count"))
 		{
-			int		arg_type = ZBX_DBPATCH_ARG_STR;
-			unsigned char	value_type;
+			int	arg_type = ZBX_DBPATCH_ARG_STR;
 
 			if (3 <= params.values_num)
 			{
 				const char	*op = row[3] + params.values[2].l,
 						*pattern =  row[3] + params.values[1].l, *ptr;
-
-				ZBX_STR2UCHAR(value_type, row[4]);
 
 				/* set numeric pattern type for numeric items unless regexp/iregexp opeation is */
 				/* performed or band operation pattern contains mask (separated by '/')         */
