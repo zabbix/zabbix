@@ -707,7 +707,7 @@ class CScript extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'scriptid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'hostid' =>		['type' => API_ID],
-			'eventid' =>	['type' => API_ID],
+			'eventid' =>	['type' => API_ID]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

@@ -125,7 +125,7 @@ class CLegacyAction extends CAction {
 
 		if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
-				CRoleHelper::UI_REPORTS_ACTION_LOG => ['auditacts.php'],
+				CRoleHelper::UI_REPORTS_ACTION_LOG => ['auditacts.php']
 			];
 		}
 

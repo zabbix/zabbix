@@ -565,7 +565,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '0M',
-						'On status change triggers blink for' => '0M',
+						'On status change triggers blink for' => '0M'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": a time unit is expected.',
@@ -579,7 +579,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '0y',
-						'On status change triggers blink for' => '0y',
+						'On status change triggers blink for' => '0y'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": a time unit is expected.',
@@ -593,7 +593,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '86401',
-						'On status change triggers blink for' => '86401',
+						'On status change triggers blink for' => '86401'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": value must be one of 0-86400.',
@@ -607,7 +607,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '86401s',
-						'On status change triggers blink for' => '86401s',
+						'On status change triggers blink for' => '86401s'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": value must be one of 0-86400.',
@@ -621,7 +621,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '1441m',
-						'On status change triggers blink for' => '1441m',
+						'On status change triggers blink for' => '1441m'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": value must be one of 0-86400.',
@@ -635,7 +635,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '25h',
-						'On status change triggers blink for' => '25h',
+						'On status change triggers blink for' => '25h'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": value must be one of 0-86400.',
@@ -649,7 +649,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '2d',
-						'On status change triggers blink for' => '2d',
+						'On status change triggers blink for' => '2d'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": value must be one of 0-86400.',
@@ -663,7 +663,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Display OK triggers for' => '99999999999999999999999999999999',
-						'On status change triggers blink for' => '99999999999999999999999999999999',
+						'On status change triggers blink for' => '99999999999999999999999999999999'
 					],
 					'details' => [
 						'Incorrect value for field "ok_period": value must be one of 0-86400.',

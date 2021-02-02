@@ -27,7 +27,7 @@
 #include "xml.h"
 #include "embed.h"
 
-#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 10)
+#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
 #define ZBX_ES_TIMEOUT		10
 
 #define ZBX_ES_STACK_LIMIT	1000

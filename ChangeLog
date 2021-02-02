@@ -1,3 +1,10 @@
+Changes for 5.4.0alpha2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.4.0alpha1
 
 New features:
@@ -61,6 +68,10 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 Changes for 5.2.5rc1
 
 New features:
+.......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
+.......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
+..F.....S. [ZBXNEXT-6399] added support of host and item macros for Script item parameters (viktors, vmaksimovs)
 
 Bug fixes:
 
@@ -89,6 +100,7 @@ New features:
 A.F....PS. [ZBXNEXT-6257] implemented Check for not supported value preprocessing step test (akozlovs, talbergs)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
 ..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
 .......PS. [ZBX-18860] fixed crash of log item during "Check for not supported value" preprocessing step (akozlovs)
 ...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
@@ -447,6 +459,9 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.9rc1
 
 New features:
+.......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
+.......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
+.......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
 
 Bug fixes:
 
@@ -472,6 +487,7 @@ New features:
 ..F....... [ZBXNEXT-6364] removed long lists of cloned objects from host and template full clone forms (Ivo)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
 ..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
 ...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
 A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
@@ -2400,6 +2416,7 @@ New features:
 .....J.... [ZBXNEXT-6307] added ability to read properties from a file (vso)
 
 Bug fixes:
+..F....... [ZBX-18942] fixed missing SID valiadion in authentication update route (talbergs)
 ..F....... [ZBX-18893] changed frontend config file permissions to 0600 (talbergs, yurii)
 ...G...PS. [ZBX-18884] fixed crash in web monitoring and web.page.* keys when encoding non ASCII characters in URL (vso)
 A.F....... [ZBX-18865] fixed dbConditionInt (db.inc.php) returning wrong result in rare cases (averza)
