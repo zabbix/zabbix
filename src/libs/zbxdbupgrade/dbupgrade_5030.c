@@ -539,7 +539,7 @@ static void	dbpatch_update_trigger(zbx_dbpatch_trigger_t *trigger, zbx_uint64_t 
 	if (SUCCEED == dbpatch_update_trigger_expression(&trigger->expression, functionid, replace))
 		trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_EXPRESSION;
 
-	if (TRIGGER_RECOVERY_MODE_EXPRESSION == trigger->recovery_mode)
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
 	{
 		if (SUCCEED == dbpatch_update_trigger_expression(&trigger->recovery_expression, functionid, replace))
 			trigger->flags |= ZBX_DBPATCH_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
