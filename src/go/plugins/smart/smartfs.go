@@ -35,6 +35,8 @@ import (
 
 const supportedSmartctl = 7.1
 
+const satType = "sat"
+
 var (
 	cpuCount     int
 	lastVerCheck time.Time
@@ -362,7 +364,7 @@ runner:
 		for {
 			var name string
 
-			if raid.rType == "sat" {
+			if raid.rType == satType {
 				name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
 			} else {
 				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
@@ -399,7 +401,7 @@ runner:
 			}
 
 			if dp.SmartStatus != nil {
-				if raid.rType == "sat" {
+				if raid.rType == satType {
 					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
 				} else {
 					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
@@ -408,6 +410,10 @@ runner:
 				if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
 					continue runner
 				}
+			}
+
+			if raid.rType == satType {
+				continue runner
 			}
 
 			i++
@@ -431,7 +437,7 @@ func (r *runner) setRaidDevices(dp deviceParser, device []byte, raidType string,
 			r.devices = append(r.devices, dp)
 		}
 
-		if raidType == "sat" {
+		if raidType == satType {
 			return true
 		}
 	} else {
