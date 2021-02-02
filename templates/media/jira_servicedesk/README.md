@@ -34,7 +34,7 @@ You can use "{EVENT.DATE}T{EVENT.TIME}" pattern, all dots from Zabbix yyyy.MM.dd
 Though a "Send to" field is not used in the Jira Service Desk webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into Jira Service Desk tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Jira Service Desk](https://confluence.atlassian.com/servicedesk) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Jira Service Desk](https://confluence.atlassian.com/servicedesk) documentations.
 
 ## Supported Versions
 Zabbix 5.0

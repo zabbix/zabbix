@@ -64,7 +64,7 @@ The **Send to** field can contain several variants of values:
 [![](images/thumb.11.png?raw=true)](images/11.png)
 [![](images/thumb.12.png?raw=true)](images/12.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
 
 ## Supported Versions
 

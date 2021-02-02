@@ -21,39 +21,35 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
-const (
-	keyPostgresDatabasesAge = "pgsql.db.age"
-)
+// processNameDiscoveryHandler gets names of all sender processes in pg_stat_replication
+// and returns JSON if all is OK or nil otherwise.
+func processNameDiscoveryHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var appNameJSON string
 
-// databasesAgeHandler gets age of each database respectively or nil otherwise.
-func (p *Plugin) databasesAgeHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
-	var countAge int64
-	// for now we are expecting only database name as a param
-	if len(params) == 0 {
-		return nil, errorFourthParamEmpty
-	}
-	if len(params[0]) == 0 {
-		return nil, errorFourthParamLen
-	}
+	query := `SELECT 
+	json_build_object('data',json_agg(json_build_object('{#APPLICATION_NAME}',CONCAT(application_name, ' ', pid))))		
+	FROM pg_stat_replication`
 
-	err := conn.postgresPool.QueryRow(context.Background(),
-		`SELECT age(datfrozenxid)
-		FROM pg_catalog.pg_database
-   		WHERE datistemplate = false
-			 AND datname = $1;`,
-		params[0]).Scan(&countAge)
-
+	row, err := conn.QueryRow(ctx, query)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
-		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	return countAge, nil
+
+	err = row.Scan(&appNameJSON)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+		}
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return appNameJSON, nil
 }

@@ -22,21 +22,23 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
 
-func TestPlugin_oldestHandler(t *testing.T) {
-
-	// create pool or aquare conn from old pool for test
-	sharedPool, err := getConnPool(t)
+func TestPlugin_databasesSizeHandler(t *testing.T) {
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -45,21 +47,20 @@ func TestPlugin_oldestHandler(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			fmt.Sprintf("oldestHandler() should return ptr to Pool for oldestHandler()"),
+			fmt.Sprintf("databaseSizeHandler should return size of each database "),
 			&impl,
-			args{conn: sharedPool},
+			args{context.Background(), sharedPool, keyDatabaseSize, testParamDatabase, []string{}},
+
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.p.oldestHandler(tt.args.conn, keyPostgresOldestXid, tt.args.params)
+			_, err := databaseSizeHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.oldestHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Plugin.databaseSizeHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
 		})
 	}
-
 }

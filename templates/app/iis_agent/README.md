@@ -21,9 +21,9 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/5.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-1\. [Import](https://www.zabbix.com/documentation/current/manual/xml_export_import/templates) the template ([template_app_iis_agent.xml](template_app_iis_agent.xml) or [template_app_iis_agent_active.xml](template_app_iis_agent_active.xml)) into Zabbix.
+1\. [Import](https://www.zabbix.com/documentation/5.0/manual/xml_export_import/templates) the template ([template_app_iis_agent.xml](template_app_iis_agent.xml) or [template_app_iis_agent_active.xml](template_app_iis_agent_active.xml)) into Zabbix.
 
-2\. [Link](https://www.zabbix.com/documentation/current/manual/config/templates/linking) the imported template to a host with IIS.
+2\. [Link](https://www.zabbix.com/documentation/5.0/manual/config/templates/linking) the imported template to a host with IIS.
 
 3\. Optionally, it is possible to customize the template:
   - Set value for the macro {$IIS.QUEUE.MAX.WARN}, if you want to receive alerts when a number of requests in the application pool queue exceeds the threshold.
@@ -47,7 +47,7 @@ No specific Zabbix configuration is required.
 |{$IIS.PORT} |<p>Listening port.</p> |`80` |
 |{$IIS.QUEUE.MAX.TIME} |<p>The time during which the queue length may exceed the threshold.</p> |`5m` |
 |{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression.</p> |`` |
-|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/current/ru/manual/config/items/itemtypes/simple_checks</p> |`http` |
+|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.0/manual/config/items/itemtypes/simple_checks</p> |`http` |
 
 ## Template links
 

@@ -20,19 +20,34 @@
 package postgres
 
 import (
+	"context"
 	"errors"
+
+	"github.com/jackc/pgx/v4"
+	"zabbix.com/pkg/zbxerr"
 )
 
-func validateHost(host string) (err error) {
-	if len(host) == 0 {
-		return errors.New("Hostname cannot be empty")
-	}
-	return
-}
+// oldestXIDHandler gets age of the oldest xid if all is OK or nil otherwise.
+func oldestXIDHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
+	var resultXID int64
 
-func validateDatabase(database string) (err error) {
-	if len(database) < 1 || len(database) > 63 || database == "" {
-		return errors.New("size name of database must be between 1 and 63 bytes")
+	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
+				FROM pg_catalog.pg_stat_activity`
+
+	row, err := conn.QueryRow(ctx, query)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	return
+
+	err = row.Scan(&resultXID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+		}
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	return resultXID, nil
 }

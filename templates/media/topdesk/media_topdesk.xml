@@ -332,7 +332,7 @@ catch (error) {&#13;
             <show_event_menu>YES</show_event_menu>
             <event_menu_url>{EVENT.TAGS.__zbx_tpd_issuelink}</event_menu_url>
             <event_menu_name>TOPdesk: {EVENT.TAGS.__zbx_tpd_issuekey}</event_menu_name>
-            <description>Please refer to https://developers.topdesk.com/documentation/index.html and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.&#13;
+            <description>Please refer to https://developers.topdesk.com/documentation/index.html and https://www.zabbix.com/documentation/5.0/manual/config/notifications/media/webhook#example_scripts.&#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
 Add a dedicated user with the media type &quot;TOPdesk&quot;.&#13;
