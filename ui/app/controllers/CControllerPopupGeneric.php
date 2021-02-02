@@ -1365,8 +1365,9 @@ class CControllerPopupGeneric extends CController {
 
 			case 'valuemaps':
 				/**
-				 * with_inherited    Search value map in host and host template value maps.
-				 * show_host_name    Display host name as value map prefix in value maps popup.
+				 * with_inherited    Show list of value map on host and host template.
+				 * show_host_name    Display host name as value map prefix in value maps popup. If this property is not
+				 *                   set only unique names of value maps will be shown.
 				 */
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
@@ -1425,8 +1426,7 @@ class CControllerPopupGeneric extends CController {
 					}
 				}
 
-				if ($this->getInput('multiselect', 0)) {
-					// In multiselect mode show only unique value maps names across all selected hosts.
+				if (!$this->getInput('show_host_name', 0)) {
 					$records = array_column($records, null, 'name');
 				}
 
