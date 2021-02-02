@@ -46,7 +46,7 @@ This guide describes how to integrate your Zabbix 4.4 installation with Mattermo
 
 [![](images/thumb.10.png?raw=true)](images/10.png)
 
-2\. In the **Administration** > **Media types** section, import the [media_mattermost.xml](media_mattermost.xml)
+2\. In the **Administration** > **Media types** section, import the [media_mattermost.yaml](media_mattermost.yaml)
 
 3\. Open the added **Mattermost** media type and set **bot_token** to the previously created token and **mattermost_url** to the **frontend URL** of your **Mattermost** installation.
 
@@ -81,7 +81,7 @@ You can view the channel identifier in the channel properties.
 [![](images/thumb.7.png?raw=true)](images/7.png)
 [![](images/thumb.6.png?raw=true)](images/6.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
 
 ## Supported Versions
 

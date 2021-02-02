@@ -16,7 +16,7 @@ As an example, this macro can be used to populate ServiceNow's custom field with
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-2\. In the "*Administration -> Media types*" section, import the [media_servicenow.xml](media_servicenow.xml)
+2\. In the "*Administration -> Media types*" section, import the [media_servicenow.yaml](media_servicenow.yaml)
 
 3\. Open the newly added **ServiceNow** media type and replace all *&lt;PLACEHOLDERS&gt;* with your values.<br>
 The following parameters are required:<br>
@@ -37,7 +37,7 @@ To export information into a ServiceNow custom field, add a parameter with the c
 The **Send to** field must contain the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/).<br>
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into ServiceNow tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
 
 ## Supported Versions
 Zabbix 5.0

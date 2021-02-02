@@ -33,7 +33,7 @@ This guide describes how to integrate your Zabbix 4.4 installation with Slack us
 
 [![](images/thumb.8.png?raw=true)](images/8.png)
 
-2\. In the **Administration** > **Media types** section, import the [media_slack.xml](media_slack.xml)
+2\. In the **Administration** > **Media types** section, import the [media_slack.yaml](media_slack.yaml)
 
 3\. Open the added **Slack** media type and set **bot_token** to the previously created token.
 
@@ -64,7 +64,7 @@ The **Send to** field can contain several variants of values:
 [![](images/thumb.11.png?raw=true)](images/11.png)
 [![](images/thumb.12.png?raw=true)](images/12.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [Slack API](https://api.slack.com) documentations.
 
 ## Supported Versions
 

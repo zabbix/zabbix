@@ -1198,7 +1198,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	}
 
 	CArrayHelper::sort($db_hosts, [
-		['field' => 'name', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
 	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);

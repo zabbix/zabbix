@@ -592,7 +592,8 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, &items[i].timeout, MACRO_TYPE_COMMON , NULL, 0);
 				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL,
-						NULL, NULL, &items[i].script_params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+						NULL, NULL, &items[i].script_params, MACRO_TYPE_SCRIPT_PARAMS_FIELD,
+						NULL, 0);
 				substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, NULL, NULL, &items[i].params, MACRO_TYPE_COMMON, NULL, 0);
 				break;

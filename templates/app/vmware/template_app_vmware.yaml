@@ -31,7 +31,7 @@ zabbix_export:
           value_type: LOG
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/current/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
+          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/5.2/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
           applications:
             -
               name: VMware

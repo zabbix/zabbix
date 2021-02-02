@@ -10,7 +10,7 @@ As an example, this macro can be used to populate Jira's custom field with URL t
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-2\. In the *Administration > Media types* section, import the [media_jira.xml](media_jira.xml).
+2\. In the *Administration > Media types* section, import the [media_jira.yaml](media_jira.yaml).
 
 3\. Open the newly added **Jira** media type and replace all *&lt;PLACEHOLDERS&gt;* with your values.<br>
 The following parameters are required:<br>
@@ -50,7 +50,7 @@ If server time is set to UTC, there is no need to add timezone at the end of par
 Though a "Send to" field is not used in Jira webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into Jira tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Jira](https://support.atlassian.com/jira-software-cloud/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [Jira](https://support.atlassian.com/jira-software-cloud/) documentations.
 
 ## Supported Versions
 Zabbix 5.0
