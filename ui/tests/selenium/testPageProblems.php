@@ -380,7 +380,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->query('name:filter_apply')->one()->click();
 		$this->page->waitUntilReady();
 
-		// We remove from the result list, templates that is not displayed there.
+		// We remove from the result list templates that is not displayed there.
 		if (array_key_exists('absence_problems', $data)) {
 			foreach ($data['absence_problems'] as $absence) {
 				if (($key = array_search($absence, $filtering)) !== false) {
@@ -388,9 +388,9 @@ class testPageProblems extends CLegacyWebTest {
 				}
 				$filtering = array_values($filtering);
 			}
-
 			$this->assertSame($filtering, $this->getTableResult('Problem'));
 		}
+
 		else {
 			$this->assertSame($data['expected_problems'], $this->getTableResult('Problem'));
 		}
@@ -676,19 +676,5 @@ class testPageProblems extends CLegacyWebTest {
 		// Click on suppression icon and check text in hintbox.
 		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/span[contains(@class, "icon-invisible")]');
 		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 2021-05-18 12:17 Maintenance: Maintenance for suppression test');
-	}
-
-	/**
-	 * Get data from chosen column.
-	 *
-	 * @param string $column		Column name, where value should be checked
-	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
-		$result = [];
-		foreach ($table->getRows() as $row) {
-			$result[] = $row->getColumn($column)->getText();
-		}
-		return $result;
 	}
 }

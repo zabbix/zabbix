@@ -395,9 +395,9 @@ class testPageTemplates extends CLegacyWebTest {
 				}
 				$filtering = array_values($filtering);
 			}
-
 			$this->assertSame($filtering, $this->getTableResult('Name'));
 		}
+
 		else {
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected_templates', []));
 		}
@@ -434,19 +434,5 @@ class testPageTemplates extends CLegacyWebTest {
 	private function resetFilter() {
 		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-	}
-
-	/**
-	 * Get data from chosen column.
-	 *
-	 * @param string $column		Column name, where value should be checked
-	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
-		$result = [];
-		foreach ($table->getRows() as $row) {
-			$result[] = $row->getColumn($column)->getText();
-		}
-		return $result;
 	}
 }
