@@ -372,19 +372,19 @@ static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session
 #ifdef HAVE_NETSNMP_STRONG_AUTH
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA224:
 			session->securityAuthProto = usmHMAC128SHA224AuthProtocol;
-			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC128SHA224AuthProtocol);
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA256:
 			session->securityAuthProto = usmHMAC192SHA256AuthProtocol;
-			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC192SHA256AuthProtocol);
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA384:
 			session->securityAuthProto = usmHMAC256SHA384AuthProtocol;
-			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC256SHA384AuthProtocol);
 			break;
 		case ITEM_SNMPV3_AUTHPROTOCOL_SHA512:
 			session->securityAuthProto = usmHMAC384SHA512AuthProtocol;
-			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC384SHA512AuthProtocol);
 			break;
 #endif
 		default:
@@ -596,22 +596,22 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192:
 						/* set the privacy protocol to AES192 */
 						session.securityPrivProto = usmAES192PrivProtocol;
-						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES192PrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256:
 						/* set the privacy protocol to AES256 */
 						session.securityPrivProto = usmAES256PrivProtocol;
-						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES256PrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192C:
 						/* set the privacy protocol to AES192 (Cisco version) */
 						session.securityPrivProto = usmAES192CiscoPrivProtocol;
-						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES192CiscoPrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256C:
 						/* set the privacy protocol to AES256 (Cisco version) */
 						session.securityPrivProto = usmAES256CiscoPrivProtocol;
-						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES256CiscoPrivProtocol);
 						break;
 #endif
 					default:
