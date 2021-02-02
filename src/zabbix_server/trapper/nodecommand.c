@@ -88,19 +88,23 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
  *                                                                            *
  * Purpose: record global script execution results into audit log             *
  *                                                                            *
+ * Comments: either 'hostid' or 'eventid' must be > 0, but not both           *
+ *                                                                            *
  ******************************************************************************/
-static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
-		zbx_uint64_t userid, const char *clientip, const char *command, unsigned char execute_on,
-		const char *output, const char *error)
+static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *command,
+		unsigned char execute_on, const char *output, const char *error)
 {
 	int		now;
 	zbx_uint64_t	auditid;
-	char		execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
+	char		execute_on_s[MAX_ID_LEN + 1], host_or_eventid[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
 
 	now = time(NULL);
 	auditid = DBget_maxid("auditlog");
 	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%d", execute_on);
-	zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, hostid);
+
+	zbx_snprintf(host_or_eventid, sizeof(host_or_eventid), ZBX_FS_UI64, (0 != hostid) ? hostid : eventid);
+
 	if (0 != proxy_hostid)
 		zbx_snprintf(proxy_hostid_s, sizeof(proxy_hostid_s), ZBX_FS_UI64, proxy_hostid);
 
@@ -121,7 +125,8 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
 
 
 		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "execute_on", execute_on_s);
-		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "hostid", hostid_s);
+		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script",
+				(0 != hostid) ? "hostid" : "eventid", host_or_eventid);
 
 		if (0 != proxy_hostid)
 		{
@@ -468,8 +473,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		else
 			perror = error;
 
-		auditlog_global_script(scriptid, hostid, host.proxy_hostid, user->userid, clientip, script.command_orig,
-				script.execute_on, poutput, perror);
+		auditlog_global_script(scriptid, hostid, eventid, host.proxy_hostid, user->userid, clientip,
+				script.command_orig, script.execute_on, poutput, perror);
 	}
 fail:
 	if (SUCCEED != ret)
