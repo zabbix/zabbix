@@ -246,7 +246,7 @@ class CMultiSelect extends CTag {
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
 					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected', 'hostids',
-					'with_inherited'
+					'with_inherited', 'show_host_name'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -322,7 +322,8 @@ class CMultiSelect extends CTag {
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
-						'with_simple_graph_item_prototypes', 'with_triggers', 'with_inherited'] as $name) {
+						'with_simple_graph_item_prototypes', 'with_triggers', 'with_inherited',
+						'show_host_name'] as $name) {
 					if (array_key_exists($name, $parameters) && $parameters[$name]) {
 						$popup_parameters[$name] = '1';
 						$autocomplete_parameters[$name] = true;

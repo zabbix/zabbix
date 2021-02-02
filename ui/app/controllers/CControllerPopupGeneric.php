@@ -1364,6 +1364,10 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'valuemaps':
+				/**
+				 * with_inherited    Search value map in host and host template value maps.
+				 * show_host_name    Display host name as value map prefix in value maps popup.
+				 */
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
 				$options = [];

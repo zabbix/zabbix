@@ -349,6 +349,7 @@ function getItemFilterForm(&$data) {
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_valuemapids_',
 					'hostids' => array_column($host_template_filter, 'id'),
+					'show_host_name' => true,
 					'with_inherited' => true,
 					'editable' => true
 				]
