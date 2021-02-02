@@ -105,7 +105,13 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
-		$this->driver = RemoteWebDriver::create('http://'.PHPUNIT_DRIVER_ADDRESS.':4444/wd/hub', $capabilities);
+		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
+
+		if (strpos($phpunit_driver_address, ':') === false) {
+			$phpunit_driver_address .= ':4444';
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
@@ -506,9 +512,11 @@ class CPage {
 	 */
 	public function removeFocus() {
 		try {
-			$this->driver->executeScript('document.activeElement.blur();');
-		} catch (Exception $ex) {
-			// Code is not missing here.
+			$this->driver->executeScript('for (var i = 0; i < 5; i++) if (document.activeElement.tagName !== "BODY")'.
+					' document.activeElement.blur(); else break;');
+		}
+		catch (\Exception $ex) {
+			throw new \Exception('Cannot remove focus.');
 		}
 	}
 

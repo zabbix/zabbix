@@ -369,6 +369,113 @@ static int	DBpatch_5030025(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5030026(void)
+{
+	const ZBX_TABLE table =
+		{"token", "tokenid", 0,
+			{
+				{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, 0, 0},
+				{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"creator_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030027(void)
+{
+	return DBcreate_index("token", "token_1", "name", 0);
+}
+
+static int	DBpatch_5030028(void)
+{
+	return DBcreate_index("token", "token_2", "userid,name", 1);
+}
+
+static int	DBpatch_5030029(void)
+{
+	return DBcreate_index("token", "token_3", "token", 1);
+}
+
+static int	DBpatch_5030030(void)
+{
+	return DBcreate_index("token", "token_4", "creator_userid", 0);
+}
+
+static int	DBpatch_5030031(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("token", 1, &field);
+}
+
+static int	DBpatch_5030032(void)
+{
+	const ZBX_FIELD field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("token", 2, &field);
+}
+
+static int	DBpatch_5030033(void)
+{
+	const ZBX_FIELD	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_5030034(void)
+{
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("scripts", &field, &old_field);
+}
+
+static int	DBpatch_5030035(void)
+{
+	const ZBX_TABLE	table =
+			{"script_param", "script_paramid", 0,
+				{
+					{"script_paramid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"scriptid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030036(void)
+{
+	const ZBX_FIELD	field = {"scriptid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("script_param", 1, &field);
+}
+
+static int	DBpatch_5030037(void)
+{
+	return DBcreate_index("script_param", "script_param_1", "scriptid,name", 1);
+}
+
+static int	DBpatch_5030038(void)
+{
+	const ZBX_FIELD field = {"type", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("scripts", &field);
+}
 #endif
 
 DBPATCH_START(5030)
@@ -401,5 +508,18 @@ DBPATCH_ADD(5030022, 0, 1)
 DBPATCH_ADD(5030023, 0, 1)
 DBPATCH_ADD(5030024, 0, 1)
 DBPATCH_ADD(5030025, 0, 1)
+DBPATCH_ADD(5030026, 0, 1)
+DBPATCH_ADD(5030027, 0, 1)
+DBPATCH_ADD(5030028, 0, 1)
+DBPATCH_ADD(5030029, 0, 1)
+DBPATCH_ADD(5030030, 0, 1)
+DBPATCH_ADD(5030031, 0, 1)
+DBPATCH_ADD(5030032, 0, 1)
+DBPATCH_ADD(5030033, 0, 1)
+DBPATCH_ADD(5030034, 0, 1)
+DBPATCH_ADD(5030035, 0, 1)
+DBPATCH_ADD(5030036, 0, 1)
+DBPATCH_ADD(5030037, 0, 1)
+DBPATCH_ADD(5030038, 0, 1)
 
 DBPATCH_END()

@@ -83,6 +83,50 @@ static duk_ret_t	es_atob(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
+ * Function: es_md5                                                           *
+ *                                                                            *
+ * Purpose: compute a md5 checksum                                            *
+ *                                                                            *
+ * Parameters: ctx - [IN] pointer to duk_context                              *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is not a string        *
+ *               - if the value stack is empty                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_md5(duk_context *ctx)
+{
+	const char	*hex = "0123456789abcdef";
+	md5_state_t	state;
+	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	int		i;
+	char		*str = NULL, *md5sum, *ptr;
+
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+
+	ptr = md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
+
+	zbx_md5_init(&state);
+	zbx_md5_append(&state, (const md5_byte_t *)str, strlen(str));
+	zbx_md5_finish(&state, hash);
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*ptr++ = hex[hash[i] >> 4];
+		*ptr++ = hex[hash[i] & 15];
+	}
+
+	*ptr = '\0';
+
+	duk_push_string(ctx, md5sum);
+	zbx_free(str);
+	zbx_free(md5sum);
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: es_init_global_functions                                         *
  *                                                                            *
  * Purpose: initializes additional global functions                           *
@@ -97,4 +141,7 @@ void	es_init_global_functions(zbx_es_t *es)
 
 	duk_push_c_function(es->env->ctx, es_btoa, 1);
 	duk_put_global_string(es->env->ctx, "btoa");
+
+	duk_push_c_function(es->env->ctx, es_md5, 1);
+	duk_put_global_string(es->env->ctx, "md5");
 }

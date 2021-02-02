@@ -842,6 +842,34 @@ function makePageFooter($with_version = true) {
 }
 
 /**
+ * Get drop-down submenu item list for the User settings section.
+ *
+ * @return array|null  Menu definition for CWidget::setTitleSubmenu.
+ */
+function getUserSettingsSubmenu(): ?array {
+	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+		return null;
+	}
+
+	$profile_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'userprofile.edit')
+		->getUrl();
+
+	$tokens_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'user.token.list')
+		->getUrl();
+
+	return [
+		'main_section' => [
+			'items' => array_filter([
+				$profile_url => _('User profile'),
+				$tokens_url  => _('API tokens')
+			])
+		]
+	];
+}
+
+/**
  * Get drop-down submenu item list for the Administration->General section.
  *
  * @return array  Menu definition for CWidget::setTitleSubmenu.
@@ -887,13 +915,19 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'module.list')
 		->getUrl();
 
+	$tokens_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'token.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
+	$can_access_tokens = (!CWebUser::isGuest() && CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS));
+
 	return [
 		'main_section' => [
-			'items' => [
+			'items' => array_filter([
 				$gui_url          => _('GUI'),
 				$autoreg_url      => _('Autoregistration'),
 				$housekeeping_url => _('Housekeeping'),
@@ -904,8 +938,9 @@ function getAdministrationGeneralSubmenu() {
 				$valuemap_url     => _('Value mapping'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
+				$tokens_url       => $can_access_tokens ? _('API tokens') : null,
 				$miscconfig_url   => _('Other')
-			]
+			])
 		]
 	];
 }

@@ -35,13 +35,15 @@ TRAPPER_LIBS = \
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
 	../../../src/zabbix_server/trapper/trapper_preproc.c  \
+	../../../src/zabbix_server/trapper/trapper_auth.c  \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)
 zbx_trapper_preproc_test_run_LDADD += @SERVER_LIBS@ 
 zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_preprocessor_test \
-	-Wl,--wrap=DBget_user_by_active_session
+	-Wl,--wrap=DBget_user_by_active_session \
+	-Wl,--wrap=DBget_user_by_auth_token
 
 zbx_trapper_preproc_test_run_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@

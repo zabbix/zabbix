@@ -7,7 +7,7 @@ INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, perio
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00');
 
 -- More user scripts
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (4,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (4, 0,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
 
 -- Add proxies
 INSERT INTO hosts (hostid, host, status, description) VALUES (20000, 'Active proxy 1', 5, '');
@@ -1478,13 +1478,13 @@ INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUE
 INSERT INTO usrgrp (usrgrpid, name) VALUES (13, 'Selenium user group');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'Selenium user group in scripts');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'Selenium user group in configuration');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'Selenium script','test',2,14,NULL,'selenium script description');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (5, 0, 'Selenium script','test',2,14,NULL,'selenium script description');
 UPDATE config SET alert_usrgrpid = 15 WHERE configid = 1;
 
 -- testPageApplication
 INSERT INTO applications (applicationid,hostid,name) VALUES (99000,10084,'Selenium test application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99000, 10084, 1, 0, 2, 'Selenium item for testPageApplication','item-with-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (99000,99000,99000);
+INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (999000,99000,99000);
 
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
@@ -1811,7 +1811,7 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99005, 15000, 'In
 INSERT INTO applications (applicationid, hostid, name) VALUES (99006, 15001, 'Inheritance application for delete with items');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (902, 99006, 99005);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99085, 15001, 1, 0, 2, 'Item for testInheritanceApplication','item-with-inheritance-app', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99001, 99006, 99085);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999001, 99006, 99085);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'Inheritance application for update');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (903, 99008, 99007);
@@ -2055,13 +2055,13 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99011, 50011, '2 
 INSERT INTO applications (applicationid, hostid, name) VALUES (99012, 50012, '3 application');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99013, 50013, '4 application');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99086, 50011, 50039, 2, 3, '1_item','trap[1]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99002, 99010, 99086);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999002, 99010, 99086);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99091, 50011, 50039, 2, 3, '2_item','trap[2]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99003, 99011, 99091);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999003, 99011, 99091);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99088, 50012, 50040, 2, 3, '3_item','trap[3]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99004, 99012, 99088);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999004, 99012, 99088);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '');
-INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99005, 99013, 99089);
+INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (999005, 99013, 99089);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', 'Macro should be resolved, host IP should be visible here: {HOST.CONN}', 0, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', 'The following url should be clickable: https://zabbix.com', 2);
 INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority, url) VALUES (100034, '1_trigger_Average', '{100034}>0', 1, 0, '1533555726', 'https://zabbix.com', 3, 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}');
@@ -2626,15 +2626,12 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90270, 1058, 0, 'rows', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90271, 1058, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90272, 1058, 0, 'rf_rate', 30);
--- change show_legend to 0 after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 1058, 0, 'show_legend', 0);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90400, 1058, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 1058, 0, 'show_legend', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (900401, 1058, 7, 'graphid', 0, 600000);
 
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (1059, 130, 'hostavail', 'Test copy Host availability', 13, 6, 5, 4);
--- add following lines after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90402, 1059, 0, 'interface_type', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90403, 1059, 0, 'interface_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90402, 1059, 0, 'interface_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90403, 1059, 0, 'interface_type', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904004, 1059, 0, 'interface_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904005, 1059, 0, 'layout', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904006, 1059, 0, 'maintenance', 1);
@@ -2698,8 +2695,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904051, 1065, 0, 'show_suppressed', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904052, 1065, 0, 'show_tags', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904053, 1065, 0, 'sort_triggers', 15);
--- change show_timeline to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904054, 1065, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904054, 1065, 0, 'show_timeline', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904055, 1065, 0, 'tag_name_format', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904056, 1065, 0, 'tags.operator.0', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904057, 1065, 0, 'tags.operator.1', 1);
@@ -2721,15 +2717,11 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904071, 1066, 0, 'show_opdata', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904072, 1066, 0, 'show_suppressed', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904073, 1066, 0, 'show_tags', 3);
--- change show_timeline to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904074, 1066, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904074, 1066, 0, 'show_timeline', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904075, 1066, 0, 'sort_triggers', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904076, 1066, 0, 'tag_name_format', 2);
--- change tags.operators to 0 after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904077, 1066, 0, 'tags.operator.0', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904078, 1066, 0, 'tags.operator.1', 0);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904079, 1066, 0, 'tags.operator.0', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904080, 1066, 0, 'tags.operator.1', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904077, 1066, 0, 'tags.operator.0', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904078, 1066, 0, 'tags.operator.1', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904081, 1066, 0, 'unacknowledged', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904082, 1066, 1, 'problem', 0, 'test4');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (904083, 1066, 1, 'tags.value.0', 0, 3);
@@ -2749,8 +2741,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904096, 1067, 0, 'severities', 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904097, 1067, 0, 'severities', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904098, 1067, 0, 'show_opdata', 2);
--- change show_timeline to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 1067, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (904099, 1067, 0, 'show_timeline', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905000, 1067, 0, 'show_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905001, 1067, 0, 'tags.operator.0', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905002, 1067, 1, 'problem', 0, 'test problem');
@@ -2778,8 +2769,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (905018, 1070, 1, 'url', 0, 'https://www.zabbix.com/integrations');
 
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (1071, 130, 'web', 'Test copy Web monitoring', 7, 21, 3, 3);
--- change maintenance to 0 after ZBX-17813 is fixed:
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905019, 1071, 0, 'maintenance', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905019, 1071, 0, 'maintenance', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905020, 1071, 0, 'rf_rate', 120);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905021, 1071, 2, 'exclude_groupids', 0, 50008);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (905022, 1071, 2, 'groupids', 0, 50016);
@@ -2816,9 +2806,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905049, 1073, 0, 'rows', 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905050, 1073, 0, 'dynamic', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905051, 1073, 0, 'rf_rate', 600);
--- change show_legend to 0 after ZBX-17813 is fixed:
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 1073, 0, 'show_legend', 0);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (905052, 1073, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 1073, 0, 'show_legend', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (905053, 1073, 7, 'graphid', 0, 600000);
 
 -- Dashboard for Graph Prototype widget

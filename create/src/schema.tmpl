@@ -431,17 +431,25 @@ INDEX		|2		|userid
 TABLE|scripts|scriptid|ZBX_DATA
 FIELD		|scriptid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|command	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|command	|t_text		|''	|NOT NULL	|0
 FIELD		|host_access	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|		|RESTRICT
 FIELD		|groupid	|t_id		|	|NULL		|0			|2|hstgrp	|		|RESTRICT
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|confirmation	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'5'	|NOT NULL	|0
 FIELD		|execute_on	|t_integer	|'2'	|NOT NULL	|0
+FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|usrgrpid
 INDEX		|2		|groupid
 UNIQUE		|3		|name
+
+TABLE|script_param|script_paramid|ZBX_DATA
+FIELD		|script_paramid	|t_id		|	|NOT NULL	|0
+FIELD		|scriptid	|t_id		|	|NOT NULL	|0			|1|scripts
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|0
+UNIQUE		|1		|scriptid,name
 
 TABLE|actions|actionid|ZBX_DATA
 FIELD		|actionid	|t_id		|	|NOT NULL	|0
@@ -1869,7 +1877,23 @@ FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
 INDEX		|1		|roleid
 INDEX		|2		|value_moduleid
 
+TABLE|token|tokenid|ZBX_DATA
+FIELD	|tokenid	|t_id		|	|NOT NULL	|0
+FIELD	|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD	|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD	|userid		|t_id		|	|NOT NULL	|0	|1	|users
+FIELD	|token		|t_varchar(128)	|	|NULL		|0
+FIELD	|lastaccess	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD	|expires_at	|t_time		|'0'	|NOT NULL	|0
+FIELD	|created_at	|t_time		|'0'	|NOT NULL	|0
+FIELD	|creator_userid	|t_id		|	|NULL		|0	|2	|users	|userid	|RESTRICT
+INDEX	|1		|name
+UNIQUE	|2		|userid,name
+UNIQUE	|3		|token
+INDEX	|4		|creator_userid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030025	|5030025
+ROW		|5030038	|5030038

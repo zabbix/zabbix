@@ -34,6 +34,9 @@ const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
 const TABFILTERITEM_STYLE_FOCUSED = 'focused';
 
+const TAG_OPERATOR_EXISTS = '4';
+const TAG_OPERATOR_NOT_EXISTS = '5';
+
 class CTabFilterItem extends CBaseComponent {
 
 	constructor(target, options) {
@@ -332,7 +335,17 @@ class CTabFilterItem extends CBaseComponent {
 			params = null;
 
 		if (form instanceof HTMLFormElement) {
-			params = new URLSearchParams(new FormData(form));
+			var form_data = new FormData(form);
+
+			// Unset tag filter values for exists/not exists tag filters.
+			for (const [key, value] of form_data.entries()) {
+				let check_tag = key.match(/tags\[(\d+)\]\[operator\]/);
+				if (check_tag && (value === TAG_OPERATOR_EXISTS || value === TAG_OPERATOR_NOT_EXISTS)) {
+					form_data.set('tags['+check_tag[1]+'][value]', '');
+				}
+			}
+
+			params = new URLSearchParams(form_data);
 
 			for (const checkbox of form.querySelectorAll('input[type="checkbox"][unchecked-value]')) {
 				if (!checkbox.checked) {
