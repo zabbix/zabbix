@@ -874,15 +874,8 @@ class testScripts extends CAPITest {
 				$this->assertEquals($dbRow['groupid'], 0);
 				$this->assertEquals($dbRow['description'], '');
 				$this->assertEquals($dbRow['confirmation'], '');
-
-				if (array_key_exists('type', $scripts[$key])) {
-					$this->assertEquals($dbRow['type'], $scripts[$key]['type']);
-				}
-				else {
-					$this->assertEquals($dbRow['type'], 0);
-				}
-
 				$this->assertEquals($dbRow['execute_on'], 2);
+				$this->assertEquals($dbRow['type'], array_key_exists('type', $scripts[$key]) ? $scripts[$key]['type'] : 0);
 			}
 		}
 		else {
