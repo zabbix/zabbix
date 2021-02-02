@@ -1306,7 +1306,7 @@ function getSnmpInterfaceDescription(array $interface): string {
 
 			$snmp_desc[] = '(priv: '.$priv_protocol.', auth: '.$auth_protocol.')';
 		}
-		elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+		elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
 			[$interface['details']['authprotocol'] => $auth_protocol] = getSnmpV3AuthProtocols();
 
 			$snmp_desc[] = '(auth: '.$auth_protocol.')';
