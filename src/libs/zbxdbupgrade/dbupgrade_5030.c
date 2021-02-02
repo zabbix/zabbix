@@ -1085,7 +1085,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		{
 			func = (zbx_dbpatch_common_function_t *)common_functions.values[i];
 
-			if (FAIL != zbx_vector_uint64_search(&hostids, func->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			if (FAIL != zbx_vector_uint64_bsearch(&hostids, func->hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				zbx_vector_ptr_append(functions, dbpatch_new_function(func->functionid, 0, NULL, NULL,
 						ZBX_DBPATCH_FUNCTION_DELETE));
