@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-22 19:56+0200\n"
-"PO-Revision-Date: 2021-01-18 14:09+0300\n"
+"PO-Revision-Date: 2021-01-27 13:23+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1610971749.000000\n"
+"X-POOTLE-MTIME: 1611746616.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -388,22 +388,22 @@ msgstr "שיטות API"
 
 #: app/controllers/CControllerAuditLogList.php:223
 msgid "API token"
-msgstr ""
+msgstr "אסימון API"
 
 #: include/classes/api/services/CToken.php:290
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "אסימון ה־API‏ „%1$s” כבר קיים למזהה המשתמש „%2$s”."
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
-msgstr ""
+msgstr "נוסף אסימון API"
 
 #: app/controllers/CControllerTokenDelete.php:61
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נמחק אסימון API"
+msgstr[1] "נמחקו אסימוני API"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
@@ -6319,7 +6319,7 @@ msgstr "הפעלת סדר וניקיון פנימיים"
 #: app/views/administration.token.list.php:200
 #: app/views/administration.user.token.list.php:151
 msgid "Enable selected API tokens?"
-msgstr ""
+msgstr "להפעיל את אסימוני ה־API הנבחרים?"
 
 #: include/views/configuration.action.list.php:150
 msgid "Enable selected actions?"
@@ -11476,7 +11476,7 @@ msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:495
 msgid "Manage API tokens"
-msgstr ""
+msgstr "ניהול אסימוני API"
 
 #: include/classes/validators/CFunctionValidator.php:373
 msgid "Mandatory parameter is missing."
@@ -13787,7 +13787,7 @@ msgstr "סטטיסטיקת תעבורה יוצאת במנשק רשת. מחזיר
 
 #: app/views/popup.scriptexec.php:47
 msgid "Output"
-msgstr ""
+msgstr "פלט"
 
 #: include/views/configuration.item.edit.php:749
 #: include/views/configuration.item.edit.php:785
@@ -14615,7 +14615,7 @@ msgstr "עיבוד תגיות"
 
 #: include/classes/helpers/CMenuHelper.php:382
 msgid "Profile"
-msgstr ""
+msgstr "פרופיל"
 
 #: include/items.inc.php:1884 include/items.inc.php:1888
 msgid "Prometheus"

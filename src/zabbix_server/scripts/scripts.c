@@ -30,6 +30,7 @@
 #include "scripts.h"
 #include "zbxjson.h"
 #include "zbxembed.h"
+#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -319,7 +320,7 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->command_orig);
 }
 
-static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
+static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT **event_out)
 {
 	int			ret = SUCCEED;
 	zbx_vector_ptr_t	events;
@@ -332,7 +333,7 @@ static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
 	zbx_db_get_events_by_eventids(&eventids, &events);
 
 	if (0 < events.values_num)
-		memcpy(event_out, events.values[0], sizeof(DB_EVENT));
+		*event_out = (DB_EVENT*)events.values[0];
 	else
 		ret = FAIL;
 
@@ -368,7 +369,7 @@ static int	zbx_get_event_by_eventid(zbx_uint64_t eventid, DB_EVENT *event_out)
  ***********************************************************************************/
 int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user_t *user,
 		zbx_script_exec_context ctx, zbx_uint64_t eventid, char *error, size_t max_error_len,
-		DB_EVENT *event)
+		DB_EVENT **event)
 {
 	int			macro_mask, ret = FAIL;
 	zbx_uint64_t		groupid, userid, *p_userid = NULL;
@@ -418,14 +419,16 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				p_userid = &userid;
 			}
 
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, event, NULL, p_userid, NULL, host, NULL,
-					NULL, NULL, NULL, &script->command, macro_mask, error, max_error_len))
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, (event != NULL ? *event : NULL), NULL,
+					p_userid, NULL, host, NULL, NULL, NULL, NULL, &script->command, macro_mask,
+					error, max_error_len))
 			{
 				goto out;
 			}
 
-			if (SUCCEED != substitute_simple_macros(NULL, event, NULL, p_userid, NULL, host, NULL, NULL,
-					NULL, NULL, &script->command_orig, macro_mask, error, max_error_len))
+			if (SUCCEED != substitute_simple_macros(NULL, (event != NULL ? *event : NULL), NULL, p_userid,
+					NULL, host, NULL, NULL, NULL, NULL, &script->command_orig, macro_mask,
+					error, max_error_len))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 			}
@@ -438,21 +441,33 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (ZBX_SCRIPT_CTX_HOST == ctx && groupid > 0 &&
-					SUCCEED != check_script_permissions(groupid, host->hostid))
+			if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type && ZBX_SCRIPT_CTX_HOST != ctx)
+			{
+				if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type)
+				{
+					zbx_strlcpy(error, "Cannot determine permission of a script.",
+							max_error_len);
+					goto out;
+				}
+				else
+					goto skip_perm_check;
+			}
+
+			if (groupid > 0 && SUCCEED != check_script_permissions(groupid, host->hostid))
 			{
 				zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
 						max_error_len);
 				goto out;
 			}
-			if (ZBX_SCRIPT_CTX_HOST == ctx && user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
+
+			if (user != NULL && USER_TYPE_SUPER_ADMIN != user->type &&
 					SUCCEED != check_user_permissions(user->userid, host, script))
 			{
 				zbx_strlcpy(error, "User does not have permission to execute this script on the host.",
 						max_error_len);
 				goto out;
 			}
-
+skip_perm_check:
 			if (NULL != user)
 			{
 				/* zbx_script_prepare() receives 'user' as const-pointer but */
@@ -622,6 +637,9 @@ static int	zbx_execute_webhook(const zbx_script_t *script, const DC_HOST *host, 
 		zabbix_log(LOG_LEVEL_WARNING, "failed to fetch script parameters for script id " ZBX_FS_UI64,
 				script->scriptid);
 	}
+
+	if (ZBX_SCRIPT_CTX_ACTION != ctx && NULL != event)
+		zbx_db_free_event((DB_EVENT*)event);
 
 	ret = zbx_es_execute_command(script->command, params, script->timeout, result, error, max_error_len, debug);
 
