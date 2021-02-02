@@ -476,6 +476,13 @@ static int	DBpatch_5030038(void)
 
 	return DBset_default("scripts", &field);
 }
+
+static int	DBpatch_5030039(void)
+{
+	const ZBX_FIELD	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("users", "alias", &field);
+}
 #endif
 
 DBPATCH_START(5030)
@@ -521,5 +528,6 @@ DBPATCH_ADD(5030035, 0, 1)
 DBPATCH_ADD(5030036, 0, 1)
 DBPATCH_ADD(5030037, 0, 1)
 DBPATCH_ADD(5030038, 0, 1)
+DBPATCH_ADD(5030039, 0, 1)
 
 DBPATCH_END()

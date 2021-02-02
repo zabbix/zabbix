@@ -1397,24 +1397,24 @@ const char	*zbx_user_string(zbx_uint64_t userid)
  *                                                                            *
  * Function: DBget_user_names                                                 *
  *                                                                            *
- * Purpose: get user alias, name and surname                                  *
+ * Purpose: get user username, name and surname                               *
  *                                                                            *
- * Parameters: userid - [IN] user id                                          *
- *             alias   - [OUT] user alias                                     *
- *             name    - [OUT] user name                                      *
- *             surname - [OUT] user surname                                   *
+ * Parameters: userid     - [IN] user id                                      *
+ *             username   - [OUT] user alias                                  *
+ *             name       - [OUT] user name                                   *
+ *             surname    - [OUT] user surname                                *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	DBget_user_names(zbx_uint64_t userid, char **alias, char **name, char **surname)
+int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **surname)
 {
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	if (NULL == (result = DBselect(
-			"select alias,name,surname"
+			"select username,name,surname"
 			" from users"
 			" where userid=" ZBX_FS_UI64, userid)))
 	{
@@ -1424,7 +1424,7 @@ int	DBget_user_names(zbx_uint64_t userid, char **alias, char **name, char **surn
 	if (NULL == (row = DBfetch(result)))
 		goto out;
 
-	*alias = zbx_strdup(NULL, row[0]);
+	*username = zbx_strdup(NULL, row[0]);
 	*name = zbx_strdup(NULL, row[1]);
 	*surname = zbx_strdup(NULL, row[2]);
 
