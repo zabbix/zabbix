@@ -20,7 +20,9 @@ The following parameters should be filled:<br>
 **vops_routing_key** - routhong key of the escalation policy.<br>
 
 3\. The following parameters can help you customize the alerts ([documentation](https://help.victorops.com/knowledge-base/incident-fields-glossary/#glossary-of-fields) for the information):<br>
-**priority_severity** - value for the VictorOps *message_type* field. *severity* is the severity's name in the default Zabbix installation. *message_type* is used to determine the behavior of the alert when it arrives.<br>
+**priority_severity** - value for the VictorOps *message_type* field. *severity* is the severity's name in the default Zabbix installation.<br>
+*priority_update* is a mandatory field set as *"INFO"* by default. If you want to create an incident for every event on update operation (include manual close), pass *"ACKNOWLEDGMENT"* as the value of this parameter.<br>
+*message_type* is used to determine the behavior of the alert when it arrives.<br>
 **field:Hostname** or **field_p:Hostname** - contains data for custom fields. "Field" parameters with another format or empty value will be ignored.<br>
 Format explanation:<br>
 - *field* - prefix of the parameter with field info.
