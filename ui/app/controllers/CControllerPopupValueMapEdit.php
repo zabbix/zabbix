@@ -111,6 +111,7 @@ class CControllerPopupValueMapEdit extends CController {
 		$data = [];
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit', 'name_readonly']);
 		$mappings = [];
+		$data['name'] = trim($data['name']);
 
 		foreach ($data['mappings'] as $mapping) {
 			$mappings[] = [
@@ -118,6 +119,8 @@ class CControllerPopupValueMapEdit extends CController {
 				'newvalue' => trim($mapping['newvalue'])
 			];
 		}
+
+		$data['mappings'] = $mappings;
 
 		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
 	}
