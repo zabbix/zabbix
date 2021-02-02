@@ -58,7 +58,7 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.09.png?raw=true)](images/09.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
 
 ## Supported Versions
 

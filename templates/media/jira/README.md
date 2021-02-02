@@ -50,7 +50,7 @@ If server time is set to UTC, there is no need to add timezone at the end of par
 Though a "Send to" field is not used in Jira webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into Jira tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Jira](https://support.atlassian.com/jira-software-cloud/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Jira](https://support.atlassian.com/jira-software-cloud/) documentations.
 
 ## Supported Versions
 Zabbix 5.0

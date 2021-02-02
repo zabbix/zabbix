@@ -217,7 +217,7 @@ catch (error) {&#13;
     Zabbix.Log(3, '[PagerDuty Webhook] Notification failed : ' + error);&#13;
     throw 'PagerDuty notification failed : ' + error;&#13;
 }</script>
-            <description>Please refer to https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2 and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.&#13;
+            <description>Please refer to https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2 and https://www.zabbix.com/documentation/5.0/manual/config/notifications/media/webhook#example_scripts.&#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
 Add a dedicated user with the media type &quot;PagerDuty&quot; and place the integration key in the &quot;token&quot; parameter to integrate into the service.</description>

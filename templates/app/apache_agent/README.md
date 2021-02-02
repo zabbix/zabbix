@@ -75,7 +75,7 @@ Example configuration of Apache:
 ```
 
 If you use another path, then don't forget to change `{$APACHE.STATUS.PATH}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/current/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/5.0/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration

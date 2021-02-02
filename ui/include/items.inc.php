@@ -1190,7 +1190,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	}
 
 	CArrayHelper::sort($db_hosts, [
-		['field' => 'name', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
 	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
