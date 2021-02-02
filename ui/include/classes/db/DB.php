@@ -846,11 +846,11 @@ class DB {
 	 * Delete data from DB.
 	 *
 	 * Example:
-	 * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
-	 * DELETE FROM applications WHERE applicationid IN (1, 8, 6)
+	 * DB::delete('items', ['itemid' => [1, 8, 6]]);
+	 * DELETE FROM items WHERE itemid IN (1, 8, 6)
 	 *
-	 * DB::delete('applications', array('applicationid'=>array(1), 'templateid'=array(10)));
-	 * DELETE FROM applications WHERE applicationid IN (1) AND templateid IN (10)
+	 * DB::delete('items', ['itemid' => [1], 'templateid' => [10]]);
+	 * DELETE FROM items WHERE itemid IN (1) AND templateid IN (10)
 	 *
 	 * @param string $table
 	 * @param array  $wheres pair of fieldname => fieldvalues

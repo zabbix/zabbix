@@ -1596,9 +1596,6 @@ class CHost extends CHostGeneral {
 		// delete host inventory
 		DB::delete('host_inventory', ['hostid' => $hostIds]);
 
-		// delete host applications
-		DB::delete('applications', ['hostid' => $hostIds]);
-
 		// delete host
 		DB::delete('hosts', ['hostid' => $hostIds]);
 
