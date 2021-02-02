@@ -193,7 +193,6 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-
 		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost with items']);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
 		// Host form fields maxlength attribute.
@@ -611,9 +610,9 @@ class testFormHost extends CWebTest {
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'ccc',
-							'Privacy protocol' => 'AES',
+							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => 'ddd',
 							'Use bulk requests' => false
 						],
@@ -1062,9 +1061,9 @@ class testFormHost extends CWebTest {
 							'Context name' => 'zabbix',
 							'Security name' => 'selenium',
 							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES',
+							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => '456test',
 							'default' => true
 						],
@@ -1131,7 +1130,7 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'new-test123',
 							'Use bulk requests' => true
 						],

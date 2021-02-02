@@ -287,7 +287,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							'context_name' => '2',
 							'security_name' => '2',
 							'security_level' => 'authNoPriv',
-							'auth_protocol' => 'SHA',
+							'auth_protocol' => 'SHA1',
 							'auth_passphrase' => '2'
 						],
 						[
@@ -300,7 +300,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							'security_level' => 'authPriv',
 							'auth_protocol' => 'MD5',
 							'auth_passphrase' => '3',
-							'priv_protocol' => 'AES',
+							'priv_protocol' => 'AES128',
 							'priv_passphrase' => '3'
 						]
 					],
@@ -592,13 +592,13 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							$this->zbxTestDropdownSelect('snmpv3_securitylevel', $value);
 							break;
 						case 'auth_protocol':
-							$this->zbxTestClickXpathWait('//input[@name="snmpv3_authprotocol"]/../label[text()="'.$value.'"]');
+							$this->zbxTestDropdownSelect('snmpv3_authprotocol', $value);
 							break;
 						case 'auth_passphrase':
 							$this->zbxTestInputTypeOverwrite('snmpv3_authpassphrase', $value);
 							break;
 						case 'priv_protocol':
-							$this->zbxTestClickXpathWait('//input[@name="snmpv3_privprotocol"]/../label[text()="'.$value.'"]');
+							$this->zbxTestDropdownSelect('snmpv3_privprotocol', $value);
 							break;
 						case 'priv_passphrase':
 							$this->zbxTestInputTypeOverwrite('snmpv3_privpassphrase', $value);
