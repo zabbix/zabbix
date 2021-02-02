@@ -479,9 +479,19 @@ static int	DBpatch_5030038(void)
 
 static int	DBpatch_5030039(void)
 {
+	return DBdrop_index("users", "users_1");
+}
+
+static int	DBpatch_5030040(void)
+{
 	const ZBX_FIELD	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBrename_field("users", "alias", &field);
+}
+
+static int	DBpatch_5030041(void)
+{
+	return DBcreate_index("users", "users_1", "username", 1);
 }
 #endif
 
@@ -529,5 +539,7 @@ DBPATCH_ADD(5030036, 0, 1)
 DBPATCH_ADD(5030037, 0, 1)
 DBPATCH_ADD(5030038, 0, 1)
 DBPATCH_ADD(5030039, 0, 1)
+DBPATCH_ADD(5030040, 0, 1)
+DBPATCH_ADD(5030041, 0, 1)
 
 DBPATCH_END()
