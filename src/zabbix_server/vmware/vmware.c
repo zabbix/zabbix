@@ -5035,7 +5035,7 @@ out:
  *                                                                            *
  * Purpose: updates vmware performance statistics data                        *
  *                                                                            *
- * Parameters: pervalues - [OUT] the performance counter values               *
+ * Parameters: perfdata  - [OUT] the performance counter values               *
  *             xdoc      - [IN] the XML document containing performance       *
  *                              counter values for all entities               *
  *             node      - [IN] the XML node containing performance counter   *
@@ -5046,13 +5046,14 @@ out:
  *                         values                                             *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, xmlDoc *xdoc, xmlNode *node)
+static int	vmware_service_process_perf_entity_data(zbx_vmware_perf_data_t *perfdata, xmlDoc *xdoc, xmlNode *node)
 {
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
 	char			*instance, *counter, *value;
 	int			i, values = 0, ret = FAIL;
+	zbx_vector_ptr_t	*pervalues = &perfdata->values;
 	zbx_vmware_perf_value_t	*perfvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -5085,7 +5086,12 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 			perfvalue->instance = (NULL != instance ? instance : zbx_strdup(NULL, ""));
 
 			if (0 == strcmp(value, "-1") || SUCCEED != is_uint64(value, &perfvalue->value))
+			{
 				perfvalue->value = ZBX_MAX_UINT64;
+				zabbix_log(LOG_LEVEL_TRACE, "PerfCounter was skipped. type:%s object id:%s "
+						"counter id:" ZBX_FS_UI64 " instance:%s value:%s", perfdata->type,
+						perfdata->id, perfvalue->counterid, perfvalue->instance, value);
+			}
 			else if (FAIL == ret)
 				ret = SUCCEED;
 
@@ -5154,7 +5160,7 @@ static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *x
 		zbx_vector_ptr_create(&data->values);
 
 		if (NULL != data->type && NULL != data->id)
-			ret = vmware_service_process_perf_entity_data(&data->values, xdoc, nodeset->nodeTab[i]);
+			ret = vmware_service_process_perf_entity_data(data, xdoc, nodeset->nodeTab[i]);
 
 		if (SUCCEED == ret)
 			zbx_vector_ptr_append(perfdata, data);
