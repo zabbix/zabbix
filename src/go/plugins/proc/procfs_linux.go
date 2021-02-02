@@ -232,7 +232,7 @@ func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) 
 			continue
 		}
 
-		v, err := strconv.Atoi(strings.TrimSpace(line[:len(line)-2]))
+		v, err := strconv.ParseInt(strings.TrimSpace(line[:len(line)-2]), 10, 64)
 		if err != nil {
 			return 0, false, err
 		}
