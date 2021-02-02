@@ -1,84 +1,87 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-01-21T09:13:51Z'
+  date: '2021-02-02T00:42:09Z'
   media_types:
     -
       name: VictorOps
       type: WEBHOOK
       parameters:
-        -
+        0:
           name: event_info
           value: '{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
-        -
+        1:
           name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
+        2:
           name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
-        -
+        3:
           name: event_source
           value: '{EVENT.SOURCE}'
-        -
+        4:
           name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
+        5:
           name: event_value
           value: '{EVENT.VALUE}'
-        -
+        6:
           name: 'field:entity_display_name'
           value: '{ALERT.SUBJECT}'
-        -
+        7:
           name: 'field:entity_id'
           value: '{EVENT.ID}'
-        -
+        8:
           name: 'field:hostname'
           value: '{HOST.NAME}'
-        -
+        9:
           name: 'field:monitoring_tool'
           value: Zabbix
-        -
+        10:
           name: 'field:operational_data'
           value: '{EVENT.OPDATA}'
-        -
+        11:
           name: 'field:severity'
           value: '{EVENT.SEVERITY}'
-        -
+        12:
           name: 'field:state_message'
           value: '{ALERT.MESSAGE}'
-        -
+        13:
           name: 'field_r:event_duration'
           value: '{EVENT.DURATION}'
-        -
+        14:
           name: 'field_r:recovery time'
           value: '{EVENT.RECOVERY.DATE} {EVENT.RECOVERY.TIME}'
-        -
+        15:
           name: priority_average
           value: WARNING
-        -
+        16:
           name: priority_default
           value: INFO
-        -
+        17:
           name: priority_disaster
           value: CRITICAL
-        -
+        18:
           name: priority_high
           value: WARNING
-        -
+        19:
           name: priority_information
           value: INFO
-        -
+        20:
           name: priority_not_classified
           value: INFO
-        -
+        21:
           name: priority_resolved
           value: OK
-        -
+        25:
+          name: priority_update
+          value: INFO
+        22:
           name: priority_warning
           value: INFO
-        -
+        23:
           name: vops_endpoint
           value: '<PLACE ENDPOINT URL HERE>'
-        -
+        24:
           name: vops_routing_key
           value: '{ALERT.SENDTO}'
       script: |
@@ -124,9 +127,13 @@ zabbix_export:
                                         prefix = parts[0].split('_');
         
                                     if (typeof prefix[1] === 'undefined'
-                                            || (prefix[1] === 'p' && params.event_value === '1')
-                                            || (prefix[1] === 'r' && params.event_value === '0')
-                                            || (prefix[1] === 'u' && params.event_update_value === '1')) {
+                                            || (prefix[1] === 'p' && params.event_value === '1'
+                                                && (params.event_update_status === '0'
+                                                    || params.event_update_status === '{EVENT.UPDATE.STATUS}'))
+                                            || (prefix[1] === 'r' && params.event_value === '0'
+                                                && (params.event_update_status === '0'
+                                                    || params.event_update_status === '{EVENT.UPDATE.STATUS}'))
+                                            || (prefix[1] === 'u' && params.event_update_status === '1')) {
                                         data[field.substring(field.indexOf(':') + 1)] = fields[field];
                                     }
                                 }
@@ -197,7 +204,7 @@ zabbix_export:
             var params = JSON.parse(value),
                 fields = {},
                 vops = {},
-                required_params = ['event_source', 'event_value'],
+                required_params = ['event_source', 'event_value', 'priority_update'],
                 severities = [
                     {name: 'not_classified', color: '#97AAB3'},
                     {name: 'information', color: '#7499FF'},
@@ -246,7 +253,7 @@ zabbix_export:
             }
         
             if (params.event_update_status === '1') {
-                fields[':message_type'] = 'ACKNOWLEDGEMENT';
+                fields[':message_type'] = params.priority_update;
             }
             else {
                 fields[':message_type'] = params['priority_' + severities[params.event_nseverity].name]
