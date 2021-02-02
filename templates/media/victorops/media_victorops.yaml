@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2021-02-02T00:42:09Z'
+  date: '2021-02-02T14:52:16Z'
   media_types:
     -
       name: VictorOps
@@ -45,6 +45,9 @@ zabbix_export:
         12:
           name: 'field:state_message'
           value: '{ALERT.MESSAGE}'
+        26:
+          name: 'field_p:trigger_description'
+          value: '{TRIGGER.DESCRIPTION}'
         13:
           name: 'field_r:event_duration'
           value: '{EVENT.DURATION}'
@@ -278,13 +281,27 @@ zabbix_export:
         -
           event_source: TRIGGERS
           operation_mode: PROBLEM
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
-          message: '{TRIGGER.DESCRIPTION}'
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         -
           event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
-          message: '{TRIGGER.DESCRIPTION}'
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         -
           event_source: TRIGGERS
           operation_mode: UPDATE
