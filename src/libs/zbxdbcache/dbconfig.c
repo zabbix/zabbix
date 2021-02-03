@@ -7829,9 +7829,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->opdata = zbx_strdup(NULL, src_trigger->opdata);
 	dst_trigger->event_name = ('\0' != *src_trigger->event_name ? zbx_strdup(NULL, src_trigger->event_name) : NULL);
 	dst_trigger->flags = 0;
-
-	dst_trigger->expression = NULL;
-	dst_trigger->recovery_expression = NULL;
 	dst_trigger->new_error = NULL;
 
 	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
