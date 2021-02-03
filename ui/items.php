@@ -750,7 +750,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['units'] !== getRequest('units', '')) {
 						$item['units'] = getRequest('units', '');
 					}
-					if ($db_item['value_type'] != ITEM_VALUE_TYPE_LOG && $db_item['value_type'] != ITEM_VALUE_TYPE_TEXT
+
+					$value_type = getRequest('value_type', $db_item['value_type']);
+
+					if ($value_type != ITEM_VALUE_TYPE_LOG && $value_type != ITEM_VALUE_TYPE_TEXT
 							&& bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
 						$item['valuemapid'] = getRequest('valuemapid');
 					}
