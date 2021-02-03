@@ -731,10 +731,14 @@ class CItem extends CItemGeneral {
 				}
 			}
 
-			// Reset valuemapid when value_type is LOG or TEXT.
-			if (($item['value_type'] != $db_items[$item['itemid']]['value_type'])
-					&& ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT)) {
-				$item['valuemapid'] = null;
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
+					// Reset valuemapid when value_type is LOG or TEXT.
+					$item['valuemapid'] = null;
+				}
+				else {
+					unset($item['valuemapid']);
+				}
 			}
 		}
 		unset($item);
