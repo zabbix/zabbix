@@ -606,6 +606,7 @@ function copyItems($srcHostId, $dstHostId) {
 		],
 		'selectApplications' => ['applicationid'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+		'selectValueMap' => ['name'],
 		'hostids' => $srcHostId,
 		'webitems' => true,
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
@@ -620,26 +621,28 @@ function copyItems($srcHostId, $dstHostId) {
 		'templated_hosts' => true
 	]);
 	$dstHost = reset($dstHosts);
-	$src_valuemaps = array_column($srcItems, 'valuemapid', 'valuemapid');
-	unset($src_valuemaps[0]);
+	$src_valuemaps = [];
+		$valuemap_map = [];
 
-	if ($src_valuemaps) {
-		$src_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $src_valuemaps
-		]);
-		$src_valuemaps = array_column($src_valuemaps, 'valuemapid', 'name');
-		$dest_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'hostids' => $dstHostId
-		]);
-		$dest_valuemaps = array_column($dest_valuemaps, 'valuemapid', 'name');
-		$valuemapids_map = [];
-
-		foreach ($src_valuemaps as $name => $valuemapid) {
-			if (array_key_exists($name, $dest_valuemaps)) {
-				$valuemapids_map[$valuemapid] = $dest_valuemaps[$name];
+		foreach ($srcItems as $src_item) {
+			if ($src_item['valuemap']) {
+				$src_valuemaps[$src_item['valuemap']['name']] = 1;
 			}
+		}
+
+		if ($src_valuemaps) {
+			$valuemap_map = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'hostids' => $dstHostId,
+				'filter' => ['name' => array_keys($src_valuemaps)]
+			]);
+			$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
+			$unknown_valuemaps = array_diff_key($src_valuemaps, $valuemap_map);
+
+		if ($unknown_valuemaps) {
+			reset($unknown_valuemaps);
+			error(_s('Valuemap "%1$s" is not available on "%2$s".', key($unknown_valuemaps), $dstHost['host']));
+			return false;
 		}
 	}
 
@@ -697,15 +700,7 @@ function copyItems($srcHostId, $dstHostId) {
 			continue;
 		}
 		else if ($srcItem['valuemapid']) {
-			if (array_key_exists($srcItem['valuemapid'], $valuemapids_map)) {
-				$srcItem['valuemapid'] = $valuemapids_map[$srcItem['valuemapid']];
-			}
-			else {
-				error(_s('Valuemap "%1$s" is not available on "%2$s".',
-					array_search($srcItem['valuemapid'], $src_valuemaps), $dstHost['host']
-				));
-				return false;
-			}
+			$srcItem['valuemapid'] = $valuemap_map[$srcItem['valuemap']['name']];
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {

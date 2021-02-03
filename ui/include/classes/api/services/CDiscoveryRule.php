@@ -2200,12 +2200,38 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectValueMap' => ['name'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
 		$new_itemids = [];
 		$itemkey_to_id = [];
 		$create_items = [];
+		$src_valuemaps = [];
+		$valuemap_map = [];
+
+		foreach ($item_prototypes as $item_prototype) {
+			if ($item_prototype['valuemap']) {
+				$src_valuemaps[$item_prototype['valuemap']['name']] = 1;
+			}
+		}
+
+		if ($src_valuemaps) {
+			$valuemap_map = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'hostids' => $dstHost['hostid'],
+				'filter' => ['name' => array_keys($src_valuemaps)]
+			]);
+			$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
+			$unknown_valuemaps = array_diff_key($src_valuemaps, $valuemap_map);
+
+			if ($unknown_valuemaps) {
+				reset($unknown_valuemaps);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap "%1$s" is not available on "%2$s".',
+					key($unknown_valuemaps), $dstHost['host'])
+				);
+			}
+		}
 
 		if ($item_prototypes) {
 			$create_order = [];
@@ -2291,6 +2317,10 @@ class CDiscoveryRule extends CItemGeneral {
 				$item_prototype = $item_prototypes[$key];
 				$item_prototype['ruleid'] = $dstDiscovery['itemid'];
 				$item_prototype['hostid'] = $dstDiscovery['hostid'];
+
+				if ($item_prototype['valuemapid']) {
+					$item_prototype['valuemapid'] = $valuemap_map[$item_prototype['valuemap']['name']];
+				}
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
