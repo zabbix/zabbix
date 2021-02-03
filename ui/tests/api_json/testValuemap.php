@@ -315,6 +315,7 @@ class testValuemap extends CAPITest {
 						]
 					],
 					[
+						'hostid' => '50009',
 						'name' => 'æų',
 						'mappings' => [
 							[
@@ -735,38 +736,6 @@ class testValuemap extends CAPITest {
 
 	public static function valuemap_user_permission() {
 		return [
-			[
-				'method' => 'valuemap.create',
-				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'valuemap' => [
-					'hostid' => '50009',
-					'name' => 'API value create as zabbix admin',
-					'mappings' =>[
-						[
-							'value' => '123',
-							'newvalue' => 'api_value'
-						]
-					]
-				],
-				'expected_error' => 'No permissions to call "valuemap.create".'
-			],
-			[
-				'method' => 'valuemap.update',
-				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'valuemap' => [
-					'valuemapid' => '19',
-					'name' => 'API value update as zabbix admin'
-				],
-				'expected_error' => 'No permissions to call "valuemap.update".'
-			],
-			[
-				'method' => 'valuemap.delete',
-				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
-				'valuemap' => [
-					'20'
-				],
-				'expected_error' => 'No permissions to call "valuemap.delete".'
-			],
 			[
 				'method' => 'valuemap.create',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
