@@ -171,7 +171,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test 1',
 						'Script' => 'java script',
-						'Timeout' => '1',
+						'Timeout' => '1'
 					]
 				]
 			],
@@ -180,7 +180,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test 60',
 						'Script' => 'java script',
-						'Timeout' => '60',
+						'Timeout' => '60'
 					]
 				]
 			],
@@ -191,7 +191,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test 0',
 						'Script' => 'java script',
-						'Timeout' => '0',
+						'Timeout' => '0'
 					]
 				]
 			],
@@ -200,7 +200,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test 1m',
 						'Script' => 'java script',
-						'Timeout' => '1m',
+						'Timeout' => '1m'
 					]
 				]
 			],
@@ -211,7 +211,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test 1h',
 						'Script' => 'java script',
-						'Timeout' => '1h',
+						'Timeout' => '1h'
 					]
 				]
 			],
@@ -222,7 +222,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test 70',
 						'Script' => 'java script',
-						'Timeout' => '70s',
+						'Timeout' => '70s'
 					]
 				]
 			],
@@ -233,7 +233,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test -1',
 						'Script' => 'java script',
-						'Timeout' => '-1',
+						'Timeout' => '-1'
 					]
 				]
 			],
@@ -244,7 +244,7 @@ class testFormAdministrationScripts extends CWebTest {
 					'fields' =>  [
 						'Name' => 'Timeout test character',
 						'Script' => 'java script',
-						'Timeout' => 'char',
+						'Timeout' => 'char'
 					]
 				]
 			],
@@ -544,13 +544,40 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
+	 * Function for checking script form update cancelling.
+	 */
+	public function testFormAdministrationScripts_CancelUpdate() {
+		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
+		$old_hash = CDBHelper::getHash($sql);
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one();
+		$form->fill([
+			'Name' => 'Cancelled cript',
+			'Type' => 'Script',
+			'Execute on' => 'Zabbix server',
+			'Commands' => 'Script command',
+			'Description' => 'Cancelled description',
+			'User group' => 'Disabled',
+			'Host group' => 'Selected',
+			'xpath://div[@id="groupid"]/..' => 'Hypervisors',
+			'Required host permissions' => 'Write',
+			'Enable confirmation' => true
+		]);
+		$form->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertPageHeader('Scripts');
+		$this->assertTrue($this->query('button:Create script')->waitUntilVisible()->one()->isReady());
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+	}
+
+	/**
 	 * Function for checking script form update without any changes.
 	 */
 	public function testFormAdministrationScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
-		$form = $this->query('id:scriptForm')->waitUntilReady()->asForm()->one()->submit();
+		$this->query('id:scriptForm')->waitUntilReady()->asForm()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
