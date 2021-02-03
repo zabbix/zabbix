@@ -854,9 +854,9 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 	result = DBselect("select f.functionid,f.itemid,f.name,f.parameter,i.value_type,h.hostid"
 			" from functions f"
-			" left join items i"
+			" join items i"
 				" on f.itemid=i.itemid"
-			" left join hosts h"
+			" join hosts h"
 				" on i.hostid=h.hostid"
 			" where triggerid=" ZBX_FS_UI64
 			" order by functionid",
