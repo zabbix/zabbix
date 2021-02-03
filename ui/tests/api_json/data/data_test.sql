@@ -36,16 +36,17 @@ INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (1900,900,40067);
 
 -- valuemap
-INSERT INTO valuemaps (valuemapid,name) VALUES (399,'API value map for update');
-INSERT INTO valuemaps (valuemapid,name) VALUES (400,'API value map for update with mappings');
-INSERT INTO valuemaps (valuemapid,name) VALUES (401,'API value map delete');
-INSERT INTO valuemaps (valuemapid,name) VALUES (402,'API value map delete2');
-INSERT INTO valuemaps (valuemapid,name) VALUES (403,'API value map delete3');
-INSERT INTO valuemaps (valuemapid,name) VALUES (404,'API value map delete4');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9904,400,'One','Online');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9905,400,'Two','Offline');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9906,402,'Three','Other');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9907,403,'Four','Unknown');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,400,'One','Online');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'Two','Offline');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,402,'Three','Other');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,403,'Four','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
