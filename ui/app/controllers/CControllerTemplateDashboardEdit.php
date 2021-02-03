@@ -52,12 +52,14 @@ class CControllerTemplateDashboardEdit extends CController {
 		if ($this->hasInput('dashboardid')) {
 			$dashboards = API::TemplateDashboard()->get([
 				'output' => ['dashboardid', 'name', 'templateid'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+				'selectPages' => ['widgets'],
 				'dashboardids' => [$this->getInput('dashboardid')],
 				'editable' => true
 			]);
 
 			$this->dashboard = $dashboards[0];
+			$this->dashboard['widgets'] = $this->dashboard['pages'][0]['widgets'];
+			unset($this->dashboard['pages']);
 
 			return (bool) $this->dashboard;
 		}

@@ -550,8 +550,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 
-							jQuery('.dashbrd-grid-container')
-								.dashboardGrid('setWidgetRefreshRate', options.widgetid, parseInt(currentRate));
+							ZABBIX.Dashboard._methods.setWidgetRefreshRate(options.widgetid, parseInt(currentRate));
 						})
 						.fail(function() {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
@@ -586,10 +585,11 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  * @return array
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
-	var $dashboard = jQuery('.dashbrd-grid-container'),
-		dashboard_data = $dashboard.dashboardGrid('getDashboardData'),
-		editMode = $dashboard.dashboardGrid('isEditMode'),
-		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
+	// TODO fix it - ZABBIX.Dashboard._target
+	var $dashboard = ZABBIX.Dashboard._target,
+		dashboard_data = ZABBIX.Dashboard._methods.getDashboardData(),
+		editMode = ZABBIX.Dashboard._methods.isEditMode(),
+		widget = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
 		widget_actions = [],
@@ -599,12 +599,13 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt);
 
 	// Do not show "Copy" action for host dashboards.
+	// TODO need to add method data for CBaseComponent
 	if ($dashboard.data('dashboardGrid')['options']['allowed_edit']
 			&& (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null)) {
 		widget_actions.push({
 			label: t('S_COPY'),
 			clickCallback: function() {
-				jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
+				ZABBIX.Dashboard._methods.copyWidget(widget);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			}
 		});
@@ -613,9 +614,9 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	if (editMode) {
 		widget_actions.push({
 			label: t('S_PASTE'),
-			disabled: ($dashboard.dashboardGrid('getCopiedWidget') === null),
+			disabled: (ZABBIX.Dashboard._methods.getCopiedWidget() === null),
 			clickCallback: function() {
-				$dashboard.dashboardGrid('pasteWidget', widget, widget.pos);
+				ZABBIX.Dashboard._methods.pasteWidget(widget, widget.pos);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			}
 		});
@@ -623,7 +624,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget_actions.push({
 			label: t('Delete'),
 			clickCallback: function() {
-				jQuery('.dashbrd-grid-container').dashboardGrid('deleteWidget', widget);
+				ZABBIX.Dashboard._methods.deleteWidget(widget);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			}
 		});
@@ -1181,7 +1182,7 @@ function getDashboardWidgetActionMenu(area_selected) {
 		items: [{
 			label: t('Add widget'),
 			clickCallback: function() {
-				jQuery('.dashbrd-grid-container').dashboardGrid('addNewWidget', null, area_selected);
+				ZABBIX.Dashboard._methods.addNewWidget(null, area_selected);
 			}
 		}, {
 			label: t('Paste widget'),
@@ -1193,7 +1194,7 @@ function getDashboardWidgetActionMenu(area_selected) {
 					height: area_selected.height
 				};
 
-				jQuery('.dashbrd-grid-container').dashboardGrid('pasteWidget', null, widget_dims);
+				ZABBIX.Dashboard._methods.pasteWidget(null, widget_dims);
 				jQuery('.dashbrd-grid-new-widget-placeholder').hide();
 			}
 		}]

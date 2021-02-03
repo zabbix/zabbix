@@ -68,13 +68,14 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	 * @return string
 	 */
 	public function getJavascript() {
+		// TODO need to fix ZABBIX.Dashboard._target.data
 		return
-			'var dashboard_data = dashboard.$target.data("dashboardGrid"),'.
+			'var dashboard_data = ZABBIX.Dashboard._target.data("dashboardGrid"),'.
 				'filter_select = jQuery("#'.$this->getName().'").get(0);'.
 			'filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');'.
 			'filter_select.selectedIndex = 0;'.
 			'jQuery.each('.
-				'dashboard.$target.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
+				'ZABBIX.Dashboard._methods.getWidgetsBy("'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
 				'function(i, widget) {'.
 					'if (widget !== dashboard_data["dialogue"]["widget"]) {'. // Widget currently edited or null for new widgets.
 						'filter_select.addOption({'.

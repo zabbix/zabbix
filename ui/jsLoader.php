@@ -49,7 +49,7 @@ if (isset($_GET['lang'])) {
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
 	'common.js' => '',
-	'dashboard.grid.js' => '',
+	'class.dashboard.page.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
@@ -131,7 +131,7 @@ $tranStrings = [
 	'class.overlay.js' => [
 		'Operation details' => _('Operation details')
 	],
-	'dashboard.grid.js' => [
+	'class.dashboard.page.js' => [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),
 		'Paste widget' => _('Paste widget'),

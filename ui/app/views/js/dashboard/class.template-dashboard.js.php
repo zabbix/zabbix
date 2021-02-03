@@ -27,8 +27,6 @@
 <script>
 	class TemplateDashboard {
 		constructor(data, widget_defaults, page) {
-			this.$target = $('.<?= ZBX_STYLE_DASHBRD_GRID_CONTAINER ?>');
-
 			this.data = data;
 			this.widget_defaults = widget_defaults;
 			this.page = page;
@@ -42,40 +40,39 @@
 		}
 
 		live() {
-			this.$target
-				.dashboardGrid({
-					'dashboard': {
-						templateid: this.data.templateid,
-						dashboardid: this.data.dashboardid
-					},
-					'options': {
-						'widget-height': 70,
-						'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
-						'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
-						'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-						'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-						'editable': true,
-						'edit_mode': true,
-						'kioskmode': false,
-						'allowed_edit': true
-					}
-				})
-				.dashboardGrid('setWidgetDefaults', this.widget_defaults)
-				.dashboardGrid('addWidgets', this.data.widgets);
+			ZABBIX.Dashboard._methods..dashboardGrid({
+				'dashboard': {
+					templateid: this.data.templateid,
+					dashboardid: this.data.dashboardid
+				},
+				'options': {
+					'widget-height': 70,
+					'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
+					'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
+					'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+					'editable': true,
+					'edit_mode': true,
+					'kioskmode': false,
+					'allowed_edit': true
+				}});
+
+			ZABBIX.Dashboard._methods.setWidgetDefaults(this.widget_defaults);
+			ZABBIX.Dashboard._methods.addWidgets(this.data.widgets);
 
 			$('#dashbrd-config').on('click', () => this.openProperties());
-			$('#dashbrd-add-widget').on('click', () => this.$target.dashboardGrid('addNewWidget', this));
-			$('#dashbrd-paste-widget').on('click', () => this.$target.dashboardGrid('pasteWidget', null, null));
-			$('#dashbrd-save').on('click', () => this.$target.dashboardGrid('saveDashboard', this.save.bind(this)));
+			$('#dashbrd-add-widget').on('click', () => ZABBIX.Dashboard._methods.addNewWidget(this));
+			$('#dashbrd-paste-widget').on('click', () => ZABBIX.Dashboard._methods.pasteWidget(null, null));
+			$('#dashbrd-save').on('click', () => ZABBIX.Dashboard._methods.saveDashboard(this.save.bind(this)));
 			$('#dashbrd-cancel').on('click', () => {
 				this.cancelEditing();
 
 				return false;
 			});
 
-			var $copied_widget = this.$target.dashboardGrid('getCopiedWidget');
+			var $copied_widget = ZABBIX.Dashboard._methods.getCopiedWidget();
 
-			if (this.$target.dashboardGrid('getCopiedWidget') !== null) {
+			if (ZABBIX.Dashboard._methods.getCopiedWidget() !== null) {
 				$('#dashbrd-paste-widget').attr('disabled', false);
 			}
 			else {
@@ -174,7 +171,7 @@
 			this.disableNavigationWarning();
 
 			$(window).on('beforeunload.TemplateDashboard', () => {
-				if (this.has_properties_modified || this.$target.dashboardGrid('isDashboardUpdated')) {
+				if (this.has_properties_modified || ZABBIX.Dashboard._methods.isDashboardUpdated()) {
 					return true;
 				}
 			});

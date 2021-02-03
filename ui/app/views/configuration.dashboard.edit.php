@@ -25,7 +25,7 @@
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('dashboard.grid.js');
+$this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('multiselect.js');
 $this->addJsFile('class.cclock.js');
 

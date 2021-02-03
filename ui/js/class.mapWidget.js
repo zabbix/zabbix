@@ -34,8 +34,9 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
 				break;
 			case 'afterUpdateWidgetConfig':
-				jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue',
-					grid['widget']['uniqueid'], 'current_sysmapid', grid['widget']['fields']['sysmapid']);
+				ZABBIX.Dashboard._methods.setWidgetStorageValue(grid['widget']['uniqueid'], 'current_sysmapid',
+					grid['widget']['fields']['sysmapid']
+				);
 				break;
 			case 'onDashboardReady':
 				if (typeof grid['widget']['storage']['current_sysmapid'] === 'undefined') {
@@ -43,7 +44,7 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				}
 				break;
 			case 'onEditStart':
-				jQuery(".dashbrd-grid-container").dashboardGrid('refreshWidget', grid['widget']['widgetid']);
+				ZABBIX.Dashboard._methods.refreshWidget(grid['widget']['widgetid']);
 				break;
 		}
 	}
@@ -60,7 +61,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 	 *									  level or back to the top level.
 	 */
 	function navigateToSubmap(submapid, uniqueid, reset_previous) {
-		var widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'uniqueid', uniqueid),
+		var widget = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
 			previous_maps = '';
 
@@ -85,13 +86,12 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 				}
 			}
 
-			jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue', uniqueid,
-				'current_sysmapid', submapid);
-			jQuery('.dashbrd-grid-container').dashboardGrid('setWidgetStorageValue', uniqueid, 'previous_maps',
-				previous_maps);
-			jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget', uniqueid);
-			jQuery('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget[0], 'current_sysmapid',
-				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
+			ZABBIX.Dashboard._methods.setWidgetStorageValue(uniqueid, 'current_sysmapid', submapid);
+			ZABBIX.Dashboard._methods.setWidgetStorageValue(uniqueid, 'previous_maps', previous_maps);
+			ZABBIX.Dashboard._methods.refreshWidget(uniqueid);
+			ZABBIX.Dashboard._methods.widgetDataShare(widget[0], 'current_sysmapid',
+				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0}
+			);
 			jQuery('.menu-popup').menuPopup('close', null);
 		}
 	}
@@ -129,8 +129,7 @@ jQuery(function($) {
 									widget_data['map_instance'].update(data);
 								}
 								else {
-									jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget',
-										widget_data['uniqueid']);
+									ZABBIX.Dashboard._methods.refreshWidget(widget_data['uniqueid']);
 								}
 							});
 						}

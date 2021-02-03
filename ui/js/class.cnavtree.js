@@ -777,9 +777,7 @@ jQuery(function($) {
 							step_in_path = $(this).closest('.tree-item'),
 							widget = getWidgetData($obj);
 
-						if ($('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget,
-								'selected_mapid', data_to_share)
-						) {
+						if (ZABBIX.Dashboard._methods.widgetDataShare(widget, 'selected_mapid', data_to_share)) {
 							$('.selected', $obj).removeClass('selected');
 							while ($(step_in_path).length) {
 								$(step_in_path).addClass('selected');
@@ -1084,8 +1082,7 @@ jQuery(function($) {
 
 			var getWidgetData = function($obj) {
 				var widget_data = $obj.data('widgetData'),
-					response = $(".dashbrd-grid-container")
-						.dashboardGrid('getWidgetsBy', 'uniqueid', widget_data['uniqueid']);
+					response = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', widget_data['uniqueid']);
 
 				if (response.length) {
 					return response[0];
@@ -1101,7 +1098,7 @@ jQuery(function($) {
 			 * @returns {boolean}
 			 */
 			var isEditMode = function() {
-				return $(".dashbrd-grid-container").dashboardGrid('isEditMode');
+				return ZABBIX.Dashboard._methods.isEditMode();
 			};
 
 			// Create multi-level array that represents real child-parent dependencies in tree.
@@ -1239,7 +1236,7 @@ jQuery(function($) {
 				 * If 'send_data' is set to be 'false', use an unexisting 'data_name', just to check if widget has
 				 * linked widgets, but avoid real data sharing.
 				 */
-				if (item_id && $('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget,
+				if (item_id && ZABBIX.Dashboard._methods.widgetDataShare(widget,
 						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('sysmapid')})) {
 					$('.selected', $obj).removeClass('selected');
 
@@ -1327,8 +1324,8 @@ jQuery(function($) {
 						];
 
 						$.each(triggers, function(index, trigger) {
-							$(".dashbrd-grid-container").dashboardGrid("addAction", trigger,
-								'zbx_widget_navtree_trigger', options.uniqueid, {
+							ZABBIX.Dashboard._methods.addAction(trigger, 'zbx_widget_navtree_trigger', options.uniqueid,
+								{
 									'parameters': [trigger],
 									'grid': {'widget': 1},
 									'priority': 5,
@@ -1341,7 +1338,7 @@ jQuery(function($) {
 							switchToEditMode($this);
 						}
 						else {
-							$('.dashbrd-grid-container').dashboardGrid('registerDataExchange', {
+							ZABBIX.Dashboard._methods.registerDataExchange({
 								uniqueid: options.uniqueid,
 								data_name: 'current_sysmapid',
 								callback: function(widget, data) {

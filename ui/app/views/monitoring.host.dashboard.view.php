@@ -38,7 +38,7 @@ if (array_key_exists('no_data', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('dashboard.grid.js');
+$this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.cclock.js');
 

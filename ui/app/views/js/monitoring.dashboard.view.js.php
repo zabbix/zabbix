@@ -46,7 +46,7 @@
 	 * Reload widget configuration dialogue. Used as callback in widget forms.
 	 */
 	function updateWidgetConfigDialogue() {
-		dashboard.$target.dashboardGrid('updateWidgetConfigDialogue');
+		ZABBIX.Dashboard._methods.updateWidgetConfigDialogue();
 	}
 
 	/**
@@ -72,7 +72,7 @@
 		}
 
 		if (handle) {
-			var widgets = dashboard.$target.dashboardGrid('getWidgetsBy', 'type', type);
+			var widgets = ZABBIX.Dashboard._methods.getWidgetsBy('type', type);
 
 			widgets.forEach(widget => {
 				if ($.contains(widget.container[0], handle)) {
@@ -89,7 +89,7 @@
 					clearMessages();
 					addMessage(makeMessageBox('good', [], response.message, true, false));
 
-					dashboard.$target.dashboardGrid('refreshWidget', widget.uniqueid);
+					ZABBIX.Dashboard._methods.refreshWidget(widget.uniqueid);
 				}
 			});
 		}

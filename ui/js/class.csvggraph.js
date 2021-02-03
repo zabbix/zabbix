@@ -50,8 +50,7 @@ jQuery(function ($) {
 
 		if (data) {
 			if (!data.isHintBoxFrozen) {
-				$('.dashbrd-grid-container')
-					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
+				ZABBIX.Dashboard._methods.unpauseWidgetRefresh(graph.data('widget')['uniqueid']);
 			}
 
 			$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
@@ -119,14 +118,13 @@ jQuery(function ($) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
 			data.isHintBoxFrozen = true;
-			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			ZABBIX.Dashboard._methods.pauseWidgetRefresh(graph.data('widget')['uniqueid']);
 
 			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-				$('.dashbrd-grid-container')
-					.dashboardGrid('unpauseWidgetRefresh', graph.data('widget')['uniqueid']);
+				ZABBIX.Dashboard._methods.unpauseWidgetRefresh(graph.data('widget')['uniqueid']);
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
 				destroyHintbox(graph);
@@ -189,7 +187,7 @@ jQuery(function ($) {
 
 		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
 		if (data.start != data.end && !data.boxing) {
-			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			ZABBIX.Dashboard._methods.pauseWidgetRefresh(graph.data('widget')['uniqueid']);
 			data.isHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);

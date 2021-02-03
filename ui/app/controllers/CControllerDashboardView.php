@@ -157,7 +157,7 @@ class CControllerDashboardView extends CController {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name', 'private'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+				'selectPages' => ['widgets'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => [$this->getInput('source_dashboardid')]
@@ -169,7 +169,7 @@ class CControllerDashboardView extends CController {
 					'name' => $dashboards[0]['name'],
 					'editable' => true,
 					'widgets' => CDashboardHelper::prepareWidgetsForGrid(
-						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['widgets']), null, true
+						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages'][0]['widgets']), null, true
 					),
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
@@ -208,7 +208,7 @@ class CControllerDashboardView extends CController {
 			if ($dashboardid !== null) {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
-					'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+					'selectPages' => ['widgets'],
 					'dashboardids' => [$dashboardid],
 					'preservekeys' => true
 				]);
@@ -217,7 +217,7 @@ class CControllerDashboardView extends CController {
 					CDashboardHelper::updateEditableFlag($dashboards);
 
 					$dashboard = array_shift($dashboards);
-					$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'], null, true);
+					$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['pages'][0]['widgets'], null, true);
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])

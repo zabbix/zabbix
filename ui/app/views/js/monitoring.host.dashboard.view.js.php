@@ -29,8 +29,7 @@
 		// Prevent page reloading on time selector events.
 		timeControl.refreshPage = false;
 
-		$('.<?= ZBX_STYLE_DASHBRD_GRID_CONTAINER ?>')
-			.dashboardGrid({
+		ZABBIX.Dashboard._methods.init({
 				dashboard: {
 					templateid: data.templateid,
 					dashboardid: data.dashboardid,
@@ -46,9 +45,9 @@
 					'edit_mode': false,
 					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
 				}
-			})
-			.dashboardGrid('setWidgetDefaults', widget_defaults)
-			.dashboardGrid('addWidgets', data.widgets);
+			});
+		ZABBIX.Dashboard._methods.setWidgetDefaults(widget_defaults);
+		ZABBIX.Dashboard._methods.addWidgets(data.widgets);
 
 		jqBlink.blink();
 	}

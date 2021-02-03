@@ -77,11 +77,13 @@ class CControllerHostDashboardView extends CController {
 
 			$dashboards = API::TemplateDashboard()->get([
 				'output' => ['dashboardid', 'name', 'templateid'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
+				'selectPages' => ['widgets'],
 				'dashboardids' => [$dashboardid]
 			]);
 
 			$dashboard = array_shift($dashboards);
+			$dashboard['widgets'] = [$dashboard['pages'][0]['widgets']];
+
 
 			if ($dashboard !== null) {
 				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
