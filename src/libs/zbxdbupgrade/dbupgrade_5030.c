@@ -1001,10 +1001,11 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		{
 			int	arg_type = ZBX_DBPATCH_ARG_STR;
 
-			if (3 <= params.values_num)
+			if (2 <= params.values_num)
 			{
-				const char	*op = row[3] + params.values[2].l,
-						*pattern =  row[3] + params.values[1].l, *ptr;
+				const char	*op, *pattern =  row[3] + params.values[1].l, *ptr;
+
+				op = (3 <= params.values_num ? row[3] + params.values[2].l : "eq");
 
 				/* set numeric pattern type for numeric items unless regexp/iregexp opeation is */
 				/* performed or band operation pattern contains mask (separated by '/')         */
