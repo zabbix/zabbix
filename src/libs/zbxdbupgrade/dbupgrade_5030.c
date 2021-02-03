@@ -1057,7 +1057,7 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 		}
 		else if (0 == strcmp(row[2], "prev"))
 		{
-			zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$,2",
+			zbx_vector_ptr_append(functions, dbpatch_new_function(functionid, itemid, "last", "$,#2",
 					ZBX_DBPATCH_FUNCTION_UPDATE));
 		}
 		else if (0 == strcmp(row[2], "strlen"))
