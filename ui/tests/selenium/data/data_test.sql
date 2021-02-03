@@ -2832,3 +2832,8 @@ INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, descri
 
 -- testFormAdministrationGeneralMacros
 INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+
+-- testFormAdministrationScripts
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (200, 0, 'Script for Update', 'test', 2, NULL, NULL, 'update description');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (201, 0, 'Script for Clone','test', 2, NULL, NULL, 'clone description');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (202, 0, 'Script for Delete','test', 2, NULL, NULL, 'delete description');
