@@ -293,6 +293,15 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 						[
 							'check_action' => 'Add',
 							'type' => 'SNMPv3 agent',
+							'snmp_oid' => '4',
+							'security_level' => 'authPriv',
+							'auth_protocol' => 'SHA512',
+							'priv_protocol' => 'AES256C',
+							'priv_passphrase' => '4'
+						],
+						[
+							'check_action' => 'Add',
+							'type' => 'SNMPv3 agent',
 							'port' => '159',
 							'snmp_oid' => '3',
 							'context_name' => '3',
