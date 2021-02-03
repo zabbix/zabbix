@@ -829,6 +829,45 @@ static void	dbpatch_convert_params(char **out, const char *parameter, zbx_vector
 
 /******************************************************************************
  *                                                                            *
+ * Function: dbpatch_is_numeric_count_pattern                                 *
+ *                                                                            *
+ * Purpose: check if the pattern can be a numeric value for the specified     *
+ *          operation                                                         *
+ *                                                                            *
+ * Parameters: op      - [IN] the operation                                   *
+ *             pattern - [IN] the pattern                                     *
+ *                                                                            *
+ * Comments: The op and pattern parameters are pointers to trigger expression *
+ *           substrings.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbpatch_is_numeric_count_pattern(const char *op, const char *pattern)
+{
+	if (0 == strncmp(op, "eq", ZBX_CONST_STRLEN("eq")) ||
+			0 == strncmp(op, "ne", ZBX_CONST_STRLEN("ne")) ||
+			0 == strncmp(op, "gt", ZBX_CONST_STRLEN("gt")) ||
+			0 == strncmp(op, "ge", ZBX_CONST_STRLEN("ge")) ||
+			0 == strncmp(op, "lt", ZBX_CONST_STRLEN("lt")) ||
+			0 == strncmp(op, "le", ZBX_CONST_STRLEN("le")))
+	{
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(op, "band", ZBX_CONST_STRLEN("band")))
+	{
+		const char	*ptr;
+
+		/* op was the next parameter after pattern in the count function - */
+		/* if the '/' is located beyond op, it's outside pattern           */
+		if (NULL == (ptr = strchr(pattern, '/')) || ptr >= op)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dbpatch_convert_trigger                                          *
  *                                                                            *
  * Purpose: convert trigger and its functions to use new expression syntax    *
@@ -1003,17 +1042,14 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 
 			if (2 <= params.values_num)
 			{
-				const char	*op, *pattern =  row[3] + params.values[1].l, *ptr;
+				const char	*op, *pattern =  row[3] + params.values[1].l;
 
 				op = (3 <= params.values_num ? row[3] + params.values[2].l : "eq");
 
-				/* set numeric pattern type for numeric items unless regexp/iregexp opeation is */
-				/* performed or band operation pattern contains mask (separated by '/')         */
+				/* set numeric pattern type for numeric items and numeric operators unless */
+				/* band operation pattern contains mask (separated by '/')                 */
 				if ((ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type) &&
-						0 != strncmp(op, "regexp", ZBX_CONST_STRLEN("regexp")) &&
-						0 != strncmp(op, "iregexp", ZBX_CONST_STRLEN("iregexp")) &&
-						(0 != strncmp(op, "band", ZBX_CONST_STRLEN("band")) ||
-								NULL == (ptr = strchr(pattern, '/')) || ptr >= op))
+						SUCCEED == dbpatch_is_numeric_count_pattern(op, pattern))
 				{
 					arg_type = ZBX_DBPATCH_ARG_NUM;
 				}
