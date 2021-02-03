@@ -909,17 +909,17 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 	return ret;
 }
 
-int	check_vcenter_hv_cpu_usage_avg(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid;
+	char			*url, *uuid, *avg, path[32];
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -927,6 +927,26 @@ int	check_vcenter_hv_cpu_usage_avg(AGENT_REQUEST *request, const char *username,
 
 	url = get_rparam(request, 0);
 	uuid = get_rparam(request, 1);
+	avg = get_rparam(request, 2);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if (NULL != avg && '\0' != *avg)
+	{
+		if (0 != strcmp(avg, "avg"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
+		else
+			zbx_strlcpy(path, "cpu/usage[average]", sizeof(path));
+	}
+	else
+		zbx_strlcpy(path, "cpu/usage[none]", sizeof(path));
 
 	zbx_vmware_lock();
 
@@ -939,8 +959,7 @@ int	check_vcenter_hv_cpu_usage_avg(AGENT_REQUEST *request, const char *username,
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/usage[average]", "",
-			ZBX_KIBIBYTE, result);
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, path, "", ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1627,10 +1646,23 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < hv->ds_names.values_num; i++)
+	for (i = 0; i < hv->dsnames.values_num; i++)
 	{
+		zbx_vmware_dsname_t	*dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+		int			j, total = 0;
+		char			buffer[16];
+
+		for (j = 0; j < dsname->hvdisknames.values_num; j++)
+			total += dsname->hvdisknames.values[j]->multipath_total;
+
+		zbx_snprintf(buffer, sizeof(buffer), "%d", total);
+
 		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#DATASTORE}", hv->ds_names.values[i], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
+
+		if (0 < total)
+			zbx_json_addstring(&json_data, "{#MULTIPATH.COUNT}", buffer, ZBX_JSON_TYPE_INT);
+
 		zbx_json_close(&json_data);
 	}
 
@@ -1656,6 +1688,7 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
+	zbx_vmware_dsname_t	dsnames_cmp;
 	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_str_uint64_pair_t	uuid_cmp = {.value = 0};
 
@@ -1697,7 +1730,9 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
-	if (FAIL == zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
+	dsnames_cmp.name = datastore->name;
+
+	if (FAIL == zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsnames_cmp, vmware_dsname_compare))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 				datastore->name));
@@ -2068,9 +2103,11 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
-	for (i = 0; i < hv->ds_names.values_num; i++)
+	for (i = 0; i < hv->dsnames.values_num; i++)
 	{
-		ds_list = zbx_strdcatf(ds_list, "%s\n", hv->ds_names.values[i]);
+		zbx_vmware_dsname_t	*dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+
+		ds_list = zbx_strdcatf(ds_list, "%s\n", dsname->name);
 	}
 
 	if (NULL != ds_list)
@@ -2080,6 +2117,115 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 
 	SET_TEXT_RESULT(result, ds_list);
 
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *hv_uuid, *ds_name, *partition;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_dsname_t	*dsname;
+	int			ret = SYSINFO_RET_FAIL, multipath_count = 0, i, j;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	hv_uuid = get_rparam(request, 1);
+	ds_name = get_rparam(request, 2);
+	partition = get_rparam(request, 3);
+
+	if ('\0' == *hv_uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if (NULL != partition && '\0' != *partition && (NULL == ds_name || '\0' == *ds_name))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	if (NULL != ds_name && '\0' != *ds_name)
+	{
+		zbx_vmware_datastore_t	*datastore;
+		zbx_vmware_dsname_t	dsnames_cmp;
+
+		datastore = ds_get(&service->data->datastores, ds_name);
+
+		if (NULL == datastore)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			goto unlock;
+		}
+
+		dsnames_cmp.name = datastore->name;
+
+		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsnames_cmp, vmware_dsname_compare)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
+					datastore->name));
+			goto unlock;
+		}
+
+		if (NULL == datastore->uuid)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+			goto unlock;
+		}
+
+		dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+
+		for (j = 0; j < dsname->hvdisknames.values_num; j++)
+		{
+			zbx_vmware_hvdiskname_t	*hvdiskname = (zbx_vmware_hvdiskname_t *)dsname->hvdisknames.values[j];
+
+			if (NULL != partition && '\0' != *ds_name)
+			{
+				if (hvdiskname->diskname.partitionid == atoi(partition))
+					multipath_count += hvdiskname->multipath_active;
+			}
+			else
+				multipath_count += hvdiskname->multipath_active;
+		}
+	}
+	else
+	{
+		for (i = 0; i < hv->dsnames.values_num; i++)
+		{
+			dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+
+			for (j = 0; j < dsname->hvdisknames.values_num; j++)
+				multipath_count += dsname->hvdisknames.values[j]->multipath_active;
+		}
+	}
+
+	SET_UI64_RESULT(result, multipath_count);
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
@@ -3885,16 +4031,17 @@ out:
 	return ret;
 }
 
-int	check_vcenter_vm_cpu_usage_avg(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_vm_cpu_usage_perf(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid;
+	const char		*url, *uuid, *avg;
+	char			path[32];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 != request->nparam)
+	if (2 > request->nparam || request->nparam > 3)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -3902,6 +4049,7 @@ int	check_vcenter_vm_cpu_usage_avg(AGENT_REQUEST *request, const char *username,
 
 	url = get_rparam(request, 0);
 	uuid = get_rparam(request, 1);
+	avg = get_rparam(request, 2);
 
 	if ('\0' == *uuid)
 	{
@@ -3909,12 +4057,25 @@ int	check_vcenter_vm_cpu_usage_avg(AGENT_REQUEST *request, const char *username,
 		goto out;
 	}
 
+	if (NULL != avg && '\0' != *avg)
+	{
+		if (0 != strcmp(avg, "avg"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
+		else
+			zbx_strlcpy(path, "cpu/usage[average]", sizeof(path));
+	}
+	else
+		zbx_strlcpy(path, "cpu/usage[none]", sizeof(path));
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/usage[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", path, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
