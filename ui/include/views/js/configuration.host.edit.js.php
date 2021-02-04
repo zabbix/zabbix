@@ -236,17 +236,21 @@
 				.querySelector(`#interfaces_${iface.interfaceid}_details_version`)
 				.value = iface.details.version;
 
-			if (iface.details.securitylevel) {
+			if (iface.details.securitylevel !== undefined) {
 				elem
 					.querySelector(`#interfaces_${iface.interfaceid}_details_securitylevel`)
 					.value = iface.details.securitylevel;
 			}
 
-			elem.querySelector(`[name="interfaces[${iface.interfaceid}][details][privprotocol]"]`).value
-				= iface.details.privprotocol;
+			if (iface.details.privprotocol !== undefined) {
+				elem.querySelector(`[name="interfaces[${iface.interfaceid}][details][privprotocol]"]`).value
+					= iface.details.privprotocol;
+			}
 
-			elem.querySelector(`[name="interfaces[${iface.interfaceid}][details][authprotocol]"]`).value
-				= iface.details.authprotocol;
+			if (iface.details.authprotocol !== undefined) {
+				elem.querySelector(`[name="interfaces[${iface.interfaceid}][details][authprotocol]"]`).value
+					= iface.details.authprotocol;
+			}
 
 			if (iface.details.bulk == <?= SNMP_BULK_ENABLED ?>) {
 				elem
