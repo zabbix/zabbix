@@ -1648,20 +1648,18 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 	for (i = 0; i < hv->dsnames.values_num; i++)
 	{
-		zbx_vmware_dsname_t	*dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
-		int			j, total = 0;
-		char			buffer[16];
+		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
+		zbx_uint64_t		total = 0;
+		int			j;
+
 
 		for (j = 0; j < dsname->hvdisknames.values_num; j++)
 			total += dsname->hvdisknames.values[j]->multipath_total;
 
-		zbx_snprintf(buffer, sizeof(buffer), "%d", total);
-
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
-
-		if (0 < total)
-			zbx_json_addstring(&json_data, "{#MULTIPATH.COUNT}", buffer, ZBX_JSON_TYPE_INT);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", total);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}", dsname->hvdisknames.values_num);
 
 		zbx_json_close(&json_data);
 	}
@@ -2105,7 +2103,7 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 
 	for (i = 0; i < hv->dsnames.values_num; i++)
 	{
-		zbx_vmware_dsname_t	*dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
 
 		ds_list = zbx_strdcatf(ds_list, "%s\n", dsname->name);
 	}
@@ -2133,7 +2131,8 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_dsname_t	*dsname;
-	int			ret = SYSINFO_RET_FAIL, multipath_count = 0, i, j;
+	int			ret = SYSINFO_RET_FAIL, partitionid = 0, i, j;
+	zbx_uint64_t		multipath_count = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2154,10 +2153,15 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		goto out;
 	}
 
-	if (NULL != partition && '\0' != *partition && (NULL == ds_name || '\0' == *ds_name))
+	if (NULL != partition && '\0' != *partition)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto out;
+		if (NULL == ds_name || '\0' == *ds_name)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+			goto out;
+		}
+
+		partitionid = atoi(partition);
 	}
 
 	zbx_vmware_lock();
@@ -2199,26 +2203,36 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 			goto unlock;
 		}
 
-		dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+		dsname = hv->dsnames.values[i];
 
 		for (j = 0; j < dsname->hvdisknames.values_num; j++)
 		{
-			zbx_vmware_hvdiskname_t	*hvdiskname = (zbx_vmware_hvdiskname_t *)dsname->hvdisknames.values[j];
+			zbx_vmware_hvdiskname_t	*hvdiskname = dsname->hvdisknames.values[j];
 
-			if (NULL != partition && '\0' != *ds_name)
+			if (NULL == partition)
 			{
-				if (hvdiskname->diskname.partitionid == atoi(partition))
-					multipath_count += hvdiskname->multipath_active;
-			}
-			else
 				multipath_count += hvdiskname->multipath_active;
+				continue;
+			}
+
+			if (hvdiskname->diskname.partitionid == partitionid)
+			{
+				multipath_count = hvdiskname->multipath_active;
+				break;
+			}
+		}
+
+		if (NULL != partition && dsname->hvdisknames.values_num == j)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown partition id."));
+			goto unlock;
 		}
 	}
 	else
 	{
 		for (i = 0; i < hv->dsnames.values_num; i++)
 		{
-			dsname = (zbx_vmware_dsname_t *)hv->dsnames.values[i];
+			dsname = hv->dsnames.values[i];
 
 			for (j = 0; j < dsname->hvdisknames.values_num; j++)
 				multipath_count += dsname->hvdisknames.values[j]->multipath_active;
