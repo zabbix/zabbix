@@ -72,7 +72,7 @@ $remove_container->addItem([
 		(new CCheckBox('valuemap_remove_except'))
 			->setLabel(_('Except selected'))
 			->setUncheckedValue(0)
-	))->addClass('valuemap-checkbox')
+	))->addClass(ZBX_STYLE_VALUEMAP_CHECKBOX)
 ]);
 
 $remove_all_container = (new CDiv())->addItem((new CDiv(
