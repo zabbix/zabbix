@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 const ZBX_STYLE_SORTABLE = 'csortable';
 const ZBX_STYLE_SORTABLE_LIST = 'csortable-list';
 const ZBX_STYLE_SORTABLE_ITEM = 'csortable-item';
@@ -32,7 +33,7 @@ class CSortable extends CBaseComponent {
 	/**
 	 * Create CSortable instance.
 	 *
-	 * @param {HTMLLIElement}  target
+	 * @param {HTMLElement}  target
 	 *
 	 * @returns {CSortable}
 	 */
