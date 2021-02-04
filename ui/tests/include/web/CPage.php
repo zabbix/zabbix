@@ -575,7 +575,7 @@ class CPage {
 	 *
 	 * @throws Exception
 	 */
-	public function assertPageTitle($title) {
+	public function assertTitle($title) {
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
@@ -595,7 +595,7 @@ class CPage {
 	 *
 	 * @throws Exception
 	 */
-	public function assertPageHeader($header) {
+	public function assertHeader($header) {
 		$text = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
 
 		if ($text !== $header) {
