@@ -34,6 +34,7 @@ import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 import org.json.*;
 
@@ -92,12 +93,16 @@ class JMXItemChecker extends ItemChecker
 
 		try
 		{
-			HashMap<String, String[]> env = null;
+			HashMap<String, Object> env = new HashMap<String, Object>();
 
 			if (null != username && null != password)
 			{
-				env = new HashMap<String, String[]>();
 				env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
+			}
+
+			if (Boolean.parseBoolean(System.getProperty("com.sun.management.jmxremote.registry.ssl")))
+			{
+				env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
 			}
 
 			jmxc = ZabbixJMXConnectorFactory.connect(url, env);
