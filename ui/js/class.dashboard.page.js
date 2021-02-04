@@ -233,7 +233,7 @@ class CDashboardPage {
 		// 	if (!widget['content_header']) {
 		// 		return;
 		// 	}
-		//
+
 		// 	// Widget popup open (refresh rate)?
 		// 	if (widget['content_header'].find('[data-expanded="true"]').length > 0
 		// 		// Widget being dragged or resized in dashboard edit mode?
@@ -348,7 +348,7 @@ class CDashboardPage {
 		widget.div.addClass('dashbrd-grid-widget-focus');
 
 		if (widget.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
-			widget.parent.div.toggleClass('iterator-double-header', widget.div.position().top == 0);
+			widget.parent.div.toggleClass('iterator-double-header', widget.div.position().top === 0);
 		}
 	}
 
@@ -366,7 +366,7 @@ class CDashboardPage {
 			// 	if (except_widget !== null && widget.uniqueid === except_widget.uniqueid) {
 			// 		return;
 			// 	}
-			//
+
 			// 	this.doLeaveWidget(widget);
 			// });
 			for (const widget of data.widgets) {
@@ -406,20 +406,20 @@ class CDashboardPage {
 	/**
 	 * Blur all child widgets of iterator, except the specified one.
 	 *
-	 * @param {object} iterator       Iterator object.
-	 * @param {object} except_widget  Dashboard widget object.
+	 * @param {object} iterator      Iterator object.
+	 * @param {object} except_child  Dashboard widget object.
 	 */
 	// TODO unused function +
-	doLeaveWidgetsOfIteratorExcept(iterator, except_child) {
+	doLeaveWidgetsOfIteratorExcept(iterator, except_child = null) {
 		// iterator['children'].forEach((child) => {
 		// 	if (except_child !== undefined && child.uniqueid === except_child.uniqueid) {
 		// 		return;
 		// 	}
-		//
+
 		// 	child['div'].removeClass('dashbrd-grid-widget-focus');
 		// });
 		for (const child of iterator.children) {
-			if (except_child !== undefined && child.uniqueid === except_child.uniqueid) {
+			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
 				continue;
 			}
 
@@ -456,7 +456,7 @@ class CDashboardPage {
 			}
 
 			// Focused widget not on the first row of dashboard?
-			if (widget.div.position().top != 0) {
+			if (widget.div.position().top !== 0) {
 				break;
 			}
 
@@ -769,14 +769,14 @@ class CDashboardPage {
 	posEquals(pos1, pos2) {
 		// TODO need to check each +
 		// var ret = true;
-		//
+
 		// $.each(['x', 'y', 'width', 'height'], function(index, key) {
 		// 	if (pos1[key] !== pos2[key]) {
 		// 		ret = false;
 		// 		return false;
 		// 	}
 		// });
-		//
+
 		// return ret;
 		for (const key of ['x', 'y', 'width', 'height']) {
 			if (pos1[key] !== pos2[key]) {
@@ -951,27 +951,27 @@ class CDashboardPage {
 		// 	if ('affected_by_draggable' in w) {
 		// 		var pos = Object.assign({}, w.pos),
 		// 			overlaps = false;
-		//
+
 		// 		pos.y -= widget.pos.height;
 		// 		pos.height += widget.pos.height;
-		//
+
 		// 		// TODO need to check each
 		// 		$.each(widgets, (_, b) => {
 		// 			overlaps = (b.uniqueid !== w.uniqueid && b.uniqueid !== widget.uniqueid && this.rectOverlap(b.pos, pos));
-		//
+
 		// 			if (overlaps) {
 		// 				pos.y = b.pos.y + b.pos.height;
 		// 				pos.height -= w.pos.y - pos.y;
 		// 				overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
 		// 			}
-		//
+
 		// 			return !overlaps;
 		// 		});
-		//
+
 		// 		if (overlaps) {
 		// 			return false;
 		// 		}
-		//
+
 		// 		w.pos.y = pos.y;
 		// 	}
 		// });
@@ -1063,12 +1063,12 @@ class CDashboardPage {
 			// 		&& this.rectOverlap(pos, affected_widget.current_pos);
 			// }).forEach((affected_widget) => {
 			// 	const boundary = Object.assign({}, affected_widget.current_pos);
-			//
+
 			// 	if (affected_widget.uniqueid !== widget.uniqueid) {
 			// 		boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
 			// 	}
 			// 	affected_widget.affected_axis = axis_key;
-			//
+
 			// 	markAffectedWidgets(boundary);
 			// });
 		}
@@ -1076,7 +1076,7 @@ class CDashboardPage {
 		let margins = {};
 		let new_max = 0;
 		let affected;
-		let overlap = 0;
+		let overlap;
 
 		// Resize action for left/up is mirrored right/down action.
 		if ('mirrored' in axis) {
@@ -1268,22 +1268,22 @@ class CDashboardPage {
 				// 	if ('pos' in box && box.pos[axis_key] > slot) {
 				// 		continue;
 				// 	}
-				//
+
 				// 	box.new_pos = Object.assign({}, box.current_pos);
 				// 	box.new_pos[axis_key] = slot;
-				//
+
 				// 	for (const col_box of col) {
 				// 		if (col_box.uniqueid === box.uniqueid || this.rectOverlap(col_box.current_pos, box.new_pos)) {
 				// 			if (col_box.current_pos[size_key] > size_min) {
 				// 				const start_pos = axis_boundaries[col_box.uniqueid].min;
 				// 				const stop_pos = axis_boundaries[col_box.uniqueid].max;
 				// 				let margin = 0;
-				//
+
 				// 				// Find max overlap position value for checked widget.
 				// 				for (let i = start_pos; i < stop_pos; i++) {
 				// 					margin = Math.max(margin, margins[i]);
 				// 				}
-				//
+
 				// 				if (margin && margin < size_max) {
 				// 					box.new_pos[axis_key] = box.current_pos[axis_key];
 				// 					continue;
@@ -1292,10 +1292,10 @@ class CDashboardPage {
 				// 						margins[i] = margins_backup[i] - scanline[size_key];
 				// 					}
 				// 				}
-				//
+
 				// 				col_box.new_pos = Object.assign({}, col_box.current_pos);
 				// 				col_box.new_pos[size_key] -= scanline[size_key];
-				//
+
 				// 				// Mark opposite axis coordinates as movable.
 				// 				for (let i = start_pos; i < stop_pos; i++) {
 				// 					collapsed_pos[i] = 1;
@@ -1306,7 +1306,7 @@ class CDashboardPage {
 				// 			}
 				// 		}
 				// 	}
-				//
+
 				// 	if (!collapsed) {
 				// 		break;
 				// 	}
@@ -1438,8 +1438,8 @@ class CDashboardPage {
 		}
 
 		// Situation when there are changes on both axes should be handled as special case.
-		if (process_order[0] === 'x' && (widget.prev_pos.y != widget.current_pos.y
-			|| widget.prev_pos.height != widget.current_pos.height)) {
+		if (process_order[0] === 'x' && (widget.prev_pos.y !== widget.current_pos.y
+			|| widget.prev_pos.height !== widget.current_pos.height)) {
 			// Mark affected_axis as y if affected box is affected by only changing y position or height.
 			const pos = {
 				x: widget.prev_pos.x,
@@ -1462,7 +1462,7 @@ class CDashboardPage {
 					&& this.rectOverlap(widget.current_pos, box.current_pos))
 					? box
 					: null;
-			}).forEach(function(box) {
+			}).forEach((box) => {
 				if (this.rectOverlap(pos, box.current_pos)) {
 					box.affected_axis = 'y';
 				}
@@ -1501,8 +1501,8 @@ class CDashboardPage {
 				axis.mirrored = true;
 			}
 
-			opposite_axis_key = (axis_key === 'y') ? 'x' : 'y',
-				opposite_size_key = (opposite_axis_key === 'x') ? 'width' : 'height';
+			opposite_axis_key = (axis_key === 'y') ? 'x' : 'y';
+			opposite_size_key = (opposite_axis_key === 'x') ? 'width' : 'height';
 
 			if (opposite_size_key in widget.prev_pos.axis_correction) {
 				// Use 'corrected' size if it is less than current size.
@@ -1664,7 +1664,7 @@ class CDashboardPage {
 		// 		this['pos'] = this['current_pos'];
 		// 		this.setDivPosition(this['div'], this['pos']);
 		// 	}
-		//
+
 		// 	delete this['current_pos'];
 		// });
 
@@ -1784,18 +1784,18 @@ class CDashboardPage {
 		// 	var new_pos = this['current_pos'],
 		// 		old_pos = this['pos'],
 		// 		changed = false;
-		//
+
 		// 	$.each(['x', 'y', 'width', 'height'], function(index, value) {
 		// 		if (new_pos[value] !== old_pos[value]) {
 		// 			changed = true;
 		// 		}
 		// 	});
-		//
+
 		// 	if (changed) {
 		// 		data['options']['updated'] = true;
 		// 		this['pos'] = this['current_pos'];
 		// 	}
-		//
+
 		// 	// should be present only while dragging
 		// 	delete this['current_pos'];
 		// });
@@ -1809,7 +1809,7 @@ class CDashboardPage {
 
 			// should be present only while dragging
 			delete box.current_pos;
-		};
+		}
 
 		this.setDivPosition(widget.div, widget.pos);
 		this.resizeDashboardGrid();
@@ -1888,13 +1888,13 @@ class CDashboardPage {
 		// TODO need to check each
 		// $.each(['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'], function(index, key) {
 		// 	var	$handle = $('<div>').addClass('ui-resizable-handle').addClass('ui-resizable-' + key);
-		//
+
 		// 	if ($.inArray(key, ['n', 'e', 's', 'w']) >= 0) {
 		// 		$handle
 		// 			.append($('<div>', {'class': 'ui-resize-dot'}))
 		// 			.append($('<div>', {'class': 'ui-resizable-border-' + key}));
 		// 	}
-		//
+
 		// 	widget['div'].append($handle);
 		// 	handles[key] = $handle;
 		// });
@@ -2140,8 +2140,6 @@ class CDashboardPage {
 
 	// TODO unused function +
 	setUpdateWidgetContentTimer(widget, rf_rate) {
-		const data = this._$target.data('dashboardGrid');
-
 		this.clearUpdateWidgetContentTimer(widget);
 
 		if (widget.updating_content) {
@@ -2218,7 +2216,7 @@ class CDashboardPage {
 					// Set single-line header for the iterator.
 					iterator.div.removeClass('iterator-double-header');
 
-					if (data.options['kioskmode'] && iterator.div.position().top == 0) {
+					if (data.options['kioskmode'] && iterator.div.position().top === 0) {
 						this.slideKiosk();
 					}
 				})
@@ -2271,7 +2269,7 @@ class CDashboardPage {
 				height: `${height * data.options['widget-height']}px`
 			};
 
-			if (cell_column == num_columns - 1) {
+			if (cell_column === (num_columns - 1)) {
 				// Setting right side for last column of widgets (fixes IE11 and Opera issues).
 				css = {...css, ...{
 					width: 'auto',
@@ -2294,8 +2292,6 @@ class CDashboardPage {
 
 	// TODO unused function +
 	addWidgetOfIterator(iterator, child) {
-		const data = this._$target.data('dashboardGrid');
-
 		// Replace empty arrays (or anything non-object) with empty objects.
 		if (typeof child.fields !== 'object') {
 			child.fields = {};
@@ -2491,7 +2487,7 @@ class CDashboardPage {
 	}
 
 	// TODO unused function +
-	updateWidgetCallback(widget, response, options) {
+	updateWidgetCallback(widget, response) {
 		const data = this._$target.data('dashboardGrid');
 
 		widget.content_body.empty();
@@ -2716,7 +2712,7 @@ class CDashboardPage {
 				if (widget.iterator) {
 					this.updateIteratorCallback(widget, response, options);
 				} else {
-					this.updateWidgetCallback(widget, response, options);
+					this.updateWidgetCallback(widget, response);
 				}
 
 				this.doAction('onContentUpdated');
@@ -2765,17 +2761,16 @@ class CDashboardPage {
 	promiseScrollIntoView(pos) {
 		const data = this._$target.data('dashboardGrid');
 
-		const $wrapper = $('.wrapper');
+		const $wrapper = $(".wrapper");
 
-		let offset_top = $wrapper.scrollTop() + this._$target.offset().top,
-			// Allow 5px free space around the object.
-			margin = 5,
-			widget_top = offset_top + pos.y * data.options['widget-height'] - margin,
-			widget_height = pos.height * data.options['widget-height'] + margin * 2,
-			wrapper_height = $wrapper.height(),
-			wrapper_scrollTop = $wrapper.scrollTop(),
-			wrapper_scrollTop_min = Math.max(0, widget_top + Math.min(0, widget_height - wrapper_height)),
-			wrapper_scrollTop_max = widget_top;
+		const offset_top = $wrapper.scrollTop() + this._$target.offset().top;
+		const margin = 5;  // Allow 5px free space around the object.
+		const widget_top = offset_top + pos.y * data.options['widget-height'] - margin;
+		const widget_height = pos.height * data.options['widget-height'] + margin * 2;
+		const wrapper_height = $wrapper.height();
+		const wrapper_scrollTop = $wrapper.scrollTop();
+		const wrapper_scrollTop_min = Math.max(0, widget_top + Math.min(0, widget_height - wrapper_height));
+		const wrapper_scrollTop_max = widget_top;
 
 		if (pos.y + pos.height > data.options['rows']) {
 			this.resizeDashboardGrid(pos.y + pos.height);
@@ -2843,7 +2838,7 @@ class CDashboardPage {
 			view_mode: view_mode
 		};
 
-		if (Object.keys(fields).length != 0) {
+		if (Object.keys(fields).length !== 0) {
 			ajax_data.fields = JSON.stringify(fields);
 		}
 
@@ -2896,7 +2891,7 @@ class CDashboardPage {
 					view_mode: view_mode
 				};
 
-				if (Object.keys(fields).length != 0) {
+				if (Object.keys(fields).length !== 0) {
 					ajax_data.fields = JSON.stringify(fields);
 				}
 
@@ -3051,16 +3046,19 @@ class CDashboardPage {
 	isPosFree(pos) {
 		const data = this._$target.data('dashboardGrid');
 
-		let free = true;
-
 		// TODO need to check each
-		$.each(data.widgets, () => {
-			if (this.rectOverlap(pos, this['pos'])) {
-				free = false;
+		// $.each(data.widgets, () => {
+		// 	if (this.rectOverlap(pos, this['pos'])) {
+		// 		free = false;
+		// 	}
+		// });
+		for (const widget of data.widgets) {
+			if (this.rectOverlap(pos, widget.pos)) {
+				return false;
 			}
-		});
+		}
 
-		return free;
+		return true;
 	}
 
 	// TODO unused function +
@@ -3182,7 +3180,7 @@ class CDashboardPage {
 					options.position.at[0] = 'left';
 				}
 
-				if (dimension.y == 0) {
+				if (dimension.y === 0) {
 					options.position.my[1] = 'top';
 					options.position.at[1] = (dimension.top > dimension.y) ? 'top' : 'bottom';
 				} else if (dimension.top > dimension.y) {
@@ -3411,9 +3409,9 @@ class CDashboardPage {
 	// TODO unused function +
 	removeWidgetActions(widget) {
 		for (const hook_name in data.triggers) {
-			for (let index = 0; index < data.triggers[hook_name].length; index++) {
-				if (widget.uniqueid === data.triggers[hook_name][index].uniqueid) {
-					data.triggers[hook_name].splice(index, 1);
+			for (let i = 0; i < data.triggers[hook_name].length; i++) {
+				if (widget.uniqueid === data.triggers[hook_name][i].uniqueid) {
+					data.triggers[hook_name].splice(i, 1);
 				}
 			}
 		}
@@ -3526,8 +3524,6 @@ class CDashboardPage {
 
 	// TODO unused function +
 	resizeWidget(widget) {
-		const data = this._$target.data('dashboardGrid');
-
 		let success = false;
 
 		if (widget.iterator) {
@@ -4006,7 +4002,7 @@ class CDashboardPage {
 
 				// TODO need to check each
 				$.each(data.widgets, (index, widget) => {
-					if (widget.widgetid == widgetid) {
+					if (widget.widgetid === widgetid) {
 						widget.rf_rate = rf_rate;
 						this.setUpdateWidgetContentTimer(widget);
 					}
@@ -4019,7 +4015,7 @@ class CDashboardPage {
 
 				// TODO need to check each
 				$.each(data.widgets, (index, widget) => {
-					if (widget.widgetid == widgetid || widget.uniqueid === widgetid) {
+					if (widget.widgetid === widgetid || widget.uniqueid === widgetid) {
 						this.updateWidgetContent(widget);
 					}
 				});
@@ -4032,7 +4028,7 @@ class CDashboardPage {
 
 				// TODO need to check each
 				$.each(data.widgets, (index, widget) => {
-					if (widget.widgetid == widgetid || widget.uniqueid === widgetid) {
+					if (widget.widgetid === widgetid || widget.uniqueid === widgetid) {
 						widget.update_paused = true;
 						return false;
 					}
@@ -4195,7 +4191,7 @@ class CDashboardPage {
 				}
 
 				// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
-				if (widget === null && pos !== null && pos.width == 2 && pos.height == 2) {
+				if (widget === null && pos !== null && pos.width === 2 && pos.height === 2) {
 					pos.width = new_widget.pos.width;
 					pos.height = new_widget.pos.height;
 
@@ -4295,8 +4291,6 @@ class CDashboardPage {
 			// After pressing "delete" button on widget.
 			// TODO unused function +
 			deleteWidget: (widget) => {
-				const data = this._$target.data('dashboardGrid');
-
 				this.deleteWidget(widget);
 			},
 
@@ -4353,7 +4347,7 @@ class CDashboardPage {
 					fields = {};
 				}
 
-				if (fields && Object.keys(fields).length != 0) {
+				if (fields && Object.keys(fields).length !== 0) {
 					ajax_data.fields = JSON.stringify(fields);
 				}
 
@@ -4529,7 +4523,7 @@ class CDashboardPage {
 				let index = -1;
 
 				if (typeof data.widget_relations.relations[widget.uniqueid] === 'undefined'
-					|| data.widget_relations.relations[widget.uniqueid].length == 0) {
+					|| data.widget_relations.relations[widget.uniqueid].length === 0) {
 					ret = false;
 				}
 
@@ -4573,7 +4567,7 @@ class CDashboardPage {
 							if (typeof data.widget_relations.relations[src_uniqueid] !== 'undefined') {
 								// TODO need to check each
 								$.each(data.widget_relations.relations[src_uniqueid], (index, dest_uid) => {
-									if (buffer_data.old.indexOf(dest_uid) == -1) {
+									if (buffer_data.old.indexOf(dest_uid) === -1) {
 										if (typeof data.widget_relations.tasks[dest_uid] !== 'undefined') {
 											const widget = this._methods.getWidgetsBy('uniqueid', dest_uid);
 											if (widget.length) {
@@ -4623,7 +4617,7 @@ class CDashboardPage {
 				 * Unset if dimension width/height is equal to size of placeholder.
 				 * Widget default size will be used.
 				 */
-				if (pos && pos.width == 2 && pos.height == 2) {
+				if (pos && pos.width === 2 && pos.height === 2) {
 					delete pos.width;
 					delete pos.height;
 				}
