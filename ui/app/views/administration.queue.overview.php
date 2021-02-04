@@ -36,7 +36,7 @@ $widget = (new CWidget())
 					->getUrl() => _('Queue overview by proxy'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'queue.details')
-					->getUrl() => _('Queue details'),
+					->getUrl() => _('Queue details')
 			]
 		]
 	]);

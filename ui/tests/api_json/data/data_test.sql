@@ -98,7 +98,7 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) 
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (31, 16, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (31, 0, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (21, 31, 20);
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (5,'API script','test',2,21,NULL,'api script description');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (5, 'API script', 0, 'test', 2, 21, NULL, 'api script description');
 UPDATE config SET alert_usrgrpid = 22 WHERE configid = 1;
 
 -- users
@@ -144,16 +144,16 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (5
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50017,'API group with deny permissions',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50014, 50014, 50017);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (4, 14, 0, 50017);
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (6,'API script for update one','/sbin/shutdown -r',2,NULL,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (7,'API script for update two','/sbin/shutdown -r',2,NULL,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (8,'API script for delete','/sbin/shutdown -r',2,NULL,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (9,'API script for delete1','/sbin/shutdown -r',2,NULL,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (10,'API script for delete2','/sbin/shutdown -r',2,NULL,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (11,'API script in action','/sbin/shutdown -r',2,NULL,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (12,'API script with user group','/sbin/shutdown -r',2,7,NULL,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (13,'API script with host group','/sbin/shutdown -r',2,NULL,4,'');
-INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (14,'API script with write permissions for the host group','/sbin/shutdown -r',3,NULL,NULL,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (18, 'API action with script', 0, 0, 0, 60);
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (6, 'API script for update one', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (7, 'API script for update two', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (8, 'API script for delete', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (9, 'API script for delete1', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (10, 'API script for delete2', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (11, 'API script in action', 0, '/sbin/shutdown -r', 2, NULL, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (12, 'API script with user group', 0, '/sbin/shutdown -r', 2, 7, NULL, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (13, 'API script with host group', 0, '/sbin/shutdown -r', 2, NULL, 4, '');
+INSERT INTO scripts (scriptid, name, type, command, host_access, usrgrpid, groupid, description) VALUES (14, 'API script with write permissions for the host group', 0, '/sbin/shutdown -r', 3, NULL, NULL, '');
+INSERT INTO actions (actionid, name,eventsource, evaltype, status, esc_period) VALUES (18, 'API action with script', 0, 0, 0, 60);
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (33, 18, 1, 0, 1, 1, 0);
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
 INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
@@ -178,9 +178,9 @@ INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90020,90020,90020)
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90021,90021,90021);
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90022,90022,90022);
 INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90023,90023,90023);
-INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90020,90020,2,'90020-acc-read','date',NULL,'');
-INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90021,90021,3,'90021-acc-write','date',NULL,'');
-INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90023,90023,2,'90023-acc-read','date',NULL,'');
+INSERT INTO scripts (groupid, scriptid, host_access, name, type, command, usrgrpid, description) VALUES (90020, 90020, 2, '90020-acc-read', 0,'date', NULL, '');
+INSERT INTO scripts (groupid, scriptid, host_access, name, type, command, usrgrpid, description) VALUES (90021, 90021, 3, '90021-acc-write', 0, 'date', NULL, '');
+INSERT INTO scripts (groupid, scriptid, host_access, name, type, command, usrgrpid, description) VALUES (90023, 90023, 2, '90023-acc-read', 0, 'date', NULL, '');
 
 -- global macro
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update','desc');
@@ -1594,3 +1594,24 @@ INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (1016, 5003, 'OS'
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, r_eventid, r_clock, r_ns, correlationid, userid, name, acknowledged, severity) VALUES (5003, 0, 0, 50175, 1610000000, 0, NULL, 0, 0, NULL, NULL, 'trigger4', 0, 0);
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1015, 5003, 'OS', 'Windows');
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (1016, 5003, 'OS', 'Win7');
+
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (200, 5, 'Script for Get','test',2,NULL,NULL,'get description');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (100, 200, 'parameter 1','value 1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (101, 200, 'parameter 2','value 2');
+
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (201, 1, 'Script for Get2','test',2,NULL,NULL,'Get2 description');
+
+-- test trigger validation
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Trigger validation test host', 'Trigger validation test host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99029, 'Trigger validation test template', 'Trigger validation test template', 3, '');
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50028, 'Trigger validation test host group', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50038, 99028, 50028);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50039, 99029, 50028);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58737, 99028, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58738, 99029, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50176, 'test-trigger-1', '{50236}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50236, 50176, 58737, 'last', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50177, 'test-trigger-2', '{50237}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50237, 50177, 58737, 'last', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50178, 'template-trigger', '{50238}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 58738, 'last', '');

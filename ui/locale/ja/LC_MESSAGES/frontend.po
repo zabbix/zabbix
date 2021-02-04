@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-22 19:56+0200\n"
-"PO-Revision-Date: 2021-01-19 02:27+0300\n"
+"PO-Revision-Date: 2021-01-29 14:12+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1611016047.000000\n"
+"X-POOTLE-MTIME: 1611922348.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -372,39 +372,39 @@ msgstr "APIメソッド"
 
 #: app/controllers/CControllerAuditLogList.php:223
 msgid "API token"
-msgstr ""
+msgstr "APIトークン"
 
 #: include/classes/api/services/CToken.php:290
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "ユーザーID\"%2$s\"用のAPIトークン\"%1$s\"がすでに存在します。"
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
-msgstr ""
+msgstr "APIトークンを追加しました"
 
 #: app/controllers/CControllerTokenDelete.php:61
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
+msgstr[0] "APIトークンを削除しました"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
+msgstr[0] "APIトークンを無効にしました"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
+msgstr[0] "APIトークンを有効にしました"
 
 #: include/classes/api/clients/CLocalApiClient.php:208
 msgid "API token expired."
-msgstr ""
+msgstr "APIトークンが有効期限切れです。"
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "APIトークンを更新しました"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -422,7 +422,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:384 include/html.inc.php:867
 #: include/html.inc.php:942
 msgid "API tokens"
-msgstr ""
+msgstr "APIトークン"
 
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
@@ -1366,7 +1366,7 @@ msgstr "8月"
 #: app/views/administration.token.view.php:38
 #: app/views/administration.user.token.view.php:37
 msgid "Auth token"
-msgstr ""
+msgstr "認証トークン"
 
 #: app/views/administration.authentication.edit.php:213
 msgid "AuthN requests"
@@ -1749,7 +1749,7 @@ msgstr "キャンセル"
 #: app/controllers/CControllerTokenCreate.php:44
 #: app/controllers/CControllerTokenCreate.php:105
 msgid "Cannot add API token"
-msgstr ""
+msgstr "APIトークンが追加できません"
 
 #: include/classes/api/services/CHttpTest.php:707
 #, c-format
@@ -2085,7 +2085,7 @@ msgstr "ウィジェットを作成できません：%1$s。"
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
+msgstr[0] "APIトークンを削除できません"
 
 #: include/classes/api/services/CUser.php:1137
 #, c-format
@@ -2355,7 +2355,7 @@ msgstr "Webシナリオを削除できません"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
+msgstr[0] "APIトークンを無効にできません"
 
 #: actionconf.php:382
 msgid "Cannot disable action"
@@ -2417,7 +2417,7 @@ msgstr "グラフの合計値は2つ以上表示できません。"
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
-msgstr[0] ""
+msgstr[0] "APIトークンを有効にできません"
 
 #: actionconf.php:381
 msgid "Cannot enable action"
@@ -2472,7 +2472,7 @@ msgstr "条件式を評価できません"
 
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
-msgstr ""
+msgstr "スクリプトを実行できません。"
 
 #: jsLoader.php:228
 msgid "Cannot expand macros."
@@ -2922,7 +2922,7 @@ msgstr "イメージ\"%1$s\"の\"imagetype\"を更新できません。"
 #: app/controllers/CControllerTokenUpdate.php:47
 #: app/controllers/CControllerTokenUpdate.php:122
 msgid "Cannot update API token"
-msgstr ""
+msgstr "APIトークンを更新できません"
 
 #: include/classes/api/services/CGraphGeneral.php:65
 msgid "Cannot update a discovered graph."
@@ -3591,7 +3591,7 @@ msgstr "いくつかのトリガーを\"and\"で比較することはできま�
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
 msgid "Component %1$s already registered."
-msgstr "コンポーネント%1$sは既に登録されています。"
+msgstr "コンポーネント%1$sはすでに登録されています。"
 
 #: include/classes/core/CComponentRegistry.php:37
 #, c-format
@@ -4087,7 +4087,7 @@ msgstr "コピー"
 #: app/views/administration.token.view.php:45
 #: app/views/administration.user.token.view.php:44
 msgid "Copy to clipboard"
-msgstr ""
+msgstr "クリップボードにコピー"
 
 #: app/views/configuration.correlation.edit.php:164
 msgid "Correlation"
@@ -4173,7 +4173,7 @@ msgstr "保存前処理キュー内にキューイングされた値の数。"
 #: app/views/administration.token.list.php:106
 #: app/views/administration.user.token.list.php:71
 msgid "Create API token"
-msgstr ""
+msgstr "APIトークンの作成"
 
 #: include/views/configuration.action.list.php:54
 msgid "Create action"
@@ -4237,7 +4237,7 @@ msgstr "ディスカバリルールの作成(先にホストを選択)"
 
 #: include/views/configuration.host.discovery.list.php:44
 msgid "Create discovery rule (select template first)"
-msgstr ""
+msgstr "ディスカバリルールの作成(先にテンプレートを選択)"
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:332
 #: include/views/configuration.host.prototype.edit.php:139
@@ -4262,7 +4262,7 @@ msgstr "グラフの作成 (先にホストを選択)"
 
 #: include/views/configuration.graph.list.php:50
 msgid "Create graph (select template first)"
-msgstr ""
+msgstr "グラフの作成 (先にテンプレートを選択)"
 
 #: include/views/configuration.graph.list.php:31
 msgid "Create graph prototype"
@@ -4307,7 +4307,7 @@ msgstr "アイテムの作成 (先にホストを選択)"
 
 #: include/views/configuration.item.list.php:43
 msgid "Create item (select template first)"
-msgstr ""
+msgstr "アイテムの作成 (先にテンプレートを選択)"
 
 #: include/views/configuration.item.prototype.list.php:30
 msgid "Create item prototype"
@@ -4367,7 +4367,7 @@ msgstr "トリガーの作成 (先にホストを選択)"
 
 #: include/views/configuration.triggers.list.php:201
 msgid "Create trigger (select template first)"
-msgstr ""
+msgstr "トリガーの作成 (先にテンプレートを選択)"
 
 #: include/views/configuration.trigger.prototype.list.php:30
 msgid "Create trigger prototype"
@@ -4407,12 +4407,12 @@ msgstr "Webシナリオの作成(最初にホストを選択)"
 
 #: include/views/configuration.httpconf.list.php:94
 msgid "Create web scenario (select template first)"
-msgstr ""
+msgstr "Webシナリオの作成(最初にテンプレートを選択)"
 
 #: app/views/administration.token.list.php:138
 #: app/views/administration.user.token.list.php:98
 msgid "Created at"
-msgstr ""
+msgstr "作成日時"
 
 #: app/views/monitoring.dashboard.list.php:65
 msgid "Created by me"
@@ -4420,11 +4420,11 @@ msgstr "私が作成"
 
 #: app/views/administration.token.list.php:139
 msgid "Created by user"
-msgstr ""
+msgstr "作成者"
 
 #: app/views/administration.token.list.php:75
 msgid "Created by users"
-msgstr ""
+msgstr "作成者"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: include/items.inc.php:41
@@ -5028,12 +5028,12 @@ msgstr "スクリプトを削除しますか？"
 #: app/views/administration.token.edit.php:116
 #: app/views/administration.user.token.edit.php:97
 msgid "Delete selected API token?"
-msgstr ""
+msgstr "選択したAPIトークンを削除しますか？"
 
 #: app/views/administration.token.list.php:202
 #: app/views/administration.user.token.list.php:153
 msgid "Delete selected API tokens?"
-msgstr ""
+msgstr "選択したAPIトークンを削除しますか？"
 
 #: include/views/configuration.action.list.php:152
 msgid "Delete selected actions?"
@@ -5408,7 +5408,7 @@ msgstr "選択したプロキシによるホストの監視を無効にします
 #: app/views/administration.token.list.php:201
 #: app/views/administration.user.token.list.php:152
 msgid "Disable selected API tokens?"
-msgstr ""
+msgstr "選択したAPIトークンを無効にしますか？"
 
 #: include/views/configuration.action.list.php:151
 msgid "Disable selected actions?"
@@ -5774,7 +5774,7 @@ msgstr "条件式を置き換えますか？"
 #: include/views/js/configuration.template.list.js.php:39
 #: include/views/js/configuration.triggers.list.js.php:39
 msgid "Does not contain"
-msgstr ""
+msgstr "含まない"
 
 #: app/partials/monitoring.host.filter.php:50
 #: app/partials/monitoring.host.filter.php:199
@@ -5789,7 +5789,7 @@ msgstr ""
 #: include/views/js/configuration.template.list.js.php:38
 #: include/views/js/configuration.triggers.list.js.php:38
 msgid "Does not equal"
-msgstr ""
+msgstr "等しくない"
 
 #: app/partials/monitoring.host.filter.php:49
 #: app/partials/monitoring.host.filter.php:198
@@ -5804,7 +5804,7 @@ msgstr ""
 #: include/views/js/configuration.template.list.js.php:37
 #: include/views/js/configuration.triggers.list.js.php:37
 msgid "Does not exist"
-msgstr ""
+msgstr "存在しない"
 
 #: include/items.inc.php:1857
 msgid "Does not match regular expression"
@@ -6238,7 +6238,7 @@ msgstr "削除処理を有効"
 #: app/views/administration.token.list.php:200
 #: app/views/administration.user.token.list.php:151
 msgid "Enable selected API tokens?"
-msgstr ""
+msgstr "選択したAPIトークンを有効にしますか？"
 
 #: include/views/configuration.action.list.php:150
 msgid "Enable selected actions?"
@@ -6575,7 +6575,7 @@ msgstr "実行の確認"
 #: include/views/js/configuration.template.list.js.php:34
 #: include/views/js/configuration.triggers.list.js.php:34
 msgid "Exists"
-msgstr ""
+msgstr "存在する"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
 #: include/classes/widgets/CWidgetHelper.php:994 jsLoader.php:250
@@ -6614,12 +6614,12 @@ msgstr "メンテナンス期間の終了"
 #: app/views/administration.user.token.list.php:93
 #: app/views/administration.user.token.view.php:48
 msgid "Expires at"
-msgstr ""
+msgstr "有効期限"
 
 #: app/views/administration.token.list.php:62
 #: app/views/administration.user.token.list.php:44
 msgid "Expires in less than"
-msgstr ""
+msgstr "有効期限までの日数"
 
 #: app/views/popup.generic.php:519 include/graphs.inc.php:27
 msgid "Exploded"
@@ -10823,7 +10823,7 @@ msgstr "最新7日"
 #: app/views/administration.token.list.php:144
 #: app/views/administration.user.token.list.php:99
 msgid "Last accessed at"
-msgstr ""
+msgstr "最終アクセス日時"
 
 #: include/classes/screens/CScreenHostTriggers.php:192
 msgid "Last change"
@@ -11374,11 +11374,11 @@ msgstr "メンテナンス：%1$s"
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
-msgstr ""
+msgstr "ページを閉じた後は表示できなくなるため、必ず認証トークンをコピーしてください。"
 
 #: include/classes/helpers/CRoleHelper.php:495
 msgid "Manage API tokens"
-msgstr ""
+msgstr "APIトークンの管理"
 
 #: include/classes/validators/CFunctionValidator.php:373
 msgid "Mandatory parameter is missing."
@@ -13446,7 +13446,7 @@ msgstr "1回の絞り込みのみ使用できます。"
 
 #: include/classes/api/services/CScript.php:482
 msgid "Only scripts of type \"Script\" can be executed by agent."
-msgstr ""
+msgstr "エージェントで実行できるのはタイプが\"スクリプト\"のスクリプトのみです。"
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -13679,7 +13679,7 @@ msgstr "ネットワークインターフェースの送信統計。整数値を
 
 #: app/views/popup.scriptexec.php:47
 msgid "Output"
-msgstr ""
+msgstr "出力"
 
 #: include/views/configuration.item.edit.php:749
 #: include/views/configuration.item.edit.php:785
@@ -14507,7 +14507,7 @@ msgstr "タグとして処理"
 
 #: include/classes/helpers/CMenuHelper.php:382
 msgid "Profile"
-msgstr ""
+msgstr "プロファイル"
 
 #: include/items.inc.php:1884 include/items.inc.php:1888
 msgid "Prometheus"
@@ -14833,12 +14833,12 @@ msgstr "リフレッシュ間隔の乗数"
 #: app/views/administration.token.edit.php:108
 #: app/views/administration.user.token.edit.php:89
 msgid "Regenerate"
-msgstr ""
+msgstr "再生成"
 
 #: app/views/administration.token.edit.php:109
 #: app/views/administration.user.token.edit.php:90
 msgid "Regenerate selected API token? Previously generated token will become invalid."
-msgstr ""
+msgstr "選択したAPIトークンを再生成しますか？以前に生成されたトークンは無効になります。"
 
 #: include/forms.inc.php:552
 msgid "Regular"
@@ -15859,11 +15859,11 @@ msgstr[0] "スクリプトを削除しました"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
-msgstr ""
+msgstr "スクリプト実行ログ"
 
 #: app/controllers/CControllerPopupScriptExec.php:116
 msgid "Script execution successful."
-msgstr ""
+msgstr "スクリプトの実行が成功しました。"
 
 #: include/classes/api/services/CScript.php:575
 #, c-format
@@ -16244,7 +16244,7 @@ msgstr "エラーを設定"
 #: app/views/administration.token.edit.php:77
 #: app/views/administration.user.token.edit.php:58
 msgid "Set expiration date and time"
-msgstr ""
+msgstr "有効期限の設定"
 
 #: include/actions.inc.php:1061
 msgid "Set host inventory mode"
@@ -17591,7 +17591,7 @@ msgstr "役割\"%1$s\"は少なくとも1人のユーザーに割り当てられ
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
 msgid "The token has expired. Please update the expiry date to use the token."
-msgstr ""
+msgstr "トークンの有効期限が切れています。トークンを使用するためには有効期限を更新してください。"
 
 #: include/html.inc.php:765
 #, c-format
@@ -19096,7 +19096,7 @@ msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free,
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMwareクラスターのパフォーマンスカウンター、 <url> - VMwareサービスURL、<id> - VMwareクラスターid、<path> - パフォーマンスカウンターのパス、<instance> - パフォーマンスカウンターのインスタンス"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -19908,7 +19908,7 @@ msgstr "XMLで指定してください"
 
 #: include/items.inc.php:1817
 msgid "XML to JSON"
-msgstr ""
+msgstr "XMLからJSON"
 
 #: include/forms.inc.php:1396 include/views/js/item.preprocessing.js.php:141
 msgid "XPath"
@@ -19983,7 +19983,7 @@ msgstr "YYYY-MM-DD hh:mm"
 #: app/views/administration.token.edit.php:85
 #: app/views/administration.user.token.edit.php:66
 msgid "YYYY-MM-DD hh:mm:ss"
-msgstr ""
+msgstr "YYYY-MM-DD hh:mm:ss"
 
 #: include/classes/import/validators/C20XmlValidator.php:821
 #: include/classes/import/validators/C30XmlValidator.php:884
@@ -20787,7 +20787,7 @@ msgstr "等しくない"
 #: include/views/js/configuration.host.discovery.edit.js.php:63
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:83
 msgid "does not exist"
-msgstr ""
+msgstr "存在しない"
 
 #: app/views/popup.lldoperation.php:69 app/views/popup.lldoverride.php:118
 #: include/actions.inc.php:35
@@ -20817,7 +20817,7 @@ msgstr "esc_step_fromとesc_step_toは両方設定する必要があります。
 #: include/views/js/configuration.host.discovery.edit.js.php:62
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:82
 msgid "exists"
-msgstr ""
+msgstr "存在する"
 
 #: include/classes/parsers/CConditionFormula.php:214
 msgid "expression is empty"

@@ -33,8 +33,7 @@ else {
 	$data = $_REQUEST;
 }
 
-if (is_array($data) && array_key_exists('method', $data)
-		&& in_array($data['method'], ['message.settings', 'message.get', 'zabbix.status'])) {
+if (is_array($data) && array_key_exists('method', $data) && $data['method'] === 'zabbix.status') {
 	CWebUser::disableSessionExtension();
 }
 
