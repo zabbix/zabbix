@@ -6107,14 +6107,14 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_strloc_get(const char *src, const zbx_strloc_t *loc)
+char	*zbx_substr(const char *src, size_t left, size_t right)
 {
 	char	*str, *ptr;
 
-	if ('"' == src[loc->l])
+	if ('"' == src[left])
 	{
-		src += loc->l + 1;
-		str = ptr = zbx_malloc(NULL, loc->r - loc->l);
+		src += left + 1;
+		str = ptr = zbx_malloc(NULL, right - left);
 
 		while ('"' != *src)
 		{
@@ -6138,9 +6138,9 @@ char	*zbx_strloc_get(const char *src, const zbx_strloc_t *loc)
 	}
 	else
 	{
-		str = zbx_malloc(NULL, loc->r - loc->l + 2);
-		memcpy(str, src + loc->l, loc->r - loc->l + 1);
-		str[loc->r - loc->l + 1] = '\0';
+		str = zbx_malloc(NULL, right - left + 2);
+		memcpy(str, src + left, right - left + 1);
+		str[right - left + 1] = '\0';
 	}
 
 	return str;
