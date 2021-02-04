@@ -125,7 +125,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details' => 'Incorrect value for field "tag": cannot be empty.',
+					'trigger_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -146,7 +146,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
-					'trigger_error_details' => 'Tag "tag" with value "value" already exists.',
+					'trigger_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
@@ -254,7 +254,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details' => 'Incorrect value for field "tag": cannot be empty.',
+					'trigger_error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -270,7 +270,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
-					'trigger_error_details' => 'Tag "action" with value "update" already exists.',
+					'trigger_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
 					'host_prototype_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
