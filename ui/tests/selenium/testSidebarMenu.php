@@ -315,8 +315,7 @@ class testSidebarMenu extends CWebTest {
 						'"]/following::ul/li/a[text()="'.$submenu.'"]')->waitUntilPresent()->one()->click();
 				$this->assertTrue($this->query('xpath://li[contains(@class, "is-selected")]/a[text()="'.
 						$data['page'].'"]')->exists());
-				$header = ($submenu === 'Other') ? 'Other configuration parameters' : $submenu;
-				$this->assertPageHeader($header);
+				$this->assertPageHeader(($submenu === 'Other') ? 'Other configuration parameters' : $submenu);
 				$this->query('xpath:'.$xpath.'/ul/li/a[text()="'.$data['page'].'"]')->one()->click();
 			}
 		}
