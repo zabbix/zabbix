@@ -99,13 +99,13 @@ class CSortable extends CBaseComponent {
 	}
 
 	/**
-	 * Focus item by scrolling it into view.
+	 * Scroll item into view.
 	 *
 	 * @param {HTMLLIElement} item
 	 *
 	 * @returns {CSortable}
 	 */
-	focus(item) {
+	scrollItemIntoView(item) {
 		if (item.parentNode != this._list) {
 			throw RangeError('Item does not belong to the list.')
 		}
@@ -118,6 +118,31 @@ class CSortable extends CBaseComponent {
 		return this;
 	}
 
+	/**
+	 * Is list scrolled to the beginning?
+	 *
+	 * @returns {boolean}
+	 */
+	isMinScroll() {
+		return (this._list_pos <= 0 || this._isEqualPos(this._list_pos, 0));
+	}
+
+	/**
+	 * Is list scrolled to the end?
+	 *
+	 * @returns {boolean}
+	 */
+	isMaxScroll() {
+		const items = this._getNonDraggingItems();
+
+		const list_loc = this._getRectLoc(this._list.getBoundingClientRect());
+		const last_item_loc = this._getRectLoc(items[items.length - 1].getBoundingClientRect());
+
+		const max_pos = last_item_loc.pos + last_item_loc.dim - list_loc.pos - list_loc.dim;
+
+		return (this._list_pos >= max_pos || this._isEqualPos(this._list_pos, max_pos));
+	}
+
 	_init() {
 		this._list = this._target.getElementsByClassName(ZBX_STYLE_SORTABLE_LIST)[0];
 		this._list_pos = -parseFloat(window.getComputedStyle(this._list).getPropertyValue(
@@ -125,7 +150,6 @@ class CSortable extends CBaseComponent {
 		));
 
 		this._drag_item = null;
-
 		this._drag_scroll_timeout = null;
 	}
 
@@ -390,19 +414,12 @@ class CSortable extends CBaseComponent {
 			return;
 		}
 
-		const items = this._getNonDraggingItems();
-
 		this._list_pos = pos;
 		this._list.style[this._is_vertical ? 'top' : 'left'] = `-${pos}px`;
 
-		const list_loc = this._getRectLoc(this._list.getBoundingClientRect());
-		const last_item_loc = this._getRectLoc(items[items.length - 1].getBoundingClientRect());
-
-		const max_pos = last_item_loc.pos + last_item_loc.dim - list_loc.pos - list_loc.dim;
-
 		this.fire(SORTABLE_EVENT_SCROLL, {
-			is_min: (this._isEqualPos(pos, 0) || pos < 0),
-			is_max: (this._isEqualPos(pos, max_pos) || pos > max_pos)
+			is_min: this.isMinScroll(),
+			is_max: this.isMaxScroll()
 		});
 	}
 
@@ -458,10 +475,12 @@ class CSortable extends CBaseComponent {
 				}
 			},
 
-			listMouseDown: (e) => {
-				// Prevent native dragging of links and images.
-				e.preventDefault();
+			targetScroll: (e) => {
+				// Prevent focusable child element scrolling into view.
+				this._target[this._is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
+			},
 
+			listMouseDown: (e) => {
 				// Prevent clicks while transitions are running.
 				if (transitions_set.size > 0) {
 					return;
@@ -474,8 +493,8 @@ class CSortable extends CBaseComponent {
 					return;
 				}
 
-				// Scroll into view if the item is partially visible.
-				this.focus(mouse_down_item);
+				// Scroll item into view if it is partially visible.
+				this.scrollItemIntoView(mouse_down_item);
 
 				// Drag handle specified, but clicked elsewhere?
 				if (mouse_down_item.getElementsByClassName(ZBX_STYLE_SORTABLE_DRAG_HANDLE).length > 0
@@ -593,6 +612,7 @@ class CSortable extends CBaseComponent {
 
 		this._target.addEventListener('click', this._events.targetClick);
 		this._target.addEventListener('wheel', this._events.targetWheel, {passive: false});
+		this._target.addEventListener('scroll', this._events.targetScroll, {passive: false});
 		this._target.addEventListener('_drag_stop', this._events._stopDragging);
 		this._list.addEventListener('mousedown', this._events.listMouseDown);
 		this._list.addEventListener('transitionrun', this._events.listRunTransition);

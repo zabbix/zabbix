@@ -101,6 +101,7 @@ $availableJScripts = [
 	'class.mapWidget.js' => '',
 	'class.scrollable.js' => '',
 	'class.sidebar.js' => '',
+	'class.sortable.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
 	'class.cviewswitcher.js' => '',
