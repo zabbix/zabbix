@@ -120,6 +120,10 @@ class CTriggerFunctionParser extends CFunctionParser {
 							break;
 
 						case ',':
+							if ($num == 0) {
+								break 2;
+							}
+
 							$_parameters[$num++] = [
 								'type' => self::PARAM_UNQUOTED,
 								'raw' => '',
@@ -128,6 +132,10 @@ class CTriggerFunctionParser extends CFunctionParser {
 							break;
 
 						case ')':
+							if ($num == 0) {
+								break 2;
+							}
+
 							$_parameters[$num] = [
 								'type' => self::PARAM_UNQUOTED,
 								'raw' => '',
@@ -137,6 +145,10 @@ class CTriggerFunctionParser extends CFunctionParser {
 							break;
 
 						case '"':
+							if ($num == 0) {
+								break 2;
+							}
+
 							$_parameters[$num] = [
 								'type' => self::PARAM_QUOTED,
 								'raw' => $source[$p],
@@ -146,7 +158,17 @@ class CTriggerFunctionParser extends CFunctionParser {
 							break;
 
 						default:
-							if ($num == 0 && !$this->parseItem($source, $p)) {
+							if ($num == 0) {
+								if ($this->parseItem($source, $p)) {
+									$_parameters[$num] = [
+										'type' => self::PARAM_UNQUOTED,
+										'raw' => substr($source, $pos + 1, $p - $pos),
+										'pos' => 1
+									];
+									$state = self::STATE_UNQUOTED;
+									break;
+								}
+
 								break 2;
 							}
 
@@ -250,10 +272,10 @@ class CTriggerFunctionParser extends CFunctionParser {
 		if ($this->item_key_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return false;
 		}
-		$p += $this->item_key_parser->getLength();
+		$p += $this->item_key_parser->getLength() - 1;
 
 		$this->host = substr($source, $pos + 1, $p2 - $pos - 1);
-		$this->item = substr($source, $p2, $p - $p2);
+		$this->item = substr($source, $p2 + 1, $p - $p2);
 		$pos = $p;
 
 		return true;

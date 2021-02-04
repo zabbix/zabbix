@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA

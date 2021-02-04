@@ -20,7 +20,7 @@
 
 
 /**
- *  A parser for function macros like "{host.item.func()}".
+ *  A parser for function macros like "{host:item.func()}".
  */
 class CFunctionMacroParser extends CParser {
 
