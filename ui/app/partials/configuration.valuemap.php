@@ -24,8 +24,7 @@
  */
 $table = (new CTable())
 	->setId('valuemap-table')
-	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->addClass('valuemap-table')
+	->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE)
 	->setColumns([
 		(new CTableColumn(_('Name')))
 			->addStyle('width: 250px;')

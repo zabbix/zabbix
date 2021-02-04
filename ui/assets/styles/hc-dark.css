@@ -6098,13 +6098,13 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .valuemap-rename-table {
   width: 100%; }
 
-#valuemap-table tbody td {
+.valuemap-list-table tbody td {
   border-collapse: separate;
   border-top: 1px solid #333333;
   border-bottom: 1px solid #333333; }
-#valuemap-table .valuemap-row td {
+.valuemap-list-table .valuemap-row td {
   vertical-align: top; }
-#valuemap-table .valuemap-label {
+.valuemap-list-table .valuemap-label {
   word-break: break-all;
   white-space: normal; }
 
