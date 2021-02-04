@@ -288,7 +288,7 @@ INDEX		|3		|available
 
 TABLE|valuemap|valuemapid|ZBX_TEMPLATE
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0
-FIELD		|hostid		|t_id		|	|NOT NULL	|0		|1|hosts
+FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 UNIQUE		|1		|hostid,name
 
@@ -801,11 +801,11 @@ UNIQUE		|1		|applicationid,itemid
 INDEX		|2		|itemid
 
 TABLE|valuemap_mapping|valuemap_mappingid|ZBX_TEMPLATE
-FIELD		|valuemap_mappingid	|t_id		|	|NOT NULL	|0
-FIELD		|valuemapid		|t_id		|	|NOT NULL	|0			|1|valuemap
-FIELD		|value			|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|newvalue		|t_varchar(64)	|''	|NOT NULL	|0
-UNIQUE		|1			|valuemapid,value
+FIELD		|valuemap_mappingid|t_id	|	|NOT NULL	|0
+FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemap
+FIELD		|value		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|newvalue	|t_varchar(64)	|''	|NOT NULL	|0
+UNIQUE		|1		|valuemapid,value
 
 TABLE|media|mediaid|ZBX_DATA
 FIELD		|mediaid	|t_id		|	|NOT NULL	|0
