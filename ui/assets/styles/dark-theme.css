@@ -6151,7 +6151,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   background-color: #383838 !important;
   border-color: #4f4f4f; }
 
-#valuemap-rename-table {
+.valuemap-rename-table {
   width: 100%; }
 
 #valuemap-table tbody td {

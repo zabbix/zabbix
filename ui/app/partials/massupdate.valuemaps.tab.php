@@ -39,7 +39,7 @@ $add_missing = (new CDiv(
 
 $rename_container = (new CTable())
 	->setId('valuemap-rename-table')
-	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
+	->addClass(ZBX_STYLE_VALUEMAP_RENAME_TABLE)
 	->setHeader([_('From'), _('To'), _('Action')])
 	->addItem((new CTag('tfoot', true))->addItem([
 		new CCol([
