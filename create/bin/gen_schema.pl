@@ -619,7 +619,7 @@ BEGIN
 	SHOW server_version INTO current_postgres_version_full;
 
 	IF NOT found THEN
-		RAISE EXCEPTION 'PostgreSQL version could not be determined, aborting';
+		RAISE EXCEPTION 'Cannot determine PostgreSQL version, aborting';
 	END IF;
 
 	SELECT substring(current_postgres_version_full, '^(\\d+).') INTO current_postgres_version_major;
@@ -649,7 +649,7 @@ BEGIN
 	IF (current_timescaledb_version_major < minimum_timescaledb_version_major OR
 			(current_timescaledb_version_major = minimum_timescaledb_version_major AND
 			current_timescaledb_version_minor < minimum_timescaledb_version_minor)) THEN
-		RAISE EXCEPTION 'TimescaleDB version % is UNSUPPORTED! Minimum is %.%.0 !',
+		RAISE EXCEPTION 'TimescaleDB version % is UNSUPPORTED! Minimum is %.%.0!',
 				current_timescaledb_version_full, minimum_timescaledb_version_major,
 				minimum_timescaledb_version_minor;
 	ELSE
