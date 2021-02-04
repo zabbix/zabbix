@@ -496,7 +496,6 @@ class CItem extends CItemGeneral {
 	 */
 	protected function createReal(array &$items) {
 		$items_rtdata = [];
-		$new_tags = [];
 
 		foreach ($items as $key => &$item) {
 			if ($item['type'] != ITEM_TYPE_DEPENDENT) {
@@ -514,11 +513,14 @@ class CItem extends CItemGeneral {
 
 		foreach ($items_rtdata as $key => &$value) {
 			$value['itemid'] = $itemids[$key];
-			$items[$key]['itemid'] = $itemids[$key];
 		}
 		unset($value);
 
 		DB::insert('item_rtdata', $items_rtdata, false);
+
+		foreach ($items as $key => $item) {
+			$items[$key]['itemid'] = $itemids[$key];
+		}
 
 		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);

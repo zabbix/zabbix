@@ -2645,14 +2645,14 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array  $items[]['tags']
 	 * @param string $items[]['tags'][]['tag']
 	 * @param string $items[]['tags'][]['value']
-	 * @param array  $itemids
+	 * @param int    $items[]['itemid']
 	 */
-	protected function createItemTags(array $items, array $itemids): void {
+	protected function createItemTags(array $items): void {
 		$new_tags = [];
 		foreach ($items as $key => $item) {
 			if (array_key_exists('tags', $item)) {
 				foreach ($item['tags'] as $tag) {
-					$tag['itemid'] = $itemids[$key];
+					$tag['itemid'] = $item['itemid'];
 					$new_tags[] = $tag;
 				}
 			}

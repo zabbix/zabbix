@@ -387,7 +387,7 @@ class CItemPrototype extends CItemGeneral {
 
 		$this->createItemParameters($items, $itemids);
 		$this->createItemPreprocessing($items);
-		$this->createItemTags($items, $itemids);
+		$this->createItemTags($items);
 	}
 
 	protected function updateReal(array $items) {
