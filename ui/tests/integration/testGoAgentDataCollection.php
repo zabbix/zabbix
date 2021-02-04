@@ -237,7 +237,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 500
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
