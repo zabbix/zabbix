@@ -131,6 +131,25 @@ foreach ($data['items'] as $itemid => $item) {
 		$item_history = (new CSpan($item['history']))->addClass(ZBX_STYLE_RED);
 	}
 
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		if ($data['config']['hk_trends_global']) {
+			$keep_trends = timeUnitToSeconds($data['config']['hk_trends']);
+			$item_trends = $data['config']['hk_trends'];
+		}
+		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
+			$keep_trends = timeUnitToSeconds($item['trends']);
+			$item_trends = $item['trends'];
+		}
+		else {
+			$keep_trends = 0;
+			$item_trends = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
+		}
+	}
+	else {
+		$keep_trends = 0;
+		$item_trends = '';
+	}
+
 	if ($keep_history != 0 || $keep_trends != 0) {
 		$actions = new CLink($is_graph ? _('Graph') : _('History'), (new CUrl('history.php'))
 			->setArgument('action', $is_graph ? HISTORY_GRAPH : HISTORY_VALUES)
@@ -176,25 +195,6 @@ foreach ($data['items'] as $itemid => $item) {
 		$item_icons = [];
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
 			$item_icons[] = makeErrorIcon($item['error']);
-		}
-
-		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			if ($data['config']['hk_trends_global']) {
-				$keep_trends = timeUnitToSeconds($data['config']['hk_trends']);
-				$item_trends = $data['config']['hk_trends'];
-			}
-			elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
-				$keep_trends = timeUnitToSeconds($item['trends']);
-				$item_trends = $item['trends'];
-			}
-			else {
-				$keep_trends = 0;
-				$item_trends = (new CSpan($item['trends']))->addClass(ZBX_STYLE_RED);
-			}
-		}
-		else {
-			$keep_trends = 0;
-			$item_trends = '';
 		}
 
 		$table_row = new CRow([
