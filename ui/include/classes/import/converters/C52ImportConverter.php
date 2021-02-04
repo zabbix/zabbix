@@ -183,10 +183,10 @@ class C52ImportConverter extends CConverter {
 		foreach ($maps as $i => $map) {
 			if (array_key_exists('selements', $map)) {
 				foreach ($map['selements'] as $s => $selement) {
-					$maps[$i]['selements'][$s]['operator'] = (string) CONDITION_EVAL_TYPE_AND_OR;
+					$maps[$i]['selements'][$s]['evaltype'] = (string) CONDITION_EVAL_TYPE_AND_OR;
 
 					if (array_key_exists('application', $selement) && $selement['application'] !== '') {
-						$maps[$i]['selements'][$s]['tags'] = self::convertApplicationsToSteps([[
+						$maps[$i]['selements'][$s]['tags'] = self::convertApplicationsToTags([[
 							'name' => $selement['application']
 						]]);
 
