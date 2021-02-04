@@ -484,7 +484,7 @@ static int	DBpatch_5030039(void)
 		{"valuemap", "valuemapid", 0,
 			{
 				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
@@ -763,7 +763,7 @@ static int	DBpatch_5030046(void)
 	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
 			"valuemapid", "value", "newvalue", NULL);
 
-	for(i = 0; i < hosts.values_num; i++, valuemapid++)
+	for (i = 0; i < hosts.values_num; i++, valuemapid++)
 	{
 		zbx_host_t	*host;
 
@@ -791,7 +791,7 @@ static int	DBpatch_5030046(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for(i = 0; i < hosts.values_num; i++, valuemapid_update++)
+	for (i = 0; i < hosts.values_num; i++, valuemapid_update++)
 	{
 		zbx_host_t	*host;
 		char		buffer[MAX_STRING_LEN];
