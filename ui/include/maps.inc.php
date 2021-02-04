@@ -692,7 +692,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
 		'selectTags' => ['tag', 'value'],
 		'objectids' => array_keys($triggerids),
-		//'objectids' => ['13474'],
 		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null,
 		'severities' => range($options['severity_min'], TRIGGER_SEVERITY_COUNT - 1),
 		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
