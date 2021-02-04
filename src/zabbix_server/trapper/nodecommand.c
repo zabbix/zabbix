@@ -302,7 +302,86 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_find_related_eventid                                         *
+ *                                                                            *
+ * Purpose: for the specified event id find the problem event id or recovery  *
+ *          event id                                                          *
+ *                                                                            *
+ * Parameters:  input_eventid - [IN] the id of event                          *
+ *              eventid       - [OUT] the id of problem event                 *
+ *              r_eventid     - [OUT] the id of recovery event                *
+ *              error         - [OUT] the error message buffer                *
+ *              error_len     - [IN] the size of error message buffer         *
+ *                                                                            *
+ * Return value:  SUCCEED (eventid and r_eventid are set) or FAIL ('error' is *
+ *                set)                                                        *
+ *                                                                            *
+ * Comments: this funcion tries to determine if the 'input_eventid' refers to *
+ *           a problem event or a recovery event. In both cases it tries to   *
+ *           find the related (recovery or problem, respectively) event id.   *
+ *           If 'input_eventid' has no corresponding recovery event then 0    *
+ *           is returned as r_eventid.                                        *
+ *           If 'input_eventid' refers to a recovery event which "closes"     *
+ *           multiple problem events then the oldest (with the smallest id)   *
+ *           one is set as the 'eventid'.                                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_find_related_eventid(zbx_uint64_t input_eventid, zbx_uint64_t *eventid, zbx_uint64_t *r_eventid,
+		char *error, size_t error_len)
+{
+	DB_RESULT	db_result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	db_result = DBselect("select min(eventid),r_eventid"
+			" from event_recovery"
+			" where eventid="ZBX_FS_UI64
+			" or r_eventid="ZBX_FS_UI64
+			" group by r_eventid",
+			input_eventid, input_eventid);
+
+	if (NULL == db_result)
+	{
+		zbx_strlcpy(error, "Database error, cannot read from 'event_recovery' table.", error_len);
+		return FAIL;
+	}
+
+	if (NULL == (row = DBfetch(db_result)))		/* the input event has no recovery event */
+	{
+		*eventid = input_eventid;
+		*r_eventid = 0;
+	}
+	else	/* the input event has a recovery event or is itself a recovery event */
+	{
+		zbx_uint64_t	eventid_loc, r_eventid_loc;
+
+		ZBX_DBROW2UINT64(eventid_loc, row[0]);
+		ZBX_DBROW2UINT64(r_eventid_loc, row[1]);
+
+		if (input_eventid == eventid_loc || input_eventid == r_eventid_loc)
+		{
+			*eventid = eventid_loc;
+			*r_eventid = r_eventid_loc;
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_snprintf(error, sizeof(error), "Internal error in %s() input_eventid:" ZBX_FS_UI64
+					" eventid:%s r_eventid:%s", __func__, input_eventid, row[0], row[1]);
+			ret = FAIL;
+		}
+	}
+
+	DBfree_result(db_result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: execute_script                                                   *
+ *                                                                            *
+ * Purpose: executing command                                                 *
  *                                                                            *
  * Parameters:  scriptid - [IN] the id of a script to be executed             *
  *              hostid   - [IN] the host the script will be executed on       *
@@ -311,8 +390,6 @@ fail:
  *              clientip - [IN] the IP of client                              *
  *              result   - [OUT] the result of a script execution             *
  *              debug    - [OUT] the debug data (optional)                    *
- *                                                                            *
- * Purpose: executing command                                                 *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -330,6 +407,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
 	char			*user_timezone = NULL, *webhook_params = NULL, error[MAX_STRING_LEN];
+	DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s",
@@ -392,19 +470,58 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else /* eventid */
 	{
-		zbx_vector_uint64_reserve(&eventids, 1);
-		zbx_vector_ptr_reserve(&events, 1);
-		zbx_vector_uint64_append(&eventids, eventid);
+		zbx_uint64_t	eventid_loc, r_eventid_loc;
+
+		if (SUCCEED != zbx_find_related_eventid(eventid, &eventid_loc, &r_eventid_loc, error, sizeof(error)))
+			goto fail;
+
+		zbx_vector_uint64_reserve(&eventids, 2);
+		zbx_vector_ptr_reserve(&events, 2);
+
+		zbx_vector_uint64_append(&eventids, eventid_loc);	/* primary event in element [0]*/
+
+		if (0 != r_eventid_loc)					/* optional recovery event in element [1] */
+			zbx_vector_uint64_append(&eventids, r_eventid_loc);
 
 		zbx_db_get_events_by_eventids(&eventids, &events);
 
-		if (0 == events.values_num)
+		switch (events.values_num)
 		{
-			zbx_strlcpy(error, "Unknown event identifier.", sizeof(error));
+			case 0:
+				zbx_strlcpy(error, "Specified event data not found.", sizeof(error));
+				goto fail;
+			case 2:
+				if (r_eventid_loc == ((DB_EVENT *)(events.values[0]))->eventid)
+					recovery_event = events.values[0];
+				else if (r_eventid_loc == ((DB_EVENT *)(events.values[1]))->eventid)
+					recovery_event = events.values[1];
+				ZBX_FALLTHROUGH;
+			case 1:
+				if (eventid_loc == ((DB_EVENT *)(events.values[0]))->eventid)
+					problem_event = events.values[0];
+				else if (eventid_loc == ((DB_EVENT *)(events.values[1]))->eventid)
+					problem_event = events.values[1];
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				zbx_snprintf(error, sizeof(error), "Internal error in %s() events.values_num:%d",
+						__func__, events.values_num);
+				goto fail;
+		}
+
+		if (NULL == problem_event)
+		{
+			zbx_snprintf(error, sizeof(error), "Internal error in %s() problem_event:NULL", __func__);
 			goto fail;
 		}
 
-		if (SUCCEED != get_host_from_event(events.values[0], &host, error, sizeof(error)))
+		if (0 != r_eventid_loc && NULL == recovery_event)
+		{
+			zbx_snprintf(error, sizeof(error), "Internal error in %s() recovery_event:NULL", __func__);
+			goto fail;
+		}
+
+		if (SUCCEED != get_host_from_event(problem_event, &host, error, sizeof(error)))
 			goto fail;
 	}
 
@@ -448,6 +565,35 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host,
 					NULL, NULL, NULL, user_timezone, &webhook_params, MACRO_TYPE_SCRIPT, error,
 					sizeof(error)))
+			{
+				goto fail;
+			}
+		}
+	}
+	else	/* script on event */
+	{
+		int	macro_type = (NULL != recovery_event) ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL;
+
+		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
+				&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &script.command,
+				macro_type, error, sizeof(error)))
+		{
+			goto fail;
+		}
+
+		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event,
+				&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &script.command_orig,
+				macro_type, error, sizeof(error)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto fail;
+		}
+
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		{
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
+					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &webhook_params,
+					macro_type, error, sizeof(error)))
 			{
 				goto fail;
 			}
