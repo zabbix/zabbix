@@ -97,12 +97,12 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char	*name;
+	char	*diskname;
 	int	partitionid;
 }
-zbx_vmware_diskname_t;
+zbx_vmware_diskextent_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_diskname, zbx_vmware_diskname_t *)
+ZBX_PTR_VECTOR_DECL(vmware_diskextent, zbx_vmware_diskextent_t *)
 
 #define ZBX_VMWARE_DS_NONE		0
 #define ZBX_VMWARE_DS_MOUNTED		1
@@ -122,7 +122,7 @@ typedef struct
 	zbx_uint64_t			free_space;
 	zbx_uint64_t			uncommitted;
 	zbx_vector_str_uint64_pair_t	hv_uuids_access;
-	zbx_vector_vmware_diskname_t	disknames;
+	zbx_vector_vmware_diskextent_t	diskextents;
 }
 zbx_vmware_datastore_t;
 
@@ -133,16 +133,16 @@ typedef struct
 {
 	int			multipath_total;
 	int			multipath_active;
-	zbx_vmware_diskname_t	diskname;
+	zbx_vmware_diskextent_t	diskextent;
 }
-zbx_vmware_hvdiskname_t;
+zbx_vmware_hvdisk_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_hvdiskname, zbx_vmware_hvdiskname_t *)
+ZBX_PTR_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t *)
 
 typedef struct
 {
 	char				*name;
-	zbx_vector_vmware_hvdiskname_t	hvdisknames;
+	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
 

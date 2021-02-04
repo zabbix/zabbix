@@ -1653,13 +1653,13 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 		int			j;
 
 
-		for (j = 0; j < dsname->hvdisknames.values_num; j++)
-			total += dsname->hvdisknames.values[j]->multipath_total;
+		for (j = 0; j < dsname->hvdisks.values_num; j++)
+			total += dsname->hvdisks.values[j]->multipath_total;
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", total);
-		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}", dsname->hvdisknames.values_num);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}", dsname->hvdisks.values_num);
 
 		zbx_json_close(&json_data);
 	}
@@ -2205,24 +2205,24 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 		dsname = hv->dsnames.values[i];
 
-		for (j = 0; j < dsname->hvdisknames.values_num; j++)
+		for (j = 0; j < dsname->hvdisks.values_num; j++)
 		{
-			zbx_vmware_hvdiskname_t	*hvdiskname = dsname->hvdisknames.values[j];
+			zbx_vmware_hvdisk_t	*hvdisk = dsname->hvdisks.values[j];
 
 			if (NULL == partition)
 			{
-				multipath_count += hvdiskname->multipath_active;
+				multipath_count += hvdisk->multipath_active;
 				continue;
 			}
 
-			if (hvdiskname->diskname.partitionid == partitionid)
+			if (hvdisk->diskextent.partitionid == partitionid)
 			{
-				multipath_count = hvdiskname->multipath_active;
+				multipath_count = hvdisk->multipath_active;
 				break;
 			}
 		}
 
-		if (NULL != partition && dsname->hvdisknames.values_num == j)
+		if (NULL != partition && dsname->hvdisks.values_num == j)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown partition id."));
 			goto unlock;
@@ -2234,8 +2234,8 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		{
 			dsname = hv->dsnames.values[i];
 
-			for (j = 0; j < dsname->hvdisknames.values_num; j++)
-				multipath_count += dsname->hvdisknames.values[j]->multipath_active;
+			for (j = 0; j < dsname->hvdisks.values_num; j++)
+				multipath_count += dsname->hvdisks.values[j]->multipath_active;
 		}
 	}
 
