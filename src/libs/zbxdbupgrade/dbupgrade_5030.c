@@ -574,11 +574,8 @@ static void	get_discovered_itemids(const zbx_vector_uint64_t *itemids, zbx_vecto
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i2.itemid"
-			" from items i1,item_discovery i2"
-			" where i2.parent_itemid=i1.itemid"
-			" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from item_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", itemids->values, itemids->values_num);
 
 	result = DBselect("%s", sql);
 	zbx_free(sql);
