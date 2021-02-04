@@ -1098,6 +1098,36 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		else
 			zbx_strlcpy(host.host, "Zabbix server", sizeof(host.host));
 
+		/* substitute macros in script body and webhook parameters */
+
+		if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
+				NULL, NULL, ack, default_timezone, &script.command, macro_type, error, sizeof(error)))
+		{
+			rc = FAIL;
+			goto fail;
+		}
+
+		/* expand macros in command_orig used for non-secure logging */
+		if (SUCCEED != substitute_simple_macros(&actionid, event, r_event, NULL, NULL, &host, NULL, NULL, ack,
+				default_timezone, &script.command_orig, macro_type, error, sizeof(error)))
+		{
+			/* script command_orig is a copy of script command - if the script command  */
+			/* macro substitution succeeded, then it will succeed also for command_orig */
+			THIS_SHOULD_NEVER_HAPPEN;
+			rc = FAIL;
+			goto fail;
+		}
+
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		{
+			if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
+					NULL, NULL, ack, default_timezone, &webhook_params, macro_type, error,
+					sizeof(error)))
+			{
+				rc = FAIL;
+				goto fail;
+			}
+		}
 fail:
 		alertid = DBget_maxid("alerts");
 
