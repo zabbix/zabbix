@@ -39,7 +39,7 @@ class C52ImportConverter extends CConverter {
 		}
 
 		if (array_key_exists('templates', $data['zabbix_export'])) {
-			$data['zabbix_export']['templates'] = self::convertHosts($data['zabbix_export']['templates']);
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
 		if (array_key_exists('maps', $data['zabbix_export'])) {
@@ -82,6 +82,32 @@ class C52ImportConverter extends CConverter {
 	}
 
 	/**
+	 * Convert templates.
+	 *
+	 * @static
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	private static function convertTemplates(array $templates): array {
+		foreach ($templates as &$template) {
+			if (array_key_exists('items', $template)) {
+				$template['items'] = self::convertItems($template['items']);
+			}
+
+			if (array_key_exists('discovery_rules', $template)) {
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+			}
+
+			unset($template['applications']);
+		}
+		unset($template);
+
+		return $templates;
+	}
+
+	/**
 	 * Convert discovery rules.
 	 *
 	 * @static
@@ -94,8 +120,6 @@ class C52ImportConverter extends CConverter {
 		foreach ($discovery_rules as &$discovery_rule) {
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
 				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
-
-				unset($discovery_rule['applications']);
 			}
 		}
 		unset($discovery_rule);
@@ -116,8 +140,8 @@ class C52ImportConverter extends CConverter {
 		foreach ($items as &$item) {
 			if (array_key_exists('applications', $item)) {
 				$item['tags'] = self::convertApplicationsToTags($item['applications']);
-				unset($item['applications']);
 			}
+			unset($item['applications'], $item['application_prototypes']);
 		}
 		unset($item);
 
