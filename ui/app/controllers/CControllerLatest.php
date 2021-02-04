@@ -138,9 +138,8 @@ abstract class CControllerLatest extends CController {
 	 * Extend previously prepared data.
 	 *
 	 * @param array $prepared_data      Data returned by prepareData method.
-	 * @param int   $show_without_data  Include items with empty history.
 	 */
-	protected function extendData(array &$prepared_data, $show_without_data) {
+	protected function extendData(array &$prepared_data) {
 		$items = CMacrosResolverHelper::resolveItemKeys($prepared_data['items']);
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
