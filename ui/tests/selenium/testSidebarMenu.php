@@ -288,25 +288,23 @@ class testSidebarMenu extends CWebTest {
 	}
 
 	/**
-	 * Check menu pages that allows to navigate in zabbix.
+	 * Check menu pages that allows to navigate in Zabbix.
 	 *
 	 * @dataProvider getMainData
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
-		$driver = CElementQuery::getDriver();
-		$driver->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
+		CElementQuery::getDriver()->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
 				'.menu-main *{transition: none !important;}\'; document.body.appendChild(style);');
-
 		$this->assertTrue($this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady()->exists());
-		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 
-		// When login in zabbix, Monitoring section is opened.
+		// When login in Zabbix, Monitoring section is opened.
 		if ($data['section'] !== 'Monitoring') {
 			$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
 			$this->query('xpath://ul[@class="menu-'.$menu.'"]/li/a[text()="'.$data['section'].'"]')->waitUntilReady()->one()->click();
 		}
 
+		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
 		$this->query('xpath:'.$xpath.'/a[text()="'.$data['section'].'"]/following::ul/li/a[text()="'.
 				$data['page'].'"]')->waitUntilClickable()->one()->click();
 
@@ -323,8 +321,7 @@ class testSidebarMenu extends CWebTest {
 			}
 		}
 		else {
-			$header = (array_key_exists('header', $data)) ? $data['header'] : $data['page'];
-			$this->assertPageHeader($header);
+			$this->assertPageHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
 		}
 	}
 
@@ -348,11 +345,15 @@ class testSidebarMenu extends CWebTest {
 			// Clicking hide, collapse button.
 			$this->query('button', $hide)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
+
+			// One second needed for menu to collapse or hide after clicking.
 			sleep(1);
 
 			// Checking that collapsed, hiden sidemenu appears on clicking.
 			$this->query('id', $id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
+
+			// One second needed for menu to appear after clicking.
 			sleep(1);
 
 			// Returning standart sidemenu view clicking on unhide, expand button.
@@ -361,7 +362,7 @@ class testSidebarMenu extends CWebTest {
 		}
 	}
 
-	public static function getUserData() {
+	public static function getUserSectionData() {
 		return [
 			[
 				[
@@ -392,9 +393,9 @@ class testSidebarMenu extends CWebTest {
 	/**
 	 * Pages that transfer you to another webpage and logout button.
 	 *
-	 * @dataProvider getUserData
+	 * @dataProvider getUserSectionData
 	 */
-	public function testSidebarMenu_User($data) {
+	public function testSidebarMenu_UserSection($data) {
 		$this->page->login()->open('')->waitUntilReady();
 
 		if (array_key_exists('link', $data)) {
