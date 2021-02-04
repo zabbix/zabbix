@@ -73,12 +73,6 @@ foreach ($titles as $key => $title) {
 		if ($key === 'images') {
 			$cbExist->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
 		}
-
-		if ($key === 'valueMaps') {
-			$cbExist->onClick(
-				'updateWarning(this, '.json_encode(_('Value mappings for value maps will be updated!')).')'
-			);
-		}
 	}
 
 	if (array_key_exists('createMissing', $data['rules'][$key])) {
