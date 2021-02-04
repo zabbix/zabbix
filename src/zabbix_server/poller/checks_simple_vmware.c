@@ -1654,7 +1654,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 
 		for (j = 0; j < dsname->hvdisks.values_num; j++)
-			total += dsname->hvdisks.values[j]->multipath_total;
+			total += dsname->hvdisks.values[j].multipath_total;
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
@@ -2131,8 +2131,8 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_dsname_t	*dsname;
-	int			ret = SYSINFO_RET_FAIL, partitionid = 0, i, j;
-	zbx_uint64_t		multipath_count = 0;
+	int			ret = SYSINFO_RET_FAIL, i, j;
+	zbx_uint64_t		partitionid = 0, multipath_count = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2161,7 +2161,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 			goto out;
 		}
 
-		partitionid = atoi(partition);
+		partitionid = (unsigned int) atoi(partition);
 	}
 
 	zbx_vmware_lock();
@@ -2179,6 +2179,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 	{
 		zbx_vmware_datastore_t	*datastore;
 		zbx_vmware_dsname_t	dsnames_cmp;
+		zbx_vmware_hvdisk_t	hvdisk_cmp;
 
 		datastore = ds_get(&service->data->datastores, ds_name);
 
@@ -2205,27 +2206,24 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 		dsname = hv->dsnames.values[i];
 
-		for (j = 0; j < dsname->hvdisks.values_num; j++)
+		if (NULL != partition)
 		{
-			zbx_vmware_hvdisk_t	*hvdisk = dsname->hvdisks.values[j];
+			hvdisk_cmp.partitionid = partitionid;
 
-			if (NULL == partition)
+			if (FAIL == (i = zbx_vector_vmware_hvdisk_bsearch(&dsname->hvdisks, hvdisk_cmp,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				multipath_count += hvdisk->multipath_active;
-				continue;
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unknown partition id:" ZBX_FS_UI64,
+						partitionid));
+				goto unlock;
 			}
 
-			if (hvdisk->diskextent.partitionid == partitionid)
-			{
-				multipath_count = hvdisk->multipath_active;
-				break;
-			}
+			multipath_count = dsname->hvdisks.values[i].multipath_active;
 		}
-
-		if (NULL != partition && dsname->hvdisks.values_num == j)
+		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown partition id."));
-			goto unlock;
+			for (j = 0; j < dsname->hvdisks.values_num; j++)
+				multipath_count += dsname->hvdisks.values[j].multipath_active;
 		}
 	}
 	else
@@ -2235,7 +2233,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 			dsname = hv->dsnames.values[i];
 
 			for (j = 0; j < dsname->hvdisks.values_num; j++)
-				multipath_count += dsname->hvdisks.values[j]->multipath_active;
+				multipath_count += dsname->hvdisks.values[j].multipath_active;
 		}
 	}
 
@@ -2354,7 +2352,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 	char			*url;
 	zbx_vmware_service_t	*service;
 	struct zbx_json		json_data;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			i, j, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2379,6 +2377,18 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_vmware_datastore_t	*datastore = service->data->datastores.values[i];
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(&json_data, "{#DATASTORE.EXTENT}");
+
+		for (j = 0; j < datastore->diskextents.values_num; j++)
+		{
+			char			buffer[64];
+			zbx_vmware_diskextent_t *extent = datastore->diskextents.values[j];
+
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, extent->partitionid);
+			zbx_json_addstring(&json_data, extent->diskname, buffer, ZBX_JSON_TYPE_INT);
+		}
+
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 

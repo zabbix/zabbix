@@ -113,7 +113,7 @@ ZBX_PTR_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
 ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_datacenter, zbx_vmware_datacenter_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_diskextent, zbx_vmware_diskextent_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t *)
+ZBX_VECTOR_IMPL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dsname, zbx_vmware_dsname_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
@@ -1078,23 +1078,6 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hvdisk_shared_free                                        *
- *                                                                            *
- * Purpose: frees shared resources allocated to store hypervisor diskextents  *
- *          data                                                              *
- *                                                                            *
- * Parameters: hvdisk  - [IN] the hypervisor diskextent                       *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_hvdisk_shared_free(zbx_vmware_hvdisk_t *hvdisk)
-{
-	vmware_shared_strfree(hvdisk->diskextent.diskname);
-
-	__vm_mem_free_func(hvdisk);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_dsname_shared_free                                        *
  *                                                                            *
  * Purpose: frees shared resources allocated to store datastore names data    *
@@ -1105,8 +1088,6 @@ static void	vmware_hvdisk_shared_free(zbx_vmware_hvdisk_t *hvdisk)
 static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 {
 	vmware_shared_strfree(dsname->name);
-
-	zbx_vector_vmware_hvdisk_clear_ext(&dsname->hvdisks, vmware_hvdisk_shared_free);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 
 	__vm_mem_free_func(dsname);
@@ -1563,32 +1544,6 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hvdisk_shared_dup                                         *
- *                                                                            *
- * Purpose: copies vmware hypervisor diskextent object into shared memory     *
- *                                                                            *
- * Parameters: src   - [IN] the vmware hypervisor diskextent object           *
- *                                                                            *
- * Return value: a duplicated vmware hypervisor diskextent object             *
- *                                                                            *
- ******************************************************************************/
-static zbx_vmware_hvdisk_t	*vmware_hvdisk_shared_dup(const zbx_vmware_hvdisk_t *src)
-{
-	zbx_vmware_hvdisk_t	*hvdisk;
-
-	hvdisk = (zbx_vmware_hvdisk_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_hvdisk_t));
-
-	hvdisk->multipath_active = src->multipath_active;
-	hvdisk->multipath_total = src->multipath_total;
-
-	hvdisk->diskextent.diskname = vmware_shared_strdup(src->diskextent.diskname);
-	hvdisk->diskextent.partitionid = src->diskextent.partitionid;
-
-	return hvdisk;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_dsname_shared_dup                                         *
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore name object into shared memory *
@@ -1612,7 +1567,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 
 	for (i = 0; i < src->hvdisks.values_num; i++)
 	{
-		zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, vmware_hvdisk_shared_dup(src->hvdisks.values[i]));
+		zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, src->hvdisks.values[i]);
 	}
 
 	return dsname;
@@ -1863,21 +1818,6 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hvdisk_free                                               *
- *                                                                            *
- * Purpose: frees resources allocated to store hypervisor diskextent data     *
- *                                                                            *
- * Parameters: hvdisk   - [IN] the hypervisor diskextent                      *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_hvdisk_free(zbx_vmware_hvdisk_t *hvdisk)
-{
-	zbx_free(hvdisk->diskextent.diskname);
-	zbx_free(hvdisk);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: vmware_dsname_free                                               *
  *                                                                            *
  * Purpose: frees resources allocated to store Datastore name data            *
@@ -1887,9 +1827,7 @@ static void	vmware_hvdisk_free(zbx_vmware_hvdisk_t *hvdisk)
  ******************************************************************************/
 static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 {
-	zbx_vector_vmware_hvdisk_clear_ext(&dsname->hvdisks, vmware_hvdisk_free);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
-
 	zbx_free(dsname->name);
 	zbx_free(dsname);
 }
@@ -2949,7 +2887,7 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 
 		if (NULL != (partition = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("partition"))))
 		{
-			diskextent->partitionid = atoi(partition);
+			diskextent->partitionid = (unsigned int) atoi(partition);
 			zbx_free(partition);
 		}
 		else
@@ -3593,28 +3531,24 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		for (j = 0; j < ds->diskextents.values_num; j++)
 		{
 			zbx_vmware_diskextent_t	*diskextent = ds->diskextents.values[j];
-			zbx_vmware_hvdisk_t	*hvdisk;
+			zbx_vmware_hvdisk_t	hvdisk;
 			char			tmp[MAX_STRING_LEN];
-			int			count;
 
 			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_PATHS(), diskextent->diskname);
 
-			if (SUCCEED != vmware_get_multipath_count(details, tmp, &count))
+			if (SUCCEED != vmware_get_multipath_count(details, tmp, &hvdisk.multipath_total))
 				continue;
 
-			hvdisk = (zbx_vmware_hvdisk_t *)zbx_malloc(NULL, sizeof(zbx_vmware_hvdisk_t));
-			hvdisk->diskextent.diskname = zbx_strdup(NULL, diskextent->diskname);
-			hvdisk->diskextent.partitionid = diskextent->partitionid;
-			hvdisk->multipath_total = count;
-;
 			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS(), diskextent->diskname);
 
-			if (SUCCEED != vmware_get_multipath_count(details, tmp, &hvdisk->multipath_active))
-				hvdisk->multipath_active = 0;
+			if (SUCCEED != vmware_get_multipath_count(details, tmp, &hvdisk.multipath_active))
+				hvdisk.multipath_active = 0;
 
+			hvdisk.partitionid = diskextent->partitionid;
 			zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, hvdisk);
 		}
 
+		zbx_vector_vmware_hvdisk_sort(&dsname->hvdisks, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_vmware_dsname_append(&hv->dsnames, dsname);
 	}
 

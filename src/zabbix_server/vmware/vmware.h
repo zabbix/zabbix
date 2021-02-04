@@ -97,8 +97,8 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char	*diskname;
-	int	partitionid;
+	char		*diskname;
+	zbx_uint64_t	partitionid;
 }
 zbx_vmware_diskextent_t;
 
@@ -131,13 +131,13 @@ ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
 typedef struct
 {
-	int			multipath_total;
-	int			multipath_active;
-	zbx_vmware_diskextent_t	diskextent;
+	zbx_uint64_t	partitionid;
+	int		multipath_total;
+	int		multipath_active;
 }
 zbx_vmware_hvdisk_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t *)
+ZBX_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 
 typedef struct
 {
