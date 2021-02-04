@@ -677,7 +677,7 @@ static int	DBpatch_5030046(void)
 	zbx_hashset_t		valuemaps;
 	zbx_hashset_iter_t	iter;
 	zbx_valuemap_t		valuemap_local, *valuemap;
-	zbx_uint64_t		valuemapid, valuemapid_update;
+	zbx_uint64_t		valuemapid;
 	zbx_vector_ptr_t	hosts;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -757,13 +757,11 @@ static int	DBpatch_5030046(void)
 	}
 	DBfree_result(result);
 
-	valuemapid_update = valuemapid = DBget_maxid_num("valuemap", hosts.values_num);
-
 	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
 	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
 			"valuemapid", "value", "newvalue", NULL);
 
-	for (i = 0; i < hosts.values_num; i++, valuemapid++)
+	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
 		zbx_host_t	*host;
 
@@ -771,7 +769,7 @@ static int	DBpatch_5030046(void)
 
 		if (NULL != (valuemap = (zbx_valuemap_t *)zbx_hashset_search(&valuemaps, &host->valuemapid)))
 		{
-			zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, host->hostid, valuemap->name);
+			zbx_db_insert_add_values(&db_insert_valuemap, ++valuemapid, host->hostid, valuemap->name);
 
 			for (j = 0; j < valuemap->mappings.values_num; j++)
 			{
@@ -791,7 +789,7 @@ static int	DBpatch_5030046(void)
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < hosts.values_num; i++, valuemapid_update++)
+	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
 		zbx_host_t	*host;
 		char		buffer[MAX_STRING_LEN];
@@ -801,7 +799,7 @@ static int	DBpatch_5030046(void)
 		if (NULL != zbx_hashset_search(&valuemaps, &host->valuemapid))
 		{
 			zbx_snprintf(buffer, sizeof(buffer), "update items set valuemapid=" ZBX_FS_UI64 " where",
-					valuemapid_update);
+					++valuemapid);
 		}
 		else
 			zbx_strlcpy(buffer, "update items set valuemapid=null where", sizeof(buffer));
