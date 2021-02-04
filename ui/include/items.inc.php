@@ -1313,7 +1313,7 @@ function getSnmpInterfaceDescription(array $interface): string {
 		}
 
 	} else {
-		$snmp_desc[] = _x('Community', 'SNMP Community').':'.$interface['details']['community'];
+		$snmp_desc[] = _x('Community', 'SNMP Community').': '.$interface['details']['community'];
 	}
 
 	return implode(', ', $snmp_desc);
