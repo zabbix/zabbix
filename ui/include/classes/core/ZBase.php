@@ -168,6 +168,13 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
+				$file = basename($_SERVER['SCRIPT_NAME']);
+				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
+
+				if ($action_name === 'notifications.get') {
+					CWebUser::disableSessionExtension();
+				}
+
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->authenticateUser();
@@ -176,9 +183,6 @@ class ZBase {
 				$this->setLayoutModeByUrl();
 				$this->initComponents();
 				$this->initModuleManager();
-
-				$file = basename($_SERVER['SCRIPT_NAME']);
-				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
 
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
