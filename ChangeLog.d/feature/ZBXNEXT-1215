@@ -1,1 +1,1 @@
-.......PS. [ZBXNEXT-1215] changed field "alias" to "username" in "users" table (viktors)
+A.F....PS. [ZBXNEXT-1215,ZBXNEXT-6474] changed field "alias" into "username" (talbergs, viktors)
