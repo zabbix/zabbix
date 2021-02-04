@@ -19,7 +19,7 @@
 **/
 
 
-class CFunctionValidator extends CValidator {
+class C10FunctionValidator extends CValidator {
 
 	/**
 	 * The array containing valid functions and parameters to them.
@@ -43,7 +43,7 @@ class CFunctionValidator extends CValidator {
 	private $allowed;
 
 	/**
-	 * If set to true, LLD macros can be used inside functions and are properly validated using LLD macro parser.
+	 * If set to true, LLD macros can be uses inside functions and are properly validated using LLD macro parser.
 	 *
 	 * @var bool
 	 */
@@ -88,13 +88,12 @@ class CFunctionValidator extends CValidator {
 		$argsIgnored = [['type' => 'str']];
 
 		$this->allowed = [
-//			'abs' => [
-//				'args' => [],
-//				'value_types'
-//			],
+			'abschange' => [
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			],
 			'avg' => [
 				'args' => [
-					['type' => 'item', 'mandat' => true, 'can_be_empty' => true],
 					['type' => 'sec_num', 'mandat' => true],
 					['type' => 'sec_zero', 'can_be_empty' => true]
 				],
@@ -107,6 +106,10 @@ class CFunctionValidator extends CValidator {
 					['type' => 'sec_zero', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesInt
+			],
+			'change' => [
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
 			],
 			'count' => [
 				'args' => [
@@ -129,10 +132,17 @@ class CFunctionValidator extends CValidator {
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
 			],
-//			'find' => [
-//				'args' => [],
-//				'value_types'
-//			],
+			'delta' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
+			'diff' => [
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			],
 			'forecast' => [
 				'args' => [
 					['type' => 'sec_num', 'mandat' => true],
@@ -149,6 +159,13 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $valueTypesNum
 			],
+			'iregexp' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true],
+					['type' => 'sec_num', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesChar
+			],
 			'last' => [
 				'args' => [
 					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
@@ -156,10 +173,6 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $valueTypesAll
 			],
-//			'length' => [
-//				'args' => [],
-//				'value_types'
-//			],
 			'logeventid' => [
 				'args' => [
 					['type' => 'str', 'mandat' => true]
@@ -209,6 +222,31 @@ class CFunctionValidator extends CValidator {
 				],
 				'value_types' => $valueTypesNum
 			],
+			'prev' => [
+				'args' => $argsIgnored,
+				'value_types' => $valueTypesAll
+			],
+			'regexp' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true],
+					['type' => 'sec_num', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesChar
+			],
+			'str' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true],
+					['type' => 'sec_num', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesChar
+			],
+			'strlen' => [
+				'args' => [
+					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesChar
+			],
 			'sum' => [
 				'args' => [
 					['type' => 'sec_num', 'mandat' => true],
@@ -242,6 +280,13 @@ class CFunctionValidator extends CValidator {
 					['type' => 'period_shift', 'mandat' => true]
 				],
 				'value_types' => $valueTypesAll
+			],
+			'trenddelta' => [
+				'args' => [
+					['type' => 'period', 'mandat' => true],
+					['type' => 'period_shift', 'mandat' => true]
+				],
+				'value_types' => $valueTypesNum
 			],
 			'trendmax' => [
 				'args' => [
@@ -357,8 +402,12 @@ class CFunctionValidator extends CValidator {
 			$func_args[$arg['type']] = $value['functionParamList'][$aNum];
 		}
 
-		return !(array_key_exists('period', $func_args) && array_key_exists('period_shift', $func_args)
-				&& !$this->validateTrendPeriods($func_args['period'], $func_args['period_shift']));
+		if (array_key_exists('period', $func_args) && array_key_exists('period_shift', $func_args)
+				&& !$this->validateTrendPeriods($func_args['period'], $func_args['period_shift'])) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -401,11 +450,8 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateParameter(string $param, string $type): bool {
+	private function validateParameter($param, $type) {
 		switch ($type) {
-			case 'item':
-				return $this->validateItem($param);
-
 			case 'sec':
 				return $this->validateSec($param);
 
@@ -453,25 +499,13 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain host and item key.
-	 * Examples: /host/key, /host/vfs.fs.size["/var/log",pfree]
-	 *
-	 * @param string $param
-	 *
-	 * @return bool
-	 */
-	private function validateItem(string $param): bool {
-		return preg_match('/^\/'.ZBX_PREG_HOST_FORMAT.'\/'.ZBX_PREG_ITEM_KEY_FORMAT.'/', $param);
-	}
-
-	/**
 	 * Validate trigger function parameter seconds value.
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
-	private function validateSecValue(string $param): bool {
+	private function validateSecValue($param) {
 		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param);
 	}
 
@@ -483,7 +517,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateSec(string $param): bool {
+	private function validateSec($param) {
 		return ($this->validateSecValue($param) && $param > 0);
 	}
 
@@ -495,7 +529,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateSecZero(string $param): bool {
+	private function validateSecZero($param) {
 		return $this->validateSecValue($param);
 	}
 
@@ -507,7 +541,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateSecNeg(string $param): bool {
+	private function validateSecNeg($param) {
 		return preg_match('/^[-]?\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param);
 	}
 
@@ -519,10 +553,12 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateSecNum(string $param): bool {
-		return preg_match('/^#\d+$/', $param)
-			? (substr($param, 1) > 0)
-			: ($this->validateSecValue($param) && $param > 0);
+	private function validateSecNum($param) {
+		if (preg_match('/^#\d+$/', $param)) {
+			return (substr($param, 1) > 0);
+		}
+
+		return ($this->validateSecValue($param) && $param > 0);
 	}
 
 	/**
@@ -533,8 +569,12 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateSecNumZero(string $param): bool {
-		return preg_match('/^#\d+$/', $param) ? (substr($param, 1) > 0) : $this->validateSecValue($param);
+	private function validateSecNumZero($param) {
+		if (preg_match('/^#\d+$/', $param)) {
+			return (substr($param, 1) > 0);
+		}
+
+		return $this->validateSecValue($param);
 	}
 
 	/**
@@ -545,7 +585,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateNumSuffix(string $param): bool {
+	private function validateNumSuffix($param) {
 		return ((new CNumberParser(['with_suffix' => true]))->parse($param) == CParser::PARSE_SUCCESS);
 	}
 
@@ -557,7 +597,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateFit(string $param): bool {
+	private function validateFit($param) {
 		return preg_match('/^(linear|polynomial[1-6]|exponential|logarithmic|power|)$/', $param);
 	}
 
@@ -569,7 +609,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateMode(string $param): bool {
+	private function validateMode($param) {
 		return preg_match('/^(value|max|min|delta|avg|)$/', $param);
 	}
 
@@ -581,7 +621,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validatePercent(string $param): bool {
+	private function validatePercent($param) {
 		return (preg_match('/^\d*(\.\d{0,4})?$/', $param) && $param !== '.' && $param <= 100);
 	}
 
@@ -593,7 +633,7 @@ class CFunctionValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	private function validateOperation(string $param): bool {
+	private function validateOperation($param) {
 		return preg_match('/^(eq|ne|gt|ge|lt|le|like|band|regexp|iregexp|)$/', $param);
 	}
 
@@ -607,9 +647,10 @@ class CFunctionValidator extends CValidator {
 	 */
 	private function validatePeriod(string $param): bool {
 		$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
+		$value = (string) $param;
 
-		if ($simple_interval_parser->parse($param) == CParser::PARSE_SUCCESS) {
-			$value = timeUnitToSeconds($param, true);
+		if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$value = timeUnitToSeconds($value, true);
 
 			if ($value >= SEC_PER_HOUR && $value % SEC_PER_HOUR === 0) {
 				return true;
@@ -630,7 +671,7 @@ class CFunctionValidator extends CValidator {
 	private function validatePeriodShift(string $param): bool {
 		$relative_time_parser = new CRelativeTimeParser();
 
-		if ($relative_time_parser->parse($param) == CParser::PARSE_SUCCESS) {
+		if ($relative_time_parser->parse((string) $param) === CParser::PARSE_SUCCESS) {
 			$tokens = $relative_time_parser->getTokens();
 
 			foreach ($tokens as $token) {

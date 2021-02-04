@@ -20,30 +20,23 @@
 
 
 /**
- * Class is used to validate and parse a function.
+ * Class is used to validate and parse the trigger function.
  */
-class CFunctionParser extends CParser {
+class C10FunctionParser extends CParser {
 
-	protected const STATE_NEW = 0;
-	protected const STATE_END = 1;
-	protected const STATE_UNQUOTED = 2;
-	protected const STATE_QUOTED = 3;
-	protected const STATE_END_OF_PARAMS = 4;
+	const STATE_NEW = 0;
+	const STATE_END = 1;
+	const STATE_UNQUOTED = 2;
+	const STATE_QUOTED = 3;
+	const STATE_END_OF_PARAMS = 4;
 
-	public const PARAM_ARRAY = 0;
-	public const PARAM_UNQUOTED = 1;
-	public const PARAM_QUOTED = 2;
+	const PARAM_ARRAY = 0;
+	const PARAM_UNQUOTED = 1;
+	const PARAM_QUOTED = 2;
 
-	protected $function = '';
-	protected $parameters = '';
-	protected $params_raw = [];
-
-	/**
-	 * An array of options.
-	 *
-	 * @var array
-	 */
-	protected $options = [];
+	private $function = '';
+	private $parameters = '';
+	private $params_raw = [];
 
 	/**
 	 * Returns true if the char is allowed in the function name, false otherwise.
@@ -52,17 +45,17 @@ class CFunctionParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	protected function isFunctionChar(string $c): bool {
+	protected function isFunctionChar($c) {
 		return ($c >= 'a' && $c <= 'z');
 	}
 
 	/**
-	 * Parse a function and parameters and put them into $this->params_raw array.
+	 * Parse a trigger function and parameters and put them into $this->params_raw array.
 	 *
-	 * @param string  $source
-	 * @param int     $pos
+	 * @param string	$source
+	 * @param int		$pos
 	 */
-	public function parse($source, $pos = 0): int {
+	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
 		$this->function = '';
@@ -99,15 +92,8 @@ class CFunctionParser extends CParser {
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
-	/**
-	 * @param string $source
-	 * @param int    $pos
-	 * @param array  $parameters
-	 *
-	 * @return bool
-	 */
-	protected function parseFunctionParameters(string $source, int &$pos, array &$parameters): bool {
-		if (!isset($source[$pos]) || $source[$pos] !== '(') {
+	private function parseFunctionParameters($source, &$pos, array &$parameters) {
+		if (!isset($source[$pos]) || $source[$pos] != '(') {
 			return false;
 		}
 
@@ -200,7 +186,7 @@ class CFunctionParser extends CParser {
 				case self::STATE_QUOTED:
 					$_parameters[$num]['raw'] .= $source[$p];
 
-					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
+					if ($source[$p] == '"' && $source[$p - 1] != '\\') {
 						$state = self::STATE_END;
 					}
 					break;
@@ -222,11 +208,11 @@ class CFunctionParser extends CParser {
 	}
 
 	/**
-	 * Returns the left part of the function without parameters.
+	 * Returns the left part of the trigger function without parameters.
 	 *
 	 * @return string
 	 */
-	public function getFunction(): string {
+	public function getFunction() {
 		return $this->function;
 	}
 
@@ -235,7 +221,7 @@ class CFunctionParser extends CParser {
 	 *
 	 * @return string
 	 */
-	public function getParameters(): string {
+	public function getParameters() {
 		return $this->parameters;
 	}
 
@@ -244,7 +230,7 @@ class CFunctionParser extends CParser {
 	 *
 	 * @return array
 	 */
-	public function getParamsRaw(): array {
+	public function getParamsRaw() {
 		return $this->params_raw;
 	}
 
@@ -253,22 +239,22 @@ class CFunctionParser extends CParser {
 	 *
 	 * @return int
 	 */
-	public function getParamsNum(): int {
+	public function getParamsNum() {
 		return array_key_exists('parameters', $this->params_raw) ? count($this->params_raw['parameters']) : 0;
 	}
 
 	/*
-	 * Unquotes special symbols in the item parameter.
+	 * Unquotes special symbols in item the parameter
 	 *
-	 * @param string  $param
+	 * @param string $param
 	 *
 	 * @return string
 	 */
-	public static function unquoteParam(string $param): string {
+	public static function unquoteParam($param) {
 		$unquoted = '';
 
 		for ($p = 1; isset($param[$p]); $p++) {
-			if ($param[$p] === '\\' && $param[$p + 1] === '"') {
+			if ($param[$p] == '\\' && $param[$p + 1] == '"') {
 				continue;
 			}
 
@@ -281,11 +267,11 @@ class CFunctionParser extends CParser {
 	/**
 	 * Returns an unquoted parameter.
 	 *
-	 * @param int $n  The number of the requested parameter.
+	 * @param int $n	the number of the requested parameter
 	 *
 	 * @return string|null
 	 */
-	public function getParam(int $n): ?string {
+	public function getParam($n) {
 		$num = 0;
 
 		foreach ($this->params_raw['parameters'] as $param) {
@@ -295,7 +281,7 @@ class CFunctionParser extends CParser {
 						// return parameter without any changes
 						return $param['raw'];
 					case self::PARAM_QUOTED:
-						return self::unquoteParam($param['raw']);
+						return $this->unquoteParam($param['raw']);
 				}
 			}
 		}

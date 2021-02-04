@@ -20,47 +20,43 @@
 
 
 /**
- * Class is used to validate and parse a function.
+ * Class is used to validate and parse a trigger function like func(/host/key, period, params).
  */
-class CFunctionParser extends CParser {
-
-	protected const STATE_NEW = 0;
-	protected const STATE_END = 1;
-	protected const STATE_UNQUOTED = 2;
-	protected const STATE_QUOTED = 3;
-	protected const STATE_END_OF_PARAMS = 4;
-
-	public const PARAM_ARRAY = 0;
-	public const PARAM_UNQUOTED = 1;
-	public const PARAM_QUOTED = 2;
-
-	protected $function = '';
-	protected $parameters = '';
-	protected $params_raw = [];
+class CTriggerFunctionParser extends CFunctionParser {
 
 	/**
-	 * An array of options.
+	 * Parser for item keys.
 	 *
-	 * @var array
+	 * @var CItemKey
 	 */
-	protected $options = [];
+	private $item_key_parser;
 
 	/**
-	 * Returns true if the char is allowed in the function name, false otherwise.
+	 * Parser for host names.
 	 *
-	 * @param string $c
-	 *
-	 * @return bool
+	 * @var CHostNameParser
 	 */
-	protected function isFunctionChar(string $c): bool {
-		return ($c >= 'a' && $c <= 'z');
+	private $host_name_parser;
+
+	private $host = '';
+	private $item = '';
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+		$this->item_key_parser = new CItemKey();
+		$this->host_name_parser = new CHostNameParser();
 	}
 
 	/**
-	 * Parse a function and parameters and put them into $this->params_raw array.
+	 * Parse a trigger function and parameters and put them into $this->params_raw array.
 	 *
-	 * @param string  $source
-	 * @param int     $pos
+	 * @param string $source
+	 * @param int    $pos
+	 *
+	 * @return int
 	 */
 	public function parse($source, $pos = 0): int {
 		$this->length = 0;
@@ -150,6 +146,10 @@ class CFunctionParser extends CParser {
 							break;
 
 						default:
+							if ($num == 0 && !$this->parseItem($source, $p)) {
+								break 2;
+							}
+
 							$_parameters[$num] = [
 								'type' => self::PARAM_UNQUOTED,
 								'raw' => $source[$p],
@@ -222,84 +222,58 @@ class CFunctionParser extends CParser {
 	}
 
 	/**
-	 * Returns the left part of the function without parameters.
+	 * @param string $source
+	 * @param int    $pos
 	 *
-	 * @return string
+	 * @return bool
 	 */
-	public function getFunction(): string {
-		return $this->function;
-	}
+	private function parseItem(string $source, int &$pos): bool {
+		$p = $pos;
 
-	/**
-	 * Returns the parameters of the function.
-	 *
-	 * @return string
-	 */
-	public function getParameters(): string {
-		return $this->parameters;
-	}
-
-	/**
-	 * Returns the list of the parameters.
-	 *
-	 * @return array
-	 */
-	public function getParamsRaw(): array {
-		return $this->params_raw;
-	}
-
-	/**
-	 * Returns the number of the parameters.
-	 *
-	 * @return int
-	 */
-	public function getParamsNum(): int {
-		return array_key_exists('parameters', $this->params_raw) ? count($this->params_raw['parameters']) : 0;
-	}
-
-	/*
-	 * Unquotes special symbols in the item parameter.
-	 *
-	 * @param string  $param
-	 *
-	 * @return string
-	 */
-	public static function unquoteParam(string $param): string {
-		$unquoted = '';
-
-		for ($p = 1; isset($param[$p]); $p++) {
-			if ($param[$p] === '\\' && $param[$p + 1] === '"') {
-				continue;
-			}
-
-			$unquoted .= $param[$p];
+		if (!isset($source[$p]) || $source[$p] !== '/') {
+			return false;
 		}
+		$p++;
 
-		return substr($unquoted, 0, -1);
+		if ($this->host_name_parser->parse($source, $p) == self::PARSE_FAIL) {
+			return false;
+		}
+		$p += $this->host_name_parser->getLength();
+
+		$p2 = $p;
+
+		if (!isset($source[$p]) || $source[$p] !== '/') {
+			return false;
+		}
+		$p++;
+
+		if ($this->item_key_parser->parse($source, $p) == self::PARSE_FAIL) {
+			return false;
+		}
+		$p += $this->item_key_parser->getLength();
+
+		$this->host = substr($source, $pos + 1, $p2 - $pos - 1);
+		$this->item = substr($source, $p2, $p - $p2);
+		$pos = $p;
+
+		return true;
 	}
 
 	/**
-	 * Returns an unquoted parameter.
+	 * Returns parsed host.
 	 *
-	 * @param int $n  The number of the requested parameter.
-	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public function getParam(int $n): ?string {
-		$num = 0;
+	public function getHost(): string {
+		return $this->host;
+	}
 
-		foreach ($this->params_raw['parameters'] as $param) {
-			if ($num++ == $n) {
-				switch ($param['type']) {
-					case self::PARAM_UNQUOTED:
-						// return parameter without any changes
-						return $param['raw'];
-					case self::PARAM_QUOTED:
-						return self::unquoteParam($param['raw']);
-				}
-			}
-		}
-
-		return null;
+	/**
+	 * Returns parsed item.
+	 *
+	 * @return string
+	 */
+	public function getItem(): string {
+		return $this->item;
 	}
 }
