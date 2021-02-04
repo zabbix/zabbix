@@ -999,6 +999,11 @@ abstract class CHostGeneral extends CHostBase {
 			]);
 
 			if ($this->outputIsRequested('mappings', $options['selectValueMaps']) && $valuemaps) {
+				foreach ($valuemaps as &$valuemap) {
+					$valuemap['mappings'] = [];
+				}
+				unset($valuemap);
+
 				$params = [
 					'output' => ['valuemapid', 'value', 'newvalue'],
 					'filter' => ['valuemapid' => array_keys($valuemaps)]
