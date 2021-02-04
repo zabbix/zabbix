@@ -160,7 +160,7 @@ class testSidebarMenu extends CWebTest {
 				[
 					'section' => 'Configuration',
 					'page' => 'Actions',
-					'header' => 'Trigger actions'
+					'header' => 'Autoregistration actions'
 				]
 			],
 			[
