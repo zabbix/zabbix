@@ -1342,6 +1342,7 @@ define('API_CALC_FORMULA',		32);
 define('API_IP',				33);
 define('API_DNS',				34);
 define('API_PORT',				35);
+define('API_SCRIPT_MENU_PATH',	36);
 
 // flags
 define('API_REQUIRED',					0x0001);
