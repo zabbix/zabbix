@@ -24,7 +24,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in host,template,mediatype,valuemap,screen,map',
+			'rules_preset' => 'in host,template,mediatype,screen,map',
 			'rules' => 'array'
 		];
 
@@ -121,10 +121,6 @@ class CControllerPopupImport extends CController {
 
 			case 'mediatype':
 				$rules['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
-				break;
-
-			case 'valuemap':
-				$rules['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 				break;
 
 			case 'map':
