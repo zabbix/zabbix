@@ -70,7 +70,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	public function getJavascript() {
 		// TODO need to fix ZABBIX.Dashboard._target.data
 		return
-			'var dashboard_data = ZABBIX.Dashboard._target.data("dashboardGrid"),'.
+			'var dashboard_data = ZABBIX.Dashboard._$target.data("dashboardGrid"),'.
 				'filter_select = jQuery("#'.$this->getName().'").get(0);'.
 			'filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');'.
 			'filter_select.selectedIndex = 0;'.

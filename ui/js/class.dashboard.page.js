@@ -29,7 +29,6 @@ class CDashboardPage {
 		this.initMethods();
 	}
 
-	// TODO unused function +
 	makeWidgetDiv(widget) {
 		const data = this._$target.data('dashboardGrid');
 
@@ -218,7 +217,6 @@ class CDashboardPage {
 	 *
 	 * @returns {boolean}
 	 */
-	// TODO unused function +
 	isDashboardFrozen() {
 		const data = this._$target.data('dashboardGrid');
 
@@ -227,32 +225,17 @@ class CDashboardPage {
 			return true;
 		}
 
-		// TODO need to check forEach +
-		// data.widgets.forEach((widget) => {
-		// 	// Widget placeholder doesn't have header.
-		// 	if (!widget['content_header']) {
-		// 		return;
-		// 	}
-
-		// 	// Widget popup open (refresh rate)?
-		// 	if (widget['content_header'].find('[data-expanded="true"]').length > 0
-		// 		// Widget being dragged or resized in dashboard edit mode?
-		// 		|| widget['div'].hasClass('ui-draggable-dragging')
-		// 		|| widget['div'].hasClass('ui-resizable-resizing')) {
-		// 		result = true;
-		// 	}
-		// });
-		for (const widget of data.widgets) {
+		for (const w of data.widgets) {
 			// Widget placeholder doesn't have header.
-			if (!widget.content_header) {
+			if (!w.content_header) {
 				continue;
 			}
 
 			// Widget popup open (refresh rate)?
-			if (widget.content_header.find('[data-expanded="true"]').length > 0
+			if (w.content_header.find('[data-expanded="true"]').length > 0
 				// Widget being dragged or resized in dashboard edit mode?
-				|| widget.div.hasClass('ui-draggable-dragging')
-				|| widget.div.hasClass('ui-resizable-resizing')) {
+				|| w.div.hasClass('ui-draggable-dragging')
+				|| w.div.hasClass('ui-resizable-resizing')) {
 				return true;
 			}
 		}
@@ -267,7 +250,6 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget  Dashboard widget object.
 	 */
-	// TODO unused function +
 	enterWidget(widget) {
 		if (widget.div.hasClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus')) {
 			return;
@@ -294,7 +276,6 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget  Dashboard widget object.
 	 */
-	// TODO unused function +
 	leaveWidget(widget) {
 		if (!widget.div.hasClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus')) {
 			return;
@@ -314,18 +295,12 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget  Dashboard widget object.
 	 */
-	// TODO unused function +
 	doEnterWidget(widget) {
 		widget.div.addClass(widget.iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
 
 		if (widget.iterator) {
 			let child_hovered = null;
 
-			// widget['children'].forEach((child) => {
-			// 	if (child['div'].is(':hover')) {
-			// 		child_hovered = child;
-			// 	}
-			// });
 			for (const child of widget.children) {
 				if (child.div.is(':hover')) {
 					child_hovered = child;
@@ -343,7 +318,6 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget  Dashboard widget object.
 	 */
-	// TODO unused function +
 	doEnterWidgetOfIterator(widget) {
 		widget.div.addClass('dashbrd-grid-widget-focus');
 
@@ -357,24 +331,16 @@ class CDashboardPage {
 	 *
 	 * @param {object} except_widget  Dashboard widget object.
 	 */
-	// TODO unused function +
 	doLeaveWidgetsExcept(except_widget) {
 		const data = this._$target.data('dashboardGrid');
 
 		if (data.widgets) {
-			// data['widgets'].forEach((widget) => {
-			// 	if (except_widget !== null && widget.uniqueid === except_widget.uniqueid) {
-			// 		return;
-			// 	}
-
-			// 	this.doLeaveWidget(widget);
-			// });
-			for (const widget of data.widgets) {
-				if (except_widget !== null && widget.uniqueid === except_widget.uniqueid) {
+			for (const w of data.widgets) {
+				if (except_widget !== null && w.uniqueid === except_widget.uniqueid) {
 					continue;
 				}
 
-				this.doLeaveWidget(widget);
+				this.doLeaveWidget(w);
 			}
 		}
 	}
@@ -384,7 +350,6 @@ class CDashboardPage {
 	 *
 	 * @param {object} widget  Dashboard widget object.
 	 */
-	// TODO unused function +
 	doLeaveWidget(widget) {
 		// Widget placeholder doesn't have header.
 		if (!widget.content_header) {
@@ -409,15 +374,7 @@ class CDashboardPage {
 	 * @param {object} iterator      Iterator object.
 	 * @param {object} except_child  Dashboard widget object.
 	 */
-	// TODO unused function +
 	doLeaveWidgetsOfIteratorExcept(iterator, except_child = null) {
-		// iterator['children'].forEach((child) => {
-		// 	if (except_child !== undefined && child.uniqueid === except_child.uniqueid) {
-		// 		return;
-		// 	}
-
-		// 	child['div'].removeClass('dashbrd-grid-widget-focus');
-		// });
 		for (const child of iterator.children) {
 			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
 				continue;
@@ -430,7 +387,6 @@ class CDashboardPage {
 	/**
 	 * Update dashboard sliding effect if in kiosk mode.
 	 */
-	// TODO unused function +
 	slideKiosk() {
 		const data = this._$target.data('dashboardGrid');
 
@@ -506,7 +462,6 @@ class CDashboardPage {
 		}
 	}
 
-	// TODO unused function +
 	setWidgetViewMode(widget, view_mode) {
 		if (widget.view_mode == view_mode) {
 			return;
@@ -523,9 +478,6 @@ class CDashboardPage {
 				widget.div.removeClass('iterator-double-header');
 			}
 
-			// widget['children'].forEach((child) => {
-			// 	this.setWidgetViewMode(child, view_mode);
-			// });
 			for (const child of widget.children) {
 				this.setWidgetViewMode(child, view_mode);
 			}
@@ -534,7 +486,6 @@ class CDashboardPage {
 		widget.div.toggleClass(hidden_header_class, view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 	}
 
-	// TODO unused function +
 	updateIteratorPager(iterator) {
 		$('.dashbrd-grid-iterator-pager-info', iterator.content_header)
 			.text(`${iterator.page} / ${iterator.page_count}`);
@@ -550,31 +501,11 @@ class CDashboardPage {
 		iterator.content_header.toggleClass('pager-visible', is_pager_visible);
 	}
 
-	// TODO unused function +
 	addWidgetInfoButtons($content_header, buttons) {
 		// Note: this function is used only for widgets and not iterators.
 
 		const $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
-		// buttons.forEach((button) => {
-		// 	$widget_actions.prepend(
-		// 		$('<li>', {'class': 'widget-info-button'})
-		// 			.append(
-		// 				$('<button>', {
-		// 					'type': 'button',
-		// 					'class': button.icon,
-		// 					'data-hintbox': 1,
-		// 					'data-hintbox-static': 1
-		// 				})
-		// 			)
-		// 			.append(
-		// 				$('<div>', {
-		// 					'class': 'hint-box',
-		// 					'html': button.hint
-		// 				}).hide()
-		// 			)
-		// 	);
-		// });
 		for (const button of buttons) {
 			$widget_actions.prepend(
 				$('<li>', {'class': 'widget-info-button'})
@@ -596,14 +527,12 @@ class CDashboardPage {
 		}
 	}
 
-	// TODO unused function +
 	removeWidgetInfoButtons($content_header) {
 		// Note: this function is used only for widgets and not iterators.
 
 		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
 	}
 
-	// TODO unused function +
 	setWidgetPadding(widget, padding) {
 		// Note: this function is used only for widgets and not iterators.
 
@@ -614,7 +543,6 @@ class CDashboardPage {
 		}
 	}
 
-	// TODO unused function +
 	applyWidgetConfiguration(widget, configuration) {
 		if ('padding' in configuration) {
 			this.setWidgetPadding(widget, configuration['padding']);
@@ -631,8 +559,8 @@ class CDashboardPage {
 
 		data.options['rows'] = 0;
 
-		for (const widget of data.widgets) {
-			data.options.rows = Math.max(widget.pos.y + widget.pos.height, data.options.rows);
+		for (const w of data.widgets) {
+			data.options.rows = Math.max(w.pos.y + w.pos.height, data.options.rows);
 		}
 
 		if (min_rows !== null && data.options['rows'] < min_rows) {
@@ -656,7 +584,6 @@ class CDashboardPage {
 	 *
 	 * @returns {int}
 	 */
-	// TODO unused function +
 	calculateGridMinHeight() {
 		let height = $(window).height() - $('footer').outerHeight() - this._$target.offset().top - $('.wrapper').scrollTop();
 
@@ -679,7 +606,6 @@ class CDashboardPage {
 		return ret;
 	}
 
-	// TODO unused function +
 	calcDivPosition($div) {
 		const data = this._$target.data('dashboardGrid');
 
@@ -723,14 +649,12 @@ class CDashboardPage {
 		}
 	}
 
-	// TODO unused function +
 	getCurrentCellWidth() {
 		const data = this._$target.data('dashboardGrid');
 
 		return $('.dashbrd-grid-container').width() / data.options['max-columns'];
 	}
 
-	// TODO unused function +
 	setDivPosition($div, pos) {
 		const data = this._$target.data('dashboardGrid');
 
@@ -742,19 +666,12 @@ class CDashboardPage {
 		});
 	}
 
-	// TODO unused function +
 	resetCurrentPositions(widgets) {
-		// for (let i = 0; i < widgets.length; i++) {
-		// 	// TODO check object clone +
-		// 	// widgets[i].current_pos = $.extend({}, widgets[i].pos);
-		// 	widgets[i].current_pos = Object.assign({}, widgets[i].pos);
-		// }
-		for (const widget of widgets) {
-			widget.current_pos = Object.assign({}, widget.pos);
+		for (const w of widgets) {
+			w.current_pos = {...w.pos};
 		}
 	}
 
-	// TODO unused function +
 	startWidgetPositioning(widget, action) {
 		const data = this._$target.data('dashboardGrid');
 
@@ -765,19 +682,7 @@ class CDashboardPage {
 		this.resetCurrentPositions(data.widgets);
 	}
 
-	// TODO unused function +
 	posEquals(pos1, pos2) {
-		// TODO need to check each +
-		// var ret = true;
-
-		// $.each(['x', 'y', 'width', 'height'], function(index, key) {
-		// 	if (pos1[key] !== pos2[key]) {
-		// 		ret = false;
-		// 		return false;
-		// 	}
-		// });
-
-		// return ret;
 		for (const key of ['x', 'y', 'width', 'height']) {
 			if (pos1[key] !== pos2[key]) {
 				return false;
@@ -812,63 +717,35 @@ class CDashboardPage {
 	 *
 	 * @returns {boolean}
 	 */
-	// TODO unused function +
 	realignWidget(widgets, widget, max_rows) {
 		const realign = (widgets, widget, allow_reorder) => {
 			const next = [];
 
-			// TODO need to check forEach
-			// widgets.forEach((w) => {
-			// 	if (widget.uniqueid !== w.uniqueid && !overflow) {
-			// 		if (this.rectOverlap(widget.current_pos, w.current_pos)
-			// 			|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)) {
-			// 			w.current_pos.y = Math.max(w.current_pos.y,
-			// 				widget.current_pos.y + widget.current_pos.height
-			// 			);
-			// 			next.push(w);
-			// 			overflow = (overflow || (w.current_pos.y + w.current_pos.height) > max_rows);
-			// 		}
-			// 	}
-			// });
-			for (const affected_widget of widgets) {
-				if (widget.uniqueid !== affected_widget.uniqueid && !overflow) {
-					if (this.rectOverlap(widget.current_pos, affected_widget.current_pos)
-							|| (!allow_reorder && 'affected_by_id' in affected_widget
-								&& affected_widget.affected_by_id === widget.uniqueid)) {
-						affected_widget.current_pos.y = Math.max(affected_widget.current_pos.y,
+			for (const w of widgets) {
+				if (widget.uniqueid !== w.uniqueid && !overflow) {
+					if (this.rectOverlap(widget.current_pos, w.current_pos)
+							|| (!allow_reorder && 'affected_by_id' in w && w.affected_by_id === widget.uniqueid)) {
+						w.current_pos.y = Math.max(w.current_pos.y,
 							widget.current_pos.y + widget.current_pos.height
 						);
-						next.push(affected_widget);
-						overflow = (overflow
-							|| (affected_widget.current_pos.y + affected_widget.current_pos.height) > max_rows);
+						next.push(w);
+						overflow = (overflow || (w.current_pos.y + w.current_pos.height) > max_rows);
 					}
 				}
 			}
 
-			// TODO need to check forEach
-			// next.forEach((widget) => {
-			// 	if (!overflow) {
-			// 		realign(widgets, widget, false);
-			// 	}
-			// });
-			for (const widget of next) {
+			for (const w of next) {
 				if (!overflow) {
-					realign(widgets, widget, false);
+					realign(widgets, w, false);
 				}
 			}
 		};
 
 		let overflow = false;
 
-		// TODO need to check forEach
-		// widgets.forEach((w) => {
-		// 	if (widget.uniqueid !== w.uniqueid && !overflow) {
-		// 		w.current_pos = Object.assign({}, w.pos);
-		// 	}
-		// });
-		for (const affected_widget of widgets) {
-			if (widget.uniqueid !== affected_widget.uniqueid && !overflow) {
-				affected_widget.current_pos = Object.assign({}, affected_widget.pos);
+		for (const w of widgets) {
+			if (widget.uniqueid !== w.uniqueid && !overflow) {
+				w.current_pos = {...w.pos};
 			}
 		}
 
@@ -877,7 +754,6 @@ class CDashboardPage {
 		return overflow;
 	}
 
-	// TODO unused function +
 	sortWidgets(widgets) {
 		widgets
 			.sort((box1, box2) => {
@@ -897,82 +773,37 @@ class CDashboardPage {
 	 * @param {object} widget    Dragged widget object.
 	 * @param {number} max_rows  Dashboard rows count.
 	 */
-	// TODO unused function +
 	dragPrepare(widgets, widget, max_rows) {
 		const markAffected = (widgets, affected_by, affected_by_draggable) => {
 			const w_pos = Object.assign({}, affected_by.pos);
 
 			w_pos.height++;
 
-			// $.map(widgets, (affected_widget) => {
-			// 	return (!('affected' in affected_widget) && this.rectOverlap(w_pos, affected_widget.pos)) ? affected_widget : null;
-			// }).forEach((affected_widget) => {
-			// 	if (affected_widget.uniqueid !== widget.uniqueid) {
-			// 		affected_widget.affected = true;
-			// 		affected_widget.affected_by_id = affected_by.uniqueid;
-			// 		if (affected_by_draggable) {
-			// 			affected_widget.affected_by_draggable = affected_by.uniqueid;
-			// 		}
-			// 		markAffected(widgets, affected_widget, affected_by_draggable);
-			// 	}
-			// });
-
-			widgets.filter((affected_widget) => {
-				return !('affected' in affected_widget)
-					&& this.rectOverlap(w_pos, affected_widget.pos)
-					&& affected_widget.uniqueid !== widget.uniqueid;
-			}).forEach((affected_widget) => {
-				affected_widget.affected = true;
-				affected_widget.affected_by_id = affected_by.uniqueid;
+			widgets.filter((w) => {
+				return !('affected' in w) && this.rectOverlap(w_pos, w.pos) && w.uniqueid !== widget.uniqueid;
+			}).forEach((w) => {
+				w.affected = true;
+				w.affected_by_id = affected_by.uniqueid;
 				if (affected_by_draggable) {
-					affected_widget.affected_by_draggable = affected_by.uniqueid;
+					w.affected_by_draggable = affected_by.uniqueid;
 				}
-				markAffected(widgets, affected_widget, affected_by_draggable);
+				markAffected(widgets, w, affected_by_draggable);
 			});
 		};
 
 		markAffected(widgets, widget, true);
 
-		for (const affected_widget of widgets) {
-			delete affected_widget.affected;
+		for (const w of widgets) {
+			delete w.affected;
 		}
 
-		for (const affected_widget of widgets) {
-			markAffected(widgets, affected_widget, false);
+		for (const w of widgets) {
+			markAffected(widgets, w, false);
 		}
 
-		// TODO need to check each
-		// $.each(widgets, (_, w) => {
-		// 	if ('affected_by_draggable' in w) {
-		// 		var pos = Object.assign({}, w.pos),
-		// 			overlaps = false;
-
-		// 		pos.y -= widget.pos.height;
-		// 		pos.height += widget.pos.height;
-
-		// 		// TODO need to check each
-		// 		$.each(widgets, (_, b) => {
-		// 			overlaps = (b.uniqueid !== w.uniqueid && b.uniqueid !== widget.uniqueid && this.rectOverlap(b.pos, pos));
-
-		// 			if (overlaps) {
-		// 				pos.y = b.pos.y + b.pos.height;
-		// 				pos.height -= w.pos.y - pos.y;
-		// 				overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
-		// 			}
-
-		// 			return !overlaps;
-		// 		});
-
-		// 		if (overlaps) {
-		// 			return false;
-		// 		}
-
-		// 		w.pos.y = pos.y;
-		// 	}
-		// });
-		for (const affected_widget of widgets) {
-			if ('affected_by_draggable' in affected_widget) {
-				const pos = {...affected_widget.pos};
+		for (const w of widgets) {
+			if ('affected_by_draggable' in w) {
+				const pos = {...w.pos};
 
 				let overlaps = false;
 
@@ -980,14 +811,14 @@ class CDashboardPage {
 				pos.height += widget.pos.height;
 
 				for (const box of widgets) {
-					overlaps = (box.uniqueid !== affected_widget.uniqueid
+					overlaps = (box.uniqueid !== w.uniqueid
 						&& box.uniqueid !== widget.uniqueid
 						&& this.rectOverlap(box.pos, pos));
 
 					if (overlaps) {
 						pos.y = box.pos.y + box.pos.height;
-						pos.height -= affected_widget.pos.y - pos.y;
-						overlaps = (pos.height < affected_widget.pos.height || pos.y >= affected_widget.pos.y);
+						pos.height -= w.pos.y - pos.y;
+						overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
 					}
 					else {
 						break;
@@ -998,7 +829,7 @@ class CDashboardPage {
 					break;
 				}
 
-				affected_widget.pos.y = pos.y;
+				w.pos.y = pos.y;
 			}
 		}
 	}
@@ -1014,7 +845,6 @@ class CDashboardPage {
 	 * @param {number} axis.size_min  Minimum size allowed for one item.
 	 * @param {number} axis.size_max  Maximum size allowed for one item, also is used as maximum size of dashboard.
 	 */
-	// TODO unused function +
 	fitWidgetsIntoBox(widgets, widget, axis) {
 		const axis_key = axis.axis_key;
 		const size_key = axis.size_key;
@@ -1024,48 +854,27 @@ class CDashboardPage {
 		const opposite_axis_key = (axis_key === 'x') ? 'y' : 'x';
 		const opposite_size_key = (size_key === 'width') ? 'height' : 'width';
 
-		const axis_pos = Object.assign({}, widget.current_pos);
+		const axis_pos = {...widget.current_pos};
 
 		const getAffectedInBounds = (bounds) => {
-			// TODO need to check map
-			return $.map(affected, (box) => {
-				return this.rectOverlap(bounds, box.current_pos) ? box : null;
+			return affected.filter((w) => {
+				return this.rectOverlap(bounds, w.current_pos);
 			});
-			// return affected.filter((affected_widget) => {
-			// 	return this.rectOverlap(bounds, affected_widget.current_pos);
-			// });
 		};
 
 		const markAffectedWidgets = (pos, uid) => {
-			$.map(widgets, (box) => {
-				return (!('affected_axis' in box) && box.uniqueid !== uid && this.rectOverlap(pos, box.current_pos))
-					? box
-					: null;
-			})
-				.forEach((box) => {
-					const boundary = Object.assign({}, box.current_pos);
+			widgets.filter((w) => {
+				return !('affected_axis' in w) && w.uniqueid !== uid && this.rectOverlap(pos, w.current_pos);
+			}).forEach((w) => {
+				const boundary = Object.assign({}, w.current_pos);
 
-					if (box.uniqueid !== widget.uniqueid) {
-						boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
-					}
-					box.affected_axis = axis_key;
+				if (w.uniqueid !== widget.uniqueid) {
+					boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
+				}
+				w.affected_axis = axis_key;
 
-					markAffectedWidgets(boundary);
-				});
-			// widgets.filter((affected_widget) => {
-			// 	return !('affected_axis' in affected_widget)
-			// 		&& affected_widget.uniqueid !== uid
-			// 		&& this.rectOverlap(pos, affected_widget.current_pos);
-			// }).forEach((affected_widget) => {
-			// 	const boundary = Object.assign({}, affected_widget.current_pos);
-
-			// 	if (affected_widget.uniqueid !== widget.uniqueid) {
-			// 		boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
-			// 	}
-			// 	affected_widget.affected_axis = axis_key;
-
-			// 	markAffectedWidgets(boundary);
-			// });
+				markAffectedWidgets(boundary);
+			});
 		}
 
 		let margins = {};
@@ -1075,31 +884,20 @@ class CDashboardPage {
 
 		// Resize action for left/up is mirrored right/down action.
 		if ('mirrored' in axis) {
-			// TODO need to check forEach
-			widgets.forEach((box) => {
-				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
-				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
-			});
-			// for (const box of widgets) {
-			// 	box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
-			// 	box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
-			// }
+			for (const w of widgets) {
+				w.current_pos[axis_key] = size_max - w.current_pos[axis_key] - w.current_pos[size_key];
+				w.pos[axis_key] = size_max - w.pos[axis_key] - w.pos[size_key];
+			}
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
 		}
 
 		// Get array containing only widgets affected by resize operation.
 		markAffectedWidgets(widget.current_pos, widget.uniqueid);
 
-		// TODO need to check $.map
-		affected = $.map(widgets, (box) => {
-			return ('affected_axis' in box && box.affected_axis === axis_key && box.uniqueid !== widget.uniqueid)
-				? box
-				: null;
-		})
-		// affected = widgets
-		// 	.filter((box) => {
-		// 		return 'affected_axis' in box && box.affected_axis === axis_key && box.uniqueid !== widget.uniqueid;
-		// 	})
+		affected = widgets
+			.filter((w) => {
+				return 'affected_axis' in w && w.affected_axis === axis_key && w.uniqueid !== widget.uniqueid;
+			})
 			.sort((box1, box2) => {
 				return box1.current_pos[axis_key] - box2.current_pos[axis_key];
 			});
@@ -1108,33 +906,33 @@ class CDashboardPage {
 		 * Compact affected widgets removing empty space between them when possible. Additionally build overlap array
 		 * which will contain maximal coordinate occupied by widgets on every opposite axis line.
 		 */
-		for (const box of affected) {
-			const last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
+		for (const w of affected) {
+			const last = w.current_pos[opposite_axis_key] + w.current_pos[opposite_size_key];
 
 			let new_pos = axis_pos[axis_key] + axis_pos[size_key];
 			let i;
 
-			for (i = box.current_pos[opposite_axis_key]; i < last; i++) {
+			for (i = w.current_pos[opposite_axis_key]; i < last; i++) {
 				if (i in margins) {
 					new_pos = Math.max(new_pos, margins[i]);
 				}
 			}
 
-			if (box.current_pos[axis_key] > new_pos) {
+			if (w.current_pos[axis_key] > new_pos) {
 				// Should keep widget original position if compacted value is less than original.
-				for (i = box.current_pos[opposite_axis_key]; i < last; i++) {
-					margins[i] = box.current_pos[axis_key] + box.current_pos[size_key];
+				for (i = w.current_pos[opposite_axis_key]; i < last; i++) {
+					margins[i] = w.current_pos[axis_key] + w.current_pos[size_key];
 				}
 
 				continue;
 			}
 
-			for (i = box.current_pos[opposite_axis_key]; i < last; i++) {
-				margins[i] = new_pos + box.current_pos[size_key];
+			for (i = w.current_pos[opposite_axis_key]; i < last; i++) {
+				margins[i] = new_pos + w.current_pos[size_key];
 			}
 
-			box.current_pos[axis_key] = new_pos;
-			new_max = Math.max(new_max, new_pos + box.current_pos[size_key]);
+			w.current_pos[axis_key] = new_pos;
+			new_max = Math.max(new_max, new_pos + w.current_pos[size_key]);
 		}
 
 		overlap = new_max - size_max;
@@ -1162,12 +960,12 @@ class CDashboardPage {
 			 * Build affected boundaries object with minimum and maximum value on opposite axis for every widget.
 			 * Key in axis_boundaries object will be widget uniqueid and value boundaries object described above.
 			 */
-			for (const affected_widget of affected) {
-				const affected_box = Object.assign({}, affected_widget.current_pos);
+			for (const w of affected) {
+				const affected_box = {...w.current_pos};
 
-				let min = affected_widget.current_pos[opposite_axis_key];
-				let max = min + affected_widget.current_pos[opposite_size_key];
-				let size = affected_widget.current_pos[size_key];
+				let min = w.current_pos[opposite_axis_key];
+				let max = min + w.current_pos[opposite_size_key];
+				let size = w.current_pos[size_key];
 				let boxes = [];
 				let bounds_changes = true;
 
@@ -1196,12 +994,12 @@ class CDashboardPage {
 					}
 				}
 
-				axis_boundaries[affected_widget.uniqueid] = {debug: affected_widget.header, min: min, max: max};
+				axis_boundaries[w.uniqueid] = {debug: w.header, min: min, max: max};
 			}
 
 			// Scan affected line by line.
 			while (slot < new_max && overlap > 0) {
-				margins_backup = Object.assign({}, margins);
+				margins_backup = {...margins};
 				collapsed_pos = {};
 				scanline[axis_key] = slot;
 				col = getAffectedInBounds(scanline);
@@ -1209,122 +1007,67 @@ class CDashboardPage {
 				next_col = getAffectedInBounds(scanline);
 				collapsed = next_col.length > 0;
 
-				// TODO need to check each
-				$.each(next_col, (_, box) => {
+				for (const box of next_col) {
 					if ('pos' in box && box.pos[axis_key] > slot) {
-						return;
+						continue;
 					}
 
-					box.new_pos = Object.assign({}, box.current_pos);
+					box.new_pos = {...box.current_pos};
 					box.new_pos[axis_key] = slot;
 
-					// TODO need to check each
-					$.each(col, (_, col_box) => {
+					for (const col_box of col) {
 						if (col_box.uniqueid === box.uniqueid || this.rectOverlap(col_box.current_pos, box.new_pos)) {
 							if (col_box.current_pos[size_key] > size_min) {
-								let start_pos = axis_boundaries[col_box.uniqueid].min,
-									stop_pos = axis_boundaries[col_box.uniqueid].max,
-									margin = 0,
-									i;
+								const start_pos = axis_boundaries[col_box.uniqueid].min;
+								const stop_pos = axis_boundaries[col_box.uniqueid].max;
+								let margin = 0
 
 								// Find max overlap position value for checked widget.
-								for (i = start_pos; i < stop_pos; i++) {
+								for (let i = start_pos; i < stop_pos; i++) {
 									margin = Math.max(margin, margins[i]);
 								}
 
 								if (margin && margin < size_max) {
 									box.new_pos[axis_key] = box.current_pos[axis_key];
-									return true;
+									continue;
 								} else {
-									for (i = start_pos; i < stop_pos; i++) {
+									for (let i = start_pos; i < stop_pos; i++) {
 										margins[i] = margins_backup[i] - scanline[size_key];
 									}
 								}
 
-								col_box.new_pos = Object.assign({}, col_box.current_pos);
+								col_box.new_pos = {...col_box.current_pos};
 								col_box.new_pos[size_key] -= scanline[size_key];
 
 								// Mark opposite axis coordinates as movable.
-								for (i = start_pos; i < stop_pos; i++) {
+								for (let i = start_pos; i < stop_pos; i++) {
 									collapsed_pos[i] = 1;
 								}
 							} else {
 								collapsed = false;
+								break;
 							}
 						}
+					}
 
-						return collapsed;
-					});
-
-					return collapsed;
-				});
-
-				// for (const box of next_col) {
-				// 	if ('pos' in box && box.pos[axis_key] > slot) {
-				// 		continue;
-				// 	}
-
-				// 	box.new_pos = Object.assign({}, box.current_pos);
-				// 	box.new_pos[axis_key] = slot;
-
-				// 	for (const col_box of col) {
-				// 		if (col_box.uniqueid === box.uniqueid || this.rectOverlap(col_box.current_pos, box.new_pos)) {
-				// 			if (col_box.current_pos[size_key] > size_min) {
-				// 				const start_pos = axis_boundaries[col_box.uniqueid].min;
-				// 				const stop_pos = axis_boundaries[col_box.uniqueid].max;
-				// 				let margin = 0;
-
-				// 				// Find max overlap position value for checked widget.
-				// 				for (let i = start_pos; i < stop_pos; i++) {
-				// 					margin = Math.max(margin, margins[i]);
-				// 				}
-
-				// 				if (margin && margin < size_max) {
-				// 					box.new_pos[axis_key] = box.current_pos[axis_key];
-				// 					continue;
-				// 				} else {
-				// 					for (let i = start_pos; i < stop_pos; i++) {
-				// 						margins[i] = margins_backup[i] - scanline[size_key];
-				// 					}
-				// 				}
-
-				// 				col_box.new_pos = Object.assign({}, col_box.current_pos);
-				// 				col_box.new_pos[size_key] -= scanline[size_key];
-
-				// 				// Mark opposite axis coordinates as movable.
-				// 				for (let i = start_pos; i < stop_pos; i++) {
-				// 					collapsed_pos[i] = 1;
-				// 				}
-				// 			} else {
-				// 				collapsed = false;
-				// 				break;
-				// 			}
-				// 		}
-				// 	}
-
-				// 	if (!collapsed) {
-				// 		break;
-				// 	}
-				// }
+					if (!collapsed) {
+						break;
+					}
+				}
 
 				if (collapsed) {
-					affected.forEach((box) => {
-						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
-							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
-								box.pos[axis_key]
+					for (const w of affected) {
+						if (w.current_pos[axis_key] > slot && w.current_pos[opposite_axis_key] in collapsed_pos) {
+							w.current_pos[axis_key] = Math.max(w.current_pos[axis_key] - scanline[size_key],
+								w.pos[axis_key]
 							);
 						}
-					});
+					}
 
 					// Update margin values for collapsed lines on opposite axis.
-					// TODO need to check each
-					$.each(collapsed_pos, (index) => {
-						margins[index] = margins_backup[index] - scanline[size_key];
-					});
-					// console.log(collapsed_pos);
-					// for (const i in collapsed_pos) {
-					// 	margins[i] = margins_backup[i] - scanline[size_key];
-					// }
+					for (const i in collapsed_pos) {
+						margins[i] = margins_backup[i] - scanline[size_key];
+					}
 
 					overlap -= 1;
 					new_max -= 1;
@@ -1363,39 +1106,29 @@ class CDashboardPage {
 		 */
 		affected.sort((box1, box2) => {
 			return box2.current_pos[axis_key] - box1.current_pos[axis_key];
-		}).forEach((box) => {
-			if (box.pos[size_key] > box.current_pos[size_key]) {
-				const new_pos = Object.assign({}, box.current_pos);
+		}).forEach((w) => {
+			if (w.pos[size_key] > w.current_pos[size_key]) {
+				const new_pos = {...w.current_pos};
 
-				let size = Math.min(box.pos[size_key], size_max - box.current_pos[axis_key]);
+				let size = Math.min(w.pos[size_key], size_max - w.current_pos[axis_key]);
 
-				new_pos[size_key] = box.pos[size_key];
-				// $.map(affected, (col_box) => {
-				// 	return col_box.uniqueid !== box.uniqueid && this.rectOverlap(col_box.current_pos, new_pos)
-				// 		? col_box
-				// 		: null;
-				// }).forEach((col_box) => {
-				// 	size = Math.min(size, col_box.current_pos[axis_key] - box.current_pos[axis_key]);
-				// });
+				new_pos[size_key] = w.pos[size_key];
+
 				affected.filter((col_box) => {
-					return col_box.uniqueid !== box.uniqueid && this.rectOverlap(col_box.current_pos, new_pos);
+					return col_box.uniqueid !== w.uniqueid && this.rectOverlap(col_box.current_pos, new_pos);
 				}).forEach((col_box) => {
-					size = Math.min(size, col_box.current_pos[axis_key] - box.current_pos[axis_key]);
+					size = Math.min(size, col_box.current_pos[axis_key] - w.current_pos[axis_key]);
 				});
 
-				box.current_pos[size_key] = Math.max(size, size_min);
+				w.current_pos[size_key] = Math.max(size, size_min);
 			}
 		});
 
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
 		if ('mirrored' in axis) {
-			// widgets.forEach((box) => {
-			// 	box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
-			// 	box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
-			// });
-			for (const box of widgets) {
-				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
-				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
+			for (const w of widgets) {
+				w.current_pos[axis_key] = size_max - w.current_pos[axis_key] - w.current_pos[size_key];
+				w.pos[axis_key] = size_max - w.pos[axis_key] - w.pos[size_key];
 			}
 		}
 	}
@@ -3223,6 +2956,8 @@ class CDashboardPage {
 	 */
 	// TODO unused function +
 	removeWidgetActions(widget) {
+		const data = this._$target.data('dashboardGrid');
+
 		for (const hook_name in data.triggers) {
 			for (let i = 0; i < data.triggers[hook_name].length; i++) {
 				if (widget.uniqueid === data.triggers[hook_name][i].uniqueid) {
@@ -3580,6 +3315,42 @@ class CDashboardPage {
 				.showAtDefaultPosition();
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 
 	initMethods() {
 		this._methods = {

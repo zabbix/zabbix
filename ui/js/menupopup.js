@@ -586,7 +586,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	// TODO fix it - ZABBIX.Dashboard._target
-	var $dashboard = ZABBIX.Dashboard._target,
+	var $dashboard = ZABBIX.Dashboard._$target,
 		dashboard_data = ZABBIX.Dashboard._methods.getDashboardData(),
 		editMode = ZABBIX.Dashboard._methods.isEditMode(),
 		widget = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
