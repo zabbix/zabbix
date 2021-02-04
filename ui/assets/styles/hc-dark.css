@@ -506,6 +506,21 @@ footer {
 .form-grid .form-actions button:not(:first-of-type) {
   margin-left: 10px; }
 
+.csortable {
+  position: relative;
+  overflow: hidden; }
+  .csortable .csortable-list {
+    position: relative;
+    top: 0;
+    left: 0;
+    transition: left 0.3s, top 0.3s; }
+    .csortable .csortable-list .csortable-item {
+      transition: left 0.3s, top 0.3s; }
+  .csortable.csortable-dragging .csortable-item {
+    position: absolute; }
+    .csortable.csortable-dragging .csortable-item.csortable-dragging {
+      display: none; }
+
 .form-search {
   position: relative;
   height: 24px; }

@@ -1,0 +1,28 @@
+.csortable {
+	position: relative;
+	overflow: hidden;
+
+	.csortable-list {
+		position: relative;
+		top: 0;
+		left: 0;
+
+		@if $ui-transitions {
+			transition: left $ui-transition-duration, top $ui-transition-duration;
+
+			.csortable-item {
+				transition: left $ui-transition-duration, top $ui-transition-duration;
+			}
+		}
+	}
+
+	&.csortable-dragging {
+		.csortable-item {
+			position: absolute;
+
+			&.csortable-dragging {
+				display: none;
+			}
+		}
+	}
+}
