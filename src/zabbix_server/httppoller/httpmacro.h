@@ -25,6 +25,7 @@ typedef struct
 	DB_HTTPTEST		httptest;
 	char			*headers;
 	zbx_vector_ptr_pair_t	variables;
+	zbx_vector_ptr_pair_t	connect_to;
 	/* httptest macro cache consisting of (key, value) pair array */
 	zbx_vector_ptr_pair_t	macros;
 }
@@ -40,6 +41,7 @@ typedef struct
 	char			*posts;
 
 	zbx_vector_ptr_pair_t	variables;
+	zbx_vector_ptr_pair_t	connect_to;
 }
 zbx_httpstep_t;
 
