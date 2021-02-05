@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,7 +201,7 @@ class testZBX6663 extends CLegacyWebTest {
 		}
 		else {
 			$link = $zbx_data['link'];
-			$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='$link']");
+			$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="'.$link.'"]');
 		}
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('selected_count'));

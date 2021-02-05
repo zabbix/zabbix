@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Ensures item label is visible in tab filter navgation.
+	 * Ensures item label is visible in tab filter navigation.
 	 *
 	 * @param {CTabfilterItem} item    Filter item object.
 	 */

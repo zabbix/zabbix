@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,9 +67,13 @@ if ($data['readonly'] || $data['is_own_role']) {
 }
 else {
 	$form_grid->addItem([
-		(new CLabel(_('User type'), 'type')),
+		(new CLabel(_('User type'), 'label-type')),
 		(new CFormField(
-			(new CComboBox('type', $data['type'], null, user_type2str()))->addClass('js-userrole-usertype')
+			(new CSelect('type'))
+				->setFocusableElementId('label-type')
+				->setValue($data['type'])
+				->addOptions(CSelect::createOptionsFromArray(user_type2str()))
+				->addClass('js-userrole-usertype')
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 	]);
 }

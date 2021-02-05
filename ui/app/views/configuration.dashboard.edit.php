@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 				->addClass(ZBX_STYLE_DASHBRD_EDIT)
 		])))
 	)
-	->addItem(get_header_host_table('dashboards', $data['dashboard']['templateid']))
+	->setNavigation(getHostNavigation('dashboards', $data['dashboard']['templateid']))
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 	->show();
 

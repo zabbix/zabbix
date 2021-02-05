@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -489,43 +489,65 @@ class CHost extends CHostGeneral {
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			if ($options['inheritedTags']) {
-				$tags = [];
+				// Swap tag operators to include templates (normally should be excluded) for later processing.
+				$filter = array_map(function($tag) {
+					$swapping_map = [
+						TAG_OPERATOR_LIKE => TAG_OPERATOR_LIKE,
+						TAG_OPERATOR_EQUAL => TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_NOT_LIKE => TAG_OPERATOR_LIKE,
+						TAG_OPERATOR_NOT_EQUAL => TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_EXISTS => TAG_OPERATOR_EXISTS,
+						TAG_OPERATOR_NOT_EXISTS => TAG_OPERATOR_EXISTS
+					];
+					return ['operator' => $swapping_map[$tag['operator']]] + $tag;
+				}, $options['tags']);
 
 				$db_template_tags = DBfetchArray(DBselect(
-					'SELECT h.hostid,ht.tag,ht.value'.
-					' FROM hosts h,host_tag ht'.
-					' WHERE '.CApiTagHelper::addWhereCondition($options['tags'], TAG_EVAL_TYPE_OR, 'h','host_tag',
-							'hostid').
-						' AND ht.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_TEMPLATE
+					'SELECT h.hostid,ht.tag,ht.value,ht.hosttagid'.
+					' FROM hosts h'.
+					' LEFT JOIN host_tag ht'.
+					' ON ht.hostid=h.hostid'.
+					' WHERE'.
+						' h.status='.HOST_STATUS_TEMPLATE.
+						' AND ('.CApiTagHelper::addWhereCondition($filter, TAG_EVAL_TYPE_OR, 'h','host_tag', 'hostid').
+							' OR ht.hosttagid IS NULL)'
 				));
 
+				$tags = [];
 				foreach ($options['tags'] as $tag) {
-					$templateids = [];
-					foreach ($db_template_tags as $template_tag) {
-						if (CApiTagHelper::checkTag($tag, $template_tag)) {
-							$templateids[$template_tag['hostid']] = true;
-						}
-					}
-
 					if (!array_key_exists($tag['tag'], $tags)) {
 						$tags[$tag['tag']] = [
-							'templateids' => [],
+							'templateids_in' => [],
+							'templateids_not_in' => [],
 							'pairs' => []
 						];
 					}
 
 					$tags[$tag['tag']]['pairs'][] = [
-						'value' => $tag['value'],
+						'value' => array_key_exists('value', $tag) ? $tag['value'] : '',
 						'operator' => $tag['operator']
 					];
 
-					while ($templateids) {
-						$tags[$tag['tag']]['templateids'] += $templateids;
+					[$templateids_in, $templateids_not_in]
+							= CApiTagHelper::checkMatchingTemplates($tag, $db_template_tags);
 
-						$templateids = API::Template()->get([
+					while ($templateids_in) {
+						$tags[$tag['tag']]['templateids_in'] += $templateids_in;
+
+						$templateids_in = API::Template()->get([
 							'output' => [],
-							'parentTemplateids' => array_keys($templateids),
+							'parentTemplateids' => array_keys($templateids_in),
+							'preservekeys' => true,
+							'nopermissions' => true
+						]);
+					}
+
+					while ($templateids_not_in) {
+						$tags[$tag['tag']]['templateids_not_in'] += $templateids_not_in;
+
+						$templateids_not_in = API::Template()->get([
+							'output' => [],
+							'parentTemplateids' => array_keys($templateids_not_in),
 							'preservekeys' => true,
 							'nopermissions' => true
 						]);
@@ -543,10 +565,25 @@ class CHost extends CHostGeneral {
 						];
 					}
 
-					$where[] = '('.
-						CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid').
-						' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids'])).
-					')';
+					// Filtering by host tags.
+					$_where = CApiTagHelper::addWhereCondition($_tags, $options['evaltype'], 'h', 'host_tag', 'hostid');
+
+					// Exclude hosts having templates with TAG_OPERATOR_NOT_* tags.
+					if ($_tag['templateids_not_in']) {
+						$_where = '('.
+							$_where.
+							' AND ('.
+								'ht2.templateid IS NULL'.
+								' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids_not_in']), true).
+							')'.
+						')';
+					}
+
+					// Extend results with hosts having inherited tags matching filtering criteria.
+					if ($_tag['templateids_in']) {
+						$_where .= ' OR '.dbConditionInt('ht2.templateid', array_keys($_tag['templateids_in']));
+					}
+					$where[] = '('.$_where.')';
 				}
 
 				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];

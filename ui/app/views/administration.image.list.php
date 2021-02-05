@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.image.list.js.php');
+
 $page_url = (new CUrl('zabbix.php'))->setArgument('action', 'image.list');
 $widget = (new CWidget())
 	->setTitle(_('Images'))
@@ -33,18 +35,25 @@ $widget = (new CWidget())
 			->setAction($page_url->getUrl())
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('Type'), 'imagetype'),
+					new CLabel(_('Type'), 'label-imagetype'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('imagetype', $page_url
+					(new CSelect('imagetype'))
+						->setId('imagetype')
+						->setFocusableElementId('label-imagetype')
+						->addOption(new CSelectOption($page_url
+								->setArgument('imagetype', IMAGE_TYPE_ICON)
+								->getUrl(),
+							_('Icon')
+						))
+						->addOption(new CSelectOption($page_url
+								->setArgument('imagetype', IMAGE_TYPE_BACKGROUND)
+								->getUrl(),
+							_('Background')
+						))
+						->setValue($page_url
 							->setArgument('imagetype', $data['imagetype'])
-							->getUrl(), 'redirect(this.options[this.selectedIndex].value);', [
-						$page_url
-							->setArgument('imagetype', IMAGE_TYPE_ICON)
-							->getUrl() => _('Icon'),
-						$page_url
-							->setArgument('imagetype', IMAGE_TYPE_BACKGROUND)
-							->getUrl() => _('Background')
-					])
+							->getUrl()
+						)
 				])
 				->addItem(
 					(new CButton(null, ($data['imagetype'] == IMAGE_TYPE_ICON)

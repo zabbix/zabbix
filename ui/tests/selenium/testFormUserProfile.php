@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -433,9 +433,9 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		if (array_key_exists('messages_disabled', $data)) {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.repeat'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
@@ -444,9 +444,9 @@ class testFormUserProfile extends CLegacyWebTest {
 		if (array_key_exists('timeout', $data)) {
 			$this->zbxTestCheckboxSelect('messages_enabled', true);
 			$this->zbxTestInputTypeOverwrite('messages_timeout', $data['timeout']);
-			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='messages_sounds.repeat'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
-			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//button[@name='stop'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
@@ -454,9 +454,9 @@ class testFormUserProfile extends CLegacyWebTest {
 		else {
 			$this->zbxTestCheckboxSelect('messages_enabled', false);
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.repeat'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");

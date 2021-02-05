@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,10 +102,7 @@ $dataValid = check_fields($fields);
 $edit_ack_operationid = null;
 $new_ack_operation = getRequest('new_ack_operation', []);
 $ack_operations = getRequest('ack_operations', []);
-
-if ($dataValid && hasRequest('eventsource') && !hasRequest('form')) {
-	CProfile::update('web.actionconf.eventsource', getRequest('eventsource'), PROFILE_TYPE_INT);
-}
+$eventsource = getRequest('eventsource', EVENT_SOURCE_TRIGGERS);
 
 if (hasRequest('actionid')) {
 	$actionPermissions = API::Action()->get([
@@ -157,8 +154,6 @@ if (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 	$action['filter'] = $filter;
-
-	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
 		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
@@ -253,8 +248,6 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 	$new_operation = getRequest('new_operation');
 	$result = true;
 
-	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
-
 	$new_operation['recovery'] = ACTION_OPERATION;
 	$new_operation['eventsource'] = $eventsource;
 
@@ -303,8 +296,6 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 }
 elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operation')) {
 	$new_recovery_operation = getRequest('new_recovery_operation');
-
-	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
 	$new_recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 	$new_recovery_operation['eventsource'] = $eventsource;
@@ -449,9 +440,7 @@ if (hasRequest('form')) {
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
 	else {
-		$data['eventsource'] = getRequest('eventsource',
-			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
-		);
+		$data['eventsource'] = $eventsource;
 		$data['esc_period'] = getRequest('esc_period');
 	}
 
@@ -574,7 +563,7 @@ else {
 	];
 
 	$data = [
-		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
+		'eventsource' => getRequest('eventsource', EVENT_SOURCE_TRIGGERS),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,

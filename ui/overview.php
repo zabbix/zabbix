@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['layout.mode.js', 'multiselect.js'];
+$page['scripts'] = ['layout.mode.js', 'multiselect.js', 'monitoring.overview.js'];
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
@@ -110,11 +110,7 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-// overview type
-if (hasRequest('type')) {
-	CProfile::update('web.overview.type', getRequest('type'), PROFILE_TYPE_INT);
-}
-$type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
+$type = getRequest('type', SHOW_TRIGGERS);
 
 // overview style
 if (hasRequest('view_style')) {

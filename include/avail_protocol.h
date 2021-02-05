@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "zbxalgo.h"
 
 void	zbx_availability_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_host_availability_t *host_availability);
-void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *host_availabilities);
+		const zbx_interface_availability_t *interface_availability);
+void	zbx_availability_deserialize(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_availability_ptr_t  *interface_availabilities);
 #endif

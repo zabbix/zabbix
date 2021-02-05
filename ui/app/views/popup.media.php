@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,16 +54,20 @@ $email_send_to_table->setFooter(new CCol(
 		->addClass('element-table-add')
 ), 'dynamic-row-control');
 
-$type_combobox = new CComboBox('mediatypeid', $options['mediatypeid']);
+$type_select = (new CSelect('mediatypeid'))
+	->setId('mediatypeid')
+	->setFocusableElementId('label-mediatypeid')
+	->setValue($options['mediatypeid']);
+
 foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
-	$type_combobox->addItem($mediatypeid, $value['name'], null, true,
-		($value['status'] == MEDIA_TYPE_STATUS_DISABLED) ? ZBX_STYLE_RED : null
+	$type_select->addOption((new CSelectOption($mediatypeid, $value['name']))
+		->addClass($value['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null)
 	);
 }
 
 // Create media form.
 $media_form = (new CFormList(_('Media')))
-	->addRow(_('Type'), $type_combobox)
+	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select)
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
 		(new CTextBox('sendto', $options['sendto'], false, 1024))

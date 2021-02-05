@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,6 +218,14 @@ class CRouter {
 		'template.dashboard.edit'			=> ['CControllerTemplateDashboardEdit',				'layout.htmlpage',		'configuration.dashboard.edit'],
 		'template.dashboard.list'			=> ['CControllerTemplateDashboardList',				'layout.htmlpage',		'configuration.dashboard.list'],
 		'template.dashboard.update'			=> ['CControllerTemplateDashboardUpdate',			'layout.json',			null],
+		'token.create'						=> ['CControllerTokenCreate',						null,					null],
+		'token.delete'						=> ['CControllerTokenDelete',						null,					null],
+		'token.disable'						=> ['CControllerTokenDisable',						null,					null],
+		'token.edit'						=> ['CControllerTokenEdit',							'layout.htmlpage',		'administration.token.edit'],
+		'token.enable'						=> ['CControllerTokenEnable',						null,					null],
+		'token.list'						=> ['CControllerTokenList',							'layout.htmlpage',		'administration.token.list'],
+		'token.update'						=> ['CControllerTokenUpdate',						null,					null],
+		'token.view'						=> ['CControllerTokenView',							'layout.htmlpage',		'administration.token.view'],
 		'timeselector.update'				=> ['CControllerTimeSelectorUpdate',				'layout.json',			null],
 		'trigdisplay.edit'					=> ['CControllerTrigDisplayEdit',					'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.update'				=> ['CControllerTrigDisplayUpdate',					null,					null],
@@ -225,6 +233,9 @@ class CRouter {
 		'user.delete'						=> ['CControllerUserDelete',						null,					null],
 		'user.edit'							=> ['CControllerUserEdit',							'layout.htmlpage',		'administration.user.edit'],
 		'user.list'							=> ['CControllerUserList',							'layout.htmlpage',		'administration.user.list'],
+		'user.token.edit'					=> ['CControllerUserTokenEdit',						'layout.htmlpage',		'administration.user.token.edit'],
+		'user.token.list'					=> ['CControllerUserTokenList',						'layout.htmlpage',		'administration.user.token.list'],
+		'user.token.view'					=> ['CControllerUserTokenView',						'layout.htmlpage',		'administration.user.token.view'],
 		'user.unblock'						=> ['CControllerUserUnblock',						null,					null],
 		'user.update'						=> ['CControllerUserUpdate',						null,					null],
 		'usergroup.create'					=> ['CControllerUsergroupCreate',					null,					null],
@@ -293,7 +304,6 @@ class CRouter {
 		'chart5.php'					=> ['CLegacyAction', null, null],
 		'chart6.php'					=> ['CLegacyAction', null, null],
 		'chart7.php'					=> ['CLegacyAction', null, null],
-		'conf.import.php'				=> ['CLegacyAction', null, null],
 		'disc_prototypes.php'			=> ['CLegacyAction', null, null],
 		'graphs.php'					=> ['CLegacyAction', null, null],
 		'history.php'					=> ['CLegacyAction', null, null],
@@ -314,12 +324,10 @@ class CRouter {
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'latest.php'					=> ['CLegacyAction', null, null],
 		'maintenance.php'				=> ['CLegacyAction', null, null],
-		'map.import.php'				=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'overview.php'					=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],
 		'report4.php'					=> ['CLegacyAction', null, null],
-		'screen.import.php'				=> ['CLegacyAction', null, null],
 		'screenconf.php'				=> ['CLegacyAction', null, null],
 		'screenedit.php'				=> ['CLegacyAction', null, null],
 		'screens.php'					=> ['CLegacyAction', null, null],

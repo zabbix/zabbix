@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -951,7 +951,8 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 			case ITEM_VALUE_TYPE_LOG:
 				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 
-				if (ISSET_LOG(request->value.result_ptr->result))
+				if (NULL != request->value.result_ptr->result &&
+						ISSET_LOG(request->value.result_ptr->result))
 				{
 					*log = *request->value.result_ptr->result->log;
 					if (NULL != log->source)

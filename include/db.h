@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,8 +94,6 @@ struct	_DC_TRIGGER;
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
 #define HOST_NAME_LEN			128
-#define HOST_ERROR_LEN			2048
-#define HOST_ERROR_LEN_MAX		(HOST_ERROR_LEN + 1)
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
 #define HOST_IPMI_PASSWORD_LEN		20
@@ -111,6 +109,8 @@ struct	_DC_TRIGGER;
 #define INTERFACE_ADDR_LEN_MAX		(INTERFACE_ADDR_LEN + 1)
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		(INTERFACE_PORT_LEN + 1)
+#define INTERFACE_ERROR_LEN		2048
+#define INTERFACE_ERROR_LEN_MAX		(INTERFACE_ERROR_LEN + 1)
 
 #define ITEM_NAME_LEN			255
 #define ITEM_KEY_LEN			2048
@@ -566,7 +566,6 @@ char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t length);
 char	*DBdyn_escape_like_pattern(const char *src);
 
-zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBadd_templates_to_host(int hostid, int host_templateid);
 
 int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
@@ -729,15 +728,18 @@ zbx_agent_availability_t;
 
 typedef struct
 {
-	zbx_uint64_t			hostid;
-
-	zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
-	int				id;	/* ensure chronological order in case of flapping host availability */
+	zbx_uint64_t			interfaceid;
+	zbx_agent_availability_t	agent;
+	/* ensure chronological order in case of flapping interface availability */
+	int				id;
 }
-zbx_host_availability_t;
+zbx_interface_availability_t;
 
-void	zbx_db_update_host_availabilities(const zbx_vector_ptr_t *host_availabilities);
+ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *);
+
+void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
+int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);
 
 typedef struct
 {

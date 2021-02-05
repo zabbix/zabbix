@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$templates_list->invalidate();
 		$row = $templates_list->findRow('Message type', 'Problem');
 

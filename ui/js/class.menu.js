@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,20 +26,21 @@ const MENU_EVENT_FOCUS           = 'focus';
 
 class CMenu extends CBaseComponent {
 
-	constructor(target) {
+	constructor(target, level) {
 		super(target);
 
-		this.init();
+		this.init(level || 0);
 		this.registerEvents();
 	}
 
-	init() {
+	init(level) {
 		this._expanded_item = null;
 		this._selected_item = null;
 		this._items = [];
+		this._level = level;
 
 		for (const el of this._target.childNodes) {
-			const item = new CMenuItem(el);
+			const item = new CMenuItem(el, this._level);
 			if (item.isExpanded()) {
 				this._expanded_item = item;
 			}
@@ -49,33 +50,38 @@ class CMenu extends CBaseComponent {
 			this._items.push(item);
 		}
 
-		if (this.hasClass('submenu')) {
-			this._target.style.maxHeight = this._target.scrollHeight + 'px';
-		}
+		this.hasClass('submenu') && this.updateHeight();
 	}
 
 	getItems() {
 		return this._items;
 	}
 
-	collapseExpanded() {
-		this._expanded_item !== null && this._expanded_item.collapseSubmenu();
-		this._expanded_item = null;
+	getLevel() {
+		return this._level;
 	}
 
-	expandSelected() {
-		if (this._selected_item !== null && this._selected_item !== this._expanded_item) {
+	collapseExpanded(from_level) {
+		if (this._expanded_item !== null && this._expanded_item.collapseSubmenu(from_level)) {
+			this._expanded_item = null;
+		}
+
+		return this._level > (from_level || 0);
+	}
+
+	expandSelected(till_level) {
+		if (this._level < till_level && this._selected_item !== null && this._selected_item !== this._expanded_item) {
 			this.collapseExpanded();
-			this._selected_item.hasSubmenu() && this._selected_item.expandSubmenu();
+			this._selected_item.hasSubmenu() && this._selected_item.expandSubmenu(till_level);
 		}
 
 		return this;
 	}
 
-	focusSelected() {
+	focusSelected(till_level) {
 		if (this._selected_item !== null) {
 			if (this._selected_item.hasSubmenu()) {
-				this.expandSelected();
+				this.expandSelected(till_level);
 				this._selected_item.getSubmenu().focusSelected();
 			}
 			else {
@@ -94,6 +100,27 @@ class CMenu extends CBaseComponent {
 		return this._selected_item;
 	}
 
+	updateHeight() {
+		this._target.style.maxHeight = `${this._target.scrollHeight}px`;
+	}
+
+	updateRect(relative_item, limit) {
+		const r_rect = relative_item.getBoundingClientRect();
+
+		limit = Object.assign({top: 0, bottom: 0}, limit || {});
+
+		this._target.style.top = `${Math.max(limit.top,
+			Math.min(r_rect.y, window.innerHeight - this._target.scrollHeight - limit.bottom)
+		)}px`;
+		this._target.style.left = `${r_rect.x + r_rect.width}px`;
+		this._target.style.maxWidth = `${this._target.scrollWidth}px`;
+		this._target.style.maxHeight = `${this._target.scrollHeight}px`;
+
+		if (this._expanded_item && this._expanded_item.hasSubmenu()) {
+			this._expanded_item.getSubmenu().updateRect(this._expanded_item._target, limit);
+		}
+	}
+
 	/**
 	 * Register all DOM events.
 	 */
@@ -110,10 +137,10 @@ class CMenu extends CBaseComponent {
 				this._expanded_item !== e.detail.target && this.collapseExpanded();
 				this._expanded_item = e.detail.target;
 
-				this.fire(MENU_EVENT_EXPAND, {menu_item: e.detail.target});
+				this.fire(MENU_EVENT_EXPAND, {menu_item: this._expanded_item});
 			},
 
-			collapse: (e) => {
+			collapse: () => {
 				this._expanded_item = null;
 			}
 		};

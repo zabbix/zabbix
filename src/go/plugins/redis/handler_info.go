@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,14 +22,13 @@ package redis
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strings"
 
+	"zabbix.com/pkg/zbxerr"
+
 	"github.com/mediocregopher/radix/v3"
 )
-
-const infoMaxParams = 1
 
 type infoSection string
 type infoKey string
@@ -80,7 +79,6 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		// E.g: dbXXX: keys=XXX,expires=XXX
 		if section == "Keyspace" || section == "Commandstats" ||
 			(section == "Replication" && redisSlaveMetricRE.MatchString(string(key))) {
-
 			extKeySpace := make(infoExtKeySpace)
 
 			for _, ksParams := range strings.Split(value, ",") {
@@ -94,7 +92,7 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		}
 
 		if len(section) == 0 {
-			return nil, errorInvalidFormat
+			return nil, zbxerr.ErrorCannotParseResult
 		}
 
 		res[section][key] = value
@@ -105,27 +103,20 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 	}
 
 	if len(res) == 0 {
-		return nil, errorEmptyResult
+		return nil, zbxerr.ErrorEmptyResult
 	}
 
 	return res, nil
 }
 
 // infoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
-func infoHandler(conn redisClient, params []string) (interface{}, error) {
+func infoHandler(conn redisClient, params map[string]string) (interface{}, error) {
 	var res string
 
-	if len(params) > infoMaxParams {
-		return nil, errorInvalidParams
-	}
-
-	section := infoSection("default")
-	if len(params) > 0 && len(params[0]) > 0 {
-		section = infoSection(strings.ToLower(params[0]))
-	}
+	section := infoSection(strings.ToLower(params["Section"]))
 
 	if err := conn.Query(radix.Cmd(&res, "INFO", string(section))); err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	redisInfo, err := parseRedisInfo(res)
@@ -135,7 +126,7 @@ func infoHandler(conn redisClient, params []string) (interface{}, error) {
 
 	jsonRes, err := json.Marshal(redisInfo)
 	if err != nil {
-		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotMarshalJSON)
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
 	return string(jsonRes), nil

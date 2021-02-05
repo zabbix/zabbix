@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2020 Zabbix SIA
+-- Copyright (C) 2001-2021 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -65,31 +65,15 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|0			|1|hosts	|hostid		|RESTRICT
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ipmi_authtype	|t_integer	|'-1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|maintenanceid	|t_id		|	|NULL		|ZBX_NODATA		|2|maintenances	|		|RESTRICT
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|snmp_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|jmx_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|jmx_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|hosts	|hostid
@@ -294,8 +278,13 @@ FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ip		|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_PROXY
 FIELD		|dns		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_PROXY
+FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|hostid,type
 INDEX		|2		|ip,dns
+INDEX		|3		|available
 
 TABLE|valuemaps|valuemapid|ZBX_TEMPLATE
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0
@@ -442,17 +431,25 @@ INDEX		|2		|userid
 TABLE|scripts|scriptid|ZBX_DATA
 FIELD		|scriptid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|command	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|command	|t_text		|''	|NOT NULL	|0
 FIELD		|host_access	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|		|RESTRICT
 FIELD		|groupid	|t_id		|	|NULL		|0			|2|hstgrp	|		|RESTRICT
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|confirmation	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'5'	|NOT NULL	|0
 FIELD		|execute_on	|t_integer	|'2'	|NOT NULL	|0
+FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|usrgrpid
 INDEX		|2		|groupid
 UNIQUE		|3		|name
+
+TABLE|script_param|script_paramid|ZBX_DATA
+FIELD		|script_paramid	|t_id		|	|NOT NULL	|0
+FIELD		|scriptid	|t_id		|	|NOT NULL	|0			|1|scripts
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|0
+UNIQUE		|1		|scriptid,name
 
 TABLE|actions|actionid|ZBX_DATA
 FIELD		|actionid	|t_id		|	|NOT NULL	|0
@@ -1879,7 +1876,23 @@ FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
 INDEX		|1		|roleid
 INDEX		|2		|value_moduleid
 
+TABLE|token|tokenid|ZBX_DATA
+FIELD	|tokenid	|t_id		|	|NOT NULL	|0
+FIELD	|name		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD	|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD	|userid		|t_id		|	|NOT NULL	|0	|1	|users
+FIELD	|token		|t_varchar(128)	|	|NULL		|0
+FIELD	|lastaccess	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD	|expires_at	|t_time		|'0'	|NOT NULL	|0
+FIELD	|created_at	|t_time		|'0'	|NOT NULL	|0
+FIELD	|creator_userid	|t_id		|	|NULL		|0	|2	|users	|userid	|RESTRICT
+INDEX	|1		|name
+UNIQUE	|2		|userid,name
+UNIQUE	|3		|token
+INDEX	|4		|creator_userid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030004	|5030004
+ROW		|5030039	|5030039

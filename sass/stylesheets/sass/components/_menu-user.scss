@@ -1,10 +1,25 @@
+$menu-user-icons-opacity: .75 !default;
+
+$menu-user-arrow-bg-position: -606px -434px !default;
+$menu-user-arrow-hover-bg-position: -606px -434px !default;
+$menu-user-selected-arrow-bg-position: -606px -434px !default;
+
 $menu-user-icons: (
-		support: -247px -48px,
-		share: -90px -84px,
-		help: -90px -48px,
-		guest: -247px -156px,
-		profile: -90px -120px,
-		signout: -90px -156px
+	support: -247px -48px,
+	share: -90px -84px,
+	help: -90px -48px,
+	guest: -247px -156px,
+	profile: -90px -120px,
+	signout: -90px -156px
+) !default;
+
+$menu-user-expanded-icons: (
+	support: -247px -48px,
+	share: -90px -84px,
+	help: -90px -48px,
+	guest: -247px -156px,
+	profile: -90px -120px,
+	signout: -90px -156px
 ) !default;
 
 %menu-user-icon-common {
@@ -28,6 +43,21 @@ $menu-user-icons: (
 		@extend %menu-user-icon-common;
 
 		&::before {
+			background-position: $bg-position;
+		}
+	}
+}
+
+// Dynamically generated classes for icons:
+//  .icon-support
+//  .icon-share
+//  .icon-help
+//  .icon-guest
+//  .icon-profile
+//  .icon-signout
+@each $class, $bg-position in $menu-user-expanded-icons {
+	.is-expanded {
+		.icon-#{$class}::before {
 			background-position: $bg-position;
 		}
 	}
@@ -80,5 +110,204 @@ $menu-user-icons: (
 
 	span {
 		color: $menu-user-disabled-color;
+	}
+
+	& > li {
+		&.is-selected {
+			> a {
+				background: $menu-user-selected-bg-color;
+				border-left-color: $menu-user-selected-border-color;
+				color: $menu-user-selected-color;
+			}
+		}
+
+		&.is-expanded {
+			& > a {
+				&,
+				&:focus {
+					background: $menu-user-expanded-bg-color;
+					border-left-color: $menu-user-expanded-border-color;
+					color: $menu-user-expanded-color;
+				}
+			}
+		}
+
+		&:not(.is-expanded) {
+			.submenu {
+				max-height: 0 !important;
+			}
+		}
+	}
+
+	.has-submenu {
+		& > a {
+			&::after {
+				content: '';
+				position: absolute;
+				top: 19px;
+				right: 14px;
+				width: 6px;
+				height: 4px;
+				background: url($sprite-path) no-repeat $menu-user-arrow-bg-position;
+				transform: rotate(0deg);
+				@if $menu-user-icons-opacity < 1 {
+					opacity: $menu-user-icons-opacity;
+				}
+
+				@if $ui-transitions {
+					transition: transform $ui-transition-duration,
+					opacity $ui-transition-duration;
+				}
+			}
+
+			&:hover,
+			&:focus {
+				&::after {
+					background-position: $menu-user-arrow-hover-bg-position;
+
+					@if $menu-user-icons-opacity < 1 {
+						opacity: 1;
+					}
+				}
+			}
+		}
+
+		&.is-expanded {
+			& > a {
+				&::after {
+					background-position: $menu-user-selected-arrow-bg-position;
+					transform: rotate(-180deg);
+				}
+
+				@if $menu-user-icons-opacity < 1 {
+					&::before,
+					&::after {
+						opacity: 1;
+					}
+				}
+			}
+		}
+	}
+
+	.submenu {
+		position: relative;
+		padding-left: 24px;
+		overflow: hidden;
+		background: $menu-user-submenu-border-color;
+
+		> li {
+			line-height: 14px;
+
+			&.is-selected {
+				> a {
+					background: $menu-user-submenu-selected-bg-color;
+					border-left-color: $menu-user-submenu-selected-border-color;
+					color: $menu-user-submenu-selected-color;
+
+					&:hover,
+					&:focus {
+						background: $menu-user-submenu-hover-bg-color;
+						color: $menu-user-submenu-hover-color;
+					}
+				}
+			}
+
+			&:not(:last-child) {
+				border-bottom: 1px solid $menu-user-submenu-border-color;
+			}
+		}
+
+		a {
+			padding: 8px 20px;
+			background: $menu-user-submenu-bg-color;
+			color: $menu-user-submenu-color;
+
+			&:hover,
+			&:focus {
+				background: $menu-user-submenu-hover-bg-color;
+				border-left-color: $menu-user-submenu-hover-border-color;
+				color: $menu-user-submenu-hover-color;
+			}
+		}
+
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			right: 0;
+			left: 0;
+			z-index: 999;
+			box-shadow: 0 0 6px 2px rgba(0, 0, 0, .35);
+		}
+
+		&::before {
+			top: 0;
+		}
+
+		&::after {
+			bottom: 0;
+		}
+
+		@if $ui-transitions {
+			transition: max-height $ui-transition-duration ease;
+			will-change: max-height;
+		}
+
+		.submenu {
+			position: fixed;
+			top: 0;
+			left: 100%;
+			padding: 1px;
+			box-shadow: 4px 4px 8px 0 $menu-user-submenu-next-level-shadow;
+
+			li {
+				border: 0;
+
+				a {
+					padding: 6px 20px;
+					border-left: 0;
+					background-color: $menu-user-submenu-next-level-bg;
+				}
+
+				&.is-selected a {
+					background-color: $menu-user-submenu-selected-bg-color;
+				}
+
+				a:hover,
+				a:focus {
+					background-color: $menu-user-submenu-hover-bg-color;
+				}
+			}
+
+			@if $ui-transitions {
+				transition: none;
+			}
+
+			&::before,
+			&::after {
+				display: none;
+			}
+		}
+
+		.has-submenu {
+			& > a {
+				&::after {
+					top: 13px;
+					transform: rotate(90deg);
+				}
+			}
+
+			&:not(.is-expanded) {
+				a {
+					&::after {
+						transform: rotate(-90deg);
+					}
+				}
+
+				.submenu {
+					left: -9999px !important;
+				}
+			}
+		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,6 +176,13 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
+				$file = basename($_SERVER['SCRIPT_NAME']);
+				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
+
+				if ($action_name === 'notifications.get') {
+					CWebUser::disableSessionExtension();
+				}
+
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
@@ -190,14 +197,16 @@ class ZBase {
 				$this->initComponents();
 				$this->initModuleManager();
 
-				$file = basename($_SERVER['SCRIPT_NAME']);
-				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
-
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
+					->setSelectedByAction($action_name, $_GET,
+						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+					);
+
+				$this->component_registry->get('menu.user')
 					->setSelectedByAction($action_name, $_GET,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);

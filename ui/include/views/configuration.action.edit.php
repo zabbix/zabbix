@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,18 +110,17 @@ $formula = (new CTextBox('formula', $data['action']['filter']['formula']))
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 
-$calculationTypeComboBox = new CComboBox('evaltype', $data['action']['filter']['evaltype'],
-	'processTypeOfCalculation()',
-	[
-		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-		CONDITION_EVAL_TYPE_AND => _('And'),
-		CONDITION_EVAL_TYPE_OR => _('Or'),
-		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-	]
-);
-
-$action_tab->addRow(_('Type of calculation'), [
-	$calculationTypeComboBox,
+$action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
+	(new CSelect('evaltype'))
+		->setId('evaltype')
+		->setFocusableElementId('label-evaltype')
+		->setValue($data['action']['filter']['evaltype'])
+		->addOptions(CSelect::createOptionsFromArray([
+			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+			CONDITION_EVAL_TYPE_AND => _('And'),
+			CONDITION_EVAL_TYPE_OR => _('Or'),
+			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+		])),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CSpan())->setId('conditionLabel'),
 	$formula

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -570,7 +570,7 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 		return FAIL;
 	}
 
-	if (FAIL == dbsync_compare_uchar(dbrow[22], host->status))
+	if (FAIL == dbsync_compare_uchar(dbrow[10], host->status))
 	{
 		host->update_items = 1;
 		return FAIL;
@@ -581,17 +581,17 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_str(dbrow[2], host->host))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[23], host->name))
+	if (FAIL == dbsync_compare_str(dbrow[11], host->name))
 		return FAIL;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (FAIL == dbsync_compare_str(dbrow[31], host->tls_issuer))
+	if (FAIL == dbsync_compare_str(dbrow[15], host->tls_issuer))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[32], host->tls_subject))
+	if (FAIL == dbsync_compare_str(dbrow[16], host->tls_subject))
 		return FAIL;
 
-	if ('\0' == *dbrow[33] || '\0' == *dbrow[34])
+	if ('\0' == *dbrow[17] || '\0' == *dbrow[18])
 	{
 		if (NULL != host->tls_dc_psk)
 			return FAIL;
@@ -601,18 +601,18 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 		if (NULL == host->tls_dc_psk)
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[33], host->tls_dc_psk->tls_psk_identity))
+		if (FAIL == dbsync_compare_str(dbrow[17], host->tls_dc_psk->tls_psk_identity))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[34], host->tls_dc_psk->tls_psk))
+		if (FAIL == dbsync_compare_str(dbrow[18], host->tls_dc_psk->tls_psk))
 			return FAIL;
 	}
 
 #endif
-	if (FAIL == dbsync_compare_uchar(dbrow[29], host->tls_connect))
+	if (FAIL == dbsync_compare_uchar(dbrow[13], host->tls_connect))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_uchar(dbrow[30], host->tls_accept))
+	if (FAIL == dbsync_compare_uchar(dbrow[14], host->tls_accept))
 		return FAIL;
 
 	/* IPMI hosts */
@@ -647,10 +647,10 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
 	/* proxies */
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&dbsync_env.cache->proxies, &host->hostid)))
 	{
-		if (FAIL == dbsync_compare_str(dbrow[31 + ZBX_HOST_TLS_OFFSET], proxy->proxy_address))
+		if (FAIL == dbsync_compare_str(dbrow[15 + ZBX_HOST_TLS_OFFSET], proxy->proxy_address))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[32 + ZBX_HOST_TLS_OFFSET], proxy->auto_compress))
+		if (FAIL == dbsync_compare_uchar(dbrow[16 + ZBX_HOST_TLS_OFFSET], proxy->auto_compress))
 			return FAIL;
 	}
 
@@ -662,6 +662,7 @@ static int	dbsync_compare_host(ZBX_DC_HOST *host, const DB_ROW dbrow)
  * Function: zbx_dbsync_compare_hosts                                         *
  *                                                                            *
  * Purpose: compares hosts table with cached configuration data               *
+ *          and populates the changeset                                       *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
  *                                                                            *
@@ -682,12 +683,8 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
-				"errors_from,available,disable_until,snmp_errors_from,"
-				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
-				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
-				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,"
-				"maintenanceid"
+				"status,name,lastaccess,tls_connect,tls_accept,tls_issuer,tls_subject,"
+				"tls_psk_identity,tls_psk,proxy_address,auto_compress,maintenanceid"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -698,15 +695,12 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 38, NULL);
+	dbsync_prepare(sync, 22, NULL);
 #else
 	if (NULL == (result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
-				"errors_from,available,disable_until,snmp_errors_from,"
-				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
-				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept,"
+				"status,name,lastaccess,tls_connect,tls_accept,"
 				"proxy_address,auto_compress,maintenanceid"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
@@ -718,7 +712,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 34, NULL);
+	dbsync_prepare(sync, 18, NULL);
 #endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
@@ -1242,42 +1236,55 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 	if (FAIL == dbsync_compare_str(dbrow[7], interface->port))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_uchar(dbrow[8], interface->available))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_int(dbrow[9], interface->disable_until))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[10], interface->error))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_int(dbrow[11], interface->errors_from))
+		return FAIL;
+	/* reset_availability, items_num and availability_ts are excluded from the comparison */
+
 	snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&dbsync_env.cache->interfaces_snmp,
 			&interface->interfaceid);
 
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
-		if (NULL == snmp || SUCCEED == DBis_null(dbrow[8]))	/* should never happen */
+		if (NULL == snmp || SUCCEED == DBis_null(dbrow[12]))	/* should never happen */
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[8], snmp->version))
+		if (FAIL == dbsync_compare_uchar(dbrow[12], snmp->version))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[9], snmp->bulk))
+		if (FAIL == dbsync_compare_uchar(dbrow[13], snmp->bulk))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[10], snmp->community))
+		if (FAIL == dbsync_compare_str(dbrow[14], snmp->community))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[11], snmp->securityname))
+		if (FAIL == dbsync_compare_str(dbrow[15], snmp->securityname))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[12], snmp->securitylevel))
+		if (FAIL == dbsync_compare_uchar(dbrow[16], snmp->securitylevel))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[13], snmp->authpassphrase))
+		if (FAIL == dbsync_compare_str(dbrow[17], snmp->authpassphrase))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], snmp->privpassphrase))
+		if (FAIL == dbsync_compare_str(dbrow[18], snmp->privpassphrase))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[15], snmp->authprotocol))
+		if (FAIL == dbsync_compare_uchar(dbrow[19], snmp->authprotocol))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_uchar(dbrow[16], snmp->privprotocol))
+		if (FAIL == dbsync_compare_uchar(dbrow[20], snmp->privprotocol))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[17], snmp->contextname))
+		if (FAIL == dbsync_compare_str(dbrow[21], snmp->contextname))
 			return FAIL;
 	}
 	else if (NULL != snmp)
@@ -1309,6 +1316,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 
 	if (NULL == (result = DBselect(
 			"select i.interfaceid,i.hostid,i.type,i.main,i.useip,i.ip,i.dns,i.port,"
+			"i.available,i.disable_until,i.error,i.errors_from,"
 			"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,"
 			"s.authprotocol,s.privprotocol,s.contextname"
 			" from interface i"
@@ -1317,7 +1325,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 18, NULL);
+	dbsync_prepare(sync, 22, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

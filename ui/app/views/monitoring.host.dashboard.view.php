@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $widget = (new CWidget())
-	->setTitle($data['dashboard']['name'].' '._('on').' '.$data['host']['name'])
+	->setTitle($data['dashboard']['name'])
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
@@ -57,15 +57,29 @@ $widget = (new CWidget())
 					->cleanItems()
 					->addVar('action', 'host.dashboard.view')
 					->addVar('hostid', $data['host']['hostid'])
-					->addItem((new CLabel(_('Dashboard'), 'dashboardid'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
+					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 					->addItem(
-						(new CComboBox('dashboardid', $data['dashboard']['dashboardid'], 'submit()',
-							$data['host_dashboards']
-						))->addClass(ZBX_STYLE_HEADER_COMBOBOX)
+						(new CSelect('dashboardid'))
+							->setId('dashboardid')
+							->setFocusableElementId('label-dashboard')
+							->setValue($data['dashboard']['dashboardid'])
+							->addOptions(CSelect::createOptionsFromArray($data['host_dashboards']))
+							->addClass(ZBX_STYLE_HEADER_Z_SELECT)
 					)
 			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))->setAttribute('aria-label', _('Content controls')));
+	))->setAttribute('aria-label', _('Content controls')))
+	->setNavigation((new CList())->addItem(new CBreadcrumbs([
+		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
+		(new CSpan())->addItem($data['host']['name']),
+		(new CSpan())
+			->addItem(new CLink($data['dashboard']['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.dashboard.view')
+					->setArgument('hostid', $data['host']['hostid'])
+			))
+			->addClass(ZBX_STYLE_SELECTED)
+	])));
 
 if ($data['time_selector'] !== null) {
 	$widget->addItem(

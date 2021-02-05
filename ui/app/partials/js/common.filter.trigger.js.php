@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,21 +25,18 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="inventory-filter-row">
-	<tr class="form_row">
-		<td>
-			<select id="inventory_#{rowNum}_field" name="inventory[#{rowNum}][field]">
-				<?php foreach (getHostInventories() as $field): ?>
-					<option value="<?= $field['db_field'] ?>"><?= $field['title'] ?></option>
-				<?php endforeach ?>
-			</select>
-		</td>
-		<td>
-			<input type="text" id="inventory_#{rowNum}_value" name="inventory[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_FILTER_SMALL_WIDTH ?>px" maxlength="255">
-		</td>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" id="inventory_#{rowNum}_remove" name="inventory_#{rowNum}_remove"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?=
+		(new CRow([
+			(new CSelect('inventory[#{rowNum}][field]'))
+				->addOptions(CSelect::createOptionsFromArray($data['inventory_fields'])),
+			(new CTextBox('inventory[#{rowNum}][value]', ''))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('inventory[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+	?>
 </script>
 <script type="text/javascript">
 	(function($) {

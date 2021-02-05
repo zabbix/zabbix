@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,19 +22,23 @@
 package postgres
 
 import (
+	"context"
 	"fmt"
 	"testing"
 )
 
 func TestPlugin_cacheHandler(t *testing.T) {
-	sharedPool, err := getConnPool(t)
+	sharedPool, err := getConnPool()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		conn   *postgresConn
-		params []string
+		ctx         context.Context
+		conn        *PGConn
+		key         string
+		params      map[string]string
+		extraParams []string
 	}
 	tests := []struct {
 		name    string
@@ -45,22 +49,18 @@ func TestPlugin_cacheHandler(t *testing.T) {
 		{
 			fmt.Sprintf("cacheHandler should return int64 with data "),
 			&impl,
-			args{conn: sharedPool},
+			args{context.Background(), sharedPool, keyCache, nil, []string{}},
+
 			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			_, err := tt.p.cacheHandler(tt.args.conn, keyPostgresCache, tt.args.params)
+			_, err := cacheHandler(tt.args.ctx, tt.args.conn, tt.args.key, tt.args.params, tt.args.extraParams...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.cacheHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
-			/* if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Plugin.walHandler() = %v, want %v", got, tt.want)
-			} */
 		})
 	}
 }

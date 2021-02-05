@@ -5,10 +5,12 @@ noinst_LIBRARIES = libzbxcrypto.a
 libzbxcrypto_a_SOURCES = \
 	base64.c \
 	md5.c \
+	sha256crypt.c \
+	sha512crypt.c \
 	tls.c \
 	tls.h \
-	tls_version.c \
 	tls_tcp.h \
-	tls_tcp_active.h
+	tls_tcp_active.h \
+	tls_version.c
 
 libzbxcrypto_a_CFLAGS = $(TLS_CFLAGS)

@@ -184,14 +184,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	background: url($sprite-path) no-repeat -540px -400px;
 }
 
-.object-group {
-	min-height: 24px;
-	line-height: 24px;
-	padding: 10px 0 6px;
-	position: relative;
-	vertical-align: top;
-}
-
 .dashbrd-edit {
 	background-color: $ui-bg-color;
 	box-shadow: 0 0 0 4px $ui-bg-color;
@@ -226,52 +218,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	}
 }
 
-// Object group navigation.
-.object-group {
-	margin-bottom: -1px;
-
-	li {
-		float: left;
-		margin-right: 5px;
-
-		span {
-			display: inline-block;
-			padding: 0 7px;
-		}
-
-		.status-container,
-		.rel-container {
-			margin: 0 5px 0 0;
-
-			span {
-				padding: 2px 3px 1px;
-			}
-		}
-
-		.rel-container {
-			margin: 0;
-		}
-	}
-
-	.selected {
-		background-color: $ui-bg-color;
-		border-radius: 2px;
-		box-shadow: inset 0 0 0 1px $ui-border-color;
-	}
-
-	.arrow-right {
-		border-left-color: $font-color;
-	}
-
-	button {
-		line-height: 22px;
-	}
-
-	.btn-link {
-		line-height: 14px;
-	}
-}
-
 .hor-list {
 	li {
 		display: inline-block;
@@ -281,68 +227,81 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			margin: 0;
 		}
 	}
-
-	.object-group {
-		margin: 0;
-	}
 }
 
-// Breadcrumbs inline with filter block.
-.filter-breadcrumb {
+.header-navigation {
 	display: inline-block;
-	padding-top: 0;
+	position: relative;
+	margin: 0 0 5px;
 	z-index: 3;
-	max-width: calc(100vw - 200px);
+	max-width: calc(100% - 200px);
+	min-height: 24px;
 
-	li {
-		line-height: 14px;
-		vertical-align: top;
-		float: none;
-		display: inline-block;
+	& > ul {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
 
-		.status-container {
-			padding-top: 3px;
-		}
+		& > li {
+			margin-right: 5px;
+			line-height: 24px;
 
-		> span {
-			display: inline-block;
-			height: 18px;
-			padding: 4px 7px 0;
-			line-height: 14px;
+			> ul {
+				display: flex;
+				align-items: baseline;
+				flex-wrap: wrap;
 
-			a {
-				display: inline-block;
-				max-width: 200px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				vertical-align: top;
-				margin-bottom: -1px;
+				li {
+					margin-right: 5px;
+				}
 
-				&:focus {
-					margin-bottom: -2px;
+				&.breadcrumbs > li {
+					margin-right: 0;
+
+					&::after {
+						content: "/";
+					}
+
+					&:last-child::after {
+						content: "";
+					}
 				}
 			}
-		}
-	}
 
-	> li {
-		padding: 1px 0;
-		line-height: 22px;
-		white-space: nowrap;
-
-		.status-container {
-			line-height: 14px;
+			.status-container {
+				margin-right: 5px;
+			}
 		}
 
-		> span {
+		li > span {
+			display: inline-block;
+			padding: 2px 7px;
+			line-height: 18px;
+			white-space: nowrap;
+			vertical-align: top;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			max-width: 250px;
+
 			a {
-				margin-top: 1px;
-				line-height: 13px;
+				vertical-align: top;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				max-width: 200px;
+				display: inline-block;
+				margin-top: 2px;
+				line-height: 14px;
+			}
+
+			&.selected {
+				background-color: $ui-bg-color;
+				border-radius: 2px;
+				box-shadow: inset 0 0 0 1px $ui-border-color;
 			}
 		}
 	}
 
-	+ .filter-space {
+	& + .filter-space {
 		margin-top: -29px;
 	}
 }
@@ -573,6 +532,7 @@ form {
 			.link-action {
 				height: 16px;
 				min-width: 1em;
+				@extend %overflow-ellipsis;
 			}
 
 			.separator {
@@ -983,6 +943,11 @@ form {
 
 .wordwrap {
 	word-break: break-all;
+}
+
+.wordbreak {
+	white-space: pre-wrap;
+	word-break: break-word;
 }
 
 .overflow-table {
@@ -3877,6 +3842,16 @@ $form-icon-btn: (
 			}
 		}
 	}
+
+	z-select {
+		.list {
+			li {
+				float: none;
+				line-height: normal;
+				padding: 5px;
+			}
+		}
+	}
 }
 
 .dashbrd-widget-foot {
@@ -4043,7 +4018,6 @@ $form-icon-btn: (
 
 				.table-forms-row-with-second-field {
 					position: relative;
-					transform: scale(1);
 
 					.table-forms-second-column {
 						position: absolute;
@@ -4064,9 +4038,21 @@ $form-icon-btn: (
 			text-align: right;
 			padding: 0 0 10px;
 
+			z-select {
+				text-align: left;
+				padding: inherit;
+			}
+
 			li {
 				display: inline;
 				padding-left: 10px;
+			}
+
+			z-select {
+				li {
+					display: block;
+					padding-left: 5px;
+				}
 			}
 		}
 
@@ -4087,6 +4073,11 @@ $form-icon-btn: (
 
 		&.modal-popup-medium {
 			min-width: 450px;
+		}
+
+		&.modal-popup-small {
+			max-width: 450px;
+			width: 100%;
 		}
 
 		&.modal-popup-static {
@@ -4949,16 +4940,6 @@ a.red {
 	}
 }
 
-select.red {
-	@extend .red;
-}
-
-select {
-	option.red {
-		@extend .red;
-	}
-}
-
 .orange {
 	color: $orange;
 }
@@ -5133,16 +5114,14 @@ a.link-action {
 	span {
 		border-radius: 0;
 
-		&:only-child {
-			border-radius: 2px;
+		&:first-of-type {
+			border-top-left-radius: 2px;
+			border-bottom-left-radius: 2px;
 		}
 
-		&:first-of-type:not(:only-child) {
-			border-radius: 2px 0 0 2px;
-		}
-
-		&:last-of-type:not(:only-child) {
-			border-radius: 0 2px 2px 0;
+		&:last-of-type {
+			border-top-right-radius: 2px;
+			border-bottom-right-radius: 2px;
 		}
 	}
 
@@ -5881,7 +5860,7 @@ svg {
 	border: 10px solid $ui-bg-color;
 	background: $ui-bg-color;
 	display: block;
-	margin: 4px 0;
+	margin-top: 4px;
 
 	.map-container {
 		display: table;
@@ -5909,7 +5888,8 @@ svg {
 	}
 }
 
-.lld-overrides-operations-table {
+.lld-overrides-operations-table,
+.confirmation-msg {
 	white-space: normal;
 	word-break: break-word;
 }
@@ -6115,7 +6095,7 @@ svg {
 }
 
 .preprocessing-list {
-	$name-width: 290px;
+	$name-width: 295px;
 	$on-fail-width: 100px;
 	$action-width: 120px;
 
@@ -6818,7 +6798,7 @@ $range-input-width: 31px;
 	font-size: 0;
 }
 
-table.preprocessing-test-results {
+.preprocessing-test-results {
 	td {
 		vertical-align: top !important;
 	}
@@ -7329,8 +7309,8 @@ table.preprocessing-test-results {
 	}
 }
 
-// Media type test log popup
-.mediatypetest-modal {
+// Popup with debug data of request processing to Zabbix server.
+.debug-modal {
 	&.overlay-dialogue.modal {
 		.overlay-dialogue-body {
 			overflow-x: auto;
@@ -7475,5 +7455,13 @@ z-select,
 	.table-col-value,
 	.table-col-template-value {
 		width: 300px;
+	}
+}
+
+.active-readonly {
+	&[readonly] {
+		color: $font-color;
+		background-color: $form-bg-color !important;
+		border-color: $form-border-color;
 	}
 }

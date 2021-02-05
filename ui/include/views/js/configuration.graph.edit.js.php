@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,29 +59,29 @@
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="calc_fnc">
-				<option value="<?= CALC_FNC_ALL ?>"><?= _('all') ?></option>
-				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
-				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
-				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-			</select>
+			<?= (new CSelect('calc_fnc'))
+				->setId('items_#{number}_calc_fnc')
+				->addOptions(CSelect::createOptionsFromArray([
+					CALC_FNC_ALL =>_('all'),
+					CALC_FNC_MIN =>_('min'),
+					CALC_FNC_AVG =>_('avg'),
+					CALC_FNC_MAX =>_('max')
+				]))
+			?>
 		</td>
 
 		<!-- drawtype -->
 		<td>
-			<select name="drawtype">
-			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
-				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
-			<?php endforeach ?>
-			</select>
+			<?= (new CSelect('drawtype'))->addOptions(CSelect::createOptionsFromArray($graph_item_drawtypes)) ?>
 		</td>
 
 		<!-- yaxisside -->
 		<td>
-			<select name="yaxisside">
-				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
-				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
-			</select>
+			<?= (new CSelect('yaxisside'))->addOptions(CSelect::createOptionsFromArray([
+					GRAPH_YAXIS_SIDE_LEFT =>_('Left'),
+					GRAPH_YAXIS_SIDE_RIGHT =>_('Right')
+				]));
+			?>
 		</td>
 
 		<td>
@@ -131,19 +131,23 @@
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="calc_fnc">
-				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
-				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
-				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-			</select>
+			<?= (new CSelect('calc_fnc'))
+				->setId('items_#{number}_calc_fnc')
+				->addOptions(CSelect::createOptionsFromArray([
+					CALC_FNC_MIN =>_('min'),
+					CALC_FNC_AVG =>_('avg'),
+					CALC_FNC_MAX =>_('max')
+				]))
+			?>
 		</td>
 
 		<!-- yaxisside -->
 		<td>
-			<select name="yaxisside">
-				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
-				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
-			</select>
+			<?= (new CSelect('yaxisside'))->addOptions(CSelect::createOptionsFromArray([
+					GRAPH_YAXIS_SIDE_LEFT =>_('Left'),
+					GRAPH_YAXIS_SIDE_RIGHT =>_('Right')
+				]))
+			?>
 		</td>
 
 		<td>
@@ -193,20 +197,24 @@
 
 		<!-- type -->
 		<td>
-			<select name="type">
-				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
-				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
-			</select>
+			<?= (new CSelect('type'))->addOptions(CSelect::createOptionsFromArray([
+					GRAPH_ITEM_SIMPLE =>_('Simple'),
+					GRAPH_ITEM_SUM =>_('Graph sum')
+				]))
+			?>
 		</td>
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="calc_fnc">
-				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
-				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
-				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-				<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
-			</select>
+			<?= (new CSelect('calc_fnc'))
+				->setId('items_#{number}_calc_fnc')
+				->addOptions(CSelect::createOptionsFromArray([
+					CALC_FNC_MIN =>_('min'),
+					CALC_FNC_AVG =>_('avg'),
+					CALC_FNC_MAX =>_('max'),
+					CALC_FNC_LST =>_('last')
+				]))
+			?>
 		</td>
 
 		<td>
@@ -256,20 +264,24 @@
 
 		<!-- type -->
 		<td>
-			<select name="type">
-				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
-				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
-			</select>
+			<?= (new CSelect('type'))->addOptions(CSelect::createOptionsFromArray([
+					GRAPH_ITEM_SIMPLE =>_('Simple'),
+					GRAPH_ITEM_SUM =>_('Graph sum')
+				]))
+			?>
 		</td>
 
 		<!-- function -->
 		<td>
-			<select id="items_#{number}_calc_fnc" name="calc_fnc">
-				<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
-				<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
-				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
-				<option value="<?= CALC_FNC_LST ?>"><?= _('last') ?></option>
-			</select>
+			<?= (new CSelect('calc_fnc'))
+				->setId('items_#{number}_calc_fnc')
+				->addOptions(CSelect::createOptionsFromArray([
+					CALC_FNC_MIN =>_('min'),
+					CALC_FNC_AVG =>_('avg'),
+					CALC_FNC_MAX =>_('max'),
+					CALC_FNC_LST =>_('last')
+				]))
+			?>
 		</td>
 
 		<td>
@@ -589,7 +601,7 @@
 
 		if (graphs.readonly) {
 			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
-			$('select', '#itemsTable').prop('disabled', true);
+			$('z-select', '#itemsTable').prop('disabled', true);
 
 			var size = $('#itemsTable tr.sortable').length;
 
@@ -641,6 +653,10 @@
 			$('form[name="graphForm"]').submit();
 		});
 
+		$('#graphtype').change(() => {
+			$('form[name="graphForm"]').submit();
+		});
+
 		var $form = $('form[name="graphForm"]');
 		$form.on('submit', function(e) {
 			$form
@@ -649,7 +665,7 @@
 					var item = {};
 
 					$(node)
-						.find('input, select')
+						.find('input, z-select')
 						.each(function(_, node) {
 							item[node.name] = node.value;
 						})

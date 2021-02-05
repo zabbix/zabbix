@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -257,12 +257,12 @@ class testFormWeb extends CLegacyWebTest {
 			'Chromium 80 (Linux)', 'Opera 67 (Windows)', 'Opera 67 (Linux)', 'Opera 67 (macOS)', 'Safari 13 (macOS)',
 			'Safari 13 (iPhone)', 'Safari 13 (iPad)', 'Safari 13 (iPod Touch)', 'Zabbix', 'Lynx 2.8.8rel.2', 'Links 2.8',
 			'Googlebot 2.1', 'other ...'];
-		$agent_element = $this->query('id:agent')->one()->asDropdown();
+		$agent_element = $this->query('id:agent')->asZDropdown()->one();
 		$this->assertEquals($agent_element->getOptions()->asText(), $agents);
 
 		$agent_groups = ['Internet Explorer', 'Mozilla Firefox', 'Opera', 'Safari', 'Google Chrome', 'Others'];
 		foreach ($agent_groups as $group) {
-			$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='$group']");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='agent']//li[@optgroup='$group']");
 		}
 
 		if ($agent == 'other ...') {
@@ -1420,7 +1420,7 @@ class testFormWeb extends CLegacyWebTest {
 					break;
 				default:
 					$this->zbxTestDropdownSelect('agent', $data['agent']);
-					$agent = $this->zbxTestGetValue("//select[@id='agent']//option[text()='".$data['agent']."']");
+					$agent = $this->zbxTestGetValue('//z-select[@id="agent"]');
 					break;
 			}
 		}

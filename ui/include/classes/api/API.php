@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -400,6 +400,13 @@ class API {
 	 */
 	public static function TemplateDashboard() {
 		return self::getApi('templatedashboard');
+	}
+
+	/**
+	 * @return CToken
+	 */
+	public static function Token() {
+		return self::getApi('token');
 	}
 
 	/**

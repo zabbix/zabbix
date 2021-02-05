@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,6 +78,9 @@ foreach ($data['scripts'] as $script) {
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 			$scriptType = _('IPMI');
+			break;
+		case ZBX_SCRIPT_TYPE_WEBHOOK:
+			$scriptType = _('Webhook');
 			break;
 	}
 

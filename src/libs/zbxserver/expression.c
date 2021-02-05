@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,19 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxserver.h"
 #include "evalfunc.h"
-#include "db.h"
 #include "log.h"
-#include "zbxalgo.h"
+#include "zbxregexp.h"
+
 #include "valuecache.h"
 #include "macrofunc.h"
-#include "zbxregexp.h"
-#include "dbcache.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/parser.h>
-#	include <libxml/tree.h>
 #	include <libxml/xpath.h>
 #	include <libxml/xmlerror.h>
 
@@ -4376,7 +4372,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		}
 		else if (0 == indexed_macro &&
 				0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD |
-						MACRO_TYPE_LLD_FILTER | MACRO_TYPE_ALLOWED_HOSTS)))
+						MACRO_TYPE_LLD_FILTER | MACRO_TYPE_ALLOWED_HOSTS |
+						MACRO_TYPE_SCRIPT_PARAMS_FIELD)))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
@@ -4421,6 +4418,21 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
 							ZBX_REQUEST_HOST_CONN);
+				}
+			}
+			else if (0 != (macro_type & MACRO_TYPE_SCRIPT_PARAMS_FIELD))
+			{
+				if (0 == strcmp(m, MVAR_ITEM_ID))
+				{
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY))
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->key);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->key_orig);
 				}
 			}
 		}
@@ -6613,41 +6625,26 @@ static int	substitute_macros_xml_impl(char **data, const DC_ITEM *item, const st
 	return FAIL;
 #else
 	xmlDoc		*doc;
-	xmlErrorPtr	pErr;
 	xmlNode		*root_element;
 	xmlChar		*mem;
 	int		size, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (doc = xmlReadMemory(*data, strlen(*data), "noname.xml", NULL, 0)))
+	if (FAIL == zbx_open_xml(*data, 0, maxerrlen, (void **)&doc, (void **)&root_element, &error))
 	{
-		if (NULL != (pErr = xmlGetLastError()))
-			zbx_snprintf(error, maxerrlen, "Cannot parse XML value: %s", pErr->message);
-		else
-			zbx_snprintf(error, maxerrlen, "Cannot parse XML value");
+		if (NULL == doc)
+			goto exit;
 
-		goto exit;
-	}
-
-	if (NULL == (root_element = xmlDocGetRootElement(doc)))
-	{
-		zbx_snprintf(error, maxerrlen, "Cannot parse XML root");
-		goto clean;
+		if (NULL == root_element)
+			goto clean;
 	}
 
 	substitute_macros_in_xml_elements(item, jp_row, lld_macro_paths, root_element);
 	xmlDocDumpMemory(doc, &mem, &size);
 
-	if (NULL == mem)
-	{
-		if (NULL != (pErr = xmlGetLastError()))
-			zbx_snprintf(error, maxerrlen, "Cannot save XML: %s", pErr->message);
-		else
-			zbx_snprintf(error, maxerrlen, "Cannot save XML");
-
+	if (FAIL == zbx_check_xml_memory((char *)mem, maxerrlen, &error))
 		goto clean;
-	}
 
 	zbx_free(*data);
 	*data = zbx_malloc(NULL, size + 1);

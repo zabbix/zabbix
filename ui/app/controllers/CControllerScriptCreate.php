@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,17 +24,21 @@ class CControllerScriptCreate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'name' =>					'db scripts.name',
-			'type' =>					'db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
-			'execute_on' =>				'db scripts.execute_on  |in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
-			'command' =>				'db scripts.command     |flags '.P_CRLF,
-			'commandipmi' =>			'db scripts.command     |flags '.P_CRLF,
+			'type' =>					'db scripts.type|in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI.','.ZBX_SCRIPT_TYPE_WEBHOOK,
+			'execute_on' =>				'db scripts.execute_on|in '.ZBX_SCRIPT_EXECUTE_ON_AGENT.','.ZBX_SCRIPT_EXECUTE_ON_SERVER.','.ZBX_SCRIPT_EXECUTE_ON_PROXY,
+			'command' =>				'db scripts.command|flags '.P_CRLF,
+			'commandipmi' =>			'db scripts.command|flags '.P_CRLF,
+			'parameters' =>				'array',
+			'script' => 				'db scripts.command|flags '.P_CRLF,
+			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, 60]),
 			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access |in '.PERM_READ.','.PERM_READ_WRITE,
+			'host_access' =>			'db scripts.host_access|in '.PERM_READ.','.PERM_READ_WRITE,
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
-			'hgstype' =>				'                        in 0,1',
+			'hgstype' =>				'in 0,1',
 			'confirmation' =>			'db scripts.confirmation|not_empty',
-			'enable_confirmation' =>	'                        in 1'
+			'enable_confirmation' =>	'in 1',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,14 +69,27 @@ class CControllerScriptCreate extends CController {
 
 		$this->getInputs($script, ['command', 'description', 'usrgrpid', 'groupid', 'host_access', 'confirmation']);
 		$script['name'] = trimPath($this->getInput('name', ''));
-		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
-		$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
+		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_WEBHOOK);
+		$script['execute_on'] = $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_PROXY);
+
+		if ($script['type'] != ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
+			$script['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_PROXY;
+		}
 
 		if ($script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
-			if ($this->hasInput('commandipmi')) {
-				$script['command'] = $this->getInput('commandipmi');
+			$script['command'] = $this->getInput('commandipmi', '');
+		}
+		elseif ($script['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
+			$script['command'] = $this->getInput('script', '');
+			$script['timeout'] = $this->getInput('timeout', DB::getDefault('scripts', 'timeout'));
+			$parameters = $this->getInput('parameters', []);
+
+			if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
+				$script['parameters'] = array_map(function ($name, $value) {
+						return compact('name', 'value');
+					}, $parameters['name'], $parameters['value']
+				);
 			}
-			$script['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_SERVER;
 		}
 
 		if ($this->getInput('hgstype', 1) == 0) {
@@ -90,9 +107,7 @@ class CControllerScriptCreate extends CController {
 			CMessageHelper::setSuccessTitle(_('Script added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'script.edit')
-			);
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'script.edit'));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot add script'));
 		}

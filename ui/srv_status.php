@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('Services');
 $page['file'] = 'srv_status.php';
-$page['scripts'] = ['layout.mode.js'];
+$page['scripts'] = ['layout.mode.js', 'srv_status.js'];
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -151,24 +151,22 @@ else {
 	);
 
 	if ($tree) {
-		// creates form for choosing a preset interval
-		$period_combo = new CComboBox('period', $period, 'javascript: submit();');
-		foreach ($periods as $key => $val) {
-			$period_combo->addItem($key, $val);
-		}
-
 		(new CWidget())
 			->setTitle(_('Services'))
 			->setWebLayoutMode($page['web_layout_mode'])
 			->setControls(new CList([
 				(new CForm('get'))
+					->setName('srv_status')
 					->cleanItems()
 					->setAttribute('aria-label', _('Main filter'))
 					->addItem((new CList())
 						->addItem([
-							new CLabel(_('Period'), 'period'),
+							new CLabel(_('Period'), 'label-period'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							$period_combo
+							(new CSelect('period'))
+								->setFocusableElementId('label-period')
+								->setValue($period)
+								->addOptions(CSelect::createOptionsFromArray($periods))
 						])
 					),
 				(new CTag('nav', true, get_icon('kioskmode', ['mode' => $page['web_layout_mode']])))

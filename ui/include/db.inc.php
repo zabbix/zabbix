@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -599,17 +599,12 @@ function check_db_fields($dbFields, &$args) {
 }
 
 /**
- * Takes an initial part of SQL query and appends a generated WHERE condition.
- * The WHERE condition is generated from the given list of values as a mix of
- * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
+ * Create condition SQL for field matching against numeric values.
  *
- * In some frontend places we can get array with bool as input values parameter. This is fail!
- * Therefore we need check it and return 1=0 as temporary solution to not break the frontend.
- *
- * @param string $field_name    Field name to be used in SQL WHERE condition
- * @param array  $values        Array of numerical values sorted in ascending order to be included in WHERE
- * @param bool   $not_in        Builds inverted condition
- * @param bool   $zero_to_null  Cast zero to null
+ * @param string $field_name
+ * @param array  $values
+ * @param bool   $not_in        Create inverse condition.
+ * @param bool   $zero_to_null  Cast zero to null.
  *
  * @return string
  */
@@ -620,7 +615,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 	$MAX_NUM_IN = 950; // Maximum number of values for using "IN (<id1>,<id2>,...,<idN>)".
 
 	if (is_bool(reset($values))) {
-		return '1=0';
+		return $not_in ? '1=1' : '1=0';
 	}
 
 	$values = array_flip($values);

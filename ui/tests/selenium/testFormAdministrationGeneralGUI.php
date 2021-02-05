@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -932,7 +932,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Limit for search and filter results' => '2'
 					],
 					'link' => 'templates.php?filter_name=cisco',
-					'row_count' => 2,
+					'row_count' => 2
 				]
 			],
 			[
@@ -941,7 +941,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max number of columns and rows in overview tables' => '5'
 					],
 					'link' => 'overview.php',
-					'row_count' => 6,		// Plus 1 info row in table.
+					'row_count' => 6		// Plus 1 info row in table.
 				]
 			],
 			[

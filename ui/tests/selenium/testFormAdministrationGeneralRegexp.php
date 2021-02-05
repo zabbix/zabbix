@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,6 +97,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
+		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Regular expression added');
@@ -146,6 +147,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
 
+		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='red']"));

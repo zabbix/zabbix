@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1913,6 +1913,222 @@ class testUsers extends CAPITest {
 	public function testUsers_Login($user, $expected_error) {
 		$this->disableAuthorization();
 		$this->call('user.login', $user, $expected_error);
+	}
+
+	public function testUsers_AuthTokenIncorrect() {
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'limit' => 1
+			],
+			'auth' => bin2hex(random_bytes(32)),
+			'id' => '1'
+		]);
+
+		$this->assertTrue(array_key_exists('error', $res));
+
+		['error' => ['data' => $error]] = $res;
+		$this->assertEquals($error, 'Not authorised.');
+	}
+
+	public function testUsers_AuthTokenDisabled() {
+		$token = bin2hex(random_bytes(32));
+		DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_DISABLED,
+			'userid' => 1,
+			'name' => 'disabled',
+			'token' => hash('sha512', $token)
+		]]);
+
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		$this->assertTrue(array_key_exists('error', $res));
+
+		['error' => ['data' => $error]] = $res;
+		$this->assertEquals($error, 'Not authorised.');
+	}
+
+	public function testUsers_AuthTokenExpired() {
+		$now = time();
+		$token = bin2hex(random_bytes(32));
+		DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'userid' => 1,
+			'name' => 'expired',
+			'expires_at' => $now - 1,
+			'token' => hash('sha512', $token)
+		]]);
+
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		$this->assertTrue(array_key_exists('error', $res));
+
+		['error' => ['data' => $error]] = $res;
+		$this->assertEquals($error, 'API token expired.');
+	}
+
+	public function testUsers_AuthTokenNotExpired() {
+		$now = time();
+		$token = bin2hex(random_bytes(32));
+
+		DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'userid' => 1,
+			'name' => 'correct',
+			'expires_at'  => $now + 10,
+			'token' => hash('sha512', $token)
+		]]);
+
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		$this->assertTrue(array_key_exists('result', $res));
+	}
+
+	public function testUsers_AuthTokenDebugModeEnabled() {
+		$token = bin2hex(random_bytes(32));
+
+		DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'userid' => 1,
+			'name' => 'debug mode',
+			'token' => hash('sha512', $token)
+		]]);
+
+		DB::update('usrgrp', [
+			'values' => ['debug_mode' => GROUP_DEBUG_MODE_ENABLED],
+			'where' => ['usrgrpid' => 7]
+		]);
+
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'inheritedTags' => 'incorrect value',
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		DB::update('usrgrp', [
+			'values' => ['debug_mode' => GROUP_DEBUG_MODE_DISABLED],
+			'where' => ['usrgrpid' => 7]
+		]);
+
+		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
+		$this->assertTrue(array_key_exists('debug', $res['error']), 'Expected debug trace in error.');
+	}
+
+	public function testUsers_AuthTokenDebugModeDisabled() {
+		$token = bin2hex(random_bytes(32));
+
+		DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'userid' => 1,
+			'name' => 'debug mode disabled',
+			'token' => hash('sha512', $token)
+		]]);
+
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'inheritedTags' => 'incorrect value',
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
+		$this->assertTrue(!array_key_exists('debug', $res['error']), 'Not expected debug trace in error.');
+	}
+
+	public function testUsers_AuthTokenLastaccessIsUpdated() {
+		$token = bin2hex(random_bytes(32));
+		$formeraccess = time() - 1;
+
+		$tokenids = DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'userid' => 1,
+			'lastaccess' => $formeraccess,
+			'name' => 'lastaccess updated',
+			'token' => hash('sha512', $token)
+		]]);
+
+		$this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		[['lastaccess' => $lastaccess]] = DB::select('token', [
+			'output' => ['lastaccess'],
+			'tokenids' => $tokenids
+		]);
+
+		$this->assertTrue($lastaccess > $formeraccess);
+	}
+
+	public function testUsers_AuthTokenUserDisabled() {
+		$token = bin2hex(random_bytes(32));
+
+		DB::insert('token', [[
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'userid' => 13,
+			'name' => 'user with status "Disabled"',
+			'token' => hash('sha512', $token)
+		]]);
+
+		$res = $this->callRaw([
+			'jsonrpc' => '2.0',
+			'method' => 'host.get',
+			'params' => [
+				'output' => [],
+				'limit' => 1
+			],
+			'auth' => $token,
+			'id' => '1'
+		]);
+
+		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
+		$this->assertEquals($res['error']['data'], 'Not authorised.');
 	}
 
 	public function testUsers_LoginBlocked() {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,18 +56,12 @@
 #define ZBX_PROTO_TAG_SCRIPTID			"scriptid"
 #define ZBX_PROTO_TAG_HOSTID			"hostid"
 #define ZBX_PROTO_TAG_AVAILABLE			"available"
-#define ZBX_PROTO_TAG_SNMP_AVAILABLE		"snmp_available"
-#define ZBX_PROTO_TAG_IPMI_AVAILABLE		"ipmi_available"
-#define ZBX_PROTO_TAG_JMX_AVAILABLE		"jmx_available"
 #define ZBX_PROTO_TAG_ERROR			"error"
-#define ZBX_PROTO_TAG_SNMP_ERROR		"snmp_error"
-#define ZBX_PROTO_TAG_IPMI_ERROR		"ipmi_error"
-#define ZBX_PROTO_TAG_JMX_ERROR			"jmx_error"
 #define ZBX_PROTO_TAG_USERNAME			"username"
 #define ZBX_PROTO_TAG_PASSWORD			"password"
 #define ZBX_PROTO_TAG_SID			"sid"
 #define ZBX_PROTO_TAG_VERSION			"version"
-#define ZBX_PROTO_TAG_HOST_AVAILABILITY		"host availability"
+#define ZBX_PROTO_TAG_INTERFACE_AVAILABILITY	"interface availability"
 #define ZBX_PROTO_TAG_HISTORY_DATA		"history data"
 #define ZBX_PROTO_TAG_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_TAG_AUTOREGISTRATION		"auto registration"
@@ -163,13 +157,10 @@
 #define ZBX_PROTO_TAG_SSL_KEY_PASSWORD		"ssl_key_password"
 #define ZBX_PROTO_TAG_MAINTENANCE_STATUS	"maintenance_status"
 #define ZBX_PROTO_TAG_MAINTENANCE_TYPE		"maintenance_type"
-#define ZBX_PROTO_TAG_SNMP_AVAILABLE		"snmp_available"
-#define ZBX_PROTO_TAG_IPMI_AVAILABLE		"ipmi_available"
 #define ZBX_PROTO_TAG_IPMI_AUTHTYPE		"ipmi_authtype"
 #define ZBX_PROTO_TAG_IPMI_PRIVILEGE		"ipmi_privilege"
 #define ZBX_PROTO_TAG_IPMI_USERNAME		"ipmi_username"
 #define ZBX_PROTO_TAG_IPMI_PASSWORD		"ipmi_password"
-#define ZBX_PROTO_TAG_JMX_AVAILABLE		"jmx_available"
 #define ZBX_PROTO_TAG_DATA_TYPE			"datatype"
 #define ZBX_PROTO_TAG_PROXY_DELAY		"proxy_delay"
 #define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
@@ -281,6 +272,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, zbx_json_type_t *type);
 void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
+zbx_json_type_t	zbx_json_valuetype(const char *p);
 
 void	zbx_json_log(const struct zbx_json_parse *jp, int loglevel);
 

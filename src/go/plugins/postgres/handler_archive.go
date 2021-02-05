@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,19 +21,16 @@ package postgres
 
 import (
 	"context"
-
+	"errors"
 	"github.com/jackc/pgx/v4"
-)
-
-const (
-	//keyPostgresCountArchive = "pgsql.archive"
-	keyPostgresSizeArchive = "pgsql.archive"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // archiveHandler gets info about count and size of archive files and returns JSON if all is OK or nil otherwise.
-func (p *Plugin) archiveHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+func archiveHandler(ctx context.Context, conn PostgresClient,
+	_ string, _ map[string]string, _ ...string) (interface{}, error) {
 	var archiveCountJSON, archiveSizeJSON string
-	var err error
+
 	queryArchiveCount := `SELECT row_to_json(T)
 							FROM (
 									SELECT archived_count, failed_count
@@ -51,24 +48,35 @@ func (p *Plugin) archiveHandler(conn *postgresConn, key string, params []string)
 										 ) ready
 								) T;`
 
-	err = conn.postgresPool.QueryRow(context.Background(), queryArchiveCount).Scan(&archiveCountJSON)
+	row, err := conn.QueryRow(ctx, queryArchiveCount)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
-		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	err = conn.postgresPool.QueryRow(context.Background(), queryArchiveSize).Scan(&archiveSizeJSON)
+
+	err = row.Scan(&archiveCountJSON)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			p.Errf(err.Error())
-			return nil, errorEmptyResult
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
-	result := string(archiveCountJSON[:len(archiveCountJSON)-1]) + "," + string(archiveSizeJSON[1:])
+
+	row, err = conn.QueryRow(ctx, queryArchiveSize)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	err = row.Scan(&archiveSizeJSON)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
+		}
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	result := archiveCountJSON[:len(archiveCountJSON)-1] + "," + archiveSizeJSON[1:]
+
 	return result, nil
 }

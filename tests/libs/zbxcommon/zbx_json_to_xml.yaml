@@ -1,0 +1,113 @@
+---
+test case: 'Test 1: simple object'
+in:
+  json: '{"a": "b"}'
+out:
+  return: SUCCEED
+  xml: '<a>b</a>'
+---
+test case: 'Test 2: combination of objects and arrays'
+in:
+  json: '{"xml":{"a":["A","B","A"],"foo":["BAR",{"@attr":"eee","#text":"ATR"},{"baz":"BAZ"},"QUX"],"zoo":"XUQ"}}'
+out:
+  return: SUCCEED
+  xml: '<xml><a>A</a><a>B</a><a>A</a><foo>BAR</foo><foo attr="eee">ATR</foo><foo><baz>BAZ</baz></foo><foo>QUX</foo><zoo>XUQ</zoo></xml>'
+---
+test case: 'Test 3: incorrect json'
+in:
+  json: '{"a","b"}'
+out:
+  return: FAIL
+  xml: ''
+---
+test case: 'Test 4: hierarchy of objects'
+in:
+  json: '{"c":{"a":"b"}}'
+out:
+  return: SUCCEED
+  xml: '<c><a>b</a></c>'
+---
+test case: 'Test 5: null value'
+in:
+  json: '{"a":null}'
+out:
+  return: SUCCEED
+  xml: '<a/>'
+---
+test case: 'Test 6: hierarchy with null'
+in:
+  json: '{"c":{"a":null}}'
+out:
+  return: SUCCEED
+  xml: '<c><a/></c>'
+---
+test case: 'Test 7: attribute'
+in:
+  json: '{"c":{"@a":"b"}}'
+out:
+  return: SUCCEED
+  xml: '<c a="b"/>'
+---
+test case: 'Test 8: attribute with text'
+in:
+  json: '{"c":{"@a":"b","#text":"d"}}'
+out:
+  return: SUCCEED
+  xml: '<c a="b">d</c>'
+---
+test case: 'Test 9: several roots in json'
+in:
+  json: '{"e":{"c": "d"},"f":{"a":"b"}}'
+out:
+  return: SUCCEED
+  xml: '<e><c>d</c></e>'
+---
+test case: 'Test 10: no root in json'
+in:
+  json: '{"e":[{"c": "d"},{"a":"b"}]}'
+out:
+  return: SUCCEED
+  xml: ''
+---
+test case: 'Test 11: root with no value'
+in:
+  json: '{"a":{}}'
+out:
+  return: SUCCEED
+  xml: '<a/>'
+---
+test case: 'Test 12: deep hierarchy'
+in:
+  json: '{"x1":{"x2":{"x3":{"x4":{"x5":{"x6":{"x7":{"x8":{"x9":{"x10":"end"}}}}}}}}}}'
+out:
+  return: SUCCEED
+  xml: '<x1><x2><x3><x4><x5><x6><x7><x8><x9><x10>end</x10></x9></x8></x7></x6></x5></x4></x3></x2></x1>'
+---
+test case: 'Test 13: incorrect attribute format -> empty attribute'
+in:
+  json: '{"xml":{"@attr":{"aaa": "eee"},"#text": "ATR"}}'
+out:
+  return: SUCCEED
+  xml: '<xml attr="">ATR</xml>'
+---
+test case: 'Test 14: empty attribute'
+in:
+  json: '{"xml":{"@attr":null,"#text": "ATR"}}'
+out:
+  return: SUCCEED
+  xml: '<xml attr="">ATR</xml>'
+---
+test case: 'Test 15: use special symbols'
+in:
+  json: '{"xml":{"@attr":"atr","#text": "10 > 9 & 8 < 9"}}'
+out:
+  return: SUCCEED
+  xml: '<xml attr="atr">10 &gt; 9 &amp; 8 &lt; 9</xml>'
+---
+test case: 'Test 16: several roots with text'
+in:
+  json: '{"a":"b","c":"d"}'
+out:
+  return: SUCCEED
+  xml: '<a>b</a>'
+...

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,13 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/traits/PreprocessingTrait.php';
 
 /**
- *
  * @backup items
  */
 class testFormItemPreprocessingTest extends CWebTest {
 
 	const HOST_ID = 40001;		//'Simple form test host'
+
+	private static $key;
 
 	use PreprocessingTrait;
 
@@ -53,6 +54,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 						['type' => 'XML XPath', 'parameter_1' => 'path'],
 						['type' => 'JSONPath', 'parameter_1' => 'path'],
 						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Simple change'],
 						['type' => 'Change per second'],
@@ -260,8 +262,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 						]
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
 						['type' => 'Check for not supported value'],
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
 						['type' => 'JSONPath', 'parameter_1' => '{$_}']
 					],
 					'action' => 'Close'
@@ -282,8 +284,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
-						['type' => 'Left trim', 'parameter_1' => 'def'],
-						['type' => 'Check for not supported value']
+						['type' => 'Left trim', 'parameter_1' => 'def']
 					],
 					'action' => 'Test'
 				]
@@ -305,7 +306,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
 						['type' => 'Change per second'],
-						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false]
+						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false],
+						['type' => 'XML to JSON']
 					],
 					'action' => 'Test'
 				]
@@ -421,12 +423,91 @@ class testFormItemPreprocessingTest extends CWebTest {
 		$this->checkTestOverlay($data, 'button:Test all steps', $prev_enabled);
 	}
 
+	public static function getSortingData() {
+		return [
+			[
+				[
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'Trim', 'parameter_1' => '1'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'Check for not supported value'],
+						['type' => 'Trim', 'parameter_1' => '1'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'Trim', 'parameter_1' => '1'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}'],
+						['type' => 'Check for not supported value']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test for checking that Not supported value step is always being tested and saved first.
+	 *
+	 * @dataProvider getSortingData
+	 */
+	public function testFormItemPreprocessingTest_Sorting($data) {
+		// Result order of steps.
+		$preprocessing = [
+			['type' => 'Check for not supported value'],
+			['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+			['type' => 'Trim', 'parameter_1' => '1'],
+			['type' => 'JSONPath', 'parameter_1' => '{$_}']
+		];
+
+		$form = $this->openPreprocessing($data);
+
+		foreach ($data['preprocessing'] as $step) {
+			$this->addPreprocessingSteps([$step]);
+		}
+
+		// Test all steps right away after adding.
+		$this->query('button:Test all steps')->waitUntilPresent()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$table = $dialog->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
+
+		foreach ($preprocessing as $i => $step) {
+			$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
+		}
+
+		$dialog->close();
+
+		$form->submit();
+
+		// Assert right steps order after item saving.
+		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr(self::$key));
+		$this->page->open('items.php?form=update&context=host&hostid='.self::HOST_ID.'&itemid='.$id);
+		$form->selectTab('Preprocessing');
+		$this->assertPreprocessingSteps($preprocessing);
+	}
+
 	private function openPreprocessing($data) {
 		$this->page->login()->open('items.php?form=create&context=host&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key';
-		$form->fill(['Key' => $key]);
+		self::$key = CTestArrayHelper::get($data, 'Key', false) ? $data['Key'] : 'test.key'.time();
+
+		$form->fill(['Name' => 'Test name', 'Key' => self::$key]);
 		$form->selectTab('Preprocessing');
+
+		return $form;
 	}
 
 	/**
@@ -510,12 +591,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 						$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
 
 						$element = $table->query('id:preproc-test-step-'.$i.'-name')->one();
-
-						$opacity = ($step['type'] === 'Check for not supported value') ? 0.35 : 1;
-						$this->assertEquals($opacity, $element->getCSSValue('opacity'));
-
-						$enabled = ($step['type'] === 'Check for not supported value') ? false : true;
-						$this->assertTrue($element->isEnabled($enabled));
+						$this->assertEquals(1, $element->getCSSValue('opacity'));
+						$this->assertTrue($element->isEnabled());
 					}
 				}
 				else {

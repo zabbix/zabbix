@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,9 +53,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					$this->zbxTestInputClearAndTypeByXpath($field_xpath, $value);
 				}
 			}
-			elseif ($tag === 'select') {
-				$id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
-				$this->zbxTestDropdownSelectWait($id, $value);
+			elseif ($tag === 'z-select') {
+				$name = $this->zbxTestGetAttributeValue($field_xpath, 'name');
+				$this->zbxTestDropdownSelectWait($name, $value);
 			}
 			elseif ($tag === 'textarea') {
 				$this->zbxTestInputClearAndTypeByXpath($field_xpath, $value);

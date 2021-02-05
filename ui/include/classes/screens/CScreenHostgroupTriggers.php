@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,19 +120,32 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 				$params['hostids'] = $hostid;
 			}
 
-			$groups_cb = (new CComboBox('tr_groupid', $groupid, 'submit()', $groups))
-				->setEnabled($this->mode != SCREEN_MODE_EDIT);
-			$hosts_cb = (new CComboBox('tr_hostid', $hostid, 'submit()', $hosts))
-				->setEnabled($this->mode != SCREEN_MODE_EDIT);
+			$groups_select = (new CSelect('tr_groupid'))
+				->setId('tr-groupid')
+				->setFocusableElementId('label-group')
+				->setValue($groupid)
+				->addOptions(CSelect::createOptionsFromArray($groups))
+				->setDisabled($this->mode == SCREEN_MODE_EDIT);
+
+			$hosts_select = (new CSelect('tr_hostid'))
+				->setId('tr-hostid')
+				->setFocusableElementId('label-host')
+				->setValue($hostid)
+				->addOptions(CSelect::createOptionsFromArray($hosts))
+				->setDisabled($this->mode == SCREEN_MODE_EDIT);
 
 			$header = (new CDiv([
 				new CTag('h4', true, _('Host group issues')),
 				(new CForm('get', $this->pageFile))
 					->addItem(
 						(new CList())
-							->addItem([_('Group'), '&nbsp;', $groups_cb])
+							->addItem([new CLabel(_('Group'), $groups_select->getFocusableElementId()), '&nbsp;',
+								$groups_select
+							])
 							->addItem('&nbsp;')
-							->addItem([_('Host'), '&nbsp;', $hosts_cb])
+							->addItem([new CLabel(_('Host'), $hosts_select->getFocusableElementId()), '&nbsp;',
+								$hosts_select
+							])
 					)
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
@@ -144,7 +157,9 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
-		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();');
+		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();'.
+			'$("#tr-groupid, #tr-hostid").on("change", (e) => $(e.target).closest("form").submit())'
+		);
 
 		return $this->getOutput(new CUiWidget('hat_htstatus', [$header, $table, $footer, $script]));
 	}

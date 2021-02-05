@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ class CAuditLog extends CApiService {
 			AUDIT_RESOURCE_DASHBOARD, AUDIT_RESOURCE_CORRELATION, AUDIT_RESOURCE_GRAPH_PROTOTYPE,
 			AUDIT_RESOURCE_ITEM_PROTOTYPE, AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_AUTOREGISTRATION,
 			AUDIT_RESOURCE_MODULE, AUDIT_RESOURCE_SETTINGS, AUDIT_RESOURCE_HOUSEKEEPING, AUDIT_RESOURCE_AUTHENTICATION,
-			AUDIT_RESOURCE_TEMPLATE_DASHBOARD
+			AUDIT_RESOURCE_TEMPLATE_DASHBOARD, AUDIT_RESOURCE_AUTH_TOKEN
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

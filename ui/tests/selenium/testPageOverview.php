@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -526,7 +526,7 @@ class testPageOverview extends CLegacyWebTest {
 			foreach ($data['inventories'] as $key => $value) {
 				switch ($key) {
 					case 'inventory_field':
-						$this->zbxTestDropdownSelect('inventory_0_field', $value);
+						$this->zbxTestDropdownSelect('inventory[0][field]', $value);
 						break;
 					case 'inventory_value':
 						$this->zbxTestInputType('inventory_0_value', $value);
@@ -614,7 +614,21 @@ class testPageOverview extends CLegacyWebTest {
 						'triggers.php?form=update&triggerid',
 						'action=showgraph&itemid'
 					],
-					'links_text' => ['Problems', 'Acknowledge', 'Configuration', 'Trigger URL', 'Webhook url for all', '1_item']
+					'links_text' => [
+						'Problems',
+						'Acknowledge',
+						'Configuration',
+						'Trigger URL',
+						'Webhook url for all',
+						'1_item',
+						'Detect operating system',
+						'Ping',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
+						'Selenium script',
+						'Traceroute'
+					]
 				]
 			],
 			[

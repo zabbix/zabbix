@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ $this->includeJsFile('configuration.applications.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Applications'))
-	->addItem(get_header_host_table('applications', $data['hostid']));
+	->setNavigation(getHostNavigation('applications', $data['hostid']));
 
 $application_form = (new CForm())
 	->setId('application-form')

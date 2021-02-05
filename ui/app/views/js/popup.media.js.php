@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,8 +43,11 @@ jQuery(document).ready(function($) {
 				$('#mediatype_send_to').show();
 				$('#mediatype_email_send_to').hide();
 			}
+
 		})
 		.trigger("change");
+
+	overlays_stack.end().centerDialog();
 });
 
 /**

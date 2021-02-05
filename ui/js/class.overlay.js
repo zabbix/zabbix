@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,8 +132,8 @@ Overlay.prototype.recoverFocus = function() {
 		return;
 	}
 
-	if (jQuery('[autofocus=autofocus]:focusable', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]:focusable', this.$dialogue).first().focus();
+	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
+		jQuery('[autofocus=autofocus]', this.$dialogue).first().focus();
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
 		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).first().focus();
@@ -189,7 +189,7 @@ Overlay.prototype.containFocus = function() {
  */
 Overlay.prototype.setLoading = function() {
 	this.$dialogue.$body.addClass('is-loading');
-	this.$dialogue.$controls.find('select, button').prop('disabled', true);
+	this.$dialogue.$controls.find('z-select, button').prop('disabled', true);
 	this.$btn_submit && this.$btn_submit.prop('disabled', true);
 };
 

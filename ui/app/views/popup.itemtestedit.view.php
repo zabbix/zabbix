@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,12 +121,18 @@ if ($data['is_item_testable']) {
 
 	if ($data['show_snmp_form']) {
 		$form_grid->addItem([
-			(new CLabel(_('SNMP version'), 'interface[details][version]'))
+			(new CLabel(_('SNMP version'), 'label-interface-details-version'))
 				->addClass('js-popup-row-snmp-version'),
 			(new CFormField(
-				new CComboBox('interface[details][version]', $data['inputs']['interface']['details']['version'], null,
-					[SNMP_V1 => _('SNMPv1'), SNMP_V2C => _('SNMPv2'), SNMP_V3 => _('SNMPv3')]
-				)
+				(new CSelect('interface[details][version]'))
+					->setId('interface_details_version')
+					->setFocusableElementId('label-interface-details-version')
+					->setValue($data['inputs']['interface']['details']['version'])
+					->addOptions(CSelect::createOptionsFromArray([
+						SNMP_V1 => _('SNMPv1'),
+						SNMP_V2C => _('SNMPv2'),
+						SNMP_V3 => _('SNMPv3')
+					]))
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmp-version'),
@@ -165,16 +171,18 @@ if ($data['is_item_testable']) {
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmpv3-securityname'),
 
-			(new CLabel(_('Security level'), 'interface[details][securitylevel]'))
+			(new CLabel(_('Security level'), 'label-interface-details-securitylevel'))
 				->addClass('js-popup-row-snmpv3-securitylevel'),
 			(new CFormField(
-				new CComboBox('interface[details][securitylevel]',
-					$data['inputs']['interface']['details']['securitylevel'], null, [
+				(new CSelect('interface[details][securitylevel]'))
+					->setId('interface_details_securitylevel')
+					->setValue($data['inputs']['interface']['details']['securitylevel'])
+					->setFocusableElementId('label-interface-details-securitylevel')
+					->addOptions(CSelect::createOptionsFromArray([
 						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
 						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 						ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-					]
-				)
+					]))
 			))
 				->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 				->addClass('js-popup-row-snmpv3-securitylevel'),
@@ -230,16 +238,15 @@ if ($data['is_item_testable']) {
 	}
 
 	$form_grid->addItem([
-		(new CLabel(_('Proxy'), 'proxy_hostid'))->addClass('js-proxy-hostid-row'),
+		(new CLabel(_('Proxy'), 'label-proxy-hostid'))->addClass('js-proxy-hostid-row'),
 		(new CFormField(
-			$data['proxies_enabled']
-				? (new CComboBox('proxy_hostid',
-					array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
-					[0 => _('(no proxy)')] + $data['proxies']))
+			(new CSelect('proxy_hostid'))
+				->setReadonly(!$data['proxies_enabled'])
+				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+				->setFocusableElementId('label-proxy-hostid')
+				->setValue(array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0)
+				->setId('proxy_hostid')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox(null, _('(no proxy)'), true))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setId('proxy_hostid')
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass('js-proxy-hostid-row'),
@@ -270,6 +277,11 @@ $form_grid->addItem([
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setId('time')
 	),
+
+	($data['preproc_item'] instanceof CDiscoveryRule)
+		? null
+		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
+			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
@@ -332,11 +344,10 @@ if (count($data['steps']) > 0) {
 		}
 
 		$result_table->addRow([
-			(new CCol($step['num'].':'))
-				->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? ZBX_STYLE_DISABLED : null),
+			(new CCol($step['num'].':')),
 			(new CCol($step['name']))
-				->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? ZBX_STYLE_DISABLED : null)
-				->setId('preproc-test-step-'.$i.'-name'),
+				->setId('preproc-test-step-'.$i.'-name')
+				->addClass(ZBX_STYLE_WORDBREAK),
 			(new CCol())
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result')

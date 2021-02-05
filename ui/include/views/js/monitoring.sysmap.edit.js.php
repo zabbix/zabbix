@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,21 @@
  * @var CView $this
  */
 ?>
+
+<script type="text/x-jquery-tmpl" id="url-tpl">
+	<?= (new CRow([
+			(new CTextBox('urls[#{id}][name]'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CTextBox('urls[#{id}][url]'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CSelect('urls[#{id}][elementtype]'))
+				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->onClick('$("#url-row-#{id}").remove();')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->setId('url-row-#{id}')
+	?>
+</script>
 
 <script type="text/x-jquery-tmpl" id="user_group_row_tpl">
 	<?= (new CRow([
@@ -94,6 +109,16 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
+		const url_tpl = new Template($('#url-tpl').html());
+		const $add_url_btn = $('#add-url');
+		const $add_url_row = $add_url_btn.closest('tr');
+		let url_rowid = $('[id^="url-row-"]').length;
+
+		$add_url_btn.on('click', (e) => {
+			$add_url_row.before(url_tpl.evaluate({id: url_rowid}));
+			url_rowid++;
+		});
+
 		var inputs = '#label_type_hostgroup, #label_type_host, #label_type_trigger, #label_type_map, #label_type_image';
 
 		$('#label_format').click(function() {

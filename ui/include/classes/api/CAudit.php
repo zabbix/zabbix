@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ class CAudit {
 		AUDIT_RESOURCE_ACTION => 				['actionid', 'name', 'actions'],
 		AUDIT_RESOURCE_APPLICATION =>			['applicationid', 'name', 'applications'],
 		AUDIT_RESOURCE_AUTHENTICATION =>		['configid', null, 'config'],
+		AUDIT_RESOURCE_AUTH_TOKEN =>			['tokenid', 'name', 'token'],
 		AUDIT_RESOURCE_AUTOREGISTRATION =>		['configid', null, 'config'],
 		AUDIT_RESOURCE_CORRELATION =>			['correlationid', 'name', 'correlation'],
 		AUDIT_RESOURCE_DASHBOARD =>				['dashboardid', 'name', 'dashboard'],
@@ -102,6 +103,9 @@ class CAudit {
 			],
 			'media_type' => [
 				'fields' => ['passwd' => true]
+			],
+			'token' => [
+				'fields' => ['token' => true]
 			],
 			'users' => [
 				'fields' => ['passwd' => true]

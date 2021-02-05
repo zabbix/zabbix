@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -336,14 +336,14 @@ function getPosition(obj) {
 function PopUp(action, options, dialogueid, trigger_elmnt) {
 	var overlay = overlays_stack.getById(dialogueid);
 	if (!overlay) {
-		var wide_popup_actions = ['popup.generic', 'popup.scriptexec', 'dashboard.share.edit',
+		var wide_popup_actions = ['popup.generic', 'dashboard.share.edit',
 				'dashboard.properties.edit', 'popup.services', 'popup.media', 'popup.lldoperation', 'popup.lldoverride',
 				'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr',
 				'popup.triggerwizard'
 			],
 			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
-				'popup.mediatype.message'
+				'popup.mediatype.message', 'popup.scriptexec'
 			],
 			static_popup_actions = ['popup.massupdate.template', 'popup.massupdate.host', 'popup.massupdate.trigger',
 				'popup.massupdate.triggerprototype'
@@ -386,12 +386,21 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
 
-				buttons.push({
-					'title': t('Cancel'),
-					'class': 'btn-alt',
-					'cancel': true,
-					'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
-				});
+				if (action === 'popup.scriptexec') {
+					buttons.push({
+						'title': t('Ok'),
+						'cancel': true,
+						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+					});
+				}
+				else {
+					buttons.push({
+						'title': t('Cancel'),
+						'class': 'btn-alt',
+						'cancel': true,
+						'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+					});
+				}
 
 				overlay.setProperties({
 					title: resp.header,

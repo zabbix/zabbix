@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,11 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 // Append languages to form list.
-$lang_combobox = (new CComboBox('default_lang', $data['default_lang']))->setAttribute('autofocus', 'autofocus');
+$lang_select = (new CSelect('default_lang'))
+	->setId('default_lang')
+	->setValue($data['default_lang'])
+	->setFocusableElementId('label-default-lang')
+	->setAttribute('autofocus', 'autofocus');
 
 $all_locales_available = 1;
 
@@ -46,7 +50,7 @@ foreach (getLocales() as $localeid => $locale) {
 	 */
 	$locale_available = ($localeid === ZBX_DEFAULT_LANG || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
 
-	$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
+	$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
 	$all_locales_available &= (int) $locale_available;
 }
@@ -57,27 +61,32 @@ setlocale(LC_MONETARY, zbx_locale_variants($data['default_lang']));
 $language_error = '';
 if (!function_exists('bindtextdomain')) {
 	$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
-	$lang_combobox->setEnabled(false);
+	$lang_select->setReadonly();
 }
 elseif ($all_locales_available == 0) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
 $gui_tab = (new CFormList())
-	->addRow(_('Default language'),
+	->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()),
 		($language_error !== '')
-			? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
-			: $lang_combobox
+			? [$lang_select, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
+			: $lang_select
 	)
-	->addRow(new CLabel(_('Default time zone'), 'default-timezone-select'),
+	->addRow(new CLabel(_('Default time zone'), 'label-default-timezone'),
 		(new CSelect('default_timezone'))
 			->addOptions(CSelect::createOptionsFromArray($data['timezones']))
 			->setValue($data['default_timezone'])
-			->setFocusableElementId('default-timezone-select')
+			->setFocusableElementId('label-default-timezone')
 			->setId('default_timezone')
 	)
-	->addRow(_('Default theme'),
-		new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes())
+	->addRow(new CLabel(_('Default theme'), 'label-default-theme'),
+		(new CSelect('default_theme'))
+			->setFocusableElementId('label-default-theme')
+			->setValue($data['default_theme'])
+			->addOptions(CSelect::createOptionsFromArray(APP::getThemes()))
+			->setAttribute('autofocus', 'autofocus')
+			->setId('default_theme')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))

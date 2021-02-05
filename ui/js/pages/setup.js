@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,6 +115,12 @@ function updateElementsAvailability() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	// Stage 1, language selection.
+	const lang = document.getElementById('default-lang');
+	if (lang) {
+		lang.addEventListener('change', () => document.forms['setup-form'].submit());
+	}
+
 	// Stage 2, database configuration.
 	if (document.querySelector('[name=type]')) {
 		document.querySelectorAll('#type, #server, #tls_encryption, #verify_certificate, #creds_storage').forEach(
@@ -122,5 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 
 		updateElementsAvailability();
+	}
+
+	// Stage 4, GUI settings.
+	const theme = document.getElementById('default-theme');
+	if (theme) {
+		theme.addEventListener('change', () => document.forms['setup-form'].submit());
 	}
 });

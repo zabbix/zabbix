@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,6 +80,6 @@ $form->addItem([
 				->getUrl()
 		)))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem(get_header_host_table('dashboards', $data['templateid']))
+	->setNavigation(getHostNavigation('dashboards', $data['templateid']))
 	->addItem($form)
 	->show();

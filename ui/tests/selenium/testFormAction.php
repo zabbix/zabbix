@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -456,7 +456,7 @@ class testFormAction extends CLegacyWebTest {
 					'Or',
 					'Custom expression'
 			]);
-			$this->zbxTestAssertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']', 'selected');
+			$this->zbxTestDropdownAssertSelected('evaltype', $evaltype);
 			switch ($evaltype) {
 				case 'And/Or':
 				case 'And':
@@ -498,7 +498,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestDropdownSelectWait('condition_type', $data['new_condition_conditiontype']);
 			COverlayDialogElement::find()->one()->waitUntilReady();
 		}
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
 		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('condition_type');
 
 		switch ($eventsource) {
@@ -550,8 +550,6 @@ class testFormAction extends CLegacyWebTest {
 		if (isset($data['new_condition_conditiontype'])) {
 			$this->zbxTestDropdownAssertSelected('condition_type', $new_condition_conditiontype);
 		}
-
-		$this->zbxTestAssertElementPresentId('operator');
 
 		switch ($new_condition_conditiontype) {
 			case 'Application':
@@ -708,10 +706,10 @@ class testFormAction extends CLegacyWebTest {
 			case 'Event type':
 			case 'Service type':
 				$this->zbxTestAssertElementPresentXpath('//input[@type="radio" and contains(@id, "0") and @checked]');
-				$this->zbxTestAssertElementPresentXpath('//select[@id="value"]');
+				$this->zbxTestAssertElementPresentXpath('//z-select[@name="value"]');
 				break;
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//ul[@id="value"]|//select[@id="value"]');
+				$this->zbxTestAssertElementNotPresentXpath('//ul[@id="value" and contains(@class, "radio")]');
 				break;
 		}
 
@@ -780,7 +778,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertElementPresentXpath('//label[text()="Not classified"]/../input[@checked]');
 				break;
 			case 'Event type':
-				$this->zbxTestAssertAttribute('//*[@id="value"]/option[text()=\'Item in "not supported" state\']', 'selected');
+				$this->zbxTestDropdownAssertSelected('value', 'Item in "not supported" state');
 				break;
 		}
 
@@ -1075,11 +1073,9 @@ class testFormAction extends CLegacyWebTest {
 				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]'.
 						'//button[text()="Cancel"]')->one()->waitUntilVisible();
 
-				$this->zbxTestAssertVisibleXpath('//select[@id="condition_type"]');
+				$this->zbxTestAssertVisibleXpath('//z-select[@id="condition-type"]');
 				$this->zbxTestDropdownAssertSelected('condition_type', 'Event acknowledged');
-				$this->zbxTestDropdownHasOptions('condition_type', [
-						'Event acknowledged'
-				]);
+				$this->zbxTestDropdownHasOptions('condition_type', ['Event acknowledged']);
 
 				$this->zbxTestAssertVisibleXpath('//div[contains(@class, "overlay-dialogue modal")]'.
 						'//label[text()="equals"]');
@@ -1093,12 +1089,8 @@ class testFormAction extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath('//div[@id="operationTab"]//button[contains(@onclick,"new_opcondition")]');
-			$this->zbxTestAssertElementNotPresentXpath('//div[@id="operationTab"]//button[contains(@onclick,"cancel_new_opcondition")]');
-
-			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_conditiontype\']');
-			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_operator\']');
-			$this->zbxTestAssertElementNotPresentXpath('//select[@id=\'new_opcondition_value\']');
+			$this->zbxTestAssertElementNotPresentXpath('//li[@id="operation-condition-list"]');
+			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="operation-condition-list-footer"]');
 		}
 
 		if ($new_operation_opcommand_type != null) {
@@ -1557,7 +1549,7 @@ class testFormAction extends CLegacyWebTest {
 		if (isset($data['conditions'])) {
 			foreach ($data['conditions'] as $condition) {
 				$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
 				$this->zbxTestDropdownSelectWait('condition_type', $condition['type']);
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				switch ($condition['type']) {
@@ -1718,7 +1710,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition_type'));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
 		$this->zbxTestDropdownSelectWait('condition_type', 'Application');
 		$this->zbxTestInputTypeWait('value', 'app');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");

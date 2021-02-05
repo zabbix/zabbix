@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,303 +21,81 @@ package mysql
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
 	"time"
 
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/uri"
+	"zabbix.com/pkg/zbxerr"
 )
 
-const pingFailed = "0"
-
-type key struct {
-	query     string // SQL request text
-	minParams int    // minParams defines the minimum number of parameters for metrics.
-	maxParams int    // maxParams defines the maximum number of parameters for metrics.
-	json      bool   // It's a flag that the result must be in JSON
-	lld       bool   // It's a flag that the result must be in JSON with the key names in uppercase
-}
-
-var keys = map[string]key{
-	"mysql.get_status_variables": {query: "show global status",
-		minParams: 1,
-		maxParams: 3,
-		json:      true,
-		lld:       false},
-	"mysql.ping": {query: "select '1'",
-		minParams: 1,
-		maxParams: 3,
-		json:      false,
-		lld:       false},
-	"mysql.version": {query: "select version()",
-		minParams: 1,
-		maxParams: 3,
-		json:      false,
-		lld:       false},
-	"mysql.db.discovery": {query: "show databases",
-		minParams: 1,
-		maxParams: 3,
-		json:      true,
-		lld:       true},
-	"mysql.db.size": {query: "select coalesce(sum(data_length + index_length),0) from information_schema.tables where table_schema=?",
-		minParams: 4,
-		maxParams: 4,
-		json:      false,
-		lld:       false},
-	"mysql.replication.discovery": {query: "show slave status",
-		minParams: 1,
-		maxParams: 3,
-		json:      true,
-		lld:       true},
-	"mysql.replication.get_slave_status": {query: "show slave status",
-		minParams: 1,
-		maxParams: 4,
-		json:      true,
-		lld:       false},
-}
+const (
+	pluginName = "Mysql"
+	hkInterval = 10
+)
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
-	connMgr *connManager
+	connMgr *ConnManager
 	options PluginOptions
 }
-
-type columnName = string
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
-var ctx, cancel = context.WithCancel(context.Background())
-
-// Start deleting unused connections
-func (p *Plugin) Start() {
-
-	p.connMgr = newConnManager(
-		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second)
-
-	// Repeatedly check for unused connections and close them.
-	go func(ctx context.Context) {
-		ticker := time.NewTicker(10 * time.Second)
-		for {
-			select {
-			case <-ctx.Done():
-				p.Debugf("stop goroutine")
-				ticker.Stop()
-				return
-			case <-ticker.C:
-				if err := p.connMgr.closeUnused(); err != nil {
-					p.Errf("Error occurred while closing connection: %s", err.Error())
-				}
-			}
-		}
-	}(ctx)
-}
-
-// Stop deleting unused connections
-func (p *Plugin) Stop() {
-
-	cancel()
-	p.connMgr.closeAllConn()
-	p.connMgr = nil
-}
-
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-
-	paramsSize := len(params)
-	username := ""
-	password := ""
-
-	if paramsSize > keys[key].maxParams {
-		return nil, errorTooManyParameters
-	}
-
-	if paramsSize < keys[key].minParams {
-		return nil, errorTooFewParameters
-	}
-
-	if paramsSize >= 2 {
-		username = params[1]
-	}
-
-	if paramsSize >= 3 {
-		password = params[2]
-	}
-
-	session, ok := p.options.Sessions[params[0]]
-	if ok && (len(username) > 0 || len(password) > 0) {
-		return nil, errorUserPassword
-	}
-
-	if !ok {
-		uri := params[0]
-		if len(uri) == 0 {
-			uri = "tcp://localhost:3306"
-		}
-		if len(username) == 0 {
-			username = "root"
-		}
-		session = &Session{Uri: uri, User: username, Password: password}
-	}
-
-	mysqlConf, err := p.getConfigDSN(session)
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
+	params, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
 	}
 
-	conn, err := p.connMgr.GetConnection(mysqlConf)
+	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
-		// Special logic of processing connection errors is used if mysql.ping is requested
+		return nil, err
+	}
+
+	handleMetric := getHandlerFunc(key)
+	if handleMetric == nil {
+		return nil, zbxerr.ErrorUnsupportedMetric
+	}
+
+	conn, err := p.connMgr.GetConnection(*uri)
+	if err != nil {
+		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.
-		if key == "mysql.ping" {
+		if key == keyPing {
 			return pingFailed, nil
 		}
+
+		p.Errf(err.Error())
+
 		return nil, err
 	}
 
-	keyProperties := keys[key]
+	ctx := context.Background()
 
-	if key == "mysql.db.size" {
-		if len(params[3]) == 0 {
-			return nil, errorDBnameMissing
-		}
+	result, err = handleMetric(ctx, conn, params)
 
-		result, err = getOne(conn, &keyProperties, params[3])
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
-	if keyProperties.json {
-		return getJSON(conn, key)
-	}
-
-	return getOne(conn, &keyProperties)
-}
-
-// Get a single value
-func getOne(config *dbConn, keyProperties *key, args ...interface{}) (result interface{}, err error) {
-
-	var col interface{}
-	if err = config.connection.QueryRow(keyProperties.query, args...).Scan(&col); err != nil {
-		return
-	}
-
-	return string(col.([]byte)), nil
-}
-
-func rows2data(rows *sql.Rows) (result []map[string]string, err error) {
-
-	columns, err := rows.Columns()
 	if err != nil {
-		return nil, err
+		p.Errf(err.Error())
 	}
 
-	count := len(columns)
-	tableData := make([]map[columnName]string, 0)
-	values := make([]interface{}, count)
-	valuePtrs := make([]interface{}, count)
-
-	for i := 0; i < count; i++ {
-		valuePtrs[i] = &values[i]
-	}
-
-	for rows.Next() {
-
-		if err = rows.Scan(valuePtrs...); err != nil {
-			return
-		}
-
-		entry := make(map[columnName]string)
-
-		for i, col := range columns {
-			if values[i] == nil {
-				entry[col] = ""
-			} else {
-				entry[col] = string(values[i].([]byte))
-			}
-		}
-
-		tableData = append(tableData, entry)
-	}
-
-	return tableData, nil
+	return result, err
 }
 
-// Get a set of values in JSON format
-func getJSON(config *dbConn, key string) (result interface{}, err error) {
-
-	rows, err := config.connection.Query(keys[key].query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	tableData, err := rows2data(rows)
-	if err != nil {
-		return nil, err
-	}
-
-	var jsonData []byte
-	switch key {
-	case "mysql.get_status_variables":
-		{
-			m := make(map[string]string)
-			for _, j := range tableData {
-				m[j["Variable_name"]] = j["Value"]
-			}
-
-			jsonData, err = json.Marshal(m)
-			if err != nil {
-				return nil, err
-			}
-		}
-	case "mysql.replication.discovery":
-		{
-			m := make([]map[string]string, 0)
-			for _, j := range tableData {
-				m = append(m, map[string]string{"Master_Host": j["Master_Host"]})
-			}
-
-			jsonData, err = json.Marshal(m)
-			if err != nil {
-				return nil, err
-			}
-		}
-	case "mysql.replication.get_slave_status":
-		{
-			if len(tableData) == 0 {
-				return nil, errorNoReplication
-			}
-			jsonData, err = json.Marshal(tableData[0])
-			if err != nil {
-				return nil, err
-			}
-		}
-	default:
-		{
-			jsonData, err = json.Marshal(tableData)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return string(jsonData), nil
+// Start implements the Runner interface and performs initialization when plugin is activated.
+func (p *Plugin) Start() {
+	p.connMgr = NewConnManager(
+		time.Duration(p.options.KeepAlive)*time.Second,
+		time.Duration(p.options.Timeout)*time.Second,
+		time.Duration(p.options.CallTimeout)*time.Second,
+		hkInterval*time.Second,
+	)
 }
 
-// init registers metrics.
-func init() {
-	plugin.RegisterMetrics(&impl, "Mysql",
-		"mysql.get_status_variables", "Values of global status variables.",
-		"mysql.ping", "If the DBMS responds it returns '1', and '0' otherwise.",
-		"mysql.version", "MySQL version.",
-		"mysql.db.discovery", "Databases discovery.",
-		"mysql.db.size", "Database size in bytes.",
-		"mysql.replication.discovery", "Replication discovery.",
-		"mysql.replication.get_slave_status", "Replication status.")
+// Stop implements the Runner interface and frees resources when plugin is deactivated.
+func (p *Plugin) Stop() {
+	p.connMgr.Destroy()
+	p.connMgr = nil
 }

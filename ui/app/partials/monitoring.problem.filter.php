@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,7 +139,9 @@ $inventories = array_column(getHostInventories(), 'title', 'db_field');
 $i = 0;
 foreach ($data['inventory'] as $field) {
 	$filter_inventory_table->addRow([
-		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventories),
+		(new CSelect('inventory['.$i.'][field]'))
+			->setValue($field['field'])
+			->addOptions(CSelect::createOptionsFromArray($inventories)),
 		(new CTextBox('inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CCol(
 			(new CButton('inventory['.$i.'][remove]', _('Remove')))
@@ -178,13 +180,22 @@ foreach ($data['tags'] as $tag) {
 		(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setModern(true),
+		(new CSelect('tags['.$i.'][operator]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				TAG_OPERATOR_EXISTS => _('Exists'),
+				TAG_OPERATOR_EQUAL => _('Equals'),
+				TAG_OPERATOR_LIKE => _('Contains'),
+				TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+				TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+				TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+			]))
+			->setValue($tag['operator'])
+			->setFocusableElementId('tags-'.$i.'#{uniqid}-operator-select')
+			->setId('tags_'.$i.'#{uniqid}_operator'),
 		(new CTextBox('tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setId('tags_'.$i.'#{uniqid}_value'),
 		(new CCol(
 			(new CButton('tags['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -329,7 +340,8 @@ if (array_key_exists('render_html', $data)) {
 (new CScriptTemplate('filter-inventory-row'))
 	->addItem(
 		(new CRow([
-			(new CComboBox('inventory[#{rowNum}][field]', null, null, $inventories))->removeId(),
+			(new CSelect('inventory[#{rowNum}][field]'))
+				->addOptions(CSelect::createOptionsFromArray($inventories)),
 			(new CTextBox('inventory[#{rowNum}][value]', '#{value}'))
 				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
@@ -350,14 +362,21 @@ if (array_key_exists('render_html', $data)) {
 				->setAttribute('placeholder', _('tag'))
 				->removeId()
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE, 'tags_0#{rowNum}#{uniqid}')
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL, 'tags_1#{rowNum}#{uniqid}')
-				->setModern(true)
-				->setId('tags_#{rowNum}#{uniqid}'),
+			(new CSelect('tags[#{rowNum}][operator]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue(TAG_OPERATOR_LIKE)
+				->setFocusableElementId('tags-#{rowNum}#{uniqid}-operator-select')
+				->setId('tags_#{rowNum}#{uniqid}_operator'),
 			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
 				->setAttribute('placeholder', _('value'))
-				->removeId()
+				->setId('tags_#{rowNum}#{uniqid}_value')
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
@@ -464,15 +483,42 @@ if (array_key_exists('render_html', $data)) {
 			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>});
 		}
 
-		$('#filter-tags_' + data.uniqid, container).dynamicRows({
-			template: '#filter-tag-row-tmpl',
-			rows: data.tags,
-			counter: 0,
-			dataCallback: (tag) => {
-				tag.uniqid = data.uniqid
-				return tag;
-			}
-		});
+		$('#filter-tags_' + data.uniqid, container)
+			.dynamicRows({
+				template: '#filter-tag-row-tmpl',
+				rows: data.tags,
+				counter: 0,
+				dataCallback: (tag) => {
+					tag.uniqid = data.uniqid
+					return tag;
+				}
+			})
+			.on('afteradd.dynamicRows', function() {
+				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
+				$(this)
+					.find('z-select')
+					.on('change', function() {
+						var num = this.id.match(/tags_(\d+)_operator/);
+
+						if (num !== null) {
+							$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
+							);
+						}
+					});
+			});
+
+		$('#filter-tags_' + data.uniqid + ' z-select')
+			.on('change', function() {
+				var num = this.id.match(/tags_(\d+)_operator/);
+
+				if (num !== null) {
+					$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
+							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
+					);
+				}
+			})
+			.trigger('change');
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({

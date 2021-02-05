@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -809,7 +809,7 @@ if (hasRequest('form')) {
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
-	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
+	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
 	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
 		|| $host['status'] == HOST_STATUS_NOT_MONITORED
 	);

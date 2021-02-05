@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,10 @@ $item_form_list = (new CFormList('item-form-list'))
 		(new CVisibilityBox('visible[type]', 'type', _('Original')))
 			->setLabel(_('Type'))
 			->setAttribute('autofocus', 'autofocus'),
-		new CComboBox('type', ITEM_TYPE_ZABBIX, null, $data['itemTypes'])
+		(new CSelect('type'))
+			->setId('type')
+			->setValue(ITEM_TYPE_ZABBIX)
+			->addOptions(CSelect::createOptionsFromArray($data['itemTypes']))
 	);
 
 // Append hosts to item form list.
@@ -153,13 +156,16 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information')),
-		new CComboBox('value_type', ITEM_VALUE_TYPE_UINT64, null, [
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+		(new CSelect('value_type'))
+			->setId('value_type')
+			->setValue(ITEM_VALUE_TYPE_UINT64)
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	)
 	// Append units to form list.
 	->addRow(
@@ -169,10 +175,13 @@ $item_form_list
 	// Append authtype to form list.
 	->addRow(
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))->setLabel(_('Authentication method')),
-		new CComboBox('authtype', ITEM_AUTHTYPE_PASSWORD, null, [
-			ITEM_AUTHTYPE_PASSWORD => _('Password'),
-			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-		])
+		(new CSelect('authtype'))
+			->setId('authtype')
+			->setValue(ITEM_AUTHTYPE_PASSWORD)
+			->addOptions(CSelect::createOptionsFromArray([
+				ITEM_AUTHTYPE_PASSWORD => _('Password'),
+				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+			]))
 	)
 	// Append username to form list.
 	->addRow(
@@ -344,16 +353,19 @@ $item_form_list->addRow(
 );
 
 // Append valuemap to form list.
-$valuemaps_combobox = (new CComboBox('valuemapid', 0))->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-$valuemaps_combobox->addItem(0, _('As is'));
+$valuemaps_select = (new CSelect('valuemapid'))
+	->setId('valuemapid')
+	->setValue(0)
+	->addOption(new CSelectOption(0, _('As is')))
+	->setAdaptiveWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
 foreach ($data['valuemaps'] as $valuemap) {
-	$valuemaps_combobox->addItem($valuemap['valuemapid'], $valuemap['name']);
+	$valuemaps_select->addOption(new CSelectOption($valuemap['valuemapid'], $valuemap['name']));
 }
 
 $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))->setLabel(_('Show value')),
-		(new CDiv([$valuemaps_combobox, ' ',
+		(new CDiv([$valuemaps_select, ' ',
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()
@@ -510,7 +522,7 @@ if ($data['displayMasteritems']) {
 		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
 		(new CDiv([
 			(new CVar('master_itemname')),
-			$master_item,
+			$master_item
 		]))->setId('master_item')
 	);
 }

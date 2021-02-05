@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1934,7 +1934,11 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 		}
 		elseif (($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_COMMAND)
 				|| $action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
-			$message = zbx_nl2br($action['message']);
+			$message = [
+				bold(_('Command').':'),
+				BR(),
+				zbx_nl2br($action['message'])
+			];
 		}
 
 		$table->addRow([

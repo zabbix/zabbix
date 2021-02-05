@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,11 +47,12 @@ class CScreenHostsInfo extends CScreenBase {
 
 		$db_host_cnt = DBselect(
 			'SELECT COUNT(DISTINCT h.hostid) AS cnt'.
-			' FROM hosts h'.$cond_from.
-			' WHERE h.available='.HOST_AVAILABLE_TRUE.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+			' FROM hosts h'.$cond_from.',interface i'.
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 				' AND '.dbConditionInt('h.hostid', $hostids).
-				$cond_where
+				$cond_where.
+				' AND i.hostid=h.hostid'.
+				' AND i.available='.INTERFACE_AVAILABLE_TRUE
 		);
 
 		$host_cnt = DBfetch($db_host_cnt);
@@ -60,11 +61,12 @@ class CScreenHostsInfo extends CScreenBase {
 
 		$db_host_cnt = DBselect(
 			'SELECT COUNT(DISTINCT h.hostid) AS cnt'.
-			' FROM hosts h'.$cond_from.
-			' WHERE h.available='.HOST_AVAILABLE_FALSE.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+			' FROM hosts h'.$cond_from.',interface i'.
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 				' AND '.dbConditionInt('h.hostid', $hostids).
-				$cond_where
+				$cond_where.
+				' AND i.hostid=h.hostid'.
+				' AND i.available='.INTERFACE_AVAILABLE_FALSE
 		);
 
 		$host_cnt = DBfetch($db_host_cnt);
@@ -73,11 +75,12 @@ class CScreenHostsInfo extends CScreenBase {
 
 		$db_host_cnt = DBselect(
 			'SELECT COUNT(DISTINCT h.hostid) AS cnt'.
-			' FROM hosts h'.$cond_from.
-			' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+			' FROM hosts h'.$cond_from.',interface i'.
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 				' AND '.dbConditionInt('h.hostid', $hostids).
-				$cond_where
+				$cond_where.
+				' AND i.hostid=h.hostid'.
+				' AND i.available='.INTERFACE_AVAILABLE_UNKNOWN
 		);
 
 		$host_cnt = DBfetch($db_host_cnt);

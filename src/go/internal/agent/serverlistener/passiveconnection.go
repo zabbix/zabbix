@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,6 @@
 package serverlistener
 
 import (
-	"time"
-
-	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/zbxcomms"
 )
 
@@ -31,7 +28,7 @@ type passiveConnection struct {
 }
 
 func (pc *passiveConnection) Write(data []byte) (n int, err error) {
-	if err = pc.conn.Write(data, time.Second*time.Duration(agent.Options.Timeout)); err != nil {
+	if err = pc.conn.Write(data); err != nil {
 		n = len(data)
 	}
 	pc.conn.Close()

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,14 +142,19 @@ function getItemFilterForm(&$data) {
 
 	// type select
 	$fTypeVisibility = [];
-	$cmbType = new CComboBox('filter_type', $filter_type, null, [-1 => _('all')]);
+	$type_select = (new CSelect('filter_type'))
+		->setId('filter_type')
+		->setValue($filter_type)
+		->setFocusableElementId('label-filter-type')
+		->addOption(new CSelectOption(-1, _('all')));
+
 	zbx_subarray_push($fTypeVisibility, -1, 'filter_delay_row');
 	zbx_subarray_push($fTypeVisibility, -1, 'filter_delay');
 
 	$item_types = item_type2str();
 	unset($item_types[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
 
-	$cmbType->addItems($item_types);
+	$type_select->addOptions(CSelect::createOptionsFromArray($item_types));
 
 	foreach ($item_types as $type => $name) {
 		if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
@@ -186,22 +191,25 @@ function getItemFilterForm(&$data) {
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
-					'enrich_parent_groups' => true,
+					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-	$filterColumn2->addRow(_('Type'), $cmbType);
-	$filterColumn3->addRow(_('Type of information'),
-		new CComboBox('filter_value_type', $filter_value_type, null, [
-			-1 => _('all'),
-			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-			ITEM_VALUE_TYPE_STR => _('Character'),
-			ITEM_VALUE_TYPE_LOG => _('Log'),
-			ITEM_VALUE_TYPE_TEXT => _('Text')
-		])
+	$filterColumn2->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), $type_select);
+	$filterColumn3->addRow(new CLabel(_('Type of information'), 'label-filter-value-type'),
+		(new CSelect('filter_value_type'))
+			->setFocusableElementId('label-filter-value-type')
+			->setValue($filter_value_type)
+			->addOptions(CSelect::createOptionsFromArray([
+				-1 => _('all'),
+				ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+				ITEM_VALUE_TYPE_STR => _('Character'),
+				ITEM_VALUE_TYPE_LOG => _('Log'),
+				ITEM_VALUE_TYPE_TEXT => _('Text')
+			]))
 	);
 
 	if ($data['context'] === 'host') {
@@ -1331,22 +1339,23 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 	$have_validate_not_supported = in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, array_column($preprocessing, 'type'));
 
 	foreach ($preprocessing as $step) {
-		// Create a combo box with preprocessing types.
-		$preproc_types_cbbox = (new CComboBox('preprocessing['.$i.'][type]', $step['type']))->setReadonly($readonly);
+		// Create a select with preprocessing types.
+		$preproc_types_select = (new CSelect('preprocessing['.$i.'][type]'))
+			->setId('preprocessing_'.$i.'_type')
+			->setValue($step['type'])
+			->setReadonly($readonly)
+			->setWidthAuto();
 
 		foreach (get_preprocessing_types(null, true, $types) as $group) {
-			$cb_group = new COptGroup($group['label']);
+			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED || $type == $step['type']);
-
-				$cb_group->addItem(
-					(new CComboItem($type, $label, ($type == $step['type'])))
-						->setEnabled($enabled)
-				);
+				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+						|| $type == $step['type']);
+				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(!$enabled));
 			}
 
-			$preproc_types_cbbox->addItem($cb_group);
+			$preproc_types_select->addOptionGroup($opt_group);
 		}
 
 		// Depending on preprocessing type, display corresponding params field and placeholders.
@@ -1547,7 +1556,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					(new CDiv())
 						->addClass(ZBX_STYLE_DRAG_ICON)
 						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
-					(new CDiv($preproc_types_cbbox))
+					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
@@ -1556,7 +1565,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('preprocessing-step-test')
-							->setEnabled($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)
 							->removeId(),
 						(new CButton('preprocessing['.$i.'][remove]', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
@@ -1826,31 +1834,52 @@ function getTriggerFormData(array $data) {
 			foreach ($item_parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
 							];
 						}
 						else {
-							$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-								$templateid => $template
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
 							];
 						}
 					}
 				}
 			}
 
-			foreach ($data['tags'] as $tag) {
-				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-				}
-				else {
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid']
+			]);
+
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
 				}
 			}
 
-			$data['tags'] = array_values($inherited_tags);
+			foreach ($data['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+				else {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+			}
+
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
-
-use Facebook\WebDriver\Exception\TimeoutException;
 
 /**
  * Custom dropdown (z-select) element.
@@ -57,28 +55,23 @@ class CZDropdownElement extends CElement {
 	public function select($text) {
 		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
 
-		for ($i = 0; $i < 2; $i++) {
+		if ($text === $this->getText()) {
+			return $this;
+		}
+
+		for ($i = 0; $i < 5; $i++) {
 			try {
 				$this->waitUntilClickable()->click();
-				$option = $this->query($xpath)->waitUntilClickable()->one();
+				$this->query($xpath)->one()->click();
 
-				break;
+				return $this;
 			}
-			catch (TimeoutException $exception) {
-				if ($i === 1) {
-					throw new Exception('Failed to wait for the dropdown options to be present.');
-				}
+			catch (Exception $exception) {
+				// Code is not missing here.
 			}
 		}
 
-		if ($option->isClickable()) {
-			$option->click();
-		}
-		else {
-			throw new Exception('Cannot select disabled dropdown element.');
-		}
-
-		return $this;
+		throw new Exception('Failed to select dropdown option "'.$text.'".');
 	}
 
 	/**

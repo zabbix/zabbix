@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 		$iregexp_checkbox = $('#iregexp'),
 		$and_button = $('#add_key_and'),
 		$or_button = $('#add_key_or'),
-		$expt_type = $('#expr_type'),
+		expr_type_select = $('z-select#expr_type').get(0),
 		$add_button = $('#add_exp'),
 		data = $expr_table.data('rows')||[];
 
@@ -106,10 +106,11 @@
 		}
 
 		if (expression.length) {
+			const {label, value} = expr_type_select.getOptionByIndex(expr_type_select.selectedIndex);
 			$expr_table.find('tbody').append(trigger_row_tmpl.evaluate({
 				expression: expression.join($and_button.is(':enabled') ? ' and ' : ' or '),
-				type_label: $('option:selected', $expt_type).text(),
-				type: $('option:selected', $expt_type).val()
+				type_label: label,
+				type: value
 			}));
 
 			var $icons = $expr_table.find('tbody td.<?= ZBX_STYLE_TD_DRAG_ICON ?>');

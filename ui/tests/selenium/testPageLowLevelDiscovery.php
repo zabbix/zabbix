@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 	use TableTrait;
 
 	const HOST_ID = 90001;
+
+	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -70,14 +72,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->assertEquals($form->getField($name)->getValue(), $value);
 				switch ($value) {
 					case 'SNMP agent':
-						$this->assertTrue($form->query('id:filter_snmp_oid')->one()->isVisible());
+						$this->assertTrue($form->getField('SNMP OID')->isVisible());
 						break;
 					case 'Zabbix trapper':
-						$this->assertFalse($form->query('id:filter_delay_row')->one()->isVisible());
+						$this->assertFalse($form->getField('Update interval')->isVisible());
 						break;
 					case 'Normal':
 					case 'Not supported':
 						$this->assertFalse($form->getField('Status')->isEnabled());
+						$this->assertEquals('all', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -93,7 +96,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'Key', 'Interval', 'Type', 'Status', 'Info'];
 		$this->assertPageTitle('Configuration of discovery rules');
 		$this->assertPageHeader('Discovery rules');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 		$this->assertSame($headers, $table->getHeadersText());
 
 		// Check table buttons.
@@ -104,7 +107,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public function testPageLowLevelDiscovery_ResetButton() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check table contents before filtering.
@@ -135,7 +138,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 */
 	public function testPageLowLevelDiscovery_EnableDisableSingle() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 		$row = $table->findRow('Name', 'Discovery rule 2');
 
 		// Clicking Enabled/Disabled link
@@ -238,12 +241,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
-		$this->selectTableRows($data['names']);
+		$this->selectTableRows($data['names'], $this->selector);
 
 		if (CTestArrayHelper::get($data, 'disabled')) {
 			$this->query('button:Disable')->one()->click();
 			$this->page->acceptAlert();
-			$this->selectTableRows($data['names']);
+			$this->selectTableRows($data['names'], $this->selector);
 		}
 
 		if (CTestArrayHelper::get($data, 'template', false)) {
@@ -263,7 +266,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	private function getTableData() {
 		$result = [];
 
-		foreach ($this->query('class:list-table')->asTable()->one()->getRows() as $row) {
+		foreach ($this->query($this->selector)->asTable()->one()->getRows() as $row) {
 			$result[] = $row->getColumn('Name')->getText();
 		}
 
@@ -520,10 +523,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
-			$this->assertTableDataColumn($data['expected']);
+			$this->assertTableDataColumn($data['expected'], 'Name', $this->selector);
 		}
 
 		if (array_key_exists('rows', $data)) {
@@ -532,7 +535,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	private function massChangeStatus($action) {
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query($this->selector)->asTable()->one();
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
@@ -587,7 +590,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
 		$form->submit();
-		$this->selectTableRows($data['keys']);
+		$this->selectTableRows($data['keys'], $this->selector);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));

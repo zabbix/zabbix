@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -351,7 +351,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$this->query('button:Apply')->one()->click();
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn($data['expected']);
 	}
@@ -481,7 +481,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setFilterSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
-		$this->query('button:Apply')->one()->click();
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
@@ -499,7 +499,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
-		$this->query('button:Apply')->one()->click();
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
@@ -522,11 +522,11 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
-		$this->query('button:Apply')->one()->click();
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		foreach ([true, false] as $show) {
 			$form->query('id:show_suppressed_0')->asCheckbox()->one()->fill($show);
-			$this->query('button:Apply')->one()->click();
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertTrue($table->findRow('Name', 'Host for suppression')->isPresent($show));
 		}
@@ -552,7 +552,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'link_name' => 'Dashboards',
-					'page_header' => 'Network interfaces on ЗАББИКС Сервер'
+					'page_header' => 'Network interfaces'
 				]
 			],
 			[
@@ -748,7 +748,7 @@ class testPageMonitoringHosts extends CWebTest {
 		];
 		foreach ($hosts as $host) {
 			$form->fill(['Name' => $host]);
-			$this->query('button:Apply')->one()->click();
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 
 			$row = $table->findRow('Name', $host);
@@ -795,6 +795,9 @@ class testPageMonitoringHosts extends CWebTest {
 		if ($host_name === 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
 				' and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
+		}
+		if ($host_name === 'ЗАББИКС Сервер' && $column === 'Dashboards') {
+			$this->assertEquals('ЗАББИКС Сервер', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -196,7 +196,7 @@ class CWidgetFormProblems extends CWidgetForm {
 		];
 
 		// Sort entries by.
-		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
+		$field_sort = (new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity').' ('._('descending').')',
@@ -206,13 +206,7 @@ class CWidgetFormProblems extends CWidgetForm {
 			SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
 		]))
-			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC)
-			->setAction(
-				'jQuery(":checkbox[name=show_timeline]")'.
-					'.filter(":disabled").prop("checked", true).end()'.
-					'.prop("disabled", !'.json_encode($sort_with_enabled_show_timeline).'[this.value])'.
-					'.filter(":disabled").prop("checked", false)'
-			);
+			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
 
 		if (array_key_exists('sort_triggers', $this->data)) {
 			$field_sort->setValue($this->data['sort_triggers']);

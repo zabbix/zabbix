@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ function submitAcknowledge(overlay) {
 		form_data;
 
 	$form.trimValues(['#message']);
-	form_data = jQuery('#message, input:visible, select:visible, input[type=hidden]', $form).serialize();
+	form_data = jQuery('#message, input:visible, input[type=hidden]', $form).serialize();
 	url.setArgument('action', 'popup.acknowledge.create');
 
 	overlay.xhr = sendAjaxData(url.getUrl(), {

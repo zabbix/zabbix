@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,27 @@ class testItem extends CAPITest {
 					'delay' => '0'
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+			],
+			// Item preprocessing.
+			[
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'Test preprocessing 1',
+					'key_' => 'mqtt.get[5]',
+					'interfaceid' => '50022',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+					'delay' => '0',
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+							'params' => '',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
 			]
 		];
 	}

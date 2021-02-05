@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,6 +91,20 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()));
 					$ret = false;
 				}
+				elseif ($this->item_type == ITEM_TYPE_AGGREGATE) {
+					$params_num = $item_key_parser->getParamsNum();
+
+					if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
+							|| $params_num > 4 || $params_num < 3
+							|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
+							|| !str_in_array($item_key_parser->getParam(2),
+									['last', 'min', 'max', 'avg', 'sum', 'count'])) {
+						error(_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
+							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()
+						));
+						$ret = false;
+					}
+				}
 			}
 
 			/*
@@ -135,7 +149,17 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps = $this->getInput('steps', []);
+		$preprocessing_steps_input = $this->getInput('steps', []);
+		$preprocessing_steps = [];
+		foreach ($preprocessing_steps_input as $preproc) {
+			if ($preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				array_unshift($preprocessing_steps, $preproc);
+			}
+			else {
+				$preprocessing_steps[] = $preproc;
+			}
+		}
+
 		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->preproc_item instanceof CItemPrototype);
@@ -224,13 +248,13 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Extract macros and apply effective values for each of them.
 		$usermacros = CMacrosResolverHelper::extractItemTestMacros([
 			'steps' => $preprocessing_steps,
-			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'delay' => $show_prev ? $this->getInput('delay', ZBX_ITEM_DELAY_DEFAULT) : '',
-			'texts_support_macros' => $texts_support_macros,
-			'texts_support_lld_macros' => $texts_support_lld_macros,
-			'texts_support_user_macros' => $texts_support_user_macros,
 			'supported_macros' => $supported_macros,
 			'support_lldmacros' => $support_lldmacros,
+			'texts_support_macros' => $texts_support_macros,
+			'texts_support_user_macros' => $texts_support_user_macros,
+			'texts_support_lld_macros' => $texts_support_lld_macros,
+			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'macros_values' => $this->getSupportedMacros($inputs + ['interfaceid' => $this->getInput('interfaceid', 0)])
 		]);
 
@@ -333,6 +357,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'interface_port_enabled' => (array_key_exists($this->item_type, $this->items_require_interface)
 				&& $this->items_require_interface[$this->item_type]['port']
 			),
+			'preproc_item' => $this->preproc_item,
 			'show_snmp_form' => ($this->item_type == ITEM_TYPE_SNMP),
 			'show_warning' => $show_warning,
 			'user' => [

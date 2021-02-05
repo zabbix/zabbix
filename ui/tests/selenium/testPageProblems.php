@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
-		$this->assertTrue($this->zbxTestCheckboxSelected('tags_000'));
+		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
 
 		// Select "AND" option and two tag names with partial "Contains" value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
@@ -105,7 +105,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Test trigger with tag');
 
 		// Change tag value filter to "Equals"
-		$this->zbxTestClickXpath('//label[@for="tags_100"]');
+		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
 		$this->query('name:filter_apply')->one()->click();
 		$this->zbxTestAssertElementText('//tbody/tr[@class="nothing-to-show"]/td', 'No data found.');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
@@ -122,7 +122,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Select tag option "OR" and exact "Equals" tag value match
 		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
-		$this->zbxTestClickXpath('//label[@for="tags_100"]');
+		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
 
 		// Filter by two tags
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
