@@ -713,7 +713,11 @@ class testConfiguration extends CAPITest {
 		return [
 			[
 				'format' => 'xml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -728,62 +732,98 @@ class testConfiguration extends CAPITest {
 			],
 			[
 				'format' => 'json',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import\''
 			],
 			// Full YAML tags without quotes.
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			// Full YAML tags with double quotes.
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "---\n\"zabbix_export\":\n  \"version\": \"4.0\"\n  \"date\": \"2020-08-03T12:41:17Z\"\n  \"groups\":\n  - \"name\": \"API host group yaml import\"\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			// Pretty YAML (without --- and ...).
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "zabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n  groups:\r\n  - name: API host group yaml import",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			// Pretty YAML (without ... in the end).
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "---\nzabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n  groups:\r\n  - name: API host group yaml import",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			// "Ugly" YAML (with new lines after -).
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "---\r\nzabbix_export:\r\n  version: \"4.0\"\r\n  date: \"2020-08-03T12:41:17Z\"\r\n  groups:\r\n  - \r\n    name: API host group yaml import\r\n...",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			// JSON contents in YAML file (short, only date and version).
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "{\"zabbix_export\":{\"version\":\"5.0\",\"date\":\"2020-08-03T12:36:39Z\"}}",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			// JSON contents in YAML file (with zabbix tags).
 			[
 				'format' => 'yaml',
-				'parameter' => 'groups',
+				'rules' => [
+					'groups' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "{\"zabbix_export\":{\"version\":\"4.0\",\"date\":\"2020-08-03T12:41:17Z\",\"groups\":[{\"name\":\"API host group yaml import\"}]}}",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import\''
 			],
 			[
 				'format' => 'xml',
-				'parameter' => 'screens',
+				'rules' => [
+					'screens' => [
+						'createMissing' => true
+					]
+				],
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -800,33 +840,62 @@ class testConfiguration extends CAPITest {
 			],
 			[
 				'format' => 'json',
-				'parameter' => 'screens',
+				'rules' => [
+					'screens' => [
+						'createMissing' => true
+					]
+				],
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","screens":[{"name":"API screen json import",'
 							. '"hsize":"1","vsize":"1"}]}}',
 				'sql' => 'select * from screens where name=\'API screen json import\''
 			],
 			[
 				'format' => 'yaml',
-				'parameter' => 'screens',
+				'rules' => [
+					'screens' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:44:35Z\"\n".
 						"  screens:\n  - name: API screen yaml import\n    hsize: \"1\"\n    vsize: \"1\"\n    screen_items: []\n...\n",
 				'sql' => 'select * from screens where name=\'API screen yaml import\''
 			],
 			[
 				'format' => 'xml',
-				'parameter' => 'valueMaps',
+				'rules' => [
+					'valueMaps' => [
+						'createMissing' => true
+					],
+					'hosts' => [
+						'createMissing' => true
+					]
+				],
 				'source' => '<?xml version="1.0" encoding="UTF-8"?> <zabbix_export> <version>5.4</version> <date>2016-12-12T07:18:00Z</date> <hosts> <host> <host>API xml import host</host> <name>API xml import host</name> <groups> <group> <name>Linux servers</name> </group> </groups> <valuemaps> <valuemap> <name>API valueMap xml import</name> <mappings> <mapping> <value>1</value> <newvalue>Up</newvalue> </mapping> </mappings> </valuemap> </valuemaps> </host> </hosts> </zabbix_export>',
 				'sql' => 'select * from valuemap where name=\'API valueMap xml import\''
 			],
 			[
 				'format' => 'json',
-				'parameter' => 'valueMaps',
+				'rules' => [
+					'valueMaps' => [
+						'createMissing' => true
+					],
+					'hosts' => [
+						'createMissing' => true
+					]
+				],
 				'source' => '{ "zabbix_export": { "version": "5.4", "date": "2016-12-12T07:18:00Z", "hosts": [ { "host": "API json import host", "name": "API json import host", "groups": [ { "name": "Linux servers" } ], "valuemaps": [ { "name": "API valueMap json import", "mappings": [ { "value": "1", "newvalue": "Up" } ] } ] } ] } }',
 				'sql' => 'select * from valuemap where name=\'API valueMap json import\''
 			],
 			[
 				'format' => 'yaml',
-				'parameter' => 'valueMaps',
+				'rules' => [
+					'valueMaps' => [
+						'createMissing' => true
+					],
+					'hosts' => [
+						'createMissing' => true
+					]
+				],
 				'source' => "zabbix_export:\n  version: '5.4'\n  date: '2016-12-12T07:18:00Z'\n  hosts:\n  -\n    host: 'API yaml import host'\n    name: 'API yaml import host'\n    groups:\n    -\n      name: 'Linux servers'\n    valuemaps:\n    -\n      name: 'API valueMap yaml import'\n      mappings:\n      -\n        value: '1'\n        newvalue: Up",
 				'sql' => 'select * from valuemap where name=\'API valueMap yaml import\''
 			]
@@ -836,17 +905,10 @@ class testConfiguration extends CAPITest {
 	/**
 	* @dataProvider import_create
 	*/
-	public function testConfiguration_ImportCreate($format, $parameter, $source, $sql) {
+	public function testConfiguration_ImportCreate($format, $rules, $source, $sql) {
 		$result = $this->call('configuration.import', [
 				'format' => $format,
-				'rules' => [
-					$parameter => [
-						'createMissing' => true
-					],
-					'hosts' => [
-						'createMissing' => true
-					]
-				],
+				'rules' => $rules,
 				'source' => $source
 			]
 		);
