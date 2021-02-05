@@ -71,7 +71,10 @@ func ReadAll(filename string) (data []byte, err error) {
 	b := make([]byte, 2048)
 	for {
 		var n int
-		if n, err = syscall.Read(fd, b); err != nil && !errors.Is(err, syscall.EINTR) {
+		if n, err = syscall.Read(fd, b); err != nil {
+			if errors.Is(err, syscall.EINTR) {
+				continue
+			}
 			return
 		}
 
