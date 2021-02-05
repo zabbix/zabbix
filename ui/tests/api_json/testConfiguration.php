@@ -815,66 +815,13 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'xml',
 				'parameter' => 'valueMaps',
-				'source' => '<?xml version="1.0" encoding="UTF-8"?>
-							<zabbix_export>
-								<version>5.4</version>
-								<date>2016-12-12T07:18:00Z</date>
-								<hosts>
-									<host>
-										<host>API xml import host</host>
-										<name>API xml import host</name>
-										<groups>
-											<group>
-												<name>Linux servers</name>
-											</group>
-										</groups>
-										<valuemaps>
-											<valuemap>
-												<name>API valueMap xml import</name>
-												<mappings>
-													<mapping>
-														<value>1</value>
-														<newvalue>Up</newvalue>
-													</mapping>
-												</mappings>
-											</valuemap>
-										</valuemaps>
-									</host>
-								</hosts>
-							</zabbix_export>',
+				'source' => '<?xml version="1.0" encoding="UTF-8"?> <zabbix_export> <version>5.4</version> <date>2016-12-12T07:18:00Z</date> <hosts> <host> <host>API xml import host</host> <name>API xml import host</name> <groups> <group> <name>Linux servers</name> </group> </groups> <valuemaps> <valuemap> <name>API valueMap xml import</name> <mappings> <mapping> <value>1</value> <newvalue>Up</newvalue> </mapping> </mappings> </valuemap> </valuemaps> </host> </hosts> </zabbix_export>',
 				'sql' => 'select * from valuemap where name=\'API valueMap xml import\''
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'valueMaps',
-				'source' => '{
-					"zabbix_export": {
-						"version": "5.4",
-						"date": "2016-12-12T07:18:00Z",
-						"hosts": [
-							{
-								"host": "API json import host",
-								"name": "API json import host",
-								"groups": [
-									{
-										"name": "Linux servers"
-									}
-								],
-								"valuemaps": [
-									{
-										"name": "API valueMap json import",
-										"mappings": [
-											{
-												"value": "1",
-												"newvalue": "Up"
-											}
-										]
-									}
-								]
-							}
-						]
-					}
-				}',
+				'source' => '{ "zabbix_export": { "version": "5.4", "date": "2016-12-12T07:18:00Z", "hosts": [ { "host": "API json import host", "name": "API json import host", "groups": [ { "name": "Linux servers" } ], "valuemaps": [ { "name": "API valueMap json import", "mappings": [ { "value": "1", "newvalue": "Up" } ] } ] } ] } }',
 				'sql' => 'select * from valuemap where name=\'API valueMap json import\''
 			],
 			[
