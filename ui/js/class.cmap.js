@@ -2667,7 +2667,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					{
 						action: 'show',
-						value: '#tagsSelectRow',
+						value: '#tags-select-row',
 						cond: [
 							{
 								elementType: '0'
@@ -2824,8 +2824,11 @@ ZABBIX.apps.map = (function($) {
 						row = $(tpl.evaluate(tag));
 
 					row.insertBefore($add_btn_row);
-					row.find('[name="tags[' + tag.rowNum + '][tag]"]').val(tag.tag);
-					row.find('[name="tags[' + tag.rowNum + '][operator]"]')
+					row
+						.find('[name="tags[' + tag.rowNum + '][tag]"]')
+						.val(tag.tag);
+					row
+						.find('[name="tags[' + tag.rowNum + '][operator]"]')
 						.on('change', function() {
 							let num = this.id.match(/tags_(\d+)_operator/);
 							if (num !== null) {
@@ -2837,7 +2840,9 @@ ZABBIX.apps.map = (function($) {
 						.val(tag.operator)
 						.trigger('change');
 
-					row.find('[name="tags[' + tag.rowNum + '][value]"]').val(tag.value);
+					row
+						.find('[name="tags[' + tag.rowNum + '][value]"]')
+						.val(tag.value);
 				}
 
 				$('#selement-tags').data('dynamicRows').counter = counter;
@@ -2997,6 +3002,9 @@ ZABBIX.apps.map = (function($) {
 				}
 			},
 
+			/**
+			 * Remove tag filter rows from DOM.
+			 */
 			cleanTagsField: function() {
 				$('#selement-tags .form_row').remove();
 			},

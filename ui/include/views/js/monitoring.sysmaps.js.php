@@ -250,7 +250,7 @@ function createFontSelect(string $name): CSelect {
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-						'tagsSelectRow'
+						'tags-select-row'
 					)
 					->addRow(_('Automatic icon selection'),
 						new CCheckBox('use_iconmap'),
