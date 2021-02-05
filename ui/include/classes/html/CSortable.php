@@ -18,18 +18,45 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Class for creating sortable lists of items.
  */
 class CSortable extends CTag {
 	/**
+	 * Container class of a CSortable.
+	 *
+	 * @var string
+	 */
+	public const ZBX_STYLE_SORTABLE = 'csortable';
+
+	/**
+	 * List class of a CSortable.
+	 *
+	 * @var string
+	 */
+	public const ZBX_STYLE_SORTABLE_LIST = 'csortable-list';
+
+	/**
+	 * List item class of a CSortable.
+	 *
+	 * @var string
+	 */
+	public const ZBX_STYLE_SORTABLE_ITEM = 'csortable-item';
+
+	/**
 	 * Drag action triggering class for item child elements. If not specified, the whole item will work as drag handle.
+	 *
+	 * @var string
 	 */
 	public const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'csortable-drag-handle';
 
-	private const ZBX_STYLE_SORTABLE = 'csortable';
-	private const ZBX_STYLE_SORTABLE_LIST = 'csortable-list';
-	private const ZBX_STYLE_SORTABLE_ITEM = 'csortable-item';
+	/**
+	 * Class applied to the CSortable container and the target list item while dragging.
+	 *
+	 * @var string
+	 */
+	public const ZBX_STYLE_SORTABLE_DRAGGING = 'csortable-dragging';
 
 	/**
 	 * List of items.
