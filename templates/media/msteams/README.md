@@ -53,7 +53,7 @@ Make sure this user has access to all hosts for which you would like problem not
 
 6\. Great! You can now start receiving alerts!
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [MS Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [MS Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentations.
 
 ## Supported Versions
 Zabbix 5.0

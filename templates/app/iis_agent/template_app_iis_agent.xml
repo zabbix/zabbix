@@ -877,7 +877,7 @@ Template tooling version used: 0.35</description>
             <macro>
                <macro>{$IIS.SERVICE}</macro>
                <value>http</value>
-               <description>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/current/ru/manual/config/items/itemtypes/simple_checks</description>
+               <description>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/5.0/manual/config/items/itemtypes/simple_checks</description>
             </macro>
          </macros>
       </template>

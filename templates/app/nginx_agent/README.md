@@ -43,7 +43,7 @@ location = /basic_status {
 ```
 
 If you use another location, then don't forget to change {$NGINX.STUB_STATUS.PATH} macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/current/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/5.0/manual/installation/install_from_packages).
 
 
 ## Zabbix configuration

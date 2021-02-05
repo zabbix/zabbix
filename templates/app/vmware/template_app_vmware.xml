@@ -39,7 +39,7 @@ Template tooling version used: 0.38</description>
                <value_type>LOG</value_type>
                <username>{$VMWARE.USERNAME}</username>
                <password>{$VMWARE.PASSWORD}</password>
-               <description>Collect VMware event log. See also: https://www.zabbix.com/documentation/current/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</description>
+               <description>Collect VMware event log. See also: https://www.zabbix.com/documentation/5.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</description>
                <applications>
                   <application>
                      <name>VMware</name>
