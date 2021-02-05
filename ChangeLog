@@ -1,8 +1,23 @@
 Changes for 5.4.0alpha2
 
 New features:
+.......PS. [ZBXNEXT-6443] added sha256() function to JavaScript preprocessing (viktors)
+.........T [ZBXNEXT-5809] added VictorOps media (tuskov)
+.........T [ZBXNEXT-6394] added template "Hikvision camera by HTTP" (abakaldin)
+.........T [ZBXNEXT-6395] added template "Jenkins by HTTP" (ychukina)
+.......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 
 Bug fixes:
+..F....... [ZBX-18720] fixed full clone of discovered host having duplicate interfaces (Ivo)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+..F....... [ZBX-18209] fixed RegEx delimiter not being escaped in macro resolver (talbergs)
+A.F....... [ZBX-18817] fixed missing API and import validation for "unsupported check" preprocessing step (talbergs)
+..F....... [ZBX-18237] fixed problem description icon in Monitoring->Problems in compact view mode being displayed above problem name (agriscenko)
+...G...... [ZBX-18945] fixed Zabbix agent 2 build Raspbian 10 (esneiders)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
+.........T [ZBX-18874] fixed incorrect links in templates and webhooks documentation (tuskov)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0alpha1
