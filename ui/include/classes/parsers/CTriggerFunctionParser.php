@@ -107,11 +107,17 @@ class CTriggerFunctionParser extends CFunctionParser {
 			return false;
 		}
 
+		$p = $pos + 1;
+
+		if (!isset($source[$p]) || $source[$p] !== '/') {
+			return false;
+		}
+
 		$_parameters = [];
 		$state = self::STATE_NEW;
 		$num = 0;
 
-		for ($p = $pos + 1; isset($source[$p]); $p++) {
+		for (; isset($source[$p]); $p++) {
 			switch ($state) {
 				// a new parameter started
 				case self::STATE_NEW:
@@ -121,7 +127,7 @@ class CTriggerFunctionParser extends CFunctionParser {
 
 						case ',':
 							if ($num == 0) {
-								break 2;
+								break 3;
 							}
 
 							$_parameters[$num++] = [
@@ -133,7 +139,7 @@ class CTriggerFunctionParser extends CFunctionParser {
 
 						case ')':
 							if ($num == 0) {
-								break 2;
+								break 3;
 							}
 
 							$_parameters[$num] = [
@@ -146,7 +152,7 @@ class CTriggerFunctionParser extends CFunctionParser {
 
 						case '"':
 							if ($num == 0) {
-								break 2;
+								break 3;
 							}
 
 							$_parameters[$num] = [
@@ -169,7 +175,7 @@ class CTriggerFunctionParser extends CFunctionParser {
 									break;
 								}
 
-								break 2;
+								break 3;
 							}
 
 							$_parameters[$num] = [
@@ -250,12 +256,7 @@ class CTriggerFunctionParser extends CFunctionParser {
 	 * @return bool
 	 */
 	private function parseItem(string $source, int &$pos): bool {
-		$p = $pos;
-
-		if (!isset($source[$p]) || $source[$p] !== '/') {
-			return false;
-		}
-		$p++;
+		$p = $pos + 1;
 
 		if ($this->host_name_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return false;

@@ -111,11 +111,17 @@ class CFunctionParser extends CParser {
 			return false;
 		}
 
+		$p = $pos + 1;
+
+		if (!isset($source[$p]) || $source[$p] === '/') {
+			return false;
+		}
+
 		$_parameters = [];
 		$state = self::STATE_NEW;
 		$num = 0;
 
-		for ($p = $pos + 1; isset($source[$p]); $p++) {
+		for (; isset($source[$p]); $p++) {
 			switch ($state) {
 				// a new parameter started
 				case self::STATE_NEW:

@@ -1860,30 +1860,30 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 			['(find(/hostA/keyA,"abc")=0) oror (last(/hostB/keyB,123)=0)', null, true],
 			[
-				'(last(/host1/key,0)/last(/host/key,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+'.
+				'(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+'.
 					'-{$USERMACRO3}*-12K+12.5m',
 				[
 					'error' => '',
 					'expressions' => [
 						0 => [
-							'expression' => 'last(/host1/key,0)',
+							'expression' => 'last(/host1/key1,0)',
 							'pos'=> 1,
 							'host' => 'host1',
 							'item' => 'key1',
-							'function' => 'last(0)',
+							'function' => 'last',
 							'functionName' => 'last',
-							'functionParam' => '0',
-							'functionParamList' => ['0']
+							'functionParam' => '/host1/key1,0',
+							'functionParamList' => ['/host1/key1', '0']
 						],
 						1 => [
-							'expression' => 'last(/host/key,#5)',
-							'pos'=> 20,
+							'expression' => 'last(/host2/key2,#5)',
+							'pos'=> 21,
 							'host' => 'host2',
 							'item' => 'key2',
-							'function' => 'last(#5)',
+							'function' => 'last',
 							'functionName' => 'last',
-							'functionParam' => '#5',
-							'functionParamList' => ['#5']
+							'functionParam' => '/host2/key2,#5',
+							'functionParamList' => ['/host2/key2', '#5']
 						]
 					]
 				],
@@ -2246,33 +2246,33 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			["last(/host/key,1) and not\r\n1", null, true],
 			["last(/host/key,1) and not\t1", null, true],
 
-			["{host:key.count(1,\"\"\r)}=0", null, false],
-			["{host:key.count(1,\"\"\n)}=0", null, false],
-			["{host:key.count(1,\"\"\r\n)}=0", null, false],
-			["{host:key.count(1,\"\"\t)}=0", null, false],
+			["count(host/key,1,\"\"\r)=0", null, false],
+			["count(host/key,1,\"\"\n)=0", null, false],
+			["count(host/key,1,\"\"\r\n)=0", null, false],
+			["count(host/key,1,\"\"\t)=0", null, false],
 
-			["{host:key.count(1,\"\r\")}=0", null, true],
-			["{host:key.count(1,\"\n\")}=0", null, true],
-			["{host:key.count(1,\"\r\n\")}=0", null, true],
-			["{host:key.count(1,\"\t\")}=0", null, true],
+			["count(host/key,1,\"\r\")=0", null, true],
+			["count(host/key,1,\"\n\")=0", null, true],
+			["count(host/key,1,\"\r\n\")=0", null, true],
+			["count(host/key,1,\"\t\")=0", null, true],
 
-			["{host:key.count(1,\r\"\")}=0", null, true],
-			["{host:key.count(1,\n\"\")}=0", null, true],
-			["{host:key.count(1,\r\n\"\")}=0", null, true],
-			["{host:key.count(1,\t\"\")}=0", null, true],
+			["count(host/key,1,\r\"\")=0", null, true],
+			["count(host/key,1,\n\"\")=0", null, true],
+			["count(host/key,1,\r\n\"\")=0", null, true],
+			["count(host/key,1,\t\"\")=0", null, true],
 
-			["{host:key.count(1\r,\"\")}=0", null, true],
-			["{host:key.count(1\n,\"\")}=0", null, true],
-			["{host:key.count(1\r\n,\"\")}=0", null, true],
-			["{host:key.count(1\t,\"\")}=0", null, true],
+			["count(host/key,1\r,\"\")=0", null, true],
+			["count(host/key,1\n,\"\")=0", null, true],
+			["count(host/key,1\r\n,\"\")=0", null, true],
+			["count(host/key,1\t,\"\")=0", null, true],
 
-			["{host:key.count(\r1,\"\")}=0", null, true],
-			["{host:key.count(\n1,\"\")}=0", null, true],
-			["{host:key.count(\r\n1,\"\")}=0", null, true],
-			["{host:key.count(\t1,\"\")}=0", null, true],
+			["count(host/key,\r1,\"\")=0", null, true],
+			["count(host/key,\n1,\"\")=0", null, true],
+			["count(host/key,\r\n1,\"\")=0", null, true],
+			["count(host/key,\t1,\"\")=0", null, true],
 
 			// collapsed trigger expressions
-			['{host:key.func()}', null, false, ['collapsed_expression' => true]],
+			['func(/host/key)', null, false, ['collapsed_expression' => true]],
 			['{123}', null, true, ['collapsed_expression' => true]],
 			['{123} = {$MACRO}', null, true, ['collapsed_expression' => true]],
 			['{123} = {#MACRO}', null, true, ['collapsed_expression' => true]],

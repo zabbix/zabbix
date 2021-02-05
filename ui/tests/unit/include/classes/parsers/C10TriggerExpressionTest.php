@@ -3259,7 +3259,7 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 	 * @param bool        $options['allow_func_only']
 	 */
 	public function testParseExpression(string $expression, ?array $result, bool $rc, array $options = []) {
-		$expression_data = new CTriggerExpression($options);
+		$expression_data = new C10TriggerExpression($options);
 
 		if ($expression_data->parse($expression)) {
 			$this->assertEquals($rc, true);
@@ -3513,7 +3513,7 @@ class C10TriggerExpressionTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider tokens_provider
 	 */
 	public function testTokens(string $expression, array $tokens, array $options = []) {
-		$parser = new CTriggerExpression($options);
+		$parser = new C10TriggerExpression($options);
 		$result = $parser->parse($expression);
 		$this->assertTrue($result instanceof CTriggerExprParserResult);
 		$this->assertEquals($tokens, $result->getTokens());

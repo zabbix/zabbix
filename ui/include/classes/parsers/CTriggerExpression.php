@@ -225,7 +225,7 @@ class CTriggerExpression {
 			$this->host_macro_parser = new CSetParser($this->options['host_macro']);
 		}
 		$this->function_parser = new CFunctionParser();
-		$this->trigger_function_parser = new CFunctionParser();
+		$this->trigger_function_parser = new CTriggerFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		$this->user_macro_parser = new CUserMacroParser();
@@ -610,7 +610,7 @@ class CTriggerExpression {
 				return true;
 			}
 		}
-		elseif ($this->parseFunction() || $this->parseTriggerFunction()) {
+		elseif ($this->parseTriggerFunction() || $this->parseFunction()) {
 			return true;
 		}
 

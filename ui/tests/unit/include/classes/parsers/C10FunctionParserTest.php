@@ -526,7 +526,7 @@ class C10FunctionParserTest extends PHPUnit_Framework_TestCase {
 		static $function_parser = null;
 
 		if ($function_parser === null) {
-			$function_parser = new CFunctionParser();
+			$function_parser = new C10FunctionParser();
 		}
 
 		$this->assertSame($expected, [

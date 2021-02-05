@@ -515,6 +515,45 @@ class CTriggerFunctionParserTest extends PHPUnit_Framework_TestCase {
 					'params_raw' => []
 				],
 				[]
+			],
+			[
+				'func( /host/key)', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'host' => '',
+					'item' => '',
+					'function' => '',
+					'parameters' => '',
+					'params_raw' => []
+				],
+				[]
+			],
+			[
+				'func(/host)', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'host' => '',
+					'item' => '',
+					'function' => '',
+					'parameters' => '',
+					'params_raw' => []
+				],
+				[]
+			],
+			[
+				'func(/host/)', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'host' => '',
+					'item' => '',
+					'function' => '',
+					'parameters' => '',
+					'params_raw' => []
+				],
+				[]
 			]
 		];
 	}
