@@ -81,7 +81,7 @@ class CConfigurationImport {
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
 		$options = array_merge($default_options, $options);
