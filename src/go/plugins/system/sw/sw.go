@@ -171,12 +171,13 @@ func parseRegex(in []string, regex string) (out []string, err error) {
 		return in, nil
 	}
 
-	for _, s := range in {
-		matched, err := regexp.MatchString(regex, s)
-		if err != nil {
-			return nil, err
-		}
+	rgx, err := regexp.Compile(regex)
+	if err != nil {
+		return nil, err
+	}
 
+	for _, s := range in {
+		matched := rgx.MatchString(s)
 		if !matched {
 			continue
 		}
@@ -188,23 +189,25 @@ func parseRegex(in []string, regex string) (out []string, err error) {
 }
 
 func parseDpkg(in []string, regex string) (out []string, err error) {
+	rgx, err := regexp.Compile(regex)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, s := range in {
-		matched, err := regexp.MatchString(regex, s)
-		if err != nil {
-			return nil, err
-		}
-
-		if !matched {
-			continue
-		}
-
 		split := strings.Fields(s)
-
 		if len(split) < 2 || split[len(split)-1] != "install" {
 			continue
 		}
 
-		out = append(out, strings.Join(split[:len(split)-1], " "))
+		str := strings.Join(split[:len(split)-1], " ")
+
+		matched := rgx.MatchString(str)
+		if !matched {
+			continue
+		}
+
+		out = append(out, str)
 	}
 
 	return
