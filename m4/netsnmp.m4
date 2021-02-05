@@ -41,7 +41,13 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
   if test "x$want_netsnmp" != "xno"; then
 
-        AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [])
+	if test "x$_libnetsnmp_config" = "xno"; then
+		AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [])
+	fi
+
+	if test -d "$_libnetsnmp_config"; then
+		AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [], [$_libnetsnmp_config])
+	fi
 
 	if test -x "$_libnetsnmp_config"; then
 
@@ -140,27 +146,31 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		AC_MSG_CHECKING(for strong SHA auth protocol support)
 		AC_TRY_LINK([
 #include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>],
-		[
+#include <net-snmp/net-snmp-includes.h>
+		],[
 struct snmp_session session;
 session.securityAuthProto = usmHMAC384SHA512AuthProtocol;
-		],
+		],[
 		AC_DEFINE(HAVE_NETSNMP_STRONG_AUTH, 1, [Define to 1 if strong SHA auth protocols are supported.])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+		AC_MSG_RESULT(yes)
+		],[
+		AC_MSG_RESULT(no)
+		])
 
 		dnl Check for AES192/256 protocol support for privacy
 		AC_MSG_CHECKING(for strong AES privacy protocol support)
 		AC_TRY_LINK([
 #include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>],
-		[
+#include <net-snmp/net-snmp-includes.h>
+		],[
 struct snmp_session session;
-session.securityAuthProto = usmAES256PrivProtocol;
-		],
+session.securityPrivProto = usmAES256PrivProtocol;
+		],[
 		AC_DEFINE(HAVE_NETSNMP_STRONG_PRIV, 1, [Define to 1 if strong AES priv protocols are supported.])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+		AC_MSG_RESULT(yes)
+		],[
+		AC_MSG_RESULT(no)
+		])
 
 		dnl Check for localname in struct snmp_session
 		AC_MSG_CHECKING(for localname in struct snmp_session)
