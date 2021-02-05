@@ -873,16 +873,27 @@ class CHttpTest extends CApiService {
 		}
 
 		// Adding web scenario tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('httptest_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['httptestid']),
-				'filter' => ['httptestid' => $httpTestIds],
-				'preservekeys' => true
-			]);
+		if ($options['selectTags'] !== null) {
+			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
+				? (array) $options['selectTags']
+				: ['tag', 'value'];
 
-			$relation_map = $this->createRelationMap($tags, 'httptestid', 'httptesttagid');
-			$tags = $this->unsetExtraFields($tags, ['httptesttagid', 'httptestid'], []);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
+			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
+			$requested_output = array_flip($options['selectTags']);
+
+			$db_tags = DBselect(
+				'SELECT '.implode(',', array_merge($options['selectTags'], ['httptestid'])).
+				' FROM httptest_tag'.
+				' WHERE '.dbConditionInt('httptestid', $httpTestIds)
+			);
+
+			array_walk($result, function (&$http_test) {
+				$http_test['tags'] = [];
+			});
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$result[$db_tag['httptestid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
+			}
 		}
 
 		return $result;

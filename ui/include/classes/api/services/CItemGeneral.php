@@ -2599,13 +2599,19 @@ abstract class CItemGeneral extends CApiService {
 		});
 
 		// Select tags from database.
-		$db_item_tags = API::getApiService()->select('item_tag', [
-			'output' => ['itemtagid', 'itemid', 'tag', 'value'],
-			'filter' => ['itemid' => array_keys($items)],
-			'preservekeys' => true
-		]);
-		$items = $this->createRelationMap($db_item_tags, 'itemid', 'itemtagid')
-			->mapMany($items, $db_item_tags, 'db_tags');
+		$db_tags = DBselect(
+			'SELECT itemtagid, itemid, tag, value'.
+			' FROM item_tag'.
+			' WHERE '.dbConditionInt('itemid', array_keys($items))
+		);
+
+		array_walk($items, function (&$item) {
+			$item['db_tags'] = [];
+		});
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$items[$db_tag['itemid']]['db_tags'][] = $db_tag;
+		}
 
 		// Find which tags must be added/deleted.
 		$new_tags = [];

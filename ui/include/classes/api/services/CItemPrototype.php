@@ -758,16 +758,27 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		// Adding item tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('item_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['itemid']),
-				'filter' => ['itemid' => $itemids],
-				'preservekeys' => true
-			]);
+		if ($options['selectTags'] !== null) {
+			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
+				? (array) $options['selectTags']
+				: ['tag', 'value'];
 
-			$relation_map = $this->createRelationMap($tags, 'itemid', 'itemtagid');
-			$tags = $this->unsetExtraFields($tags, ['itemtagid', 'itemid'], []);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
+			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
+			$requested_output = array_flip($options['selectTags']);
+
+			$db_tags = DBselect(
+				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
+				' FROM item_tag'.
+				' WHERE '.dbConditionInt('itemid', $itemids)
+			);
+
+			array_walk($result, function (&$item) {
+				$item['tags'] = [];
+			});
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
+			}
 		}
 
 		return $result;

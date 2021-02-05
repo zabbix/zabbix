@@ -845,13 +845,19 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function updateElementsTags(array $selements): void {
 		// Select tags from database.
-		$db_tags = API::getApiService()->select('sysmaps_element_tag', [
-			'output' => ['selementtagid', 'selementid', 'tag', 'value', 'operator'],
-			'filter' => ['selementid' => array_column($selements, 'selementid')],
-			'preservekeys' => true
-		]);
-		$relation_map = $this->createRelationMap($db_tags, 'selementid', 'selementtagid');
-		$selements = $relation_map->mapMany($selements, $db_tags, 'db_tags');
+		$db_tags = DBselect(
+			'SELECT selementtagid, selementid, tag, value, operator'.
+			' FROM sysmaps_element_tag'.
+			' WHERE '.dbConditionInt('selementid', array_column($selements, 'selementid'))
+		);
+
+		array_walk($selements, function (&$selement) {
+			$selement['db_tags'] = [];
+		});
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$selements[$db_tag['selementid']]['db_tags'][] = $db_tag;
+		}
 
 		// Find which tags must be added/deleted.
 		$new_tags = [];

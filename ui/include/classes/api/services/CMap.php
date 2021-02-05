@@ -2431,15 +2431,23 @@ class CMap extends CMapElement {
 			}
 
 			if ($this->outputIsRequested('tags', $options['selectSelements']) && $selements) {
-				$tags = API::getApiService()->select('sysmaps_element_tag', [
-					'output' => ['selementid', 'tag', 'value', 'operator'],
-					'filter' => ['selementid' => array_column($selements, 'selementid')],
-					'preservekeys' => true
-				]);
+				$db_tags = DBselect(
+					'SELECT selementid, tag, value, operator'.
+					' FROM sysmaps_element_tag'.
+					' WHERE '.dbConditionInt('selementid', array_keys($selements))
+				);
 
-				$tags_relation_map = $this->createRelationMap($tags, 'selementid', 'selementtagid');
-				$tags = $this->unsetExtraFields($tags, ['selementid', 'selementtagid'], []);
-				$selements = $tags_relation_map->mapMany($selements, $tags, 'tags');
+				array_walk($selements, function (&$selement) {
+					$selement['tags'] = [];
+				});
+
+				while ($db_tag = DBfetch($db_tags)) {
+					$selements[$db_tag['selementid']]['tags'][] = [
+						'tag' => $db_tag['tag'],
+						'value' => $db_tag['value'],
+						'operator' => $db_tag['operator']
+					];
+				}
 			}
 
 			if ($this->outputIsRequested('permission', $options['selectSelements']) && $selements) {
