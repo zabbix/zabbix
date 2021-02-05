@@ -788,7 +788,6 @@ if (hasRequest('form')) {
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
 				'selectTags' => ['tag', 'value'],
-				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
