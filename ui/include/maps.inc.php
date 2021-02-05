@@ -1375,7 +1375,7 @@ function getSelementLabelColor($is_problem, $is_ack) {
  *
  * @return array
  */
-function getProblemsMatchingTags(array $problems, array $filter_tags, int $evaltype = TAG_EVAL_TYPE_AND_OR): array {
+function getProblemsMatchingTags(array $problems, array $filter_tags, int $evaltype): array {
 	if (!$problems) {
 		return [];
 	}

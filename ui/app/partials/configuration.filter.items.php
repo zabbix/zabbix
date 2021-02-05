@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,9 @@ foreach (array_keys($item_types) as $type) {
 	}
 }
 
-zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($filter_type_visibility, true).');');
+zbx_add_post_js("var filterTypeSwitcher".
+	" = new CViewSwitcher('filter_type', 'change', ".json_encode($filter_type_visibility, true).');'
+);
 
 // First column
 $filter_column_1

@@ -2041,8 +2041,10 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
  * @param string $data['tags'][]['tag']
  * @param string $data['tags'][]['value']
  * @param int    $data['show_inherited_tags']
+ *
+ * @return array
  */
-function getHttpTestTags(array $data) {
+function getHttpTestTags(array $data): array {
 	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
 
 	if ($data['show_inherited_tags']) {
