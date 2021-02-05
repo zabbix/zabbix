@@ -77,11 +77,11 @@ class CControllerLatestView extends CControllerLatest {
 			);
 
 			// tags
-			$evaltype = getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
+			$evaltype = $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR);
 			CProfile::update('web.latest.filter.evaltype', $evaltype, PROFILE_TYPE_INT);
 
 			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
-			foreach (getRequest('filter_tags', []) as $tag) {
+			foreach ($this->getInput('filter_tags', []) as $tag) {
 				if ($tag['tag'] === '' && $tag['value'] === '') {
 					continue;
 				}
@@ -92,7 +92,6 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::updateArray('web.latest.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.latest.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.latest.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
-			unset($filter_tags, $evaltype);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.latest.filter.groupids');

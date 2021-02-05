@@ -147,7 +147,8 @@
 
 	latestPage.prototype.liveFilter = function() {
 		var $filter_hostids = $('#filter_hostids_'),
-			$filter_show_without_data = $('#filter_show_without_data');
+			$filter_show_without_data = $('#filter_show_without_data'),
+			$filter_tags = $('#filter-tags');
 
 		$filter_hostids.on('change', function() {
 			var no_hosts_selected = !$(this).multiSelect('getData').length;
@@ -158,13 +159,8 @@
 
 			$filter_show_without_data.prop('disabled', no_hosts_selected);
 		});
-	};
 
-	$(function() {
-		window.latest_page = new latestPage();
-		window.latest_page.liveFilter();
-
-		$('#filter-tags')
+		$filter_tags
 			.dynamicRows({template: '#filter-tag-row-tmpl'})
 			.on('afteradd.dynamicRows', function() {
 				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
@@ -181,7 +177,8 @@
 			});
 
 		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-		$('#filter-tags z-select')
+		$filter_tags
+			.find('z-select')
 			.on('change', function() {
 				let num = this.id.match(/filter_tags_(\d+)_operator/);
 				if (num !== null) {
@@ -191,5 +188,10 @@
 				}
 			})
 			.trigger('change');
+	};
+
+	$(function() {
+		window.latest_page = new latestPage();
+		window.latest_page.liveFilter();
 	});
 </script>
