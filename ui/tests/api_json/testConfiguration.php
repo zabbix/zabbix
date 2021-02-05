@@ -157,8 +157,7 @@ class testConfiguration extends CAPITest {
 			['images'],
 			['maps'],
 			['screens'],
-			['templates'],
-			['valueMaps']
+			['templates']
 		];
 	}
 
@@ -250,13 +249,6 @@ class testConfiguration extends CAPITest {
 				[
 					'options' => [
 						'templates' => ['10069']
-					]
-				]
-			],
-			[
-				[
-					'options' => [
-						'valueMaps' => ['1']
 					]
 				]
 			]
@@ -488,8 +480,8 @@ class testConfiguration extends CAPITest {
 			]],
 			[[
 				'parameter' => 'valueMaps',
-				'expected' => ['createMissing', 'updateExisting'],
-				'unexpected' => ['deleteMissing']
+				'expected' => ['createMissing', 'updateExisting', 'deleteMissing'],
+				'unexpected' => []
 			]]
 		];
 	}
@@ -824,36 +816,90 @@ class testConfiguration extends CAPITest {
 				'format' => 'xml',
 				'parameter' => 'valueMaps',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
-								<zabbix_export>
-								<version>3.2</version>
+							<zabbix_export>
+								<version>5.4</version>
 								<date>2016-12-12T07:18:00Z</date>
-								<value_maps>
-									<value_map>
-										<name>API valueMap xml import</name>
-										<mappings>
-											<mapping>
-												<value>1</value>
-												<newvalue>Up</newvalue>
-											</mapping>
-										</mappings>
-									</value_map>
-								</value_maps>
-								</zabbix_export>',
-				'sql' => 'select * from valuemaps where name=\'API valueMap xml import\''
+								<hosts>
+									<host>
+										<host>API xml import host</host>
+										<name>API xml import host</name>
+										<groups>
+											<group>
+												<name>Linux servers</name>
+											</group>
+										</groups>
+										<valuemaps>
+											<valuemap>
+												<name>API valueMap xml import</name>
+												<mappings>
+													<mapping>
+														<value>1</value>
+														<newvalue>Up</newvalue>
+													</mapping>
+												</mappings>
+											</valuemap>
+										</valuemaps>
+									</host>
+								</hosts>
+							</zabbix_export>',
+				'sql' => 'select * from valuemap where name=\'API valueMap xml import\''
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'valueMaps',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import",'
-							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
-				'sql' => 'select * from valuemaps where name=\'API valueMap json import\''
+				'source' => '{
+					"zabbix_export": {
+						"version": "5.4",
+						"date": "2016-12-12T07:18:00Z",
+						"hosts": [
+							{
+								"host": "API json import host",
+								"name": "API json import host",
+								"groups": [
+									{
+										"name": "Linux servers"
+									}
+								],
+								"valuemaps": [
+									{
+										"name": "API valueMap json import",
+										"mappings": [
+											{
+												"value": "1",
+												"newvalue": "Up"
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}',
+				'sql' => 'select * from valuemap where name=\'API valueMap json import\''
 			],
 			[
 				'format' => 'yaml',
 				'parameter' => 'valueMaps',
-				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:47:05Z\"\n".
-						"  value_maps:\n  - name: API valueMap yaml import\n    mappings:\n    - value: One\n      newvalue: Up\n...\n",
-				'sql' => 'select * from valuemaps where name=\'API valueMap yaml import\''
+				'source' => "
+					zabbix_export:
+						version: '5.4'
+						date: '2016-12-12T07:18:00Z'
+						hosts:
+						-
+							host: 'API yaml import host'
+							name: 'API yaml import host'
+							groups:
+							-
+								name: 'Linux servers'
+							valuemaps:
+							-
+								name: 'API valueMap yaml import'
+								mappings:
+								-
+									value: '1'
+									newvalue: Up
+				",
+				'sql' => 'select * from valuemap where name=\'API valueMap yaml import\''
 			]
 		];
 	}
@@ -908,35 +954,6 @@ class testConfiguration extends CAPITest {
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import as non Super Admin\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
-			],
-			[
-				'format' => 'xml',
-				'parameter' => 'valueMaps',
-				'source' => '<?xml version="1.0" encoding="UTF-8"?>
-								<zabbix_export>
-								<version>3.2</version>
-								<date>2016-12-12T07:18:00Z</date>
-								<value_maps>
-									<value_map>
-										<name>API valueMap xml import as non Super Admin</name>
-										<mappings>
-											<mapping>
-												<value>1</value>
-												<newvalue>Up</newvalue>
-											</mapping>
-										</mappings>
-									</value_map>
-								</value_maps>
-								</zabbix_export>',
-				'sql' => 'select * from valuemaps where name=\'API valueMap xml import as non Super Admin\'',
-				'expected_error' => 'Only super admins can create value maps.'
-			],
-			[
-				'format' => 'json',
-				'parameter' => 'valueMaps',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import as non Super Admin", "mappings":[{"value":"1","newvalue":"Up"}]}]}}',
-				'sql' => 'select * from valuemaps where name=\'API valueMap json import as non Super Admin\'',
-				'expected_error' => 'Only super admins can create value maps.'
 			]
 		];
 	}
