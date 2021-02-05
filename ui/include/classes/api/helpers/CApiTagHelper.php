@@ -143,7 +143,7 @@ class CApiTagHelper {
 
 		$sql_where_negated = [];
 		if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
-			$sql_where = array_filter($sql_where, function($statement) use (&$sql_where_negated) {
+			$sql_where = array_filter($sql_where, function ($statement) use (&$sql_where_negated) {
 				if (substr($statement, 0, 3) === 'NOT') {
 					$sql_where_negated[] = substr($statement, 4);
 					return false;
@@ -182,7 +182,7 @@ class CApiTagHelper {
 	 */
 	public static function addInheritedHostTagsWhereCondition(array $tags, int $evaltype): string {
 		// Swap tag operators to select templates normally should be excluded.
-		$swapped_filter = array_map(function($tag) {
+		$swapped_filter = array_map(function ($tag) {
 			$swapping_map = [
 				TAG_OPERATOR_LIKE => TAG_OPERATOR_LIKE,
 				TAG_OPERATOR_EQUAL => TAG_OPERATOR_EQUAL,
@@ -256,7 +256,7 @@ class CApiTagHelper {
 
 		// Make 'where' condition from negated filter tags.
 		$negated_conditions = array_fill_keys(array_keys($negated_tags), ['values' => [], 'templateids' => []]);
-		array_walk($negated_conditions, function(&$where, $tag_name) use ($negated_tags, $db_template_tags) {
+		array_walk($negated_conditions, function (&$where, $tag_name) use ($negated_tags, $db_template_tags) {
 			if ($negated_tags[$tag_name] === false) {
 				$tag = ['tag' => $tag_name, 'operator' => TAG_OPERATOR_NOT_EXISTS];
 				$where['templateids'] += self::getMatchingTemplateids($tag, $db_template_tags);
@@ -312,7 +312,7 @@ class CApiTagHelper {
 				$where_conditions[] = 'NOT ('.implode(' AND ', $negated_where_conditions).')';
 			}
 			else {
-				$where_conditions = array_map(function($condition) {
+				$where_conditions = array_map(function ($condition) {
 					return 'NOT '.$condition;
 				}, $negated_where_conditions);
 			}
