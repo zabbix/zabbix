@@ -129,7 +129,7 @@ var AddValueMap = class {
 	createHiddenInput(name, value) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
-		input.name = `valuemap[${valuemap_number}]${name}`;
+		input.name = `valuemaps[${valuemap_number}]${name}`;
 		input.value = value;
 
 		return input;

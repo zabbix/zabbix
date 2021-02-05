@@ -88,7 +88,7 @@ $fields = [
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'valuemap' => 				[T_ZBX_STR, O_OPT, null,		null,	null],
+	'valuemaps' => 				[T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"host.export","host.massdelete","host.massdisable", "host.massenable"'),
@@ -507,7 +507,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		$valuemaps = getRequest('valuemap', []);
+		$valuemaps = getRequest('valuemaps', []);
 
 		if ((getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone')
 				&& getRequest('clone_hostid', 0)) {
@@ -771,7 +771,7 @@ if (hasRequest('form')) {
 		'psk_edit_mode' => getRequest('psk_edit_mode', 1),
 
 		// Valuemap
-		'valuemaps' => array_values(getRequest('valuemap', []))
+		'valuemaps' => array_values(getRequest('valuemaps', []))
 	];
 
 	if (!hasRequest('form_refresh')) {
@@ -788,6 +788,7 @@ if (hasRequest('form')) {
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
 				'selectTags' => ['tag', 'value'],
+				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
@@ -870,7 +871,6 @@ if (hasRequest('form')) {
 				'selectParentTemplates' => ['templateid'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectHostDiscovery' => ['parent_hostid'],
-				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
