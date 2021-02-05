@@ -47,7 +47,7 @@ foreach (array_keys($item_types) as $type) {
 }
 
 zbx_add_post_js("var filterTypeSwitcher".
-	" = new CViewSwitcher('filter_type', 'change', ".json_encode($filter_type_visibility, true).');'
+	" = new CViewSwitcher('filter_type', 'change', ".json_encode($filter_type_visibility).");"
 );
 
 // First column
