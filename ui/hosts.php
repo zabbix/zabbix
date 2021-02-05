@@ -520,63 +520,39 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		else {
 			$db_valuemaps = API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
+				'output' => [],
 				'hostids' => $hostId,
-				'selectMappings' => ['value', 'newvalue'],
 				'preservekeys' => true
 			]);
 		}
 
-		$valuemaps_create = [];
-		$valuemaps_update = [];
-		$valuemaps_delete = array_column($db_valuemaps, 'valuemapid');
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = array_fill_keys(array_keys($db_valuemaps), '');
 
-		if ($valuemaps) {
-			$valuemaps_delete = array_flip($valuemaps_delete);
-
-			foreach ($valuemaps as $valuemap) {
-				$db_valuemap = array_key_exists('valuemapid', $valuemap) ? $db_valuemaps[$valuemap['valuemapid']] : [];
-
-				if ($db_valuemap) {
-					$update = [];
-					$db_mappings = array_column($db_valuemap['mappings'], 'newvalue', 'value');
-					$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
-
-					if ($db_valuemap['name'] !== $valuemap['name']) {
-						$update['name'] = $valuemap['name'];
-					}
-
-					if (array_diff($db_mappings, $mappings) || array_diff($mappings, $db_mappings)) {
-						$update['mappings'] = $valuemap['mappings'];
-					}
-
-					if ($update) {
-						$valuemaps_update[] = ['valuemapid' => $valuemap['valuemapid']] + $update;
-					}
-
-					unset($valuemaps_delete[$valuemap['valuemapid']]);
-				}
-				else {
-					$valuemaps_create[] = [
-						'name' => $valuemap['name'],
-						'hostid' => $hostId,
-						'mappings' => $valuemap['mappings']
-					];
-				}
+		foreach ($valuemaps as $valuemap) {
+			if (array_key_exists('valuemapid', $valuemap)) {
+				$upd_valuemaps[] = $valuemap;
+				unset($del_valuemapids[$valuemap['valuemapid']]);
 			}
-
-			$valuemaps_delete = array_keys($valuemaps_delete);
+			else {
+				$ins_valuemaps[] = [
+					'name' => $valuemap['name'],
+					'hostid' => $hostId,
+					'mappings' => $valuemap['mappings']
+				];
+			}
 		}
 
-		if ($valuemaps_update && !API::ValueMap()->update($valuemaps_update)) {
+		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
 			throw new Exception();
 		}
 
-		if ($valuemaps_create && !API::ValueMap()->create($valuemaps_create)) {
+		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
 			throw new Exception();
 		}
 
-		if ($valuemaps_delete && !API::ValueMap()->delete($valuemaps_delete)) {
+		if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
 			throw new Exception();
 		}
 
