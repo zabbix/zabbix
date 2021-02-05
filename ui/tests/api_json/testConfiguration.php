@@ -880,25 +880,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'yaml',
 				'parameter' => 'valueMaps',
-				'source' => "
-					zabbix_export:
-						version: '5.4'
-						date: '2016-12-12T07:18:00Z'
-						hosts:
-						-
-							host: 'API yaml import host'
-							name: 'API yaml import host'
-							groups:
-							-
-								name: 'Linux servers'
-							valuemaps:
-							-
-								name: 'API valueMap yaml import'
-								mappings:
-								-
-									value: '1'
-									newvalue: Up
-				",
+				'source' => "zabbix_export:\n  date: '2016-12-12T07:18:00Z'\n  hosts:\n  -\n    host: 'API yaml import host'\n    name: 'API yaml import host'\n    groups:\n    -\n      name: 'Linux servers'\n      valuemaps:\n      -\n        name: 'API valueMap yaml import'\n        mappings:\n        -\n          value: '1'\n          newvalue: Up",
 				'sql' => 'select * from valuemap where name=\'API valueMap yaml import\''
 			]
 		];
