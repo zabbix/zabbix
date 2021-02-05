@@ -116,7 +116,6 @@ class CControllerPopupMassupdateItem extends CController {
 		foreach ($tags as $key => $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
 				unset($tags[$key]);
-				continue;
 			}
 			else {
 				unset($tags[$key]['type']);

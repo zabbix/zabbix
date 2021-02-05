@@ -96,7 +96,6 @@ if (isset($_REQUEST['favobj'])) {
 							foreach ($element['tags'] as $key => $tag) {
 								if ($tag['tag'] === '' && $tag['value'] === '') {
 									unset($element['tags'][$key]);
-									continue;
 								}
 							}
 						}
