@@ -500,7 +500,8 @@
 		new CViewSwitcher('agent', 'change', config.agent_visibility);
 		this.pairs = {
 			'variables': null,
-			'headers': null
+			'headers': null,
+			'connect_to': null
 		};
 
 		jQuery('.httpconf-dynamic-row', $tab).each(function(index, table) {
@@ -522,6 +523,10 @@
 
 				if (type === 'headers') {
 					e.new_node.querySelector('[data-type="value"]').setAttribute('maxlength', 2000);
+				}
+
+				if (type === 'connect_to') {
+					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 				}
 			});
 
@@ -556,6 +561,13 @@
 		eachPair.call(this.pairs.variables, function(pair) {
 			prefix = 'pairs[' + (iter ++) + ']';
 			frag.appendChild(hiddenInput('type', 'variables', prefix));
+			frag.appendChild(hiddenInput('name', pair.name, prefix));
+			frag.appendChild(hiddenInput('value', pair.value, prefix));
+		});
+
+		eachPair.call(this.pairs.connect_to, function(pair) {
+			prefix = 'pairs[' + (iter ++) + ']';
+			frag.appendChild(hiddenInput('type', 'connect_to', prefix));
 			frag.appendChild(hiddenInput('name', pair.name, prefix));
 			frag.appendChild(hiddenInput('value', pair.value, prefix));
 		});
@@ -672,6 +684,12 @@
 				frag.appendChild(hiddenInput('value', pair.value, prefix_pair));
 			});
 
+			step.data.pairs.connect_to.forEach(function(pair) {
+				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
+				frag.appendChild(hiddenInput('type',  'connect_to',  prefix_pair));
+				frag.appendChild(hiddenInput('name',  pair.name,  prefix_pair));
+				frag.appendChild(hiddenInput('value', pair.value, prefix_pair));
+			});
 		}.bind(this));
 
 		return frag;
@@ -757,7 +775,8 @@
 				query_fields: [],
 				post_fields: [],
 				variables: [],
-				headers: []
+				headers: [],
+				connect_to: []
 			}
 		};
 		this.data = jQuery.extend(true, data, defaults);
@@ -817,7 +836,8 @@
 			query_fields: null,
 			post_fields: null,
 			variables: null,
-			headers: null
+			headers: null,
+			connect_to: null
 		};
 
 		$pairs.each(function(index, node) {
@@ -836,6 +856,13 @@
 					e.new_node.querySelector('[data-type="value"]').setAttribute('maxlength', 2000);
 				});
 			}
+
+			if (type === 'connect_to') {
+				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+				});
+			}
+
 
 			var dynamic_rows = new DynamicRows($node, {
 					add_before: $node.find('.element-table-add').closest('tr')[0],

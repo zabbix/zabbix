@@ -221,7 +221,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$steps = getRequest('steps', []);
-		$field_names = ['headers', 'variables', 'post_fields', 'query_fields'];
+		$field_names = ['headers', 'variables', 'connect_to', 'post_fields', 'query_fields'];
 		$i = 1;
 
 		foreach ($steps as &$step) {
@@ -281,11 +281,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ssl_cert_file' => getRequest('ssl_cert_file'),
 			'ssl_key_file' => getRequest('ssl_key_file'),
 			'ssl_key_password' => getRequest('ssl_key_password'),
-			'headers' => []
+			'headers' => [],
+			'connect_to' => []
 		];
 
 		foreach (getRequest('pairs', []) as $pair) {
-			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
+			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers', 'connect_to']) &&
 				((array_key_exists('name', $pair) && $pair['name'] !== '') ||
 				(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
 
@@ -345,7 +346,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
 			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, ['applicationid']);
-			foreach (['headers', 'variables'] as $field_name) {
+			foreach (['headers', 'variables','connect_to'] as $field_name) {
 				if (count($httpTest[$field_name]) !== count($dbHttpTest[$field_name])) {
 					continue;
 				}
@@ -372,7 +373,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (array_key_exists('httpstepid', $step) && array_key_exists($step['httpstepid'], $dbHttpSteps)) {
 					$db_step = $dbHttpSteps[$step['httpstepid']];
 					$new_step = CArrayHelper::unsetEqualValues($step, $db_step, ['httpstepid']);
-					foreach (['headers', 'variables', 'posts', 'query_fields'] as $field_name) {
+					foreach (['headers', 'variables', 'posts', 'query_fields', 'connect_to'] as $field_name) {
 						if (!array_key_exists($field_name, $new_step)
 								|| !is_array($new_step[$field_name]) || !is_array($db_step[$field_name])
 								|| count($new_step[$field_name]) !== count($db_step[$field_name])) {
@@ -560,10 +561,10 @@ if (isset($_REQUEST['form'])) {
 		$db_httptests = API::HttpTest()->get([
 			'output' => ['name', 'applicationid', 'delay', 'retries', 'status', 'agent', 'authentication',
 				'http_user', 'http_password', 'http_proxy', 'templateid', 'verify_peer', 'verify_host', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'headers', 'variables'
+				'ssl_key_file', 'ssl_key_password', 'headers', 'variables', 'connect_to'
 			],
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
-				'follow_redirects', 'retrieve_mode', 'headers', 'variables', 'query_fields', 'post_type'
+				'follow_redirects', 'retrieve_mode', 'headers', 'variables', 'query_fields', 'post_type', 'connect_to'
 			],
 			'httptestids' => getRequest('httptestid')
 		]);
@@ -598,7 +599,8 @@ if (isset($_REQUEST['form'])) {
 
 		$fields = [
 			'headers' => 'headers',
-			'variables' => 'variables'
+			'variables' => 'variables',
+			'connect_to' => 'connect_to'
 		];
 
 		CArrayHelper::sort($db_httptest['variables'], ['name']);
@@ -618,6 +620,7 @@ if (isset($_REQUEST['form'])) {
 		$data['http_user'] = $db_httptest['http_user'];
 		$data['http_password'] = $db_httptest['http_password'];
 		$data['http_proxy'] = $db_httptest['http_proxy'];
+		$data['connect_to'] = $db_httptest['connect_to'];
 		$data['templated'] = (bool) $db_httptest['templateid'];
 
 		$data['verify_peer'] = $db_httptest['verify_peer'];
@@ -632,7 +635,8 @@ if (isset($_REQUEST['form'])) {
 			'headers' => 'headers',
 			'variables' => 'variables',
 			'query_fields' => 'query_fields',
-			'post_fields' => 'posts'
+			'post_fields' => 'posts',
+			'connect_to' => 'connect_to'
 		];
 
 		foreach ($data['steps'] as &$step) {
@@ -694,6 +698,7 @@ if (isset($_REQUEST['form'])) {
 		$data['http_user'] = getRequest('http_user', '');
 		$data['http_password'] = getRequest('http_password', '');
 		$data['http_proxy'] = getRequest('http_proxy', '');
+		$data['connect_to'] = getRequest('connect_to', '');
 		$data['templated'] = (bool) getRequest('templated');
 		$data['steps'] = getRequest('steps', []);
 		$data['verify_peer'] = getRequest('verify_peer');

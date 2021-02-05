@@ -284,6 +284,10 @@ class CHttpTest extends CApiService {
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
+			'connect_to' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
+			]],
 			'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
@@ -317,6 +321,10 @@ class CHttpTest extends CApiService {
 				'headers' =>			['type' => API_OBJECTS, 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
+				]],
+				'connect_to' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
@@ -354,7 +362,7 @@ class CHttpTest extends CApiService {
 		Manager::HttpTest()->persist($httptests);
 
 		foreach ($db_httptests as &$db_httptest) {
-			unset($db_httptest['headers'], $db_httptest['variables'], $db_httptest['steps']);
+			unset($db_httptest['headers'], $db_httptest['variables'], $db_httptest['steps'], $db_httptest['connect_to']);
 		}
 		unset($db_httptest);
 
@@ -382,6 +390,10 @@ class CHttpTest extends CApiService {
 				'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
+			'connect_to' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
+				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
+			]],
 			'headers' =>			['type' => API_OBJECTS, 'fields' => [
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'name')],
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
@@ -405,6 +417,10 @@ class CHttpTest extends CApiService {
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
 				'posts' =>				['type' => API_HTTP_POST, 'length' => DB::getFieldLength('httpstep', 'posts'), 'name-length' => DB::getFieldLength('httpstep_field', 'name'), 'value-length' => DB::getFieldLength('httpstep_field', 'value')],
+				'connect_to' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest_field', 'value')]
+				]],
 				'variables' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 					'name' =>				['type' => API_VARIABLE_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httpstep_field', 'value')]
@@ -441,6 +457,7 @@ class CHttpTest extends CApiService {
 		foreach ($db_httptests as &$db_httptest) {
 			$db_httptest['headers'] = [];
 			$db_httptest['variables'] = [];
+			$db_httptest['connect_to'] = [];
 			$db_httptest['steps'] = zbx_toHash($db_httptest['steps'], 'httpstepid');
 		}
 		unset($db_httptest);
@@ -804,7 +821,6 @@ class CHttpTest extends CApiService {
 				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
 			}
 		}
-
 		return $sqlParts;
 	}
 
@@ -816,7 +832,8 @@ class CHttpTest extends CApiService {
 		// adding headers and variables
 		$fields = [
 			ZBX_HTTPFIELD_HEADER => 'headers',
-			ZBX_HTTPFIELD_VARIABLE => 'variables'
+			ZBX_HTTPFIELD_VARIABLE => 'variables',
+			ZBX_HTTPFIELD_CONNECT_TO => 'connect_to'
 		];
 		foreach ($fields as $type => $field) {
 			if (!$this->outputIsRequested($field, $options['output'])) {
@@ -869,7 +886,8 @@ class CHttpTest extends CApiService {
 					ZBX_HTTPFIELD_HEADER => 'headers',
 					ZBX_HTTPFIELD_VARIABLE => 'variables',
 					ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields',
-					ZBX_HTTPFIELD_POST_FIELD => 'posts'
+					ZBX_HTTPFIELD_POST_FIELD => 'posts',
+					ZBX_HTTPFIELD_CONNECT_TO=> 'connect_to'
 				];
 				foreach ($fields as $type => $field) {
 					if (!$this->outputIsRequested($field, $options['selectSteps'])) {

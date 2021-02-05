@@ -358,7 +358,7 @@ function copyHttpTests($srcHostId, $dstHostId) {
 	$httpTests = API::HttpTest()->get([
 		'output' => ['name', 'applicationid', 'delay', 'status', 'variables', 'agent', 'authentication',
 			'http_user', 'http_password', 'http_proxy', 'retries', 'ssl_cert_file', 'ssl_key_file',
-			'ssl_key_password', 'verify_peer', 'verify_host', 'headers'
+			'ssl_key_password', 'verify_peer', 'verify_host', 'headers', 'connect_to'
 		],
 		'hostids' => $srcHostId,
 		'selectSteps' => ['name', 'no', 'url', 'query_fields', 'timeout', 'posts', 'required', 'status_codes',

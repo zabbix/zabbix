@@ -266,11 +266,11 @@ class CHttpTestManager {
 		$httpTests = API::HttpTest()->get([
 			'output' => ['httptestid', 'name', 'applicationid', 'delay', 'status', 'agent', 'authentication',
 				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
-				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'variables', 'headers'
+				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'variables', 'headers', 'connect_to'
 			],
 			'hostids' => $templateId,
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required', 'status_codes',
-				'follow_redirects', 'retrieve_mode', 'variables', 'headers', 'query_fields'
+				'follow_redirects', 'retrieve_mode', 'variables', 'headers', 'query_fields', 'connect_to'
 			],
 			'preservekeys' => true
 		]);
@@ -759,12 +759,16 @@ class CHttpTestManager {
 	 * @param array  $httptests['headers']             (optional)
 	 * @param string $httptests['headers']['name']
 	 * @param string $httptests['headers']['value']
+	 * @param array  $httptests['connect_to']             (optional)
+	 * @param string $httptests['connect_to']['name']
+	 * @param string $httptests['connect_to']['value']
 	 * @param string $method
 	 */
 	private function updateHttpTestFields(array $httptests, $method) {
 		$fields = [
 			ZBX_HTTPFIELD_VARIABLE => 'variables',
-			ZBX_HTTPFIELD_HEADER => 'headers'
+			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_CONNECT_TO => 'connect_to'
 		];
 		$httptest_fields = [];
 
@@ -860,6 +864,7 @@ class CHttpTestManager {
 		$fields = [
 			ZBX_HTTPFIELD_VARIABLE => 'variables',
 			ZBX_HTTPFIELD_HEADER => 'headers',
+			ZBX_HTTPFIELD_CONNECT_TO => 'connect_to',
 			ZBX_HTTPFIELD_POST_FIELD => 'post_fields',
 			ZBX_HTTPFIELD_QUERY_FIELD => 'query_fields'
 		];
