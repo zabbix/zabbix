@@ -8389,7 +8389,7 @@ static int	DCconfig_find_active_time_function(const char *expression)
 	const ZBX_DC_HOST	*dc_host;
 	const ZBX_DC_ITEM	*dc_item;
 
-	while (SUCCEED == get_N_functionid(expression, 1, &functionid, &expression))
+	while (SUCCEED == get_N_functionid(expression, 1, &functionid, NULL, &expression))
 	{
 		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
 			continue;

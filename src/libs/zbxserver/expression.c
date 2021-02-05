@@ -88,11 +88,14 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
  *                            '{11}=1 & {2346734}>5'                          *
  *             N_functionid - [IN] number of function in trigger expression   *
  *             functionid   - [OUT] ID of an N-th function in expression      *
+ *             start        - [OUT] a pointer to text preceding the extracted *
+ *                            function id (can be NULL)                       *
  *             end          - [OUT] a pointer to text following the extracted *
  *                            function id (can be NULL)                       *
  *                                                                            *
  ******************************************************************************/
-int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end)
+int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **start,
+		const char **end)
 {
 	enum state_t {NORMAL, ID}	state = NORMAL;
 	int				num = 0, ret = FAIL;
@@ -117,6 +120,8 @@ int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *fun
 
 			state = ID;
 			p_functionid = c + 1;
+			if (NULL != start)
+				*start = c;
 		}
 		else if ('}' == *c && ID == state && NULL != p_functionid)
 		{
@@ -199,7 +204,7 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d", __func__, expression, N_functionid);
 
-	if (SUCCEED == get_N_functionid(expression, N_functionid, &functionid, NULL))
+	if (SUCCEED == get_N_functionid(expression, N_functionid, &functionid, NULL, NULL))
 	{
 		DCconfig_get_functions_by_functionids(&function, &functionid, &errcode, 1);
 

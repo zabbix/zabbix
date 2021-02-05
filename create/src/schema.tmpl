@@ -88,6 +88,7 @@ FIELD		|proxy_address	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|auto_compress	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|custom_interfaces|t_integer	|'0'	|NOT NULL	|0
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -99,6 +100,7 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|internal	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|name
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
@@ -249,6 +251,7 @@ FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|applicationid
 UNIQUE		|2		|hostid,name
 INDEX		|3		|status
@@ -343,6 +346,7 @@ FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|hostid,key_(1021)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -686,6 +690,7 @@ FIELD		|manual_close	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|opdata		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
@@ -727,6 +732,7 @@ FIELD		|ymin_itemid	|t_id		|	|NULL		|0			|2|items	|itemid		|RESTRICT
 FIELD		|ymax_itemid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|name
 INDEX		|2		|templateid
 INDEX		|3		|ymin_itemid
@@ -1676,6 +1682,7 @@ FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NULL		|0			|1|users	|	|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|hosts	|hostid
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|userid
 INDEX		|2		|templateid
 
@@ -1896,4 +1903,4 @@ INDEX	|4		|creator_userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030038	|5030038
+ROW		|5030056	|5030056
