@@ -1944,6 +1944,12 @@ Changes for 4.0.29rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+..F....... [ZBX-18931] fixed PHP runtime errors in CLineGraphDraw.php (Sasha)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.28
