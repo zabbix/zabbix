@@ -842,6 +842,9 @@ class testConfiguration extends CAPITest {
 				'rules' => [
 					$parameter => [
 						'createMissing' => true
+					],
+					'hosts' => [
+						'createMissing' => true
 					]
 				],
 				'source' => $source
