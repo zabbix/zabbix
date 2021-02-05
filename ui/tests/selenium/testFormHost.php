@@ -193,7 +193,6 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_Layout() {
-
 		$this->page->login()->open('hosts.php?form=update&hostid='.self::$hostids['testFormHost with items']);
 		$form = $this->query('id:hosts-form')->asForm()->one()->waitUntilVisible();
 		// Host form fields maxlength attribute.
@@ -579,6 +578,61 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
+			// Different versions of SNMP interface and encryption.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'host_fields' => [
+						'Host name' => 'Host with different versions of SNMP interface',
+						'Groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv1',
+							'SNMP community' => 'test'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_TEST}'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA224'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA256',
+							'Privacy protocol' => 'AES192'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA384',
+							'Privacy protocol' => 'AES192C'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'SNMP version' => 'SNMPv3',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA512',
+							'Privacy protocol' => 'AES256C'
+						]
+					]
+				]
+			],
 			// All interfaces and all fields in form.
 			[
 				[
@@ -611,9 +665,9 @@ class testFormHost extends CWebTest {
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'ccc',
-							'Privacy protocol' => 'AES',
+							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => 'ddd',
 							'Use bulk requests' => false
 						],
@@ -1062,9 +1116,9 @@ class testFormHost extends CWebTest {
 							'Context name' => 'zabbix',
 							'Security name' => 'selenium',
 							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA1',
 							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES',
+							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => '456test',
 							'default' => true
 						],
@@ -1131,7 +1185,7 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
-							'Authentication protocol' => 'SHA',
+							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
 							'Use bulk requests' => true
 						],
@@ -1465,8 +1519,14 @@ class testFormHost extends CWebTest {
 							'dns' => '',
 							'Connect to' => 'IP',
 							'port' => '122',
-							'SNMP version' => 'SNMPv1',
-							'SNMP community' => 'zabbix',
+							'SNMP version' => 'SNMPv3',
+							'Context name' => 'zabbix',
+							'Security name' => 'selenium',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA256',
+							'Authentication passphrase' => 'test123',
+							'Privacy protocol' => 'AES256',
+							'Privacy passphrase' => '456test',
 							'Use bulk requests' => false
 						]
 					]

@@ -597,17 +597,20 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Create HTML helper element for host interfaces availability.
  *
- * @param array $host_interfaces                              Array of arrays of host interfaces.
- * @param int   $host_interfaces[]['type']                    Interface type.
- * @param int   $host_interfaces[]['available']               Interface availability.
- * @param int   $host_interfaces[]['useip']                   Interface use IP or DNS.
- * @param int   $host_interfaces[]['ip']                      Interface IP address.
- * @param int   $host_interfaces[]['dns']                     Interface domain name.
- * @param int   $host_interfaces[]['port']                    Interface port.
- * @param int   $host_interfaces[]['details']['version']      Interface SNMP version.
- * @param int   $host_interfaces[]['details']['contextname']  Interface context name for SNMP version 3.
- * @param int   $host_interfaces[]['details']['community']    Interface community for SNMP non version 3 interface.
- * @param int   $host_interfaces[]['error']                   Interface error message.
+ * @param array $host_interfaces                                Array of arrays of host interfaces.
+ * @param int   $host_interfaces[]['type']                      Interface type.
+ * @param int   $host_interfaces[]['available']                 Interface availability.
+ * @param int   $host_interfaces[]['useip']                     Interface use IP or DNS.
+ * @param int   $host_interfaces[]['ip']                        Interface IP address.
+ * @param int   $host_interfaces[]['dns']                       Interface domain name.
+ * @param int   $host_interfaces[]['port']                      Interface port.
+ * @param int   $host_interfaces[]['details']['version']        Interface SNMP version.
+ * @param int   $host_interfaces[]['details']['contextname']    Interface context name for SNMP version 3.
+ * @param int   $host_interfaces[]['details']['community']      Interface community for SNMP non version 3 interface.
+ * @param int   $host_interfaces[]['details']['securitylevel']  Security level for SNMP version 3 interface.
+ * @param int   $host_interfaces[]['details']['authprotocol']   Authentication protocol for SNMP version 3 interface.
+ * @param int   $host_interfaces[]['details']['privprotocol']   Privacy protocol for SNMP version 3 interface.
+ * @param int   $host_interfaces[]['error']                     Interface error message.
  *
  * @return CHostAvailability
  */
@@ -618,11 +621,7 @@ function getHostAvailabilityTable($host_interfaces): CHostAvailability {
 		$description = null;
 
 		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-			$version = $interface['details']['version'];
-			$description = vsprintf('%s, %s: %s', ($version == SNMP_V3)
-				? [_s('SNMPv%1$d', $version), _('Context name'), $interface['details']['contextname']]
-				: [_s('SNMPv%1$d', $version), _x('Community', 'SNMP Community'), $interface['details']['community']]
-			);
+			$description = getSnmpInterfaceDescription($interface);
 		}
 
 		$interfaces[] = [
