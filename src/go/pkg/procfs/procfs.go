@@ -40,7 +40,7 @@ const (
 // GetMemory reads /proc/meminfo file and returns and returns the value in bytes for the
 // specific memory type. Returns an error if the value was not found, or if theres is an issue
 // with reading the file or parsing the value.
-func GetMemory(memType string) (mem float64, err error) {
+func GetMemory(memType string) (mem uint64, err error) {
 	meminfo, err := ReadAll("/proc/meminfo")
 	if err != nil {
 		return mem, fmt.Errorf("cannot read meminfo file: %s", err.Error())
@@ -71,9 +71,10 @@ func ReadAll(filename string) (data []byte, err error) {
 	b := make([]byte, 2048)
 	for {
 		var n int
-		if n, err = syscall.Read(fd, b); err != nil {
+		if n, err = syscall.Read(fd, b); err != nil && !errors.Is(err, syscall.EINTR) {
 			return
 		}
+
 		if n == 0 {
 			return buf.Bytes(), nil
 		}
@@ -86,7 +87,7 @@ func ReadAll(filename string) (data []byte, err error) {
 // ByteFromProcFileData returns the value in bytes of the provided value name from the provided
 // process file data. Returns true if the value is found, and false if it is not or if there is an
 // error. Returns an error if the theres is an issue with parsing values.
-func ByteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
+func ByteFromProcFileData(data []byte, valueName string) (uint64, bool, error) {
 	for _, line := range strings.Split(string(data), "\n") {
 		i := strings.Index(line, ":")
 		if i < 0 || valueName != line[:i] {
@@ -98,7 +99,7 @@ func ByteFromProcFileData(data []byte, valueName string) (float64, bool, error) 
 			continue
 		}
 
-		v, err := strconv.Atoi(strings.TrimSpace(line[:len(line)-2]))
+		v, err := strconv.ParseUint(strings.TrimSpace(line[:len(line)-2]), 10, 64)
 		if err != nil {
 			return 0, false, err
 		}
@@ -115,7 +116,7 @@ func ByteFromProcFileData(data []byte, valueName string) (float64, bool, error) 
 		default:
 			return 0, false, errors.New("cannot resolve value type")
 		}
-		return float64(v), true, nil
+		return v, true, nil
 	}
 
 	return 0, false, nil

@@ -22,41 +22,36 @@ package memory
 import (
 	"errors"
 
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/procfs"
 	"zabbix.com/pkg/zbxerr"
 )
 
 func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error) {
-	var mem float64
-
 	switch mode {
 	case "total", "":
-		mem, err = procfs.GetMemory("MemTotal")
+		result, err = procfs.GetMemory("MemTotal")
 	case "free":
-		mem, err = procfs.GetMemory("MemFree")
+		result, err = procfs.GetMemory("MemFree")
 	case "buffers":
-		mem, err = procfs.GetMemory("Buffers")
+		result, err = procfs.GetMemory("Buffers")
 	case "used":
-		mem, err = getUsed(false)
+		result, _, err = getUsedAndTotal()
 	case "pused":
-		mem, err = getUsed(true)
+		result, err = getPUsed()
 	case "available":
-		mem, err = getAvailable(false)
+		result, err = getAvailable()
 	case "pavailable":
-		mem, err = getAvailable(true)
-	case "shared":
-		return nil, plugin.UnsupportedMetricError
+		result, err = getPAvailable()
 	case "cached":
-		mem, err = procfs.GetMemory("Cached")
+		result, err = procfs.GetMemory("Cached")
 	case "active":
-		mem, err = procfs.GetMemory("Active")
+		result, err = procfs.GetMemory("Active")
 	case "anon":
-		mem, err = procfs.GetMemory("AnonPages")
+		result, err = procfs.GetMemory("AnonPages")
 	case "inactive":
-		mem, err = procfs.GetMemory("Inactive")
+		result, err = procfs.GetMemory("Inactive")
 	case "slab":
-		mem, err = procfs.GetMemory("Slab")
+		result, err = procfs.GetMemory("Slab")
 	default:
 		return nil, errors.New("Invalid first parameter.")
 	}
@@ -65,34 +60,33 @@ func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error)
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	if mode == "pused" || mode == "pavailable" {
-		return mem, nil
-	}
-
-	result = int(mem)
-
 	return
 }
 
-func getUsed(percent bool) (float64, error) {
+func getUsedAndTotal() (uint64, uint64, error) {
 	total, err := procfs.GetMemory("MemTotal")
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
 	free, err := procfs.GetMemory("MemFree")
 	if err != nil {
+		return 0, 0, err
+	}
+
+	return total - free, total, nil
+}
+
+func getPUsed() (float64, error) {
+	used, total, err := getUsedAndTotal()
+	if err != nil {
 		return 0, err
 	}
 
-	if percent {
-		return (total - free) / total * float64(100), nil
-	}
-
-	return total - free, nil
+	return float64(used) / float64(total) * 100, nil
 }
 
-func getAvailable(percent bool) (float64, error) {
+func getAvailable() (uint64, error) {
 	mem, err := procfs.GetMemory("MemAvailable")
 	if err != nil {
 		cached, err := procfs.GetMemory("Cached")
@@ -113,14 +107,19 @@ func getAvailable(percent bool) (float64, error) {
 		mem = (free + buff) + cached
 	}
 
-	if percent {
-		total, err := procfs.GetMemory("MemTotal")
-		if err != nil {
-			return 0, err
-		}
+	return mem, nil
+}
 
-		return mem / total * float64(100), nil
+func getPAvailable() (float64, error) {
+	mem, err := getAvailable()
+	if err != nil {
+		return 0, err
 	}
 
-	return mem, nil
+	total, err := procfs.GetMemory("MemTotal")
+	if err != nil {
+		return 0, err
+	}
+
+	return float64(mem) / float64(total) * 100, nil
 }

@@ -452,7 +452,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 		return nil, errors.New("Invalid third parameter.")
 	}
 
-	var mem float64
+	var mem uint64
 	if memtype == "pmem" {
 		mem, err = procfs.GetMemory("MemTotal")
 		if err != nil {
@@ -475,7 +475,6 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 
 	var count int
 	var memSize, value float64
-	var found bool
 	var cmdRgx *regexp.Regexp
 	if cmdline != "" {
 		cmdRgx, err = regexp.Compile(cmdline)
@@ -521,7 +520,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 				continue
 			}
 
-			value = vmRSS / mem * 100.00
+			value = float64(vmRSS) / float64(mem) * 100.00
 		case "size":
 			vmData, found, err := procfs.ByteFromProcFileData(data, "VmData")
 			if err != nil {
@@ -551,7 +550,7 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 			}
 			value = float64(vmData + vmStk + vmExe)
 		default:
-			value, found, err = procfs.ByteFromProcFileData(data, typeStr)
+			typeValue, found, err := procfs.ByteFromProcFileData(data, typeStr)
 			if err != nil {
 				return nil, fmt.Errorf("Cannot obtain amount of %s: %s", typeStr, err.Error())
 			}
@@ -559,6 +558,8 @@ func (p *PluginExport) Export(key string, params []string, ctx plugin.ContextPro
 			if !found {
 				continue
 			}
+
+			value = float64(typeValue)
 		}
 
 		if count != 0 {

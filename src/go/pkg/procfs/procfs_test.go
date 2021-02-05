@@ -50,7 +50,7 @@ func Test_byteFromProcFileData(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		wantValue float64
+		wantValue uint64
 		wantFound bool
 		wantErr   bool
 	}{
