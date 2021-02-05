@@ -64,15 +64,16 @@ class CSortable extends CBaseComponent {
 	}
 
 	/**
-	 * Add item to the list.
+	 * Insert item to the list before the reference item or at the end.
 	 *
 	 * @param {HTMLLIElement}      item
 	 * @param {HTMLLIElement|null} reference_item
 	 *
 	 * @returns {CSortable}
 	 */
-	addItem(item, reference_item = null) {
+	insertItemBefore(item, reference_item = null) {
 		item.classList.add(ZBX_STYLE_SORTABLE_ITEM);
+		item.tabIndex = 0;
 
 		this._stopDragging();
 		this._list.insertBefore(item, reference_item);
@@ -99,13 +100,13 @@ class CSortable extends CBaseComponent {
 	}
 
 	/**
-	 * Scroll item into view.
+	 * Focus item and scroll it into view.
 	 *
 	 * @param {HTMLLIElement} item
 	 *
 	 * @returns {CSortable}
 	 */
-	scrollItemIntoView(item) {
+	focusItem(item) {
 		if (item.parentNode != this._list) {
 			throw RangeError('Item does not belong to the list.')
 		}
@@ -452,7 +453,12 @@ class CSortable extends CBaseComponent {
 				}
 			},
 
-			targetWheel: (e) => {
+			targetScroll: (e) => {
+				// Prevent browsers from automatically scrolling focusable elements into view.
+				this._target[this._is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
+			},
+
+			wheel: (e) => {
 				e.preventDefault();
 
 				if (mouse_down_item !== null) {
@@ -475,11 +481,6 @@ class CSortable extends CBaseComponent {
 				}
 			},
 
-			targetScroll: (e) => {
-				// Prevent focusable child element scrolling into view.
-				this._target[this._is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
-			},
-
 			listMouseDown: (e) => {
 				// Prevent clicks while transitions are running.
 				if (transitions_set.size > 0) {
@@ -494,7 +495,7 @@ class CSortable extends CBaseComponent {
 				}
 
 				// Scroll item into view if it is partially visible.
-				this.scrollItemIntoView(mouse_down_item);
+				this.focusItem(mouse_down_item);
 
 				// Drag handle specified, but clicked elsewhere?
 				if (mouse_down_item.getElementsByClassName(ZBX_STYLE_SORTABLE_DRAG_HANDLE).length > 0
@@ -507,10 +508,10 @@ class CSortable extends CBaseComponent {
 				// Save initial mouse position.
 				mouse_down_pos = this._is_vertical ? e.clientY : e.clientX;
 
-				this._target.removeEventListener('wheel', this._events.targetWheel);
+				this._target.removeEventListener('wheel', this._events.wheel);
 				window.addEventListener('mousemove', this._events.windowMouseMove);
 				window.addEventListener('mouseup', this._events.windowMouseUp);
-				window.addEventListener('wheel', this._events.targetWheel, {passive: false});
+				window.addEventListener('wheel', this._events.wheel, {passive: false});
 			},
 
 			windowMouseMove: (e) => {
@@ -561,8 +562,40 @@ class CSortable extends CBaseComponent {
 
 				window.removeEventListener('mousemove', this._events.windowMouseMove);
 				window.removeEventListener('mouseup', this._events.windowMouseUp);
-				window.removeEventListener('wheel', this._events.targetWheel);
-				this._target.addEventListener('wheel', this._events.targetWheel, {passive: false});
+				window.removeEventListener('wheel', this._events.wheel);
+				this._target.addEventListener('wheel', this._events.wheel, {passive: false});
+			},
+
+			listKeyDown: (e) => {
+				if (e.target.parentNode != this._list) {
+					return;
+				}
+
+				if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || !e.ctrlKey) {
+					return;
+				}
+
+				const reference_item = (e.key === 'ArrowLeft')
+					? e.target.previousSibling
+					: (e.target.nextSibling ? e.target.nextSibling.nextSibling : null);
+
+				// Leftmost element already focused?
+				if (e.key === 'ArrowLeft' && reference_item === null) {
+					return;
+				}
+
+				this.insertItemBefore(e.target, reference_item);
+
+				// Re-focus the moved item.
+				e.target.focus();
+			},
+
+			listFocusIn: (e) => {
+				if (e.target.parentNode != this._list) {
+					return;
+				}
+
+				this.focusItem(e.target);
 			},
 
 			listRunTransition: (e) => {
@@ -611,10 +644,12 @@ class CSortable extends CBaseComponent {
 		let end_dragging_after_transitions = false;
 
 		this._target.addEventListener('click', this._events.targetClick);
-		this._target.addEventListener('wheel', this._events.targetWheel, {passive: false});
-		this._target.addEventListener('scroll', this._events.targetScroll, {passive: false});
+		this._target.addEventListener('scroll', this._events.targetScroll);
+		this._target.addEventListener('wheel', this._events.wheel, {passive: false});
 		this._target.addEventListener('_drag_stop', this._events._stopDragging);
 		this._list.addEventListener('mousedown', this._events.listMouseDown);
+		this._list.addEventListener('keydown', this._events.listKeyDown);
+		this._list.addEventListener('focusin', this._events.listFocusIn);
 		this._list.addEventListener('transitionrun', this._events.listRunTransition);
 		this._list.addEventListener('transitionend', this._events.listEndTransition);
 	}

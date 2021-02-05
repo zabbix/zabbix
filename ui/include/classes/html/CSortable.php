@@ -65,7 +65,11 @@ class CSortable extends CTag {
 		$list = (new CTag('ul', true))->addClass(self::ZBX_STYLE_SORTABLE_LIST);
 
 		foreach ($this->list as $item) {
-			$list->addItem((new CTag('li', true, $item))->addClass(self::ZBX_STYLE_SORTABLE_ITEM));
+			$list->addItem(
+				(new CTag('li', true, $item))
+					->addClass(self::ZBX_STYLE_SORTABLE_ITEM)
+					->setAttribute('tabindex', '0')
+			);
 		}
 
 		$this->addItem($list);
