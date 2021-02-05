@@ -594,7 +594,7 @@ sub process_row
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
-sub timescaledb_create_extension
+sub timescaledb
 {
 	print<<EOF
 DO \$\$
@@ -666,11 +666,7 @@ BEGIN
 END \$\$;
 EOF
 	;
-	exit;
-}
 
-sub timescaledb_configure
-{
 	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
 		print<<EOF
@@ -696,7 +692,7 @@ EOF
 
 sub usage
 {
-	print "Usage: $0 [c|mysql|oracle|postgresql|sqlite3|timescaledb_create_extension|timescaledb_configure]\n";
+	print "Usage: $0 [c|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
 	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -759,14 +755,13 @@ sub main
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
 
-	if ($format eq 'c')					{ %output = %c; }
-	elsif ($format eq 'mysql')				{ %output = %mysql; }
-	elsif ($format eq 'oracle')				{ %output = %oracle; }
-	elsif ($format eq 'postgresql')				{ %output = %postgresql; }
-	elsif ($format eq 'sqlite3')				{ %output = %sqlite3; }
-	elsif ($format eq 'timescaledb_create_extension')	{ timescaledb_create_extension(); }
-	elsif ($format eq 'timescaledb_configure')		{ timescaledb_configure(); }
-	else							{ usage(); }
+	if ($format eq 'c')			{ %output = %c; }
+	elsif ($format eq 'mysql')		{ %output = %mysql; }
+	elsif ($format eq 'oracle')		{ %output = %oracle; }
+	elsif ($format eq 'postgresql')		{ %output = %postgresql; }
+	elsif ($format eq 'sqlite3')		{ %output = %sqlite3; }
+	elsif ($format eq 'timescaledb')	{ timescaledb(); }
+	else					{ usage(); }
 
 	process();
 

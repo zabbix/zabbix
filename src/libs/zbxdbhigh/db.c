@@ -886,7 +886,7 @@ void	DBcheck_capabilities(void)
 	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 */
 	if (MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB > (postgresql_version = zbx_dbms_get_version()))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Postgresql version %d is not supported with TimescaleDB, minimum is %d",
+		zabbix_log(LOG_LEVEL_CRIT, "PostgreSQL version %d is not supported with TimescaleDB, minimum is %d",
 				postgresql_version, MIN_POSTGRESQL_VERSION_WITH_TIMESCALEDB);
 
 		DBclose();
@@ -899,7 +899,7 @@ void	DBcheck_capabilities(void)
 	if (NULL == (row = DBfetch(result)))
 		goto clean;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %s", (char*)row[0]);
+	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %s", (char*)row[0]);
 
 	sscanf((const char*)row[0], "%d.%d.%d", &timescaledb_major, &timescaledb_minor, &timescaledb_patch);
 	timescaledb_version_full = timescaledb_major * 10000;

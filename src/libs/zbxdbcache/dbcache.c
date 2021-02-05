@@ -4298,8 +4298,7 @@ int	hc_get_history_compression_age(void)
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
 
-	if (0 == zbx_strcmp_null(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE) &&
-			ON == cfg.db.history_compression_status && 0 != cfg.db.history_compress_older)
+	if (ON == cfg.db.history_compression_status && 0 != cfg.db.history_compress_older)
 	{
 		compression_age = (int)time(NULL) - cfg.db.history_compress_older;
 	}

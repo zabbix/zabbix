@@ -73,8 +73,7 @@ dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) timescaledb_create_extension.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) timescaledb_configure.sql
+	$(MAKE) $(AM_MAKEFLAGS) timescaledb.sql
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \

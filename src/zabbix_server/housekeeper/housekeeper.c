@@ -571,7 +571,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, rule->table);
 
-		result = DBselect("SELECT drop_chunks(newer_than => 0 , table_name => '%s')", rule->table);
+		result = DBselect("SELECT drop_chunks(newer_than => 0, table_name => '%s')", rule->table);
 	}
 	else
 	{
@@ -587,7 +587,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
 
-		result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
+		result = DBselect("SELECT drop_chunks(newer_than => %d, table_name => '%s')", keep_from, rule->table);
 	}
 
 

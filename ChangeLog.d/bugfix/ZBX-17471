@@ -1,1 +1,1 @@
-........S. [ZBX-17471] fixed housekeeper not deleting history and trends for TimescaleDB (arimdjonoks)
+........S. [ZBX-17471] fixed housekeeper not deleting history and trends for TimescaleDB if storage period is 0 (arimdjonoks)
