@@ -152,14 +152,54 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.ZBX_SCRIPT_SCOPE_ACTION.', '.ZBX_SCRIPT_SCOPE_HOST.', '.ZBX_SCRIPT_SCOPE_EVENT.'.'
 			],
 			// Check script menu path.
-			'Test invalid menu_path' => [
+			'Test invalid menu_path for host scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for event scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test unexpected menu_path for action scope (default)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
 					'menu_path' => 'folder1/folder2/'.'/folder4'
 				],
-				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'menu_path' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
 			],
 			// Check script host access.
 			'Test invalid host_access (empty)' => [
@@ -913,12 +953,25 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful menu path (empty)' => [
+			'Test successful menu path for host scope (empty)' => [
 				'script' => [
 					[
 						'name' => 'API create script (menu path test 1)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful menu path for event scope (empty)' => [
+				'script' => [
+					[
+						'name' => 'API create script (menu path test 2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 						'menu_path' => ''
 					]
 				],
@@ -927,9 +980,10 @@ class testScripts extends CAPITest {
 			'Test successful menu path (empty root)' => [
 				'script' => [
 					[
-						'name' => 'API create script (menu path test 2)',
+						'name' => 'API create script (menu path test 3)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'menu_path' => '/'
 					]
 				],
@@ -938,9 +992,10 @@ class testScripts extends CAPITest {
 			'Test successful menu path (preceding slash)' => [
 				'script' => [
 					[
-						'name' => 'API create script (menu path test 3)',
+						'name' => 'API create script (menu path test 4)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'menu_path' => '/folder1/folder2'
 					]
 				],
@@ -949,9 +1004,10 @@ class testScripts extends CAPITest {
 			'Test successful menu path (trailing slash)' => [
 				'script' => [
 					[
-						'name' => 'API create script (menu path test 4)',
+						'name' => 'API create script (menu path test 5)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'menu_path' => 'folder1/folder2/'
 					]
 				],
@@ -960,9 +1016,10 @@ class testScripts extends CAPITest {
 			'Test successful menu path (preceding and trailing slash)' => [
 				'script' => [
 					[
-						'name' => 'API create script (menu path test 5)',
+						'name' => 'API create script (menu path test 6)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'menu_path' => '/folder1/folder2/'
 					]
 				],
@@ -971,9 +1028,10 @@ class testScripts extends CAPITest {
 			'Test successful menu path (no slash)' => [
 				'script' => [
 					[
-						'name' => 'API create script (menu path test 6)',
+						'name' => 'API create script (menu path test 7)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
 						'menu_path' => 'folder1/folder2'
 					]
 				],
@@ -1368,14 +1426,7 @@ class testScripts extends CAPITest {
 				$this->assertNotEmpty($db_script['command']);
 				$this->assertSame($db_script['command'], $scripts[$num]['command']);
 
-				// Optional common fields for all script types.
-				if (array_key_exists('menu_path', $scripts[$num])) {
-					$this->assertSame($db_script['menu_path'], $scripts[$num]['menu_path']);
-				}
-				else {
-					$this->assertEmpty($db_script['menu_path']);
-				}
-
+				// Check scope.
 				if (array_key_exists('scope', $scripts[$num])) {
 					$this->assertEquals($db_script['scope'], $scripts[$num]['scope']);
 				}
@@ -1383,6 +1434,20 @@ class testScripts extends CAPITest {
 					$this->assertEquals($db_script['scope'], CDBHelper::getDefault('scripts', 'scope'));
 				}
 
+				// Check menu path.
+				if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					$this->assertEmpty($db_script['menu_path']);
+				}
+				else {
+					if (array_key_exists('menu_path', $scripts[$num])) {
+						$this->assertSame($db_script['menu_path'], $scripts[$num]['menu_path']);
+					}
+					else {
+						$this->assertEmpty($db_script['menu_path']);
+					}
+				}
+
+				// Optional common fields for all script types.
 				if (array_key_exists('usrgrpid', $scripts[$num])) {
 					$this->assertSame($db_script['usrgrpid'], strval($scripts[$num]['usrgrpid']));
 				}
@@ -1740,12 +1805,57 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.ZBX_SCRIPT_SCOPE_ACTION.', '.ZBX_SCRIPT_SCOPE_HOST.', '.ZBX_SCRIPT_SCOPE_EVENT.'.'
 			],
 			// Check script menu path.
-			'Test invalid menu_path' => [
+			'Test invalid menu_path for host scope' => [
+				'script' => [
+					'scriptid' => 16,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for event scope' => [
+				'script' => [
+					'scriptid' => 17,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for host scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test invalid menu_path for event scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			'Test unexpected menu_path for action scope (empty)' => [
+				'script' => [
+					'scriptid' => 15,
+					'menu_path' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope' => [
 				'script' => [
 					'scriptid' => 15,
 					'menu_path' => 'folder1/folder2/'.'/folder4'
 				],
-				'expected_error' => 'Invalid parameter "/1/menu_path": directory cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
+			],
+			'Test unexpected menu_path for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'menu_path' => 'folder1/folder2/'.'/folder4'
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
 			],
 			// Check script host access.
 			'Test invalid host_access (empty)' => [
@@ -2387,6 +2497,22 @@ class testScripts extends CAPITest {
 						'usrgrpid' => 7,
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
+						'confirmation' => 'Do you want to reboot it?'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful custom script update with menu path' => [
+				'script' => [
+					[
+						'scriptid' => 16,
+						'name' => 'API custom script update with menu path',
+						'command' => 'reboot',
+						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
+						'host_access' => PERM_READ_WRITE,
+						'usrgrpid' => 7,
+						'groupid' => 4,
+						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
 						'menu_path' => '/root/folder1/'
 					]
@@ -2403,8 +2529,7 @@ class testScripts extends CAPITest {
 						'usrgrpid' => 7,
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
-						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/'
+						'confirmation' => 'Do you want to reboot it?'
 					]
 				],
 				'expected_error' => null
@@ -2420,7 +2545,6 @@ class testScripts extends CAPITest {
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/',
 						'port' => '{$MACRO}',
 						'username' => 'Jill',
 						'password' => 'Barry'
@@ -2439,7 +2563,6 @@ class testScripts extends CAPITest {
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/',
 						'port' => '{$MACRO}',
 						'username' => 'Jill',
 						'password' => 'Barry',
@@ -2484,7 +2607,6 @@ class testScripts extends CAPITest {
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/',
 						'port' => '{$MACRO}',
 						'username' => 'Barry'
 					]
@@ -2503,7 +2625,6 @@ class testScripts extends CAPITest {
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/',
 						'parameters' => [
 							[
 								'name' => 'param1',
@@ -2529,7 +2650,6 @@ class testScripts extends CAPITest {
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/',
 						'parameters' => []
 					]
 				],
@@ -2546,7 +2666,6 @@ class testScripts extends CAPITest {
 						'groupid' => 4,
 						'description' => 'Check successful update with all properties',
 						'confirmation' => 'Do you want to reboot it?',
-						'menu_path' => '/root/folder1/',
 						'parameters' => [
 							[
 								'name' => 'new_param_1',
@@ -3347,20 +3466,36 @@ class testScripts extends CAPITest {
 					$this->assertSame($db_script['command'], $db_upd_script['command']);
 				}
 
-				// Check menu path.
-				if (array_key_exists('menu_path', $script)) {
-					$this->assertSame($db_upd_script['menu_path'], $script['menu_path']);
-				}
-				else {
-					$this->assertSame($db_script['menu_path'], $db_upd_script['menu_path']);
-				}
-
 				// Check scope.
 				if (array_key_exists('scope',$script)) {
 					$this->assertEquals($db_upd_script['scope'], $script['scope']);
 				}
 				else {
 					$this->assertEquals($db_script['scope'], $db_upd_script['scope']);
+				}
+
+				if ($db_script['scope'] != $db_upd_script['scope']) {
+					if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+						$this->assertEmpty($db_script['menu_path']);
+					}
+					else {
+						// Check menu path.
+						if (array_key_exists('menu_path', $script)) {
+							$this->assertSame($db_upd_script['menu_path'], $script['menu_path']);
+						}
+						else {
+							$this->assertSame($db_script['menu_path'], $db_upd_script['menu_path']);
+						}
+					}
+				}
+				else {
+					// Check menu path.
+					if (array_key_exists('menu_path', $script)) {
+						$this->assertSame($db_upd_script['menu_path'], $script['menu_path']);
+					}
+					else {
+						$this->assertSame($db_script['menu_path'], $db_upd_script['menu_path']);
+					}
 				}
 
 				// Check user group ID.

@@ -284,16 +284,18 @@ class CScript extends CApiService {
 		foreach ($scripts as $script) {
 			$path = '/'.++$i;
 
-			$opt_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
-			$opt_rules['fields'] += $common_fields;
+			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
+			$scope_rules = $this->getScopeValidationRules($script['scope'], 'create', $scope_fields);
 
-			if (!CApiInputValidator::validate($opt_rules, $script, $path, $error)) {
+			$type_rules['fields'] += $common_fields + $scope_fields;
+
+			if (!CApiInputValidator::validate($type_rules, $script, $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			if (array_key_exists('authtype', $script)) {
 				$ssh_rules = $this->getAuthTypeValidationRules($script['authtype'], 'create');
-				$ssh_rules['fields'] += $common_fields + $type_fields;
+				$ssh_rules['fields'] += $common_fields + $type_fields + $scope_fields;
 
 				if (!CApiInputValidator::validate($ssh_rules, $script, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -333,8 +335,10 @@ class CScript extends CApiService {
 			$db_script = $db_scripts[$scriptid];
 			$db_type = $db_script['type'];
 			$db_authtype = $db_script['authtype'];
+			$db_scope = $db_script['scope'];
 			$type = array_key_exists('type', $script) ? $script['type'] : $db_type;
 			$authtype = array_key_exists('authtype', $script) ? $script['authtype'] : $db_authtype;
+			$scope = array_key_exists('scope', $script) ? $script['scope'] : $db_scope;
 
 			$upd_script = [];
 
@@ -401,6 +405,10 @@ class CScript extends CApiService {
 			elseif ($type == ZBX_SCRIPT_TYPE_SSH && $authtype != $db_authtype && $authtype == ITEM_AUTHTYPE_PASSWORD) {
 				$upd_script['publickey'] = '';
 				$upd_script['privatekey'] = '';
+			}
+
+			if ($scope != $db_scope && $scope == ZBX_SCRIPT_SCOPE_ACTION) {
+				$upd_script['menu_path'] = '';
 			}
 
 			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
@@ -549,7 +557,7 @@ class CScript extends CApiService {
 
 		// Populate common and mandatory fields.
 		$scripts = zbx_toHash($scripts, 'scriptid');
-		$scripts = $this->extendFromObjects($scripts, $db_scripts, ['name', 'type', 'command']);
+		$scripts = $this->extendFromObjects($scripts, $db_scripts, ['name', 'type', 'command', 'scope']);
 
 		$i = 0;
 		foreach ($scripts as $num => &$script) {
@@ -570,10 +578,12 @@ class CScript extends CApiService {
 				}
 			}
 
-			$opt_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
-			$opt_rules['fields'] += $common_fields;
+			$type_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
+			$scope_rules = $this->getScopeValidationRules($script['scope'], $method, $scope_fields);
 
-			if (!CApiInputValidator::validate($opt_rules, $script, $path, $error)) {
+			$type_rules['fields'] += $common_fields + $scope_fields;
+
+			if (!CApiInputValidator::validate($type_rules, $script, $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
@@ -587,7 +597,7 @@ class CScript extends CApiService {
 				$script = $this->extendFromObjects([$script], [$db_script], ['authtype'])[0];
 
 				$ssh_rules = $this->getAuthTypeValidationRules($script['authtype'], $method);
-				$ssh_rules['fields'] += $common_fields + $type_fields;
+				$ssh_rules['fields'] += $common_fields + $type_fields + $scope_fields;
 
 				if (!CApiInputValidator::validate($ssh_rules, $script, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -614,7 +624,6 @@ class CScript extends CApiService {
 		$common_fields = [
 			'name' =>			['type' => API_SCRIPT_NAME, 'length' => DB::getFieldLength('scripts', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])],
-			'menu_path' =>		['type' => API_SCRIPT_MENU_PATH, 'length' => DB::getFieldLength('scripts', 'menu_path')],
 			'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
 			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
 			'usrgrpid' =>		['type' => API_ID],
@@ -625,6 +634,7 @@ class CScript extends CApiService {
 		];
 
 		if ($method === 'create') {
+			$common_fields['scope']['default'] = ZBX_SCRIPT_SCOPE_ACTION;
 			$api_input_rules['uniq'] = [['name']];
 			$common_fields['name']['flags'] = API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
@@ -641,6 +651,7 @@ class CScript extends CApiService {
 		 */
 		$api_input_rules['fields'] += $common_fields + [
 			'execute_on' =>		['type' => API_INT32],
+			'menu_path' =>		['type' => API_STRING_UTF8],
 			'port' =>			['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 			'authtype' =>		['type' => API_INT32],
 			'username' =>		['type' => API_STRING_UTF8],
@@ -658,6 +669,30 @@ class CScript extends CApiService {
 	}
 
 	/**
+	 * Get validation rules for script scope.
+	 *
+	 * @param int    $scope  [IN]          Script scope.
+	 * @param string $method [IN]          API method "create" or "update".
+	 * @param array  $common_fields [OUT]  Returns common fields for specific script scope.
+	 *
+	 * @return array
+	 */
+	protected function getScopeValidationRules(int $scope, string $method, &$common_fields = []): array {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+		$common_fields = [];
+
+		if ($scope == ZBX_SCRIPT_SCOPE_HOST || $scope == ZBX_SCRIPT_SCOPE_EVENT) {
+			$common_fields = [
+				'menu_path' => ['type' => API_SCRIPT_MENU_PATH, 'length' => DB::getFieldLength('scripts', 'menu_path')]
+			];
+
+			$api_input_rules['fields'] += $common_fields;
+		}
+
+		return $api_input_rules;
+	}
+
+	/**
 	 * Get validation rules for each script type.
 	 *
 	 * @param int    $type   [IN]          Script type.
@@ -668,6 +703,7 @@ class CScript extends CApiService {
 	 */
 	protected function getTypeValidationRules(int $type, string $method, &$common_fields = []): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+		$common_fields = [];
 
 		switch ($type) {
 			case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
@@ -716,6 +752,10 @@ class CScript extends CApiService {
 				];
 				break;
 		}
+
+//		$api_input_rules['fields'] += $common_fields + [
+//			'menu_path' => ['type' => API_STRING_UTF8]
+//		];
 
 		return $api_input_rules;
 	}
