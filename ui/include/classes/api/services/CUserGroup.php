@@ -605,17 +605,17 @@ class CUserGroup extends CApiService {
 		}
 
 		$db_users = DBselect(
-			'SELECT u.userid,u.alias,count(ug.usrgrpid) as usrgrp_num'.
+			'SELECT u.userid,u.username,count(ug.usrgrpid) as usrgrp_num'.
 			' FROM users u,users_groups ug'.
 			' WHERE u.userid=ug.userid'.
 				' AND '.dbConditionInt('u.userid', array_keys($del_userids)).
-			' GROUP BY u.userid,u.alias'
+			' GROUP BY u.userid,u.username'
 		);
 
 		while ($db_user = DBfetch($db_users)) {
 			if ($db_user['usrgrp_num'] == $del_userids[$db_user['userid']]) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('User "%1$s" cannot be without user group.', $db_user['alias'])
+					_s('User "%1$s" cannot be without user group.', $db_user['username'])
 				);
 			}
 		}

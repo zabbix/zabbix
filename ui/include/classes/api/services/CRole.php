@@ -61,8 +61,8 @@ class CRole extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected $user_params = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-		'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
+	protected $user_params = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
+		'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 	];
 
 	/**

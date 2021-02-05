@@ -148,7 +148,7 @@ class CWebUser {
 	public static function setDefault(): void {
 		self::$data = [
 			'sessionid' => CEncryptHelper::generateKey(),
-			'alias' => ZBX_GUEST_USER,
+			'username' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
 			'type' => 0,
@@ -194,7 +194,7 @@ class CWebUser {
 	 * @return bool
 	 */
 	public static function isGuest() {
-		return (self::$data && self::$data['alias'] == ZBX_GUEST_USER);
+		return (self::$data && self::$data['username'] == ZBX_GUEST_USER);
 	}
 
 	/**
@@ -205,7 +205,7 @@ class CWebUser {
 	public static function isGuestAllowed() {
 		$guest = DB::select('users', [
 			'output' => ['userid'],
-			'filter' => ['alias' => ZBX_GUEST_USER]
+			'filter' => ['username' => ZBX_GUEST_USER]
 		]);
 
 		return check_perm2system($guest[0]['userid'])
