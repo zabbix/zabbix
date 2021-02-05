@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup valuemaps
+ * @backup valuemap
  */
 class testValuemap extends CAPITest {
 
