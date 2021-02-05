@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-18 17:38+0200\n"
+"POT-Creation-Date: 2021-02-05 19:57+0200\n"
 "PO-Revision-Date: 2020-11-13 18:43+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -516,7 +516,7 @@ msgstr "В действии \"%1$s\" нет заданных операций."
 msgid "Action added"
 msgstr "Действие добавлено"
 
-#: include/classes/core/ZBase.php:459
+#: include/classes/core/ZBase.php:463
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr "Класс действия %1$s должен расширять %2$s класс."
@@ -1475,7 +1475,7 @@ msgstr "Пароль подключения (Bind password)"
 msgid "Blocked"
 msgstr "Заблокирован"
 
-#: include/classes/core/ZBase.php:312
+#: include/classes/core/ZBase.php:316
 msgid "Blue"
 msgstr "Голубая"
 
@@ -1689,12 +1689,12 @@ msgstr "Не удалось добавить корреляцию"
 msgid "Cannot add correlation condition"
 msgstr "Не удалось добавить условие корреляции"
 
-#: include/classes/api/services/CTrigger.php:958
-#: include/classes/api/services/CTriggerPrototype.php:784
+#: include/classes/api/services/CTrigger.php:956
+#: include/classes/api/services/CTriggerPrototype.php:780
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не удалось добавить зависимость от узла сети к шаблону."
 
-#: include/classes/api/services/CDiscoveryRule.php:857
+#: include/classes/api/services/CDiscoveryRule.php:859
 #: include/triggers.inc.php:553
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
@@ -1883,21 +1883,21 @@ msgstr "Не удалось очистить историю"
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
 msgstr "Не удалось очистить историю: по крайней мере один из выбранных элементов данных не принадлежит к какому-либо узлу сети под наблюдением"
 
-#: include/classes/api/services/CDiscoveryRule.php:2434
+#: include/classes/api/services/CDiscoveryRule.php:2436
 msgid "Cannot clone graph prototypes."
 msgstr "Не удалось клонировать прототипы графиков."
 
-#: include/classes/api/services/CDiscoveryRule.php:2488
+#: include/classes/api/services/CDiscoveryRule.php:2490
 msgid "Cannot clone host prototypes."
 msgstr "Не удалось клонировать прототипы узлов сети."
 
-#: include/classes/api/services/CDiscoveryRule.php:2239
-#: include/classes/api/services/CDiscoveryRule.php:2295
-#: include/classes/api/services/CDiscoveryRule.php:2313
+#: include/classes/api/services/CDiscoveryRule.php:2241
+#: include/classes/api/services/CDiscoveryRule.php:2297
+#: include/classes/api/services/CDiscoveryRule.php:2315
 msgid "Cannot clone item prototypes."
 msgstr "Не удалось клонировать прототипы элементов данных."
 
-#: include/classes/api/services/CDiscoveryRule.php:770
+#: include/classes/api/services/CDiscoveryRule.php:772
 msgid "Cannot clone trigger prototypes."
 msgstr "Не удалось клонировать прототипы триггеров."
 
@@ -1953,16 +1953,16 @@ msgstr "Не удалось создать прототип узлов сети 
 msgid "Cannot create another database connection."
 msgstr "Не удалось создать другое подключение к базе данных."
 
-#: include/classes/api/services/CTrigger.php:992
-#: include/classes/api/services/CTriggerPrototype.php:815
+#: include/classes/api/services/CTrigger.php:990
+#: include/classes/api/services/CTriggerPrototype.php:811
 msgid "Cannot create circular dependencies."
 msgstr "Невозможно создать закольцованные зависимости."
 
-#: include/classes/api/services/CTrigger.php:964
+#: include/classes/api/services/CTrigger.php:962
 msgid "Cannot create dependency on trigger itself."
 msgstr "Невозможно создать зависимость триггера от самого себя."
 
-#: include/classes/api/services/CTriggerPrototype.php:754
+#: include/classes/api/services/CTriggerPrototype.php:750
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Не возможно создать зависимость прототипа триггеров к самому себе."
 
@@ -2018,8 +2018,8 @@ msgstr[0] "Не удалось удалить панель"
 msgstr[1] "Не удалось удалить панели"
 msgstr[2] "Не удалось удалить панели"
 
-#: include/classes/api/services/CTrigger.php:862
-#: include/classes/api/services/CTriggerPrototype.php:581
+#: include/classes/api/services/CTrigger.php:860
+#: include/classes/api/services/CTriggerPrototype.php:577
 msgid "Cannot delete dependency"
 msgstr "Не удалось удалить зависимость"
 
@@ -2217,12 +2217,12 @@ msgstr "Невозможно удалить элемент данных унас
 msgid "Cannot delete templated items."
 msgstr "Невозможно удалить элементы данных унаследованные из шаблонов."
 
-#: include/classes/api/services/CTrigger.php:655
+#: include/classes/api/services/CTrigger.php:653
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Невозможно удалить триггер \"%1$s:%2$s\" унаследованный из шаблона."
 
-#: include/classes/api/services/CTriggerPrototype.php:534
+#: include/classes/api/services/CTriggerPrototype.php:530
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
 msgstr "Не удалось удалить прототип графиков \"%1$s:%2$s\" унаследованный из шаблона."
@@ -2458,8 +2458,8 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти группу узлов сети \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" на \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2084
-#: include/classes/api/services/CDiscoveryRule.php:2266
+#: include/classes/api/services/CDiscoveryRule.php:2086
+#: include/classes/api/services/CDiscoveryRule.php:2268
 #: include/classes/api/services/CItemGeneral.php:108 include/items.inc.php:498
 #: include/items.inc.php:644
 #, c-format
@@ -2596,7 +2596,7 @@ msgid "Cannot link template."
 msgstr "Не удалось присоединить шаблон."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:633
+#: include/classes/core/ZBase.php:637
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2720,16 +2720,6 @@ msgstr "Не удалось установить \"%1$s\" для элемент�
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" шаблонному комплексному экрану \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:829
-#, c-format
-msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
-msgstr "Не удалось установить \"%1$s\" для триггера \"%2$s\"."
-
-#: include/classes/api/services/CTriggerGeneral.php:838
-#, c-format
-msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr "Не удалось установить \"%1$s\" для прототипа триггера \"%2$s\"."
-
 #: include/classes/api/services/CItemPrototype.php:339
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
@@ -2814,25 +2804,15 @@ msgstr "Не удалось обновить \"%1$s\" для прототипа 
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для элемента данных \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1003
+#: include/classes/api/services/CTriggerGeneral.php:917
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для шаблонного графика \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1012
+#: include/classes/api/services/CTriggerGeneral.php:928
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для шаблонного прототипа графика \"%2$s\"."
-
-#: include/classes/api/services/CTriggerGeneral.php:1002
-#, c-format
-msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
-msgstr "Не удалось обновить \"%1$s\" для триггера \"%2$s\"."
-
-#: include/classes/api/services/CTriggerGeneral.php:1011
-#, c-format
-msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
-msgstr "Не удалось обновить \"%1$s\" для прототипа триггера \"%2$s\"."
 
 #: include/classes/api/services/CHost.php:2190
 #, c-format
@@ -2844,9 +2824,9 @@ msgstr "Не удалось обновить \"%1$s\" у обнаруженно�
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Не удалось обновить \"%1$s\" у обнаруженного элемента данных \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1066
-#: include/classes/api/services/CTrigger.php:698
-#: include/classes/api/services/CTrigger.php:822
+#: include/classes/api/services/CTriggerGeneral.php:923
+#: include/classes/api/services/CTrigger.php:697
+#: include/classes/api/services/CTrigger.php:820
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Не удалось обновить \"%2$s\" у обнаруженного триггера \"%1$s\"."
@@ -3084,7 +3064,7 @@ msgstr "Не удалось обновить шаблоны для обнару�
 msgid "Cannot update trigger"
 msgstr "Не удалось обновить триггер"
 
-#: include/classes/api/services/CTriggerGeneral.php:1981
+#: include/classes/api/services/CTriggerGeneral.php:1792
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Не удалось обновить триггер \"%1$s\": %2$s."
@@ -3096,7 +3076,7 @@ msgstr[0] "Не удалось обновить прототип триггер�
 msgstr[1] "Не удалось обновить прототипы триггеров"
 msgstr[2] "Не удалось обновить прототипы триггеров"
 
-#: include/classes/api/services/CTriggerGeneral.php:1837
+#: include/classes/api/services/CTriggerGeneral.php:1633
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Не удалось обновить прототип триггера \"%1$s\": %2$s."
@@ -3238,7 +3218,7 @@ msgstr "Информация о шасси. Возвращает строку"
 msgid "Check already exists."
 msgstr "Проверка уже существует."
 
-#: include/classes/parsers/CTriggerExpression.php:504
+#: include/classes/parsers/CTriggerExpression.php:517
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Проверьте часть выражения начиная с \"%1$s\"."
@@ -3350,7 +3330,7 @@ msgstr "Закольцованная ссылка в шаблонах: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Закольцованное соединение шаблонов не допускается."
 
-#: include/classes/core/ZBase.php:453
+#: include/classes/core/ZBase.php:457
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr "Класс %1$s не найден для действия %2$s."
@@ -3557,12 +3537,12 @@ msgstr "Условие \"%2$s\" не используется в формуле 
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr "Условие \"%2$s\" не используется в формуле \"%3$s\" для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1753
+#: include/classes/api/services/CDiscoveryRule.php:1755
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "Условие \"%2$s\" не используется в формуле \"%3$s\" правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1547
+#: include/classes/api/services/CDiscoveryRule.php:1549
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
 msgstr "Условие \"%2$s\" не используется в \"%3$s\" формуле для замещения \"%1$s\"."
@@ -3577,12 +3557,12 @@ msgstr "Условие \"%2$s\" используемое в формуле \"%3$
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" для корреляции \"%1$s\" не определено."
 
-#: include/classes/api/services/CDiscoveryRule.php:1752
+#: include/classes/api/services/CDiscoveryRule.php:1754
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" правила обнаружения \"%1$s\" не определено."
 
-#: include/classes/api/services/CDiscoveryRule.php:1546
+#: include/classes/api/services/CDiscoveryRule.php:1548
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
 msgstr "Условие \"%2$s\" используемое в формуле \"%3$s\" для замещения \"%1$s\" не задано."
@@ -4396,7 +4376,7 @@ msgstr "DNS имя"
 msgid "Daily"
 msgstr "Ежедневно"
 
-#: include/classes/core/ZBase.php:313
+#: include/classes/core/ZBase.php:317
 msgid "Dark"
 msgstr "Темная"
 
@@ -5401,7 +5381,7 @@ msgstr "Правило обнаружения \"%1$s\" уже существуе
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "Правило обнаружения \"%1$s\" уже существует."
 
-#: include/classes/api/services/CDiscoveryRule.php:2103
+#: include/classes/api/services/CDiscoveryRule.php:2105
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr "Правило обнаружения \"%1$s\" нельзя скопировать без его мастер элемента данных."
@@ -5606,12 +5586,12 @@ msgstr "Дубликат значения \"имя\" \"%1$s\" у карты се
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Дубликат значения \"имя\" \"%1$s\" у комплексного экрана."
 
-#: include/classes/api/services/CTrigger.php:1134
+#: include/classes/api/services/CTrigger.php:1132
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублирующиеся зависимости в триггере \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:985
+#: include/classes/api/services/CTriggerPrototype.php:981
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Дубликат зависимостей в прототипе триггеров \"%1$s\"."
@@ -5632,16 +5612,6 @@ msgstr "Дубликат узла сети. Узел сети с таким же
 #, c-format
 msgid "Duplicate severity name \"%1$s\"."
 msgstr "Дубликат имени важности \"%1$s\"."
-
-#: include/classes/api/services/CTriggerGeneral.php:836
-#, c-format
-msgid "Duplicate trigger prototype with name \"%1$s\"."
-msgstr "Дубликат прототипа триггеров с именем \"%1$s\"."
-
-#: include/classes/api/services/CTriggerGeneral.php:827
-#, c-format
-msgid "Duplicate trigger with name \"%1$s\"."
-msgstr "Дубликат прототипа триггеров с именем \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:735
 #: include/classes/api/services/CMap.php:1199
@@ -5815,12 +5785,12 @@ msgstr "Пустой ID корреляции."
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "Пустой ID формулы условия фильтра для действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1780
+#: include/classes/api/services/CDiscoveryRule.php:1782
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Пустой ID формулы условия фильтра для правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1772
+#: include/classes/api/services/CDiscoveryRule.php:1774
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "Пустой макрос условия фильтра для правила обнаружения \"%1$s\"."
@@ -5857,8 +5827,7 @@ msgstr "Пустой тип условия фильтрации для дейс�
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
 #: include/classes/api/services/CTemplate.php:601
-#: include/classes/api/services/CTrigger.php:673
-#: include/classes/api/services/CTrigger.php:797
+#: include/classes/api/services/CTrigger.php:794
 #: include/classes/api/services/CUserMacro.php:618
 msgid "Empty input parameter."
 msgstr "Пустой входной параметр."
@@ -6454,7 +6423,6 @@ msgstr "Поле \"%1$s\" не может быть NULL."
 #: include/classes/api/services/CHostGroup.php:949
 #: include/classes/api/services/CHost.php:961
 #: include/classes/api/services/CTemplate.php:893
-#: include/classes/api/services/CTriggerGeneral.php:508
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6689,12 +6657,12 @@ msgstr "Формула"
 msgid "Formula missing for action \"%1$s\"."
 msgstr "Отсутствует формула для \"%1$s\" действия."
 
-#: include/classes/api/services/CDiscoveryRule.php:1750
+#: include/classes/api/services/CDiscoveryRule.php:1752
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
 msgstr "Отсутствует формула для \"%1$s\" правила обнаружения."
 
-#: include/classes/api/services/CDiscoveryRule.php:1543
+#: include/classes/api/services/CDiscoveryRule.php:1545
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
 msgstr "Отсутствует формула для \"%1$s\" замещения."
@@ -7315,11 +7283,11 @@ msgstr "Иерархия"
 msgid "High"
 msgstr "Высокая"
 
-#: include/classes/core/ZBase.php:315
+#: include/classes/core/ZBase.php:319
 msgid "High-contrast dark"
 msgstr "Высококонтрастная тёмная"
 
-#: include/classes/core/ZBase.php:314
+#: include/classes/core/ZBase.php:318
 msgid "High-contrast light"
 msgstr "Высококонтрастная светлая"
 
@@ -8524,7 +8492,7 @@ msgstr "Использованы некорректные символы в им
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "Некорректные условия в действии \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1745
+#: include/classes/api/services/CDiscoveryRule.php:1747
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Некорректные условия в правиле обнаружения \"%1$s\"."
@@ -8543,12 +8511,12 @@ msgstr "Некорректное пользовательское выражен
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr "Некорректное пользовательское выражение \"%2$s\" для корреляции \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1751
+#: include/classes/api/services/CDiscoveryRule.php:1753
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Некорректное пользовательское выражение \"%2$s\" для правила обнаружения \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1544
+#: include/classes/api/services/CDiscoveryRule.php:1546
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
 msgstr "Некорректное пользовательское выражение \"%2$s\" для замещения \"%1$s\": %3$s."
@@ -8606,7 +8574,7 @@ msgstr "Некорректный загружаемый файл."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "Некорректный ID формулы условия фильтра для действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1781
+#: include/classes/api/services/CDiscoveryRule.php:1783
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Некорректный ID формулы условия фильтра для правила обнаружения \"%1$s\"."
@@ -8616,12 +8584,12 @@ msgstr "Некорректный ID формулы условия фильтра
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr "Задан некорректный ID формулы условия фильтра для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1773
+#: include/classes/api/services/CDiscoveryRule.php:1775
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Некорректный макрос условия фильтра для правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1579
+#: include/classes/api/services/CDiscoveryRule.php:1581
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
 msgstr "Некорректный макрос условия фильтра для замещения \"%1$s\"."
@@ -8632,7 +8600,7 @@ msgstr "Некорректный макрос условия фильтра дл
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Некорректный оператор условия фильтра для действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1785
+#: include/classes/api/services/CDiscoveryRule.php:1787
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Некорректный оператор условия фильтра для правила обнаружения \"%1$s\"."
@@ -8725,7 +8693,7 @@ msgstr "Указан некорректный ID элемента данных \
 msgid "Incorrect item for axis value."
 msgstr "Некорректный элемент данных для значения оси."
 
-#: include/classes/api/services/CTriggerGeneral.php:1751
+#: include/classes/api/services/CTriggerGeneral.php:1547
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "В выражении триггера \"%2$s\" указан некорректный ключ элемента данных \"%1$s\"."
@@ -8911,18 +8879,19 @@ msgstr "Некорректный ID триггера для услуги \"%1$s\
 msgid "Incorrect trigger expression"
 msgstr "Некорректное выражение триггера"
 
-#: include/classes/parsers/CTriggerExpression.php:495
-#: include/classes/parsers/CTriggerExpression.php:504
+#: include/classes/parsers/CTriggerExpression.php:502
+#: include/classes/parsers/CTriggerExpression.php:516
 msgid "Incorrect trigger expression."
 msgstr "Некорректное выражение триггера."
 
-#: include/classes/api/services/CTriggerGeneral.php:1541
+#: include/classes/api/services/CTriggerGeneral.php:534
+#: include/classes/api/services/CTriggerGeneral.php:1337
 #: include/triggers.inc.php:659
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некорректное выражение триггера. Узел сети \"%1$s\" не существует или у вас нет прав доступа к этому узлу сети."
 
-#: include/classes/api/services/CTriggerGeneral.php:1542
+#: include/classes/api/services/CTriggerGeneral.php:1338
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Некорректное выражение у триггера. Элементы выражения триггера не должны принадлежать шаблону и узлу сети одновременно."
 
@@ -8934,12 +8903,13 @@ msgstr "Некорректное выражение у триггера. Эле�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "В выражении указана некорректная функция триггера \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1548
+#: include/classes/api/services/CTriggerGeneral.php:535
+#: include/classes/api/services/CTriggerGeneral.php:1344
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Некорректное выражение прототипа триггеров. Узел сети \"%1$s\" не существует или у вас нет прав доступа к нему."
 
-#: include/classes/api/services/CTriggerGeneral.php:1549
+#: include/classes/api/services/CTriggerGeneral.php:1345
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Некорректное выражение прототипа триггеров. Элементы выражения прототипа триггеров не должны быть от шаблона и узла сети одновременно."
 
@@ -8953,7 +8923,7 @@ msgstr "Некорректный тип вычисления для действ
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr "Некорректный тип вычисления для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1738
+#: include/classes/api/services/CDiscoveryRule.php:1740
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Некорректный тип вычисления для правила обнаружения \"%1$s\"."
@@ -9141,8 +9111,8 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1807
-#: include/classes/api/services/CDiscoveryRule.php:2205
+#: include/classes/api/services/CDiscoveryRule.php:1809
+#: include/classes/api/services/CDiscoveryRule.php:2207
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -9273,23 +9243,11 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
 #: include/classes/api/services/CTemplate.php:400
-#: include/classes/api/services/CTriggerGeneral.php:513
-#: include/classes/api/services/CTriggerGeneral.php:519
-#: include/classes/api/services/CTriggerGeneral.php:529
-#: include/classes/api/services/CTriggerGeneral.php:891
-#: include/classes/api/services/CTriggerGeneral.php:899
-#: include/classes/api/services/CTriggerGeneral.php:917
-#: include/classes/api/services/CTriggerGeneral.php:924
-#: include/classes/api/services/CTriggerGeneral.php:931
-#: include/classes/api/services/CTriggerGeneral.php:937
-#: include/classes/api/services/CTriggerGeneral.php:945
-#: include/classes/api/services/CTriggerGeneral.php:1143
-#: include/classes/api/services/CTriggerGeneral.php:1152
-#: include/classes/api/services/CTriggerGeneral.php:1160
-#: include/classes/api/services/CTriggerGeneral.php:1170
-#: include/classes/api/services/CTriggerGeneral.php:1178
-#: include/classes/api/services/CTriggerGeneral.php:1184
-#: include/classes/api/services/CTriggerGeneral.php:1192
+#: include/classes/api/services/CTriggerGeneral.php:703
+#: include/classes/api/services/CTriggerGeneral.php:709
+#: include/classes/api/services/CTriggerGeneral.php:729
+#: include/classes/api/services/CTriggerGeneral.php:736
+#: include/classes/api/services/CTriggerGeneral.php:742
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:115
@@ -9512,14 +9470,11 @@ msgstr "Период хранения внутренних данных"
 #: include/classes/api/helpers/CApiHostHelper.php:90
 #: include/classes/api/services/CGraphGeneral.php:498
 #: include/classes/api/services/CGraphGeneral.php:640
-#: include/classes/api/services/CTriggerGeneral.php:629
-#: include/classes/api/services/CTriggerGeneral.php:774
-#: include/classes/api/services/CTriggerGeneral.php:846
-#: include/classes/api/services/CTriggerGeneral.php:1020
-#: include/classes/api/services/CTriggerGeneral.php:1257
-#: include/classes/api/services/CTriggerGeneral.php:1366
-#: include/classes/api/services/CTriggerGeneral.php:1554
-#: include/classes/api/services/CTriggerGeneral.php:1916
+#: include/classes/api/services/CTriggerGeneral.php:934
+#: include/classes/api/services/CTriggerGeneral.php:1057
+#: include/classes/api/services/CTriggerGeneral.php:1162
+#: include/classes/api/services/CTriggerGeneral.php:1350
+#: include/classes/api/services/CTriggerGeneral.php:1727
 #: include/classes/core/CJsonRpc.php:208
 #: include/classes/import/validators/CXmlValidatorGeneral.php:195
 #: include/classes/widgets/fields/CWidgetField.php:103
@@ -9716,20 +9671,20 @@ msgstr "Ошибочное количество параметров."
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CAutoregistration.php:151
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CDiscoveryRule.php:1591
-#: include/classes/api/services/CDiscoveryRule.php:1611
-#: include/classes/api/services/CDiscoveryRule.php:1623
-#: include/classes/api/services/CDiscoveryRule.php:1642
-#: include/classes/api/services/CDiscoveryRule.php:1653
-#: include/classes/api/services/CDiscoveryRule.php:1665
-#: include/classes/api/services/CDiscoveryRule.php:1673
-#: include/classes/api/services/CDiscoveryRule.php:1684
-#: include/classes/api/services/CDiscoveryRule.php:1695
-#: include/classes/api/services/CDiscoveryRule.php:1827
-#: include/classes/api/services/CDiscoveryRule.php:1913
-#: include/classes/api/services/CDiscoveryRule.php:1930
-#: include/classes/api/services/CDiscoveryRule.php:1948
-#: include/classes/api/services/CDiscoveryRule.php:1956
+#: include/classes/api/services/CDiscoveryRule.php:1593
+#: include/classes/api/services/CDiscoveryRule.php:1613
+#: include/classes/api/services/CDiscoveryRule.php:1625
+#: include/classes/api/services/CDiscoveryRule.php:1644
+#: include/classes/api/services/CDiscoveryRule.php:1655
+#: include/classes/api/services/CDiscoveryRule.php:1667
+#: include/classes/api/services/CDiscoveryRule.php:1675
+#: include/classes/api/services/CDiscoveryRule.php:1686
+#: include/classes/api/services/CDiscoveryRule.php:1697
+#: include/classes/api/services/CDiscoveryRule.php:1829
+#: include/classes/api/services/CDiscoveryRule.php:1915
+#: include/classes/api/services/CDiscoveryRule.php:1932
+#: include/classes/api/services/CDiscoveryRule.php:1950
+#: include/classes/api/services/CDiscoveryRule.php:1958
 #: include/classes/api/services/CItemGeneral.php:2262
 #: include/classes/api/services/CItemGeneral.php:2269
 #: include/classes/api/services/CItemGeneral.php:2275
@@ -9740,77 +9695,82 @@ msgstr "Ошибочное количество параметров."
 #: include/classes/api/services/CItemGeneral.php:2337
 #: include/classes/api/services/CItemGeneral.php:2366
 #: include/classes/api/services/CModule.php:291
+#: include/classes/api/services/CTriggerGeneral.php:1682
+#: include/classes/api/services/CTriggerGeneral.php:1698
 #: include/classes/api/services/CUser.php:663
 #: include/classes/api/services/CUser.php:674
-#: include/classes/validators/CApiInputValidator.php:262
-#: include/classes/validators/CApiInputValidator.php:267
-#: include/classes/validators/CApiInputValidator.php:272
-#: include/classes/validators/CApiInputValidator.php:299
-#: include/classes/validators/CApiInputValidator.php:329
-#: include/classes/validators/CApiInputValidator.php:390
-#: include/classes/validators/CApiInputValidator.php:397
-#: include/classes/validators/CApiInputValidator.php:429
-#: include/classes/validators/CApiInputValidator.php:434
-#: include/classes/validators/CApiInputValidator.php:476
-#: include/classes/validators/CApiInputValidator.php:481
-#: include/classes/validators/CApiInputValidator.php:515
-#: include/classes/validators/CApiInputValidator.php:520
-#: include/classes/validators/CApiInputValidator.php:561
-#: include/classes/validators/CApiInputValidator.php:566
-#: include/classes/validators/CApiInputValidator.php:620
-#: include/classes/validators/CApiInputValidator.php:654
-#: include/classes/validators/CApiInputValidator.php:659
-#: include/classes/validators/CApiInputValidator.php:715
-#: include/classes/validators/CApiInputValidator.php:748
-#: include/classes/validators/CApiInputValidator.php:753
-#: include/classes/validators/CApiInputValidator.php:794
-#: include/classes/validators/CApiInputValidator.php:799
-#: include/classes/validators/CApiInputValidator.php:804
-#: include/classes/validators/CApiInputValidator.php:840
-#: include/classes/validators/CApiInputValidator.php:895
-#: include/classes/validators/CApiInputValidator.php:902
-#: include/classes/validators/CApiInputValidator.php:929
-#: include/classes/validators/CApiInputValidator.php:974
-#: include/classes/validators/CApiInputValidator.php:1001
-#: include/classes/validators/CApiInputValidator.php:1006
-#: include/classes/validators/CApiInputValidator.php:1013
-#: include/classes/validators/CApiInputValidator.php:1044
-#: include/classes/validators/CApiInputValidator.php:1089
-#: include/classes/validators/CApiInputValidator.php:1094
-#: include/classes/validators/CApiInputValidator.php:1131
-#: include/classes/validators/CApiInputValidator.php:1136
-#: include/classes/validators/CApiInputValidator.php:1181
-#: include/classes/validators/CApiInputValidator.php:1190
-#: include/classes/validators/CApiInputValidator.php:1196
-#: include/classes/validators/CApiInputValidator.php:1224
-#: include/classes/validators/CApiInputValidator.php:1234
-#: include/classes/validators/CApiInputValidator.php:1240
-#: include/classes/validators/CApiInputValidator.php:1278
-#: include/classes/validators/CApiInputValidator.php:1290
-#: include/classes/validators/CApiInputValidator.php:1299
-#: include/classes/validators/CApiInputValidator.php:1306
-#: include/classes/validators/CApiInputValidator.php:1311
-#: include/classes/validators/CApiInputValidator.php:1343
-#: include/classes/validators/CApiInputValidator.php:1353
-#: include/classes/validators/CApiInputValidator.php:1378
-#: include/classes/validators/CApiInputValidator.php:1383
-#: include/classes/validators/CApiInputValidator.php:1407
-#: include/classes/validators/CApiInputValidator.php:1412
-#: include/classes/validators/CApiInputValidator.php:1438
-#: include/classes/validators/CApiInputValidator.php:1445
-#: include/classes/validators/CApiInputValidator.php:1472
-#: include/classes/validators/CApiInputValidator.php:1479
-#: include/classes/validators/CApiInputValidator.php:1506
-#: include/classes/validators/CApiInputValidator.php:1515
-#: include/classes/validators/CApiInputValidator.php:1552
-#: include/classes/validators/CApiInputValidator.php:1568
-#: include/classes/validators/CApiInputValidator.php:1579
-#: include/classes/validators/CApiInputValidator.php:1612
-#: include/classes/validators/CApiInputValidator.php:1667
-#: include/classes/validators/CApiInputValidator.php:1754
-#: include/classes/validators/CApiInputValidator.php:1759
-#: include/classes/validators/CApiInputValidator.php:1786
-#: include/classes/validators/CApiInputValidator.php:1796
+#: include/classes/validators/CApiInputValidator.php:266
+#: include/classes/validators/CApiInputValidator.php:271
+#: include/classes/validators/CApiInputValidator.php:276
+#: include/classes/validators/CApiInputValidator.php:303
+#: include/classes/validators/CApiInputValidator.php:333
+#: include/classes/validators/CApiInputValidator.php:394
+#: include/classes/validators/CApiInputValidator.php:401
+#: include/classes/validators/CApiInputValidator.php:433
+#: include/classes/validators/CApiInputValidator.php:438
+#: include/classes/validators/CApiInputValidator.php:480
+#: include/classes/validators/CApiInputValidator.php:485
+#: include/classes/validators/CApiInputValidator.php:519
+#: include/classes/validators/CApiInputValidator.php:524
+#: include/classes/validators/CApiInputValidator.php:565
+#: include/classes/validators/CApiInputValidator.php:570
+#: include/classes/validators/CApiInputValidator.php:624
+#: include/classes/validators/CApiInputValidator.php:658
+#: include/classes/validators/CApiInputValidator.php:663
+#: include/classes/validators/CApiInputValidator.php:719
+#: include/classes/validators/CApiInputValidator.php:752
+#: include/classes/validators/CApiInputValidator.php:757
+#: include/classes/validators/CApiInputValidator.php:798
+#: include/classes/validators/CApiInputValidator.php:803
+#: include/classes/validators/CApiInputValidator.php:808
+#: include/classes/validators/CApiInputValidator.php:844
+#: include/classes/validators/CApiInputValidator.php:899
+#: include/classes/validators/CApiInputValidator.php:906
+#: include/classes/validators/CApiInputValidator.php:933
+#: include/classes/validators/CApiInputValidator.php:978
+#: include/classes/validators/CApiInputValidator.php:1005
+#: include/classes/validators/CApiInputValidator.php:1010
+#: include/classes/validators/CApiInputValidator.php:1017
+#: include/classes/validators/CApiInputValidator.php:1048
+#: include/classes/validators/CApiInputValidator.php:1093
+#: include/classes/validators/CApiInputValidator.php:1098
+#: include/classes/validators/CApiInputValidator.php:1135
+#: include/classes/validators/CApiInputValidator.php:1140
+#: include/classes/validators/CApiInputValidator.php:1185
+#: include/classes/validators/CApiInputValidator.php:1194
+#: include/classes/validators/CApiInputValidator.php:1200
+#: include/classes/validators/CApiInputValidator.php:1228
+#: include/classes/validators/CApiInputValidator.php:1238
+#: include/classes/validators/CApiInputValidator.php:1244
+#: include/classes/validators/CApiInputValidator.php:1282
+#: include/classes/validators/CApiInputValidator.php:1294
+#: include/classes/validators/CApiInputValidator.php:1303
+#: include/classes/validators/CApiInputValidator.php:1310
+#: include/classes/validators/CApiInputValidator.php:1315
+#: include/classes/validators/CApiInputValidator.php:1347
+#: include/classes/validators/CApiInputValidator.php:1357
+#: include/classes/validators/CApiInputValidator.php:1382
+#: include/classes/validators/CApiInputValidator.php:1387
+#: include/classes/validators/CApiInputValidator.php:1411
+#: include/classes/validators/CApiInputValidator.php:1416
+#: include/classes/validators/CApiInputValidator.php:1442
+#: include/classes/validators/CApiInputValidator.php:1449
+#: include/classes/validators/CApiInputValidator.php:1476
+#: include/classes/validators/CApiInputValidator.php:1483
+#: include/classes/validators/CApiInputValidator.php:1510
+#: include/classes/validators/CApiInputValidator.php:1519
+#: include/classes/validators/CApiInputValidator.php:1556
+#: include/classes/validators/CApiInputValidator.php:1572
+#: include/classes/validators/CApiInputValidator.php:1583
+#: include/classes/validators/CApiInputValidator.php:1616
+#: include/classes/validators/CApiInputValidator.php:1671
+#: include/classes/validators/CApiInputValidator.php:1758
+#: include/classes/validators/CApiInputValidator.php:1763
+#: include/classes/validators/CApiInputValidator.php:1790
+#: include/classes/validators/CApiInputValidator.php:1800
+#: include/classes/validators/CApiInputValidator.php:1831
+#: include/classes/validators/CApiInputValidator.php:1841
+#: include/classes/validators/CApiInputValidator.php:1846
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:130
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:483
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:499
@@ -9999,7 +9959,7 @@ msgstr "Элемент данных \"%1$s\" не может заполнять 
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" не существует у шаблона \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2206
+#: include/classes/api/services/CDiscoveryRule.php:2208
 #: include/classes/api/services/CItemGeneral.php:1954
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
@@ -12049,7 +12009,7 @@ msgstr "Не указан \"%1$s\" для шаблона комплексног�
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Не указано \"%2$s\" для условия фильтра действия \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1789
+#: include/classes/api/services/CDiscoveryRule.php:1791
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "Не указано \"%2$s\" для условия фильтра правила обнаружения \"%1$s\"."
@@ -12059,7 +12019,7 @@ msgstr "Не указано \"%2$s\" для условия фильтра пра
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Не указан \"%2$s\" для фильтра в действии \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1757
+#: include/classes/api/services/CDiscoveryRule.php:1759
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Не указано \"%2$s\" для фильтра в правиле обнаружения \"%1$s\"."
@@ -12343,8 +12303,8 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CDiscoveryRule.php:548
 #: include/classes/api/services/CDiscoveryRule.php:589
 #: include/classes/api/services/CDiscoveryRule.php:625
-#: include/classes/api/services/CDiscoveryRule.php:1710
-#: include/classes/api/services/CDiscoveryRule.php:1982
+#: include/classes/api/services/CDiscoveryRule.php:1712
+#: include/classes/api/services/CDiscoveryRule.php:1984
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -12439,14 +12399,14 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
-#: include/classes/api/services/CTriggerGeneral.php:1082
-#: include/classes/api/services/CTrigger.php:647
-#: include/classes/api/services/CTrigger.php:691
-#: include/classes/api/services/CTrigger.php:727
-#: include/classes/api/services/CTrigger.php:815
-#: include/classes/api/services/CTriggerPrototype.php:526
-#: include/classes/api/services/CTriggerPrototype.php:704
-#: include/classes/api/services/CTriggerPrototype.php:722
+#: include/classes/api/services/CTriggerGeneral.php:957
+#: include/classes/api/services/CTrigger.php:645
+#: include/classes/api/services/CTrigger.php:692
+#: include/classes/api/services/CTrigger.php:726
+#: include/classes/api/services/CTrigger.php:813
+#: include/classes/api/services/CTriggerPrototype.php:522
+#: include/classes/api/services/CTriggerPrototype.php:700
+#: include/classes/api/services/CTriggerPrototype.php:718
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:877
 #: include/classes/api/services/CUserMacro.php:377
@@ -12523,7 +12483,7 @@ msgstr "Триггеры не заданы."
 msgid "No value"
 msgstr "Значение отсутствует"
 
-#: include/classes/validators/CApiInputValidator.php:865
+#: include/classes/validators/CApiInputValidator.php:869
 msgid "Non-boolean flags are deprecated."
 msgstr "Не-логические флаги устарели."
 
@@ -12589,8 +12549,8 @@ msgstr "Не подтверждено"
 msgid "Not all results are displayed. Please provide more specific search criteria."
 msgstr "Отображены не все результаты. Пожалуйста, задайте более конкретные критерии поиска."
 
-#: include/classes/api/services/CTrigger.php:1037
-#: include/classes/api/services/CTriggerPrototype.php:863
+#: include/classes/api/services/CTrigger.php:1035
+#: include/classes/api/services/CTriggerPrototype.php:859
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr "Не все шаблоны присоединены к \"%1$s\"."
@@ -13566,7 +13526,7 @@ msgstr "Навигатор"
 msgid "Parameter"
 msgstr "Параметр"
 
-#: include/classes/validators/CApiInputValidator.php:925
+#: include/classes/validators/CApiInputValidator.php:929
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
 msgstr "Параметр \"%1$s\" устарел."
@@ -16665,11 +16625,6 @@ msgstr "У таблицы \"%1$s\" нет поля с названием \"%2$s\
 msgid "Tag"
 msgstr "Этикетка"
 
-#: include/classes/api/services/CTriggerGeneral.php:539
-#, c-format
-msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
-msgstr "Тег \"%1$s\" со значением \"%2$s\" уже существует."
-
 #: app/views/monitoring.problem.view.php:300
 #: include/classes/widgets/forms/CWidgetFormProblems.php:151
 msgid "Tag display priority"
@@ -17389,13 +17344,12 @@ msgstr "Динамика изменений"
 msgid "Trigger"
 msgstr "Триггер"
 
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:620
+#: include/classes/api/services/CTriggerGeneral.php:583
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1908
+#: include/classes/api/services/CTriggerGeneral.php:1719
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Триггер \"%1$s\" принадлежит шаблонам с разными связями."
@@ -17417,7 +17371,7 @@ msgstr "Действия триггеров"
 msgid "Trigger added"
 msgstr "Триггер добавлен"
 
-#: include/classes/api/services/CTrigger.php:1080
+#: include/classes/api/services/CTrigger.php:1078
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Триггер не может зависеть от триггера, который наследуется от него."
 
@@ -17464,10 +17418,6 @@ msgstr[2] "Триггеры активированы"
 msgid "Trigger event and alert data storage period \"%1$s\"."
 msgstr "Период хранения данных событий о триггерах и оповещениях \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:784
-msgid "Trigger expression must contain at least one host:key reference."
-msgstr "Выражение триггера должно содержать по крайней мере одну ссылку узел_сети:ключ."
-
 #: include/classes/api/services/CHostBase.php:153
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
@@ -17510,18 +17460,17 @@ msgstr "Обзор триггеров"
 msgid "Trigger prototype"
 msgstr "Прототип триггеров"
 
-#: include/classes/api/services/CTriggerGeneral.php:589
-#: include/classes/api/services/CTriggerGeneral.php:625
+#: include/classes/api/services/CTriggerGeneral.php:584
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Прототип триггера \"%1$s\" уже существует у \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1912
+#: include/classes/api/services/CTriggerGeneral.php:1723
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Прототип триггера \"%1$s\" принадлежит шаблонам с разными связями."
 
-#: include/classes/api/services/CTriggerGeneral.php:1831
+#: include/classes/api/services/CTriggerGeneral.php:1627
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Прототип триггеров \"%1$s\" содержит прототипы элементов данных из нескольких правил обнаружения."
@@ -17531,7 +17480,7 @@ msgstr "Прототип триггеров \"%1$s\" содержит прото
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Прототип триггеров \"%1$s\" зависит от триггера \"%2$s\", который не существует."
 
-#: include/classes/api/services/CTriggerGeneral.php:1826
+#: include/classes/api/services/CTriggerGeneral.php:1622
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Прототип триггеров \"%1$s\" должен содержать по крайней мере один прототип элементов данных."
@@ -17540,7 +17489,7 @@ msgstr "Прототип триггеров \"%1$s\" должен содержа
 msgid "Trigger prototype added"
 msgstr "Прототип триггеров добавлен"
 
-#: include/classes/api/services/CTriggerPrototype.php:920
+#: include/classes/api/services/CTriggerPrototype.php:916
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Прототипа триггеров не может зависеть от триггера который унаследован от него."
 
@@ -17570,10 +17519,6 @@ msgstr "Прототипы триггеров удалены"
 #: trigger_prototypes.php:473
 msgid "Trigger prototypes updated"
 msgstr "Прототипы триггеров обновлены"
-
-#: include/classes/api/services/CTriggerGeneral.php:796
-msgid "Trigger recovery expression must contain at least one host:key reference."
-msgstr "Выражение восстановления триггера должно содержать по крайней мере одну ссылку на узел сети:ключ."
 
 #: app/views/administration.trigseverity.edit.php:31
 #: app/views/administration.trigseverity.edit.php:95 include/html.inc.php:905
@@ -17880,7 +17825,7 @@ msgstr "Разблокировать"
 msgid "Unblock selected users?"
 msgstr "Разблокировать выбранных пользователей?"
 
-#: include/classes/core/ZBase.php:548
+#: include/classes/core/ZBase.php:552
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr "Неожиданный ответ для действия %1$s."
@@ -18051,7 +17996,7 @@ msgstr "Неподдерживаемая операция."
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для действия условия фильтра \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1790
+#: include/classes/api/services/CDiscoveryRule.php:1792
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для правила обнаружения условия фильтра \"%1$s\"."
@@ -18061,7 +18006,7 @@ msgstr "Неподдерживаемый параметр \"%2$s\" для пра
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для фильтра в действии \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1758
+#: include/classes/api/services/CDiscoveryRule.php:1760
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Неподдерживаемый параметр \"%2$s\" для фильтра в правиле обнаружения \"%1$s\"."
@@ -19226,22 +19171,10 @@ msgstr "Ошибочные поля для услуги \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Ошибочные поля для времени услуги \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:837
-#: include/classes/api/services/CTriggerGeneral.php:1010
-msgid "Wrong fields for trigger prototype."
-msgstr "Ошибочные поля для прототипа триггеров."
-
-#: include/classes/api/services/CTriggerGeneral.php:828
-#: include/classes/api/services/CTriggerGeneral.php:1001
-msgid "Wrong fields for trigger."
-msgstr "Ошибочные поля для триггера."
-
 #: include/classes/api/services/CMapElement.php:74
 #: include/classes/api/services/CMap.php:969
 #: include/classes/api/services/CMap.php:1440
 #: include/classes/api/services/CScreenItem.php:958
-#: include/classes/api/services/CTriggerGeneral.php:866
-#: include/classes/api/services/CTriggerGeneral.php:1035
 msgid "Wrong value for url field."
 msgstr "Ошибочное значение для поля url."
 
@@ -19571,7 +19504,7 @@ msgstr "Zabbix сервер (прокси)"
 msgid "Zabbix server details"
 msgstr "Детали Zabbix сервера"
 
-#: jsrpc.php:80
+#: jsrpc.php:79
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сервер не запущен: отображаемая информация может быть не актуальной."
 
@@ -19610,51 +19543,49 @@ msgstr "[Ошибочное значение для дня: \"%1$s\" ]"
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[Ошибочное значение для месяца: \"%1$s\" ]"
 
-#: include/classes/validators/CApiInputValidator.php:840
+#: include/classes/validators/CApiInputValidator.php:844
 msgid "a boolean is expected"
 msgstr "ожидается логическое"
 
-#: include/classes/api/services/CTriggerGeneral.php:513
-#: include/classes/api/services/CTriggerGeneral.php:529
 #: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:238
 #: include/classes/validators/CActionCondValidator.php:185
-#: include/classes/validators/CApiInputValidator.php:262
+#: include/classes/validators/CApiInputValidator.php:266
 #: include/classes/validators/CEventCorrCondValidator.php:91
 #: include/classes/validators/CNewValidator.php:311
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
 
-#: include/classes/validators/CApiInputValidator.php:620
+#: include/classes/validators/CApiInputValidator.php:624
 msgid "a floating point value is expected"
 msgstr "ожидается значение с плавающей точкой"
 
-#: include/classes/validators/CApiInputValidator.php:330
+#: include/classes/validators/CApiInputValidator.php:334
 #: include/classes/validators/CNewValidator.php:298
 msgid "a hexadecimal colour code (6 symbols) is expected"
 msgstr "ожидается код цвета в шестнадцатеричном формате (6 символов)"
 
-#: include/classes/validators/CApiInputValidator.php:1412
+#: include/classes/validators/CApiInputValidator.php:1416
 msgid "a low-level discovery macro is expected"
 msgstr "ожидается макрос низкоуровневого обнаружения"
 
-#: include/classes/validators/CApiInputValidator.php:1311
+#: include/classes/validators/CApiInputValidator.php:1315
 #: include/validate.inc.php:194
 msgid "a number has too many fractional digits"
 msgstr "у числа слишком много десятичных точек"
 
-#: include/classes/validators/CApiInputValidator.php:794
-#: include/classes/validators/CApiInputValidator.php:1290
+#: include/classes/validators/CApiInputValidator.php:798
+#: include/classes/validators/CApiInputValidator.php:1294
 #: include/validate.inc.php:175
 msgid "a number is expected"
 msgstr "ожидается число"
 
-#: include/classes/validators/CApiInputValidator.php:481
-#: include/classes/validators/CApiInputValidator.php:520
-#: include/classes/validators/CApiInputValidator.php:804
-#: include/classes/validators/CApiInputValidator.php:1299
-#: include/classes/validators/CApiInputValidator.php:1306
-#: include/classes/validators/CApiInputValidator.php:1579
+#: include/classes/validators/CApiInputValidator.php:485
+#: include/classes/validators/CApiInputValidator.php:524
+#: include/classes/validators/CApiInputValidator.php:808
+#: include/classes/validators/CApiInputValidator.php:1303
+#: include/classes/validators/CApiInputValidator.php:1310
+#: include/classes/validators/CApiInputValidator.php:1583
 #: include/validate.inc.php:183 include/validate.inc.php:189
 msgid "a number is too large"
 msgstr "число слишком большое"
@@ -19676,24 +19607,24 @@ msgstr "ожидается относительное время"
 msgid "a time is expected"
 msgstr "ожидается время"
 
-#: include/classes/validators/CApiInputValidator.php:1479
+#: include/classes/validators/CApiInputValidator.php:1483
 #: include/classes/validators/CNewValidator.php:285
 msgid "a time period is expected"
 msgstr "ожидается период времени"
 
-#: include/classes/validators/CApiInputValidator.php:1445
+#: include/classes/validators/CApiInputValidator.php:1449
 #: include/validate.inc.php:221
 msgid "a time range is expected"
 msgstr "ожидался период времени"
 
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupLldOperation.php:154
-#: include/classes/validators/CApiInputValidator.php:1568
+#: include/classes/validators/CApiInputValidator.php:1572
 #: include/validate.inc.php:213 include/validate.inc.php:586
 msgid "a time unit is expected"
 msgstr "ожидается единица времени"
 
-#: include/classes/validators/CApiInputValidator.php:1383
+#: include/classes/validators/CApiInputValidator.php:1387
 msgid "a user macro is expected"
 msgstr "ожидается пользовательский макрос"
 
@@ -19750,18 +19681,18 @@ msgstr "все способы оповещения"
 #: include/classes/import/validators/C50XmlValidator.php:2296
 #: include/classes/import/validators/C50XmlValidator.php:2423
 #: include/classes/import/validators/CXmlValidatorGeneral.php:252
-#: include/classes/validators/CApiInputValidator.php:429
-#: include/classes/validators/CApiInputValidator.php:561
-#: include/classes/validators/CApiInputValidator.php:654
-#: include/classes/validators/CApiInputValidator.php:748
-#: include/classes/validators/CApiInputValidator.php:895
-#: include/classes/validators/CApiInputValidator.php:1089
-#: include/classes/validators/CApiInputValidator.php:1131
+#: include/classes/validators/CApiInputValidator.php:433
+#: include/classes/validators/CApiInputValidator.php:565
+#: include/classes/validators/CApiInputValidator.php:658
+#: include/classes/validators/CApiInputValidator.php:752
+#: include/classes/validators/CApiInputValidator.php:899
+#: include/classes/validators/CApiInputValidator.php:1093
+#: include/classes/validators/CApiInputValidator.php:1135
 msgid "an array is expected"
 msgstr "ожидается массив"
 
-#: include/classes/validators/CApiInputValidator.php:974
-#: include/classes/validators/CApiInputValidator.php:1044
+#: include/classes/validators/CApiInputValidator.php:978
+#: include/classes/validators/CApiInputValidator.php:1048
 msgid "an array or a character string is expected"
 msgstr "ожидается массив или строка символов"
 
@@ -19771,7 +19702,7 @@ msgid "an empty string is expected"
 msgstr "ожидается пустая строка"
 
 #: include/classes/api/services/CHost.php:1876
-#: include/classes/validators/CApiInputValidator.php:1007
+#: include/classes/validators/CApiInputValidator.php:1011
 msgid "an even number of hexadecimal characters is expected"
 msgstr "ожидается четное количество шестнадцатеричных символов"
 
@@ -19779,11 +19710,11 @@ msgstr "ожидается четное количество шестнадца�
 msgid "an explicit time is expected"
 msgstr "ожидается время указанное явно"
 
-#: include/classes/validators/CApiInputValidator.php:476
+#: include/classes/validators/CApiInputValidator.php:480
 msgid "an integer is expected"
 msgstr "ожидается целое число"
 
-#: include/classes/validators/CApiInputValidator.php:515
+#: include/classes/validators/CApiInputValidator.php:519
 msgid "an unsigned integer is expected"
 msgstr "ожидается целое положительное число"
 
@@ -19890,7 +19821,7 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1931
+#: include/classes/api/services/CDiscoveryRule.php:1933
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:319
@@ -19926,11 +19857,8 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CTriggerGeneral.php:519
-#: include/classes/api/services/CTriggerGeneral.php:899
-#: include/classes/api/services/CTriggerGeneral.php:931
-#: include/classes/api/services/CTriggerGeneral.php:1160
-#: include/classes/api/services/CTriggerGeneral.php:1178
+#: include/classes/api/services/CTriggerGeneral.php:703
+#: include/classes/api/services/CTriggerGeneral.php:736
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
@@ -19951,14 +19879,14 @@ msgstr "нельзя изменить"
 #: include/classes/validators/CActionCondValidator.php:175
 #: include/classes/validators/CActionCondValidator.php:181
 #: include/classes/validators/CActionCondValidator.php:191
-#: include/classes/validators/CApiInputValidator.php:272
-#: include/classes/validators/CApiInputValidator.php:434
-#: include/classes/validators/CApiInputValidator.php:566
-#: include/classes/validators/CApiInputValidator.php:659
-#: include/classes/validators/CApiInputValidator.php:753
-#: include/classes/validators/CApiInputValidator.php:799
-#: include/classes/validators/CApiInputValidator.php:1094
-#: include/classes/validators/CApiInputValidator.php:1136
+#: include/classes/validators/CApiInputValidator.php:276
+#: include/classes/validators/CApiInputValidator.php:438
+#: include/classes/validators/CApiInputValidator.php:570
+#: include/classes/validators/CApiInputValidator.php:663
+#: include/classes/validators/CApiInputValidator.php:757
+#: include/classes/validators/CApiInputValidator.php:803
+#: include/classes/validators/CApiInputValidator.php:1098
+#: include/classes/validators/CApiInputValidator.php:1140
 #: include/classes/validators/CEventCorrCondValidator.php:55
 #: include/classes/validators/CEventCorrCondValidator.php:61
 #: include/classes/validators/CEventCorrCondValidator.php:67
@@ -19979,7 +19907,7 @@ msgstr "не удалось сконвертировать в JSON, значен
 msgid "cannot perform Scroll API request, data could be truncated"
 msgstr "не удалось выполнить Scroll API запрос, данные могут быть обрезаны"
 
-#: include/classes/api/services/CDiscoveryRule.php:1914
+#: include/classes/api/services/CDiscoveryRule.php:1916
 msgid "cannot update property for templated discovery rule"
 msgstr "не удалось обновить свойство у правила обнаружения из шаблона"
 
@@ -20092,7 +20020,7 @@ msgstr "описание"
 msgid "diff() - Difference between last and preceding values (1 - true, 0 - false)"
 msgstr "diff() - Разница между последним и предыдущим значениями (1 - правда, 0 - ложь)"
 
-#: include/classes/validators/CApiInputValidator.php:1353
+#: include/classes/validators/CApiInputValidator.php:1357
 msgid "directory or script name cannot be empty"
 msgstr "директория или имя скрипта не могут быть пустыми"
 
@@ -20252,11 +20180,11 @@ msgstr "в"
 msgid "including subgroups"
 msgstr "включая подгруппы"
 
-#: include/classes/parsers/CTriggerExpression.php:494
+#: include/classes/parsers/CTriggerExpression.php:497
 msgid "incorrect calculated item formula"
 msgstr "некорректная формула вычисленного элемента данных"
 
-#: include/classes/parsers/CTriggerExpression.php:503
+#: include/classes/parsers/CTriggerExpression.php:511
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
 msgstr "некорректная формула вычисленного элемента данных начиная с \"%1$s\""
@@ -20273,6 +20201,15 @@ msgstr "некорректное количество элементов"
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
 msgstr "некорректный синтаксис около \"%1$s\""
+
+#: include/classes/parsers/CTriggerExpression.php:501
+msgid "incorrect trigger expression"
+msgstr ""
+
+#: include/classes/parsers/CTriggerExpression.php:515
+#, c-format
+msgid "incorrect trigger expression starting from \"%1$s\""
+msgstr ""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -20293,7 +20230,7 @@ msgstr "ошибочный шаблон Prometheus"
 msgid "invalid address range \"%1$s\""
 msgstr "ошибочный диапазон адресов \"%1$s\""
 
-#: include/classes/validators/CApiInputValidator.php:267
+#: include/classes/validators/CApiInputValidator.php:271
 msgid "invalid byte sequence in UTF-8"
 msgstr "ошибочная последовательность байт в UTF-8"
 
@@ -20307,15 +20244,15 @@ msgstr "ошибочная задержка"
 msgid "invalid history storage period"
 msgstr "недопустимый период хранения истории"
 
-#: include/classes/validators/CApiInputValidator.php:1190
+#: include/classes/validators/CApiInputValidator.php:1194
 msgid "invalid host group name"
 msgstr "ошибочное имя группы узлов сети"
 
-#: include/classes/validators/CApiInputValidator.php:1234
+#: include/classes/validators/CApiInputValidator.php:1238
 msgid "invalid host name"
 msgstr "ошибочное имя узла сети"
 
-#: include/classes/validators/CApiInputValidator.php:1515
+#: include/classes/validators/CApiInputValidator.php:1519
 msgid "invalid regular expression"
 msgstr "ошибочное регулярное выражение"
 
@@ -20337,7 +20274,7 @@ msgstr "больше чем или равно"
 msgid "is less than or equals"
 msgstr "меньше чем или равно"
 
-#: include/classes/validators/CApiInputValidator.php:1759
+#: include/classes/validators/CApiInputValidator.php:1763
 msgid "is not enclosed in {} or is malformed"
 msgstr "не заключено в {} или ошибочно"
 
@@ -20482,7 +20419,7 @@ msgid "min() - Minimum value for period T"
 msgstr "min() - Минимальное значение за период Т"
 
 #: include/classes/api/services/CHost.php:1882
-#: include/classes/validators/CApiInputValidator.php:1001
+#: include/classes/validators/CApiInputValidator.php:1005
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "минимальная длина %1$s символов"
@@ -20515,8 +20452,8 @@ msgstr "должен быть действительным пользовате�
 msgid "must be between \"%1$s\" and \"%2$s\""
 msgstr "должно быть между \"%1$s\" и \"%2$s\""
 
-#: include/classes/validators/CApiInputValidator.php:1197
-#: include/classes/validators/CApiInputValidator.php:1241
+#: include/classes/validators/CApiInputValidator.php:1201
+#: include/classes/validators/CApiInputValidator.php:1245
 msgid "must contain at least one low-level discovery macro"
 msgstr "должно содержать по крайней мере один макрос низкоуровневого обнаружения"
 
@@ -20748,10 +20685,8 @@ msgstr "краткое описание"
 #: include/classes/api/services/CMediatype.php:786
 #: include/classes/api/services/CProxy.php:664
 #: include/classes/api/services/CProxy.php:790
-#: include/classes/api/services/CTriggerGeneral.php:891
-#: include/classes/api/services/CTriggerGeneral.php:917
-#: include/classes/api/services/CTriggerGeneral.php:1152
-#: include/classes/api/services/CTriggerGeneral.php:1170
+#: include/classes/api/services/CTriggerGeneral.php:709
+#: include/classes/api/services/CTriggerGeneral.php:742
 #: include/classes/validators/CActionCondValidator.php:145
 msgid "should be empty"
 msgstr "должно быть пустым"
@@ -20829,14 +20764,14 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 #: app/controllers/CControllerDashboardUpdate.php:150
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CDashboard.php:388
-#: include/classes/api/services/CDiscoveryRule.php:1592
-#: include/classes/api/services/CDiscoveryRule.php:1949
-#: include/classes/api/services/CDiscoveryRule.php:1957
+#: include/classes/api/services/CDiscoveryRule.php:1594
+#: include/classes/api/services/CDiscoveryRule.php:1951
+#: include/classes/api/services/CDiscoveryRule.php:1959
 #: include/classes/api/services/CHost.php:1969
 #: include/classes/api/services/CHost.php:2163
 #: include/classes/api/services/CHttpTest.php:742
 #: include/classes/api/services/CTemplate.php:401
-#: include/classes/validators/CApiInputValidator.php:930
+#: include/classes/validators/CApiInputValidator.php:934
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
 msgstr "параметр \"%1$s\" отсутствует"
@@ -20887,11 +20822,15 @@ msgstr "триггер"
 msgid "trigger does not allow manual closing"
 msgstr "триггер не позволяет ручное закрытие"
 
-#: include/classes/api/services/CTriggerGeneral.php:1838
+#: include/classes/validators/CApiInputValidator.php:1847
+msgid "trigger expression must contain at least one host:key reference"
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1634
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "прототип триггера нельзя переместить в другой шаблон или узел сети"
 
-#: include/classes/api/services/CTriggerGeneral.php:1983
+#: include/classes/api/services/CTriggerGeneral.php:1794
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "триггер со связями нельзя переместить в другой шаблон или узел сети"
 
@@ -20900,7 +20839,7 @@ msgstr "триггер со связями нельзя переместить �
 msgid "type here to search"
 msgstr "начните печатать для поиска"
 
-#: include/classes/validators/CApiInputValidator.php:1796
+#: include/classes/validators/CApiInputValidator.php:1800
 msgid "unacceptable URL"
 msgstr "неприемлемый URL"
 
@@ -20927,13 +20866,13 @@ msgstr "неожиданный конец ключа"
 msgid "unexpected end of macro"
 msgstr "неожиданное завершение макроса"
 
-#: include/classes/api/services/CDiscoveryRule.php:1612
-#: include/classes/api/services/CDiscoveryRule.php:1643
-#: include/classes/api/services/CDiscoveryRule.php:1666
-#: include/classes/api/services/CDiscoveryRule.php:1685
+#: include/classes/api/services/CDiscoveryRule.php:1614
+#: include/classes/api/services/CDiscoveryRule.php:1645
+#: include/classes/api/services/CDiscoveryRule.php:1668
+#: include/classes/api/services/CDiscoveryRule.php:1687
 #: include/classes/api/services/CHttpTest.php:456
 #: include/classes/api/services/CHttpTest.php:480
-#: include/classes/validators/CApiInputValidator.php:902
+#: include/classes/validators/CApiInputValidator.php:906
 #, c-format
 msgid "unexpected parameter \"%1$s\""
 msgstr "неожиданный параметр \"%1$s\""
@@ -20960,12 +20899,7 @@ msgstr "неожиданный текст \"%1$s\""
 #: include/classes/api/services/CItemGeneral.php:1591
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
-#: include/classes/api/services/CTriggerGeneral.php:925
-#: include/classes/api/services/CTriggerGeneral.php:938
-#: include/classes/api/services/CTriggerGeneral.php:946
-#: include/classes/api/services/CTriggerGeneral.php:1144
-#: include/classes/api/services/CTriggerGeneral.php:1185
-#: include/classes/api/services/CTriggerGeneral.php:1193
+#: include/classes/api/services/CTriggerGeneral.php:730
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr "неожиданное значение \"%1$s\""
@@ -21020,7 +20954,7 @@ msgstr "неподдерживаемый номер версии"
 msgid "value"
 msgstr "значение"
 
-#: include/classes/api/services/CDiscoveryRule.php:1828
+#: include/classes/api/services/CDiscoveryRule.php:1830
 #, c-format
 msgid "value \"%1$s\" already exists"
 msgstr "значение \"%1$s\" уже существует"
@@ -21034,34 +20968,37 @@ msgstr "значение \"%1$s\" уже существует"
 msgid "value \"%1$s\" not found"
 msgstr "значение \"%1$s\" не найдено"
 
-#: include/classes/validators/CApiInputValidator.php:1613
-#: include/classes/validators/CApiInputValidator.php:1667
+#: include/classes/validators/CApiInputValidator.php:1617
+#: include/classes/validators/CApiInputValidator.php:1671
 #, c-format
 msgid "value %1$s already exists"
 msgstr "значение %1$s уже существует"
 
-#: include/classes/validators/CApiInputValidator.php:397
-#: include/classes/validators/CApiInputValidator.php:1013
-#: include/classes/validators/CApiInputValidator.php:1181
-#: include/classes/validators/CApiInputValidator.php:1224
-#: include/classes/validators/CApiInputValidator.php:1278
-#: include/classes/validators/CApiInputValidator.php:1343
-#: include/classes/validators/CApiInputValidator.php:1378
-#: include/classes/validators/CApiInputValidator.php:1407
-#: include/classes/validators/CApiInputValidator.php:1438
-#: include/classes/validators/CApiInputValidator.php:1472
-#: include/classes/validators/CApiInputValidator.php:1506
-#: include/classes/validators/CApiInputValidator.php:1552
-#: include/classes/validators/CApiInputValidator.php:1754
-#: include/classes/validators/CApiInputValidator.php:1786
+#: include/classes/api/services/CTriggerGeneral.php:1682
+#: include/classes/api/services/CTriggerGeneral.php:1699
+#: include/classes/validators/CApiInputValidator.php:401
+#: include/classes/validators/CApiInputValidator.php:1017
+#: include/classes/validators/CApiInputValidator.php:1185
+#: include/classes/validators/CApiInputValidator.php:1228
+#: include/classes/validators/CApiInputValidator.php:1282
+#: include/classes/validators/CApiInputValidator.php:1347
+#: include/classes/validators/CApiInputValidator.php:1382
+#: include/classes/validators/CApiInputValidator.php:1411
+#: include/classes/validators/CApiInputValidator.php:1442
+#: include/classes/validators/CApiInputValidator.php:1476
+#: include/classes/validators/CApiInputValidator.php:1510
+#: include/classes/validators/CApiInputValidator.php:1556
+#: include/classes/validators/CApiInputValidator.php:1758
+#: include/classes/validators/CApiInputValidator.php:1790
+#: include/classes/validators/CApiInputValidator.php:1831
 msgid "value is too long"
 msgstr "значение слишком длинное"
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CDiscoveryRule.php:1624
-#: include/classes/api/services/CDiscoveryRule.php:1655
-#: include/classes/api/services/CDiscoveryRule.php:1675
-#: include/classes/api/services/CDiscoveryRule.php:1696
+#: include/classes/api/services/CDiscoveryRule.php:1626
+#: include/classes/api/services/CDiscoveryRule.php:1657
+#: include/classes/api/services/CDiscoveryRule.php:1677
+#: include/classes/api/services/CDiscoveryRule.php:1698
 #: include/classes/api/services/CEvent.php:772
 #: include/classes/api/services/CHost.php:992
 #: include/classes/api/services/CHost.php:2025
@@ -21071,8 +21008,8 @@ msgstr "значение слишком длинное"
 #: include/classes/api/services/CMap.php:681
 #: include/classes/api/services/CMap.php:1140
 #: include/classes/api/services/CMap.php:1146
-#: include/classes/validators/CApiInputValidator.php:391
-#: include/classes/validators/CApiInputValidator.php:716
+#: include/classes/validators/CApiInputValidator.php:395
+#: include/classes/validators/CApiInputValidator.php:720
 #: include/validate.inc.php:579
 #, c-format
 msgid "value must be one of %1$s"
