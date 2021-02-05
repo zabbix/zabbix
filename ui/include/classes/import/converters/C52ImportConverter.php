@@ -190,7 +190,7 @@ class C52ImportConverter extends CConverter {
 							'name' => $selement['application']
 						]]);
 
-						$maps[$i]['selements'][$s]['tags'] = array_map(function($tag) {
+						$maps[$i]['selements'][$s]['tags'] = array_map(function ($tag) {
 							return $tag + ['operator' => (string) TAG_OPERATOR_LIKE];
 						}, $maps[$i]['selements'][$s]['tags']);
 					}

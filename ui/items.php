@@ -1524,7 +1524,7 @@ else {
 				'subfilter_interval' => (!getRequest('subfilter_interval')
 					|| ($delay !== '' && in_array($delay, getRequest('subfilter_interval')))),
 				'subfilter_tags' => (!$subfilter_tags
-					|| (bool) array_intersect_key($subfilter_tags, array_flip(array_map(function($tag) {
+					|| (bool) array_intersect_key($subfilter_tags, array_flip(array_map(function ($tag) {
 							return json_encode([$tag['tag'], $tag['value']]);
 						}, $item['tags']))))
 			];
