@@ -2662,20 +2662,4 @@ abstract class CItemGeneral extends CApiService {
 			DB::insert('item_tag', $new_tags);
 		}
 	}
-
-	/**
-	 * Validates the input parameters for the get() method.
-	 *
-	 * @throws APIException  if the input is invalid
-	 *
-	 * @param array $options
-	 */
-	protected function validateGet(array $options) {
-		$evaltype_validator = new CLimitedSetValidator([
-			'values' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
-		]);
-		if (!$evaltype_validator->validate($options['evaltype'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
-		}
-	}
 }
