@@ -432,3 +432,103 @@ function userAgents() {
 		]
 	];
 }
+
+/**
+ * Get direct or inherited tags for web scenario edit form.
+ *
+ * @param array  $data
+ * @param string $data['templates'][<templateid>]['hostid']
+ * @param string $data['templates'][<templateid>]['name']
+ * @param int    $data['templates'][<templateid>]['permission']
+ * @param string $data['hostid']
+ * @param array  $data['tags']
+ * @param string $data['tags'][]['tag']
+ * @param string $data['tags'][]['value']
+ * @param int    $data['show_inherited_tags']
+ *
+ * @return array
+ */
+function getHttpTestTags(array $data): array {
+	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
+
+	if ($data['show_inherited_tags']) {
+		unset($data['templates'][0]);
+
+		$db_templates = $data['templates']
+			? API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($data['templates']),
+				'preservekeys' => true
+			])
+			: [];
+
+		$db_host = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid'],
+			'templated_hosts' => true
+		]);
+
+		if ($db_host) {
+			$db_host_tags = $db_host[0]['tags'];
+			$db_host = [
+				'permission' => PERM_READ_WRITE,
+				'hostid' => $db_host[0]['hostid'],
+				'name' => $db_host[0]['name']
+			];
+		}
+		else {
+			$db_host_tags = [];
+		}
+
+		// Make list of template tags.
+		$inherited_tags = [];
+		foreach ($data['templates'] as $templateid => $template) {
+			if (array_key_exists($templateid, $db_templates)) {
+				foreach ($db_templates[$templateid]['tags'] as $tag) {
+					if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+						$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
+						];
+					}
+					else {
+						$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+							$templateid => $template
+						];
+					}
+				}
+			}
+		}
+
+		// Overwrite and attache host level tags.
+		foreach ($db_host_tags as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+					'parent_templates' => [$db_host['hostid'] => $db_host],
+					'type' => ZBX_PROPERTY_INHERITED
+				];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+					$db_host['hostid'] => $db_host
+				];
+			}
+		}
+
+		// Overwrite and attache http test's own tags.
+		foreach ($data['tags'] as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+		}
+
+		$tags = array_values($inherited_tags);
+	}
+
+	return $tags;
+}
