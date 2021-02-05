@@ -79,9 +79,9 @@ $hostid = getRequest('hostid', 0);
 // permissions
 if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
+		'itemids' => getRequest('parent_discoveryid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['flags'],
-		'itemids' => getRequest('parent_discoveryid'),
 		'editable' => true
 	]);
 	$discoveryRule = reset($discoveryRule);
@@ -91,6 +91,7 @@ if (getRequest('parent_discoveryid')) {
 
 	if ($hostid != 0) {
 		$hostPrototype = API::HostPrototype()->get([
+			'hostids' => [$hostid],
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
@@ -99,7 +100,6 @@ if (getRequest('parent_discoveryid')) {
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'selectTags' => ['tag', 'value'],
 			'selectInterfaces' => ['type', 'main', 'useip', 'ip', 'dns', 'port', 'details'],
-			'hostids' => [$hostid],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -299,10 +299,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		unset($macro);
 
 		$result = API::HostPrototype()->create($newHostPrototype);
-
-		if ($result) {
-			$hostid = reset($result['hostids']);
-		}
 
 		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
 	}
