@@ -48,7 +48,7 @@ $fields = [
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
-	'valuemap'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'valuemaps'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
@@ -280,7 +280,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		$valuemaps = array_values(getRequest('valuemap', []));
+		$valuemaps = array_values(getRequest('valuemaps', []));
 
 		if (getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone') {
 			$db_valuemaps = [];
@@ -507,7 +507,7 @@ if (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
 		'macros' => $macros,
-		'valuemaps' => array_values(getRequest('valuemap', []))
+		'valuemaps' => array_values(getRequest('valuemaps', []))
 	];
 
 	if ($data['templateid'] != 0) {
