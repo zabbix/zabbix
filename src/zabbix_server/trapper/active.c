@@ -44,12 +44,14 @@ extern unsigned char	program_type;
  *             host_metadata - [IN] host metadata                             *
  *             flag          - [IN] flag describing interface type            *
  *             interface     - [IN] interface value if flag is not default    *
+ *             tls_subject   - [IN] TLS subject of the host if using TLS CERT *
+ *             tls_issuer    - [IN] TLS issuer of the host if using TLS CERT *
  *                                                                            *
  * Comments: helper function for get_hostid_by_host                           *
  *                                                                            *
  ******************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, const char *tls_subject, const char *tls_issuer)
 {
 	char		dns[INTERFACE_DNS_LEN_MAX];
 	char		ip_addr[INTERFACE_IP_LEN_MAX];
@@ -85,7 +87,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
-				(int)time(NULL));
+				(int)time(NULL), tls_subject, tls_issuer);
 	}
 	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
@@ -120,6 +122,40 @@ static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsig
 			goto out;
 		}
 
+		ret = SUCCEED;
+	}
+	else if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type){
+		zbx_tls_conn_attr_t	attr;
+		char        *subject_host = NULL;
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get connection attributes for host"
+					" \"%s\"", host);
+			goto out;
+		}
+
+
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		/*if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
+		{
+			zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
+					" host \"%s\"", host);#			goto done;
+		}
+		*/
+		/* simplified match, not compliant with RFC 4517, 4518 */
+		if ( FAIL == zbx_regexp_sub(attr.subject, "^CN=([^\\.]+)","\\1",&subject_host)){
+			zabbix_log(LOG_LEVEL_WARNING, "certificate subject does not match CN=hostname"
+					" host \"%s\", subject: \"%s\"", host, attr.subject);
+			goto out;
+		}
+		if (0 != strcmp(host, subject_host))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "certificate subject does not match for"
+					" host \"%s\", subject: \"%s\"", host, subject_host);
+			goto out;
+		}
 		ret = SUCCEED;
 	}
 	else if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type)
@@ -167,12 +203,14 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
 		char *error)
 {
-	char			*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
+	char			*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port, *tls_subject, *tls_issuer;
 	DB_RESULT		result;
 	DB_ROW			row;
 	unsigned short		old_port_v;
 	int			tls_offset = 0, ret = FAIL;
 	zbx_conn_flags_t	old_flag_v;
+	tls_subject="";
+	tls_issuer="";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
@@ -238,9 +276,10 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 			{
 				zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
-						" host \"%s\"", host);
+						" host \"%s\", issuer: \"%s\", expected \"%s\"", host,attr.issuer, row[3]);
 				goto done;
 			}
+			tls_issuer = attr.issuer;
 
 			/* simplified match, not compliant with RFC 4517, 4518 */
 			if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
@@ -249,6 +288,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 						" host \"%s\"", host);
 				goto done;
 			}
+			tls_subject = attr.subject;
+			
 		}
 #if defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 		else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
@@ -287,7 +328,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
 				(old_flag_v != flag))
 		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface, tls_subject, tls_issuer);
 		}
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
@@ -302,9 +343,14 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	else
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
-
-		if (SUCCEED == zbx_autoreg_check_permissions(host, ip, port, sock))
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+		if (SUCCEED == zbx_autoreg_check_permissions(host, ip, port, sock)){
+			zbx_tls_conn_attr_t	attr;
+			if((ZBX_TCP_SEC_TLS_CERT == sock->connection_type) && (SUCCEED == zbx_tls_get_attr_cert(sock, &attr))){
+				tls_subject = attr.subject;
+				tls_issuer = attr.issuer;
+			}
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,tls_subject,tls_issuer);
+		}
 	}
 done:
 	DBfree_result(result);
