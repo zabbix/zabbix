@@ -1059,7 +1059,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
 		{
-			if (0 != host.hostid)
+			if (0 != host.hostid)	/* target is from "Host" list or "Host group" list */
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
@@ -1084,7 +1084,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 #endif
 			}
 			else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-					sizeof(error))))
+					sizeof(error))))	/* target is "Current host" */
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
