@@ -502,7 +502,7 @@ function getHttpTestTags(array $data): array {
 			}
 		}
 
-		// Overwrite and attache host level tags.
+		// Overwrite and attach host level tags.
 		foreach ($db_host_tags as $tag) {
 			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
 				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
@@ -517,7 +517,7 @@ function getHttpTestTags(array $data): array {
 			}
 		}
 
-		// Overwrite and attache http test's own tags.
+		// Overwrite and attach http test's own tags.
 		foreach ($data['tags'] as $tag) {
 			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
 				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
