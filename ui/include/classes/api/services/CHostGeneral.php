@@ -478,30 +478,6 @@ abstract class CHostGeneral extends CHostBase {
 				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
 					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
-
-				/*
-				 * Convert templated application prototypes to normal application prototypes
-				 * who are linked to these item prototypes.
-				 */
-				$application_prototypes = DBfetchArray(DBselect(
-					'SELECT ap.application_prototypeid'.
-					' FROM application_prototype ap'.
-					' WHERE EXISTS ('.
-						'SELECT NULL'.
-						' FROM item_application_prototype iap'.
-						' WHERE '.dbConditionInt('iap.itemid', $item_prototypeids).
-							' AND iap.application_prototypeid=ap.application_prototypeid'.
-					')'
-				));
-
-				if ($application_prototypes) {
-					$application_prototypeids = zbx_objectValues($application_prototypes, 'application_prototypeid');
-
-					DB::update('application_prototype', [
-						'values' => ['templateid' => 0],
-						'where' => ['application_prototypeid' => $application_prototypeids]
-					]);
-				}
 			}
 		}
 		/* }}} ITEMS, DISCOVERY RULES */
