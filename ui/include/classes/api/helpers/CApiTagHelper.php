@@ -143,7 +143,7 @@ class CApiTagHelper {
 
 		$sql_where_negated = [];
 		if ($evaltype == TAG_EVAL_TYPE_AND_OR) {
-			$sql_where = array_filter($sql_where, function($statement) use (&$sql_where_negated) {
+			$sql_where = array_filter($sql_where, function ($statement) use (&$sql_where_negated) {
 				if (substr($statement, 0, 3) === 'NOT') {
 					$sql_where_negated[] = substr($statement, 4);
 					return false;
@@ -182,7 +182,7 @@ class CApiTagHelper {
 	 */
 	public static function addInheritedHostTagsWhereCondition(array $tags, int $evaltype): string {
 		// Swap tag operators to select templates normally should be excluded.
-		$swapped_filter = array_map(function($tag) {
+		$swapped_filter = array_map(function ($tag) {
 			$swapping_map = [
 				TAG_OPERATOR_LIKE => TAG_OPERATOR_LIKE,
 				TAG_OPERATOR_EQUAL => TAG_OPERATOR_EQUAL,
