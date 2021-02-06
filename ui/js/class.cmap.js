@@ -846,8 +846,6 @@ ZABBIX.apps.map = (function($) {
 						options.counter = ++options.counter;
 					})
 					.on('afteradd.dynamicRows', function() {
-						$('.textarea-flexible', $('#selement-tags')).textareaFlexible();
-
 						var rows = this.querySelectorAll('.form_row');
 						new CTagFilterItem(rows[rows.length- 1]);
 					});
