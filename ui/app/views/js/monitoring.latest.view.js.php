@@ -147,8 +147,7 @@
 
 	latestPage.prototype.liveFilter = function() {
 		var $filter_hostids = $('#filter_hostids_'),
-			$filter_show_without_data = $('#filter_show_without_data'),
-			$filter_tags = $('#filter-tags');
+			$filter_show_without_data = $('#filter_show_without_data');
 
 		$filter_hostids.on('change', function() {
 			var no_hosts_selected = !$(this).multiSelect('getData').length;
@@ -160,34 +159,17 @@
 			$filter_show_without_data.prop('disabled', no_hosts_selected);
 		});
 
-		$filter_tags
+		$('#filter-tags')
 			.dynamicRows({template: '#filter-tag-row-tmpl'})
 			.on('afteradd.dynamicRows', function() {
-				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-				$(this)
-					.find('z-select')
-					.on('change', function() {
-						let num = this.id.match(/filter_tags_(\d+)_operator/);
-						if (num !== null) {
-							let show = $(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>;
-							$('#filter_tags_' + num[1] + '_value').toggle(show);
-						}
-					});
+				var rows = this.querySelectorAll('.form_row');
+				new CTagFilterItem(rows[rows.length- 1]);
 			});
 
-		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-		$filter_tags
-			.find('z-select')
-			.on('change', function() {
-				let num = this.id.match(/filter_tags_(\d+)_operator/);
-				if (num !== null) {
-					let show = $(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>;
-					$('#filter_tags_' + num[1] + '_value').toggle(show);
-				}
-			})
-			.trigger('change');
+		// Init existing fields once loaded.
+		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+			new CTagFilterItem(row);
+		});
 	};
 
 	$(function() {

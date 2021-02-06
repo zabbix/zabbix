@@ -20,9 +20,6 @@
 
 ZABBIX.namespace('classes.Observer');
 
-const TAG_OPERATOR_EXISTS = '4';
-const TAG_OPERATOR_NOT_EXISTS = '5';
-
 ZABBIX.classes.Observer = (function() {
 	var Observer = function() {
 		this.listeners = {};
@@ -851,17 +848,8 @@ ZABBIX.apps.map = (function($) {
 					.on('afteradd.dynamicRows', function() {
 						$('.textarea-flexible', $('#selement-tags')).textareaFlexible();
 
-						// Hide tag value field if operator is "Exists" or "Does not exist".
-						$(this)
-							.find('z-select')
-							.on('change', function() {
-								let num = this.id.match(/tags_(\d+)_operator/);
-								if (num !== null) {
-									let show = $(this).val() !== TAG_OPERATOR_EXISTS
-											&& $(this).val() !== TAG_OPERATOR_NOT_EXISTS;
-									$('#tags_' + num[1] + '_value').toggle(show);
-								}
-							});
+						var rows = this.querySelectorAll('.form_row');
+						new CTagFilterItem(rows[rows.length- 1]);
 					});
 
 				// mass update form
@@ -2827,22 +2815,16 @@ ZABBIX.apps.map = (function($) {
 					row
 						.find('[name="tags[' + tag.rowNum + '][tag]"]')
 						.val(tag.tag);
+
 					row
 						.find('[name="tags[' + tag.rowNum + '][operator]"]')
-						.on('change', function() {
-							let num = this.id.match(/tags_(\d+)_operator/);
-							if (num !== null) {
-								let show = $(this).val() !== TAG_OPERATOR_EXISTS
-										&& $(this).val() !== TAG_OPERATOR_NOT_EXISTS;
-								$('#tags_' + num[1] + '_value').toggle(show);
-							}
-						})
-						.val(tag.operator)
-						.trigger('change');
+						.val(tag.operator);
 
 					row
 						.find('[name="tags[' + tag.rowNum + '][value]"]')
 						.val(tag.value);
+
+					new CTagFilterItem(row[0]);
 				}
 
 				$('#selement-tags').data('dynamicRows').counter = counter;

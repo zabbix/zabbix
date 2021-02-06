@@ -47,6 +47,7 @@ $this->addJsFile('class.mapWidget.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
+$this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('dashboard/class.dashboard.js.php');
 $this->includeJsFile('dashboard/class.dashboard-share.js.php');

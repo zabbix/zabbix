@@ -25,6 +25,7 @@
 
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('class.tagfilteritem.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 

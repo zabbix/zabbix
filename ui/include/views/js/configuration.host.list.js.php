@@ -33,19 +33,14 @@
 		$('#filter-tags')
 			.dynamicRows({template: '#filter-tag-row-tmpl'})
 			.on('afteradd.dynamicRows', function() {
-				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-				$(this)
-					.find('z-select')
-					.on('change', function() {
-						var num = this.id.match(/filter_tags_(\d+)_operator/);
-
-						if (num !== null) {
-							$('#filter_tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-							);
-						}
-					});
+				var rows = this.querySelectorAll('.form_row');
+				new CTagFilterItem(rows[rows.length- 1]);
 			});
+
+		// Init existing fields once loaded.
+		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
+			new CTagFilterItem(row);
+		});
 
 		$('#filter_monitored_by').on('change', function() {
 			var filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
@@ -57,16 +52,5 @@
 				$('#filter_proxyids_').multiSelect('disable');
 			}
 		});
-
-		// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-		$('#filter-tags z-select').on('change', function() {
-			var num = this.id.match(/filter_tags_(\d+)_operator/);
-
-			if (num !== null) {
-				$('#filter_tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-						&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-				);
-			}
-		}).trigger('change');
 	});
 </script>

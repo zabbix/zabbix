@@ -410,31 +410,14 @@ if (array_key_exists('render_html', $data)) {
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
-				// Hide tag value field if operator is "Exists" or "Does not exist". Show tag value field otherwise.
-				$(this)
-					.find('z-select')
-					.on('change', function() {
-						var num = this.id.match(/tags_(\d+)_operator/);
-
-						if (num !== null) {
-							$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-									&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-							);
-						}
-					});
+				var rows = this.querySelectorAll('.form_row');
+				new CTagFilterItem(rows[rows.length- 1]);
 			});
 
-		$('#filter-tags_' + data.uniqid + ' z-select')
-			.on('change', function() {
-				var num = this.id.match(/tags_(\d+)_operator/);
-
-				if (num !== null) {
-					$('#tags_' + num[1] + '_value').toggle($(this).val() != <?= TAG_OPERATOR_EXISTS ?>
-							&& $(this).val() != <?= TAG_OPERATOR_NOT_EXISTS ?>
-					);
-				}
-			})
-			.trigger('change');
+		// Init existing fields once loaded.
+		document.querySelectorAll('#filter-tags_' + data.uniqid + ' .form_row').forEach(row => {
+			new CTagFilterItem(row);
+		});
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({

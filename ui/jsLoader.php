@@ -108,6 +108,7 @@ $availableJScripts = [
 	'class.rpc.js' => '',
 	'class.tabfilter.js' => '',
 	'class.tabfilteritem.js' => '',
+	'class.tagfilteritem.js' => '',
 	'class.template.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
