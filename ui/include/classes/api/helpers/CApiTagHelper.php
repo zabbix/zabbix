@@ -256,7 +256,7 @@ class CApiTagHelper {
 
 		// Make 'where' condition from negated filter tags.
 		$negated_conditions = array_fill_keys(array_keys($negated_tags), ['values' => [], 'templateids' => []]);
-		array_walk($negated_conditions, function(&$where, $tag_name) use ($negated_tags, $db_template_tags) {
+		array_walk($negated_conditions, function (&$where, $tag_name) use ($negated_tags, $db_template_tags) {
 			if ($negated_tags[$tag_name] === false) {
 				$tag = ['tag' => $tag_name, 'operator' => TAG_OPERATOR_NOT_EXISTS];
 				$where['templateids'] += self::getMatchingTemplateids($tag, $db_template_tags);
@@ -312,7 +312,7 @@ class CApiTagHelper {
 				$where_conditions[] = 'NOT ('.implode(' AND ', $negated_where_conditions).')';
 			}
 			else {
-				$where_conditions = array_map(function($condition) {
+				$where_conditions = array_map(function ($condition) {
 					return 'NOT '.$condition;
 				}, $negated_where_conditions);
 			}
@@ -368,6 +368,15 @@ class CApiTagHelper {
 		return '('.implode($operator, $where_conditions).')';
 	}
 
+	/**
+	 * Function returns SQL WHERE statement for given tag value based on operator.
+	 *
+	 * @param array  $tag
+	 * @param string $tag['value']
+	 * @param int    $tag['operator']
+	 *
+	 * @return string
+	 */
 	private static function makeTagWhereCondition(array $tag): string {
 		if ($tag['operator'] == TAG_OPERATOR_EQUAL || $tag['operator'] == TAG_OPERATOR_NOT_EQUAL) {
 			return 'host_tag.value='.zbx_dbstr($tag['value']);
@@ -379,6 +388,19 @@ class CApiTagHelper {
 		}
 	}
 
+	/**
+	 * Function to collect templateids having tags matching the filter tag.
+	 *
+	 * @param array   $filter_tag
+	 * @param string  $filter_tag['tag']
+	 * @param int     $filter_tag['operator']
+	 * @param string  $filter_tag['value']
+	 * @param array   $template_tags
+	 * @param string  $template_tags[]['tag']
+	 * @param string  $template_tags[]['value']
+	 *
+	 * @return array
+	 */
 	private static function getMatchingTemplateids(array $filter_tag, array $template_tags): array {
 		$templateids = [];
 
