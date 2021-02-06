@@ -1453,19 +1453,19 @@ function checkIfProblemTagsMatches(array $filter_tag, array $tags): bool {
 			break;
 
 		case TAG_OPERATOR_NOT_LIKE:
-			foreach ($tags as $tag) {
-				if ($filter_tag['tag'] === $tag['tag'] && mb_stripos($tag['value'], $filter_tag['value']) === false) {
-					return true;
-				}
-			}
+			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
+				return ($filter_tag['tag'] === $tag['tag']
+					&& mb_stripos($tag['value'], $filter_tag['value']) === false
+				);
+			});
+			return (count($tags) == 0);
 			break;
 
 		case TAG_OPERATOR_NOT_EQUAL:
-			foreach ($tags as $tag) {
-				if ($filter_tag['tag'] !== $tag['tag'] && $filter_tag['value'] !== $tag['value']) {
-					return true;
-				}
-			}
+			$tags = array_filter($tags, function ($tag) use ($filter_tag) {
+				return ($filter_tag['tag'] === $tag['tag'] && $filter_tag['value'] === $tag['value']);
+			});
+			return (count($tags) == 0);
 			break;
 
 		case TAG_OPERATOR_EXISTS:
