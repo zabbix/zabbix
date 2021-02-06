@@ -862,7 +862,7 @@ abstract class CMapElement extends CApiService {
 		// Find which tags must be added/deleted.
 		$new_tags = [];
 		$del_tagids = [];
-		foreach ($selements as $index => $selement) {
+		foreach ($selements as $selement) {
 			if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST
 					&& $selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 				$del_tagids = array_merge($del_tagids, array_column($selement['db_tags'], 'selementtagid'));

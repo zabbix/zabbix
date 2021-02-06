@@ -879,7 +879,7 @@ else {
 	$dbHttpSteps = DBselect(
 		'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
 			' FROM httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($http_tests, 'httptestid')).
+			' WHERE '.dbConditionInt('hs.httptestid', array_column($http_tests, 'httptestid')).
 			' GROUP BY hs.httptestid'
 	);
 	while ($dbHttpStep = DBfetch($dbHttpSteps)) {
