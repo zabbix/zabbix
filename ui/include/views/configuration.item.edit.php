@@ -809,32 +809,28 @@ $form_list
 	->addRow(_('Log time format'),
 		(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_logtimefmt'
-	);
-
-$form_list->addRow(
-	new CLabel(_('Value mapping'), 'valuemapid_ms'),
-	(new CMultiSelect([
-		'name' => 'valuemapid',
-		'object_name' => 'valuemaps',
-		'disabled' => $readonly,
-		'multiple' => false,
-		'data' => $data['valuemap'],
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'valuemaps',
-				'srcfld1' => 'valuemapid',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'valuemapid',
-				'hostids' => [$data['hostid']],
-				'editable' => true
+	)
+	->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'disabled' => $readonly,
+			'multiple' => false,
+			'data' => $data['valuemap'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'editable' => true
+				]
 			]
-		]
-	]))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	'row_valuemap'
-);
-
-$form_list
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'row_valuemap'
+	)
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[

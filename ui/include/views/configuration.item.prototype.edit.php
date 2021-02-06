@@ -726,11 +726,8 @@ $form_list
 	->addRow(_('Log time format'),
 		(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_logtimefmt'
-	);
-
-$form_list
-	->addRow(
-		new CLabel(_('Value mapping'), 'valuemapid_ms'),
+	)
+	->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
 		(new CMultiSelect([
 			'name' => 'valuemapid',
 			'object_name' => 'valuemaps',
