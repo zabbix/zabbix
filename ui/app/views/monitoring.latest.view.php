@@ -95,7 +95,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 				->addRow(_('Show details'), [
 					(new CCheckBox('filter_show_details'))->setChecked($data['filter']['show_details'] == 1),
 					(new CDiv([
-						(new CLabel(_('Show items without data'), 'show_suppressed_#{uniqid}'))
+						(new CLabel(_('Show items without data'), 'filter_show_without_data'))
 							->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 						(new CCheckBox('filter_show_without_data'))
 							->setChecked($data['filter']['show_without_data'] == 1)
