@@ -491,7 +491,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				: getRequest('history'),
 			'units'			=> getRequest('units'),
 			'logtimefmt'	=> getRequest('logtimefmt'),
-			'valuemapid'	=> getRequest('valuemapid'),
+			'valuemapid'	=> getRequest('valuemapid', 0),
 			'authtype'		=> getRequest('authtype'),
 			'username'		=> getRequest('username'),
 			'password'		=> getRequest('password'),
