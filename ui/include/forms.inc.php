@@ -915,7 +915,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
 		'units' => getRequest('units', ''),
-		'valuemapid' => getRequest('valuemapid'),
+		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'new_application' => getRequest('new_application', ''),
@@ -1282,7 +1282,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['valuemapid']) {
+	if ($data['is_discovery_rule']) {
+		unset($data['valuemapid']);
+	}
+	else if ($data['valuemapid']) {
 		$data['valuemap'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $data['valuemapid']
