@@ -281,26 +281,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$valuemaps = array_values(getRequest('valuemaps', []));
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = [];
 
 		if (getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone') {
-			$db_valuemaps = [];
-
 			foreach ($valuemaps as &$valuemap) {
 				unset($valuemap['valuemapid']);
 			}
 			unset($valuemap);
 		}
-		else {
-			$db_valuemaps = API::ValueMap()->get([
+		else if ($templateId) {
+			$del_valuemapids = API::ValueMap()->get([
 				'output' => [],
 				'hostids' => $templateId,
 				'preservekeys' => true
 			]);
 		}
-
-		$ins_valuemaps = [];
-		$upd_valuemaps = [];
-		$del_valuemapids = array_fill_keys(array_keys($db_valuemaps), '');
 
 		foreach ($valuemaps as $valuemap) {
 			if (array_key_exists('valuemapid', $valuemap)) {
@@ -308,11 +305,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($del_valuemapids[$valuemap['valuemapid']]);
 			}
 			else {
-				$ins_valuemaps[] = [
-					'name' => $valuemap['name'],
-					'hostid' => $templateId,
-					'mappings' => $valuemap['mappings']
-				];
+				$ins_valuemaps[] = $valuemap + ['hostid' => $templateId];
 			}
 		}
 

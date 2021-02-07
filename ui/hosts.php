@@ -508,27 +508,24 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$valuemaps = array_values(getRequest('valuemaps', []));
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = [];
 
 		if ((getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone')
 				&& getRequest('clone_hostid', 0)) {
-			$db_valuemaps = [];
-
 			foreach ($valuemaps as &$valuemap) {
 				unset($valuemap['valuemapid']);
 			}
 			unset($valuemap);
 		}
-		else {
-			$db_valuemaps = API::ValueMap()->get([
+		else if ($hostId) {
+			$del_valuemapids = API::ValueMap()->get([
 				'output' => [],
 				'hostids' => $hostId,
 				'preservekeys' => true
 			]);
 		}
-
-		$ins_valuemaps = [];
-		$upd_valuemaps = [];
-		$del_valuemapids = array_fill_keys(array_keys($db_valuemaps), '');
 
 		foreach ($valuemaps as $valuemap) {
 			if (array_key_exists('valuemapid', $valuemap)) {
@@ -536,11 +533,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($del_valuemapids[$valuemap['valuemapid']]);
 			}
 			else {
-				$ins_valuemaps[] = [
-					'name' => $valuemap['name'],
-					'hostid' => $hostId,
-					'mappings' => $valuemap['mappings']
-				];
+				$ins_valuemaps[] = $valuemap + ['hostid' => $templateId];
 			}
 		}
 
