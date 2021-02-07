@@ -727,6 +727,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				if ($db_item['templateid'] == 0) {
+					$value_type = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
+
 					if ($db_item['name'] !== getRequest('name', '')) {
 						$item['name'] = getRequest('name', '');
 					}
@@ -742,15 +744,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['ipmi_sensor'] !== getRequest('ipmi_sensor', '')) {
 						$item['ipmi_sensor'] = getRequest('ipmi_sensor', '');
 					}
-					if ($db_item['value_type'] != getRequest('value_type', ITEM_VALUE_TYPE_FLOAT)) {
-						$item['value_type'] = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
+					if ($db_item['value_type'] != $value_type) {
+						$item['value_type'] = $value_type;
 					}
 					if ($db_item['units'] !== getRequest('units', '')) {
 						$item['units'] = getRequest('units', '');
 					}
-
-					$value_type = getRequest('value_type', $db_item['value_type']);
-
 					if ($value_type != ITEM_VALUE_TYPE_LOG && $value_type != ITEM_VALUE_TYPE_TEXT
 							&& bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
 						$item['valuemapid'] = getRequest('valuemapid');
