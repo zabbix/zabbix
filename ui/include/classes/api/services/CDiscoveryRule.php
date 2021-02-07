@@ -2197,6 +2197,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'allow_traps', 'discover', 'parameters'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
