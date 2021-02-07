@@ -438,13 +438,11 @@ if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
 			'output' => ['hostid'],
-			'selectValueMaps' => ['valuemapid', 'name'],
 			'hostids' => $filter_hostids
 		]);
 		if (!$host) {
 			$host = API::Template()->get([
 				'output' => ['templateid'],
-				'selectValueMaps' => ['valuemapid', 'name'],
 				'templateids' => $filter_hostids
 			]);
 		}
