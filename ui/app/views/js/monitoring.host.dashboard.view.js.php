@@ -30,22 +30,23 @@
 		timeControl.refreshPage = false;
 
 		ZABBIX.Dashboard._methods.init({
-				dashboard: {
-					templateid: data.templateid,
-					dashboardid: data.dashboardid,
-					dynamic_hostid: host.hostid
-				},
-				options: {
-					'widget-height': 70,
-					'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
-					'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
-					'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-					'editable': false,
-					'edit_mode': false,
-					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
-				}
-			});
+			dashboard: {
+				templateid: data.templateid,
+				dashboardid: data.dashboardid,
+				dynamic_hostid: host.hostid
+			},
+			options: {
+				'widget-height': 70,
+				'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
+				'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
+				'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+				'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+				'editable': false,
+				'edit_mode': false,
+				'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+			}
+		});
+
 		ZABBIX.Dashboard._methods.setWidgetDefaults(widget_defaults);
 		ZABBIX.Dashboard._methods.addWidgets(data.widgets);
 

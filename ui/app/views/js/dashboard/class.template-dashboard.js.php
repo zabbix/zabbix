@@ -40,7 +40,7 @@
 		}
 
 		live() {
-			ZABBIX.Dashboard._methods..dashboardGrid({
+			ZABBIX.Dashboard._methods.dashboardGrid({
 				'dashboard': {
 					templateid: this.data.templateid,
 					dashboardid: this.data.dashboardid
@@ -55,7 +55,8 @@
 					'edit_mode': true,
 					'kioskmode': false,
 					'allowed_edit': true
-				}});
+				}
+			});
 
 			ZABBIX.Dashboard._methods.setWidgetDefaults(this.widget_defaults);
 			ZABBIX.Dashboard._methods.addWidgets(this.data.widgets);
