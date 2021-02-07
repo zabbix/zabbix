@@ -507,7 +507,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		$valuemaps = getRequest('valuemaps', []);
+		$valuemaps = array_values(getRequest('valuemaps', []));
 
 		if ((getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone')
 				&& getRequest('clone_hostid', 0)) {
