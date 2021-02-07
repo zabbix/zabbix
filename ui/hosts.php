@@ -533,7 +533,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($del_valuemapids[$valuemap['valuemapid']]);
 			}
 			else {
-				$ins_valuemaps[] = $valuemap + ['hostid' => $templateId];
+				$ins_valuemaps[] = $valuemap + ['hostid' => $hostId];
 			}
 		}
 
