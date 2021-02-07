@@ -644,7 +644,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
 					? ITEM_NO_STORAGE_VALUE
 					: getRequest('trends', DB::getDefault('items', 'trends')),
-				'valuemapid' => getRequest('valuemapid'),
+				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
 				'applications' => $applications,
@@ -752,7 +752,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					}
 					if ($value_type != ITEM_VALUE_TYPE_LOG && $value_type != ITEM_VALUE_TYPE_TEXT
 							&& bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
-						$item['valuemapid'] = getRequest('valuemapid');
+						$item['valuemapid'] = getRequest('valuemapid', 0);
 					}
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
