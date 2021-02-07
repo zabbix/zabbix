@@ -701,7 +701,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item = prepareScriptItemFormData($script_item) + $item;
 			}
 
-			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG && $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
 				unset($item['valuemapid']);
 			}
 
