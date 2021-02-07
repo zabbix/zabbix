@@ -2903,6 +2903,102 @@ $form-icon-btn: (
 	width: 100%;
 }
 
+.dashbrd-navigation {
+	display: flex;
+	margin: 10px 0 8px 0;
+}
+
+.dashbrd-navigation-tabs {
+	// Compensate 2px padding of tabs.
+	margin: -2px 10px 0 0;
+	overflow: hidden;
+
+	.csortable {
+		// Accomodate 2px shadow of focused tabs.
+		padding: 2px 0;
+		// Hide the invisible tab paddings.
+		margin: 0 -1.5px;
+	}
+
+	.csortable-list {
+		display: flex;
+		padding: 0;
+		margin: 0;
+
+		& > .csortable-item:focus:not(:active) {
+			// Increase padding to accomodate the focused div's shadow.
+			padding: 0 3.5px 0 3.5px;
+
+			& > div {
+				padding: 0 8px;
+				border: 1px solid transparent;
+				box-shadow: 0 0 0 2px rgba($blue, .35);
+			}
+		}
+	}
+
+	.csortable-item {
+		// This container should not be visually styled at this level.
+		box-sizing: border-box;
+		display: block;
+		// Invisible padding for tab separation.
+		padding: 0 1.5px 0 1.5px;
+		margin: 0;
+		list-style-type: none;
+		outline: none;
+
+		& > div {
+			min-height: 22px;
+			line-height: 22px;
+			box-sizing: border-box;
+			padding: 0 10px;
+			flex-shrink: 0;
+
+			font-size: 12px;
+			white-space: nowrap;
+
+			cursor: pointer;
+			user-select: none;
+
+			background-color: $ui-bg-color;
+			border: 1px solid $ui-border-color;
+			border-radius: 2px;
+
+			@if $ui-transitions {
+				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
+			}
+		}
+	}
+
+	& .csortable > .csortable-item > div,
+	& .csortable-list > .csortable-item > div:hover {
+		background: #e8f5ff;
+		border: 1px solid lighten($blue, 30%);
+	}
+
+	& .csortable > .csortable-item > div.selected-page,
+	& .csortable-list > .csortable-item > div.selected-page {
+		color: $white;
+		background: $ui-bg-selected-color;
+		border: 1px solid transparent;
+	}
+}
+
+.dashbrd-navigation-controls {
+	display: flex;
+	flex-shrink: 0;
+
+	button {
+		margin-left: 10px;
+
+		&.previous-page,
+		&.next-page {
+			display: none;
+			margin: 0;
+		}
+	}
+}
+
 // Dashboard, widgets and iterators.
 // To maintain code clarity:
 //   - Do not mix rules for dashboard view mode and dashboard edit mode.

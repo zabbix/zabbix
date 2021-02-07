@@ -513,9 +513,9 @@ footer {
     position: relative;
     top: 0;
     left: 0;
-    transition: left 0.3s, top 0.3s; }
+    transition: left .2s, top .2s; }
     .csortable .csortable-list .csortable-item {
-      transition: left 0.3s, top 0.3s; }
+      transition: left .2s, top .2s; }
   .csortable.csortable-dragging .csortable-item {
     position: absolute; }
     .csortable.csortable-dragging .csortable-item.csortable-dragging {
@@ -2955,6 +2955,64 @@ z-select[disabled] button,
 .signin-container input[type="text"], .signin-container input[type="password"] {
   padding: 9px 5px;
   width: 100%; }
+
+.dashbrd-navigation {
+  display: flex;
+  margin: 10px 0 8px 0; }
+
+.dashbrd-navigation-tabs {
+  margin: -2px 10px 0 0;
+  overflow: hidden; }
+  .dashbrd-navigation-tabs .csortable {
+    padding: 2px 0;
+    margin: 0 -1.5px; }
+  .dashbrd-navigation-tabs .csortable-list {
+    display: flex;
+    padding: 0;
+    margin: 0; }
+    .dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) {
+      padding: 0 3.5px 0 3.5px; }
+      .dashbrd-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) > div {
+        padding: 0 8px;
+        border: 1px solid transparent;
+        box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+  .dashbrd-navigation-tabs .csortable-item {
+    box-sizing: border-box;
+    display: block;
+    padding: 0 1.5px 0 1.5px;
+    margin: 0;
+    list-style-type: none;
+    outline: none; }
+    .dashbrd-navigation-tabs .csortable-item > div {
+      min-height: 22px;
+      line-height: 22px;
+      box-sizing: border-box;
+      padding: 0 10px;
+      flex-shrink: 0;
+      font-size: 12px;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      background-color: #ffffff;
+      border: 1px solid #dfe4e7;
+      border-radius: 2px;
+      transition: background-color 0.3s, border-color 0.3s; }
+  .dashbrd-navigation-tabs .csortable > .csortable-item > div, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div:hover {
+    background: #e8f5ff;
+    border: 1px solid #a6d0f4; }
+  .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-page, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-page {
+    color: #ffffff;
+    background: #768d99;
+    border: 1px solid transparent; }
+
+.dashbrd-navigation-controls {
+  display: flex;
+  flex-shrink: 0; }
+  .dashbrd-navigation-controls button {
+    margin-left: 10px; }
+    .dashbrd-navigation-controls button.previous-page, .dashbrd-navigation-controls button.next-page {
+      display: none;
+      margin: 0; }
 
 .dashbrd-grid-container {
   position: relative;

@@ -8,10 +8,10 @@
 		left: 0;
 
 		@if $ui-transitions {
-			transition: left $ui-transition-duration, top $ui-transition-duration;
+			transition: left .2s, top .2s;
 
 			.csortable-item {
-				transition: left $ui-transition-duration, top $ui-transition-duration;
+				transition: left .2s, top .2s;
 			}
 		}
 	}

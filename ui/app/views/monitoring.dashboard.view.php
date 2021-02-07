@@ -47,6 +47,7 @@ $this->addJsFile('class.mapWidget.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
+$this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('dashboard/class.dashboard.js.php');
 $this->includeJsFile('dashboard/class.dashboard-share.js.php');
@@ -154,7 +155,42 @@ if ($data['time_selector'] !== null) {
 	);
 }
 
+$tabs = new CSortable();
+
+$tabs->add((new CDiv('The first'))->addClass('selected-page'));
+
+for ($i = 1; $i < 30; $i++) {
+	$tabs->add((new CDiv('Short '.$i))->addClass(CSortable::ZBX_STYLE_SORTABLE_DRAG_HANDLE));
+	$tabs->add((new CDiv('Longer name '.$i))->addClass(CSortable::ZBX_STYLE_SORTABLE_DRAG_HANDLE));
+	$tabs->add(
+		(new CDiv('With properties '.$i))
+			->addClass(CSortable::ZBX_STYLE_SORTABLE_DRAG_HANDLE)
+			->addItem(
+				(new CTag('a', true, '[ - ]'))
+					->setAttribute('href', '#')
+					->addStyle('margin-left: 5px;')
+					->onClick('alert(1);')
+			)
+	);
+}
+
+$controls = [
+	(new CSimpleButton())
+		->setEnabled(false)
+		->addClass('previous-page btn-iterator-page-previous'),
+	(new CSimpleButton())
+		->setEnabled(true) // num of pages > 1
+		->addClass('next-page btn-iterator-page-next'),
+	(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
+];
+
 $widget
+	->addItem(
+		(new CDiv())
+			->addItem((new CDiv($tabs))->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+			->addItem((new CDiv($controls))->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS))
+			->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 	->show();
 
