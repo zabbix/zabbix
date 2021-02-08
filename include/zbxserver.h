@@ -51,6 +51,8 @@
 #define MACRO_TYPE_EVENT_NAME		0x02000000	/* event name in trigger configuration */
 #define MACRO_TYPE_EXPRESSION		0x04000000	/* macros in expression macro */
 #define MACRO_TYPE_SCRIPT_PARAMS_FIELD	0x08000000
+#define MACRO_TYPE_SCRIPT_NORMAL	0x10000000
+#define MACRO_TYPE_SCRIPT_RECOVERY	0x20000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1

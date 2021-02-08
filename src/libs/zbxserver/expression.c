@@ -1845,6 +1845,11 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
 #define MVAR_HOST_DESCRIPTION		"{HOST.DESCRIPTION}"
 #define MVAR_HOST_PORT			"{HOST.PORT}"
+#define MVAR_HOST_TARGET_DNS		"{HOST.TARGET.DNS}"
+#define MVAR_HOST_TARGET_CONN		"{HOST.TARGET.CONN}"
+#define MVAR_HOST_TARGET_HOST		"{HOST.TARGET.HOST}"
+#define MVAR_HOST_TARGET_IP		"{HOST.TARGET.IP}"
+#define MVAR_HOST_TARGET_NAME		"{HOST.TARGET.NAME}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
@@ -3145,7 +3150,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				break;
 			case ZBX_TOKEN_SIMPLE_MACRO:
 				if (0 == (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
-							MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_EXPRESSION)) ||
+							MACRO_TYPE_MESSAGE_ACK | MACRO_TYPE_EXPRESSION |
+							MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)) ||
 						EVENT_SOURCE_TRIGGERS != ((NULL != r_event) ? r_event : event)->source)
 				{
 					pos++;
@@ -3170,7 +3176,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		ret = SUCCEED;
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
-				MACRO_TYPE_MESSAGE_ACK)))
+				MACRO_TYPE_MESSAGE_ACK |
+				MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
+		/* MACRO_TYPE_SCRIPT_NORMAL and MACRO_TYPE_SCRIPT_RECOVERY behave pretty similar to */
+		/* MACRO_TYPE_MESSAGE_NORMAL and MACRO_TYPE_MESSAGE_RECOVERY. Therefore the code is not duplicated */
+		/* but few conditions are added below where behavior differs. */
 		{
 			const DB_EVENT	*c_event;
 
@@ -3457,19 +3467,17 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
 				}
-				else if (0 == strcmp(m, MVAR_USER_FULLNAME) && NULL == userid)
+				else if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack &&
+						0 == strcmp(m, MVAR_USER_FULLNAME))
 				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-					{
-						const char	*user_name1;
+					const char	*user_name1;
 
-						if (SUCCEED == zbx_check_user_permissions(&ack->userid, userid))
-							user_name1 = zbx_user_string(ack->userid);
-						else
-							user_name1 = "Inaccessible user";
+					if (SUCCEED == zbx_check_user_permissions(&ack->userid, userid))
+						user_name1 = zbx_user_string(ack->userid);
+					else
+						user_name1 = "Inaccessible user";
 
-						replace_to = zbx_strdup(replace_to, user_name1);
-					}
+					replace_to = zbx_strdup(replace_to, user_name1);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -3486,18 +3494,45 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
-				else if (NULL != userid)
+				else if (0 != (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)) &&
+						NULL != userid && (0 == strcmp(m, MVAR_USER_ALIAS) ||
+						0 == strcmp(m, MVAR_USER_NAME) || 0 == strcmp(m, MVAR_USER_SURNAME) ||
+						0 == strcmp(m, MVAR_USER_FULLNAME)))
 				{
-					if (0 == strcmp(m, MVAR_USER_ALIAS) || 0 == strcmp(m, MVAR_USER_NAME) ||
-							0 == strcmp(m, MVAR_USER_SURNAME) ||
-							0 == strcmp(m, MVAR_USER_FULLNAME))
-					{
-						resolve_user_macros(*userid, m, &user_alias, &user_name, &user_surname,
+					resolve_user_macros(*userid, m, &user_alias, &user_name, &user_surname,
 							&user_names_found, &replace_to);
-					}
+				}
+				else if (0 == strcmp(m, MVAR_HOST_TARGET_DNS))
+				{
+					if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+						replace_to = zbx_strdup(replace_to, interface.dns_orig);
+					require_address = 1;
+				}
+				else if (0 == strcmp(m, MVAR_HOST_TARGET_CONN))
+				{
+					if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+						replace_to = zbx_strdup(replace_to, interface.addr);
+					require_address = 1;
+				}
+				else if (0 == strcmp(m, MVAR_HOST_TARGET_HOST))
+				{
+					if (NULL != dc_host->host)
+						replace_to = zbx_strdup(replace_to, dc_host->host);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_TARGET_IP))
+				{
+					if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
+						replace_to = zbx_strdup(replace_to, interface.ip_orig);
+					require_address = 1;
+				}
+				else if (0 == strcmp(m, MVAR_HOST_TARGET_NAME))
+				{
+					if (NULL != dc_host->name)
+						replace_to = zbx_strdup(replace_to, dc_host->name);
 				}
 			}
-			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
+			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object &&
+					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3717,7 +3752,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
-			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source &&
+					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3858,7 +3894,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
-			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source &&
+					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3951,7 +3988,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
-					EVENT_OBJECT_ITEM == c_event->object)
+					EVENT_OBJECT_ITEM == c_event->object &&
+					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -4098,7 +4136,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
-					EVENT_OBJECT_LLDRULE == c_event->object)
+					EVENT_OBJECT_LLDRULE == c_event->object &&
+					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{

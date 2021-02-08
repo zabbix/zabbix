@@ -414,6 +414,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			__func__, scriptid, hostid, eventid, user->userid, clientip);
 
 	*error = '\0';
+	memset(&host, 0, sizeof(host));
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_ptr_create(&events);
 
@@ -573,7 +574,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else	/* script on event */
 	{
-		int	macro_type = (NULL != recovery_event) ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL;
+		int	macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
 
 		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 				&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &script.command,
