@@ -152,7 +152,7 @@ $inventoryFilterTable->addRow(
 $column2 = (new CFormList())
 	->addRow(_('Host inventory'), $inventoryFilterTable)
 	->addRow(_('Tags'),
-		CTagFilterFieldHelper::get([], [
+		CTagFilterFieldHelper::getTagFilterField([
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags']
 		])

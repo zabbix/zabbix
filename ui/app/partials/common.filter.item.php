@@ -67,7 +67,7 @@ $filter_column_left = (new CFormList())
 
 $filter_column_right = (new CFormList())
 	->addRow(_('Tags'),
-		CTagFilterFieldHelper::get([], [
+		CTagFilterFieldHelper::getTagFilterField([
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags']
 		])

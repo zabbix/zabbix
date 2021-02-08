@@ -22,21 +22,21 @@
 class CTagFilterFieldHelper {
 
 	/**
-	 * @param array  $options
-	 * @param bool   $options['with_evaltype']
-	 * @param string $options['tag_field_name']
-	 * @param string $options['evaltype_field_name']
-	 * @param string $options['table_id']
 	 * @param array  $data
-	 * @param int    $data['evaltype']
-	 * @param array  $data['tags']
+	 * @param int    $data['evaltype']                (optional)
+	 * @param array  $data['tags']                    (optional)
 	 * @param string $data['tags'][]['tag']
 	 * @param int    $data['tags'][]['operator']
 	 * @param string $data['tags'][]['value']
+	 * @param array  $options
+	 * @param string $options['tag_field_name']       (optional)
+	 * @param string $options['evaltype_field_name']  (optional)
+	 * @param string $options['table_id']             (optional)
+	 *
+	 * @return CTagFilterFieldHelper
 	 */
-	public static function get(array $options = [], array $data = []) {
+	public static function getTagFilterField(array $data = [], array $options = []) {
 		$options += [
-			'with_evaltype' => true,
 			'tag_field_name' => 'filter_tags',
 			'evaltype_field_name' => 'filter_evaltype',
 			'table_id' => 'filter-tags'
@@ -49,17 +49,15 @@ class CTagFilterFieldHelper {
 
 		$tags_table = (new CTable())->setId($options['table_id']);
 
-		if ($options['with_evaltype']) {
-			$tags_table->addRow(
-				(new CCol(
-					(new CRadioButtonList($options['evaltype_field_name'], (int) $data['evaltype']))
-						->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-						->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-						->setModern(true)
-						->setId($options['evaltype_field_name'])
-				))->setColSpan(4)
-			);
-		}
+		$tags_table->addRow(
+			(new CCol(
+				(new CRadioButtonList($options['evaltype_field_name'], (int) $data['evaltype']))
+					->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+					->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+					->setModern(true)
+					->setId($options['evaltype_field_name'])
+			))->setColSpan(4)
+		);
 
 		foreach (array_values($data['tags']) as $i => $tag) {
 			$tags_table->addRow([
@@ -104,10 +102,14 @@ class CTagFilterFieldHelper {
 	}
 
 	/**
+	 * Make empty tag filter field row template.
+	 *
 	 * @param array  $options
-	 * @param string $options['tag_field_name']
+	 * @param string $options['tag_field_name']  (optional)
+	 *
+	 * @return string
 	 */
-	public static function getTemplate(array $options = []) {
+	public static function getTemplate(array $options = []): string {
 		$options += [
 			'tag_field_name' => 'filter_tags'
 		];
@@ -126,13 +128,11 @@ class CTagFilterFieldHelper {
 					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
 					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
-				->setValue(TAG_OPERATOR_LIKE)
-				->setFocusableElementId('filter-tags-#{rowNum}-operator-select')//?
-				->setId($options['tag_field_name'].'_#{rowNum}_operator'),
+				->setValue(TAG_OPERATOR_LIKE),
 			(new CTextBox($options['tag_field_name'].'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setId($options['tag_field_name'].'_#{rowNum}_value'),
+				->removeId(),
 			(new CCol(
 				(new CButton($options['tag_field_name'].'[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)

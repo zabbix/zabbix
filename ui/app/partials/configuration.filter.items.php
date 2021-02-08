@@ -138,11 +138,10 @@ $filter_column_2
 
 // Third column
 $filter_column_3->addRow(_('Tags'),
-	CTagFilterFieldHelper::get([], [
-			'evaltype' => $data['filter_data']['filter_evaltype'],
-			'tags' => $data['filter_data']['filter_tags']
-		]
-	)
+	CTagFilterFieldHelper::getTagFilterField([
+		'evaltype' => $data['filter_data']['filter_evaltype'],
+		'tags' => $data['filter_data']['filter_tags']
+	])
 );
 
 if ($data['context'] === 'host') {

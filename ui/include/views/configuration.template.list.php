@@ -30,7 +30,7 @@ if (!$filter_tags) {
 	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 
-$filter_tags_table = CTagFilterFieldHelper::get([], [
+$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'evaltype' => $data['filter']['evaltype'],
 	'tags' => $filter_tags
 ]);

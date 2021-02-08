@@ -41,7 +41,7 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter_tags_table = CTagFilterFieldHelper::get([], [
+	$filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 		'evaltype' => $data['filter']['evaltype'],
 		'tags' => $data['filter']['tags']
 	]);
