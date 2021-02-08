@@ -216,7 +216,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 								if (is_array($application_prototype)
 										&& array_key_exists('new', $application_prototype)) {
 									$new_application_prototypes[] = [
-										'name' => $application_prototype['new'],
+										'name' => $application_prototype['new']
 									];
 								}
 								else {
@@ -580,7 +580,7 @@ class CControllerPopupMassupdateItemPrototype extends CController {
 				'multiple_interface_types' => false,
 				'initial_item_type' => null,
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
-				'preprocessing_types' => CItemPrototype::$supported_preprocessing_types,
+				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES,
 				'displayApplications' => true,
 				'display_interfaces' => true,
 				'displayMasteritems' => true,

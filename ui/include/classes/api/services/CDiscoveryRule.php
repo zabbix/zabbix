@@ -40,13 +40,11 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Define a set of supported pre-processing rules.
 	 *
 	 * @var array
-	 *
-	 * 5.6 would allow this to be defined constant.
 	 */
-	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
+	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
 		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
+		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON
 	];
 
 	public function __construct() {
@@ -774,7 +772,9 @@ class CDiscoveryRule extends CItemGeneral {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		foreach ($dstTriggers as $id => &$trigger) {
-			unset($trigger['triggerid'], $trigger['templateid']);
+			unset($trigger['triggerid'], $trigger['templateid'], $trigger['hosts'], $trigger['functions'],
+				$trigger['items'], $trigger['discoveryRule']
+			);
 
 			// Update the destination expressions.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],

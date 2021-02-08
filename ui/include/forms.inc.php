@@ -191,7 +191,7 @@ function getItemFilterForm(&$data) {
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
-					'enrich_parent_groups' => true,
+					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -1834,15 +1834,16 @@ function getTriggerFormData(array $data) {
 			foreach ($item_parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
 							];
 						}
 						else {
-							$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-								$templateid => $template
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
 							];
 						}
 					}
@@ -1857,21 +1858,28 @@ function getTriggerFormData(array $data) {
 
 			if ($db_hosts) {
 				foreach ($db_hosts[0]['tags'] as $tag) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag;
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
 				}
 			}
 
 			foreach ($data['tags'] as $tag) {
-				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 				}
 				else {
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 				}
 			}
 
-			$data['tags'] = array_values($inherited_tags);
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);

@@ -526,12 +526,7 @@ if ($data['display_interfaces']) {
 
 			$form->addVar('selectedInterfaceId', $data['interfaceid']);
 			$form_list->addRow((new CLabel(_('Host interface'), 'interface'))->setAsteriskMark(),
-				(new CTextBox('interface',
-					$interface['useip']
-						? $interface['ip'].' : '.$interface['port']
-						: $interface['dns'].' : '.$interface['port'],
-					true
-				))->setAriaRequired(),
+				(new CTextBox('interface', getHostInterface($interface), true))->setAriaRequired(),
 				'interface_row'
 			);
 		}

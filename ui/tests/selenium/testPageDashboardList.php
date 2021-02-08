@@ -40,7 +40,7 @@ class testPageDashboardList extends CWebTest {
 
 	public function testPageDashboardList_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
-		$this->assertPageTitle('Dashboards');
+		$this->page->assertTitle('Dashboards');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['', 'Name'], $table->getHeadersText());
 

@@ -90,7 +90,8 @@ $widget = (new CWidget())
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	// filter
-	$widget->addItem((new CFilter((new CUrl('overview.php'))->setArgument('type', 1)))
+	$widget->addItem((new CFilter((new CUrl('overview.php'))->setArgument('type', SHOW_DATA)))
+		->addVar('type', SHOW_DATA)
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

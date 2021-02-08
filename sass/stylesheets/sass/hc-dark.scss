@@ -65,6 +65,9 @@ $menu-main-submenu-selected-color: #ffffff;
 $menu-main-submenu-selected-bg-color: #0c0c0c;
 $menu-main-submenu-selected-border-color: #787878;
 
+$menu-main-submenu-next-level-bg: #ffffff !default;
+$menu-main-submenu-next-level-shadow: transparent !default;
+
 $menu-main-icons-opacity: 1;
 
 $menu-main-arrow-bg-position: -579px -434px;
@@ -74,27 +77,43 @@ $menu-user-color: #131619;
 $menu-user-hover-color: #000000;
 $menu-user-disabled-color: #787878;
 
+$menu-user-submenu-color: #0c0c0c;
+$menu-user-submenu-bg-color: #cccccc;
+$menu-user-submenu-border-color: #f3f3f3;
+$menu-user-submenu-hover-color: #ffffff;
+$menu-user-submenu-hover-bg-color: #1a1a1a;
+$menu-user-submenu-hover-border-color: transparent;
+$menu-user-submenu-selected-color: #ffffff;
+$menu-user-submenu-selected-bg-color: #0c0c0c;
+$menu-user-submenu-selected-border-color: #787878;
+
+$menu-user-submenu-next-level-bg: #ffffff !default;
+$menu-user-submenu-next-level-shadow: transparent !default;
+
+$menu-user-arrow-bg-position: -579px -434px;
+$menu-user-arrow-hover-bg-position: -579px -434px;
+
 // Sidebar
 $sidebar-server-name-color: #787878;
 
 $menu-main-icons: (
-		dashboard: -600px -664px,
-		problems: -600px -688px,
-		monitoring: -600px -712px,
-		inventory: -600px -736px,
-		reports: -600px -760px,
-		configuration: -600px -784px,
-		administration: -600px -808px
+	dashboard: -600px -664px,
+	problems: -600px -688px,
+	monitoring: -600px -712px,
+	inventory: -600px -736px,
+	reports: -600px -760px,
+	configuration: -600px -784px,
+	administration: -600px -808px
 );
 
 $menu-user-icons: (
-		support: -247px -84px,
-		share: -168px -84px,
-		help: -168px -48px,
-		guest: -247px -192px,
-		profile: -168px -120px,
-		signout: -168px -156px
-) !default;
+	support: -247px -84px,
+	share: -168px -84px,
+	help: -168px -48px,
+	guest: -247px -192px,
+	profile: -168px -120px,
+	signout: -168px -156px
+);
 
 // UI
 $ui-bg-color: #000000;
@@ -263,8 +282,9 @@ $dashboard-my-bg-color: #e0e0e0;
 
 // components/menu-main
 .menu-main {
-	& > li.has-submenu {
+	li.has-submenu {
 		&.is-expanded > a,
+		.is-selected > a,
 		& > a:hover,
 		& > a:focus {
 			&::before {

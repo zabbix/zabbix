@@ -67,10 +67,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = CDBHelper::getHash($sqlTemplate);
 		$sqlHosts =
-				'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
-				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
-				'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
-				'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,'.
+				'SELECT hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,'.
 				'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
 			' ORDER BY hostid';
@@ -263,7 +261,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
 		// Check that Hosts page is opened.
-		$this->assertPageHeader('Hosts');
+		$this->page->assertHeader('Hosts');
 		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table->invalidate();
 		// Check that correct Hosts are filtered.

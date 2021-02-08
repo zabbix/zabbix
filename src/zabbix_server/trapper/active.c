@@ -24,8 +24,9 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 
-#include "active.h"
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
+
+#include "active.h"
 
 extern unsigned char	program_type;
 

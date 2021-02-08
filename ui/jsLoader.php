@@ -352,7 +352,8 @@ $tranStrings = [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'common.js' => [
-		'Cancel' => _('Cancel')
+		'Cancel' => _('Cancel'),
+		'Ok' => _('Ok')
 	],
 	'component.z-select.js' => [
 		'All' => _('All')

@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
@@ -42,6 +43,7 @@ require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHostGraph.php';
+require_once dirname(__FILE__).'/testPageHostInterfaces.php';
 require_once dirname(__FILE__).'/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
@@ -170,6 +172,7 @@ class SeleniumTests {
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
@@ -189,6 +192,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');
+		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageInventory');

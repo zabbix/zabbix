@@ -21,13 +21,16 @@ package plugins
 
 import (
 	_ "zabbix.com/plugins/ceph"
+	_ "zabbix.com/plugins/docker"
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/memcached"
 	_ "zabbix.com/plugins/modbus"
+	_ "zabbix.com/plugins/mysql"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/oracle"
 	_ "zabbix.com/plugins/postgres"
 	_ "zabbix.com/plugins/redis"
+	_ "zabbix.com/plugins/system/sw"
 	_ "zabbix.com/plugins/system/users"
 	_ "zabbix.com/plugins/systemrun"
 	_ "zabbix.com/plugins/web"

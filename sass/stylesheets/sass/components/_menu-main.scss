@@ -101,52 +101,52 @@ $menu-main-icons: (
 				}
 			}
 		}
+	}
 
-		&.has-submenu {
-			& > a {
-				&::after {
-					content: '';
-					position: absolute;
-					top: 19px;
-					right: 14px;
-					width: 6px;
-					height: 4px;
-					background: url($sprite-path) no-repeat $menu-main-arrow-bg-position;
-					transform: rotate(0deg);
-					@if $menu-main-icons-opacity < 1 {
-						opacity: $menu-main-icons-opacity;
-					}
-
-					@if $ui-transitions {
-						transition: transform $ui-transition-duration,
-						opacity $ui-transition-duration;
-					}
+	.has-submenu {
+		& > a {
+			&::after {
+				content: '';
+				position: absolute;
+				top: 19px;
+				right: 14px;
+				width: 6px;
+				height: 4px;
+				background: url($sprite-path) no-repeat $menu-main-arrow-bg-position;
+				transform: rotate(0deg);
+				@if $menu-main-icons-opacity < 1 {
+					opacity: $menu-main-icons-opacity;
 				}
 
-				&:hover,
-				&:focus {
-					&::after {
-						background-position: $menu-main-arrow-hover-bg-position;
-
-						@if $menu-main-icons-opacity < 1 {
-							opacity: 1;
-						}
-					}
+				@if $ui-transitions {
+					transition: transform $ui-transition-duration,
+					opacity $ui-transition-duration;
 				}
 			}
 
-			&.is-expanded {
-				& > a {
-					&::after {
-						background-position: $menu-main-arrow-hover-bg-position;
-						transform: rotate(-180deg);
-					}
+			&:hover,
+			&:focus {
+				&::after {
+					background-position: $menu-main-arrow-hover-bg-position;
 
 					@if $menu-main-icons-opacity < 1 {
-						&::before,
-						&::after {
-							opacity: 1;
-						}
+						opacity: 1;
+					}
+				}
+			}
+		}
+
+		&.is-expanded {
+			& > a {
+				&::after {
+					background-position: $menu-main-arrow-hover-bg-position;
+					transform: rotate(-180deg);
+				}
+
+				@if $menu-main-icons-opacity < 1 {
+					&::before,
+					&::after {
+						opacity: 1;
 					}
 				}
 			}
@@ -182,11 +182,11 @@ $menu-main-icons: (
 		overflow: hidden;
 		background: $menu-main-submenu-border-color;
 
-		li {
+		> li {
 			line-height: 14px;
 
 			&.is-selected {
-				a {
+				> a {
 					background: $menu-main-submenu-selected-bg-color;
 					border-left-color: $menu-main-submenu-selected-border-color;
 					color: $menu-main-submenu-selected-color;
@@ -205,7 +205,7 @@ $menu-main-icons: (
 		}
 
 		a {
-			padding: 8px 12px 8px 20px;
+			padding: 8px 20px;
 			font-size: 12px;
 			background: $menu-main-submenu-bg-color;
 			color: $menu-main-submenu-color;
@@ -239,7 +239,63 @@ $menu-main-icons: (
 		@if $ui-transitions {
 			transition: max-height $ui-transition-duration ease;
 			will-change: max-height;
-			transform: translate3d(0, 0, 0);
+		}
+
+		.submenu {
+			position: fixed;
+			top: 0;
+			left: 100%;
+			padding: 1px;
+			box-shadow: 4px 4px 8px 0 $menu-main-submenu-next-level-shadow;
+
+			li {
+				border: 0;
+
+				a {
+					padding: 6px 20px;
+					border-left: 0;
+					background-color: $menu-main-submenu-next-level-bg;
+				}
+
+				&.is-selected a {
+					background-color: $menu-main-submenu-selected-bg-color;
+				}
+
+				a:hover,
+				a:focus {
+					background-color: $menu-main-submenu-hover-bg-color;
+				}
+			}
+
+			@if $ui-transitions {
+				transition: none;
+			}
+
+			&::before,
+			&::after {
+				display: none;
+			}
+		}
+
+		.has-submenu {
+			& > a {
+				&::after {
+					top: 13px;
+					transform: rotate(90deg);
+				}
+			}
+
+			&:not(.is-expanded) {
+				a {
+					&::after {
+						transform: rotate(-90deg);
+					}
+				}
+
+				.submenu {
+					left: -9999px !important;
+				}
+			}
 		}
 	}
 }

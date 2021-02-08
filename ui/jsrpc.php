@@ -33,8 +33,7 @@ else {
 	$data = $_REQUEST;
 }
 
-if (is_array($data) && array_key_exists('method', $data)
-		&& in_array($data['method'], ['message.settings', 'message.get', 'zabbix.status'])) {
+if (is_array($data) && array_key_exists('method', $data) && $data['method'] === 'zabbix.status') {
 	CWebUser::disableSessionExtension();
 }
 
@@ -633,6 +632,9 @@ if ($requestType == PAGE_TYPE_JSON) {
 			'result' => $result,
 			'id' => $data['id']
 		]);
+
+		session_write_close();
+		exit();
 	}
 }
 elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
@@ -640,6 +642,9 @@ elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
 		'jsonrpc' => '2.0',
 		'result' => $result
 	]);
+
+	session_write_close();
+	exit();
 }
 elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
 	echo $result;

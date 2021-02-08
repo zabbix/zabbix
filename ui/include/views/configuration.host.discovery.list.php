@@ -72,7 +72,7 @@ $filter_column1 = (new CFormList())
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
-					'enrich_parent_groups' => true,
+					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -323,7 +323,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 $button_list = [
 	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?')],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')],
+	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?')]
 ];
 
 if ($data['context'] === 'host') {

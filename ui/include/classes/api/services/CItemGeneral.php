@@ -1244,12 +1244,16 @@ abstract class CItemGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$type_validator = new CLimitedSetValidator(['values' => $this::$supported_preprocessing_types]);
+			$type_validator = new CLimitedSetValidator(['values' => static::SUPPORTED_PREPROCESSING_TYPES]);
 
 			$error_handler_validator = new CLimitedSetValidator([
 				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
 					ZBX_PREPROC_FAIL_SET_ERROR
 				]
+			]);
+
+			$unsupported_error_handler_validator = new CLimitedSetValidator([
+				'values' => [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR]
 			]);
 
 			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
@@ -1446,6 +1450,7 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_DELTA_VALUE:
 					case ZBX_PREPROC_DELTA_SPEED:
+					case ZBX_PREPROC_XML_TO_JSON:
 						// Check if 'params' is empty, because it must be empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1457,12 +1462,15 @@ abstract class CItemGeneral extends CApiService {
 							);
 						}
 
-						// Check if one of the deltas (Delta per second or Delta value) already exists.
-						if ($delta) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
-						}
-						else {
-							$delta = true;
+						if ($preprocessing['type'] == ZBX_PREPROC_DELTA_VALUE
+								|| $preprocessing['type'] == ZBX_PREPROC_DELTA_SPEED) {
+							// Check if one of the deltas (Delta per second or Delta value) already exists.
+							if ($delta) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
+							}
+							else {
+								$delta = true;
+							}
 						}
 						break;
 
@@ -1647,6 +1655,43 @@ abstract class CItemGeneral extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
 									_('should be empty')
+								)
+							);
+						}
+						break;
+
+					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+						if (is_array($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif (!$unsupported_error_handler_validator->validate($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
+									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
+								)
+							);
+						}
+
+						if (is_array($preprocessing['error_handler_params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE
+								&& $preprocessing['error_handler_params'] !== ''
+								&& $preprocessing['error_handler_params'] !== null
+								&& $preprocessing['error_handler_params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('should be empty')
+								)
+							);
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
+								&& ($preprocessing['error_handler_params'] === ''
+									|| $preprocessing['error_handler_params'] === null
+									|| $preprocessing['error_handler_params'] === false)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('cannot be empty')
 								)
 							);
 						}

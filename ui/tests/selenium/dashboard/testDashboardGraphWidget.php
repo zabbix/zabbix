@@ -2330,7 +2330,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$tag_elements = [
 			'id:evaltype',				// Tag type.
 			'id:tags_0_tag',			// Tag name.
-			'id:tags_0_operator_0',		// Tag operator.
+			'id:tags_0_operator',		// Tag operator.
 			'id:tags_0_value',			// Tag value
 			'id:tags_0_remove',			// Tag remove button.
 			'id:tags_add'				// Tagg add button.
