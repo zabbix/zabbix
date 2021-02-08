@@ -274,7 +274,7 @@ class CHttpTestManager {
 		$hostIds = zbx_toArray($hostIds);
 
 		$httpTests = API::HttpTest()->get([
-			'output' => ['httptestid', 'name', 'applicationid', 'delay', 'status', 'agent', 'authentication',
+			'output' => ['httptestid', 'name', 'delay', 'status', 'agent', 'authentication',
 				'http_user', 'http_password', 'hostid', 'templateid', 'http_proxy', 'retries', 'ssl_cert_file',
 				'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'variables', 'headers'
 			],

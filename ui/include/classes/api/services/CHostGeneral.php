@@ -466,7 +466,7 @@ abstract class CHostGeneral extends CHostBase {
 			$item_prototypeids = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 
 			if ($clear) {
-				// This will include deletion of linked application prototypes.
+				// Deletes item prototypes and related entities.
 				CItemPrototypeManager::delete($item_prototypeids);
 			}
 			else {
