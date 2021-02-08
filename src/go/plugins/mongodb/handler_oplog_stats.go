@@ -28,7 +28,7 @@ import (
 )
 
 type oplogStats struct {
-	TimeDiff int64 `json:"timediff"` // in seconds
+	TimeDiff int `json:"timediff"` // in seconds
 }
 
 type oplogEntry struct {
@@ -80,7 +80,7 @@ func oplogStatsHandler(s Session, _ map[string]string) (interface{}, error) {
 	// This internal timestamp type is a 64 bit value where:
 	// the most significant 32 bits are a time_t value (seconds since the Unix epoch)
 	// the least significant 32 bits are an incrementing ordinal for operations within a given second.
-	stats.TimeDiff = int64(opLast.Timestamp>>32 - opFirst.Timestamp>>32)
+	stats.TimeDiff = int(opLast.Timestamp>>32 - opFirst.Timestamp>>32)
 
 	jsonRes, err := json.Marshal(stats)
 	if err != nil {

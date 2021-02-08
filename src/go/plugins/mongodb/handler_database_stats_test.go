@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"reflect"
+	"strings"
 	"testing"
 	"zabbix.com/pkg/zbxerr"
 )
@@ -50,7 +51,7 @@ func Test_databaseStatsHandler(t *testing.T) {
 				s:      mockSession,
 				params: map[string]string{"Database": "testdb"},
 			},
-			want:    string(jsonData),
+			want:    strings.TrimSpace(string(jsonData)),
 			wantErr: nil,
 		},
 		{
