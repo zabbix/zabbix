@@ -74,11 +74,27 @@ class C52ImportConverter extends CConverter {
 				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
 			}
 
+			if (array_key_exists('httptests', $host)) {
+				$host['httptests'] = self::convertHttpTests($host['httptests']);
+			}
+
 			unset($host['applications']);
 		}
 		unset($host);
 
 		return $hosts;
+	}
+
+	private static function convertHttpTests(array $http_tests): array {
+		foreach ($http_tests as &$http_test) {
+			if (array_key_exists('application', $http_test)) {
+				$http_test['tags'] = self::convertApplicationsToTags([$http_test['application']]);
+				unset($http_test['application']);
+			}
+		}
+		unset($http_test);
+
+		return $http_tests;
 	}
 
 	/**
@@ -98,6 +114,10 @@ class C52ImportConverter extends CConverter {
 
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+			}
+
+			if (array_key_exists('httptests', $template)) {
+				$template['httptests'] = self::convertHttpTests($template['httptests']);
 			}
 
 			unset($template['applications']);
