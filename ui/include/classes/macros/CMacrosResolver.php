@@ -136,7 +136,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		if ($this->isTypeAvailable('user_data')) {
-			$types['macros']['user_data'] = ['{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'];
+			// {USER.ALIAS} is deprecated in version 5.4.
+			$types['macros']['user_data'] = ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}',
+				'{USER.SURNAME}'
+			];
 		}
 
 		if ($this->isTypeAvailable('user')) {
@@ -177,6 +180,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						&& $matched_macros['macros']['user_data']) {
 					foreach ($matched_macros['macros']['user_data'] as $macro) {
 						switch ($macro) {
+							case '{USER.ALIAS}': // Deprecated in version 5.4.
 							case '{USER.USERNAME}':
 								$macros[$hostid][$macro] = CWebUser::$data['username'];
 								break;
