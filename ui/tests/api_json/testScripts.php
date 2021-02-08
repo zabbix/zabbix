@@ -202,60 +202,204 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
 			],
 			// Check script host access.
-			'Test invalid host_access (empty)' => [
+			'Test unexpected host_access for action scope (default, string)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
 					'host_access' => ''
 				],
+				// Must be changed in future if CApiInputValidator is improved.
 				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
 			],
-			'Test invalid host_access (string)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'command' => 'reboot server',
-					'host_access' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
-			],
-			'Test invalid host_access' => [
+			'Test unexpected host_access for action scope (default, int)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
 					'host_access' => 999999
 				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test unexpected host_access for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test invalid host_access for host scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for host scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access host scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+			],
+			'Test invalid host_access for event scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for event scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access event scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'host_access' => 999999
+				],
 				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
 			],
 			// Check script user group.
-			'Test invalid user group (empty)' => [
+			'Test unexpected usrgrpid for action scope (default, string)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
 					'usrgrpid' => ''
 				],
+				// Must be changed in future if CApiInputValidator is improved.
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
-			'Test invalid user group (string)' => [
+			'Test unexpected usrgrpid for action scope (default, int)' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
+					'usrgrpid' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test unexpected usrgrpid for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'usrgrpid' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test invalid usrgrpid for host scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for host scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'usrgrpid' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
-			'Test invalid user group' => [
+			'Test invalid usrgrpid for host scope' => [
 				'script' => [
 					'name' => 'API create script',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'usrgrpid' => 999999
 				],
 				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for host scope (empty)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope (string)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			// Check script confirmation.
+			'Test unexpected confirmation for action scope (default)' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+			'Test unexpected confirmation for action scope' => [
+				'script' => [
+					'name' => 'API create script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
 			],
 			// Check script host group.
 			'Test invalid host group (empty)' => [
@@ -1049,7 +1193,8 @@ class testScripts extends CAPITest {
 						'usrgrpid' => 0,
 						'groupid' => 4,
 						'host_access' => PERM_READ_WRITE,
-						'confirmation' => 'confirmation text'
+						'confirmation' => 'confirmation text',
+						'menu_path' => 'folder1/folder2'
 					]
 				],
 				'expected_error' => null
@@ -1071,7 +1216,8 @@ class testScripts extends CAPITest {
 						'username' => 'John',
 						'password' => 'Ada',
 						'publickey' => 'secret_public_key',
-						'privatekey' => 'secret_private_key'
+						'privatekey' => 'secret_private_key',
+						'menu_path' => 'folder1/folder2'
 					]
 				],
 				'expected_error' => null
@@ -1090,7 +1236,8 @@ class testScripts extends CAPITest {
 						'confirmation' => 'confirmation text',
 						'port' => 456,
 						'username' => 'John',
-						'password' => 'Ada'
+						'password' => 'Ada',
+						'menu_path' => 'folder1/folder2'
 					]
 				],
 				'expected_error' => null
@@ -1108,6 +1255,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'confirmation' => 'confirmation text',
 						'timeout' => '10',
+						'menu_path' => 'folder1/folder2',
 						'parameters' => [
 							[
 								'name' => 'username',
@@ -1437,25 +1585,46 @@ class testScripts extends CAPITest {
 				// Check menu path.
 				if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 					$this->assertEmpty($db_script['menu_path']);
+					$this->assertSame($db_script['usrgrpid'], '0');
+					$this->assertEquals($db_script['host_access'], CDBHelper::getDefault('scripts', 'host_access'));
+					$this->assertEmpty($db_script['confirmation']);
 				}
 				else {
+					// Check menu path.
 					if (array_key_exists('menu_path', $scripts[$num])) {
 						$this->assertSame($db_script['menu_path'], $scripts[$num]['menu_path']);
 					}
 					else {
 						$this->assertEmpty($db_script['menu_path']);
 					}
+
+					// Check user group.
+					if (array_key_exists('usrgrpid', $scripts[$num])) {
+						$this->assertSame($db_script['usrgrpid'], strval($scripts[$num]['usrgrpid']));
+					}
+					else {
+						// Despite the default in DB is NULL, getting value from DB gets us 0 as string.
+						$this->assertSame($db_script['usrgrpid'], '0');
+					}
+
+					// Check host access.
+					if (array_key_exists('host_access', $scripts[$num])) {
+						$this->assertEquals($db_script['host_access'], $scripts[$num]['host_access']);
+					}
+					else {
+						$this->assertEquals($db_script['host_access'], CDBHelper::getDefault('scripts', 'host_access'));
+					}
+
+					// Check confirmation.
+					if (array_key_exists('confirmation', $scripts[$num])) {
+						$this->assertSame($db_script['confirmation'], $scripts[$num]['confirmation']);
+					}
+					else {
+						$this->assertEmpty($db_script['confirmation']);
+					}
 				}
 
 				// Optional common fields for all script types.
-				if (array_key_exists('usrgrpid', $scripts[$num])) {
-					$this->assertSame($db_script['usrgrpid'], strval($scripts[$num]['usrgrpid']));
-				}
-				else {
-					// Despite the default in DB is NULL, getting value from DB gets us 0 as string.
-					$this->assertSame($db_script['usrgrpid'], '0');
-				}
-
 				if (array_key_exists('groupid', $scripts[$num])) {
 					$this->assertSame($db_script['groupid'], strval($scripts[$num]['groupid']));
 				}
@@ -1464,25 +1633,11 @@ class testScripts extends CAPITest {
 					$this->assertSame($db_script['groupid'], '0');
 				}
 
-				if (array_key_exists('host_access', $scripts[$num])) {
-					$this->assertEquals($db_script['host_access'], $scripts[$num]['host_access']);
-				}
-				else {
-					$this->assertEquals($db_script['host_access'], CDBHelper::getDefault('scripts', 'host_access'));
-				}
-
 				if (array_key_exists('description', $scripts[$num])) {
 					$this->assertSame($db_script['description'], $scripts[$num]['description']);
 				}
 				else {
 					$this->assertEmpty($db_script['description']);
-				}
-
-				if (array_key_exists('confirmation', $scripts[$num])) {
-					$this->assertSame($db_script['confirmation'], $scripts[$num]['confirmation']);
-				}
-				else {
-					$this->assertEmpty($db_script['confirmation']);
 				}
 
 				if ($scripts[$num]['type']) {
@@ -1858,48 +2013,184 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "menu_path".'
 			],
 			// Check script host access.
-			'Test invalid host_access (empty)' => [
+			'Test unexpected host_access for action scope (string)' => [
 				'script' => [
 					'scriptid' => 15,
 					'host_access' => ''
 				],
+				// Must be changed in future if CApiInputValidator is improved.
 				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
 			],
-			'Test invalid host_access (string)' => [
+			'Test unexpected host_access for action scope (int)' => [
 				'script' => [
 					'scriptid' => 15,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test unexpected host_access for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "host_access".'
+			],
+			'Test invalid host_access for host scope (empty)' => [
+				'script' => [
+					'scriptid' => 16,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for host scope (string)' => [
+				'script' => [
+					'scriptid' => 16,
 					'host_access' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
 			],
-			'Test invalid host_access' => [
+			'Test invalid host_access for host scope' => [
+				'script' => [
+					'scriptid' => 16,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+			],
+			'Test invalid host_access for host scope (change of scope)' => [
 				'script' => [
 					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+			],
+			'Test invalid host_access for event scope (empty)' => [
+				'script' => [
+					'scriptid' => 17,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for event scope (string)' => [
+				'script' => [
+					'scriptid' => 17,
+					'host_access' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
+			],
+			'Test invalid host_access for event scope' => [
+				'script' => [
+					'scriptid' => 17,
+					'host_access' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
+			],
+			'Test invalid host_access for event scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 					'host_access' => 999999
 				],
 				'expected_error' => 'Invalid parameter "/1/host_access": value must be one of '.PERM_READ.', '.PERM_READ_WRITE.'.'
 			],
 			// Check script user group.
-			'Test invalid user group (empty)' => [
+			'Test unexpected usrgrpid for action scope (string)' => [
 				'script' => [
 					'scriptid' => 15,
 					'usrgrpid' => ''
 				],
+				// Must be changed in future if CApiInputValidator is improved.
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
-			'Test invalid user group (string)' => [
+			'Test unexpected usrgrpid for action scope (int)' => [
 				'script' => [
 					'scriptid' => 15,
-					'usrgrpid' => 'abc'
+					'usrgrpid' => 0
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test unexpected usrgrpid for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "usrgrpid".'
+			],
+			'Test invalid usrgrpid for host scope (empty)' => [
+				'script' => [
+					'scriptid' => 16,
+					'usrgrpid' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
-			'Test invalid user group' => [
+			'Test invalid usrgrpid for host scope (string)' => [
 				'script' => [
-					'scriptid' => 15,
+					'scriptid' => 16,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for host scope' => [
+				'script' => [
+					'scriptid' => 16,
 					'usrgrpid' => 999999
 				],
 				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for host scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for event scope (empty)' => [
+				'script' => [
+					'scriptid' => 17,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope (string)' => [
+				'script' => [
+					'scriptid' => 17,
+					'usrgrpid' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
+			],
+			'Test invalid usrgrpid for event scope' => [
+				'script' => [
+					'scriptid' => 17,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			'Test invalid usrgrpid for event scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 15,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'usrgrpid' => 999999
+				],
+				'expected_error' => 'User group with ID "999999" is not available.'
+			],
+			// Check script confirmation.
+			'Test unexpected confirmation for action scope' => [
+				'script' => [
+					'scriptid' => 15,
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
+			],
+			'Test unexpected confirmation for action scope (change of scope)' => [
+				'script' => [
+					'scriptid' => 16,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'confirmation' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "confirmation".'
 			],
 			// Check script host group.
 			'Test invalid host group (empty)' => [
@@ -2465,7 +2756,7 @@ class testScripts extends CAPITest {
 			'Test successful custom script update without changes' => [
 				'script' => [
 					[
-						'scriptid' => 15
+						'scriptid' => 6
 					]
 				],
 				'expected_error' => null
@@ -2473,12 +2764,12 @@ class testScripts extends CAPITest {
 			'Test successful multiple custom script updates' => [
 				'script' => [
 					[
-						'scriptid' => 15,
+						'scriptid' => 6,
 						'name' => 'API script custom execute on agent (action scope) updated',
 						'command' => 'reboot server 1'
 					],
 					[
-						'scriptid' => 16,
+						'scriptid' => 7,
 						'name' => 'API script custom execute on agent (host scope) updated',
 						'command' => 'reboot server 2'
 					]
@@ -2493,11 +2784,8 @@ class testScripts extends CAPITest {
 						'name' => 'Апи скрипт обнавлён утф-8',
 						'command' => 'reboot',
 						'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
-						'host_access' => PERM_READ_WRITE,
-						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
-						'confirmation' => 'Do you want to reboot it?'
+						'description' => 'Check successful update'
 					]
 				],
 				'expected_error' => null
@@ -2512,7 +2800,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'menu_path' => '/root/folder1/'
 					]
@@ -2528,7 +2816,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?'
 					]
 				],
@@ -2543,7 +2831,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'port' => '{$MACRO}',
 						'username' => 'Jill',
@@ -2561,7 +2849,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'port' => '{$MACRO}',
 						'username' => 'Jill',
@@ -2605,7 +2893,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'port' => '{$MACRO}',
 						'username' => 'Barry'
@@ -2623,7 +2911,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'parameters' => [
 							[
@@ -2648,7 +2936,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'parameters' => []
 					]
@@ -2664,7 +2952,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 7,
 						'groupid' => 4,
-						'description' => 'Check successful update with all properties',
+						'description' => 'Check successful update',
 						'confirmation' => 'Do you want to reboot it?',
 						'parameters' => [
 							[
@@ -3072,6 +3360,53 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check scope field update.
+			'Test successful parameter update of host scope' => [
+				'script' => [
+					[
+						'scriptid' => 56,
+						'menu_path' => '/new_folder1/new_folder2/',
+						'usrgrpid' => 7,
+						'confirmation' => 'confirmation text updated',
+						'host_access' => PERM_READ_WRITE
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter update of event scope' => [
+				'script' => [
+					[
+						'scriptid' => 57,
+						'menu_path' => '/new_folder1/new_folder2/',
+						'usrgrpid' => 7,
+						'confirmation' => 'confirmation text updated',
+						'host_access' => PERM_READ_WRITE
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter update of action scope (scope change)' => [
+				'script' => [
+					[
+						'scriptid' => 55,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/new_folder1/new_folder2/',
+						'usrgrpid' => 7,
+						'confirmation' => 'confirmation text updated',
+						'host_access' => PERM_READ_WRITE
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter reset when scope changes to action' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'scope' => ZBX_SCRIPT_SCOPE_ACTION
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -3474,19 +3809,14 @@ class testScripts extends CAPITest {
 					$this->assertEquals($db_script['scope'], $db_upd_script['scope']);
 				}
 
-				if ($db_script['scope'] != $db_upd_script['scope']) {
-					if ($db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
-						$this->assertEmpty($db_script['menu_path']);
-					}
-					else {
-						// Check menu path.
-						if (array_key_exists('menu_path', $script)) {
-							$this->assertSame($db_upd_script['menu_path'], $script['menu_path']);
-						}
-						else {
-							$this->assertSame($db_script['menu_path'], $db_upd_script['menu_path']);
-						}
-					}
+				// Check scope dependent fields.
+				if ($db_upd_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					$this->assertEmpty($db_upd_script['menu_path']);
+					$this->assertSame($db_upd_script['usrgrpid'], '0');
+					$this->assertEquals($db_upd_script['host_access'],
+						CDBHelper::getDefault('scripts', 'host_access')
+					);
+					$this->assertEmpty($db_upd_script['confirmation']);
 				}
 				else {
 					// Check menu path.
@@ -3496,30 +3826,38 @@ class testScripts extends CAPITest {
 					else {
 						$this->assertSame($db_script['menu_path'], $db_upd_script['menu_path']);
 					}
+
+					// Check user group.
+					if (array_key_exists('usrgrpid', $script)) {
+						$this->assertSame($db_upd_script['usrgrpid'], strval($script['usrgrpid']));
+					}
+					else {
+						$this->assertSame($db_script['usrgrpid'], $db_upd_script['usrgrpid']);
+					}
+
+					// Check host_access.
+					if (array_key_exists('host_access', $script)) {
+						$this->assertEquals($db_upd_script['host_access'], $script['host_access']);
+					}
+					else {
+						$this->assertEquals($db_script['host_access'], $db_upd_script['host_access']);
+					}
+
+					// Check confirmation.
+					if (array_key_exists('confirmation', $script)) {
+						$this->assertSame($db_upd_script['confirmation'], $script['confirmation']);
+					}
+					else {
+						$this->assertSame($db_script['confirmation'], $db_upd_script['confirmation']);
+					}
 				}
 
-				// Check user group ID.
-				if (array_key_exists('usrgrpid', $script)) {
-					$this->assertSame($db_upd_script['usrgrpid'], strval($script['usrgrpid']));
-				}
-				else {
-					$this->assertSame($db_script['usrgrpid'], $db_upd_script['usrgrpid']);
-				}
-
-				// Check host group ID.
+				// Check host group.
 				if (array_key_exists('groupid', $script)) {
 					$this->assertSame($db_upd_script['groupid'], strval($script['groupid']));
 				}
 				else {
 					$this->assertSame($db_script['groupid'], $db_upd_script['groupid']);
-				}
-
-				// Check host_access.
-				if (array_key_exists('host_access', $script)) {
-					$this->assertEquals($db_upd_script['host_access'], $script['host_access']);
-				}
-				else {
-					$this->assertEquals($db_script['host_access'], $db_upd_script['host_access']);
 				}
 
 				// Check description.
@@ -3528,14 +3866,6 @@ class testScripts extends CAPITest {
 				}
 				else {
 					$this->assertSame($db_script['description'], $db_upd_script['description']);
-				}
-
-				// Check confirmation.
-				if (array_key_exists('confirmation', $script)) {
-					$this->assertSame($db_upd_script['confirmation'], $script['confirmation']);
-				}
-				else {
-					$this->assertSame($db_script['confirmation'], $db_upd_script['confirmation']);
 				}
 			}
 		}

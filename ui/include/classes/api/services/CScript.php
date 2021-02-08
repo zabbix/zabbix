@@ -285,7 +285,7 @@ class CScript extends CApiService {
 			$path = '/'.++$i;
 
 			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
-			$scope_rules = $this->getScopeValidationRules($script['scope'], 'create', $scope_fields);
+			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
 
 			$type_rules['fields'] += $common_fields + $scope_fields;
 
@@ -409,6 +409,9 @@ class CScript extends CApiService {
 
 			if ($scope != $db_scope && $scope == ZBX_SCRIPT_SCOPE_ACTION) {
 				$upd_script['menu_path'] = '';
+				$upd_script['usrgrpid'] = 0;
+				$upd_script['host_access'] = DB::getDefault('scripts', 'host_access');;
+				$upd_script['confirmation'] = '';
 			}
 
 			if ($type == ZBX_SCRIPT_TYPE_WEBHOOK && array_key_exists('parameters', $script)) {
@@ -579,7 +582,7 @@ class CScript extends CApiService {
 			}
 
 			$type_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
-			$scope_rules = $this->getScopeValidationRules($script['scope'], $method, $scope_fields);
+			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
 
 			$type_rules['fields'] += $common_fields + $scope_fields;
 
@@ -626,10 +629,7 @@ class CScript extends CApiService {
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK])],
 			'scope' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT])],
 			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
-			'usrgrpid' =>		['type' => API_ID],
 			'groupid' =>		['type' => API_ID],
-			'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
-			'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'description')]
 		];
 
@@ -647,11 +647,14 @@ class CScript extends CApiService {
 
 		/*
 		 * Merge together optional fields that depend on script type. Some of these fields are not required for some
-		 * script types.
+		 * script types. Set only type for now. Unique parameter names, lengths and other flags are set later.
 		 */
 		$api_input_rules['fields'] += $common_fields + [
 			'execute_on' =>		['type' => API_INT32],
 			'menu_path' =>		['type' => API_STRING_UTF8],
+			'usrgrpid' =>		['type' => API_ID],
+			'host_access' =>	['type' => API_INT32],
+			'confirmation' =>	['type' => API_STRING_UTF8],
 			'port' =>			['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 			'authtype' =>		['type' => API_INT32],
 			'username' =>		['type' => API_STRING_UTF8],
@@ -659,9 +662,9 @@ class CScript extends CApiService {
 			'privatekey' =>		['type' => API_STRING_UTF8],
 			'password' =>		['type' => API_STRING_UTF8],
 			'timeout' =>		['type' => API_TIME_UNIT],
-			'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('script_param', 'name')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('script_param', 'value')]
+			'parameters' =>			['type' => API_OBJECTS, 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8],
+				'value' =>				['type' => API_STRING_UTF8]
 			]]
 		];
 
@@ -672,18 +675,20 @@ class CScript extends CApiService {
 	 * Get validation rules for script scope.
 	 *
 	 * @param int    $scope  [IN]          Script scope.
-	 * @param string $method [IN]          API method "create" or "update".
 	 * @param array  $common_fields [OUT]  Returns common fields for specific script scope.
 	 *
 	 * @return array
 	 */
-	protected function getScopeValidationRules(int $scope, string $method, &$common_fields = []): array {
+	protected function getScopeValidationRules(int $scope, &$common_fields = []): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 		$common_fields = [];
 
 		if ($scope == ZBX_SCRIPT_SCOPE_HOST || $scope == ZBX_SCRIPT_SCOPE_EVENT) {
 			$common_fields = [
-				'menu_path' => ['type' => API_SCRIPT_MENU_PATH, 'length' => DB::getFieldLength('scripts', 'menu_path')]
+				'menu_path' =>		['type' => API_SCRIPT_MENU_PATH, 'length' => DB::getFieldLength('scripts', 'menu_path')],
+				'usrgrpid' =>		['type' => API_ID],
+				'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
+				'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')]
 			];
 
 			$api_input_rules['fields'] += $common_fields;
