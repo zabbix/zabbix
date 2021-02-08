@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-12-23T09:21:31Z</date>
+   <date>2021-02-08T18:34:37Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -29,7 +29,7 @@ Template tooling version used: 0.38</description>
          <items>
             <item>
                <name>SMART: Get attributes</name>
-               <key>smart.disk.get[{#NAME}]</key>
+               <key>smart.disk.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -70,12 +70,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()} &lt;= {#THRESH}</expression>
-                           <name>SMART [{#NAME}]: Disk {#NAME} attribute {#ID} {#ATTRNAME} is failed</name>
+                           <name>SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed</name>
                            <priority>WARNING</priority>
                            <description>The value should be greater than THRESH.</description>
                         </trigger_prototype>
@@ -93,11 +93,13 @@ Template tooling version used: 0.38</description>
                               <macro>{#ID}</macro>
                               <value>{$SMART.ATTRIBUTE.ID.MATCHES}</value>
                               <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
                            </condition>
                            <condition>
                               <macro>{#NAME}</macro>
                               <value>{$SMART.DISK.NAME.MATCHES}</value>
                               <formulaid>B</formulaid>
+                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -142,7 +144,7 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -165,7 +167,7 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -191,7 +193,7 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -218,7 +220,7 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -245,12 +247,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;90</expression>
-                           <name>SMART [{#NAME}]: {#NAME}: NVMe disk percentage using is over 90% of estimated endurance</name>
+                           <name>SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -279,12 +281,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                           <name>SMART [{#NAME}]: {#NAME}: Disk has been replaced (new serial number received)</name>
+                           <name>SMART [{#NAME}]: Disk has been replaced (new serial number received)</name>
                            <priority>INFO</priority>
                            <description>Device serial number has changed. Ack to close.</description>
                            <manual_close>YES</manual_close>
@@ -315,23 +317,23 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.WARN}</expression>
-                           <name>SMART [{#NAME}]: {#NAME}: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)</name>
+                           <name>SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m)</name>
                            <priority>WARNING</priority>
                            <dependencies>
                               <dependency>
-                                 <name>SMART [{#NAME}]: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                                 <name>SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
                                  <expression>{Template Module SMART by Zabbix agent 2:smart.disk.temperature[{#NAME}].avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$SMART.TEMPERATURE.MAX.CRIT}</expression>
-                           <name>SMART [{#NAME}]: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
+                           <name>SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</name>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -361,12 +363,12 @@ Template tooling version used: 0.38</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>smart.disk.get[{#NAME}]</key>
+                        <key>smart.disk.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}="false"</expression>
-                           <name>SMART [{#NAME}]: {#NAME}: Disk self-test is not passed</name>
+                           <name>SMART [{#NAME}]: Disk self-test is not passed</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -383,6 +385,7 @@ Template tooling version used: 0.38</description>
                               <macro>{#DISKTYPE}</macro>
                               <value>nvme</value>
                               <formulaid>A</formulaid>
+                              <operator>MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>
@@ -405,6 +408,7 @@ Template tooling version used: 0.38</description>
                               <macro>{#DISKTYPE}</macro>
                               <value>nvme</value>
                               <formulaid>A</formulaid>
+                              <operator>NOT_MATCHES_REGEX</operator>
                            </condition>
                         </conditions>
                      </filter>

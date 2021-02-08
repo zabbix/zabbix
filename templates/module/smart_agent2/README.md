@@ -51,7 +51,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix_raw_items |SMART: Get attributes |<p>-</p> |ZABBIX_PASSIVE |smart.disk.get[{#NAME}] |
+|Zabbix_raw_items |SMART: Get attributes |<p>-</p> |ZABBIX_PASSIVE |smart.disk.get |
 |Zabbix_raw_items |SMART [{#NAME}]: Device model |<p>-</p> |DEPENDENT |smart.disk.model[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].model_name.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Serial number |<p>-</p> |DEPENDENT |smart.disk.sn[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].serial_number.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Zabbix_raw_items |SMART [{#NAME}]: Self-test passed |<p>The disk is passed the SMART self-test or not.</p> |DEPENDENT |smart.disk.test[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.disk_name=='{#NAME}')].ata_smart_data.self_test.status.passed.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -66,12 +66,12 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|SMART [{#NAME}]: {#NAME}: Disk has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close.</p> |`{TEMPLATE_NAME:smart.disk.sn[{#NAME}].diff()}=1 and {TEMPLATE_NAME:smart.disk.sn[{#NAME}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|SMART [{#NAME}]: {#NAME}: Disk self-test is not passed | |`{TEMPLATE_NAME:smart.disk.test[{#NAME}].last()}="false"` |HIGH | |
-|SMART [{#NAME}]: {#NAME}: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m) | |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- SMART [{#NAME}]: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</p> |
-|SMART [{#NAME}]: {#NAME}: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m) | |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}` |AVERAGE | |
-|SMART [{#NAME}]: {#NAME}: NVMe disk percentage using is over 90% of estimated endurance | |`{TEMPLATE_NAME:smart.disk.percentage_used[{#NAME}].last()}>90` |AVERAGE | |
-|SMART [{#NAME}]: Disk {#NAME} attribute {#ID} {#ATTRNAME} is failed |<p>The value should be greater than THRESH.</p> |`{TEMPLATE_NAME:smart.disk.error[{#NAME},{#ID}].last()} <= {#THRESH}` |WARNING | |
+|SMART [{#NAME}]: Disk has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close.</p> |`{TEMPLATE_NAME:smart.disk.sn[{#NAME}].diff()}=1 and {TEMPLATE_NAME:smart.disk.sn[{#NAME}].strlen()}>0` |INFO |<p>Manual close: YES</p> |
+|SMART [{#NAME}]: Disk self-test is not passed | |`{TEMPLATE_NAME:smart.disk.test[{#NAME}].last()}="false"` |HIGH | |
+|SMART [{#NAME}]: Average disk temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C for 5m) | |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m)</p> |
+|SMART [{#NAME}]: Average disk temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C for 5m) | |`{TEMPLATE_NAME:smart.disk.temperature[{#NAME}].avg(5m)}>{$SMART.TEMPERATURE.MAX.CRIT}` |AVERAGE | |
+|SMART [{#NAME}]: NVMe disk percentage using is over 90% of estimated endurance | |`{TEMPLATE_NAME:smart.disk.percentage_used[{#NAME}].last()}>90` |AVERAGE | |
+|SMART [{#NAME}]: Attribute {#ID} {#ATTRNAME} is failed |<p>The value should be greater than THRESH.</p> |`{TEMPLATE_NAME:smart.disk.error[{#NAME},{#ID}].last()} <= {#THRESH}` |WARNING | |
 
 ## Feedback
 
