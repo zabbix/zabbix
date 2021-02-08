@@ -538,21 +538,6 @@ static int	DBpatch_5030044(void)
 
 static int	DBpatch_5030045(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute(
-			"insert into ids select 'dashboard_page','dashboardpage_id',nextid from ids"
-			" where table_name='dashboard' and field_name='dashboardid'"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5030046(void)
-{
 	const ZBX_FIELD	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	if (SUCCEED != DBadd_field("widget", &field))
@@ -561,7 +546,7 @@ static int	DBpatch_5030046(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030047(void)
+static int	DBpatch_5030046(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -572,29 +557,29 @@ static int	DBpatch_5030047(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030048(void)
+static int	DBpatch_5030047(void)
 {
 	const ZBX_FIELD	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBset_not_null("widget", &field);
 }
 
-static int	DBpatch_5030049(void)
+static int	DBpatch_5030048(void)
 {
 	return DBdrop_foreign_key("widget", 1);
 }
 
-static int	DBpatch_5030050(void)
+static int	DBpatch_5030049(void)
 {
 	return DBdrop_field("widget", "dashboardid");
 }
 
-static int	DBpatch_5030051(void)
+static int	DBpatch_5030050(void)
 {
 	return DBcreate_index("widget", "widget_1", "dashboard_pageid", 0);
 }
 
-static int	DBpatch_5030052(void)
+static int	DBpatch_5030051(void)
 {
 	const ZBX_FIELD field = {"dashboard_pageid", NULL, "dashboard_page", "dashboard_pageid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -659,6 +644,5 @@ DBPATCH_ADD(5030048, 0, 1)
 DBPATCH_ADD(5030049, 0, 1)
 DBPATCH_ADD(5030050, 0, 1)
 DBPATCH_ADD(5030051, 0, 1)
-DBPATCH_ADD(5030052, 0, 1)
 
 DBPATCH_END()
