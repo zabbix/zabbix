@@ -85,18 +85,6 @@ class C52ImportConverter extends CConverter {
 		return $hosts;
 	}
 
-	private static function convertHttpTests(array $http_tests): array {
-		foreach ($http_tests as &$http_test) {
-			if (array_key_exists('application', $http_test)) {
-				$http_test['tags'] = self::convertApplicationsToTags([$http_test['application']]);
-				unset($http_test['application']);
-			}
-		}
-		unset($http_test);
-
-		return $http_tests;
-	}
-
 	/**
 	 * Convert templates.
 	 *
@@ -220,5 +208,26 @@ class C52ImportConverter extends CConverter {
 		}
 
 		return $maps;
+	}
+
+	/**
+	 * Convert http tests.
+	 *
+	 * @static
+	 *
+	 * @param array $http_tests
+	 *
+	 * @return array
+	 */
+	private static function convertHttpTests(array $http_tests): array {
+		foreach ($http_tests as &$http_test) {
+			if (array_key_exists('application', $http_test)) {
+				$http_test['tags'] = self::convertApplicationsToTags([$http_test['application']]);
+				unset($http_test['application']);
+			}
+		}
+		unset($http_test);
+
+		return $http_tests;
 	}
 }
