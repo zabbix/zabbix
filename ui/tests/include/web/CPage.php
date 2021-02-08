@@ -584,7 +584,7 @@ class CPage {
 
 		$text = $this->getTitle();
 		if ($text !== $title) {
-			throw new \Exception('Title of the page '.$text.' is not equal to '.$title);
+			throw new \Exception('Title of the page "'.$text.'" is not equal to "'.$title.'".');
 		}
 	}
 
@@ -599,7 +599,7 @@ class CPage {
 		$text = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
 
 		if ($text !== $header) {
-			throw new \Exception('Header of the page '.$text.' is not equal to '.$header);
+			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
 		}
 	}
 }
