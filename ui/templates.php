@@ -522,7 +522,8 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
-			$data['valuemaps'] = $data['dbTemplate']['valuemaps'];
+			CArrayHelper::sort($data['dbTemplate']['valuemaps'], ['name']);
+			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
 	}
 

@@ -847,7 +847,8 @@ if (hasRequest('form')) {
 			}
 
 			// Valuemap
-			$data['valuemaps'] = $dbHost['valuemaps'];
+			CArrayHelper::sort($dbHost['valuemaps'], ['name']);
+			$data['valuemaps'] = array_values($dbHost['valuemaps']);
 
 			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
 		}
