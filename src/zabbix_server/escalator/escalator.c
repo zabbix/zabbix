@@ -760,31 +760,12 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const DB_EVENT
 	}
 }
 
-static int	get_scriptname_by_scriptid(zbx_uint64_t scriptid, char **script_name)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	result = DBselect("select name from scripts where scriptid=" ZBX_FS_UI64, scriptid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*script_name = zbx_strdup(NULL, row[0]);
-		DBfree_result(result);
-		return SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	return FAIL;
-}
-
-static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const DC_HOST *host,
+static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_uint64_t alertid, const char *host,
 		const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid, int esc_step,
-		const zbx_script_t *script, zbx_alert_status_t status, const char *error)
+		const char *message, zbx_alert_status_t status, const char *error)
 {
 	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
-	char	*tmp = NULL, *message;
+	char	*tmp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -797,25 +778,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 
 	now = (int)time(NULL);
 
-	if (ZBX_SCRIPT_TYPE_IPMI == script->type || ZBX_SCRIPT_TYPE_SSH == script->type
-			|| ZBX_SCRIPT_TYPE_TELNET == script->type || ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type)
-	{
-		message = script->command_orig;
-	}
-	else
-	{
-		if (FAIL == get_scriptname_by_scriptid(script->scriptid, &message))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to find scriptname using script id " ZBX_FS_UI64,
-					script->scriptid);
-			message = NULL;
-		}
-	}
-
-	tmp = zbx_dsprintf(tmp, "%s:%s", host->host, ZBX_NULL2EMPTY_STR(message));
-
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script->type)
-		zbx_free(message);
+	tmp = zbx_dsprintf(tmp, "%s:%s", host, message);
 
 	if (NULL == r_event)
 	{
@@ -896,7 +859,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 				/* the 1st 'select' works if remote command target is "Host group" */
 				"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
 					",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
-					",s.scope,s.timeout,h.tls_connect"
+					",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 				/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
@@ -927,7 +890,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			/* the 2nd 'select' works if remote command target is "Host" */
 			"select distinct h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
 				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
-				",s.scope,s.timeout,h.tls_connect"
+				",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
@@ -946,7 +909,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			/* the 3rd 'select' works if remote command target is "Current host" */
 			"select distinct 0,0,null,s.type,s.scriptid,s.execute_on,s.port"
 				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
-				",s.scope,s.timeout,%d",
+				",s.scope,s.timeout,s.name,%d",
 			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
 #ifdef HAVE_OPENIPMI
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -976,7 +939,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		zbx_script_t		script;
 		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
 		zbx_uint64_t		alertid, groupid;
-		char			*webhook_params = NULL, error[ALERT_ERROR_LEN_MAX];
+		char			*webhook_params = NULL, *script_name = NULL, error[ALERT_ERROR_LEN_MAX];
 
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
@@ -1014,6 +977,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			rc = FAIL;
 			goto fail;
 		}
+
+		script_name = row[16];
 
 		/* validate script permissions */
 
@@ -1062,18 +1027,18 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[2]);
-				host.tls_connect = (unsigned char)atoi(row[16]);
+				host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[17]);
-				host.ipmi_privilege = (unsigned char)atoi(row[18]);
-				strscpy(host.ipmi_username, row[19]);
-				strscpy(host.ipmi_password, row[20]);
+				host.ipmi_authtype = (signed char)atoi(row[18]);
+				host.ipmi_privilege = (unsigned char)atoi(row[19]);
+				strscpy(host.ipmi_username, row[20]);
+				strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[17 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[18 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[19 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 			else if (SUCCEED == (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
@@ -1146,8 +1111,9 @@ fail:
 		if (FAIL == rc)
 			status = ALERT_STATUS_FAILED;
 
-		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				&script, status, error);
+		add_command_alert(&db_insert, alerts_num++, alertid, host.host, event, r_event, actionid, esc_step,
+				(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ? script_name : script.command_orig,
+				status, error);
 skip:
 		zbx_free(webhook_params);
 		zbx_script_clean(&script);
