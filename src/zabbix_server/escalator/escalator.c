@@ -1114,8 +1114,8 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
-					NULL, NULL, ack, default_timezone, &webhook_params, macro_type, error,
-					sizeof(error)))
+					NULL, NULL, ack, default_timezone, &webhook_params,
+					macro_type | MACRO_TYPE_HTTP_JSON, error, sizeof(error)))
 			{
 				rc = FAIL;
 				goto fail;
