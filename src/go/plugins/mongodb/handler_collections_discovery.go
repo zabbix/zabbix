@@ -31,7 +31,7 @@ type colEntity struct {
 	DbName  string `json:"{#DBNAME}"`
 }
 
-// collectionsDiscoveryHandler TODO
+// collectionsDiscoveryHandler
 // https://docs.mongodb.com/manual/reference/command/listDatabases/
 func collectionsDiscoveryHandler(s Session, _ map[string]string) (interface{}, error) {
 	dbs, err := s.DatabaseNames()

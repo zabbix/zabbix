@@ -30,7 +30,7 @@ type dbEntity struct {
 	DBName string `json:"{#DBNAME}"`
 }
 
-// databasesDiscoveryHandler TODO
+// databasesDiscoveryHandler
 // https://docs.mongodb.com/manual/reference/command/listDatabases/
 func databasesDiscoveryHandler(s Session, _ map[string]string) (interface{}, error) {
 	dbs, err := s.DatabaseNames()
