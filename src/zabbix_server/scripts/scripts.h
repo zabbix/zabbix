@@ -26,7 +26,6 @@
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid);
-int	zbx_check_webhook_script_permissions(const zbx_script_t *script, char *error, size_t error_len);
 int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, zbx_script_t *script);
 int	DBfetch_webhook_params(zbx_uint64_t scriptid, char **params, char *error, size_t error_len);
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len);

@@ -986,7 +986,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		ZBX_STR2UCHAR(script.type, row[3]);
 
-		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type || ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 			ZBX_STR2UCHAR(script.execute_on, row[5]);
 
 		if (ZBX_SCRIPT_TYPE_SSH == script.type)
@@ -1035,13 +1035,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		{
 			zbx_strlcpy(error, "Script does not have permission to be executed on the host.",
 					sizeof(error));
-			rc = FAIL;
-			goto fail;
-		}
-
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type &&
-				SUCCEED != zbx_check_webhook_script_permissions(&script, error, sizeof(error)))
-		{
 			rc = FAIL;
 			goto fail;
 		}
@@ -1135,11 +1128,11 @@ fail:
 		{
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 			{
-				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
-					rc = zbx_script_execute(&script, &host,
-							(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ?
-							webhook_params : NULL, NULL, error, sizeof(error), NULL);
+					rc = zbx_script_execute(&script, &host, webhook_params, NULL, error,
+							sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else

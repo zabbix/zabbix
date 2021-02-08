@@ -453,12 +453,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		goto fail;
 	}
 
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type &&
-			SUCCEED != zbx_check_webhook_script_permissions(&script, error, sizeof(error)))
-	{
-		goto fail;
-	}
-
 	/* get host or event details */
 
 	if (0 != hostid)
@@ -606,12 +600,10 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	{
 		const char	*poutput = NULL, *perror = NULL;
 
-		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			ret = zbx_script_execute(&script, &host,
-					(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ? webhook_params : NULL,
-					result, error, sizeof(error),
-					(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ? debug : NULL);
+			ret = zbx_script_execute(&script, &host, webhook_params, result, error, sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));

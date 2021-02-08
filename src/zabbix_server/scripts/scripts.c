@@ -233,17 +233,6 @@ exit:
 	return ret;
 }
 
-int	zbx_check_webhook_script_permissions(const zbx_script_t *script, char *error, size_t error_len)
-{
-	if (ZBX_SCRIPT_EXECUTE_ON_SERVER == script->execute_on)
-		return SUCCEED;
-
-	zbx_strlcpy(error, "Deprecated configuration. Webhook script can be executed only on Zabbix server.",
-			error_len);
-
-	return FAIL;
-}
-
 int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, zbx_script_t *script)
 {
 	int		ret = SUCCEED;
