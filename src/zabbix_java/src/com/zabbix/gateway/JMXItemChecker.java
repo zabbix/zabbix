@@ -108,15 +108,13 @@ class JMXItemChecker extends ItemChecker
 			{
 				try
 				{
-					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
-							env);
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
 					useRMISSLforURLHintCache.put(url.getURLPath(), false);
 				}
 				catch (IOException e)
 				{
 					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
-					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
-							env);
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
 					useRMISSLforURLHintCache.put(url.getURLPath(), true);
 				}
 			}
@@ -125,15 +123,13 @@ class JMXItemChecker extends ItemChecker
 				try
 				{
 					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
-					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
-							env);
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
 					useRMISSLforURLHintCache.put(url.getURLPath(), true);
 				}
 				catch (IOException e)
 				{
 					env.remove("com.sun.jndi.rmi.factory.socket");
-					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
-							env);
+					jmxc = ZabbixJMXConnectorFactory.connect(url, env);
 					useRMISSLforURLHintCache.put(url.getURLPath(), false);
 				}
 			}
