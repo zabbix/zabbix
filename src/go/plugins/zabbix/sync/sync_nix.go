@@ -31,6 +31,5 @@ func getMetrics() []string {
 		"system.sw.packages", "Listing of installed packages.",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "Directory size (in bytes).",
-		"vm.memory.size", "Memory size in bytes or in percentage from total.",
 	}
 }
