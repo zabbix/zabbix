@@ -6514,6 +6514,7 @@ out:
 	zbx_dbsync_clear(&hgroups_sync);
 	zbx_dbsync_clear(&itempp_sync);
 	zbx_dbsync_clear(&itemscrp_sync);
+	zbx_dbsync_clear(&item_tag_sync);
 	zbx_dbsync_clear(&maintenance_sync);
 	zbx_dbsync_clear(&maintenance_period_sync);
 	zbx_dbsync_clear(&maintenance_tag_sync);
@@ -13455,6 +13456,22 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
+static void	zbx_gather_item_tags(ZBX_DC_ITEM *item, zbx_vector_ptr_t *item_tags)
+{
+	zbx_dc_item_tag_t	*dc_tag;
+	zbx_item_tag_t		*tag;
+	int			i;
+
+	for (i = 0; i < item->tags.values_num; i++)
+	{
+		dc_tag = (zbx_dc_item_tag_t *)item->tags.values[i];
+		tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
+		tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);
+		tag->tag.value = zbx_strdup(NULL, dc_tag->value);
+		zbx_vector_ptr_append(item_tags, tag);
+	}
+}
+
 static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *item_tags)
 {
 	zbx_dc_host_tag_index_t 	*dc_tag_index;
@@ -13499,6 +13516,8 @@ static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 		return;
 
 	n = item_tags->values_num;
+
+	zbx_gather_item_tags(item, item_tags);
 
 	zbx_gather_tags_from_host(item->hostid, item_tags);
 

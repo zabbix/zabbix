@@ -838,7 +838,7 @@ typedef struct
 	zbx_hashset_t		trigger_tags;
 	zbx_hashset_t		item_tags;
 	zbx_hashset_t		host_tags;
-	zbx_hashset_t		host_tags_index;		/* host tag index by hostid */
+	zbx_hashset_t		host_tags_index;	/* host tag index by hostid */
 	zbx_hashset_t		correlations;
 	zbx_hashset_t		corr_conditions;
 	zbx_hashset_t		corr_operations;
