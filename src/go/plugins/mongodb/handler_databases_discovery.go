@@ -22,6 +22,7 @@ package mongodb
 import (
 	"encoding/json"
 	"sort"
+
 	"zabbix.com/pkg/zbxerr"
 )
 

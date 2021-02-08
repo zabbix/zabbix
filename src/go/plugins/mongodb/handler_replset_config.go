@@ -21,6 +21,7 @@ package mongodb
 
 import (
 	"encoding/json"
+
 	"gopkg.in/mgo.v2/bson"
 	"zabbix.com/pkg/zbxerr"
 )

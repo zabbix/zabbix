@@ -21,9 +21,10 @@ package mongodb
 
 import (
 	"context"
-	"gopkg.in/mgo.v2/bson"
 	"sync"
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"gopkg.in/mgo.v2"
 	"zabbix.com/pkg/log"

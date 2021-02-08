@@ -22,8 +22,9 @@ package mongodb
 import (
 	"encoding/json"
 	"errors"
-	"gopkg.in/mgo.v2/bson"
 	"strings"
+
+	"gopkg.in/mgo.v2/bson"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -65,7 +66,11 @@ func parseMembers(raw []interface{}) (result []Member, err error) {
 		}
 
 		if v, ok := m.(rawMember)["optime"].(map[string]interface{}); ok {
-			member.optime = int(v["ts"].(bson.MongoTimestamp) >> 32)
+			if ts, ok := v["ts"].(bson.MongoTimestamp); ok {
+				member.optime = int(ts >> 32)
+			} else {
+				member.optime = int(int64(v["ts"].(float64)) >> 32)
+			}
 		}
 
 		if v, ok := m.(rawMember)["state"].(int); ok {
@@ -105,6 +110,7 @@ func injectExtendedMembersStats(raw []interface{}) error {
 
 	for _, node := range members {
 		node.ptr.(rawMember)["lag"] = primary.optime - node.optime
+
 		if node.state == stateSecondary && node.health != nodeHealthy {
 			unhealthyNodes = append(unhealthyNodes, node.name)
 			unhealthyCount++
@@ -138,6 +144,7 @@ func replSetStatusHandler(s Session, _ map[string]string) (interface{}, error) {
 		if strings.Contains(err.Error(), "not running with --replSet") {
 			return "{}", nil
 		}
+
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 

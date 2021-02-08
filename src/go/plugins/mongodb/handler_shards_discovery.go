@@ -25,18 +25,19 @@ import (
 	"net"
 	"strings"
 	"time"
+
 	"zabbix.com/pkg/zbxerr"
 )
 
 type lldShEntity struct {
-	Id        string `json:"{#ID}"`
+	ID        string `json:"{#ID}"`
 	Hostname  string `json:"{#HOSTNAME}"`
-	MongodUri string `json:"{#MONGOD_URI}"`
+	MongodURI string `json:"{#MONGOD_URI}"`
 	State     string `json:"{#STATE}"`
 }
 
 type shEntry struct {
-	Id    string      `bson:"_id"`
+	ID    string      `bson:"_id"`
 	Host  string      `bson:"host"`
 	State json.Number `bson:"state"`
 }
@@ -56,6 +57,7 @@ func shardsDiscoveryHandler(s Session, _ map[string]string) (interface{}, error)
 
 	for _, sh := range shards {
 		hosts := sh.Host
+
 		h := strings.SplitN(sh.Host, "/", 2)
 		if len(h) > 1 {
 			hosts = h[1]
@@ -68,9 +70,9 @@ func shardsDiscoveryHandler(s Session, _ map[string]string) (interface{}, error)
 			}
 
 			lld = append(lld, lldShEntity{
-				Id:        sh.Id,
+				ID:        sh.ID,
 				Hostname:  host,
-				MongodUri: fmt.Sprintf("%s://%s", uriDefaults.Scheme, hostport),
+				MongodURI: fmt.Sprintf("%s://%s", uriDefaults.Scheme, hostport),
 				State:     sh.State.String(),
 			})
 		}

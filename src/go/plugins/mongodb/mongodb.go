@@ -20,9 +20,10 @@
 package mongodb
 
 import (
-	"gopkg.in/mgo.v2"
 	"os"
 	"time"
+
+	"gopkg.in/mgo.v2"
 
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
@@ -109,6 +110,7 @@ func (l MongoLogger) Output(_ int, msg string) error {
 func init() {
 	if os.Getenv("MGO_DEBUG") == "1" {
 		logger := MongoLogger{Debugf: impl.Debugf}
+
 		mgo.SetDebug(true)
 		mgo.SetLogger(logger)
 	}
