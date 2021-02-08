@@ -1814,7 +1814,7 @@ class testUsers extends CAPITest {
 		return [
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'zabbix',
 					'sessionid' => '123456'
 				],
@@ -1825,25 +1825,25 @@ class testUsers extends CAPITest {
 				'login' => [
 					'password' => 'zabbix'
 				],
-				'expected_error' => 'Invalid parameter "/": the parameter "user" is missing.'
+				'expected_error' => 'Invalid parameter "/": the parameter "username" is missing.'
 			],
 			[
 				'login' => [
-					'user' => '',
+					'username' => '',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => 'Unknown user',
+					'username' => 'Unknown user',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => '!@#$%^&\\\'\"""\;:',
+					'username' => '!@#$%^&\\\'\"""\;:',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
@@ -1851,27 +1851,27 @@ class testUsers extends CAPITest {
 			// Check password
 			[
 				'login' => [
-					'user' => 'Admin'
+					'username' => 'Admin'
 				],
 				'expected_error' => 'Invalid parameter "/": the parameter "password" is missing.'
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => ''
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'wrong password'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => '!@#$%^&\\\'\"""\;:'
 				],
 				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
@@ -1879,7 +1879,7 @@ class testUsers extends CAPITest {
 			// Check disabled user.
 			[
 				'login' => [
-					'user' => 'api-user-action',
+					'username' => 'api-user-action',
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'No permissions for system access.'
@@ -1887,14 +1887,14 @@ class testUsers extends CAPITest {
 			// Successfully login.
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'zabbix'
 				],
 				'expected_error' => null
 			],
 			[
 				'login' => [
-					'user' => 'Admin',
+					'username' => 'Admin',
 					'password' => 'zabbix',
 					'userData' => true
 				],
@@ -1902,7 +1902,7 @@ class testUsers extends CAPITest {
 			],
 			[
 				'login' => [
-					'user' => 'guest',
+					'username' => 'guest',
 					'password' => ''
 				],
 				'expected_error' => null
@@ -2140,7 +2140,7 @@ class testUsers extends CAPITest {
 	public function testUsers_LoginBlocked() {
 		$this->disableAuthorization();
 		for ($i = 1; $i <= 6; $i++) {
-			$result = $this->call('user.login', ['user' => 'Admin', 'password' => 'attempt '.$i], true);
+			$result = $this->call('user.login', ['username' => 'Admin', 'password' => 'attempt '.$i], true);
 		}
 
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',

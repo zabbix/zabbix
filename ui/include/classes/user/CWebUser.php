@@ -48,7 +48,7 @@ class CWebUser {
 	public static function login(string $login, string $password): bool {
 		try {
 			self::$data = API::User()->login([
-				'user' => $login,
+				'username' => $login,
 				'password' => $password,
 				'userData' => true
 			]);
@@ -102,7 +102,7 @@ class CWebUser {
 			if (empty(self::$data)) {
 				CMessageHelper::clear();
 				self::$data = API::User()->login([
-					'user' => ZBX_GUEST_USER,
+					'username' => ZBX_GUEST_USER,
 					'password' => '',
 					'userData' => true
 				]);
