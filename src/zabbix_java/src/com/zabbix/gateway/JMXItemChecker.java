@@ -19,6 +19,7 @@
 
 package com.zabbix.gateway;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
@@ -57,6 +58,8 @@ class JMXItemChecker extends ItemChecker
 		ATTRIBUTES,
 		BEANS
 	}
+
+	static HashMap<String, Boolean> useRMISSLforURLHintCache = new HashMap<String, Boolean>();
 
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -100,12 +103,41 @@ class JMXItemChecker extends ItemChecker
 				env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
 			}
 
-			if (Boolean.parseBoolean(System.getProperty("com.sun.management.jmxremote.registry.ssl")))
+			if (!useRMISSLforURLHintCache.containsKey(url.getURLPath()) ||
+					!useRMISSLforURLHintCache.get(url.getURLPath()))
 			{
-				env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+				try
+				{
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
+							env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), false);
+				}
+				catch (IOException e)
+				{
+					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
+							env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), true);
+				}
+			}
+			else
+			{
+				try
+				{
+					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
+							env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), true);
+				}
+				catch (IOException e)
+				{
+					env.remove("com.sun.jndi.rmi.factory.socket");
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(url.getURLPath()),
+							env);
+					useRMISSLforURLHintCache.put(url.getURLPath(), false);
+				}
 			}
 
-			jmxc = ZabbixJMXConnectorFactory.connect(url, env);
 			mbsc = jmxc.getMBeanServerConnection();
 
 			for (String key : keys)
@@ -115,7 +147,8 @@ class JMXItemChecker extends ItemChecker
 		{
 			JSONObject value = new JSONObject();
 
-			logger.warn("cannot process keys '{}': {}: {}", new Object[] {keys, ZabbixException.getRootCauseMessage(e1), url});
+			logger.warn("cannot process keys '{}': {}: {}", new Object[] {keys,
+					ZabbixException.getRootCauseMessage(e1), url});
 			logger.debug("error caused by", e1);
 
 			try
@@ -124,7 +157,8 @@ class JMXItemChecker extends ItemChecker
 			}
 			catch (JSONException e2)
 			{
-				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(), ZabbixException.getRootCauseMessage(e2)};
+				Object[] logInfo = {JSON_TAG_ERROR, e1.getMessage(),
+						ZabbixException.getRootCauseMessage(e2)};
 				logger.warn("cannot add JSON attribute '{}' with message '{}': {}", logInfo);
 				logger.debug("error caused by", e2);
 			}

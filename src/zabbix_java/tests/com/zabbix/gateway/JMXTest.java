@@ -20,22 +20,16 @@
 package com.zabbix.gateway;
 
 import org.junit.*;
-
-import static javax.net.ssl.SSLContext.getInstance;
-import static javax.net.ssl.SSLContext.setDefault;
 import static org.junit.Assert.*;
 
-import java.io.*;
-import java.security.*;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXServiceURL;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 public class JMXTest {
@@ -66,44 +60,20 @@ public class JMXTest {
 
 	static
 	{
-		SSLContext sc = null;
-		KeyStore keystore = null;
-		KeyManagerFactory keyManagerFactory = null;
-
 		System.setProperty("javax.net.ssl.keyStore", VALID_TARGET_APP_KEYSTORE_FILE);
 		System.setProperty("javax.net.ssl.keyStorePassword", KEY_STORE_PASSWORD);
 		System.setProperty("javax.net.ssl.trustStore", VALID_MONITOR_APP_TRUSTSTORE_FILE);
 		System.setProperty("javax.net.ssl.trustStorePassword", TRUST_STORE_PASSWORD);
 		System.setProperty("com.sun.net.ssl.checkRevocation", "true");
-
-		try
-		{
-			keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-			// does not matter which target store gets used valid or invalid
-			InputStream in = new FileInputStream(System.getProperty("javax.net.ssl.keyStore"));
-			String keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
-			keystore.load(in, keyStorePassword == null ? null : keyStorePassword.toCharArray());
-			keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			keyManagerFactory.init(keystore, keyStorePassword == null ? null : keyStorePassword.toCharArray());
-			sc = getInstance("SSL");
-			sc.init(keyManagerFactory.getKeyManagers(), null, new java.security.SecureRandom());
-			sc.getSocketFactory();
-			setDefault(sc);
-			Logger.getLogger("javax.management.remote.rmi").setLevel(Level.ALL);
-		}
-		catch (Exception e)
-		{
-			fail(e.getMessage());
-		}
 	}
+
+	static HashMap<String, Boolean> useRMISSLforURLHintCache = new HashMap<String, Boolean>();
 
 	static void jmxTestScenario(boolean useAuth,
 			boolean useIncorrectPassForMonitor,
-			boolean useSSL,
+			boolean targetAppUsesRegistrySSL,
 			boolean useTrustStoreWithoutTargetKey)
 	{
-
-		System.setProperty("com.sun.management.jmxremote.registry.ssl", String.valueOf(useSSL));
 
 		Process p = null;
 
@@ -122,9 +92,9 @@ public class JMXTest {
 					"-Dcom.sun.management.jmxremote.authenticate=" + String.valueOf(useAuth),
 					"-Dcom.sun.management.jmxremote.access.file=" + JMXREMOTE_ACCESS_FILE,
 					"-Dcom.sun.management.jmxremote.password.file=" + JMXREMOTE_PASSWORD_FILE,
-					"-Dcom.sun.management.jmxremote.ssl=" + String.valueOf(useSSL),
-					"-Dcom.sun.management.jmxremote.registry.ssl=" + String.valueOf(useSSL),
-					"-Djavax.net.debug=all",
+					"-Dcom.sun.management.jmxremote.ssl=true",
+					"-Dcom.sun.management.jmxremote.registry.ssl=" +
+							String.valueOf(targetAppUsesRegistrySSL),
 					"SimpleAgent");
 
 			pb.directory(new File(JMX_TESTS_PATH));
@@ -143,12 +113,40 @@ public class JMXTest {
 				});
 			}
 
-			if (Boolean.parseBoolean(System.getProperty("com.sun.management.jmxremote.registry.ssl")))
+			JMXConnector jmxc = null;
+
+			if (!useRMISSLforURLHintCache.containsKey(JMX_APP_URL) ||
+					!useRMISSLforURLHintCache.get(JMX_APP_URL))
 			{
-				env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+				try
+				{
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(JMX_APP_URL), env);
+					useRMISSLforURLHintCache.put(JMX_APP_URL, false);
+				}
+				catch (IOException e)
+				{
+					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(JMX_APP_URL), env);
+					useRMISSLforURLHintCache.put(JMX_APP_URL, true);
+				}
+			}
+			else
+			{
+				try
+				{
+					env.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(JMX_APP_URL), env);
+					useRMISSLforURLHintCache.put(JMX_APP_URL, true);
+				}
+				catch (IOException e)
+				{
+					env.remove("com.sun.jndi.rmi.factory.socket");
+					jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(JMX_APP_URL), env);
+					useRMISSLforURLHintCache.put(JMX_APP_URL, false);
+				}
 			}
 
-			JMXConnector jmxc = ZabbixJMXConnectorFactory.connect(new JMXServiceURL(JMX_APP_URL), env);
+
 			MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
 
 			ObjectName objectName = new ObjectName("FOO:name=HelloBean");
@@ -192,12 +190,6 @@ public class JMXTest {
 		}
 	}
 
-	@After
-	public void cleanSystemProperties()
-	{
-		System.clearProperty("com.sun.management.jmxremote.registry.ssl");
-	}
-
 	@Test
 	public void basic()
 	{
@@ -239,4 +231,16 @@ public class JMXTest {
 	{
 		jmxTestScenario(true, false, true, true);
 	}
+
+	@Test
+	public void flickeringRMISSL()
+	{
+		jmxTestScenario(true, false, false, false);
+		jmxTestScenario(true, false, true, false);
+		jmxTestScenario(true, false, false, false);
+		jmxTestScenario(true, false, true, false);
+		jmxTestScenario(true, false, true, false);
+		jmxTestScenario(true, false, false, false);
+	}
+
 }

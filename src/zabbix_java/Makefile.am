@@ -21,6 +21,7 @@ $(ZJG): class src/com/zabbix/gateway/*.java
 	$(JAR) cf $(ZJG) -C class/src .
 
 test: class
+	echo "badger useruser" > tests/com/zabbix/gateway/jmx_test_beans/jmxremote.password
 	chmod 600 tests/com/zabbix/gateway/jmx_test_beans/jmxremote.password
 	$(JAVAC) tests/com/zabbix/gateway/jmx_test_beans/*.java
 	$(JAVAC) -d class/tests -classpath class/src:$(JUNIT) tests/com/zabbix/gateway/*.java
