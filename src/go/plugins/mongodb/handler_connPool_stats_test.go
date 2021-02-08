@@ -13,10 +13,10 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-func Test_databaseStatsHandler(t *testing.T) {
+func Test_connPoolStatsHandler(t *testing.T) {
 	var testData map[string]interface{}
 
-	jsonData, err := ioutil.ReadFile("testdata/dbStats.json")
+	jsonData, err := ioutil.ReadFile("testdata/connPoolStats.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,7 +29,7 @@ func Test_databaseStatsHandler(t *testing.T) {
 	mockSession := NewMockConn()
 	db := mockSession.DB("testdb")
 	db.(*MockMongoDatabase).RunFunc = func(dbName, cmd string) ([]byte, error) {
-		if cmd == "dbStats" {
+		if cmd == "connPoolStats" {
 			return bson.Marshal(testData)
 		}
 
@@ -48,7 +48,7 @@ func Test_databaseStatsHandler(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Must parse an output of \" + dbStats + \"command",
+			name: "Must parse an output of \" + connPoolStats + \"command",
 			args: args{
 				s:      mockSession,
 				params: map[string]string{"Database": "testdb"},
@@ -75,16 +75,15 @@ func Test_databaseStatsHandler(t *testing.T) {
 			wantErr: zbxerr.ErrorCannotFetchData,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := databaseStatsHandler(tt.args.s, tt.args.params)
+			got, err := connPoolStatsHandler(tt.args.s, tt.args.params)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("databaseStatsHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("connPoolStatsHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("databaseStatsHandler() got = %v, want %v", got, tt.want)
+				t.Errorf("connPoolStatsHandler() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

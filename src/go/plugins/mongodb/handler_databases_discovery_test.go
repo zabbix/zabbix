@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -12,6 +13,7 @@ func Test_databasesDiscoveryHandler(t *testing.T) {
 		s   Session
 		dbs []string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -37,6 +39,7 @@ func Test_databasesDiscoveryHandler(t *testing.T) {
 			wantErr: zbxerr.ErrorCannotFetchData,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for _, db := range tt.args.dbs {
@@ -48,6 +51,7 @@ func Test_databasesDiscoveryHandler(t *testing.T) {
 				t.Errorf("databasesDiscoveryHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("databasesDiscoveryHandler() got = %v, want %v", got, tt.want)
 			}

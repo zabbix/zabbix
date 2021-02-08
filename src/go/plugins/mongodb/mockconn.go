@@ -1,10 +1,12 @@
 package mongodb
 
 import (
+	"errors"
 	"fmt"
+	"time"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"time"
 	"zabbix.com/pkg/zbxerr"
 )
 
@@ -40,8 +42,10 @@ func (conn *MockConn) DatabaseNames() (names []string, err error) {
 		if db.name == mustFail {
 			return nil, zbxerr.ErrorCannotFetchData
 		}
+
 		names = append(names, db.name)
 	}
+
 	return
 }
 
@@ -82,10 +86,12 @@ func (d *MockMongoDatabase) C(name string) Collection {
 func (d *MockMongoDatabase) CollectionNames() (names []string, err error) {
 	for _, col := range d.collections {
 		if col.name == mustFail {
-			return nil, zbxerr.ErrorCannotFetchData
+			return nil, errors.New("fail")
 		}
+
 		names = append(names, col.name)
 	}
+
 	return
 }
 
@@ -93,8 +99,9 @@ func (d *MockMongoDatabase) Run(cmd, result interface{}) error {
 	if d.RunFunc == nil {
 		d.RunFunc = func(dbName, _ string) ([]byte, error) {
 			if dbName == mustFail {
-				return nil, zbxerr.ErrorCannotFetchData
+				return nil, errors.New("fail")
 			}
+
 			return bson.Marshal(map[string]int{"ok": 1})
 		}
 	}

@@ -2,9 +2,10 @@ package mongodb
 
 import (
 	"errors"
-	"gopkg.in/mgo.v2/bson"
 	"reflect"
 	"testing"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 func Test_oplogStatsHandler(t *testing.T) {
@@ -20,11 +21,14 @@ func Test_oplogStatsHandler(t *testing.T) {
 		if len(sortFields) == 0 {
 			panic("sortFields must be set")
 		}
+
 		switch sortFields[0] {
 		case sortAsc:
 			return bson.Marshal(opFirst)
+
 		case sortDesc:
 			return bson.Marshal(opLast)
+
 		default:
 			panic("unknown sort type")
 		}
@@ -70,6 +74,7 @@ func Test_oplogStatsHandler(t *testing.T) {
 			wantErr: nil,
 		},
 	}
+
 	for _, tt := range tests {
 		for _, col := range tt.args.collections {
 			localDb.C(col).Find(oplogQuery).(*MockMongoQuery).DataFunc = dataFunc
@@ -81,6 +86,7 @@ func Test_oplogStatsHandler(t *testing.T) {
 				t.Errorf("oplogStatsHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("oplogStatsHandler() got = %v, want %v", got, tt.want)
 			}

@@ -13,10 +13,10 @@ import (
 	"zabbix.com/pkg/zbxerr"
 )
 
-func Test_databaseStatsHandler(t *testing.T) {
+func Test_collectionStatsHandler(t *testing.T) {
 	var testData map[string]interface{}
 
-	jsonData, err := ioutil.ReadFile("testdata/dbStats.json")
+	jsonData, err := ioutil.ReadFile("testdata/collStats.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,9 +27,9 @@ func Test_databaseStatsHandler(t *testing.T) {
 	}
 
 	mockSession := NewMockConn()
-	db := mockSession.DB("testdb")
+	db := mockSession.DB("MyDatabase")
 	db.(*MockMongoDatabase).RunFunc = func(dbName, cmd string) ([]byte, error) {
-		if cmd == "dbStats" {
+		if cmd == "collStats" {
 			return bson.Marshal(testData)
 		}
 
@@ -48,21 +48,12 @@ func Test_databaseStatsHandler(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "Must parse an output of \" + dbStats + \"command",
+			name: "Must parse an output of \" + collStats + \"command",
 			args: args{
 				s:      mockSession,
-				params: map[string]string{"Database": "testdb"},
+				params: map[string]string{"Database": "MyDatabase", "Collection": "MyCollection"},
 			},
 			want:    strings.TrimSpace(string(jsonData)),
-			wantErr: nil,
-		},
-		{
-			name: "Must not fail on unknown db",
-			args: args{
-				s:      mockSession,
-				params: map[string]string{"Database": "not_exists"},
-			},
-			want:    "{\"ok\":1}",
 			wantErr: nil,
 		},
 		{
@@ -78,13 +69,15 @@ func Test_databaseStatsHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := databaseStatsHandler(tt.args.s, tt.args.params)
+			got, err := collectionStatsHandler(tt.args.s, tt.args.params)
+
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("databaseStatsHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("collectionStatsHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("databaseStatsHandler() got = %v, want %v", got, tt.want)
+				t.Errorf("collectionStatsHandler() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
