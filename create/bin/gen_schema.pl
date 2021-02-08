@@ -632,23 +632,15 @@ BEGIN
 					current_postgres_version_full, minimum_postgres_version_major,
 					minimum_postgres_version_minor;
 	ELSE
-		RAISE NOTICE 'PostgreSQL version % is valid.', current_postgres_version_full;
+		RAISE NOTICE 'PostgreSQL version % is valid', current_postgres_version_full;
 	END IF;
 
 	SELECT extversion INTO current_timescaledb_version_full FROM pg_extension WHERE extname = 'timescaledb';
 
 	IF NOT found THEN
-		CREATE EXTENSION IF NOT EXISTS timescaledb $ENV{ZBX_TIMESCALEDB_SCHEMA} CASCADE;
-		RAISE NOTICE 'TimescaleDB extension does not exist, installing...';
-		SELECT extversion INTO current_timescaledb_version_full FROM pg_extension WHERE extname = 'timescaledb';
-
-		IF NOT found THEN
-			RAISE EXCEPTION 'TimescaleDB extension could not be installed';
-		END IF;
-
-		RAISE NOTICE 'TimescaleDB extension was installed';
+		RAISE EXCEPTION 'TimescaleDB extension is not installed';
 	ELSE
-		RAISE WARNING 'TimescaleDB extension is already installed';
+		RAISE NOTICE 'TimescaleDB extension is detected';
 	END IF;
 
 	SELECT substring(current_timescaledb_version_full, '^(\\d+).') INTO current_timescaledb_version_major;
@@ -661,30 +653,31 @@ BEGIN
 				current_timescaledb_version_full, minimum_timescaledb_version_major,
 				minimum_timescaledb_version_minor;
 	ELSE
-		RAISE NOTICE 'TimescaleDB version % is valid.', current_timescaledb_version_full;
+		RAISE NOTICE 'TimescaleDB version % is valid', current_timescaledb_version_full;
 	END IF;
-END \$\$;
 EOF
 	;
 
 	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
 		print<<EOF
-SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
 EOF
-		;
+	;
 	}
 
 	for ("trends", "trends_uint")
 	{
 		print<<EOF
-SELECT create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
 EOF
-		;
+	;
 	}
 	print<<EOF
-UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
-UPDATE config SET compression_status=1,compress_older='7d';
+	UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
+	UPDATE config SET compression_status=1,compress_older='7d';
+	RAISE NOTICE 'TimescaleDB is installed succesfully';
+END \$\$;
 EOF
 	;
 	exit;

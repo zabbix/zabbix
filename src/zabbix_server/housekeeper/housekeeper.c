@@ -587,7 +587,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
 
-		result = DBselect("SELECT drop_chunks(newer_than => %d, table_name => '%s')", keep_from, rule->table);
+		result = DBselect("SELECT drop_chunks(older_than => %d, table_name => '%s')", keep_from, rule->table);
 	}
 
 
