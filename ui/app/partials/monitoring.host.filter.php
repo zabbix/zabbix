@@ -23,6 +23,57 @@
  * @var CPartial $this
  */
 
+$filter_tags_table = (new CTable())
+	->setId('tags_#{uniqid}')
+	->addRow(
+		(new CCol(
+			(new CRadioButtonList('evaltype', (int) $data['evaltype']))
+				->setId('evaltype_#{uniqid}')
+				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
+				->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
+				->setModern(true)
+		))->setColSpan(4)
+);
+
+foreach (array_values($data['tags']) as $i => $tag) {
+	$filter_tags_table->addRow([
+		(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
+			->setAttribute('placeholder', _('tag'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->removeId(),
+		(new CSelect('tags['.$i.'][operator]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				TAG_OPERATOR_EXISTS => _('Exists'),
+				TAG_OPERATOR_EQUAL => _('Equals'),
+				TAG_OPERATOR_LIKE => _('Contains'),
+				TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+				TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+				TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+			]))
+			->setValue($tag['operator'])
+			->setFocusableElementId('tags-'.$i.'#{uniqid}-operator-select')
+			->setId('tags_'.$i.'#{uniqid}_operator'),
+		(new CTextBox('tags['.$i.'][value]', $tag['value']))
+			->setAttribute('placeholder', _('value'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setId('tags_'.$i.'#{uniqid}_value'),
+		(new CCol(
+			(new CButton('tags['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->removeId()
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
+}
+$filter_tags_table->addRow(
+	(new CCol(
+		(new CButton('tags_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->removeId()
+	))->setColSpan(3)
+);
+
 $left_column = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['name']))
@@ -69,15 +120,6 @@ $left_column = (new CFormList())
 			->setChecked($data['severities'])
 			->setUniqid('#{uniqid}')
 	);
-
-$filter_tags_table = CTagFilterFieldHelper::get([
-	'evaltype_field_name' => 'evaltype',
-	'tag_field_name' => 'tags',
-	'table_id' => 'tags_#{uniqid}'
-], [
-	'evaltype' => $data['evaltype'],
-	'tags' => $data['tags']
-]);
 
 $right_column = (new CFormList())
 	->addRow(_('Status'),
@@ -142,7 +184,37 @@ if (array_key_exists('render_html', $data)) {
 	->show();
 
 (new CScriptTemplate('filter-tag-row-tmpl'))
-	->addItem(CTagFilterFieldHelper::getTemplate(['tag_field_name' => 'tags']))
+	->addItem(
+		(new CRow([
+			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
+				->setAttribute('placeholder', _('tag'))
+				->removeId()
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CSelect('tags[#{rowNum}][operator]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					TAG_OPERATOR_EXISTS => _('Exists'),
+					TAG_OPERATOR_EQUAL => _('Equals'),
+					TAG_OPERATOR_LIKE => _('Contains'),
+					TAG_OPERATOR_NOT_EXISTS => _('Does not exist'),
+					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
+					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
+				]))
+				->setValue(TAG_OPERATOR_LIKE)
+				->setFocusableElementId('tags-#{rowNum}#{uniqid}-operator-select')
+				->setId('tags_#{rowNum}#{uniqid}_operator'),
+			(new CTextBox('tags[#{rowNum}][value]', '#{value}'))
+				->setAttribute('placeholder', _('value'))
+				->setId('tags_#{rowNum}#{uniqid}_value')
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+					->removeId()
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+	)
 	->show();
 ?>
 <script type="text/javascript">
