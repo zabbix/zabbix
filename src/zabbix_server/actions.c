@@ -854,7 +854,7 @@ static int	check_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct t.triggerid,a.name"
+			"select distinct t.triggerid,it.tag,it.value"
 			" from item_tag it,functions f,triggers t"
 			" where it.itemid=i.itemid"
 			" and i.itemid=f.itemid"
@@ -870,7 +870,7 @@ static int	check_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_OPERATOR_EQUAL:
 			while (NULL != (row = DBfetch(result)))
 			{
-				if (0 == strcmp(row[1], condition->value))
+				if (0 == strcmp(row[1], condition->value2) && 0 == strcmp(row[2], condition->value))
 				{
 					ZBX_STR2UINT64(objectid, row[0]);
 					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
@@ -880,7 +880,8 @@ static int	check_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_OPERATOR_LIKE:
 			while (NULL != (row = DBfetch(result)))
 			{
-				if (NULL != strstr(row[1], condition->value))
+				if (NULL != strstr(row[1], condition->value2) &&
+						NULL != strstr(row[2], condition->value))
 				{
 					ZBX_STR2UINT64(objectid, row[0]);
 					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
@@ -890,7 +891,8 @@ static int	check_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_OPERATOR_NOT_LIKE:
 			while (NULL != (row = DBfetch(result)))
 			{
-				if (NULL != strstr(row[1], condition->value))
+				if (NULL != strstr(row[1], condition->value2) &&
+						NULL != strstr(row[2], condition->value))
 				{
 					ZBX_STR2UINT64(objectid, row[0]);
 

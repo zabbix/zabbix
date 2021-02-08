@@ -706,21 +706,156 @@ static int	DBpatch_5030052(void)
 
 static int	DBpatch_5030053(void)
 {
-#define CONDITION_TYPE_APPLICATION	15
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d where conditiontype=%d",
+	zbx_db_insert_prepare(&db_insert, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select distinct e.eventid,it.tag,it.value from events e"
+			" left join triggers t on e.objectid=t.triggerid"
+			" left join functions f on t.triggerid=f.triggerid"
+			" left join items i on i.itemid=f.itemid"
+			" join item_tag it on i.itemid=it.itemid"
+			" where e.source=%d and e.object=%d and t.flags in (%d,%d) order by e.eventid;",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		rowN;
+		DB_RESULT	resultN;
+		zbx_uint64_t	eventid;
+		char		*tag, *value, tmp[MAX_STRING_LEN];
+
+		ZBX_DBROW2UINT64(eventid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		value = DBdyn_escape_string(row[2]);
+		zbx_snprintf(tmp, sizeof(tmp),
+				"select null from event_tag where eventid=" ZBX_FS_UI64 " and tag='%s' and value='%s'",
+				eventid, tag, value);
+
+		resultN = DBselectN(tmp, 1);
+
+		if (NULL == (rowN = DBfetch(resultN)))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
+
+		DBfree_result(resultN);
+		zbx_free(tag);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "eventtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030054(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
+
+	result = DBselect("select eventid,tag,value from event_tag");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		rowN;
+		DB_RESULT	resultN;
+		zbx_uint64_t	eventid;
+		char		*tag, *value, tmp[MAX_STRING_LEN];
+
+		ZBX_DBROW2UINT64(eventid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		value = DBdyn_escape_string(row[2]);
+		zbx_snprintf(tmp, sizeof(tmp),
+				"select null from problem_tag where eventid=" ZBX_FS_UI64 " and tag='%s'"
+				" and value='%s'", eventid, tag, value);
+
+		resultN = DBselectN(tmp, 1);
+
+		if (NULL == (rowN = DBfetch(resultN)))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
+
+		DBfree_result(resultN);
+		zbx_free(tag);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "problemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+#define CONDITION_TYPE_APPLICATION	15
+static int	DBpatch_5030055(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	conditionid;
+	char		*value;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect(
+			"select c.conditionid,c.value,c.conditiontype,a.eventsource from conditions c"
+			" left join actions a on a.actionid=c.actionid"
+			" where a.eventsource=%d and c.conditiontype=%d",
+			EVENT_SOURCE_TRIGGERS, CONDITION_TYPE_APPLICATION);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(conditionid, row[0]);
+		value = DBdyn_escape_string(row[1]);
+
+		if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application',value='%s'"
+				" where conditionid=" ZBX_FS_UI64, CONDITION_TYPE_EVENT_TAG_VALUE, value, conditionid))
+		{
+			return FAIL;
+		}
+
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_5030056(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
 			CONDITION_TYPE_ITEM_TAG, CONDITION_TYPE_APPLICATION))
 	{
 		return FAIL;
 	}
 
 	return SUCCEED;
-#undef CONDITION_TYPE_APPLICATION
-}
 
-static int	DBpatch_5030054(void)
+}
+#undef CONDITION_TYPE_APPLICATION
+
+static int	DBpatch_5030057(void)
 {
 #define AUDIT_RESOURCE_APPLICATION	12
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -733,7 +868,7 @@ static int	DBpatch_5030054(void)
 #undef AUDIT_RESOURCE_APPLICATION
 }
 
-static int	DBpatch_5030055(void)
+static int	DBpatch_5030058(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -748,52 +883,52 @@ static int	DBpatch_5030055(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_5030056(void)
+static int	DBpatch_5030059(void)
 {
 	return DBdrop_foreign_key("httptest", 1);
 }
 
-static int	DBpatch_5030057(void)
+static int	DBpatch_5030060(void)
 {
 	return DBdrop_index("httptest", "httptest_1");
 }
 
-static int	DBpatch_5030058(void)
+static int	DBpatch_5030061(void)
 {
 	return DBdrop_field("httptest", "applicationid");
 }
 
-static int	DBpatch_5030059(void)
+static int	DBpatch_5030062(void)
 {
 	return DBdrop_field("sysmaps_elements", "application");
 }
 
-static int	DBpatch_5030060(void)
+static int	DBpatch_5030063(void)
 {
 	return DBdrop_table("application_discovery");
 }
 
-static int	DBpatch_5030061(void)
+static int	DBpatch_5030064(void)
 {
 	return DBdrop_table("item_application_prototype");
 }
 
-static int	DBpatch_5030062(void)
+static int	DBpatch_5030065(void)
 {
 	return DBdrop_table("application_prototype");
 }
 
-static int	DBpatch_5030063(void)
+static int	DBpatch_5030066(void)
 {
 	return DBdrop_table("application_template");
 }
 
-static int	DBpatch_5030064(void)
+static int	DBpatch_5030067(void)
 {
 	return DBdrop_table("items_applications");
 }
 
-static int	DBpatch_5030065(void)
+static int	DBpatch_5030068(void)
 {
 	return DBdrop_table("applications");
 }
@@ -870,5 +1005,8 @@ DBPATCH_ADD(5030062, 0, 1)
 DBPATCH_ADD(5030063, 0, 1)
 DBPATCH_ADD(5030064, 0, 1)
 DBPATCH_ADD(5030065, 0, 1)
+DBPATCH_ADD(5030066, 0, 1)
+DBPATCH_ADD(5030067, 0, 1)
+DBPATCH_ADD(5030068, 0, 1)
 
 DBPATCH_END()
