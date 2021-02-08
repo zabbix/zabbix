@@ -3,38 +3,6 @@
 -- Activate "Zabbix Server" host
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
--- applications
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
-INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
-INSERT INTO applications (applicationid,hostid,name) VALUES (366,50009,'API application');
-INSERT INTO applications (applicationid,hostid,name) VALUES (367,50009,'API host application for update');
-INSERT INTO applications (applicationid,hostid,name) VALUES (368,10093,'API template application for update');
-INSERT INTO applications (applicationid,hostid,name) VALUES (369,50010,'API templated application');
-INSERT INTO applications (applicationid,hostid,name) VALUES (370,50009,'API templated application');
-INSERT INTO applications (applicationid,hostid,name) VALUES (371,50009,'API application delete');
-INSERT INTO applications (applicationid,hostid,name) VALUES (372,50009,'API application delete2');
-INSERT INTO applications (applicationid,hostid,name) VALUES (373,50009,'API application delete3');
-INSERT INTO applications (applicationid,hostid,name) VALUES (374,50009,'API application delete4');
-INSERT INTO applications (applicationid,hostid,name) VALUES (376,10084,'API application for Zabbix server');
-INSERT INTO application_template (application_templateid,applicationid,templateid) VALUES (52,370,369);
--- discovered application
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40066, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40067, 50009, 50022, 0, 2,'API discovery item','vfs.fs.size[{#FSNAME},free]',30,90,0,'','',2,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40068, 50009, 50022, 0, 2,'API discovery item','vfs.fs.size[/,free]',30,90,0,'','',4,'','');
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15085,40067,40066,'vfs.fs.size[{#FSNAME},free]');
-INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) VALUES (15086,40068,40067,'vfs.fs.size[{#FSNAME},free]');
-INSERT INTO applications (applicationid,hostid,name,flags) VALUES (375,50009,'API discovery application',4);
-INSERT INTO application_prototype (application_prototypeid,itemid,name) VALUES (900,40066,'API discovery application');
-INSERT INTO application_discovery (application_discoveryid,applicationid,application_prototypeid,name) VALUES (1,375,900,'API discovery application');
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375,40068);
-INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (1900,900,40067);
-
 -- valuemap
 INSERT INTO valuemaps (valuemapid,name) VALUES (399,'API value map for update');
 INSERT INTO valuemaps (valuemapid,name) VALUES (400,'API value map for update with mappings');
@@ -51,6 +19,15 @@ INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, 
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
 
 -- host groups
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (40066, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'API host group for update',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50009, 50005);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'API host group for update internal',1);
@@ -241,9 +218,7 @@ INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (1501
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15014, 15013, 'Api step 2', 2, 'http://api.com', '');
 
 -- web scenario for webitem update testing
-INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15015,50009,'Webtest key_name application',0);
-INSERT INTO applications (applicationid,hostid,name,flags) VALUES (15016,50009,'Webtest key_name application2',0);
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, applicationid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009, 15015);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15015, 15015, 'Webstep name 1', 1, 'http://api.com', '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15016, 15015, 'Webstep name 2', 2, 'http://api.com', '');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150151, 50009, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
@@ -264,15 +239,6 @@ INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (1501
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150157, 15016, 150157, 2);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150158, 15016, 150158, 1);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150159, 15016, 150159, 0);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150151,15015,150151);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150152,15015,150152);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150153,15015,150153);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150154,15015,150154);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150155,15015,150155);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150156,15015,150156);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150157,15015,150157);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150158,15015,150158);
-INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (150159,15015,150159);
 
 -- proxy
 INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'Api active proxy for delete0', 5, '');
@@ -297,7 +263,7 @@ INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, la
 INSERT INTO sysmap_user (sysmapuserid, sysmapid, userid, permission) VALUES (1, 10001, 5, 3);
 INSERT INTO sysmap_user (sysmapuserid, sysmapid, userid, permission) VALUES (2, 10003, 5, 3);
 INSERT INTO sysmap_user (sysmapuserid, sysmapid, userid, permission) VALUES (3, 10004, 5, 3);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance, elementsubtype, areatype, width, height, viewtype, use_iconmap, application) VALUES (7, 10001, 0, 4, 151, NULL, 'New element', -1, 189, 77, NULL, NULL, 0, 0, 200, 200, 0, 1, '');
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance, elementsubtype, areatype, width, height, viewtype, use_iconmap) VALUES (7, 10001, 0, 4, 151, NULL, 'New element', -1, 189, 77, NULL, NULL, 0, 0, 200, 200, 0, 1);
 
 -- disabled item and LLD rule
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (90000, 10084, 1, 0, 3,'Api disabled item','disabled.item','30d','90d',1,'','',0,'','');
