@@ -1,7 +1,7 @@
 # MongoDB plugin
 Provides native Zabbix solution for monitoring MongoDB servers and clusters (document-based, distributed database). 
 It can monitor several MongoDB instances simultaneously, remotes or locals to the Zabbix Agent. 
-Both TCP and Unix-socket connections are supported. The plugin keeps connections in the opened state to reduce network 
+The plugin keeps connections in the opened state to reduce network 
 congestion, latency, CPU and memory usage. Best for use in conjunction with the official 
 [MongoDB template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/mongodb)
 You can extend it or create your template for your specific needs. 
@@ -62,13 +62,12 @@ A connection can be configured using either keys' parameters or named sessions.
     
       mongodb.ping[tcp://127.0.0.1,user,password]
       
-* The only supported network schemas for a URI are "tcp" and "unix".  
+* Currently, only TCP connections supported.
+  
 Examples of valid URIs:
     - tcp://127.0.0.1:27017
     - tcp://localhost
     - localhost
-    - unix:///var/run/mongodb/mongodb-27017.sock
-    - /var/run/mongodb/mongodb-27017.sock
       
 #### Using keys' parameters
 The common parameters for all keys are: [ConnString][,User][,Password]  

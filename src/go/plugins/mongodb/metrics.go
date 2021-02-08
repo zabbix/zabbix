@@ -97,7 +97,7 @@ var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "27017"}
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
-			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp"}})
 	paramUser       = metric.NewConnParam("User", "MongoDB user.")
 	paramPassword   = metric.NewConnParam("Password", "User's password.")
 	paramDatabase   = metric.NewParam("Database", "Database name.").WithDefault("admin")
