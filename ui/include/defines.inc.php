@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.8rc1');
-define('ZABBIX_API_VERSION',	'5.0.8');
+define('ZABBIX_VERSION',		'5.0.9rc1');
+define('ZABBIX_API_VERSION',	'5.0.9');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -1303,42 +1303,43 @@ define('XML_REQUIRED',		0x08);
 
 // API validation
 // multiple types
-define('API_MULTIPLE',			0);
+define('API_MULTIPLE',				0);
 // scalar data types
-define('API_STRING_UTF8',		1);
-define('API_INT32',				2);
-define('API_ID',				3);
-define('API_BOOLEAN',			4);
-define('API_FLAG',				5);
-define('API_FLOAT',				6);
-define('API_UINT64',			7);
+define('API_STRING_UTF8',			1);
+define('API_INT32',					2);
+define('API_ID',					3);
+define('API_BOOLEAN',				4);
+define('API_FLAG',					5);
+define('API_FLOAT',					6);
+define('API_UINT64',				7);
 // arrays
-define('API_OBJECT',			8);
-define('API_IDS',				9);
-define('API_OBJECTS',			10);
-define('API_STRINGS_UTF8',		11);
-define('API_INTS32',			12);
-define('API_FLOATS',			13);
-define('API_UINTS64',			14);
+define('API_OBJECT',				8);
+define('API_IDS',					9);
+define('API_OBJECTS',				10);
+define('API_STRINGS_UTF8',			11);
+define('API_INTS32',				12);
+define('API_FLOATS',				13);
+define('API_UINTS64',				14);
 // specific types
-define('API_HG_NAME',			15);
-define('API_SCRIPT_NAME',		16);
-define('API_USER_MACRO',		17);
-define('API_TIME_PERIOD',		18);
-define('API_REGEX',				19);
-define('API_HTTP_POST',			20);
-define('API_VARIABLE_NAME',		21);
-define('API_OUTPUT',			22);
-define('API_TIME_UNIT',			23);
-define('API_URL',				24);
-define('API_H_NAME',			25);
-define('API_RANGE_TIME',		26);
-define('API_COLOR',				27);
-define('API_NUMERIC',			28);
-define('API_LLD_MACRO',			29);
-define('API_PSK',				30);
-define('API_SORTORDER',			31);
-define('API_CALC_FORMULA',		32);
+define('API_HG_NAME',				15);
+define('API_SCRIPT_NAME',			16);
+define('API_USER_MACRO',			17);
+define('API_TIME_PERIOD',			18);
+define('API_REGEX',					19);
+define('API_HTTP_POST',				20);
+define('API_VARIABLE_NAME',			21);
+define('API_OUTPUT',				22);
+define('API_TIME_UNIT',				23);
+define('API_URL',					24);
+define('API_H_NAME',				25);
+define('API_RANGE_TIME',			26);
+define('API_COLOR',					27);
+define('API_NUMERIC',				28);
+define('API_LLD_MACRO',				29);
+define('API_PSK',					30);
+define('API_SORTORDER',				31);
+define('API_CALC_FORMULA',			32);
+define('API_TRIGGER_EXPRESSION',	33);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1751,6 +1752,7 @@ define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
+define('ZBX_STYLE_WORDBREAK', 'wordbreak');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');

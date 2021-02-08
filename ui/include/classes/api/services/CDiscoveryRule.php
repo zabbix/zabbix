@@ -751,7 +751,9 @@ class CDiscoveryRule extends CItemGeneral {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		foreach ($dstTriggers as $id => &$trigger) {
-			unset($trigger['triggerid'], $trigger['templateid']);
+			unset($trigger['triggerid'], $trigger['templateid'], $trigger['hosts'], $trigger['functions'],
+				$trigger['items'], $trigger['discoveryRule']
+			);
 
 			// Update the destination expressions.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],

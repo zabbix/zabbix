@@ -41,8 +41,8 @@ class testPageMonitoringHosts extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking Title, Header and Column names.
-		$this->assertPageTitle('Hosts');
-		$this->assertPageHeader('Hosts');
+		$this->page->assertTitle('Hosts');
+		$this->page->assertHeader('Hosts');
 		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
 			'Graphs', 'Screens', 'Web'];
 		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
@@ -586,7 +586,7 @@ class testPageMonitoringHosts extends CWebTest {
 				$this->query('xpath://td/a[text()="'.$data['name'].'"]/following::td/a[text()="'.$data['link_name'].'"]')
 					->one()->click();
 				$this->page->waitUntilReady();
-				$this->assertPageHeader($data['page_header']);
+				$this->page->assertHeader($data['page_header']);
 				$form->checkValue(['Hosts' => $data['name']]);
 				$form->query('button:Reset')->one()->click();
 				break;
@@ -778,7 +778,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->getColumn($column)->click();
 		$this->page->waitUntilReady();
 		if ($page_header !== null) {
-			$this->assertPageHeader($page_header);
+			$this->page->assertHeader($page_header);
 		}
 		if ($host_name === 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
 				' and @aria-selected="false"]')->exists()) {

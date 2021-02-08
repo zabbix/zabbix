@@ -81,7 +81,7 @@ You can view the channel identifier in the channel properties.
 [![](images/thumb.7.png?raw=true)](images/7.png)
 [![](images/thumb.6.png?raw=true)](images/6.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.0/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
 
 ## Supported Versions
 

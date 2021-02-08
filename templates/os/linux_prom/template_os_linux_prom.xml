@@ -1077,7 +1077,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>B</units>
-               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <description>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.0/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
                      <name>Memory</name>

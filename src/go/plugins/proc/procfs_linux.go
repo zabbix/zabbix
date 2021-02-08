@@ -23,20 +23,13 @@ package proc
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
-	"strings"
 	"syscall"
-)
 
-const (
-	kB = 1024
-	mB = kB * 1024
-	gB = mB * 1024
-	tB = gB * 1024
+	"zabbix.com/pkg/procfs"
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -51,28 +44,6 @@ func read2k(filename string) (data []byte, err error) {
 	}
 	syscall.Close(fd)
 	return
-}
-
-func readAll(filename string) (data []byte, err error) {
-	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
-	if err != nil {
-		return
-	}
-	defer syscall.Close(fd)
-	var buf bytes.Buffer
-	b := make([]byte, 2048)
-	for {
-		var n int
-		if n, err = syscall.Read(fd, b); err != nil {
-			return
-		}
-		if n == 0 {
-			return buf.Bytes(), nil
-		}
-		if _, err = buf.Write(b[:n]); err != nil {
-			return
-		}
-	}
 }
 
 func getProcessName(pid string) (name string, err error) {
@@ -100,7 +71,7 @@ func getProcessUserID(pid string) (userid int64, err error) {
 
 func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
 	var data []byte
-	if data, err = readAll("/proc/" + pid + "/cmdline"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/cmdline"); err != nil {
 		return
 	}
 
@@ -199,58 +170,4 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 	}
 
 	return processes, nil
-}
-
-func getMemory() (mem float64, err error) {
-	meminfo, err := readAll("/proc/meminfo")
-	if err != nil {
-		return mem, fmt.Errorf("cannot read meminfo file: %s", err.Error())
-	}
-
-	var found bool
-	mem, found, err = byteFromProcFileData(meminfo, "MemTotal")
-	if err != nil {
-		return mem, fmt.Errorf("cannot get the amount of total memory: %s", err.Error())
-	}
-
-	if !found {
-		return mem, fmt.Errorf("cannot get the amount of total memory")
-	}
-
-	return
-}
-
-func byteFromProcFileData(data []byte, valueName string) (float64, bool, error) {
-	for _, line := range strings.Split(string(data), "\n") {
-		i := strings.Index(line, ":")
-		if i < 0 || valueName != line[:i] {
-			continue
-		}
-
-		line = line[i+1:]
-		if len(line) < 3 {
-			continue
-		}
-
-		v, err := strconv.Atoi(strings.TrimSpace(line[:len(line)-2]))
-		if err != nil {
-			return 0, false, err
-		}
-
-		switch line[len(line)-2:] {
-		case "kB":
-			v *= kB
-		case "mB":
-			v *= mB
-		case "GB":
-			v *= gB
-		case "TB":
-			v *= tB
-		default:
-			return 0, false, errors.New("cannot resolve value type")
-		}
-		return float64(v), true, nil
-	}
-
-	return 0, false, nil
 }

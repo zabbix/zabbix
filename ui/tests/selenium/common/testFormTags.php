@@ -124,7 +124,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details' => 'Incorrect value for field "tag": cannot be empty.'
+					'trigger_error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -144,7 +144,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
-					'trigger_error_details' => 'Tag "tag" with value "value" already exists.'
+					'trigger_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
 			[
@@ -157,6 +157,21 @@ class testFormTags extends CWebTest {
 							'index' => 0,
 							'tag' => '    trimmed tag    ',
 							'value' => '   trimmed value    '
+						]
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Long tag name and value',
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'Long tag name. Long tag name. Long tag name. Long tag name. Long tag name.'
+									.' Long tag name. Long tag name. Long tag name.',
+							'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'
+									.' Long tag value. Long tag value. Long tag value. Long tag value.'
 						]
 					]
 				]
@@ -197,6 +212,14 @@ class testFormTags extends CWebTest {
 
 		$form->selectTab('Tags');
 		$this->query('id:tags-table')->asMultifieldTable()->one()->fill($data['tags']);
+
+		// Check screenshots of text area right after filling.
+		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+			$this->page->removeFocus();
+			$screenshot_area = $this->query('id:tags-table')->one();
+			$this->assertScreenshot($screenshot_area, $data['name']);
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -217,7 +240,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
-					'trigger_error_details'=>'Incorrect value for field "tag": cannot be empty.'
+					'trigger_error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -232,7 +255,7 @@ class testFormTags extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
-					'trigger_error_details' => 'Tag "action" with value "update" already exists.'
+					'trigger_error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
 			[
@@ -445,5 +468,12 @@ class testFormTags extends CWebTest {
 		unset($tag);
 
 		$this->query('id:tags-table')->asMultifieldTable()->one()->checkValue($expected);
+
+		// Check screenshot of text area after saving.
+		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
+			$this->page->removeFocus();
+			$screenshot_area = $this->query('id:tags-table')->one();
+			$this->assertScreenshot($screenshot_area, $data['name']);
+		}
 	}
 }

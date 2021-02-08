@@ -50,7 +50,9 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$PG.CONFLICTS.MAX.WARN} |<p>-</p> |`0` |
 |{$PG.CONN_TOTAL_PCT.MAX.WARN} |<p>-</p> |`90` |
+|{$PG.DATABASE} |<p>-</p> |`postgres` |
 |{$PG.DEADLOCKS.MAX.WARN} |<p>-</p> |`0` |
+|{$PG.LLD.FILTER.APPLICATION} |<p>-</p> |`(.+)` |
 |{$PG.LLD.FILTER.DBNAME} |<p>-</p> |`(.+)` |
 |{$PG.PASSWORD} |<p>-</p> |`postgres` |
 |{$PG.URI} |<p>-</p> |`tcp://localhost:5432` |
@@ -64,12 +66,14 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
+|Replication Discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.replication.process.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#APPLICATION} MATCHES_REGEX `{$PG.LLD.FILTER.APPLICATION}`</p> |
 |Database discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.db.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$PG.LLD.FILTER.DBNAME}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
+|PostgreSQL |PostgreSQL: Custom queries |<p>Execute custom queries from file *.sql</p> |ZABBIX_PASSIVE |pgsql.custom.query["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""] |
 |PostgreSQL |WAL: Bytes written |<p>WAL write in bytes</p> |DEPENDENT |pgsql.wal.write<p>**Preprocessing**:</p><p>- JSONPATH: `$.write`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |WAL: Segments count |<p>Number of WAL segments</p> |DEPENDENT |pgsql.wal.count<p>**Preprocessing**:</p><p>- JSONPATH: `$.write`</p> |
 |PostgreSQL |Bgwriter: Buffers allocated |<p>Number of buffers allocated</p> |DEPENDENT |pgsql.bgwriter.buffers_alloc.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.buffers_alloc`</p><p>- CHANGE_PER_SECOND |
@@ -81,7 +85,8 @@ There are no template links in this template.
 |PostgreSQL |Checkpoint: By timeout |<p>Number of scheduled checkpoints that have been performed</p> |DEPENDENT |pgsql.bgwriter.checkpoints_timed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoints_timed`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Checkpoint: Requested |<p>Number of requested checkpoints that have been performed</p> |DEPENDENT |pgsql.bgwriter.checkpoints_req.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoints_req`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Checkpoint: Checkpoint write time |<p>Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds</p> |DEPENDENT |pgsql.bgwriter.checkpoint_write_time.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoint_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
-|PostgreSQL |Checkpoint: Checkpoint sync time |<p>Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk</p> |DEPENDENT |pgsql.bgwriter.sync_time.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.sync_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |Checkpoint: Checkpoint write time |<p>Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds</p> |DEPENDENT |pgsql.bgwriter.checkpoint_sync_time.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoint_sync_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |Checkpoint: Checkpoint sync time |<p>Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk</p> |DEPENDENT |pgsql.bgwriter.checkpoint_sync_time.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoint_sync_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Archive: Count of archive files |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</p> |DEPENDENT |pgsql.archive.count_archived_files<p>**Preprocessing**:</p><p>- JSONPATH: `$.archived_count`</p> |
 |PostgreSQL |Archive: Count of attempts to archive files |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</p> |DEPENDENT |pgsql.archive.failed_trying_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.failed_count`</p> |
 |PostgreSQL |Archive: Count of files in archive_status need to archive |<p>-</p> |DEPENDENT |pgsql.archive.count_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.count_files`</p> |
@@ -113,9 +118,9 @@ There are no template links in this template.
 |PostgreSQL |Connections sum: Waiting |<p>Total number of waiting connections</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</p> |DEPENDENT |pgsql.connections.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.waiting`</p> |
 |PostgreSQL |Connections sum: Idle in transaction (aborted) |<p>Total number of connections in a transaction state, but not executing a query and one of the statements in the transaction caused an error.</p> |DEPENDENT |pgsql.connections.idle_in_transaction_aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.idle_in_transaction_aborted`</p> |
 |PostgreSQL |Connections sum: Disabled |<p>Total number of disabled connections</p> |DEPENDENT |pgsql.connections.disabled<p>**Preprocessing**:</p><p>- JSONPATH: `$.disabled`</p> |
-|PostgreSQL |PostgreSQL: Age of oldest xid |<p>Age of oldest xid.</p> |ZABBIX_PASSIVE |pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |PostgreSQL: Age of oldest xid |<p>Age of oldest xid.</p> |ZABBIX_PASSIVE |pgsql.oldest.xid["{$PG.URI}","{$PG.USER}"] |
 |PostgreSQL |Autovacuum: Count of autovacuum workers |<p>Number of autovacuum workers.</p> |ZABBIX_PASSIVE |pgsql.autovacuum.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
-|PostgreSQL |PostgreSQL: Cache hit |<p>-</p> |ZABBIX_PASSIVE |pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |PostgreSQL: Cache hit |<p>-</p> |ZABBIX_PASSIVE |pgsql.cache.hit["{$PG.URI}"] |
 |PostgreSQL |PostgreSQL: Uptime |<p>-</p> |ZABBIX_PASSIVE |pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |PostgreSQL |Replication: Lag in bytes |<p>Replication lag with Master in byte.</p> |ZABBIX_PASSIVE |pgsql.replication.lag.b["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |PostgreSQL |Replication: Lag in seconds |<p>Replication lag with Master in seconds.</p> |ZABBIX_PASSIVE |pgsql.replication.lag.sec["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
@@ -123,8 +128,11 @@ There are no template links in this template.
 |PostgreSQL |Replication: Standby count |<p>Number of standby servers</p> |ZABBIX_PASSIVE |pgsql.replication.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |PostgreSQL |Replication: Status |<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p> |ZABBIX_PASSIVE |pgsql.replication.status["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |PostgreSQL |PostgreSQL: Ping |<p>-</p> |ZABBIX_PASSIVE |pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|PostgreSQL |Application {#APPLICATION}: Replication flush lag | |DEPENDENT |pgsql.replication.process.flush_lag["{#APPLICATION}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#APPLICATION}'].flush_lag`</p> |
+|PostgreSQL |Application {#APPLICATION}: Replication replay lag | |DEPENDENT |pgsql.replication.process.replay_lag["{#APPLICATION}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#APPLICATION}'].replay_lag`</p> |
+|PostgreSQL |Application {#APPLICATION}: Replication write lag | |DEPENDENT |pgsql.replication.process.write_lag["{#APPLICATION}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#APPLICATION}'].write_lag`</p> |
 |PostgreSQL |DB {#DBNAME}: Database age |<p>Database age</p> |ZABBIX_PASSIVE |pgsql.db.age["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
-|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number of bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
+|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number оf bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Database size |<p>Database size</p> |ZABBIX_PASSIVE |pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Blocks hit per second |<p>Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary</p> |DEPENDENT |pgsql.dbstat.blks_hit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_hit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Total number of disk blocks read in this database</p> |DEPENDENT |pgsql.dbstat.blks_read.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_read`</p><p>- CHANGE_PER_SECOND |
@@ -140,7 +148,7 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Commits per second |<p>Number of transactions in this database that have been committed</p> |DEPENDENT |pgsql.dbstat.xact_commit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_commit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Rollbacks per second |<p>Total number of transactions in this database that have been rolled back</p> |DEPENDENT |pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_rollback`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Backends connected |<p>Number of backends currently connected to this database</p> |DEPENDENT |pgsql.dbstat.numbackends["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].numbackends`</p> |
-|PostgreSQL |DB {#DBNAME}: Checksum failures |<p>Number of data page checksum failures detected in this database</p> |DEPENDENT |pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |DB {#DBNAME}: Checksum failures |<p>Number of data page checksum failures detected in this database</p> |DEPENDENT |pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].checksum_failures`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_read_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Num of accessexclusive locks |<p>Number of accessexclusive locks for each database</p> |DEPENDENT |pgsql.locks.accessexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].accessexclusive`</p> |
@@ -159,13 +167,14 @@ There are no template links in this template.
 |Zabbix_raw_items |PostgreSQL: Get connections |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |Zabbix_raw_items |PostgreSQL: Get WAL |<p>Collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 |Zabbix_raw_items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get replication |<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p> |ZABBIX_PASSIVE |pgsql.replication.process["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:pgsql.connections.total_pct.min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
-|PostgreSQL: Oldest xid is too big |<p>-</p> |`{TEMPLATE_NAME:pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()} > 18000000` |AVERAGE | |
+|PostgreSQL: Oldest xid is too big |<p>-</p> |`{TEMPLATE_NAME:pgsql.oldest.xid["{$PG.URI}","{$PG.USER}"].last()} > 18000000` |AVERAGE | |
 |PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE}) |<p>-</p> |`{TEMPLATE_NAME:pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()} < 600` |AVERAGE | |
 |PostgreSQL: Service is down |<p>-</p> |`{TEMPLATE_NAME:pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()}=0` |HIGH | |
 |DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`{TEMPLATE_NAME:pgsql.dbstat.conflicts.rate["{#DBNAME}"].min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
