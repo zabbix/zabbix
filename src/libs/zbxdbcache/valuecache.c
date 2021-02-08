@@ -121,10 +121,6 @@ zbx_vc_chunk_t;
 #define ZBX_VC_MAX_CHUNK_RECORDS	((64 * ZBX_KIBIBYTE - sizeof(zbx_vc_chunk_t)) / \
 		sizeof(zbx_history_record_t) + 1)
 
-/* the item operational state flags */
-#define ZBX_ITEM_STATE_CLEAN_PENDING	1
-#define ZBX_ITEM_STATE_REMOVE_PENDING	2
-
 /* the value cache item data */
 typedef struct
 {
@@ -133,9 +129,6 @@ typedef struct
 
 	/* the item value type */
 	unsigned char	value_type;
-
-	/* the item operational state flags (ZBX_ITEM_STATE_*)        */
-	unsigned char	state;
 
 	/* the item status flags (ZBX_ITEM_STATUS_*)                  */
 	unsigned char	status;
@@ -1762,7 +1755,7 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 		item->status = 0;
 
 	/* try to remove chunks with all history values older than the timestamp */
-	while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
+	while (NULL != chunk && chunk->slots[chunk->first_value].timestamp.sec < timestamp)
 	{
 		zbx_vc_chunk_t	*next;
 
@@ -1782,15 +1775,6 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 
 		next = chunk->next;
 		vch_item_remove_chunk(item, chunk);
-
-		/* empty items must be removed to avoid situation when a new value is added to cache */
-		/* while other values with matching timestamp seconds are not cached                 */
-		if (NULL == next)
-		{
-			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
-			break;
-		}
-
 		chunk = next;
 	}
 }
@@ -1815,7 +1799,7 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_record_t *value)
 {
 	int		ret = FAIL, index, sindex, nslots = 0;
-	zbx_vc_chunk_t	*head = item->head, *chunk, *schunk;
+	zbx_vc_chunk_t	*chunk, *schunk;
 
 	if (NULL != item->head &&
 			0 < zbx_history_record_compare_asc_func(&item->head->slots[item->head->last_value], value))
@@ -1826,6 +1810,11 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 			/* we can't add it to keep cache consistency. Additionally we must make sure no   */
 			/* values with matching timestamp seconds are kept in cache.                      */
 			vch_item_remove_values(item, value->timestamp.sec + 1);
+
+			/* empty items must be removed to avoid situation when a new value is added to cache */
+			/* while other values with matching timestamp seconds are not cached                 */
+			if (NULL == item->head)
+				goto out;
 
 			/* if the value is newer than the database cached from timestamp we must */
 			/* adjust the cached from timestamp to exclude this value                */
@@ -1896,10 +1885,6 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 
 	if (SUCCEED != vch_item_copy_value(item, chunk, index, value))
 		goto out;
-
-	/* try to remove old (unused) chunks if a new chunk was added */
-	if (head != item->head)
-		item->state |= ZBX_ITEM_STATE_CLEAN_PENDING;
 
 	ret = SUCCEED;
 out:
@@ -2592,23 +2577,23 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
+			zbx_vc_chunk_t		*head = item->head;
 
-			/* If the new value type does not match the item's type in cache we can't  */
-			/* change the cache because other processes might still be accessing it    */
-			/* at the same time. The only thing that can be done is to remove it       */
-			/* so it could be added later with new type.                               */
+			/* If the new value type does not match the item's type in cache remove it, */
+			/* so it's cached with the correct type from correct tables when accessed   */
+			/* next time.
 			/* Also remove item if the value adding failed. In this case we            */
 			/* won't have the latest data in cache - so the requests must go directly  */
 			/* to the database.                                                        */
 			if (item->value_type != h->value_type || item->last_accessed < expire_timestamp ||
-					0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) ||
 					FAIL == vch_item_add_value_at_head(item, &record))
 			{
 				vc_remove_item(item);
 				continue;
 			}
 
-			if (0 != (item->state & ZBX_ITEM_STATE_CLEAN_PENDING))
+			/* try to remove old (unused) chunks if a new chunk was added */
+			if (head != item->head)
 				vch_item_clean_cache(item);
 
 		}
@@ -2671,7 +2656,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_re
 		new_item.value_type = value_type;
 		item = &new_item;
 	}
-	else if (0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING) || item->value_type != value_type)
+	else if (item->value_type != value_type)
 		goto out;
 
 	ret = vch_item_get_values(item, values, seconds, count, ts);
@@ -2685,7 +2670,7 @@ out:
 		WRLOCK_CACHE;
 
 		if (NULL != item)
-			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			vc_remove_item(item);
 
 		if (SUCCEED == ret)
 			vc_update_statistics(NULL, 0, values->values_num);
@@ -2914,7 +2899,7 @@ void	zbx_vc_flush_stats()
 			item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &itemid);
 		}
 
-		if (NULL == item || 0 != (item->state & ZBX_ITEM_STATE_REMOVE_PENDING))
+		if (NULL == item)
 			continue;
 
 		switch (update->type)
