@@ -355,6 +355,32 @@ class CDashboard extends CDashboardGeneral {
 	}
 
 	/**
+	 * Check for unique dashboard names.
+	 *
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
+	 *
+	 * @throws APIException if dashboard names are not unique.
+	 */
+	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+		$names = [];
+
+		foreach ($dashboards as $dashboard) {
+			if ($db_dashboards === null || $dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
+				$names[] = $dashboard['name'];
+			}
+		}
+
+		$duplicate = DBfetch(DBselect(
+			'SELECT name FROM dashboard WHERE templateid IS NULL AND '.dbConditionString('name', $names), 1
+		));
+
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $duplicate['name']));
+		}
+	}
+
+	/**
 	 * Check for valid users.
 	 *
 	 * @param array      $dashboards

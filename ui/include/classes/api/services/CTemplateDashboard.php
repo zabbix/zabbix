@@ -284,7 +284,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkDuplicates($names_by_templateid);
+		$this->checkDuplicates($dashboards);
 		$this->checkPages($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
@@ -357,5 +357,34 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$this->checkPages($dashboards);
 		$this->checkWidgets($dashboards, $db_dashboards);
 		$this->checkWidgetFields($dashboards, $db_dashboards);
+	}
+
+	/**
+	 * Check for unique dashboard names per template.
+	 *
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
+	 *
+	 * @throws APIException if dashboard names are not unique.
+	 */
+	protected function checkDuplicates(array $dashboards, array $db_dashboards = null): void {
+		$names_by_template = [];
+
+		foreach ($dashboards as $dashboard) {
+			if ($db_dashboards === null || $dashboard['name'] !== $db_dashboards[$dashboard['dashboardid']]['name']) {
+				$names_by_template[$dashboard['templateid']][] = $dashboard['name'];
+			}
+		}
+
+		$where = [];
+		foreach ($names_by_template as $templateid => $names) {
+			$where[] = '('.dbConditionId('templateid', [$templateid]).' AND '.dbConditionString('name', $names).')';
+		}
+
+		$duplicate = DBfetch(DBselect('SELECT name FROM dashboard WHERE '.implode(' OR ', $where), 1));
+
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Dashboard "%1$s" already exists.', $duplicate['name']));
+		}
 	}
 }
