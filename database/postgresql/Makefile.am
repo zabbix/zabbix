@@ -18,4 +18,3 @@ EXTRA_DIST = \
 	schema.sql \
 	double.sql \
 	$(DB_EXTENSION).sql
-
