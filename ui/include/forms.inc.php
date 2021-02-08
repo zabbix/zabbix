@@ -1088,7 +1088,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if (!$data['is_discovery_rule']) {
 		// Select inherited tags.
-		if ($data['show_inherited_tags']) {
+		if ($data['show_inherited_tags'] && array_key_exists('item', $data)) {
 			if ($data['item']['discoveryRule']) {
 				$items = [$data['item']['discoveryRule']];
 				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
