@@ -398,6 +398,7 @@ class CApiTagHelper {
 	 * @param array   $template_tags
 	 * @param string  $template_tags[]['tag']
 	 * @param string  $template_tags[]['value']
+	 * @param string  $template_tags[]['hostid']
 	 *
 	 * @return array
 	 */
