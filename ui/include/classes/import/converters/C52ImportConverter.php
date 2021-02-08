@@ -146,8 +146,12 @@ class C52ImportConverter extends CConverter {
 	 */
 	private static function convertItems(array $items): array {
 		foreach ($items as &$item) {
+			$item['tags'] = [];
 			if (array_key_exists('applications', $item)) {
-				$item['tags'] = self::convertApplicationsToTags($item['applications']);
+				$item['tags'] += self::convertApplicationsToTags($item['applications']);
+			}
+			if (array_key_exists('application_prototypes', $item)) {
+				$item['tags'] += self::convertApplicationsToTags($item['application_prototypes']);
 			}
 			unset($item['applications'], $item['application_prototypes']);
 		}
