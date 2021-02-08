@@ -40,9 +40,9 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 	var err error
 
 	if strict {
-		out, err = zbxcmd.ExecuteStrict(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+		out, err = zbxcmd.ExecuteStrict(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout), "")
 	} else {
-		out, err = zbxcmd.Execute(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+		out, err = zbxcmd.Execute(fmt.Sprintf("sudo %s %s", path, args), time.Second*time.Duration(p.options.Timeout), "")
 	}
 
 	if err != nil {
