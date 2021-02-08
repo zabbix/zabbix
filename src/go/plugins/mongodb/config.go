@@ -20,8 +20,6 @@
 package mongodb
 
 import (
-	"gopkg.in/mgo.v2"
-	"os"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )
@@ -56,21 +54,4 @@ func (p *Plugin) Validate(options interface{}) error {
 	var opts PluginOptions
 
 	return conf.Unmarshal(options, &opts)
-}
-
-type MongoLogger struct {
-	Debugf func(format string, args ...interface{})
-}
-
-func (l MongoLogger) Output(_ int, msg string) error {
-	l.Debugf(msg)
-	return nil
-}
-
-func init() {
-	if os.Getenv("MGO_DEBUG") == "1" {
-		logger := MongoLogger{Debugf: impl.Debugf}
-		mgo.SetDebug(true)
-		mgo.SetLogger(logger)
-	}
 }

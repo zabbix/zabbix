@@ -20,6 +20,8 @@
 package mongodb
 
 import (
+	"gopkg.in/mgo.v2"
+	"os"
 	"time"
 
 	"zabbix.com/pkg/uri"
@@ -93,4 +95,21 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+type MongoLogger struct {
+	Debugf func(format string, args ...interface{})
+}
+
+func (l MongoLogger) Output(_ int, msg string) error {
+	l.Debugf(msg)
+	return nil
+}
+
+func init() {
+	if os.Getenv("MGO_DEBUG") == "1" {
+		logger := MongoLogger{Debugf: impl.Debugf}
+		mgo.SetDebug(true)
+		mgo.SetLogger(logger)
+	}
 }
