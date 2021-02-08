@@ -19,4 +19,3 @@ EXTRA_DIST = \
 	double.sql \
 	$(DB_EXTENSION).sql
 
-.PHONY: timescaledb.sql

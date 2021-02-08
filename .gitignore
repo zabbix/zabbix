@@ -55,8 +55,7 @@ database/oracle/data.sql
 database/oracle/schema.sql
 database/postgresql/data.sql
 database/postgresql/schema.sql
-database/postgresql/timescaledb_configure.sql
-database/postgresql/timescaledb_create_extension.sql
+database/postgresql/timescaledb.sql
 database/sqlite3/data.sql
 database/sqlite3/schema.sql
 etc/agent.conf
