@@ -692,8 +692,7 @@ static int	DBpatch_5030049(void)
 
 		zbx_free(command);
 
-		rc = DBexecute("update scripts set command='%s' where scriptid=%s",
-				command_esc, row[0]);
+		rc = DBexecute("update scripts set command='%s' where scriptid=%s", command_esc, row[0]);
 
 		zbx_free(command_esc);
 
