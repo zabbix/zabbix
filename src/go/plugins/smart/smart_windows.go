@@ -1,6 +1,8 @@
+// +build  windows
+
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,25 +19,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package smart
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/docker"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/modbus"
-	_ "zabbix.com/plugins/mysql"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/smart"
-	_ "zabbix.com/plugins/system/sw"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"fmt"
+	"time"
+
+	"zabbix.com/pkg/zbxcmd"
 )
+
+func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
+	path := "smartctl"
+	if p.options.Path != "" {
+		path = p.options.Path
+	}
+
+	var out string
+	var err error
+
+	if strict {
+		out, err = zbxcmd.ExecuteStrict(fmt.Sprintf("%s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+	} else {
+		out, err = zbxcmd.Execute(fmt.Sprintf("%s %s", path, args), time.Second*time.Duration(p.options.Timeout))
+	}
+
+	return []byte(out), err
+}
