@@ -641,7 +641,7 @@ class CMap extends CMapElement {
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
 		// Continue to check 2 more mandatory fields and other optional fields.
-		foreach ($maps as $map) {
+		foreach ($maps as $map_index => $map) {
 			// Check mandatory fields "width" and "height".
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -988,6 +988,10 @@ class CMap extends CMapElement {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('No permissions to referred object or it does not exist!')
 					);
+				}
+
+				foreach (array_values($map['selements']) as $selement_index => $selement) {
+					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
 				}
 			}
 
