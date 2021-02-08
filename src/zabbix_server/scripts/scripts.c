@@ -283,6 +283,36 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->command_orig);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_webhook_params_pack_json                                     *
+ *                                                                            *
+ * Purpose: pack webhook script parameters into JSON                          *
+ *                                                                            *
+ * Parameters: params      - [IN] vector of pairs of pointers to parameter    *
+ *                                names and values                            *
+ *             params_json - [OUT] JSON string                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **params_json)
+{
+	struct zbx_json	json_data;
+	int		i;
+
+	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < params->values_num; i++)
+	{
+		zbx_ptr_pair_t	pair = params->values[i];
+
+		zbx_json_addstring(&json_data, pair.first, pair.second, ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_json_close(&json_data);
+	*params_json = zbx_strdup(*params_json, json_data.buffer);
+	zbx_json_free(&json_data);
+}
+
 /***********************************************************************************
  *                                                                                 *
  * Function: zbx_script_prepare                                                    *
@@ -356,7 +386,7 @@ out:
  * Purpose: fetch webhook parameters                                          *
  *                                                                            *
  * Parameters:  scriptid  - [IN] the id of script to be executed              *
- *              params    - [OUT] parsed parameters                           *
+ *              params    - [OUT] parameters name-value pairs                 *
  *              error     - [IN/OUT] the error message                        *
  *              error_len - [IN] the maximum error length                     *
  *                                                                            *
@@ -364,12 +394,12 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	DBfetch_webhook_params(zbx_uint64_t scriptid, char **params, char *error, size_t error_len)
+int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
 {
 	int		ret = SUCCEED;
 	DB_RESULT	result;
 	DB_ROW		row;
-	struct zbx_json	json_data;
+	zbx_ptr_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64, __func__, scriptid);
 
@@ -382,21 +412,13 @@ int	DBfetch_webhook_params(zbx_uint64_t scriptid, char **params, char *error, si
 		goto out;
 	}
 
-	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
-
 	while (NULL != (row = DBfetch(result)))
 	{
-		const char	*name = row[0];
-		const char	*value = row[1];
-
-		zbx_json_addstring(&json_data, name, value, ZBX_JSON_TYPE_STRING);
+		pair.first = zbx_strdup(NULL, row[0]);
+		pair.second = zbx_strdup(NULL, row[1]);
+		zbx_vector_ptr_pair_append(params, pair);
 	}
 
-	zbx_json_close(&json_data);
-
-	*params = zbx_strdup(*params, json_data.buffer);
-
-	zbx_json_free(&json_data);
 	DBfree_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

@@ -400,13 +400,14 @@ static int	zbx_find_related_eventid(zbx_uint64_t input_eventid, zbx_uint64_t *ev
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
 		const char *clientip, char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0;
+	int			ret = FAIL, scope = 0, i;
 	DC_HOST			host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
-	char			*user_timezone = NULL, *webhook_params = NULL, error[MAX_STRING_LEN];
+	zbx_vector_ptr_pair_t	webhook_params;
+	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
@@ -417,6 +418,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	memset(&host, 0, sizeof(host));
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_ptr_create(&events);
+	zbx_vector_ptr_pair_create(&webhook_params);
 
 	zbx_script_init(&script);
 
@@ -558,12 +560,18 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host,
-					NULL, NULL, NULL, user_timezone, &webhook_params, MACRO_TYPE_SCRIPT, error,
-					sizeof(error)))
+			for (i = 0; i < webhook_params.values_num; i++)
 			{
-				goto fail;
+				if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL,
+						&host, NULL, NULL, NULL, user_timezone,
+						(char **)&webhook_params.values[i].second, MACRO_TYPE_SCRIPT, error,
+						sizeof(error)))
+				{
+					goto fail;
+				}
 			}
+
+			zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
 		}
 	}
 	else	/* script on event */
@@ -587,12 +595,18 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &webhook_params,
-					macro_type, error, sizeof(error)))
+			for (i = 0; i < webhook_params.values_num; i++)
 			{
-				goto fail;
+				if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
+						&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
+						(char **)&webhook_params.values[i].second, macro_type, error,
+						sizeof(error)))
+				{
+					goto fail;
+				}
 			}
+
+			zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
 		}
 	}
 
@@ -603,7 +617,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			ret = zbx_script_execute(&script, &host, webhook_params, result, error, sizeof(error), debug);
+			ret = zbx_script_execute(&script, &host, webhook_params_json, result, error, sizeof(error),
+					debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
@@ -621,8 +636,16 @@ fail:
 		*result = zbx_strdup(*result, error);
 
 	zbx_script_clean(&script);
-	zbx_free(webhook_params);
+	zbx_free(webhook_params_json);
 	zbx_free(user_timezone);
+
+	for (i = 0; i < webhook_params.values_num; i++)
+	{
+		zbx_free(webhook_params.values[i].first);
+		zbx_free(webhook_params.values[i].second);
+	}
+
+	zbx_vector_ptr_pair_destroy(&webhook_params);
 	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
 	zbx_vector_ptr_destroy(&events);
 	zbx_vector_uint64_destroy(&eventids);

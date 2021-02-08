@@ -934,12 +934,14 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int			rc = SUCCEED, scope;
+		int			rc = SUCCEED, scope, i;
 		DC_HOST			host;
 		zbx_script_t		script;
 		zbx_alert_status_t	status = ALERT_STATUS_NOT_SENT;
 		zbx_uint64_t		alertid, groupid;
-		char			*webhook_params = NULL, *script_name = NULL, error[ALERT_ERROR_LEN_MAX];
+		char			*webhook_params_json = NULL, *script_name = NULL;
+		zbx_vector_ptr_pair_t	webhook_params;
+		char			error[ALERT_ERROR_LEN_MAX];
 
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
@@ -1078,13 +1080,19 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
-					NULL, NULL, ack, default_timezone, &webhook_params,
-					macro_type, error, sizeof(error)))
+			for (i = 0; i < webhook_params.values_num; i++)
 			{
-				rc = FAIL;
-				goto fail;
+				if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
+						&host, NULL, NULL, ack, default_timezone,
+						(char **)&webhook_params.values[i].second, macro_type, error,
+						sizeof(error)))
+				{
+					rc = FAIL;
+					goto fail;
+				}
 			}
+
+			zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
 		}
 fail:
 		alertid = DBget_maxid("alerts");
@@ -1096,7 +1104,7 @@ fail:
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
-					rc = zbx_script_execute(&script, &host, webhook_params, NULL, error,
+					rc = zbx_script_execute(&script, &host, webhook_params_json, NULL, error,
 							sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
@@ -1115,7 +1123,15 @@ fail:
 				(ZBX_SCRIPT_TYPE_WEBHOOK == script.type) ? script_name : script.command_orig,
 				status, error);
 skip:
-		zbx_free(webhook_params);
+		zbx_free(webhook_params_json);
+
+		for (i = 0; i < webhook_params.values_num; i++)
+		{
+			zbx_free(webhook_params.values[i].first);
+			zbx_free(webhook_params.values[i].second);
+		}
+
+		zbx_vector_ptr_pair_destroy(&webhook_params);
 		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
