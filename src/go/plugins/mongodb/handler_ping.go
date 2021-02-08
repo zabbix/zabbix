@@ -17,23 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package mongodb
 
-import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/docker"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/mongodb"
-	_ "zabbix.com/plugins/mysql"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+const (
+	pingFailed = 0
+	pingOk     = 1
 )
+
+// pingHandler executes 'ping' command and returns pingOk if a connection is alive or pingFailed otherwise.
+// https://docs.mongodb.com/manual/reference/command/ping/index.html
+func pingHandler(s Session, _ map[string]string) (interface{}, error) {
+	if err := s.Ping(); err != nil {
+		return pingFailed, nil
+	}
+
+	return pingOk, nil
+}

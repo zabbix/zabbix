@@ -17,23 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package mongodb
 
 import (
-	_ "zabbix.com/plugins/ceph"
-	_ "zabbix.com/plugins/docker"
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/mongodb"
-	_ "zabbix.com/plugins/mysql"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/system/users"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"encoding/json"
+	"gopkg.in/mgo.v2/bson"
+	"zabbix.com/pkg/zbxerr"
 )
+
+// collectionStatsHandler
+// https://docs.mongodb.com/manual/reference/command/collStats/index.html
+func collectionStatsHandler(s Session, params map[string]string) (interface{}, error) {
+	colStats := &bson.M{}
+	err := s.DB(params["Database"]).Run(&bson.D{
+		bson.DocElem{
+			Name:  "collStats",
+			Value: params["Collection"],
+		},
+		bson.DocElem{
+			Name:  "maxTimeMS",
+			Value: s.GetMaxTimeMS(),
+		},
+	}, colStats)
+
+	if err != nil {
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	}
+
+	jsonRes, err := json.Marshal(colStats)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	}
+
+	return string(jsonRes), nil
+}
