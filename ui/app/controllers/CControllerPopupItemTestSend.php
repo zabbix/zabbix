@@ -288,6 +288,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
 
+			/*
+			 * Server will turn off status code check if field value is empty. If field is not present, then server will
+			 * default to check if status code is 200.
+			 */
 			if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $item_test_data)) {
 				$item_test_data['status_codes'] = '';
 			}

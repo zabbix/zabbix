@@ -579,7 +579,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'ssl_key_password' => array_key_exists('ssl_key_password', $input)
 						? $input['ssl_key_password']
 						: null,
-					'status_codes' => array_key_exists('status_codes', $input) ? $input['status_codes'] : '',
+					'status_codes' => array_key_exists('status_codes', $input) ? $input['status_codes'] : null,
 					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'url' => array_key_exists('url', $input) ? $input['url'] : null,
 					'verify_host' => array_key_exists('verify_host', $input) ? $input['verify_host'] : 0,
