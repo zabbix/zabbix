@@ -2914,7 +2914,7 @@ $form-icon-btn: (
 	overflow: hidden;
 
 	.csortable {
-		// Accomodate 2px shadow of focused tabs.
+		// Accommodate 2px shadow of focused tabs.
 		padding: 2px 0;
 		// Hide the invisible tab paddings.
 		margin: 0 -1.5px;
@@ -2926,7 +2926,7 @@ $form-icon-btn: (
 		margin: 0;
 
 		& > .csortable-item:focus:not(:active) {
-			// Increase padding to accomodate the focused div's shadow.
+			// Increase padding to accommodate the focused div's shadow.
 			padding: 0 3.5px 0 3.5px;
 
 			& > div {
