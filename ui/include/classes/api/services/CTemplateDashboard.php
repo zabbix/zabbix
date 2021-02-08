@@ -213,7 +213,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$upd_dashboards = [];
 
 		foreach ($dashboards as $dashboard) {
-			$upd_dashboard = dbUpdatedValues('dashboard', $dashboard, $db_dashboards[$dashboard['dashboardid']]);
+			$upd_dashboard = DB::getUpdatedValues('dashboard', $dashboard, $db_dashboards[$dashboard['dashboardid']]);
 
 			if ($upd_dashboard) {
 				$upd_dashboards[] = [

@@ -647,7 +647,7 @@ abstract class CDashboardGeneral extends CApiService {
 				$page['sortorder'] = $page_index;
 
 				if (array_key_exists('dashboard_pageid', $page)) {
-					$upd_page = dbUpdatedValues('dashboard_page', $page, $db_pages[$page['dashboard_pageid']]);
+					$upd_page = DB::getUpdatedValues('dashboard_page', $page, $db_pages[$page['dashboard_pageid']]);
 
 					if ($upd_page) {
 						$upd_pages[] = [
@@ -739,7 +739,7 @@ abstract class CDashboardGeneral extends CApiService {
 
 				foreach ($page['widgets'] as $widget) {
 					if (array_key_exists('widgetid', $widget)) {
-						$upd_widget = dbUpdatedValues('widget', $widget, $db_widgets[$widget['widgetid']]);
+						$upd_widget = DB::getUpdatedValues('widget', $widget, $db_widgets[$widget['widgetid']]);
 
 						if ($upd_widget) {
 							$upd_widgets[] = [
@@ -840,7 +840,7 @@ abstract class CDashboardGeneral extends CApiService {
 								&& $fields[$db_field['type']][$db_field['name']]) {
 							$field = array_shift($fields[$db_field['type']][$db_field['name']]);
 
-							$upd_field = dbUpdatedValues('widget_field', $field, $db_field);
+							$upd_field = DB::getUpdatedValues('widget_field', $field, $db_field);
 
 							if ($upd_field) {
 								$upd_fields[] = [
