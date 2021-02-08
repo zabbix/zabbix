@@ -105,59 +105,37 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Add existing pages, widgets and widget fields to $db_dashboards whether these are affected by the update.
+	 * Add the existing pages, widgets and widget fields to $db_dashboards whether these are affected by the update.
 	 *
-	 * @param array      $dashboards
-	 * @param array|null $db_dashboards
+	 * @param array $dashboards
+	 * @param array $db_dashboards
 	 */
 	protected function addAffectedObjects(array $dashboards, array &$db_dashboards): void {
-		// Parent ID criteria for fetching child objects - pages, widgets and fields.
+		// Select pages of these dashboards.
 		$dashboardids = [];
+
+		// Select widgets of these pages.
 		$pageids = [];
+
+		// Select fields of these widgets.
 		$widgetids = [];
 
-		// The requested parent-child relations.
-		$page_parents = [];
-		$widget_parents = [];
-
 		foreach ($dashboards as $dashboard) {
-			$dashboardid = $dashboard['dashboardid'];
-
-			// Updating dashboard pages?
 			if (array_key_exists('pages', $dashboard)) {
-				// Fetch all pages of this dashboard.
-				$dashboardids[$dashboardid] = true;
+				$dashboardids[$dashboard['dashboardid']] = true;
 
 				foreach ($dashboard['pages'] as $page) {
 					if (array_key_exists('dashboard_pageid', $page)) {
-						$pageid = $page['dashboard_pageid'];
-						$page_parents[$pageid] = $dashboardid;
-
-						// Updating page widgets?
 						if (array_key_exists('widgets', $page)) {
-							// Fetch all widgets of this page.
-							$pageids[$pageid] = true;
+							$pageids[$page['dashboard_pageid']] = true;
 
 							foreach ($page['widgets'] as $widget) {
 								if (array_key_exists('widgetid', $widget)) {
-									$widgetid = $widget['widgetid'];
-									$widget_parents[$widgetid] = $pageid;
-
-									// Updating widget fields?
 									if (array_key_exists('fields', $widget)) {
-										// Fetch all fields of this widget.
-										$widgetids[$widgetid] = true;
+										$widgetids[$widget['widgetid']] = true;
 									}
 								}
 							}
-						}
-					}
-					else {
-						// Page widgets can't have IDs specified if the page itself didn't have one.
-						if (array_key_exists('widgets', $page) && array_column($page['widgets'], 'widgetid')) {
-							self::exception(ZBX_API_ERROR_PERMISSIONS,
-								_('No permissions to referred object or it does not exist!')
-							);
 						}
 					}
 				}
@@ -176,15 +154,6 @@ abstract class CDashboardGeneral extends CApiService {
 				'preservekeys' => true
 			]);
 
-			foreach ($page_parents as $pageid => $dashboardid) {
-				if (!array_key_exists($pageid, $db_pages)
-						|| bccomp($db_pages[$pageid]['dashboardid'], $dashboardid) != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-
 			foreach ($db_pages as &$db_page) {
 				$db_page['widgets'] = [];
 			}
@@ -196,15 +165,6 @@ abstract class CDashboardGeneral extends CApiService {
 					'filter' => ['dashboard_pageid' => array_keys($pageids)],
 					'preservekeys' => true
 				]);
-
-				foreach ($widget_parents as $widgetid => $pageid) {
-					if (!array_key_exists($widgetid, $db_widgets)
-							|| bccomp($db_widgets[$widgetid]['dashboard_pageid'], $pageid) != 0) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('No permissions to referred object or it does not exist!')
-						);
-					}
-				}
 
 				foreach ($db_widgets as &$db_widget) {
 					$db_widget['fields'] = [];
@@ -230,6 +190,49 @@ abstract class CDashboardGeneral extends CApiService {
 
 			foreach ($db_pages as $pageid => $db_page) {
 				$db_dashboards[$db_page['dashboardid']]['pages'][$pageid] = $db_page;
+			}
+		}
+	}
+
+	/**
+	 * Check ownership and permissions to the referenced pages and widgets.
+	 *
+	 * @param array $dashboards
+	 * @param array $db_dashboards
+	 *
+	 * @throws APIException.
+	 */
+	protected function checkReferences(array $dashboards, array $db_dashboards): void {
+		foreach ($dashboards as $dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			$db_pages = $db_dashboards[$dashboard['dashboardid']]['pages'];
+
+			foreach ($dashboard['pages'] as $page) {
+				if (array_key_exists('dashboard_pageid', $page)
+						&& !array_key_exists($page['dashboard_pageid'], $db_pages)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+
+				if (!array_key_exists('widgets', $page)) {
+					continue;
+				}
+
+				$db_widgets = array_key_exists('dashboard_pageid', $page)
+					? $db_pages[$page['dashboard_pageid']]['widgets']
+					: [];
+
+				foreach ($page['widgets'] as $widget) {
+					if (array_key_exists('widgetid', $widget) && !array_key_exists($widget['widgetid'], $db_widgets)) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS,
+							_('No permissions to referred object or it does not exist!')
+						);
+					}
+				}
 			}
 		}
 	}
