@@ -22,6 +22,7 @@ package mongodb
 import (
 	"context"
 	"gopkg.in/mgo.v2/bson"
+	"net/url"
 	"sync"
 	"time"
 
@@ -236,8 +237,13 @@ func (c *ConnManager) create(uri uri.URI) (*MongoConn, error) {
 		panic("connection already exists")
 	}
 
+	addr := uri.Addr()
+	if uri.Scheme() == "unix" {
+		addr = url.PathEscape(addr)
+	}
+
 	session, err := mgo.DialWithInfo(&mgo.DialInfo{
-		Addrs:     []string{uri.Addr()},
+		Addrs:     []string{addr},
 		Direct:    true,
 		FailFast:  false,
 		Password:  uri.Password(),
