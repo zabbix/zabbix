@@ -677,10 +677,7 @@ static int	DBpatch_5030049(void)
 
 	if (NULL == (result = DBselect("select scriptid,command"
 			" from scripts"
-			" where scriptid in ("
-			"select distinct scriptid"
-			" from opcommand"
-			" where scriptid is not null)")))
+			" where scriptid in (select distinct scriptid from opcommand where scriptid is not null)")))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'scripts'", __func__);
 		return FAIL;
@@ -688,17 +685,17 @@ static int	DBpatch_5030049(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		const char	*scriptid = row[0];
-		const char	*command = row[1];
-		char		*command_new = NULL;
-		int		rc;
+		char	*command, *command_esc;
+		int	rc;
 
-		command_new  = zbx_rename_host_macros(command);
+		command_esc = DBdyn_escape_field("scripts", "command", (command = zbx_rename_host_macros(row[1])));
+
+		zbx_free(command);
 
 		rc = DBexecute("update scripts set command='%s' where scriptid=%s",
-				command_new, scriptid);
+				command_esc, row[0]);
 
-		zbx_free(command_new);
+		zbx_free(command_esc);
 
 		if (ZBX_DB_OK > rc)
 		{
@@ -706,7 +703,6 @@ static int	DBpatch_5030049(void)
 			break;
 		}
 	}
-
 	DBfree_result(result);
 
 	return ret;
