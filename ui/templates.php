@@ -291,7 +291,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 			unset($valuemap);
 		}
-		else if ($templateId) {
+		else if (hasRequest('update')) {
 			$del_valuemapids = API::ValueMap()->get([
 				'output' => [],
 				'hostids' => $templateId,

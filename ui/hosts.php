@@ -513,13 +513,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$del_valuemapids = [];
 
 		if ((getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone')
-				&& getRequest('clone_hostid', 0)) {
+				&& getRequest('clone_hostid', 0) != 0) {
 			foreach ($valuemaps as &$valuemap) {
 				unset($valuemap['valuemapid']);
 			}
 			unset($valuemap);
 		}
-		else if ($hostId) {
+		else if (hasRequest('update')) {
 			$del_valuemapids = API::ValueMap()->get([
 				'output' => [],
 				'hostids' => $hostId,
