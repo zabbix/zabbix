@@ -26,65 +26,233 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		// type change
+		let $menu_path = $('#menu_path'),
+			$user_group = $('#user_group'),
+			$host_access = $('#host_access'),
+			$enable_confirmation = $('#enable_confirmation'),
+			$confirmation = $('#confirmation'),
+			$publickey = $('#publickey'),
+			$privatekey = $('#privatekey'),
+			$password = $('#password'),
+			$passphrase = $('#passphrase');
+
+		// Scope change.
+		$('#scope')
+			.change(function() {
+				let scope = $('input[name=scope]:checked').val();
+
+				if (scope == <?= ZBX_SCRIPT_SCOPE_ACTION ?>) {
+					$menu_path
+						.add($user_group)
+						.add($host_access)
+						.add($enable_confirmation)
+						.add($confirmation)
+						.closest('li')
+						.hide();
+				}
+				else {
+					$menu_path
+						.add($user_group)
+						.add($host_access)
+						.add($enable_confirmation)
+						.add($confirmation)
+						.closest('li')
+						.show();
+				}
+			})
+			.change();
+
+		// Type change.
 		$('#type')
 			.change(function() {
 				let type = $('input[name=type]:checked').val(),
-					$execute_on = $('#execute_on');
+					$execute_on = $('#execute_on'),
+					$authtype = $('#authtype'),
+					$username = $('#username'),
+					$port = $('#port'),
 					$command_ipmi = $('#commandipmi'),
-					$command = $('#command');
+					$command = $('#command'),
 					$parameters = $('#row_webhook_parameters'),
 					$script = $('#script'),
 					$timeout = $('#timeout');
 
-				if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
-					if ($command.val() !== '') {
-						$command_ipmi.val($command.val());
-						$command.val('');
-					}
+				switch (type) {
+					case '<?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>':
+						if ($command_ipmi.val() !== '') {
+							$command.val($command_ipmi.val());
+							$command_ipmi.val('');
+						}
 
-					$execute_on
-						.add($command)
-						.add($parameters)
-						.add($script)
-						.add($timeout)
-						.closest('li')
-						.hide();
+						$command_ipmi
+							.add($parameters)
+							.add($script)
+							.add($timeout)
+							.add($authtype)
+							.add($username)
+							.add($password)
+							.add($publickey)
+							.add($privatekey)
+							.add($passphrase)
+							.add($port)
+							.closest('li')
+							.hide();
 
-					$command_ipmi
-						.closest('li')
-						.show();
+						$execute_on
+							.add($command)
+							.closest('li')
+							.show();
+						break;
+
+					case '<?= ZBX_SCRIPT_TYPE_IPMI ?>':
+						if ($command.val() !== '') {
+							$command_ipmi.val($command.val());
+							$command.val('');
+						}
+
+						$execute_on
+							.add($command)
+							.add($parameters)
+							.add($script)
+							.add($timeout)
+							.add($authtype)
+							.add($username)
+							.add($password)
+							.add($publickey)
+							.add($privatekey)
+							.add($passphrase)
+							.add($port)
+							.closest('li')
+							.hide();
+
+						$command_ipmi
+							.closest('li')
+							.show();
+						break;
+
+					case '<?= ZBX_SCRIPT_TYPE_SSH ?>':
+						if ($command_ipmi.val() !== '') {
+							$command.val($command_ipmi.val());
+							$command_ipmi.val('');
+						}
+
+						$execute_on
+							.add($command_ipmi)
+							.add($parameters)
+							.add($script)
+							.add($timeout)
+							.closest('li')
+							.hide();
+
+							if ($authtype.val() == <?= ITEM_AUTHTYPE_PASSWORD ?>) {
+								$publickey
+									.add($privatekey)
+									.add($passphrase)
+									.closest('li')
+									.hide();
+
+								$command
+									.add($authtype)
+									.add($username)
+									.add($password)
+									.add($port)
+									.closest('li')
+									.show();
+							}
+							else {
+								$password
+									.closest('li')
+									.hide();
+
+								$command
+									.add($authtype)
+									.add($username)
+									.add($publickey)
+									.add($privatekey)
+									.add($passphrase)
+									.add($port)
+									.closest('li')
+									.show();
+							}
+						break;
+
+					case '<?= ZBX_SCRIPT_TYPE_TELNET ?>':
+						if ($command_ipmi.val() !== '') {
+							$command.val($command_ipmi.val());
+							$command_ipmi.val('');
+						}
+
+						$execute_on
+							.add($command_ipmi)
+							.add($parameters)
+							.add($script)
+							.add($timeout)
+							.add($authtype)
+							.add($publickey)
+							.add($privatekey)
+							.add($passphrase)
+							.closest('li')
+							.hide();
+
+						$command
+							.add($username)
+							.add($password)
+							.add($port)
+							.closest('li')
+							.show();
+						break;
+
+					case '<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>':
+						$execute_on
+							.add($command)
+							.add($command_ipmi)
+							.add($authtype)
+							.add($username)
+							.add($password)
+							.add($publickey)
+							.add($privatekey)
+							.add($passphrase)
+							.add($port)
+							.closest('li')
+							.hide();
+
+						$parameters
+							.add($script)
+							.add($timeout)
+							.closest('li')
+							.show();
+						break;
 				}
-				else if (type == <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>) {
-					if ($command_ipmi.val() !== '') {
-						$command.val($command_ipmi.val());
-						$command_ipmi.val('');
+			})
+			.change();
+
+		// Authtype change.
+		$('#authtype')
+			.change(function() {
+				let type = $('input[name=type]:checked').val();
+
+				if (type == <?= ZBX_SCRIPT_TYPE_SSH ?>) {
+					if ($(this).val() == <?= ITEM_AUTHTYPE_PASSWORD ?>) {
+						$publickey
+							.add($privatekey)
+							.add($passphrase)
+							.closest('li')
+							.hide();
+
+						$password
+							.closest('li')
+							.show();
 					}
+					else {
+						$password
+							.closest('li')
+							.hide();
 
-					$command_ipmi
-						.add($parameters)
-						.add($script)
-						.add($timeout)
-						.closest('li')
-						.hide();
-
-					$execute_on
-						.add($command)
-						.closest('li')
-						.show();
-				}
-				else if (type == <?= ZBX_SCRIPT_TYPE_WEBHOOK ?>) {
-					$execute_on
-						.add($command)
-						.add($command_ipmi)
-						.closest('li')
-						.hide();
-
-					$parameters
-						.add($script)
-						.add($timeout)
-						.closest('li')
-						.show();
+						$publickey
+							.add($privatekey)
+							.add($passphrase)
+							.closest('li')
+							.show();
+					}
 				}
 			})
 			.change();
@@ -137,10 +305,10 @@
 			})
 			.change();
 
-		// trim spaces on sumbit
+		// Trim spaces on sumbit.
 		$('#scriptForm').submit(function() {
 			$(this).trimValues(['#name', '#command', '#commandipmi', '#description', 'input[name^="parameters"]',
-				'input[name="script"]'
+				'input[name="script"]', '#username', '#publickey', '#privatekey', '#menu_path', '#port'
 			]);
 		});
 
