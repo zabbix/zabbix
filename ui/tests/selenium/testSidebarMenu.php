@@ -316,12 +316,12 @@ class testSidebarMenu extends CWebTest {
 						'"]/following::ul/li/a[text()="'.$submenu.'"]')->waitUntilPresent()->one()->click();
 				$this->assertTrue($this->query('xpath://li[contains(@class, "is-selected")]/a[text()="'.
 						$data['page'].'"]')->exists());
-				$this->assertPageHeader(($submenu === 'Other') ? 'Other configuration parameters' : $submenu);
+				$this->page->assertHeader(($submenu === 'Other') ? 'Other configuration parameters' : $submenu);
 				$this->query('xpath:'.$xpath.'/ul/li/a[text()="'.$data['page'].'"]')->one()->click();
 			}
 		}
 		else {
-			$this->assertPageHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
+			$this->page->assertHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
 		}
 	}
 
@@ -404,7 +404,7 @@ class testSidebarMenu extends CWebTest {
 		}
 		else {
 			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click();
-			$this->assertPageTitle('Zabbix');
+			$this->page->assertTitle('Zabbix');
 		}
 	}
 }
