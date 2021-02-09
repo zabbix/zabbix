@@ -66,7 +66,7 @@ jQuery(function ($) {
 	 */
 	function dropDocumentListeners(e, graph) {
 		var widgets_boxing = 0; // Number of widgets with active SBox.
-		$('.dashbrd-grid-container').data('dashboardGrid')['widgets'].forEach(function(w) {
+		ZABBIX.Dashboard.getWidgets().forEach(function(w) {
 			if (w !== graph.data('widget') && w['type'] === 'svggraph') {
 				var svg_graph = $('svg', w['content_body']);
 				if (svg_graph.length && svg_graph.data('options')['boxing']) {

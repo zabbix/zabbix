@@ -586,8 +586,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	// TODO fix it - ZABBIX.Dashboard._target
-	var $dashboard = ZABBIX.Dashboard._$target,
-		dashboard_data = ZABBIX.Dashboard.getDashboardData(),
+	var dashboard_data = ZABBIX.Dashboard.getDashboardData(),
 		editMode = ZABBIX.Dashboard.isEditMode(),
 		widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
@@ -600,7 +599,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 
 	// Do not show "Copy" action for host dashboards.
 	// TODO need to add method data for CBaseComponent
-	if ($dashboard.data('dashboardGrid')['options']['allowed_edit']
+	if (ZABBIX.Dashboard.getOptions()['allowed_edit']
 			&& (dashboard_data.templateid === null || dashboard_data.dynamic_hostid === null)) {
 		widget_actions.push({
 			label: t('S_COPY'),
