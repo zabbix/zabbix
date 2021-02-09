@@ -622,22 +622,22 @@ function copyItems($srcHostId, $dstHostId) {
 	]);
 	$dstHost = reset($dstHosts);
 	$src_valuemaps = [];
-		$valuemap_map = [];
+	$valuemap_map = [];
 
-		foreach ($srcItems as $src_item) {
-			if ($src_item['valuemap']) {
-				$src_valuemaps[$src_item['valuemap']['name']] = 1;
-			}
+	foreach ($srcItems as $src_item) {
+		if ($src_item['valuemap']) {
+			$src_valuemaps[$src_item['valuemap']['name']] = 1;
 		}
+	}
 
-		if ($src_valuemaps) {
-			$valuemap_map = API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
-				'hostids' => $dstHostId,
-				'filter' => ['name' => array_keys($src_valuemaps)]
-			]);
-			$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
-			$unknown_valuemaps = array_diff_key($src_valuemaps, $valuemap_map);
+	if ($src_valuemaps) {
+		$valuemap_map = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'hostids' => $dstHostId,
+			'filter' => ['name' => array_keys($src_valuemaps)]
+		]);
+		$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
+		$unknown_valuemaps = array_diff_key($src_valuemaps, $valuemap_map);
 
 		if ($unknown_valuemaps) {
 			reset($unknown_valuemaps);
