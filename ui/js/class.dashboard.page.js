@@ -80,7 +80,7 @@ class CDashboardPage {
 			}
 		}
 		else {
-			this._data.new_widget_placeholder.setState(new_widget_placeholder.STATE_READONLY);
+			this._data.new_widget_placeholder.setState(this._data.new_widget_placeholder.STATE_READONLY);
 		}
 
 		this._data.new_widget_placeholder.showAtDefaultPosition();
