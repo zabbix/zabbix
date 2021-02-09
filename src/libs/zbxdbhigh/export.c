@@ -22,6 +22,7 @@
 #include "export.h"
 
 extern char		*CONFIG_EXPORT_DIR;
+extern char		*CONFIG_EXPORT_TYPE;
 extern zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
 typedef struct
@@ -38,20 +39,51 @@ static zbx_export_file_t	*problems_file;
 
 static char	*export_dir;
 
-int	zbx_is_export_enabled(void)
+int	zbx_is_export_enabled(int flags)
 {
-	if (NULL == CONFIG_EXPORT_DIR)
-		return FAIL;
+	int ret = FAIL;
 
-	return SUCCEED;
+	if (NULL == CONFIG_EXPORT_DIR)
+		return ret;
+
+	if (NULL != CONFIG_EXPORT_TYPE)
+	{
+		int	i;
+		char	*types[] = {ZBX_OPTION_EXPTYPE_EVENTS, ZBX_OPTION_EXPTYPE_HISTORY, ZBX_OPTION_EXPTYPE_TRENDS,
+				NULL};
+
+		for (i = 0; NULL != types[i]; i++)
+		{
+			if (NULL != strstr(CONFIG_EXPORT_TYPE, types[i]) && 0 != (flags & (1 << i)))
+				ret = SUCCEED;
+		}
+	}
+	else
+		ret = SUCCEED;
+
+	return ret;
 }
 
 int	zbx_export_init(char **error)
 {
 	struct stat	fs;
 
-	if (FAIL == zbx_is_export_enabled())
+	if (FAIL == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_TRENDS | ZBX_FLAG_EXPTYPE_HISTORY))
+	{
+		if (NULL != CONFIG_EXPORT_TYPE)
+		{
+			*error = zbx_dsprintf(*error, "Misconfiguration: \"ExportType\" is set "
+					"while \"ExportDir\" not.");
+			return FAIL;
+		}
 		return SUCCEED;
+	}
+
+	if (NULL == CONFIG_EXPORT_TYPE)
+	{
+		CONFIG_EXPORT_TYPE = zbx_dsprintf(CONFIG_EXPORT_TYPE, "%s,%s,%s", ZBX_OPTION_EXPTYPE_EVENTS,
+				ZBX_OPTION_EXPTYPE_HISTORY, ZBX_OPTION_EXPTYPE_TRENDS);
+	}
 
 	if (0 != stat(CONFIG_EXPORT_DIR, &fs))
 	{
@@ -115,6 +147,10 @@ static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *proce
 void	zbx_history_export_init(const char *process_name, int process_num)
 {
 	history_file = export_init(history_file, "history", process_name, process_num);
+}
+
+void	zbx_trends_export_init(const char *process_name, int process_num)
+{
 	trends_file = export_init(trends_file, "trends", process_name, process_num);
 }
 
