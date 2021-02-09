@@ -7467,19 +7467,18 @@ z-select,
 }
 
 .valuemap-list-table {
-	tbody td {
-		border-collapse: separate;
-		border-top: 1px solid $table-border-color;
-		border-bottom: 1px solid $table-border-color;
+	tbody {
+		td {
+			border-bottom: 1px solid $table-border-color;
+		}
+
+		tr:first-child td {
+			border-top: 1px solid $table-border-color;
+		}
 	}
 
-	.valuemap-row td {
+	td {
 		vertical-align: top;
-	}
-
-	.valuemap-label {
-		word-break: break-all;
-		white-space: normal;
 	}
 }
 

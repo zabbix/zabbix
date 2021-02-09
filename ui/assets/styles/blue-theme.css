@@ -6141,14 +6141,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   border-color: #acbbc2; }
 
 .valuemap-list-table tbody td {
-  border-collapse: separate;
-  border-top: 1px solid #ebeef0;
   border-bottom: 1px solid #ebeef0; }
-.valuemap-list-table .valuemap-row td {
+.valuemap-list-table tbody tr:first-child td {
+  border-top: 1px solid #ebeef0; }
+.valuemap-list-table td {
   vertical-align: top; }
-.valuemap-list-table .valuemap-label {
-  word-break: break-all;
-  white-space: normal; }
 
 .valuemap-checkbox {
   margin-top: 10px; }

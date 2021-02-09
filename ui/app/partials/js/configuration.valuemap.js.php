@@ -50,7 +50,6 @@ var AddValueMap = class {
 		this.data = data;
 
 		this.row = document.createElement('tr');
-		this.row.classList.add('valuemap-row');
 		this.row.appendChild(this.createNameCell());
 		this.row.appendChild(this.createMappingCell());
 		this.row.appendChild(this.createRemoveCell());
@@ -80,7 +79,7 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
 		link.innerHTML = this.data.name;
-		link.classList.add('valuemap-label');
+		link.classList.add('wordwrap');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click',
 			(event) => PopUp('popup.valuemap.edit', Object.assign(this.data, {'edit': 1}), null, event.target)
@@ -108,7 +107,7 @@ var AddValueMap = class {
 	createMappingCell() {
 		let i = 0;
 		const cell = document.createElement('td');
-		cell.classList.add('valuemap-label');
+		cell.classList.add('wordwrap');
 		for (let value of this.data.mappings) {
 			if (i <= MAX_MAPPINGS) {
 				cell.append((i < MAX_MAPPINGS)
