@@ -2443,7 +2443,7 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
 	return zbx_strlen_utf8_nchars(text, maxlen);
 }
 
-#ifdef HAVE_POSTGRESQL
+#if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbms_get_version                                             *
@@ -2524,10 +2524,9 @@ int	zbx_tsdb_get_version(void)
 		DBfree_result(result);
 	}
 	else
-	{
 		ver = ZBX_TSDB_VERSION;
-	}
 out:
 	return ver;
 }
+
 #endif

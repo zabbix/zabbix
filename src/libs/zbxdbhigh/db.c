@@ -898,13 +898,12 @@ void	DBcheck_capabilities(void)
 		exit(EXIT_FAILURE);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: %d", timescaledb_version);
+	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %d", timescaledb_version);
 
 	if (MIN_TIMESCALEDB_VERSION > timescaledb_version)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "TimescaleDB version %d is not supported, minimum is %d",
 				timescaledb_version, MIN_TIMESCALEDB_VERSION);
-		DBfree_result(result);
 		DBclose();
 		exit(EXIT_FAILURE);
 	}

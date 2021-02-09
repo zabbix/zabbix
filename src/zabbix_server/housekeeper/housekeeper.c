@@ -560,6 +560,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  ******************************************************************************/
 static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
+#if defined(HAVE_POSTGRESQL)
 	int		history_seconds;
 	DB_RESULT	result;
 
@@ -571,9 +572,9 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, rule->table);
 
-		result = DBselect(0 == ZBX_DB_TSDB_V1 ?
-				"SELECT drop_chunks(table_name=>'%s', newer_than=>0)" :
-				"SELECT drop_chunks(relation=>'%s', newer_than=>0)",
+		result = DBselect(1 == ZBX_DB_TSDB_V1 ?
+				"select drop_chunks(table_name=>'%s',newer_than=>0)" :
+				"select drop_chunks(relation=>'%s',newer_than=>0)",
 				rule->table);
 	}
 	else
@@ -590,9 +591,9 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
 
-		result = DBselect(0 == ZBX_DB_TSDB_V1 ?
-				"SELECT drop_chunks(table_name=>'%s', older_than=>%d)" :
-				"SELECT drop_chunks(relation=>'%s', older_than=>%d)",
+		result = DBselect(1 == ZBX_DB_TSDB_V1 ?
+				"select drop_chunks(table_name=>'%s',older_than=>%d)" :
+				"select drop_chunks(relation=>'%s',older_than=>%d)",
 				rule->table, keep_from);
 	}
 
@@ -605,6 +606,10 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;
+#else
+	ZBX_UNUSED(rule);
+	ZBX_UNUSED(now);
+#endif
 }
 
 /******************************************************************************
