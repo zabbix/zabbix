@@ -946,6 +946,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		*error = '\0';
 		memset(&host, 0, sizeof(host));
 		zbx_script_init(&script);
+		zbx_vector_ptr_pair_create(&webhook_params);
 
 		/* fill 'script' elements */
 
