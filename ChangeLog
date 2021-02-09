@@ -1,11 +1,21 @@
 Changes for 5.0.9rc1
 
 New features:
+.......PS. [ZBXNEXT-6443] added sha256() function to JavaScript preprocessing (viktors)
+.........T [ZBXNEXT-5809] added VictorOps media (tuskov)
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 .......PS. [ZBXNEXT-6441] added function to configure HTTP authentication for embedded scripts (wiper)
 .......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
 
 Bug fixes:
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+..F....... [ZBX-18209] fixed RegEx delimiter not being escaped in macro resolver (talbergs)
+..F....... [ZBX-18237] fixed problem description icon in Monitoring->Problems in compact view mode being displayed above problem name (agriscenko)
+...G...... [ZBX-18945] fixed Zabbix agent 2 build Raspbian 10 (esneiders)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
+.........T [ZBX-18874] fixed incorrect links in templates and webhooks documentation (tuskov)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.8
@@ -1944,6 +1954,12 @@ Changes for 4.0.29rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
+A......... [ZBX-18449] reworked trigger API validation (miks)
+..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
+..F....... [ZBX-18931] fixed PHP runtime errors in CLineGraphDraw.php (Sasha)
+...G...... [ZBX-18872] fixed system.sw.os[name] for cases without quotation mark in /etc/os-release (akozlovs)
+.......PS. [ZBX-18885] fixed SNMP agent item not accepting values that are bigger than 2KB (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.28
@@ -5008,6 +5024,7 @@ Changes for 3.0.32rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
 ..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 
 --------------------------------------------------------------------------------

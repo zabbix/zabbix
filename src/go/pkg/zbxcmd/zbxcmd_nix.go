@@ -32,7 +32,7 @@ import (
 	"zabbix.com/pkg/log"
 )
 
-func Execute(s string, timeout time.Duration) (string, error) {
+func execute(s string, timeout time.Duration, strict bool) (string, error) {
 	cmd := exec.Command("sh", "-c", s)
 
 	var b bytes.Buffer
@@ -54,10 +54,15 @@ func Execute(s string, timeout time.Duration) (string, error) {
 		}
 	})
 
-	cmd.Wait()
+	werr := cmd.Wait()
 
 	if !t.Stop() {
 		return "", fmt.Errorf("Timeout while executing a shell script.")
+	}
+
+	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
+	if strict && werr != nil {
+		return "", fmt.Errorf("Command execution failed: %s", werr)
 	}
 
 	if maxExecuteOutputLenB <= len(b.String()) {
