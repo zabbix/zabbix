@@ -70,7 +70,16 @@ class CConfigurationExportBuilder {
 				$is_array = $val['type'] & XML_ARRAY;
 				$is_indexed_array = $val['type'] & XML_INDEXED_ARRAY;
 				$has_data = array_key_exists($tag, $row);
-				$default_value = array_key_exists('default', $val) ? $val['default'] : null;
+
+				if (array_key_exists('ex_default', $val)) {
+					$default_value = (string) call_user_func($val['ex_default'], $row);
+				}
+				elseif (array_key_exists('default', $val)) {
+					$default_value = (string) $val['default'];
+				}
+				else {
+					$default_value = null;
+				}
 
 				if (!$default_value && !$has_data) {
 					if ($is_required) {

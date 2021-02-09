@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:41Z'
+  date: '2021-02-04T08:53:15Z'
   groups:
     -
       name: 'Templates/Server hardware'
@@ -44,8 +44,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'sensor.temp.status[cpqHeThermalCondition.0]'
-          delay: 3m
-          history: 2w
+          history: 7d
           trends: 0d
           description: |
             MIB: CPQHLTH-MIB
@@ -60,13 +59,17 @@ zabbix_export:
               name: Temperature
           valuemap:
             name: 'CPQSINFO-MIB::status'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: system.hw.model
-          delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -80,14 +83,13 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 6h
         -
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: system.hw.serialnumber
-          delay: 1h
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -101,7 +103,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 6h
           triggers:
             -
               expression: '{diff()}=1 and {strlen()}>0'
@@ -114,8 +116,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'system.status[cpqHeMibCondition.0]'
-          delay: 30s
-          history: 2w
+          history: 7d
           trends: 0d
           description: |
             MIB: CPQHLTH-MIB
@@ -125,6 +126,11 @@ zabbix_export:
               name: Status
           valuemap:
             name: 'CPQSINFO-MIB::status'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           triggers:
             -
               expression: '{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1'
@@ -156,7 +162,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]'
-              history: 1w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
@@ -185,6 +191,11 @@ zabbix_export:
                   name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaAccelBattery'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1'
@@ -193,7 +204,7 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"notPresent"},eq)}=1'
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"},eq)}=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -207,17 +218,50 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]'
-              history: 1w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
                 Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.
                 Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.
+                
+                The status can be:
+                Other (1)
+                 Indicates that the instrument agent does not recognize the status of the cache module. You may need to upgrade the instrument agent.
+                
+                Invalid (2)
+                 Indicates that a cache module board has not been installed in this system or is present but not configured.
+                
+                Enabled (3)
+                 Indicates that cache operations are currently configured and enabled for at least one logical drive.
+                
+                Temporarily Disabled (4)
+                 Indicates that cache operations have been temporarily disabled. View the cache module board error code object to determine why the write cache operations have been temporarily disabled.
+                
+                Permanently Disabled (5)
+                 Indicates that cache operations have been permanently disabled. View the cache module board error code object to determine why the write cache operations have been disabled.
+                
+                Cache Module Flash Memory Not Attached (6)
+                 Indicates that the flash memory component of the flash backed cache module is not attached. This status will be set when the flash memory is not attached and the Supercap is attached. This value is only used on flash backed cache modules that support removable flash memory.
+                
+                Cache Module Degraded Failsafe Speed (7)
+                 Indicates that the cache module board is currently degraded and operating at a failsafe speed. View variables cpqDaCacheMemoryDataWidth and cpqDaCacheMemoryTransferRate to obtain the cache module board`s current memory data width and memory transfer rate.
+                
+                Cache Module Critical Failure (8)
+                 Indicates that the cache module board has encountered a critical failure. The controller is currently operating in Zero Memory Raid mode.
+                
+                Read Cache Could Not Be Mapped (9)
+                 Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available. This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.
               applications:
                 -
                   name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaAccelStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
@@ -226,7 +270,7 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'Please check the device for faults'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -236,7 +280,7 @@ zabbix_export:
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                       expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
                 -
-                  expression: '{count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1'
+                  expression: '{count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1 and {last()}<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -247,7 +291,12 @@ zabbix_export:
                       expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1'
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
-                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+                      expression: '{HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {HP iLO SNMP:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Array Controller Discovery'
           type: SNMP_AGENT
@@ -261,7 +310,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]'
-              delay: 1d
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
@@ -271,12 +320,17 @@ zabbix_export:
                   name: 'Disk arrays'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaCntlrModel'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: '{#CNTLR_LOCATION}: Disk array controller status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]'
-              history: 1w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
@@ -287,6 +341,11 @@ zabbix_export:
                   name: 'Disk arrays'
               valuemap:
                 name: 'CPQSINFO-MIB::status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
@@ -304,6 +363,11 @@ zabbix_export:
                     -
                       name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
                       expression: '{HP iLO SNMP:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'FAN Discovery'
           type: SNMP_AGENT
@@ -317,8 +381,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}'
               key: 'sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]'
-              delay: 3m
-              history: 2w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQHLTH-MIB
@@ -333,6 +396,11 @@ zabbix_export:
                   name: Fans
               valuemap:
                 name: 'CPQSINFO-MIB::status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$FAN_CRIT_STATUS},eq)}=1'
@@ -350,6 +418,11 @@ zabbix_export:
                     -
                       name: 'Fan {#SNMPINDEX}: Fan is in critical state'
                       expression: '{HP iLO SNMP:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Physical Disk Discovery'
           type: SNMP_AGENT
@@ -363,8 +436,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
-              delay: 1h
-              history: 2w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
@@ -377,13 +449,17 @@ zabbix_export:
                   name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvMediaType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: '{#DISK_LOCATION}: Physical disk model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]'
-              delay: 1h
-              history: 2w
+              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -395,12 +471,17 @@ zabbix_export:
               applications:
                 -
                   name: 'Physical disks'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: '{#DISK_LOCATION}: Physical disk serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]'
-              delay: 1d
+              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -412,6 +493,11 @@ zabbix_export:
               applications:
                 -
                   name: 'Physical disks'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{diff()}=1 and {strlen()}>0'
@@ -424,8 +510,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
-              delay: 1h
-              history: 2w
+              history: 7d
               trends: 0d
               units: B
               description: |
@@ -445,12 +530,16 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]'
-              delay: 3m
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
@@ -463,6 +552,11 @@ zabbix_export:
                   name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvSmartStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDrive"},eq)}=1 or {count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"},eq)}=1'
@@ -479,7 +573,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]'
-              delay: 3m
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQIDA-MIB
@@ -494,6 +588,11 @@ zabbix_export:
                   name: 'Physical disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaPhyDrvStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$DISK_FAIL_STATUS},eq)}=1'
@@ -511,6 +610,11 @@ zabbix_export:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
                       expression: '{HP iLO SNMP:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'PSU Discovery'
           type: SNMP_AGENT
@@ -524,8 +628,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}'
               key: 'sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]'
-              delay: 3m
-              history: 2w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQHLTH-MIB
@@ -539,6 +642,11 @@ zabbix_export:
                   name: 'Power supply'
               valuemap:
                 name: 'CPQSINFO-MIB::status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$PSU_CRIT_STATUS},eq)}=1'
@@ -556,6 +664,11 @@ zabbix_export:
                     -
                       name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
                       expression: '{HP iLO SNMP:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Temperature Discovery'
           type: SNMP_AGENT
@@ -571,12 +684,58 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable'
           item_prototypes:
             -
+              name: '{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 1'
+                  name: '{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: '{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  expression: '{last()} = 3'
+                  name: '{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
               name: '{#SNMPINDEX}: Temperature sensor location'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}'
               key: 'sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]'
-              delay: 1h
-              history: 1w
+              history: 7d
               trends: 0d
               description: |
                 MIB: CPQHLTH-MIB
@@ -586,12 +745,17 @@ zabbix_export:
                   name: Temperature
               valuemap:
                 name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: '{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]'
-              delay: 6m
+              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -600,35 +764,16 @@ zabbix_export:
               applications:
                 -
                   name: Temperature
-              trigger_prototypes:
+              preprocessing:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"{#SNMPINDEX}"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"{#SNMPINDEX}"}-3'
-                  name: '{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPINDEX}"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: HIGH
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"{#SNMPINDEX}"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"{#SNMPINDEX}"}-3'
-                  name: '{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPINDEX}"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                  dependencies:
-                    -
-                      name: '{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPINDEX}"}'
-                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"{#SNMPINDEX}"}'
-                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"{#SNMPINDEX}"}-3'
-                -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}+3'
-                  name: '{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Temperature Discovery Ambient'
           type: SNMP_AGENT
@@ -648,11 +793,58 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter'
           item_prototypes:
             -
+              name: 'Ambient: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 1'
+                  name: 'Ambient: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: 'Ambient: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  expression: '{last()} = 3'
+                  name: 'Ambient: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
               name: 'Ambient: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]'
-              delay: 3m
+              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -661,35 +853,16 @@ zabbix_export:
               applications:
                 -
                   name: Temperature
-              trigger_prototypes:
+              preprocessing:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"Ambient"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
-                  name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: HIGH
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"Ambient"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Ambient"}-3'
-                  name: 'Ambient: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                  dependencies:
-                    -
-                      name: 'Ambient: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
-                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Ambient"}'
-                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Ambient"}-3'
-                -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Ambient"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Ambient"}+3'
-                  name: 'Ambient: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Temperature Discovery CPU'
           type: SNMP_AGENT
@@ -705,11 +878,58 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter'
           item_prototypes:
             -
+              name: 'CPU-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 1'
+                  name: 'CPU-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: 'CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  expression: '{last()} = 3'
+                  name: 'CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
               name: 'CPU-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]'
-              delay: 3m
+              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -718,37 +938,18 @@ zabbix_export:
               applications:
                 -
                   name: Temperature
-              trigger_prototypes:
+              preprocessing:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"CPU"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"CPU"}-3'
-                  name: 'CPU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: HIGH
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"CPU"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"CPU"}-3'
-                  name: 'CPU-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                  dependencies:
-                    -
-                      name: 'CPU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
-                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"CPU"}'
-                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"CPU"}-3'
-                -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"CPU"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"CPU"}+3'
-                  name: 'CPU-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
-          name: 'Temperature Discovery System'
+          name: 'Temperature Discovery I/O'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
           key: tempDescr.discovery.io
@@ -757,53 +958,81 @@ zabbix_export:
             conditions:
               -
                 macro: '{#SENSOR_LOCALE}'
-                value: '3'
+                value: '5'
                 formulaid: A
-          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter'
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter'
           item_prototypes:
             -
-              name: 'System-{#SNMPINDEX}: Temperature'
+              name: 'I/O-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 1'
+                  name: 'I/O-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: 'I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  expression: '{last()} = 3'
+                  name: 'I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              name: 'I/O-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
-              key: 'sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]'
-              delay: 6m
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"]'
+              history: 7d
               value_type: FLOAT
               units: °C
               description: |
                 MIB: CPQHLTH-MIB
-                Temperature readings of testpoint: System-{#SNMPINDEX}
+                Temperature readings of testpoint: I/O-{#SNMPINDEX}
               applications:
                 -
                   name: Temperature
-              trigger_prototypes:
+              preprocessing:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"Device"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Device"}-3'
-                  name: 'System-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: HIGH
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"Device"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Device"}-3'
-                  name: 'System-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                  dependencies:
-                    -
-                      name: 'System-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
-                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Device"}'
-                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Device"}-3'
-                -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Device"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Device"}+3'
-                  name: 'System-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Temperature Discovery Memory'
           type: SNMP_AGENT
@@ -819,11 +1048,58 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter'
           item_prototypes:
             -
+              name: 'Memory-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 1'
+                  name: 'Memory-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: 'Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  expression: '{last()} = 3'
+                  name: 'Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
               name: 'Memory-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]'
-              delay: 6m
+              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -832,35 +1108,16 @@ zabbix_export:
               applications:
                 -
                   name: Temperature
-              trigger_prototypes:
+              preprocessing:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"Memory"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"Memory"}-3'
-                  name: 'Memory-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Memory"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: HIGH
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"Memory"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"Memory"}-3'
-                  name: 'Memory-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"Memory"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                  dependencies:
-                    -
-                      name: 'Memory-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"Memory"}'
-                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"Memory"}'
-                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"Memory"}-3'
-                -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"Memory"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"Memory"}+3'
-                  name: 'Memory-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"Memory"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Temperature Discovery PSU'
           type: SNMP_AGENT
@@ -876,11 +1133,58 @@ zabbix_export:
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter'
           item_prototypes:
             -
+              name: 'PSU-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              trigger_prototypes:
+                -
+                  expression: '{last()} = 1'
+                  name: 'PSU-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: 'PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
+                  priority: HIGH
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
+                -
+                  expression: '{last()} = 3'
+                  name: 'PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
+                  priority: WARNING
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
               name: 'PSU-{#SNMPINDEX}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]'
-              delay: 6m
+              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -889,35 +1193,101 @@ zabbix_export:
               applications:
                 -
                   name: Temperature
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          name: 'Temperature Discovery System'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]'
+          key: tempDescr.discovery.system
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SENSOR_LOCALE}'
+                value: '3'
+                formulaid: A
+          description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter'
+          item_prototypes:
+            -
+              name: 'System-{#SNMPINDEX}: Temperature sensor condition'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CPQHLTH-MIB
+                The Temperature sensor condition.
+                This value will be one of the following:
+                other(1)
+                  Temperature could not be determined.
+                ok(2)
+                  The temperature sensor is within normal operating range.
+                degraded(3)
+                  The temperature sensor is outside of normal operating range.
+                failed(4)
+                  The temperature sensor detects a condition that could
+                  permanently damage the system.
+                The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.  If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.
+              applications:
+                -
+                  name: Temperature
+              valuemap:
+                name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
-                  expression: '{avg(5m)}>{$TEMP_CRIT:"PSU"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_CRIT:"PSU"}-3'
-                  name: 'PSU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"PSU"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  expression: '{last()} = 1'
+                  name: 'System-{#SNMPINDEX}: Temperature could not be determined'
+                  priority: INFO
+                  description: 'Temperature could not be determined.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()} = 4'
+                  name: 'System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+                  description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
                 -
-                  expression: '{avg(5m)}>{$TEMP_WARN:"PSU"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{max(5m)}<{$TEMP_WARN:"PSU"}-3'
-                  name: 'PSU-{#SNMPINDEX}: Temperature is above warning threshold: >{$TEMP_WARN:"PSU"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  expression: '{last()} = 3'
+                  name: 'System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
-                  dependencies:
-                    -
-                      name: 'PSU-{#SNMPINDEX}: Temperature is above critical threshold: >{$TEMP_CRIT:"PSU"}'
-                      expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}>{$TEMP_CRIT:"PSU"}'
-                      recovery_expression: '{HP iLO SNMP:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}<{$TEMP_CRIT:"PSU"}-3'
+                  description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
+            -
+              name: 'System-{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CPQHLTH-MIB
+                Temperature readings of testpoint: System-{#SNMPINDEX}
+              applications:
                 -
-                  expression: '{avg(5m)}<{$TEMP_CRIT_LOW:"PSU"}'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '{min(5m)}>{$TEMP_CRIT_LOW:"PSU"}+3'
-                  name: 'PSU-{#SNMPINDEX}: Temperature is too low: <{$TEMP_CRIT_LOW:"PSU"}'
-                  opdata: 'Current value: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
+                  name: Temperature
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           name: 'Virtual Disk Discovery'
           type: SNMP_AGENT
@@ -931,8 +1301,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]'
-              delay: 1h
-              history: 2w
+              history: 7d
               description: |
                 Logical Drive Fault Tolerance.
                 This shows the fault tolerance mode of the logical drive.
@@ -941,13 +1310,17 @@ zabbix_export:
                   name: 'Virtual disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvFaultTol'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Disk size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]'
-              delay: 1h
-              history: 2w
+              history: 7d
               trends: 0d
               units: B
               description: |
@@ -965,19 +1338,27 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
             -
               name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]'
-              delay: 3m
-              history: 2w
+              history: 7d
               description: 'Logical Drive Status.'
               applications:
                 -
                   name: 'Virtual disks'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               trigger_prototypes:
                 -
                   expression: '{count(#1,{$VDISK_CRIT_STATUS},eq)}=1'
@@ -995,6 +1376,11 @@ zabbix_export:
                     -
                       name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
                       expression: '{HP iLO SNMP:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
       macros:
         -
           macro: '{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"}'
@@ -1063,27 +1449,27 @@ zabbix_export:
           macro: '{$PSU_WARN_STATUS}'
           value: '3'
         -
-          macro: '{$TEMP_CRIT}'
-          value: '60'
-        -
-          macro: '{$TEMP_CRIT:"Ambient"}'
-          value: '35'
-        -
-          macro: '{$TEMP_CRIT_LOW}'
-          value: '5'
-        -
-          macro: '{$TEMP_WARN}'
-          value: '50'
-        -
-          macro: '{$TEMP_WARN:"Ambient"}'
-          value: '30'
-        -
           macro: '{$VDISK_CRIT_STATUS}'
           value: '3'
         -
           macro: '{$VDISK_OK_STATUS}'
           value: '2'
   value_maps:
+    -
+      name: 'CPQHLTH-MIB::cpqHeTemperatureCondition'
+      mappings:
+        -
+          value: '1'
+          newvalue: other
+        -
+          value: '2'
+          newvalue: ok
+        -
+          value: '3'
+          newvalue: degraded
+        -
+          value: '4'
+          newvalue: failed
     -
       name: 'CPQHLTH-MIB::cpqHeTemperatureLocale'
       mappings:

@@ -1252,6 +1252,10 @@ abstract class CItemGeneral extends CApiService {
 				]
 			]);
 
+			$unsupported_error_handler_validator = new CLimitedSetValidator([
+				'values' => [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR]
+			]);
+
 			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
 				'lldmacros' => ($this instanceof CItemPrototype)
 			]);
@@ -1647,6 +1651,43 @@ abstract class CItemGeneral extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
 									_('should be empty')
+								)
+							);
+						}
+						break;
+
+					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+						if (is_array($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif (!$unsupported_error_handler_validator->validate($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
+									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
+								)
+							);
+						}
+
+						if (is_array($preprocessing['error_handler_params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE
+								&& $preprocessing['error_handler_params'] !== ''
+								&& $preprocessing['error_handler_params'] !== null
+								&& $preprocessing['error_handler_params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('should be empty')
+								)
+							);
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
+								&& ($preprocessing['error_handler_params'] === ''
+									|| $preprocessing['error_handler_params'] === null
+									|| $preprocessing['error_handler_params'] === false)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('cannot be empty')
 								)
 							);
 						}
