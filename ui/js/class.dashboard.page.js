@@ -3575,7 +3575,7 @@ class CDashboardPage {
 					for (const box of this._data.widgets) {
 						overlap |= this._rectOverlap(box.pos, pos);
 
-						if (!overlap) {
+						if (overlap) {
 							break;
 						}
 					}
@@ -3643,7 +3643,7 @@ class CDashboardPage {
 						if (!overlap) {
 							pos = c_pos;
 
-							return false;
+							break;
 						}
 					}
 
