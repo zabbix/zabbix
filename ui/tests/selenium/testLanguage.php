@@ -259,7 +259,7 @@ class testLanguage extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
 		$this->page->userLogin($data['fields']['Alias'], $data['fields']['Password']);
-		$this->assertPageTitle($data['page_title']);
+		$this->page->assertTitle($data['page_title']);
 		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.
 				zbx_dbstr($data['fields']['Alias'])));
@@ -268,7 +268,7 @@ class testLanguage extends CWebTest {
 
 	private function checkLanguage($message, $page_title, $body_lang, $defaultdb_lang) {
 		$this->assertMessage(TEST_GOOD, $message);
-		$this->assertPageTitle($page_title);
+		$this->page->assertTitle($page_title);
 		$this->assertEquals($body_lang, $this->query('xpath://body')->one()->getAttribute('lang'));
 		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT default_lang FROM config'));
 	}

@@ -180,6 +180,12 @@ class CApiInputValidator {
 
 			case API_PORT:
 				return self::validatePort($rule, $data, $path, $error);
+
+			case API_TRIGGER_EXPRESSION:
+				return self::validateTriggerExpression($rule, $data, $path, $error);
+
+			case API_EVENT_NAME:
+				return self::validateEventName($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -231,6 +237,8 @@ class CApiInputValidator {
 			case API_IP:
 			case API_DNS:
 			case API_PORT:
+			case API_TRIGGER_EXPRESSION:
+			case API_EVENT_NAME:
 				return true;
 
 			case API_OBJECT:
@@ -1955,6 +1963,85 @@ class CApiInputValidator {
 		}
 
 		$data = (string) $data;
+
+		return true;
+	}
+
+	/**
+	 * Trigger expression validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO, API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTriggerExpression($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$expression_data = new CTriggerExpression([
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'lowercase_errors' => true
+		]);
+
+		if (!$expression_data->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
+			return false;
+		}
+
+		if (!$expression_data->expressions) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('trigger expression must contain at least one host:key reference')
+			);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Event name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEventName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(0, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$eventname_validator = new CEventNameValidator();
+
+		if (!$eventname_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $eventname_validator->getError());
+			return false;
+		}
 
 		return true;
 	}

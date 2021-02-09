@@ -2898,3 +2898,12 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');
+
+-- testFormAdministrationScripts
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (200, 5, 'Script for Update', 'test', 2, NULL, NULL, 'update description');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (100, 200, 'update_name', 'update_value');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (101, 200, 'update_name2', 'update_value2');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (201, 5, 'Script for Clone','test', 2, NULL, NULL, 'clone description');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (102, 201, 'name1', 'value1');
+INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (103, 201, 'name2', 'value2');
+INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (202, 5, 'Script for Delete','test', 2, NULL, NULL, 'delete description');
