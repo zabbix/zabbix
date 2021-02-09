@@ -270,11 +270,11 @@ class testPageTriggerUrl extends CWebTest {
 			if ($trigger_overview) {
 				$this->assertTrue($popup->hasItems('Acknowledge'));
 				// Check that only the links from data provider plus Acknowledge link persist in the popup.
-				$this->assertEquals(count($data['links'])+5, $popup->getItems()->count());
+				$this->assertEquals(count($data['links'])+8, $popup->getItems()->count());
 			}
 			else {
 				// Check that only the expected links ar present in the popup.
-				$this->assertEquals(count($data['links'])+4, $popup->getItems()->count());
+				$this->assertEquals(count($data['links'])+7, $popup->getItems()->count());
 			}
 			// Open trigger link.
 			$popup->fill('Trigger URL');

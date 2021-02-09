@@ -31,7 +31,7 @@ class CControllerTokenUpdate extends CController {
 			'status'        => 'db token.status|required|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
 			'action_src'    => 'fatal|required|in token.edit,user.token.edit',
 			'action_dst'    => 'fatal|required|in token.list,user.token.list,token.view,user.token.view',
-			'regenerate'    => 'in 1',
+			'regenerate'    => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -88,7 +88,7 @@ class CControllerCorrelationList extends CController {
 			'selectFilter' => ['formula', 'conditions', 'evaltype', 'eval_formula'],
 			'selectOperations' => ['type'],
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name'],
+				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']

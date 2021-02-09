@@ -100,8 +100,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
 	case "system.sw.os":
 		cfunc = unsafe.Pointer(C.SYSTEM_SW_OS)
-	case "system.sw.packages":
-		cfunc = unsafe.Pointer(C.SYSTEM_SW_PACKAGES)
 	case "system.swap.in":
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
 	case "system.swap.out":
@@ -110,8 +108,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
 	case "vfs.dir.size":
 		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
-	case "vm.memory.size":
-		cfunc = unsafe.Pointer(C.VM_MEMORY_SIZE)
 	}
 	return
 }
