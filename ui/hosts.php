@@ -507,7 +507,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		$valuemaps = array_values(getRequest('valuemaps', []));
+		$valuemaps = getRequest('valuemaps', []);
 		$ins_valuemaps = [];
 		$upd_valuemaps = [];
 		$del_valuemapids = [];
