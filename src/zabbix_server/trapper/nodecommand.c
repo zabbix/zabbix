@@ -92,9 +92,9 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
  *           "manual script on event"                                         *
  *                                                                            *
  ******************************************************************************/
-static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *command,
-		unsigned char execute_on, const char *output, const char *error)
+static void	auditlog_global_script(const zbx_script_t *script, zbx_uint64_t hostid, zbx_uint64_t eventid,
+		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *clientip, const char *output,
+		const char *error)
 {
 	int		now;
 	zbx_uint64_t	auditid;
@@ -103,7 +103,7 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
 
 	now = time(NULL);
 	auditid = DBget_maxid("auditlog");
-	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%d", execute_on);
+	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script->execute_on);
 
 	zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, hostid);
 
@@ -126,7 +126,7 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
 		DBbegin();
 
 		zbx_db_insert_add_values(&db_audit, auditid, userid, now, AUDIT_ACTION_EXECUTE, AUDIT_RESOURCE_SCRIPT,
-				clientip, scriptid);
+				clientip, script->scriptid);
 
 
 		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "execute_on", execute_on_s);
@@ -142,7 +142,11 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
 					proxy_hostid_s);
 		}
 
-		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "command", command);
+		if (ZBX_SCRIPT_TYPE_WEBHOOK != script->type)
+		{
+			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "command",
+					script->command_orig);
+		}
 
 		if (NULL != output)
 			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "output", output);
@@ -156,7 +160,6 @@ static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, z
 		zbx_db_insert_autoincrement(&db_details, "auditdetailid");
 		zbx_db_insert_execute(&db_details);
 		zbx_db_insert_clean(&db_details);
-
 	}
 	while (ZBX_DB_DOWN == DBcommit());
 }
@@ -642,8 +645,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		else
 			perror = error;
 
-		auditlog_global_script(scriptid, host.hostid, eventid, host.proxy_hostid, user->userid, clientip,
-				script.command_orig, script.execute_on, poutput, perror);
+		auditlog_global_script(&script, host.hostid, eventid, host.proxy_hostid, user->userid, clientip,
+				poutput, perror);
 	}
 fail:
 	if (SUCCEED != ret)
