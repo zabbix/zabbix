@@ -892,16 +892,18 @@ abstract class CDashboardGeneral extends CApiService {
 					}
 
 					foreach ($db_widgets as $db_widget) {
+						$dashboard_pageid = $db_widget['dashboard_pageid'];
 						unset($db_widget['dashboard_pageid']);
-						$db_pages[$db_widget['dashboard_pageid']]['widgets'][] = $db_widget;
+						$db_pages[$dashboard_pageid]['widgets'][] = $db_widget;
 					}
 				}
 
 				$db_pages = $this->unsetExtraFields($db_pages, ['dashboard_pageid'], $options['selectPages']);
 
 				foreach ($db_pages as $db_page) {
+					$dashboardid = $db_page['dashboardid'];
 					unset($db_page['dashboardid'], $db_page['sortorder']);
-					$result[$db_page['dashboardid']]['pages'][] = $db_page;
+					$result[$dashboardid]['pages'][] = $db_page;
 				}
 			}
 		}
