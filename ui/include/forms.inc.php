@@ -1285,7 +1285,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	if ($data['is_discovery_rule']) {
 		unset($data['valuemapid']);
 	}
-	else if ($data['valuemapid']) {
+	else if ($data['valuemapid'] != 0) {
 		$data['valuemap'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $data['valuemapid']
