@@ -36,7 +36,7 @@ class CUser extends CApiService {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
-	protected $sortColumns = ['userid', 'username'];
+	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
 
 	/**
 	 * Get users data.
@@ -50,7 +50,7 @@ class CUser extends CApiService {
 	 * @param bool   $options['count']			output only count of objects in result. (result returned in property 'rowscount')
 	 * @param string $options['pattern']		filter by Host name containing only give pattern
 	 * @param int    $options['limit']			output will be limited to given number
-	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username']
+	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username', 'alias']
 	 * @param string $options['sortorder']		output will be sorted in given order ['ASC', 'DESC']
 	 *
 	 * @return array
@@ -176,6 +176,14 @@ class CUser extends CApiService {
 		}
 
 		$userIds = [];
+
+		if (is_array($options['output']) && in_array('alias', $options['output'])) {
+			$options['output'][] = 'username';
+		}
+
+		if ($options['sortfield'] === 'alias') {
+			$options['sortfield'] = 'username';
+		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
