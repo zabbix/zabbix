@@ -1147,18 +1147,6 @@ class CHttpTestManager {
 		$has_status = array_key_exists('status', $httptest);
 		$has_name_changed = ($httptest['name'] !== $db_httptest['name']);
 
-		if (!array_key_exists('tags', $httptest)) {
-			$httptest['tags'] = [];
-		}
-
-		CArrayHelper::sort($db_httptest['tags'], ['tag', 'value']);
-		CArrayHelper::sort($httptest['tags'], ['tag', 'value']);
-		$has_tags_changed = (array_values($db_httptest['tags']) === array_values($httptest['tags']));
-
-		if (!$has_tags_changed && !$has_status && !$has_name_changed) {
-			return;
-		}
-
 		$stepids = array_column($db_httptest['steps'], 'httpstepid');
 
 		$stepitems = DBfetchArrayAssoc(DBselect(
@@ -1169,10 +1157,6 @@ class CHttpTestManager {
 		), 'itemid');
 
 		$stepitemids = array_keys($stepitems);
-
-		if ($has_tags_changed) {
-			$this->updateStepItemsTags($httptest['tags'], $db_httptest['tags'], $stepitemids);
-		}
 
 		if ($has_status) {
 			$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE)
