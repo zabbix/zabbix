@@ -43,6 +43,9 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 	if test "x$_libnetsnmp_config" = "xno"; then
 		AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [])
+		want_static_netsnmp="no"
+	else
+		want_static_netsnmp="yes"
 	fi
 
 	if test -d "$_libnetsnmp_config"; then
@@ -131,6 +134,17 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 				;;
 				esac
 			done
+		elif test "x$want_static_netsnmp" = "xyes"; then
+			_libsnmp_dir_lib="`$_libnetsnmp_config --libdir | cut -b3-`"
+
+			test [ "x$static_linking_support" = "xno" -o -z "$static_linking_support" ] -a -z "$_libsnmp_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
+
+			if test "x$static_linking_support" = "xno" -o -z "$static_linking_support"; then
+				test -f $_libsnmp_dir_lib/libnetsnmp.a || AC_MSG_ERROR(["libnetsnmp.a static library was not found in $_libsnmp_dir_lib"])
+				SNMP_LIBS=`echo "$SNMP_LIBS"|sed "s|-lnetsnmp|$_libsnmp_dir_lib/libnetsnmp.a|g"`
+			else
+				SNMP_LIBS=`echo "$SNMP_LIBS"|sed "s/-lnetsnmp/${static_linking_support}static -lnetsnmp ${static_linking_support}dynamic/g"`
+			fi
 		fi
 
 		_save_netsnmp_cflags="$CFLAGS"
