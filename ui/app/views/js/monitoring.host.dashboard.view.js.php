@@ -29,7 +29,7 @@
 		// Prevent page reloading on time selector events.
 		timeControl.refreshPage = false;
 
-		ZABBIX.Dashboard.init({
+		ZABBIX.Dashboard = new CDashboardPage($('.dashbrd-grid-container'), {
 			dashboard: {
 				templateid: data.templateid,
 				dashboardid: data.dashboardid,

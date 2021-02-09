@@ -23,12 +23,9 @@ const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 
 class CDashboardPage {
 
-	constructor($target) {
+	constructor($target, data) {
 		this._$target = $target;
-	}
 
-	// TODO unused function - public
-	init(data) {
 		const dashboard = {
 			templateid: null,
 			dashboardid: null,
@@ -4130,11 +4127,6 @@ class CDashboardPage {
 		return triggers.length;
 	}
 }
-
-$(function(){
-	ZABBIX.Dashboard = new CDashboardPage($('.dashbrd-grid-container'));
-});
-
 
 /**
  * TODO

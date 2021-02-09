@@ -40,7 +40,7 @@
 		}
 
 		live() {
-			ZABBIX.Dashboard.init({
+			ZABBIX.Dashboard = new CDashboardPage($('.dashbrd-grid-container'), {
 				'dashboard': {
 					templateid: this.data.templateid,
 					dashboardid: this.data.dashboardid
