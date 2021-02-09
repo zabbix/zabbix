@@ -761,9 +761,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageMonitoringHosts_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?name=&ip=&dns=&port=10051&status=-1&evaltype=0&tags%5B0%5D%5Btag%5D=&tags'.
-				'%5B0%5D%5Boperator%5D=0&tags%5B0%5D%5Bvalue%5D=&maintenance_status=1&filter_name=&filter_show_counter'.
-				'=0&filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view&groupids%5B%5D=4');
+		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setFilterSelector('id:tags_0');

@@ -366,14 +366,8 @@ class testPageProblems extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsExceptContainsEqualsData
 	 */
 	public function testPageProblems_FilterByTagsExceptContainsEquals($data) {
-		$this->page->login()->open('zabbix.php?show=1&application=&name=&inventory%5B0%5D%5Bfield%5D=type&inventory'.
-				'%5B0%5D%5Bvalue%5D=&evaltype=0&tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Boperator%5D=0&tags%5B0%5D%5Bvalue'.
-				'%5D=&show_tags=3&tag_name_format=0&tag_priority=&show_opdata=0&show_timeline=1&filter_name='.
-				'&filter_show_counter=0&filter_custom_time=0&sort=name&sortorder=ASC&age_state=0&show_suppressed'.
-				'=0&unacknowledged=0&compact_view=0&details=0&highlight_row=0&action=problem.view');
+		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$filtering = $this->getTableResult('Problem');
-
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
 		$this->setFilterSelector('id:filter-tags_0');
 		$this->setTags($data['tags']);
@@ -381,6 +375,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// We remove from the result list templates that is not displayed there.
+		$filtering = $this->getTableResult('Problem');
 		if (array_key_exists('absence_problems', $data)) {
 			foreach ($data['absence_problems'] as $absence) {
 				if (($key = array_search($absence, $filtering)) !== false) {
@@ -388,11 +383,10 @@ class testPageProblems extends CLegacyWebTest {
 				}
 				$filtering = array_values($filtering);
 			}
-			$this->assertSame($filtering, $this->getTableResult('Problem'));
+			$this->assertTableDataColumn($filtering, 'Problem');
 		}
-
 		else {
-			$this->assertSame($data['expected_problems'], $this->getTableResult('Problem'));
+			$this->assertTableDataColumn($data['expected_problems'], 'Problem');
 		}
 
 		// Reset filter due to not influence further tests.

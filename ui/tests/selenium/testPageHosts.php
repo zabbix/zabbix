@@ -671,11 +671,8 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open('hosts.php?filter_groups%5B%5D=4&filter_host=host&filter_dns=&filter_ip=&filter_port'.
-				'=10051&filter_monitored_by=0&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D=&filter_tags%5B0%5D%5B'.
-				'operator%5D=0&filter_tags%5B0%5D%5Bvalue%5D=&filter_set=1');
+		$this->page->login()->open('hosts.php?filter_groups%5B%5D=4&filter_host=host&filter_port=10051&&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);
 		$form->submit();
