@@ -6155,8 +6155,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   border-bottom: 1px solid #383838; }
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #383838; }
-.valuemap-list-table td {
-  vertical-align: top; }
 
 .valuemap-checkbox {
   margin-top: 10px; }
