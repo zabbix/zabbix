@@ -87,7 +87,9 @@ class CDashboard extends CDashboardGeneral {
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_keys($this->getTableSchema()['fields']);
+			$options['output'] = $this->getTableSchema()['fields'];
+			unset($options['output']['templateid']);
+			$options['output'] = array_keys($options['output']);
 		}
 
 		// permissions
