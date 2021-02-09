@@ -1061,25 +1061,29 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 
 		/* substitute macros in script body and webhook parameters */
 
-		if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
-				NULL, NULL, ack, default_timezone, &script.command, macro_type, error, sizeof(error)))
+		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 		{
-			rc = FAIL;
-			goto fail;
-		}
+			if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
+					NULL, NULL, ack, default_timezone, &script.command, macro_type, error,
+					sizeof(error)))
+			{
+				rc = FAIL;
+				goto fail;
+			}
 
-		/* expand macros in command_orig used for non-secure logging */
-		if (SUCCEED != substitute_simple_macros(&actionid, event, r_event, NULL, NULL, &host, NULL, NULL, ack,
-				default_timezone, &script.command_orig, macro_type, error, sizeof(error)))
-		{
-			/* script command_orig is a copy of script command - if the script command  */
-			/* macro substitution succeeded, then it will succeed also for command_orig */
-			THIS_SHOULD_NEVER_HAPPEN;
-			rc = FAIL;
-			goto fail;
+			/* expand macros in command_orig used for non-secure logging */
+			if (SUCCEED != substitute_simple_macros(&actionid, event, r_event, NULL, NULL, &host,
+					NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, error,
+					sizeof(error)))
+			{
+				/* script command_orig is a copy of script command - if the script command  */
+				/* macro substitution succeeded, then it will succeed also for command_orig */
+				THIS_SHOULD_NEVER_HAPPEN;
+				rc = FAIL;
+				goto fail;
+			}
 		}
-
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		else
 		{
 			for (i = 0; i < webhook_params.values_num; i++)
 			{

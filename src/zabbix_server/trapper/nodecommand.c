@@ -542,23 +542,27 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	if (0 != hostid)	/* script on host */
 	{
-		if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host, NULL,
-				NULL, NULL, user_timezone, &script.command, MACRO_TYPE_SCRIPT, error, sizeof(error)))
+		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 		{
-			goto fail;
-		}
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host,
+					NULL, NULL, NULL, user_timezone, &script.command, MACRO_TYPE_SCRIPT, error,
+					sizeof(error)))
+			{
+				goto fail;
+			}
 
-		/* expand macros in command_orig used for non-secure logging */
-		if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, &user->userid, NULL, &host, NULL, NULL, NULL,
-				user_timezone, &script.command_orig, MACRO_TYPE_SCRIPT, error, sizeof(error)))
-		{
-			/* script command_orig is a copy of script command - if the script command  */
-			/* macro substitution succeeded, then it will succeed also for command_orig */
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto fail;
+			/* expand macros in command_orig used for non-secure logging */
+			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, &user->userid, NULL, &host,
+					NULL, NULL, NULL, user_timezone, &script.command_orig, MACRO_TYPE_SCRIPT, error,
+					sizeof(error)))
+			{
+				/* script command_orig is a copy of script command - if the script command  */
+				/* macro substitution succeeded, then it will succeed also for command_orig */
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto fail;
+			}
 		}
-
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		else
 		{
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
@@ -578,22 +582,24 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	{
 		int	macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
 
-		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-				&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &script.command,
-				macro_type, error, sizeof(error)))
+		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 		{
-			goto fail;
-		}
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
+					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
+					&script.command, macro_type, error, sizeof(error)))
+			{
+				goto fail;
+			}
 
-		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event,
-				&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone, &script.command_orig,
-				macro_type, error, sizeof(error)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto fail;
+			if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event,
+					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
+					&script.command_orig, macro_type, error, sizeof(error)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto fail;
+			}
 		}
-
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+		else
 		{
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
