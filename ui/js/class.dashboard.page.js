@@ -42,10 +42,6 @@ class CDashboardPage {
 			widget_defaults: {},
 			widgets: [],
 			triggers: {},
-			// A single placeholder used for positioning and resizing a widget.
-			placeholder: null,
-			// A single placeholder used for prompting to add a new widget.
-			new_widget_placeholder: null,
 			widget_relation_submissions: [],
 			widget_relations: {
 				relations: [],
@@ -65,6 +61,7 @@ class CDashboardPage {
 			return false;
 		};
 
+		// A single placeholder used for prompting to add a new widget.
 		this._data.new_widget_placeholder = new newWidgetPlaceholder(this._data.options['widget-width'],
 			this._data.options['widget-height'], add_new_widget_callback
 		);
@@ -146,14 +143,14 @@ class CDashboardPage {
 	updateDynamicHost(hostid) {
 		this._data.dashboard.dynamic_hostid = hostid;
 
-		for (const w of data.widgets) {
+		for (const w of this._data.widgets) {
 			if (w.fields.dynamic == 1) {
 				this._updateWidgetContent(w);
 
 				const widget_actions = $('.btn-widget-action', w.content_header).data('menu-popup').data;
 
-				if (data.dashboard.dynamic_hostid !== null) {
-					widget_actions.dynamic_hostid = data.dashboard.dynamic_hostid;
+				if (this._data.dashboard.dynamic_hostid !== null) {
+					widget_actions.dynamic_hostid = this._data.dashboard.dynamic_hostid;
 				}
 				else {
 					delete widget_actions.dynamic_hostid;
@@ -1004,7 +1001,7 @@ class CDashboardPage {
 	 */
 	_isDashboardFrozen() {
 		// Edit widget dialogue active?
-		if (data.options['config_dialogue_active']) {
+		if (this._data.options['config_dialogue_active']) {
 			return true;
 		}
 
@@ -3922,7 +3919,7 @@ class CDashboardPage {
 	 *
 	 * @returns {int}  Number of triggers, that were called.
 	 */
-	_doAction(hook_name, widget= null) {
+	_doAction(hook_name, widget = null) {
 		if (typeof this._data.triggers[hook_name] === 'undefined') {
 			return 0;
 		}
