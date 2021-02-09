@@ -1007,15 +1007,6 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			goto fail;
 		}
 
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
-		{
-			if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
-			{
-				rc = FAIL;
-				goto fail;
-			}
-		}
-
 		/* get host details */
 
 		if (ZBX_SCRIPT_EXECUTE_ON_SERVER != script.execute_on)
@@ -1085,6 +1076,12 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		}
 		else
 		{
+			if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+			{
+				rc = FAIL;
+				goto fail;
+			}
+
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
 				if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
