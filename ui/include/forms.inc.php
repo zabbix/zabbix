@@ -92,7 +92,7 @@ function getItemFilterForm(&$data) {
 	$filter_status				= getRequest('filter_status');
 	$filter_inherited			= getRequest('filter_inherited');
 	$filter_with_triggers		= getRequest('filter_with_triggers');
-	$filter_valuemaps			= getRequest('filter_valuemapids');
+	$filter_valuemapids			= getRequest('filter_valuemapids');
 	$subfilter_hosts			= getRequest('subfilter_hosts');
 	$subfilter_apps				= getRequest('subfilter_apps');
 	$subfilter_types			= getRequest('subfilter_types');
@@ -325,10 +325,10 @@ function getItemFilterForm(&$data) {
 	);
 
 	// row 5
-	$valuemaps_filter = $filter_valuemaps
+	$valuemaps_filter = $filter_valuemapids
 		? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $filter_valuemaps,
+			'valuemapids' => $filter_valuemapids,
 			'editable' => true
 		]), ['valuemapid' => 'id'])
 		: [];
