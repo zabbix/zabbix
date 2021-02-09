@@ -3190,9 +3190,15 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
-					cache_trigger_hostids(&hostids, c_event->trigger.expression,
-							c_event->trigger.recovery_expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					if (NULL == dc_host)
+					{
+						cache_trigger_hostids(&hostids, c_event->trigger.expression,
+								c_event->trigger.recovery_expression);
+						DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					}
+					else
+						DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+
 					pos = token.loc.r;
 				}
 				else if (ZBX_TOKEN_SIMPLE_MACRO == token.type)
