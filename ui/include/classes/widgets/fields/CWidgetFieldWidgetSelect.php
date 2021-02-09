@@ -75,7 +75,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 			'filter_select.addOption('.json_encode(['label' => _('Select widget'), 'value' => '-1']).');'.
 			'filter_select.selectedIndex = 0;'.
 			'jQuery.each('.
-				'ZABBIX.Dashboard._methods.getWidgetsBy("'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
+				'ZABBIX.Dashboard.getWidgetsBy("'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
 				'function(i, widget) {'.
 					'if (widget !== dashboard_data["dialogue"]["widget"]) {'. // Widget currently edited or null for new widgets.
 						'filter_select.addOption({'.

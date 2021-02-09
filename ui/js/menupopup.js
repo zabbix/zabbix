@@ -550,7 +550,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 
-							ZABBIX.Dashboard._methods.setWidgetRefreshRate(options.widgetid, parseInt(currentRate));
+							ZABBIX.Dashboard.setWidgetRefreshRate(options.widgetid, parseInt(currentRate));
 						})
 						.fail(function() {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
@@ -587,9 +587,9 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	// TODO fix it - ZABBIX.Dashboard._target
 	var $dashboard = ZABBIX.Dashboard._$target,
-		dashboard_data = ZABBIX.Dashboard._methods.getDashboardData(),
-		editMode = ZABBIX.Dashboard._methods.isEditMode(),
-		widget = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
+		dashboard_data = ZABBIX.Dashboard.getDashboardData(),
+		editMode = ZABBIX.Dashboard.isEditMode(),
+		widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
 		widget_actions = [],
@@ -605,7 +605,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget_actions.push({
 			label: t('S_COPY'),
 			clickCallback: function() {
-				ZABBIX.Dashboard._methods.copyWidget(widget);
+				ZABBIX.Dashboard.copyWidget(widget);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			}
 		});
@@ -614,9 +614,9 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 	if (editMode) {
 		widget_actions.push({
 			label: t('S_PASTE'),
-			disabled: (ZABBIX.Dashboard._methods.getCopiedWidget() === null),
+			disabled: (ZABBIX.Dashboard.getCopiedWidget() === null),
 			clickCallback: function() {
-				ZABBIX.Dashboard._methods.pasteWidget(widget, widget.pos);
+				ZABBIX.Dashboard.pasteWidget(widget, widget.pos);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			}
 		});
@@ -624,7 +624,7 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget_actions.push({
 			label: t('Delete'),
 			clickCallback: function() {
-				ZABBIX.Dashboard._methods.deleteWidget(widget);
+				ZABBIX.Dashboard.deleteWidget(widget);
 				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
 			}
 		});
@@ -1196,7 +1196,7 @@ function getDashboardWidgetActionMenu(area_selected) {
 		items: [{
 			label: t('Add widget'),
 			clickCallback: function() {
-				ZABBIX.Dashboard._methods.addNewWidget(null, area_selected);
+				ZABBIX.Dashboard.addNewWidget(null, area_selected);
 			}
 		}, {
 			label: t('Paste widget'),
@@ -1208,7 +1208,7 @@ function getDashboardWidgetActionMenu(area_selected) {
 					height: area_selected.height
 				};
 
-				ZABBIX.Dashboard._methods.pasteWidget(null, widget_dims);
+				ZABBIX.Dashboard.pasteWidget(null, widget_dims);
 				jQuery('.dashbrd-grid-new-widget-placeholder').hide();
 			}
 		}]

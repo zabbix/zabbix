@@ -29,7 +29,7 @@
 		// Prevent page reloading on time selector events.
 		timeControl.refreshPage = false;
 
-		ZABBIX.Dashboard._methods.init({
+		ZABBIX.Dashboard.init({
 			dashboard: {
 				templateid: data.templateid,
 				dashboardid: data.dashboardid,
@@ -47,8 +47,8 @@
 			}
 		});
 
-		ZABBIX.Dashboard._methods.setWidgetDefaults(widget_defaults);
-		ZABBIX.Dashboard._methods.addWidgets(data.widgets);
+		ZABBIX.Dashboard.setWidgetDefaults(widget_defaults);
+		ZABBIX.Dashboard.addWidgets(data.widgets);
 
 		jqBlink.blink();
 	}

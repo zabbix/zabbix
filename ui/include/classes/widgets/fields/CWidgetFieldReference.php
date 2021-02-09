@@ -49,7 +49,7 @@ class CWidgetFieldReference extends CWidgetField {
 		return
 			'var reference_field = jQuery("input[name=\"'.$this->getName().'\"]", "'.$form_selector.'");'.
 			'if (!reference_field.val().length) {'.
-				'var reference = ZABBIX.Dashboard._methods.makeReference();'.
+				'var reference = ZABBIX.Dashboard.makeReference();'.
 				'reference_field.val(reference);'.
 			'}';
 	}

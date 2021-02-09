@@ -101,25 +101,25 @@ else {
 				'}'.
 			'}'.
 
-			'ZABBIX.Dashboard._methods.addAction("onResizeEnd", '.
+			'ZABBIX.Dashboard.addAction("onResizeEnd", '.
 				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
 					'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
 				'});'.
 
-			'ZABBIX.Dashboard._methods.addAction("timer_refresh", '.
+			'ZABBIX.Dashboard.addAction("timer_refresh", '.
 				'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
 					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
 				'});'.
 
-			'ZABBIX.Dashboard._methods.addAction("onWidgetDelete", '.
+			'ZABBIX.Dashboard.addAction("onWidgetDelete", '.
 				'"zbx_graph_widget_delete", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'",'.zbx_jsvalue($data['fs_data']).'],'.
 					'trigger_name: "graph_widget_delete_'.$data['widget']['uniqueid'].'"'.
 				'});'.
 
-			'ZABBIX.Dashboard._methods.addAction("onEditStart", '.
+			'ZABBIX.Dashboard.addAction("onEditStart", '.
 				'"zbx_graph_widget_edit_start", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
 					'trigger_name: "graph_widget_edit_start_'.$data['widget']['uniqueid'].'"'.

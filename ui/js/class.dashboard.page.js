@@ -25,8 +25,844 @@ class CDashboardPage {
 
 	constructor($target) {
 		this._$target = $target;
+	}
 
-		this.initMethods();
+	// TODO unused function - public
+	init(data) {
+		const dashboard = {
+			templateid: null,
+			dashboardid: null,
+			dynamic_hostid: null,
+			...data.dashboard
+		};
+
+		const options = {
+			...data.options,
+			'rows': 0,
+			'updated': false,
+			'widget-width': 100 / data.options['max-columns']
+		};
+
+		const add_new_widget_callback = (e) => {
+			if (!this.isEditMode()) {
+				this.editDashboard();
+			}
+			this.addNewWidget(e.target);
+
+			return false;
+		};
+
+		const new_widget_placeholder = new newWidgetPlaceholder(options['widget-width'],
+			options['widget-height'], add_new_widget_callback
+		);
+
+		// This placeholder is used while positioning/resizing widgets.
+		const placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).append($('<div>')).hide();
+
+		this._$target.append(new_widget_placeholder.getObject(), placeholder);
+
+		if (options['editable']) {
+			if (options['kioskmode']) {
+				new_widget_placeholder.setState(new_widget_placeholder.STATE_KIOSK_MODE);
+			}
+			else {
+				new_widget_placeholder.setState(new_widget_placeholder.STATE_ADD_NEW);
+			}
+		}
+		else {
+			new_widget_placeholder.setState(new_widget_placeholder.STATE_READONLY);
+		}
+
+		new_widget_placeholder.showAtDefaultPosition();
+
+		this._$target.data('dashboardGrid', {
+			dashboard: {...dashboard},
+			options: {...options},
+			widget_defaults: {},
+			widgets: [],
+			triggers: {},
+			// A single placeholder used for positioning and resizing a widget.
+			placeholder: placeholder,
+			// A single placeholder used for prompting to add a new widget.
+			new_widget_placeholder: new_widget_placeholder,
+			widget_relation_submissions: [],
+			widget_relations: {
+				relations: [],
+				tasks: {}
+			},
+			data_buffer: [],
+			minimalHeight: this._calculateGridMinHeight(),
+			storage: ZABBIX.namespace('instances.localStorage')
+		});
+
+		data = this._$target.data('dashboardGrid');
+
+		let resize_timeout;
+
+		if (data.options.edit_mode) {
+			this._doAction('onEditStart');
+			this._editDashboard();
+		}
+
+		$(window).on('resize', () => {
+			clearTimeout(resize_timeout);
+			resize_timeout = setTimeout(() => {
+				data.widgets.forEach((widget) => {
+					this._resizeWidget(widget);
+				});
+			}, 200);
+
+			// Recalculate dashboard container minimal required height.
+			data.minimalHeight = this._calculateGridMinHeight();
+			data.cell_width = this._getCurrentCellWidth();
+			data.new_widget_placeholder.resize();
+			this._resizeDashboardGrid();
+		});
+
+		['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach((action) => {
+			this.addAction(action, this._hideMessageExhausted);
+		});
+	}
+
+	getDashboardData() {
+		const data = this._$target.data('dashboardGrid');
+
+		return {...data.dashboard};
+	}
+
+	/**
+	 * Get copied widget (if compatible with the current dashboard) or null otherwise.
+	 *
+	 * @returns {object|null}  Copied widget or null.
+	 */
+	getCopiedWidget() {
+		const data = this._$target.data('dashboardGrid');
+
+		const copied_widget = data.storage.readKey('dashboard.copied_widget', null);
+
+		if (copied_widget !== null && copied_widget.dashboard.templateid === data.dashboard.templateid) {
+			return copied_widget.widget;
+		}
+		else {
+			return null;
+		}
+	}
+
+	updateDynamicHost(hostid) {
+		const data = this._$target.data('dashboardGrid');
+
+		data.dashboard.dynamic_hostid = hostid;
+
+		for (const w of data.widgets) {
+			if (w.fields.dynamic == 1) {
+				this._updateWidgetContent(w);
+
+				const widget_actions = $('.btn-widget-action', w.content_header).data('menu-popup').data;
+
+				if (data.dashboard.dynamic_hostid !== null) {
+					widget_actions.dynamic_hostid = data.dashboard.dynamic_hostid;
+				}
+				else {
+					delete widget_actions.dynamic_hostid;
+				}
+			}
+		}
+	}
+
+	setWidgetDefaults(defaults) {
+		const data = this._$target.data('dashboardGrid');
+
+		data.widget_defaults = {...data.widget_defaults, ...defaults};
+	}
+
+	addWidgets(widgets) {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const w of widgets) {
+			this.addWidget(w);
+		}
+
+		for (const w of data.widgets) {
+			this._updateWidgetContent(w);
+		}
+	}
+
+	addWidget(widget) {
+		const data = this._$target.data('dashboardGrid');
+
+		// Replace empty arrays (or anything non-object) with empty objects.
+		if (typeof widget.fields !== 'object') {
+			widget.fields = {};
+		}
+		if (typeof widget.configuration !== 'object') {
+			widget.configuration = {};
+		}
+
+		widget = {
+			'widgetid': '',
+			'type': '',
+			'header': '',
+			'view_mode': ZBX_WIDGET_VIEW_MODE_NORMAL,
+			'pos': {
+				'x': 0,
+				'y': 0,
+				'width': 1,
+				'height': 1
+			},
+			'rf_rate': 0,
+			'preloader_timeout': 10000,	// in milliseconds
+			'update_paused': false,
+			'initial_load': true,
+			'ready': false,
+			'storage': {},
+			...widget,
+			'parent': false
+		};
+
+		if (typeof widget.new_widget === 'undefined') {
+			widget.new_widget = !widget.widgetid.length;
+		}
+
+		let widget_local = JSON.parse(JSON.stringify(widget));
+
+		const widget_type_defaults = data.widget_defaults[widget_local.type];
+
+		widget_local.iterator = widget_type_defaults.iterator;
+
+		if (widget_local.iterator) {
+			widget_local = {
+				...widget_local,
+				'page': 1,
+				'page_count': 1,
+				'children': [],
+				'update_pending': false
+			};
+		}
+
+		widget_local.uniqueid = this._generateUniqueId();
+		widget_local.div = this._makeWidgetDiv(widget_local);
+		widget_local.div.data('widget-index', data.widgets.length);
+
+		data.widgets.push(widget_local);
+		this._$target.append(widget_local.div);
+
+		this._setDivPosition(widget_local.div, widget_local.pos);
+
+		if (data.pos_action !== 'updateWidgetConfig') {
+			this._checkWidgetOverlap();
+			this._resizeDashboardGrid();
+		}
+
+		this._showPreloader(widget_local);
+		data.new_widget_placeholder.hide();
+
+		if (widget_local.iterator) {
+			// Placeholders will be shown while the iterator will be loading.
+			this._addIteratorPlaceholders(widget_local,
+				this._numIteratorColumns(widget_local) * this._numIteratorRows(widget_local)
+			);
+			this._alignIteratorContents(widget_local, widget_local.pos);
+
+			this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget_local.uniqueid, {
+				trigger_name: `onIteratorResizeEnd_${widget_local.uniqueid}`,
+				parameters: [data, widget_local]
+			});
+		}
+
+		if (data.options.edit_mode) {
+			widget_local.rf_rate = 0;
+			this._setWidgetModeEdit(widget_local);
+		}
+
+		this._doAction('onWidgetAdd', widget_local);
+	}
+
+	addNewWidget(trigger_element, pos) {
+		const data = this._$target.data('dashboardGrid');
+
+		/*
+		 * Unset if dimension width/height is equal to size of placeholder.
+		 * Widget default size will be used.
+		 */
+		if (pos && pos.width === 2 && pos.height === 2) {
+			delete pos.width;
+			delete pos.height;
+		}
+
+		const widget = (pos && 'x' in pos && 'y' in pos) ? {pos: pos} : null;
+
+		data.pos_action = 'addmodal';
+		this._openConfigDialogue(widget, trigger_element);
+	}
+
+	setWidgetRefreshRate(widgetid, rf_rate) {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const w of data.widgets) {
+			if (w.widgetid === widgetid) {
+				w.rf_rate = rf_rate;
+				this._setUpdateWidgetContentTimer(w);
+			}
+		}
+	}
+
+	refreshWidget(widgetid) {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const w of data.widgets) {
+			if (w.widgetid === widgetid || w.uniqueid === widgetid) {
+				this._updateWidgetContent(w);
+			}
+		}
+	}
+
+	/**
+	 * Pause specific widget refresh.
+	 */
+	pauseWidgetRefresh(widgetid) {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const w of data.widgets) {
+			if (w.widgetid === widgetid || w.uniqueid === widgetid) {
+				w.update_paused = true;
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Unpause specific widget refresh.
+	 */
+	unpauseWidgetRefresh(widgetid) {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const w of data.widgets) {
+			if (w.widgetid === widgetid || w.uniqueid === widgetid) {
+				w.update_paused = false;
+				break;
+			}
+		}
+	}
+
+	setWidgetStorageValue(uniqueid, field, value) {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const w of data.widgets) {
+			if (w.uniqueid === uniqueid) {
+				w.storage[field] = value;
+			}
+		}
+	}
+
+	editDashboard() {
+		const data = this._$target.data('dashboardGrid');
+
+		// Set before firing "onEditStart" for isEditMode to work correctly.
+		data.options['edit_mode'] = true;
+
+		this._doAction('onEditStart');
+		this._editDashboard();
+
+		// Event must not fire if the dashboard was initially loaded in edit mode.
+		// TODO need to fix event trigger
+		$.publish('dashboard.grid.editDashboard');
+	}
+
+	isDashboardUpdated() {
+		const data = this._$target.data('dashboardGrid');
+
+		return data.options.updated;
+	}
+
+	saveDashboard(callback) {
+		const data = this._$target.data('dashboardGrid');
+
+		this._doAction('beforeDashboardSave');
+		callback(data.widgets);
+	}
+
+	/**
+	 * After pressing "Edit" button on widget.
+	 */
+	editWidget(widget, trigger_element) {
+		if (!this.isEditMode()) {
+			this.editDashboard();
+		}
+
+		this._openConfigDialogue(widget, trigger_element);
+	}
+
+	/**
+	 * Function to store copied widget into storage buffer.
+	 *
+	 * @param {object} widget  Widget object copied.
+	 */
+	copyWidget(widget) {
+		const data = this._$target.data('dashboardGrid');
+
+		this._doAction('onWidgetCopy', widget);
+
+		data.storage.writeKey('dashboard.copied_widget', {
+			dashboard: {
+				templateid: data.dashboard.templateid
+			},
+			widget: {
+				type: widget.type,
+				pos: {
+					width: widget.pos.width,
+					height: widget.pos.height
+				},
+				header: widget.header,
+				view_mode: widget.view_mode,
+				rf_rate: widget.rf_rate,
+				fields: widget.fields,
+				configuration: widget.configuration
+			}
+		});
+
+		$.publish('dashboard.grid.copyWidget');
+	}
+
+	/**
+	 * Create new widget or replace existing widget in given position.
+	 *
+	 * @param {object} widget  (nullable) Widget to replace.
+	 * @param {object} pos     (nullable) Position to paste new widget in.
+	 */
+	pasteWidget(widget, pos) {
+		const data = this._$target.data('dashboardGrid');
+
+		data.pos_action = 'paste';
+
+		this._hideMessageExhausted();
+
+		let new_widget = this.getCopiedWidget();
+
+		// Regenerate reference field values.
+		if ('reference' in new_widget.fields) {
+			new_widget.fields['reference'] = this.makeReference();
+		}
+
+		// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
+		if (widget === null && pos !== null && pos.width === 2 && pos.height === 2) {
+			pos.width = new_widget.pos.width;
+			pos.height = new_widget.pos.height;
+
+			if (pos.x > data.options['max-columns'] - pos.width
+					|| pos.y > data.options['max-rows'] - pos.height
+					|| !this._isPosFree(pos)) {
+				data.widgets.filter((w) => {
+					return this._rectOverlap(w.pos, pos);
+				}).forEach((w) => {
+					if (pos.x + pos.width > w.pos.x && pos.x < w.pos.x) {
+						pos.width = w.pos.x - pos.x;
+					}
+					else if (pos.y + pos.height > w.pos.y && pos.y < w.pos.y) {
+						pos.height = w.pos.y - pos.y;
+					}
+				});
+			}
+
+			pos.width = Math.min(data.options['max-columns'] - pos.x, pos.width);
+			pos.height = Math.min(data.options['max-rows'] - pos.y, pos.height);
+		}
+
+		// When no position is given, find first empty space. Use copied widget width and height.
+		if (pos === null) {
+			pos = this._findEmptyPosition({
+				'width': new_widget.pos.width,
+				'height': new_widget.pos.height
+			});
+			if (!pos) {
+				this._showMessageExhausted();
+
+				return;
+			}
+
+			new_widget.pos.x = pos.x;
+			new_widget.pos.y = pos.y;
+		}
+		else {
+			new_widget = {...new_widget, pos: pos};
+		}
+
+		const dashboard_busy_item = {};
+
+		this._setDashboardBusy('pasteWidget', dashboard_busy_item);
+
+		// Remove old widget.
+		if (widget !== null) {
+			this._removeWidget(widget);
+		}
+
+		this._promiseScrollIntoView(pos)
+			.then(() => {
+				this.addWidget(new_widget);
+				new_widget = data.widgets.slice(-1)[0];
+
+				// Restrict loading content prior to sanitizing widget fields.
+				new_widget.update_paused = true;
+
+				this._setWidgetModeEdit(new_widget);
+				this._disableWidgetControls(new_widget);
+
+				const url = new Curl('zabbix.php');
+				url.setArgument('action', 'dashboard.widget.sanitize');
+
+				return $.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						fields: JSON.stringify(new_widget.fields),
+						type: new_widget.type
+					}
+				});
+			})
+			.then((response) => {
+				if ('errors' in response) {
+					return $.Deferred().reject();
+				}
+
+				new_widget.fields = response.fields;
+				new_widget.update_paused = false;
+				this._enableWidgetControls(new_widget);
+				this._updateWidgetContent(new_widget);
+
+				data.options['updated'] = true;
+			})
+			.fail(() => {
+				this._deleteWidget(new_widget);
+			})
+			.always(() => {
+				// Mark dashboard as updated.
+				data.options['updated'] = true;
+				data.pos_action = '';
+
+				this._clearDashboardBusy('pasteWidget', dashboard_busy_item);
+			});
+	}
+
+	/**
+	 * After pressing "delete" button on widget.
+	 */
+	deleteWidget(widget) {
+		this._deleteWidget(widget);
+	}
+
+	/**
+	 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
+	 * attributes in form itself).
+	 */
+	updateWidgetConfigDialogue() {
+		const data = this._$target.data('dashboardGrid');
+
+		const $body = data.dialogue.body;
+		const $footer = $('.overlay-dialogue-footer', data.dialogue.div);
+		const $header = $('.dashbrd-widget-head', data.dialogue.div);
+		const $form = $('form', $body);
+		const widget = data.dialogue.widget; // Widget currently being edited.
+		const url = new Curl('zabbix.php');
+		const ajax_data = {};
+
+		let fields;
+
+		url.setArgument('action', 'dashboard.widget.edit');
+
+		if (data.dashboard.templateid !== null) {
+			ajax_data.templateid = data.dashboard.templateid;
+		}
+
+		if ($form.length) {
+			// Take values from form.
+			fields = $form.serializeJSON();
+			ajax_data.type = fields['type'];
+			ajax_data.prev_type = data.dialogue.widget_type;
+			delete fields['type'];
+
+			if (ajax_data.prev_type === ajax_data.type) {
+				ajax_data.name = fields['name'];
+				ajax_data.view_mode = (fields['show_header'] == 1)
+					? ZBX_WIDGET_VIEW_MODE_NORMAL
+					: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
+
+				delete fields['name'];
+				delete fields['show_header'];
+			}
+			else {
+				// Get default config if widget type changed.
+				fields = {};
+			}
+		}
+		else if (widget !== null) {
+			// Open form with current config.
+			ajax_data.type = widget.type;
+			ajax_data.name = widget.header;
+			ajax_data.view_mode = widget.view_mode;
+			fields = widget.fields;
+		}
+		else {
+			// Get default config for new widget.
+			fields = {};
+		}
+
+		if (fields && Object.keys(fields).length !== 0) {
+			ajax_data.fields = JSON.stringify(fields);
+		}
+
+		const overlay = overlays_stack.getById('widgetConfg');
+
+		overlay.setLoading();
+
+		if (overlay.xhr) {
+			overlay.xhr.abort();
+		}
+
+		overlay.xhr = jQuery.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: ajax_data,
+			dataType: 'json'
+		});
+
+		overlay.xhr.done((response) => {
+			data.dialogue.widget_type = response.type;
+
+			$body.empty();
+			$body.append(response.body);
+
+			if (typeof response.debug !== 'undefined') {
+				$body.append(response.debug);
+			}
+
+			if (typeof response.messages !== 'undefined') {
+				$body.append(response.messages);
+			}
+
+			$body.find('form').attr('aria-labeledby', $header.find('h4').attr('id'));
+
+			// Change submit function for returned form.
+			$('#widget-dialogue-form', $body).on('submit', (e) => {
+				e.preventDefault();
+				this._updateWidgetConfig(widget);
+			});
+
+			const $overlay = jQuery('[data-dialogueid="widgetConfg"]');
+
+			$overlay.toggleClass('sticked-to-top', data.dialogue.widget_type === 'svggraph');
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
+			Overlay.prototype.containFocus.call({'$dialogue': $overlay});
+
+			overlay.unsetLoading();
+
+			const area_size = {
+				'width': data.widget_defaults[data.dialogue.widget_type].size.width,
+				'height': data.widget_defaults[data.dialogue.widget_type].size.height
+			};
+
+			if (widget === null && !this._findEmptyPosition(area_size)) {
+				this._showDialogMessageExhausted();
+				$('.dialogue-widget-save', $footer).prop('disabled', true);
+			}
+
+			// Activate tab indicator for graph widget form.
+			if (data.dialogue.widget_type === 'svggraph') {
+				new TabIndicators();
+			}
+		});
+	}
+
+	/**
+	 * Returns list of widgets filter by key=>value pair.
+	 */
+	getWidgetsBy(key, value) {
+		const data = this._$target.data('dashboardGrid');
+
+		const widgets_found = [];
+
+		for (const w of data.widgets) {
+			if (w[key] === value) {
+				widgets_found.push(w);
+			}
+		}
+
+		return widgets_found;
+	}
+
+	/**
+	 * Register widget as data receiver shared by other widget.
+	 */
+	registerDataExchange(obj) {
+		const data = this._$target.data('dashboardGrid');
+
+		data.widget_relation_submissions.push(obj);
+	}
+
+	/**
+	 * Pushes received data in data buffer and calls sharing method.
+	 *
+	 * @param {object} widget     Data origin widget
+	 * @param {string} data_name  String to identify data shared
+	 *
+	 * @returns {boolean}  Indicates either there was linked widget that was related to data origin widget
+	 */
+	widgetDataShare(widget, data_name) {
+		const data = this._$target.data('dashboardGrid');
+
+		const args = Array.prototype.slice.call(arguments, 2);
+		const uniqueid = widget.uniqueid;
+
+		let ret = true;
+		let index = -1;
+
+		if (!args.length) {
+			return false;
+		}
+
+		if (typeof data.widget_relations.relations[widget.uniqueid] === 'undefined'
+			|| data.widget_relations.relations[widget.uniqueid].length === 0) {
+			ret = false;
+		}
+
+		if (typeof data.data_buffer[uniqueid] === 'undefined') {
+			data.data_buffer[uniqueid] = [];
+		}
+		else if (typeof data.data_buffer[uniqueid] !== 'undefined') {
+			for (const i in data.data_buffer[uniqueid]) {
+				if (data.data_buffer[uniqueid][i].data_name === data_name) {
+					index = i;
+				}
+			}
+		}
+
+		if (index === -1) {
+			data.data_buffer[uniqueid].push({
+				data_name: data_name,
+				args: args,
+				old: []
+			});
+		}
+		else {
+			if (data.data_buffer[uniqueid][index].args !== args) {
+				data.data_buffer[uniqueid][index].args = args;
+				data.data_buffer[uniqueid][index].old = [];
+			}
+		}
+
+		this.callWidgetDataShare();
+
+		return ret;
+	}
+
+	callWidgetDataShare() {
+		const data = this._$target.data('dashboardGrid');
+
+		for (const src_uniqueid in data.data_buffer) {
+			if (typeof data.data_buffer[src_uniqueid] !== 'object') {
+				continue;
+			}
+
+			for (const buffer_data of data.data_buffer[src_uniqueid]) {
+				if (typeof data.widget_relations.relations[src_uniqueid] === 'undefined') {
+					continue;
+				}
+
+				for (const dest_uid of data.widget_relations.relations[src_uniqueid]) {
+					if (buffer_data.old.includes(dest_uid)) {
+						continue;
+					}
+
+					if (typeof data.widget_relations.tasks[dest_uid] === 'undefined') {
+						continue;
+					}
+
+					const widget = this.getWidgetsBy('uniqueid', dest_uid);
+
+					if (widget.length) {
+						for (const task of data.widget_relations.tasks[dest_uid]) {
+							if (task.data_name === buffer_data.data_name) {
+								task.callback.apply([widget[0], buffer_data.args]);
+							}
+						}
+
+						buffer_data.old.push(dest_uid);
+					}
+				}
+			}
+		}
+	}
+
+	makeReference() {
+		const data = this._$target.data('dashboardGrid');
+
+		let ref = false;
+
+		while (!ref) {
+			ref = this._generateRandomString(5);
+
+			for (let i = 0, l = data.widgets.length; l > i; i++) {
+				if (typeof data.widgets[i].fields['reference'] !== 'undefined') {
+					if (data.widgets[i].fields['reference'] === ref) {
+						ref = false;
+						break;
+					}
+				}
+			}
+		}
+
+		return ref;
+	}
+
+	isEditMode() {
+		const data = this._$target.data('dashboardGrid');
+
+		return data.options.edit_mode;
+	}
+
+	/**
+	 * Add action, that will be performed on $hook_name trigger.
+	 *
+	 * @param {string} hook_name                  Name of trigger, when $function_to_call should be called.
+	 * @param {string} function_to_call           Name of function in global scope that will be called.
+	 * @param {string|null} uniqueid              A widget to receive the event for (null for all widgets).
+	 * @param {object} options                    Any key in options is optional.
+	 * @param {array}  options['parameters']      Array of parameters with which the function will be called.
+	 * @param {array}  options['grid']            Mark, what data from grid should be passed to $function_to_call.
+	 *                                            If is empty, parameter 'grid' will not be added to function_to_call params.
+	 * @param {string} options['grid']['widget']  True to pass the widget as argument.
+	 * @param {string} options['grid']['data']    True to pass dashboard grid data as argument.
+	 * @param {string} options['grid']['obj']     True to pass dashboard grid object as argument.
+	 * @param {int}    options['priority']        Order, when it should be called, compared to others. Default = 10.
+	 * @param {int}    options['trigger_name']    Unique name. There can be only one trigger with this name for each hook.
+	 */
+	addAction(hook_name, function_to_call, uniqueid = null, options = {}) {
+		const data = this._$target.data('dashboardGrid');
+
+		let found = false;
+
+		if (typeof data.triggers[hook_name] === 'undefined') {
+			data.triggers[hook_name] = [];
+		}
+
+		// Add trigger with each name only once.
+		if (typeof options['trigger_name'] !== 'undefined') {
+			let trigger_name = options['trigger_name'];
+
+			for (const t of data.triggers[hook_name]) {
+				if (typeof t.options['trigger_name'] !== 'undefined' && t.options['trigger_name'] === trigger_name) {
+					found = true;
+				}
+			}
+		}
+
+		if (!found) {
+			data.triggers[hook_name].push({
+				'function': function_to_call,
+				'uniqueid': uniqueid,
+				'options': options
+			});
+		}
 	}
 
 	_makeWidgetDiv(widget) {
@@ -117,7 +953,7 @@ class CDashboardPage {
 								'class': 'btn-widget-edit',
 								'title': t('Edit')
 							}).on('click', (e) => {
-								this._methods.editWidget(widget, e.target);
+								this.editWidget(widget, e.target);
 							})
 						)
 						: ''
@@ -1756,15 +2592,17 @@ class CDashboardPage {
 
 			if (cell_column === (num_columns - 1)) {
 				// Setting right side for last column of widgets (fixes IE11 and Opera issues).
-				css = {...css, ...{
-					width: 'auto',
-					right: '0px'
-				}};
+				css = {
+					...css,
+					'width': 'auto',
+					'right': '0px'
+				};
 			} else {
-				css = {...css, ...{
-					width: `${Math.round(width / pos.width * 100 * 100) / 100}%`,
-					right: 'auto'
-				}};
+				css = {
+					...css,
+					'width': `${Math.round(width / pos.width * 100 * 100) / 100}%`,
+					'right': 'auto'
+				};
 			}
 
 			if (index < iterator.children.length) {
@@ -1785,23 +2623,20 @@ class CDashboardPage {
 		}
 
 		child = {
-			...{
-				'widgetid': '',
-				'type': '',
-				'header': '',
-				'view_mode': iterator.view_mode,
-				'preloader_timeout': 10000,	// in milliseconds
-				'update_paused': false,
-				'initial_load': true,
-				'ready': false,
-				'storage': {}
-			},
+			'widgetid': '',
+			'type': '',
+			'header': '',
+			'view_mode': iterator.view_mode,
+			'preloader_timeout': 10000,	// in milliseconds
+			'update_paused': false,
+			'initial_load': true,
+			'ready': false,
+			'storage': {},
 			...child,
-			...{
-				'iterator': false,
-				'parent': iterator,
-				'new_widget': false
-			}};
+			'iterator': false,
+			'parent': iterator,
+			'new_widget': false
+		};
 
 		child.uniqueid = this._generateUniqueId();
 		child.div = this._makeWidgetDiv(child);
@@ -2064,18 +2899,80 @@ class CDashboardPage {
 			 */
 
 			if (dashboard_was_ready) {
-				this._methods.registerDataExchangeCommit();
+				this._registerDataExchangeCommit();
 			} else {
 				const dashboard_is_ready = !data.widgets.filter(function(widget) {
 					return !widget.ready;
 				}).length;
 
 				if (dashboard_is_ready) {
-					this._methods.registerDataExchangeCommit();
+					this._registerDataExchangeCommit();
 					this._doAction('onDashboardReady');
 				}
 			}
 		}
+	}
+
+	_registerDataExchangeCommit() {
+		const data = this._$target.data('dashboardGrid');
+
+		const used_indexes = []
+
+		let erase = false;
+
+		data.widget_relation_submissions.forEach((rel, rel_index) => {
+			erase = false;
+
+			// No linked widget reference given. Just register as data receiver.
+			if (typeof rel.linkedto === 'undefined') {
+				if (typeof data.widget_relations.tasks[rel.uniqueid] === 'undefined') {
+					data.widget_relations.tasks[rel.uniqueid] = [];
+				}
+
+				data.widget_relations.tasks[rel.uniqueid].push({
+					data_name: rel.data_name,
+					callback: rel.callback
+				});
+				erase = true;
+			}
+			/*
+			 * Linked widget reference is given. Register two direction relationship as well as
+			 * register data receiver.
+			 */
+			else {
+				for (const w of data.widgets) {
+					if (typeof w.fields.reference !== 'undefined' && w.fields.reference === rel.linkedto) {
+						if (typeof data.widget_relations.relations[w.uniqueid] === 'undefined') {
+							data.widget_relations.relations[w.uniqueid] = [];
+						}
+						if (typeof data.widget_relations.relations[rel.uniqueid] === 'undefined') {
+							data.widget_relations.relations[rel.uniqueid] = [];
+						}
+						if (typeof data.widget_relations.tasks[rel.uniqueid] === 'undefined') {
+							data.widget_relations.tasks[rel.uniqueid] = [];
+						}
+
+						data.widget_relations.relations[w.uniqueid].push(rel.uniqueid);
+						data.widget_relations.relations[rel.uniqueid].push(w.uniqueid);
+						data.widget_relations.tasks[rel.uniqueid].push({
+							data_name: rel.data_name,
+							callback: rel.callback
+						});
+						erase = true;
+					}
+				}
+			}
+
+			if (erase) {
+				used_indexes.push(rel_index);
+			}
+		});
+
+		for (let i = used_indexes.length - 1; i >= 0; i--) {
+			data.widget_relation_submissions.splice(used_indexes[i], 1);
+		}
+
+		this.callWidgetDataShare();
 	}
 
 	_getWidgetContentSize(widget) {
@@ -2414,7 +3311,7 @@ class CDashboardPage {
 
 					this._promiseScrollIntoView(pos)
 						.then(() => {
-							this._methods.addWidget(widget_data);
+							this.addWidget(widget_data);
 							data.pos_action = '';
 
 							// New widget is last element in data['widgets'] array.
@@ -2460,7 +3357,7 @@ class CDashboardPage {
 
 					// Disable position/size checking during addWidget call.
 					data.pos_action = 'updateWidgetConfig';
-					this._methods.addWidget(widget_data);
+					this.addWidget(widget_data);
 					data.pos_action = '';
 
 					// New widget is last element in data['widgets'] array.
@@ -2479,18 +3376,18 @@ class CDashboardPage {
 	}
 
 	/**
-	 * Find first empty position in given size.
+	 * Find first empty position of the given size.
 	 *
-	 * @param {{width: (*|number|number), height: (*|number|number)}}   area_size          Seeked space.
-	 * @param {int}    area_size[width]   Seeked space width.
-	 * @param {int}    area_size[height]  Seeked space height.
+	 * @param {{width: (*|number|number), height: (*|number|number)}} area_size
+	 * @param {int} area_size[width]
+	 * @param {int} area_size[height]
 	 *
 	 * @returns {object|boolean}  area_size object extended with position or false in case if no empty space is found.
 	 */
 	_findEmptyPosition(area_size) {
 		const data = this._$target.data('dashboardGrid');
 
-		const pos = {...area_size, ...{'x': 0, 'y': 0}};
+		const pos = {...area_size, 'x': 0, 'y': 0};
 
 		// Go y by row and try to position widget in each space.
 		const max_col = data.options['max-columns'] - pos.width;
@@ -2576,7 +3473,7 @@ class CDashboardPage {
 		data.dialogue.div = overlay.$dialogue;
 		data.dialogue.body = overlay.$dialogue.$body;
 
-		this._methods.updateWidgetConfigDialogue();
+		this.updateWidgetConfigDialogue();
 	}
 
 	_editDashboard() {
@@ -2615,7 +3512,7 @@ class CDashboardPage {
 			data.pos_action = 'addmodal';
 			this._setResizableState(data.widgets, 'enable');
 
-			if (this._getCopiedWidget() !== null) {
+			if (this.getCopiedWidget() !== null) {
 				const menu = getDashboardWidgetActionMenu(dimension);
 				const options = {
 					position: {
@@ -2654,7 +3551,7 @@ class CDashboardPage {
 
 				data.new_widget_placeholder.getObject().menuPopup(menu, e, options);
 			} else {
-				this._methods.addNewWidget(null, dimension);
+				this.addNewWidget(null, dimension);
 			}
 		});
 
@@ -3043,23 +3940,6 @@ class CDashboardPage {
 	}
 
 	/**
-	 * Get copied widget (if compatible with the current dashboard) or null otherwise.
-	 *
-	 * @returns {object|null}  Copied widget or null.
-	 */
-	_getCopiedWidget() {
-		const data = this._$target.data('dashboardGrid');
-
-		const copied_widget = data.storage.readKey('dashboard.copied_widget', null);
-
-		if (copied_widget !== null && copied_widget.dashboard.templateid === data.dashboard.templateid) {
-			return copied_widget.widget;
-		} else {
-			return null;
-		}
-	}
-
-	/**
 	 * Set dashboard busy state by registering a blocker.
 	 *
 	 * @param {string} type  Common type of the blocker.
@@ -3189,7 +4069,7 @@ class CDashboardPage {
 					if (widget !== null) {
 						grid.widget = widget;
 					} else if (trigger.uniqueid !== null) {
-						const widgets = this._methods.getWidgetsBy('uniqueid', trigger.uniqueid);
+						const widgets = this.getWidgetsBy('uniqueid', trigger.uniqueid);
 						if (widgets.length > 0) {
 							grid.widget = widgets[0];
 						}
@@ -3212,985 +4092,11 @@ class CDashboardPage {
 
 		return triggers.length;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	initMethods() {
-		this._methods = {
-			// TODO unused function
-			init: (data) => {
-				const dashboard = Object.assign({
-						templateid: null,
-						dashboardid: null,
-						dynamic_hostid: null
-					}, data.dashboard),
-					options = Object.assign({}, data.options, {
-						'rows': 0,
-						'updated': false,
-						'widget-width': 100 / data.options['max-columns']
-					});
-
-				const add_new_widget_callback = (e) => {
-					if (!this._methods.isEditMode()) {
-						this._methods.editDashboard();
-					}
-					this._methods.addNewWidget(e.target);
-
-					return false;
-				};
-
-				const new_widget_placeholder = new newWidgetPlaceholder(options['widget-width'],
-					options['widget-height'], add_new_widget_callback
-				);
-
-				// This placeholder is used while positioning/resizing widgets.
-				const placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).append($('<div>')).hide();
-
-				this._$target.append(new_widget_placeholder.getObject(), placeholder);
-
-				if (options['editable']) {
-					if (options['kioskmode']) {
-						new_widget_placeholder.setState(new_widget_placeholder.STATE_KIOSK_MODE);
-					} else {
-						new_widget_placeholder.setState(new_widget_placeholder.STATE_ADD_NEW);
-					}
-				} else {
-					new_widget_placeholder.setState(new_widget_placeholder.STATE_READONLY);
-				}
-
-				new_widget_placeholder.showAtDefaultPosition();
-
-				this._$target.data('dashboardGrid', {
-					dashboard: Object.assign({}, dashboard),
-					options: Object.assign({}, options),
-					widget_defaults: {},
-					widgets: [],
-					triggers: {},
-					// A single placeholder used for positioning and resizing a widget.
-					placeholder: placeholder,
-					// A single placeholder used for prompting to add a new widget.
-					new_widget_placeholder: new_widget_placeholder,
-					widget_relation_submissions: [],
-					widget_relations: {
-						relations: [],
-						tasks: {}
-					},
-					data_buffer: [],
-					minimalHeight: this._calculateGridMinHeight(),
-					storage: ZABBIX.namespace('instances.localStorage')
-				});
-
-				data = this._$target.data('dashboardGrid');
-
-				let resize_timeout;
-
-				if (data.options.edit_mode) {
-					this._doAction('onEditStart');
-					this._editDashboard();
-				}
-
-				$(window).on('resize', () => {
-					clearTimeout(resize_timeout);
-					resize_timeout = setTimeout(() => {
-						data.widgets.forEach((widget) => {
-							this._resizeWidget(widget);
-						});
-					}, 200);
-
-					// Recalculate dashboard container minimal required height.
-					data.minimalHeight = this._calculateGridMinHeight();
-					data.cell_width = this._getCurrentCellWidth();
-					data.new_widget_placeholder.resize();
-					this._resizeDashboardGrid();
-				});
-
-				['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach(action => {
-					this._methods.addAction(action, this._hideMessageExhausted, null, {});
-				});
-			},
-
-			// TODO unused function +
-			getDashboardData: () => {
-				const data = this._$target.data('dashboardGrid');
-
-				return Object.assign({}, data.dashboard);
-			},
-
-			/**
-			 * Get copied widget (if compatible with the current dashboard) or null otherwise.
-			 *
-			 * @returns {object|null}  Copied widget or null.
-			 */
-			// TODO unused function +
-			getCopiedWidget: () => {
-				return this._getCopiedWidget();
-			},
-
-			// TODO unused function +
-			updateDynamicHost: (hostid) => {
-				const data = this._$target.data('dashboardGrid');
-
-				data.dashboard.dynamic_hostid = hostid;
-
-				// TODO need to check each
-				$.each(data.widgets, (index, widget) => {
-					if (widget.fields.dynamic == 1) {
-						this._updateWidgetContent(widget);
-
-						const widget_actions = $('.btn-widget-action', widget.content_header).data('menu-popup').data;
-
-						if (data.dashboard.dynamic_hostid !== null) {
-							widget_actions.dynamic_hostid = data.dashboard.dynamic_hostid;
-						} else {
-							delete widget_actions.dynamic_hostid;
-						}
-					}
-				});
-			},
-
-			// TODO unused function +
-			setWidgetDefaults: (defaults) => {
-				const data = this._$target.data('dashboardGrid');
-
-				defaults = Object.assign({}, data.widget_defaults, defaults);
-				data.widget_defaults = defaults;
-			},
-
-			// TODO unused function +
-			addWidget: (widget) => {
-				// Replace empty arrays (or anything non-object) with empty objects.
-				if (typeof widget.fields !== 'object') {
-					widget.fields = {};
-				}
-				if (typeof widget.configuration !== 'object') {
-					widget.configuration = {};
-				}
-
-				widget = Object.assign({
-					'widgetid': '',
-					'type': '',
-					'header': '',
-					'view_mode': ZBX_WIDGET_VIEW_MODE_NORMAL,
-					'pos': {
-						'x': 0,
-						'y': 0,
-						'width': 1,
-						'height': 1
-					},
-					'rf_rate': 0,
-					'preloader_timeout': 10000,	// in milliseconds
-					'update_paused': false,
-					'initial_load': true,
-					'ready': false,
-					'storage': {}
-				}, widget, {
-					'parent': false
-				});
-
-				if (typeof widget.new_widget === 'undefined') {
-					widget.new_widget = !widget.widgetid.length;
-				}
-
-				const data = this._$target.data('dashboardGrid');
-				const widget_local = JSON.parse(JSON.stringify(widget));
-
-				const widget_type_defaults = data.widget_defaults[widget_local.type];
-
-				widget_local.iterator = widget_type_defaults.iterator;
-
-				if (widget_local.iterator) {
-					$.extend(widget_local, {
-						'page': 1,
-						'page_count': 1,
-						'children': [],
-						'update_pending': false
-					});
-				}
-
-				widget_local.uniqueid = this._generateUniqueId();
-				widget_local.div = this._makeWidgetDiv(widget_local);
-				widget_local.div.data('widget-index', data.widgets.length);
-
-				data.widgets.push(widget_local);
-				this._$target.append(widget_local.div);
-
-				this._setDivPosition(widget_local.div, widget_local.pos);
-
-				if (data.pos_action !== 'updateWidgetConfig') {
-					this._checkWidgetOverlap();
-					this._resizeDashboardGrid();
-				}
-
-				this._showPreloader(widget_local);
-				data.new_widget_placeholder.hide();
-
-				if (widget_local.iterator) {
-					// Placeholders will be shown while the iterator will be loading.
-					this._addIteratorPlaceholders(widget_local,
-						this._numIteratorColumns(widget_local) * this._numIteratorRows(widget_local)
-					);
-					this._alignIteratorContents(widget_local, widget_local.pos);
-
-					this._methods.addAction('onResizeEnd', this._onIteratorResizeEnd, widget_local.uniqueid, {
-						trigger_name: `onIteratorResizeEnd_${widget_local.uniqueid}`,
-						parameters: [data, widget_local]
-					});
-				}
-
-				if (data.options.edit_mode) {
-					widget_local.rf_rate = 0;
-					this._setWidgetModeEdit(widget_local);
-				}
-
-				this._doAction('onWidgetAdd', widget_local);
-			},
-
-			// TODO unused function +
-			setWidgetRefreshRate: (widgetid, rf_rate) => {
-				const data = this._$target.data('dashboardGrid');
-
-				// TODO need to check each
-				$.each(data.widgets, (index, widget) => {
-					if (widget.widgetid === widgetid) {
-						widget.rf_rate = rf_rate;
-						this._setUpdateWidgetContentTimer(widget);
-					}
-				});
-			},
-
-			// TODO unused function +
-			refreshWidget: (widgetid) => {
-				const data = this._$target.data('dashboardGrid');
-
-				// TODO need to check each
-				$.each(data.widgets, (index, widget) => {
-					if (widget.widgetid === widgetid || widget.uniqueid === widgetid) {
-						this._updateWidgetContent(widget);
-					}
-				});
-			},
-
-			// Pause specific widget refresh.
-			// TODO unused function +
-			pauseWidgetRefresh: (widgetid) => {
-				const data = this._$target.data('dashboardGrid');
-
-				// TODO need to check each
-				$.each(data.widgets, (index, widget) => {
-					if (widget.widgetid === widgetid || widget.uniqueid === widgetid) {
-						widget.update_paused = true;
-						return false;
-					}
-				});
-			},
-
-			// Unpause specific widget refresh.
-			// TODO unused function +
-			unpauseWidgetRefresh: (widgetid) => {
-				const data = this._$target.data('dashboardGrid');
-
-				// TODO need to check each +
-				// $.each(data['widgets'], (index, widget) => {
-				// 	if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
-				// 		widget['update_paused'] = false;
-				// 		return false;
-				// 	}
-				// });
-				for (const widget of data.widgets) {
-					if (widget.widgetid === widgetid || widget.uniqueid === widgetid) {
-						widget.update_paused = false;
-						break;
-					}
-				}
-			},
-
-			// TODO unused function +
-			setWidgetStorageValue: (uniqueid, field, value) => {
-				const data = this._$target.data('dashboardGrid');
-
-				// TODO need to check each +
-				// $.each(data['widgets'], (index, widget) => {
-				// 	if (widget['uniqueid'] === uniqueid) {
-				// 		widget['storage'][field] = value;
-				// 	}
-				// });
-				for (const widget of data.widgets) {
-					if (widget.uniqueid === uniqueid) {
-						widget.storage[field] = value;
-					}
-				}
-			},
-
-			// TODO unused function +
-			addWidgets: (widgets) => {
-				const data = this._$target.data('dashboardGrid');
-
-				// TODO need to check each +
-				// $.each(widgets, () => {
-				// 	this._methods.addWidget(Array.prototype.slice.call(arguments, 1));
-				// });
-
-				for (const widget of widgets) {
-					this._methods.addWidget(widget);
-				}
-
-				// TODO need to check each +
-				// $.each(data['widgets'], (index, value) => {
-				// 	this.updateWidgetContent(data, value);
-				// });
-				for (const widget of data.widgets) {
-					this._updateWidgetContent(widget);
-				}
-			},
-
-			// TODO unused function +
-			editDashboard: () => {
-				const data = this._$target.data('dashboardGrid');
-
-				// Set before firing "onEditStart" for isEditMode to work correctly.
-				data.options['edit_mode'] = true;
-
-				this._doAction('onEditStart');
-				this._editDashboard();
-
-				// Event must not fire if the dashboard was initially loaded in edit mode.
-				$.publish('dashboard.grid.editDashboard');
-			},
-
-			// TODO unused function +
-			isDashboardUpdated: () => {
-				const data = this._$target.data('dashboardGrid');
-
-				return data.options.updated;
-			},
-
-			// TODO unused function +
-			saveDashboard: (callback) => {
-				const data = this._$target.data('dashboardGrid');
-
-				this._doAction('beforeDashboardSave');
-				callback(data.widgets);
-			},
-
-			// After pressing "Edit" button on widget.
-			// TODO unused function +
-			editWidget: (widget, trigger_element) => {
-				if (!this._methods.isEditMode()) {
-					this._methods.editDashboard();
-				}
-
-				this._openConfigDialogue(widget, trigger_element);
-			},
-
-			/**
-			 * Function to store copied widget into storage buffer.
-			 *
-			 * @param {object} widget  Widget object copied.
-			 *
-			 * @returns {jQuery}
-			 */
-			// TODO unused function +
-			copyWidget: (widget) => {
-				const data = this._$target.data('dashboardGrid');
-
-				this._doAction('onWidgetCopy', widget);
-
-				data.storage.writeKey('dashboard.copied_widget', {
-					dashboard: {
-						templateid: data.dashboard.templateid
-					},
-					widget: {
-						type: widget.type,
-						pos: {
-							width: widget.pos.width,
-							height: widget.pos.height
-						},
-						header: widget.header,
-						view_mode: widget.view_mode,
-						rf_rate: widget.rf_rate,
-						fields: widget.fields,
-						configuration: widget.configuration
-					}
-				});
-
-				$.publish('dashboard.grid.copyWidget');
-			},
-
-			/**
-			 * Create new widget or replace existing widget in given position.
-			 *
-			 * @param {object} widget  (nullable) Widget to replace.
-			 * @param {object} pos     (nullable) Position to paste new widget in.
-			 *
-			 * @returns {jQuery}
-			 */
-			// TODO unused function +
-			pasteWidget: (widget, pos) => {
-				const data = this._$target.data('dashboardGrid');
-
-				data.pos_action = 'paste';
-
-				this._hideMessageExhausted();
-
-				let new_widget = this._getCopiedWidget();
-
-				// Regenerate reference field values.
-				if ('reference' in new_widget.fields) {
-					new_widget.fields['reference'] = this._methods.makeReference();
-				}
-
-				// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
-				if (widget === null && pos !== null && pos.width === 2 && pos.height === 2) {
-					pos.width = new_widget.pos.width;
-					pos.height = new_widget.pos.height;
-
-					if (pos.x > data.options['max-columns'] - pos.width
-						|| pos.y > data.options['max-rows'] - pos.height
-						|| !this._isPosFree(pos)) {
-						$.map(data.widgets, (box) => {
-							return this._rectOverlap(box.pos, pos) ? box : null;
-						}).forEach((box) => {
-							if (pos.x + pos.width > box.pos.x && pos.x < box.pos.x) {
-								pos.width = box.pos.x - pos.x;
-							} else if (pos.y + pos.height > box.pos.y && pos.y < box.pos.y) {
-								pos.height = box.pos.y - pos.y;
-							}
-						});
-					}
-
-					pos.width = Math.min(data.options['max-columns'] - pos.x, pos.width);
-					pos.height = Math.min(data.options['max-rows'] - pos.y, pos.height);
-				}
-
-				// When no position is given, find first empty space. Use copied widget width and height.
-				if (pos === null) {
-					pos = this._findEmptyPosition({
-						'width': new_widget.pos.width,
-						'height': new_widget.pos.height
-					});
-					if (!pos) {
-						this._showMessageExhausted();
-
-						return;
-					}
-
-					new_widget.pos.x = pos.x;
-					new_widget.pos.y = pos.y;
-				} else {
-					new_widget = Object.assign(new_widget, {pos: pos});
-				}
-
-				const dashboard_busy_item = {};
-
-				this._setDashboardBusy('pasteWidget', dashboard_busy_item);
-
-				// Remove old widget.
-				if (widget !== null) {
-					this._removeWidget(widget);
-				}
-
-				this._promiseScrollIntoView(pos)
-					.then(() => {
-						this._methods.addWidget(new_widget);
-						new_widget = data.widgets.slice(-1)[0];
-
-						// Restrict loading content prior to sanitizing widget fields.
-						new_widget.update_paused = true;
-
-						this._setWidgetModeEdit(new_widget);
-						this._disableWidgetControls(new_widget);
-
-						const url = new Curl('zabbix.php');
-						url.setArgument('action', 'dashboard.widget.sanitize');
-
-						return $.ajax({
-							url: url.getUrl(),
-							method: 'POST',
-							dataType: 'json',
-							data: {
-								fields: JSON.stringify(new_widget.fields),
-								type: new_widget.type
-							}
-						});
-					})
-					.then((response) => {
-						if ('errors' in response) {
-							return $.Deferred().reject();
-						}
-
-						new_widget.fields = response.fields;
-						new_widget.update_paused = false;
-						this._enableWidgetControls(new_widget);
-						this._updateWidgetContent(new_widget);
-
-						data.options['updated'] = true;
-					})
-					.fail(() => {
-						this._deleteWidget(new_widget);
-					})
-					.always(() => {
-						// Mark dashboard as updated.
-						data.options['updated'] = true;
-						data.pos_action = '';
-
-						this._clearDashboardBusy('pasteWidget', dashboard_busy_item);
-					});
-			},
-
-			// After pressing "delete" button on widget.
-			// TODO unused function +
-			deleteWidget: (widget) => {
-				this._deleteWidget(widget);
-			},
-
-			/*
-			 * Add or update form on widget configuration dialogue (when opened, as well as when requested by 'onchange'
-			 * attributes in form itself).
-			 */
-			// TODO unused function +
-			updateWidgetConfigDialogue: () => {
-				const data = this._$target.data('dashboardGrid');
-				const $body = data.dialogue.body;
-				const $footer = $('.overlay-dialogue-footer', data.dialogue.div);
-				const $header = $('.dashbrd-widget-head', data.dialogue.div);
-				const $form = $('form', $body);
-				const widget = data.dialogue.widget; // Widget currently being edited.
-				const url = new Curl('zabbix.php');
-				const ajax_data = {};
-
-				let fields;
-
-				url.setArgument('action', 'dashboard.widget.edit');
-
-				if (data.dashboard.templateid !== null) {
-					ajax_data.templateid = data.dashboard.templateid;
-				}
-
-				if ($form.length) {
-					// Take values from form.
-					fields = $form.serializeJSON();
-					ajax_data.type = fields['type'];
-					ajax_data.prev_type = data.dialogue.widget_type;
-					delete fields['type'];
-
-					if (ajax_data.prev_type === ajax_data.type) {
-						ajax_data.name = fields['name'];
-						ajax_data.view_mode = (fields['show_header'] == 1)
-							? ZBX_WIDGET_VIEW_MODE_NORMAL
-							: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
-
-						delete fields['name'];
-						delete fields['show_header'];
-					} else {
-						// Get default config if widget type changed.
-						fields = {};
-					}
-				} else if (widget !== null) {
-					// Open form with current config.
-					ajax_data.type = widget.type;
-					ajax_data.name = widget.header;
-					ajax_data.view_mode = widget.view_mode;
-					fields = widget.fields;
-				} else {
-					// Get default config for new widget.
-					fields = {};
-				}
-
-				if (fields && Object.keys(fields).length !== 0) {
-					ajax_data.fields = JSON.stringify(fields);
-				}
-
-				const overlay = overlays_stack.getById('widgetConfg');
-
-				overlay.setLoading();
-
-				if (overlay.xhr) {
-					overlay.xhr.abort();
-				}
-
-				overlay.xhr = jQuery.ajax({
-					url: url.getUrl(),
-					method: 'POST',
-					data: ajax_data,
-					dataType: 'json'
-				});
-
-				overlay.xhr.done((response) => {
-					data.dialogue.widget_type = response.type;
-
-					$body.empty();
-					$body.append(response.body);
-					if (typeof response.debug !== 'undefined') {
-						$body.append(response.debug);
-					}
-					if (typeof response.messages !== 'undefined') {
-						$body.append(response.messages);
-					}
-
-					$body.find('form').attr('aria-labeledby', $header.find('h4').attr('id'));
-
-					// Change submit function for returned form.
-					$('#widget-dialogue-form', $body).on('submit', (e) => {
-						e.preventDefault();
-						this._updateWidgetConfig(widget);
-					});
-
-					const $overlay = jQuery('[data-dialogueid="widgetConfg"]');
-					$overlay.toggleClass('sticked-to-top', data.dialogue.widget_type === 'svggraph');
-
-					Overlay.prototype.recoverFocus.call({'$dialogue': $overlay});
-					Overlay.prototype.containFocus.call({'$dialogue': $overlay});
-
-					overlay.unsetLoading();
-
-					const area_size = {
-						'width': data.widget_defaults[data.dialogue.widget_type].size.width,
-						'height': data.widget_defaults[data.dialogue.widget_type].size.height
-					};
-
-					if (widget === null && !this._findEmptyPosition(area_size)) {
-						this._showDialogMessageExhausted();
-						$('.dialogue-widget-save', $footer).prop('disabled', true);
-					}
-
-					// Activate tab indicator for graph widget form.
-					if (data.dialogue.widget_type === 'svggraph') {
-						new TabIndicators();
-					}
-				});
-			},
-
-			// Returns list of widgets filter by key=>value pair
-			// TODO unused function +
-			getWidgetsBy: (key, value) => {
-				const data = this._$target.data('dashboardGrid');
-				const widgets_found = [];
-
-				// TODO need to check each
-				$.each(data.widgets, (index, widget) => {
-					if (widget[key] === value) {
-						widgets_found.push(widget);
-					}
-				});
-
-				return widgets_found;
-			},
-
-			// Register widget as data receiver shared by other widget.
-			// TODO unused function +
-			registerDataExchange: (obj) => {
-				const data = this._$target.data('dashboardGrid');
-
-				data.widget_relation_submissions.push(obj);
-			},
-
-			// TODO unused function +
-			registerDataExchangeCommit: () => {
-				const data = this._$target.data('dashboardGrid');
-				const used_indexes = []
-
-				let erase = false;
-
-				// TODO need to check each
-				$.each(data.widget_relation_submissions, (rel_index, rel) => {
-					erase = false;
-
-					// No linked widget reference given. Just register as data receiver.
-					if (typeof rel.linkedto === 'undefined') {
-						if (typeof data.widget_relations.tasks[rel.uniqueid] === 'undefined') {
-							data.widget_relations.tasks[rel.uniqueid] = [];
-						}
-
-						data.widget_relations.tasks[rel.uniqueid].push({
-							data_name: rel.data_name,
-							callback: rel.callback
-						});
-						erase = true;
-					}
-					/*
-					 * Linked widget reference is given. Register two direction relationship as well as
-					 * register data receiver.
-					 */
-					else {
-						// TODO need to check each
-						$.each(data.widgets, (index, widget) => {
-							if (typeof widget.fields.reference !== 'undefined'
-								&& widget.fields.reference === rel.linkedto) {
-								if (typeof data.widget_relations.relations[widget.uniqueid] === 'undefined') {
-									data.widget_relations.relations[widget.uniqueid] = [];
-								}
-								if (typeof data.widget_relations.relations[rel.uniqueid] === 'undefined') {
-									data.widget_relations.relations[rel.uniqueid] = [];
-								}
-								if (typeof data.widget_relations.tasks[rel.uniqueid] === 'undefined') {
-									data.widget_relations.tasks[rel.uniqueid] = [];
-								}
-
-								data.widget_relations.relations[widget.uniqueid].push(rel.uniqueid);
-								data.widget_relations.relations[rel.uniqueid].push(widget.uniqueid);
-								data.widget_relations.tasks[rel.uniqueid].push({
-									data_name: rel.data_name,
-									callback: rel.callback
-								});
-								erase = true;
-							}
-						});
-					}
-
-					if (erase) {
-						used_indexes.push(rel_index);
-					}
-				});
-
-				for (let i = used_indexes.length - 1; i >= 0; i--) {
-					data.widget_relation_submissions.splice(used_indexes[i], 1);
-				}
-
-				this._methods.callWidgetDataShare();
-			},
-
-			/**
-			 * Pushes received data in data buffer and calls sharing method.
-			 *
-			 * @param {object} widget     Data origin widget
-			 * @param {string} data_name  String to identify data shared
-			 *
-			 * @returns {boolean}  Indicates either there was linked widget that was related to data origin widget
-			 */
-			// TODO unused function +
-			widgetDataShare: (widget, data_name) => {
-				const args = Array.prototype.slice.call(arguments, 2);
-				const uniqueid = widget.uniqueid;
-
-				let ret = true;
-
-				if (!args.length) {
-					return false;
-				}
-
-				const data = this._$target.data('dashboardGrid');
-				let index = -1;
-
-				if (typeof data.widget_relations.relations[widget.uniqueid] === 'undefined'
-					|| data.widget_relations.relations[widget.uniqueid].length === 0) {
-					ret = false;
-				}
-
-				if (typeof data.data_buffer[uniqueid] === 'undefined') {
-					data.data_buffer[uniqueid] = [];
-				} else if (typeof data.data_buffer[uniqueid] !== 'undefined') {
-					// TODO need to check each
-					$.each(data.data_buffer[uniqueid], (i, arr) => {
-						if (arr.data_name === data_name) {
-							index = i;
-						}
-					});
-				}
-
-				if (index === -1) {
-					data.data_buffer[uniqueid].push({
-						data_name: data_name,
-						args: args,
-						old: []
-					});
-				} else {
-					if (data.data_buffer[uniqueid][index].args !== args) {
-						data.data_buffer[uniqueid][index].args = args;
-						data.data_buffer[uniqueid][index].old = [];
-					}
-				}
-
-				this._methods.callWidgetDataShare();
-
-				return ret;
-			},
-
-			// TODO unused function +
-			callWidgetDataShare: () => {
-				const data = this._$target.data('dashboardGrid');
-
-				for (const src_uniqueid in data.data_buffer) {
-					if (typeof data.data_buffer[src_uniqueid] === 'object') {
-						// TODO need to check each
-						$.each(data.data_buffer[src_uniqueid], (index, buffer_data) => {
-							if (typeof data.widget_relations.relations[src_uniqueid] !== 'undefined') {
-								// TODO need to check each
-								$.each(data.widget_relations.relations[src_uniqueid], (index, dest_uid) => {
-									if (buffer_data.old.indexOf(dest_uid) === -1) {
-										if (typeof data.widget_relations.tasks[dest_uid] !== 'undefined') {
-											const widget = this._methods.getWidgetsBy('uniqueid', dest_uid);
-											if (widget.length) {
-												// TODO need to check each
-												$.each(data.widget_relations.tasks[dest_uid], (i, task) => {
-													if (task.data_name === buffer_data.data_name) {
-														task.callback.apply([widget[0], buffer_data.args]);
-													}
-												});
-
-												buffer_data.old.push(dest_uid);
-											}
-										}
-									}
-								});
-							}
-						});
-					}
-				}
-			},
-
-			// TODO unused function +
-			makeReference: () => {
-				const data = this._$target.data('dashboardGrid');
-
-				let ref = false;
-
-				while (!ref) {
-					ref = this._generateRandomString(5);
-
-					for (let i = 0, l = data.widgets.length; l > i; i++) {
-						if (typeof data.widgets[i].fields['reference'] !== 'undefined') {
-							if (data.widgets[i].fields['reference'] === ref) {
-								ref = false;
-								break;
-							}
-						}
-					}
-				}
-
-				return ref;
-			},
-
-			// TODO unused function +
-			addNewWidget: (trigger_element, pos) => {
-				/*
-				 * Unset if dimension width/height is equal to size of placeholder.
-				 * Widget default size will be used.
-				 */
-				if (pos && pos.width === 2 && pos.height === 2) {
-					delete pos.width;
-					delete pos.height;
-				}
-
-				const widget = (pos && 'x' in pos && 'y' in pos) ? {pos: pos} : null;
-
-				const data = this._$target.data('dashboardGrid');
-
-				data.pos_action = 'addmodal';
-				this._openConfigDialogue(widget, trigger_element);
-			},
-
-			// TODO unused function +
-			isEditMode: () => {
-				const data = this._$target.data('dashboardGrid');
-
-				return data.options.edit_mode;
-			},
-
-			/**
-			 * Add action, that will be performed on $hook_name trigger.
-			 *
-			 * @param {string} hook_name                  Name of trigger, when $function_to_call should be called.
-			 * @param {string} function_to_call           Name of function in global scope that will be called.
-			 * @param {string} uniqueid                   A widget to receive the event for (null for all widgets).
-			 * @param {array}  options                    Any key in options is optional.
-			 * @param {array}  options['parameters']      Array of parameters with which the function will be called.
-			 * @param {array}  options['grid']            Mark, what data from grid should be passed to $function_to_call.
-			 *                                            If is empty, parameter 'grid' will not be added to function_to_call params.
-			 * @param {string} options['grid']['widget']  True to pass the widget as argument.
-			 * @param {string} options['grid']['data']    True to pass dashboard grid data as argument.
-			 * @param {string} options['grid']['obj']     True to pass dashboard grid object as argument.
-			 * @param {int}    options['priority']        Order, when it should be called, compared to others. Default = 10.
-			 * @param {int}    options['trigger_name']    Unique name. There can be only one trigger with this name for each hook.
-			 */
-			// TODO unused function +
-			addAction: (hook_name, function_to_call, uniqueid, options) => {
-				const data = this._$target.data('dashboardGrid');
-
-				let found = false,
-					trigger_name = null;
-
-				if (typeof data.triggers[hook_name] === 'undefined') {
-					data.triggers[hook_name] = [];
-				}
-
-				// Add trigger with each name only once.
-				if (typeof options['trigger_name'] !== 'undefined') {
-					trigger_name = options['trigger_name'];
-					// TODO need to check each
-					$.each(data.triggers[hook_name], (index, trigger) => {
-						if (typeof trigger.options['trigger_name'] !== 'undefined'
-							&& trigger.options['trigger_name'] === trigger_name) {
-							found = true;
-						}
-					});
-				}
-
-				if (!found) {
-					data.triggers[hook_name].push({
-						'function': function_to_call,
-						'uniqueid': uniqueid,
-						'options': options
-					});
-				}
-			}
-		};
-	}
 }
 
 $(function(){
 	ZABBIX.Dashboard = new CDashboardPage($('.dashbrd-grid-container'));
 });
-
-
-/*(function($) {
-	"use strict";
-
-	$.fn.dashboardGrid = function(method) {
-		if (ZABBIX.Dashboard._methods[method]) {
-			return ZABBIX.Dashboard._methods[method](arguments[0]);
-		}
-		else if (typeof method === 'object' || !method) {
-			return ZABBIX.Dashboard._methods.init(arguments[0]);
-		}
-		else {
-			$.error('Invalid method "' +  method + '".');
-		}
-	}
-}(jQuery));*/
-
-
 
 
 /**

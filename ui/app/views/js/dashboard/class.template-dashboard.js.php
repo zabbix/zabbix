@@ -40,7 +40,7 @@
 		}
 
 		live() {
-			ZABBIX.Dashboard._methods.dashboardGrid({
+			ZABBIX.Dashboard.init({
 				'dashboard': {
 					templateid: this.data.templateid,
 					dashboardid: this.data.dashboardid
@@ -58,22 +58,22 @@
 				}
 			});
 
-			ZABBIX.Dashboard._methods.setWidgetDefaults(this.widget_defaults);
-			ZABBIX.Dashboard._methods.addWidgets(this.data.widgets);
+			ZABBIX.Dashboard.setWidgetDefaults(this.widget_defaults);
+			ZABBIX.Dashboard.addWidgets(this.data.widgets);
 
 			$('#dashbrd-config').on('click', () => this.openProperties());
-			$('#dashbrd-add-widget').on('click', () => ZABBIX.Dashboard._methods.addNewWidget(this));
-			$('#dashbrd-paste-widget').on('click', () => ZABBIX.Dashboard._methods.pasteWidget(null, null));
-			$('#dashbrd-save').on('click', () => ZABBIX.Dashboard._methods.saveDashboard(this.save.bind(this)));
+			$('#dashbrd-add-widget').on('click', () => ZABBIX.Dashboard.addNewWidget(this));
+			$('#dashbrd-paste-widget').on('click', () => ZABBIX.Dashboard.pasteWidget(null, null));
+			$('#dashbrd-save').on('click', () => ZABBIX.Dashboard.saveDashboard(this.save.bind(this)));
 			$('#dashbrd-cancel').on('click', () => {
 				this.cancelEditing();
 
 				return false;
 			});
 
-			var $copied_widget = ZABBIX.Dashboard._methods.getCopiedWidget();
+			var $copied_widget = ZABBIX.Dashboard.getCopiedWidget();
 
-			if (ZABBIX.Dashboard._methods.getCopiedWidget() !== null) {
+			if (ZABBIX.Dashboard.getCopiedWidget() !== null) {
 				$('#dashbrd-paste-widget').attr('disabled', false);
 			}
 			else {
@@ -172,7 +172,7 @@
 			this.disableNavigationWarning();
 
 			$(window).on('beforeunload.TemplateDashboard', () => {
-				if (this.has_properties_modified || ZABBIX.Dashboard._methods.isDashboardUpdated()) {
+				if (this.has_properties_modified || ZABBIX.Dashboard.isDashboardUpdated()) {
 					return true;
 				}
 			});

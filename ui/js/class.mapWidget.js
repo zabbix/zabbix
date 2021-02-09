@@ -34,7 +34,7 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				jQuery('#' + div_id).zbx_mapwidget('update', grid['widget']);
 				break;
 			case 'afterUpdateWidgetConfig':
-				ZABBIX.Dashboard._methods.setWidgetStorageValue(grid['widget']['uniqueid'], 'current_sysmapid',
+				ZABBIX.Dashboard.setWidgetStorageValue(grid['widget']['uniqueid'], 'current_sysmapid',
 					grid['widget']['fields']['sysmapid']
 				);
 				break;
@@ -44,7 +44,7 @@ if (typeof(zbx_sysmap_widget_trigger) !== typeof(Function)) {
 				}
 				break;
 			case 'onEditStart':
-				ZABBIX.Dashboard._methods.refreshWidget(grid['widget']['widgetid']);
+				ZABBIX.Dashboard.refreshWidget(grid['widget']['widgetid']);
 				break;
 		}
 	}
@@ -61,7 +61,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 	 *									  level or back to the top level.
 	 */
 	function navigateToSubmap(submapid, uniqueid, reset_previous) {
-		var widget = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', uniqueid),
+		var widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', uniqueid),
 			reset_previous = reset_previous || false,
 			previous_maps = '';
 
@@ -86,10 +86,10 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 				}
 			}
 
-			ZABBIX.Dashboard._methods.setWidgetStorageValue(uniqueid, 'current_sysmapid', submapid);
-			ZABBIX.Dashboard._methods.setWidgetStorageValue(uniqueid, 'previous_maps', previous_maps);
-			ZABBIX.Dashboard._methods.refreshWidget(uniqueid);
-			ZABBIX.Dashboard._methods.widgetDataShare(widget[0], 'current_sysmapid',
+			ZABBIX.Dashboard.setWidgetStorageValue(uniqueid, 'current_sysmapid', submapid);
+			ZABBIX.Dashboard.setWidgetStorageValue(uniqueid, 'previous_maps', previous_maps);
+			ZABBIX.Dashboard.refreshWidget(uniqueid);
+			ZABBIX.Dashboard.widgetDataShare(widget[0], 'current_sysmapid',
 				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0}
 			);
 			jQuery('.menu-popup').menuPopup('close', null);
@@ -129,7 +129,7 @@ jQuery(function($) {
 									widget_data['map_instance'].update(data);
 								}
 								else {
-									ZABBIX.Dashboard._methods.refreshWidget(widget_data['uniqueid']);
+									ZABBIX.Dashboard.refreshWidget(widget_data['uniqueid']);
 								}
 							});
 						}

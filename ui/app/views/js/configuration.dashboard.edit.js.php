@@ -34,6 +34,6 @@
 	 * Reload widget configuration dialogue. Used as callback in widget forms.
 	 */
 	function updateWidgetConfigDialogue() {
-		ZABBIX.Dashboard._methods.updateWidgetConfigDialogue();
+		ZABBIX.Dashboard.updateWidgetConfigDialogue();
 	}
 </script>

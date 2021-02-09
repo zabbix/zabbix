@@ -67,7 +67,7 @@
 			// Prevent page reloading on time selector events.
 			timeControl.refreshPage = false;
 
-			ZABBIX.Dashboard._methods.init({
+			ZABBIX.Dashboard.init({
 				dashboard: {
 					dashboardid: this.data.dashboardid,
 					dynamic_hostid: this.dynamic.host ? this.dynamic.host.id : null
@@ -85,8 +85,8 @@
 				}
 			});
 
-			ZABBIX.Dashboard._methods.setWidgetDefaults(this.widget_defaults);
-			ZABBIX.Dashboard._methods.addWidgets(this.data.widgets);
+			ZABBIX.Dashboard.setWidgetDefaults(this.widget_defaults);
+			ZABBIX.Dashboard.addWidgets(this.data.widgets);
 
 			this._livePages();
 
@@ -101,7 +101,7 @@
 				this.openProperties();
 			}
 			else {
-				$('#dashbrd-edit').click(() => ZABBIX.Dashboard._methods.editDashboard());
+				$('#dashbrd-edit').click(() => ZABBIX.Dashboard.editDashboard());
 			}
 
 			$.subscribe('dashboard.grid.editDashboard', () => this.edit());
@@ -185,7 +185,7 @@
 
 				$('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard._methods.updateDynamicHost(hostid);
+				ZABBIX.Dashboard.updateDynamicHost(hostid);
 			});
 
 			$('#dynamic_hostid').on('change', () => {
@@ -208,7 +208,7 @@
 					url.setArgument('hostid', host.id);
 				}
 
-				ZABBIX.Dashboard._methods.updateDynamicHost(host ? host.id : null);
+				ZABBIX.Dashboard.updateDynamicHost(host ? host.id : null);
 
 				history.pushState({host: host}, '', url.getUrl());
 
@@ -229,16 +229,16 @@
 				.show();
 
 			$('#dashbrd-config').on('click', () => this.openProperties());
-			$('#dashbrd-add-widget').on('click', () => ZABBIX.Dashboard._methods.addNewWidget(this));
-			$('#dashbrd-paste-widget').on('click', () => ZABBIX.Dashboard._methods.pasteWidget(null, null));
-			$('#dashbrd-save').on('click', () => ZABBIX.Dashboard._methods.saveDashboard(this.save.bind(this)));
+			$('#dashbrd-add-widget').on('click', () => ZABBIX.Dashboard.addNewWidget(this));
+			$('#dashbrd-paste-widget').on('click', () => ZABBIX.Dashboard.pasteWidget(null, null));
+			$('#dashbrd-save').on('click', () => ZABBIX.Dashboard.saveDashboard(this.save.bind(this)));
 			$('#dashbrd-cancel').on('click', () => {
 				this.cancelEditing();
 
 				return false;
 			});
 
-			if (ZABBIX.Dashboard._methods.getCopiedWidget() !== null) {
+			if (ZABBIX.Dashboard.getCopiedWidget() !== null) {
 				$('#dashbrd-paste-widget').attr('disabled', false);
 			}
 			else {
@@ -345,7 +345,7 @@
 			this.disableNavigationWarning();
 
 			$(window).on('beforeunload.dashboard', () => {
-				if (this.has_properties_modified || ZABBIX.Dashboard._methods.isDashboardUpdated()) {
+				if (this.has_properties_modified || ZABBIX.Dashboard.isDashboardUpdated()) {
 					return true;
 				}
 			});

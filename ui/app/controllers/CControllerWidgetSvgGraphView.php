@@ -118,7 +118,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			if ($initial_load) {
 				$script_inline .=
 					'jQuery.subscribe("timeselector.rangeupdate", function(e, data) {'.
-						'ZABBIX.Dashboard._methods.refreshWidget("'.$uniqueid.'");'.
+						'ZABBIX.Dashboard.refreshWidget("'.$uniqueid.'");'.
 					'});';
 			}
 		}
@@ -147,14 +147,14 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			]);
 
 			$script_inline .=
-				'var widget = ZABBIX.Dashboard._methods.getWidgetsBy(\'uniqueid\', "'.$uniqueid.'");'.
+				'var widget = ZABBIX.Dashboard.getWidgetsBy(\'uniqueid\', "'.$uniqueid.'");'.
 				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.json_encode($graph_options).', widget[0]);';
 		}
 
 		if ($initial_load) {
 			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
-				'ZABBIX.Dashboard._methods.addAction("onResizeEnd",'.
+				'ZABBIX.Dashboard.addAction("onResizeEnd",'.
 					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
 						'parameters: ["onResizeEnd"],'.
 						'grid: {widget: 1},'.
@@ -163,7 +163,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 			// Disable SBox when switch to edit mode.
 			$script_inline .=
-				'ZABBIX.Dashboard._methods.addAction("onEditStart",'.
+				'ZABBIX.Dashboard.addAction("onEditStart",'.
 					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
 						'parameters: ["onEditStart"],'.
 						'grid: {widget: 1},'.

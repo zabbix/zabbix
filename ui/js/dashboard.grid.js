@@ -3471,7 +3471,7 @@
 				});
 
 				['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach(action => {
-					methods.addAction.call($this, action, () => hideMessageExhausted(data), null, {});
+					methods.addAction.call($this, action, () => hideMessageExhausted(data));
 				});
 			});
 		},

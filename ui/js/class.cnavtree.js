@@ -777,7 +777,7 @@ jQuery(function($) {
 							step_in_path = $(this).closest('.tree-item'),
 							widget = getWidgetData($obj);
 
-						if (ZABBIX.Dashboard._methods.widgetDataShare(widget, 'selected_mapid', data_to_share)) {
+						if (ZABBIX.Dashboard.widgetDataShare(widget, 'selected_mapid', data_to_share)) {
 							$('.selected', $obj).removeClass('selected');
 							while ($(step_in_path).length) {
 								$(step_in_path).addClass('selected');
@@ -1082,7 +1082,7 @@ jQuery(function($) {
 
 			var getWidgetData = function($obj) {
 				var widget_data = $obj.data('widgetData'),
-					response = ZABBIX.Dashboard._methods.getWidgetsBy('uniqueid', widget_data['uniqueid']);
+					response = ZABBIX.Dashboard.getWidgetsBy('uniqueid', widget_data['uniqueid']);
 
 				if (response.length) {
 					return response[0];
@@ -1098,7 +1098,7 @@ jQuery(function($) {
 			 * @returns {boolean}
 			 */
 			var isEditMode = function() {
-				return ZABBIX.Dashboard._methods.isEditMode();
+				return ZABBIX.Dashboard.isEditMode();
 			};
 
 			// Create multi-level array that represents real child-parent dependencies in tree.
@@ -1236,7 +1236,7 @@ jQuery(function($) {
 				 * If 'send_data' is set to be 'false', use an unexisting 'data_name', just to check if widget has
 				 * linked widgets, but avoid real data sharing.
 				 */
-				if (item_id && ZABBIX.Dashboard._methods.widgetDataShare(widget,
+				if (item_id && ZABBIX.Dashboard.widgetDataShare(widget,
 						send_data ? 'selected_mapid' : '', {mapid: $(selected_item).data('sysmapid')})) {
 					$('.selected', $obj).removeClass('selected');
 
@@ -1324,21 +1324,19 @@ jQuery(function($) {
 						];
 
 						$.each(triggers, function(index, trigger) {
-							ZABBIX.Dashboard._methods.addAction(trigger, 'zbx_widget_navtree_trigger', options.uniqueid,
-								{
-									'parameters': [trigger],
-									'grid': {'widget': 1},
-									'priority': 5,
-									'trigger_name': 'maptree_' + options.uniqueid
-								}
-							);
+							ZABBIX.Dashboard.addAction(trigger, 'zbx_widget_navtree_trigger', options.uniqueid, {
+								'parameters': [trigger],
+								'grid': {'widget': 1},
+								'priority': 5,
+								'trigger_name': 'maptree_' + options.uniqueid
+							});
 						});
 
 						if (isEditMode()) {
 							switchToEditMode($this);
 						}
 						else {
-							ZABBIX.Dashboard._methods.registerDataExchange({
+							ZABBIX.Dashboard.registerDataExchange({
 								uniqueid: options.uniqueid,
 								data_name: 'current_sysmapid',
 								callback: function(widget, data) {

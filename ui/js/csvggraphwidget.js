@@ -29,7 +29,7 @@ function zbx_svggraph_widget_trigger(hook_name) {
 
 	switch (hook_name) {
 		case 'onResizeEnd':
-			ZABBIX.Dashboard._methods.refreshWidget(grid.widget['uniqueid']);
+			ZABBIX.Dashboard.refreshWidget(grid.widget['uniqueid']);
 			break;
 
 		case 'onEditStart':
