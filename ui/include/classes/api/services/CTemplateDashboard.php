@@ -86,7 +86,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_diff(array_keys($this->getTableSchema()['fields']), ['userid', 'private']);
+			$options['output'] = array_keys($this->getTableSchema()['fields']);
 		}
 
 		$options['groupCount'] = ($options['groupCount'] && $options['countOutput']);
@@ -187,7 +187,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$ins_dashboards = [];
 
 		foreach ($dashboards as $dashboard) {
-			$ins_dashboards[] = array_diff_key($dashboard, array_flip(['pages']));
+			unset($dashboard['pages']);
+			$ins_dashboards[] = $dashboard;
 		}
 
 		$dashboardids = DB::insert('dashboard', $ins_dashboards);

@@ -594,9 +594,8 @@ abstract class CDashboardGeneral extends CApiService {
 					unset($db_pages[$page['dashboard_pageid']]);
 				}
 				else {
-					$ins_pages[] = ['dashboardid' => $dashboard['dashboardid']] + array_diff_key($page, array_flip([
-						'widgets'
-					]));
+					unset($page['widgets']);
+					$ins_pages[] = ['dashboardid' => $dashboard['dashboardid']] + $page;
 				}
 			}
 		}
@@ -893,18 +892,16 @@ abstract class CDashboardGeneral extends CApiService {
 					}
 
 					foreach ($db_widgets as $db_widget) {
-						$db_pages[$db_widget['dashboard_pageid']]['widgets'][] = array_diff_key($db_widget, array_flip([
-							'dashboard_pageid'
-						]));
+						unset($db_widget['dashboard_pageid']);
+						$db_pages[$db_widget['dashboard_pageid']]['widgets'][] = $db_widget;
 					}
 				}
 
 				$db_pages = $this->unsetExtraFields($db_pages, ['dashboard_pageid'], $options['selectPages']);
 
 				foreach ($db_pages as $db_page) {
-					$result[$db_page['dashboardid']]['pages'][] = array_diff_key($db_page, array_flip(['dashboardid',
-						'sortorder'
-					]));
+					unset($db_page['dashboardid'], $db_page['sortorder']);
+					$result[$db_page['dashboardid']]['pages'][] = $db_page;
 				}
 			}
 		}
