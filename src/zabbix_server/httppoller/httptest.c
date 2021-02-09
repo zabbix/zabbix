@@ -372,6 +372,7 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 	httpstep->headers = NULL;
 
 	zbx_vector_ptr_pair_create(&headers);
+	zbx_vector_ptr_pair_create(&httpstep->connect_to);
 	zbx_vector_ptr_pair_create(&query_fields);
 	zbx_vector_ptr_pair_create(&post_fields);
 	zbx_vector_ptr_pair_create(&httpstep->variables);
@@ -433,6 +434,9 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 			case ZBX_HTTPFIELD_POST_FIELD:
 				vector = &post_fields;
 				break;
+			case ZBX_HTTPFIELD_CONNECT_TO:
+				vector = &httpstep->connect_to;
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				zbx_free(key);
@@ -492,6 +496,7 @@ out:
 	httppairs_free(&headers);
 	httppairs_free(&query_fields);
 	httppairs_free(&post_fields);
+	httppairs_free(&httpstep->connect_to);
 	DBfree_result(result);
 
 	return ret;
@@ -530,6 +535,31 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
 }
 #endif
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_connect_to                                                   
+ *                                                                            *
+ * Purpose: adds connect-to entries to curl_slist                             *
+ *                                                                            *
+ * Parameters: connect_to       - [IN] list of connect-to entries             *
+ *             connect_to_slist - [IN/OUT] curl_slist                         *
+ *                                                                            *
+ ******************************************************************************/
+
+ static void add_connect_to (zbx_vector_ptr_pair_t* connect_to, struct curl_slist **connect_to_slist)
+ {
+	for (int p = 0;p < connect_to->values_num; p++){
+		char *connect_to_str = NULL;
+		size_t offset = 0;
+		size_t alloc_len=0;
+		zbx_strcpy_alloc(&connect_to_str, &alloc_len, &offset, connect_to->values[p].first);
+		zbx_strcpy_alloc(&connect_to_str, &alloc_len, &offset, ":");
+		zbx_strcpy_alloc(&connect_to_str, &alloc_len, &offset, connect_to->values[p].second);
+		*connect_to_slist = curl_slist_append(*connect_to_slist, connect_to_str);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: httptest_load_pairs                                              *
@@ -555,6 +585,7 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 
 	zbx_vector_ptr_pair_create(&headers);
 	zbx_vector_ptr_pair_create(&httptest->variables);
+	zbx_vector_ptr_pair_create(&httptest->connect_to);
 
 	httptest->headers = NULL;
 	result = DBselect(
@@ -597,6 +628,9 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 				break;
 			case ZBX_HTTPFIELD_VARIABLE:
 				vector = &httptest->variables;
+				break;
+			case ZBX_HTTPFIELD_CONNECT_TO:
+				vector = &httptest->connect_to;
 				break;
 			default:
 				zbx_free(key);
@@ -687,6 +721,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		goto clean;
 	}
 
+	// build connect-to list for CURL
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
@@ -709,6 +744,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		struct curl_slist	*headers_slist = NULL;
+		struct curl_slist	*connect_to_slist= NULL;
 		char			*header_cookie = NULL;
 		size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 		size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
@@ -810,6 +846,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		else if (NULL != httptest->headers && '\0' != *httptest->headers)
 			add_http_headers(httptest->headers, &headers_slist, &header_cookie);
 
+		/* connect-to defined in a step overwrite headers defined in scenario */
+		add_connect_to(&(httptest->connect_to), &connect_to_slist);
+		add_connect_to(&(httpstep.connect_to), &connect_to_slist);
+
 		err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, header_cookie);
 		zbx_free(header_cookie);
 
@@ -820,6 +860,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CONNECT_TO, connect_to_slist)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -886,8 +932,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			zbx_free(page.data);
 		}
 		while (0 < --httptest->httptest.retries);
-
-		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
+		/* must be called after curl_easy_perform() to clean up headers*/
+		curl_slist_free_all(headers_slist);
+		curl_slist_free_all(connect_to_slist);
 
 		if (CURLE_OK == err)
 		{
@@ -1173,6 +1220,7 @@ int	process_httptests(int httppoller_num, int now)
 		}
 		zbx_free(httptest.httptest.agent);
 		zbx_free(httptest.headers);
+		httppairs_free(&httptest.connect_to);
 		httppairs_free(&httptest.variables);
 
 		/* clear the macro cache used in this http test */

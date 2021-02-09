@@ -149,6 +149,24 @@ $http_popup_form_list->addRow(_('Headers'),
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 );
 
+$http_popup_form_list->addRow(_('Connect To'),
+	(new CDiv(
+		(new CTable())
+			->addClass('httpconf-dynamic-row')
+			->setAttribute('data-type', 'connect_to')
+			->addStyle('width: 100%;')
+			->setHeader(['', _('Original host:port'), '', _('Connect-to host:port'), ''])
+			->addRow((new CRow([
+				(new CCol(
+					(new CButton(null, _('Add')))
+						->addClass('element-table-add')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(5)
+			])))
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
 $http_popup_form_list
 	->addRow(_('Follow redirects'),
 		(new CCheckBox('follow_redirects'))

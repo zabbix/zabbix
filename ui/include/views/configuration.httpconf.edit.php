@@ -165,6 +165,24 @@ $http_form_list->addRow(_('Headers'), (new CDiv(
 	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 );
 
+$http_form_list->addRow(_('Connect to'), (new CDiv(
+	(new CTable())
+		->addClass('httpconf-dynamic-row')
+		->setAttribute('data-type', 'connect_to')
+		->setAttribute('style', 'width: 100%;')
+		->setHeader(['', _('Original host:port'),'', _('Connect-to host:port'), ''])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+			))->setColSpan(5)
+		])))
+))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
+
 $http_form_list->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
@@ -294,7 +312,8 @@ $this->data['scenario_tab_data'] = [
 	'agent_visibility' => [],
 	'pairs' => [
 		'variables' => [],
-		'headers' => []
+		'headers' => [],
+		'connect_to' => []
 	]
 ];
 
