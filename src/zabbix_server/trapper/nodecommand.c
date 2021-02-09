@@ -234,7 +234,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ZBX_STR2UCHAR(script->type, row[4]);
 
-	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type || ZBX_SCRIPT_TYPE_WEBHOOK == script->type)
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type)
 		ZBX_STR2UCHAR(script->execute_on, row[5]);
 
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
