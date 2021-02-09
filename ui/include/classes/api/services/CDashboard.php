@@ -349,7 +349,7 @@ class CDashboard extends CDashboardGeneral {
 		// Add the existing pages, widgets and widget fields to $db_dashboards.
 		$this->addAffectedObjects($dashboards, $db_dashboards);
 
-		// Check ownership and permissions to the referenced pages and widgets.
+		// Check ownership of the referenced pages and widgets.
 		$this->checkReferences($dashboards, $db_dashboards);
 
 		$this->checkDuplicates($dashboards, $db_dashboards);

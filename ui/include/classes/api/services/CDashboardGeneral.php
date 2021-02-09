@@ -195,7 +195,7 @@ abstract class CDashboardGeneral extends CApiService {
 	}
 
 	/**
-	 * Check ownership and permissions to the referenced pages and widgets.
+	 * Check ownership of the referenced pages and widgets.
 	 *
 	 * @param array $dashboards
 	 * @param array $db_dashboards
