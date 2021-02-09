@@ -3558,8 +3558,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, dc_host->name);
 				}
 			}
-			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object &&
-					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
+			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object )
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3779,8 +3778,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
-			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source &&
-					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
+			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3921,8 +3919,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
-			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source &&
-					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
+			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -4015,8 +4012,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
-					EVENT_OBJECT_ITEM == c_event->object &&
-					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
+					EVENT_OBJECT_ITEM == c_event->object)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -4163,8 +4159,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
-					EVENT_OBJECT_LLDRULE == c_event->object &&
-					0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
+					EVENT_OBJECT_LLDRULE == c_event->object)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
