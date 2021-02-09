@@ -62,25 +62,25 @@ class CDashboardPage {
 		};
 
 		// A single placeholder used for prompting to add a new widget.
-		this._data.new_widget_placeholder = new newWidgetPlaceholder(this._data.options['widget-width'],
+		this._data.new_widget_placeholder = new CDashboardWidgetPlaceholder(this._data.options['widget-width'],
 			this._data.options['widget-height'], add_new_widget_callback
 		);
 
 		// This placeholder is used while positioning/resizing widgets.
 		this._data.placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).append($('<div>')).hide();
 
-		this._$target.append(this._data.new_widget_placeholder.getObject(), this._data.placeholder);
+		this._$target.append(this._data.new_widget_placeholder.getNode(), this._data.placeholder);
 
 		if (this._data.options['editable']) {
 			if (this._data.options['kioskmode']) {
-				this._data.new_widget_placeholder.setState(this._data.new_widget_placeholder.STATE_KIOSK_MODE);
+				this._data.new_widget_placeholder.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_KIOSK_MODE);
 			}
 			else {
-				this._data.new_widget_placeholder.setState(this._data.new_widget_placeholder.STATE_ADD_NEW);
+				this._data.new_widget_placeholder.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW);
 			}
 		}
 		else {
-			this._data.new_widget_placeholder.setState(this._data.new_widget_placeholder.STATE_READONLY);
+			this._data.new_widget_placeholder.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_READONLY);
 		}
 
 		this._data.new_widget_placeholder.showAtDefaultPosition();
@@ -3437,7 +3437,7 @@ class CDashboardPage {
 				const menu = getDashboardWidgetActionMenu(dimension);
 				const options = {
 					position: {
-						of: this._data.new_widget_placeholder.getObject(),
+						of: this._data.new_widget_placeholder.getNode(),
 						my: ['left', 'top'],
 						at: ['right', 'bottom'],
 						collision: 'fit'
@@ -3471,7 +3471,7 @@ class CDashboardPage {
 				options.position.my = options.position.my.join(' ');
 				options.position.at = options.position.at.join(' ');
 
-				this._data.new_widget_placeholder.getObject().menuPopup(menu, e, options);
+				$(this._data.new_widget_placeholder.getNode()).menuPopup(menu, e, options);
 			}
 			else {
 				this.addNewWidget(null, dimension);
@@ -3480,11 +3480,8 @@ class CDashboardPage {
 
 		this._$target
 			.on('mousedown', (e) => {
-				const $target = $(e.target);
-
 				if (e.which !== 1 || this._data.pos_action !== ''
-					|| (!$target.is(this._data.new_widget_placeholder.getObject())
-						&& !this._data.new_widget_placeholder.getObject().has($target).length)) {
+						|| !this._data.new_widget_placeholder.getNode().contains(e.target)) {
 					return;
 				}
 
@@ -3496,7 +3493,7 @@ class CDashboardPage {
 				delete this._data.add_widget_dimension.top;
 
 				this._data.new_widget_placeholder
-					.setState(this._data.new_widget_placeholder.STATE_RESIZING)
+					.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING)
 					.showAtPosition(this._data.add_widget_dimension);
 
 				return false;
@@ -3516,9 +3513,9 @@ class CDashboardPage {
 					return;
 				}
 
-				if (this._data.pos_action !== 'add' && this._data.pos_action !== 'addmodal' && !$target.is(this._$target)
-					&& !$target.is(this._data.new_widget_placeholder.getObject())
-					&& !this._data.new_widget_placeholder.getObject().has($target).length) {
+				if (this._data.pos_action !== 'add' && this._data.pos_action !== 'addmodal'
+						&& !$target.is(this._$target)
+						&& !this._data.new_widget_placeholder.getNode().contains(e.target)) {
 					this._data.add_widget_dimension = {};
 					this._data.new_widget_placeholder.hide();
 					this._resizeDashboardGrid();
@@ -3666,8 +3663,8 @@ class CDashboardPage {
 
 				this._data.new_widget_placeholder
 					.setState((this._data.pos_action === 'add')
-						? this._data.new_widget_placeholder.STATE_RESIZING
-						: this._data.new_widget_placeholder.STATE_POSITIONING
+						? DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING
+						: DASHBOARD_WIDGET_PLACEHOLDER_STATE_POSITIONING
 					)
 					.showAtPosition(this._data.add_widget_dimension);
 			});
@@ -3906,7 +3903,7 @@ class CDashboardPage {
 		}
 		else {
 			this._data.new_widget_placeholder
-				.setState(this._data.new_widget_placeholder.STATE_ADD_NEW)
+				.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW)
 				.showAtDefaultPosition();
 		}
 	}
@@ -4003,184 +4000,3 @@ class CDashboardPage {
 		return triggers.length;
 	}
 }
-
-/**
- * TODO
- */
-
-newWidgetPlaceholder.prototype.STATE_ADD_NEW = 0;
-newWidgetPlaceholder.prototype.STATE_RESIZING = 1;
-newWidgetPlaceholder.prototype.STATE_POSITIONING = 2;
-newWidgetPlaceholder.prototype.STATE_KIOSK_MODE = 3;
-newWidgetPlaceholder.prototype.STATE_READONLY = 4;
-
-newWidgetPlaceholder.prototype.classes = {
-	placeholder: 'dashbrd-grid-new-widget-placeholder',
-	placeholder_box: 'dashbrd-grid-widget-new-box',
-	placeholder_box_label: 'dashbrd-grid-new-widget-label',
-	resizing: 'dashbrd-grid-widget-set-size',
-	positioning: 'dashbrd-grid-widget-set-position'
-};
-
-/**
- * Create new widget placeholder instance.
- *
- * @param {int}      cell_width        Dashboard grid cell width in percents.
- * @param {int}      cell_height       Dashboard grid cell height in pixels.
- * @param {callback} add_new_callback  Callback to execute on click on "Add new widget".
-
- * @returns {object}  Placeholder instance.
- */
-function newWidgetPlaceholder(cell_width, cell_height, add_new_callback) {
-	this.cell_width = cell_width;
-	this.cell_height = cell_height;
-	this.add_new_callback = add_new_callback;
-
-	this.$placeholder = $('<div>', {'class': this.classes.placeholder});
-	this.$placeholder_box = $('<div>', {'class': this.classes.placeholder_box});
-	this.$placeholder_box_label = $('<div>', {'class': this.classes.placeholder_box_label});
-	this.$placeholder_box_label_wrap = $('<span>');
-
-	this.$placeholder_box_label_wrap.appendTo(this.$placeholder_box_label);
-	this.$placeholder_box_label.appendTo(this.$placeholder_box);
-	this.$placeholder_box.appendTo(this.$placeholder);
-
-	this.setState(this.STATE_ADD_NEW);
-}
-
-/**
- * Get jQuery object of the new widget placeholder.
- *
- * @returns {jQuery}
- */
-newWidgetPlaceholder.prototype.getObject = function() {
-	return this.$placeholder;
-};
-
-/**
- * Set state of the new widget placeholder.
- *
- * @param {int} state  newWidgetPlaceholder.prototype.STATE_* constant.
- *
- * @returns {this}
- */
-newWidgetPlaceholder.prototype.setState = function(state) {
-	this.$placeholder.hide();
-
-	if (state === this.state) {
-		return this;
-	}
-
-	this.$placeholder.off('click');
-	this.$placeholder.removeClass('disabled');
-	this.$placeholder_box.removeClass(this.classes.resizing + ' ' + this.classes.positioning);
-	this.$placeholder_box_label_wrap.empty();
-
-	switch (state) {
-		case this.STATE_ADD_NEW:
-			this.$placeholder_box_label_wrap.append(
-				$('<a>', {href: '#'}).text(t('Add a new widget'))
-			);
-
-			this.$placeholder.on('click', this.add_new_callback);
-
-			break;
-
-		case this.STATE_RESIZING:
-			this.$placeholder_box.addClass(this.classes.resizing);
-			this.$placeholder_box_label_wrap.text(t('Release to create a widget.'));
-
-			break;
-
-		case this.STATE_POSITIONING:
-			this.$placeholder_box.addClass(this.classes.positioning);
-			this.$placeholder_box_label_wrap.text(t('Click and drag to desired size.'));
-
-			break;
-
-		case this.STATE_KIOSK_MODE:
-			this.$placeholder_box_label_wrap.text(t('Cannot add widgets in kiosk mode'));
-			this.$placeholder.addClass('disabled');
-
-			break;
-
-		case this.STATE_READONLY:
-			this.$placeholder_box_label_wrap.text(t('You do not have permissions to edit dashboard'));
-			this.$placeholder.addClass('disabled');
-
-			break;
-	}
-
-	return this;
-};
-
-/**
- * Resize the new widget placeholder. Use to update visibility of the label of the placeholder.
- *
- * @returns {this}
- */
-newWidgetPlaceholder.prototype.resize = function() {
-	if (this.$placeholder.is(':visible')) {
-		this.$placeholder_box_label_wrap.show();
-		if (this.$placeholder_box_label[0].scrollHeight > this.$placeholder_box_label.outerHeight()) {
-			this.$placeholder_box_label_wrap.hide();
-		}
-	}
-
-	return this;
-};
-
-/**
- * Show new widget placeholder at given position.
- *
- * @param {object} pos  Object with position and dimension.
- *
- * @returns {this}
- */
-newWidgetPlaceholder.prototype.showAtPosition = function(pos) {
-	this.$placeholder
-		.css({
-			position: 'absolute',
-			left: (pos.x * this.cell_width) + '%',
-			top: (pos.y * this.cell_height) + 'px',
-			width: (pos.width * this.cell_width) + '%',
-			height: (pos.height * this.cell_height) + 'px'
-		})
-		.show();
-
-	this.resize();
-
-	return this;
-};
-
-/**
- * Show new widget placeholder at the default position.
- *
- * @returns {this}
- */
-newWidgetPlaceholder.prototype.showAtDefaultPosition = function() {
-	this.$placeholder
-		.css({
-			position: '',
-			top: '',
-			left: '',
-			height: '',
-			width: ''
-		})
-		.show();
-
-	this.resize();
-
-	return this;
-};
-
-/**
- * Hide new widget placeholder.
- *
- * @returns {this}
- */
-newWidgetPlaceholder.prototype.hide = function() {
-	this.$placeholder.hide();
-
-	return this;
-};

@@ -3198,12 +3198,16 @@ z-select[disabled] button,
       top: 0;
       left: 50%;
       transform: translateX(-50%); }
+    .dashbrd-grid-new-widget-placeholder .dashbrd-grid-new-widget-label span.hidden {
+      display: none; }
   .dashbrd-grid-new-widget-placeholder.disabled {
     opacity: 1; }
     .dashbrd-grid-new-widget-placeholder.disabled .dashbrd-grid-widget-new-box {
       background-color: rgba(255, 255, 255, 0.7); }
       .dashbrd-grid-new-widget-placeholder.disabled .dashbrd-grid-widget-new-box .dashbrd-grid-new-widget-label::before {
         background: url("../img/icon-sprite.svg?20200407") no-repeat -122px -284px; }
+  .dashbrd-grid-new-widget-placeholder.hidden {
+    display: none; }
 
 .dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -345px -888px; }

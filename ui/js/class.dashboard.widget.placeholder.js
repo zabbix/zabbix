@@ -18,6 +18,181 @@
 **/
 
 
+const DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
+const DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
+const DASHBOARD_WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
+const DASHBOARD_WIDGET_PLACEHOLDER_STATE_KIOSK_MODE = 3;
+const DASHBOARD_WIDGET_PLACEHOLDER_STATE_READONLY = 4;
+
+const DASHBOARD_WIDGET_PLACEHOLDER_CLASS = 'dashbrd-grid-new-widget-placeholder';
+const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX = 'dashbrd-grid-widget-new-box';
+const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX_LABEL = 'dashbrd-grid-new-widget-label';
+const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_RESIZING = 'dashbrd-grid-widget-set-size';
+const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_POSITIONING = 'dashbrd-grid-widget-set-position';
+const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN = 'hidden';
+
+/**
+ * New widget placeholder class.
+ */
 class CDashboardWidgetPlaceholder {
 
+	/**
+	 * Create new widget placeholder instance.
+	 *
+	 * @param {int}      cell_width        Dashboard grid cell width in percents.
+	 * @param {int}      cell_height       Dashboard grid cell height in pixels.
+	 * @param {callback} add_new_callback  Callback to execute on click on "Add new widget".
+	 */
+	constructor(cell_width, cell_height, add_new_callback) {
+		this._cell_width = cell_width;
+		this._cell_height = cell_height;
+		this._add_new_callback = add_new_callback;
+
+		this._placeholder = document.createElement('div');
+		this._placeholder.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS);
+
+		this._placeholder_box = document.createElement('div');
+		this._placeholder_box.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX);
+
+		this._placeholder_box_label = document.createElement('div');
+		this._placeholder_box_label.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX_LABEL);
+
+		this._placeholder_box_label_wrap = document.createElement('span');
+
+		this._placeholder_box_label.appendChild(this._placeholder_box_label_wrap);
+		this._placeholder_box.appendChild(this._placeholder_box_label);
+		this._placeholder.appendChild(this._placeholder_box);
+
+		this.setState(DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW);
+	}
+
+	/**
+	 * Get node of the new widget placeholder.
+	 *
+	 * @returns {HTMLElement}
+	 */
+	getNode() {
+		return this._placeholder;
+	}
+
+	/**
+	 * Set state of the new widget placeholder.
+	 *
+	 * @param {int} state  DASHBOARD_WIDGET_PLACEHOLDER_STATE_* constant.
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	setState(state) {
+		this._placeholder.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+
+		this._placeholder.classList.remove('disabled');
+		this._placeholder.removeEventListener('click', this._add_new_callback);
+		this._placeholder_box.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_RESIZING,
+			DASHBOARD_WIDGET_PLACEHOLDER_CLASS_POSITIONING
+		);
+		this._placeholder_box_label_wrap.textContent = '';
+
+		switch (state) {
+			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_ADD_NEW:
+				const link = document.createElement('a');
+				link.textContent = t('Add a new widget');
+				link.href = '#';
+				this._placeholder_box_label_wrap.appendChild(link);
+
+				this._placeholder.addEventListener('click', this._add_new_callback);
+
+				break;
+
+			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING:
+				this._placeholder_box.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_RESIZING);
+				this._placeholder_box_label_wrap.textContent = t('Release to create a widget.');
+
+				break;
+
+			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_POSITIONING:
+				this._placeholder_box.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_POSITIONING);
+				this._placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
+
+				break;
+
+			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_KIOSK_MODE:
+				this._placeholder_box_label_wrap.textContent = t('Cannot add widgets in kiosk mode');
+				this._placeholder.classList.add('disabled');
+
+				break;
+
+			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_READONLY:
+				this._placeholder_box_label_wrap.textContent = t('You do not have permissions to edit dashboard');
+				this._placeholder.classList.add('disabled');
+
+				break;
+		}
+
+		return this;
+	};
+
+	/**
+	 * Resize the new widget placeholder. Use to update visibility of the label of the placeholder.
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	resize() {
+		if (!this._placeholder.classList.contains(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN)) {
+			this._placeholder_box_label_wrap.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+			if (this._placeholder_box_label.scrollHeight > this._placeholder_box_label.clientHeight) {
+				this._placeholder_box_label_wrap.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+			}
+		}
+
+		return this;
+	};
+
+	/**
+	 * Show new widget placeholder at given position.
+	 *
+	 * @param {object} pos  Object with position and dimension.
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	showAtPosition(pos) {
+		this._placeholder.style.position = 'absolute';
+		this._placeholder.style.left = `${pos.x * this._cell_width}%`;
+		this._placeholder.style.top = `${pos.y * this._cell_height}px`;
+		this._placeholder.style.width = `${pos.width * this._cell_width}%`;
+		this._placeholder.style.height = `${pos.height * this._cell_height}px`;
+		this._placeholder.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+
+		this.resize();
+
+		return this;
+	};
+
+	/**
+	 * Show new widget placeholder at the default position.
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	showAtDefaultPosition() {
+		this._placeholder.style.position = '';
+		this._placeholder.style.left = '';
+		this._placeholder.style.top = '';
+		this._placeholder.style.width = '';
+		this._placeholder.style.height = '';
+		this._placeholder.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+
+		this.resize();
+
+		return this;
+	};
+
+	/**
+	 * Hide new widget placeholder.
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	hide() {
+		this._placeholder.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+
+		return this;
+	};
 }

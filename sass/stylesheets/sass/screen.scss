@@ -3064,6 +3064,12 @@ $form-icon-btn: (
 			left: 50%;
 			transform: translateX(-50%);
 		}
+
+		span {
+			&.hidden {
+				display: none;
+			}
+		}
 	}
 
 	&.disabled {
@@ -3076,6 +3082,10 @@ $form-icon-btn: (
 				background: url($sprite-path) no-repeat -122px -284px;
 			}
 		}
+	}
+
+	&.hidden {
+		display: none;
 	}
 }
 
