@@ -296,12 +296,13 @@ class testSidebarMenu extends CWebTest {
 		$this->page->login()->open('')->waitUntilReady();
 		CElementQuery::getDriver()->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
 				'.menu-main *{transition: none !important;}\'; document.body.appendChild(style);');
-		$this->assertTrue($this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady()->exists());
+		$this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady();
 
-		// When login in Zabbix, Monitoring section is opened.
+		// Check section from data provider and click on it.
 		if ($data['section'] !== 'Monitoring') {
 			$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
-			$this->query('xpath://ul[@class="menu-'.$menu.'"]/li/a[text()="'.$data['section'].'"]')->waitUntilReady()->one()->click();
+			$this->query('xpath://ul[@class="menu-'.$menu.'"]/li/a[text()='.CXPathHelper::escapeQuotes($data['section']).
+					']')->waitUntilReady()->one()->click();
 		}
 
 		$xpath = '//nav/ul/li[contains(@class, "has-submenu")]';
