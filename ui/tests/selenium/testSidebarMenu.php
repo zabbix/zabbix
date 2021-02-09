@@ -253,7 +253,7 @@ class testSidebarMenu extends CWebTest {
 
 		$this->query('xpath://nav/ul/li[contains(@class, "has-submenu")]/a[text()="'.$data['section'].'"]/following::ul/li/a[text()="'.
 				$data['page'].'"]')->waitUntilClickable()->one()->click();
-		$this->assertPageHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
+		$this->page->assertHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
 	}
 
 	/**
@@ -342,7 +342,7 @@ class testSidebarMenu extends CWebTest {
 		}
 		else {
 			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click();
-			$this->assertPageTitle($data['title']);
+			$this->page->assertTitle($data['title']);
 		}
 	}
 }
