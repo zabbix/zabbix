@@ -573,7 +573,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		zbx_free(ch_error);
 		err = 1;
 	}
-
 #if !defined(HAVE_IPV6)
 	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
