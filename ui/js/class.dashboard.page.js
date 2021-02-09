@@ -3845,7 +3845,7 @@ class CDashboardPage {
 	 * Hide "dashboard is exhausted" warning message in dashboard context.
 	 */
 	_hideMessageExhausted() {
-		if (this._data.options.message_exhausted) {
+		if (!this._data.options.message_exhausted) {
 			return;
 		}
 
