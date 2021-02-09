@@ -990,7 +990,8 @@ class CDashboardPage {
 				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
 					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
 				);
-		} else {
+		}
+		else {
 			widget.content_script = $('<div>');
 			widget.container.append(widget.content_script);
 		}
@@ -1098,7 +1099,8 @@ class CDashboardPage {
 		if (widget.parent) {
 			this._doLeaveWidgetsOfIteratorExcept(widget.parent, widget);
 			this._doEnterWidgetOfIterator(widget);
-		} else {
+		}
+		else {
 			this._doLeaveWidgetsExcept(widget);
 			this._doEnterWidget(widget);
 		}
@@ -1254,7 +1256,8 @@ class CDashboardPage {
 
 			if (widget.iterator) {
 				slide_lines = widget.div.hasClass('iterator-double-header') ? 2 : 1;
-			} else if (widget.div.hasClass(classes.hidden_header)) {
+			}
+			else if (widget.div.hasClass(classes.hidden_header)) {
 				slide_lines = 1;
 			}
 
@@ -1287,7 +1290,8 @@ class CDashboardPage {
 				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
 			}
 			$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
-		} else if (slide_lines < slide_lines_current) {
+		}
+		else if (slide_lines < slide_lines_current) {
 			data.options['kiosk_slide_timeout'] = setTimeout(() => {
 				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
 				if (slide_lines > 0) {
@@ -1462,7 +1466,8 @@ class CDashboardPage {
 			place_y = $div.hasClass('resizing-top')
 				? (Math.round((pos.top + $div.height()) / cell_h) - place_h)
 				: Math.round(pos.top / cell_h);
-		} else {
+		}
+		else {
 			place_x = Math.round(pos.left / cell_w);
 			place_y = Math.round(pos.top / cell_h);
 			place_w = Math.round(($div.width() + pos.left - place_x * cell_w) / cell_w);
@@ -1610,7 +1615,7 @@ class CDashboardPage {
 	 */
 	_dragPrepare(widgets, widget, max_rows) {
 		const markAffected = (widgets, affected_by, affected_by_draggable) => {
-			const w_pos = Object.assign({}, affected_by.pos);
+			const w_pos = {...affected_by.pos};
 
 			w_pos.height++;
 
@@ -1701,7 +1706,7 @@ class CDashboardPage {
 			widgets.filter((w) => {
 				return !('affected_axis' in w) && w.uniqueid !== uid && this._rectOverlap(pos, w.current_pos);
 			}).forEach((w) => {
-				const boundary = Object.assign({}, w.current_pos);
+				const boundary = {...w.current_pos};
 
 				if (w.uniqueid !== widget.uniqueid) {
 					boundary[size_key] += pos[axis_key] + pos[size_key] - boundary[axis_key];
@@ -1779,7 +1784,7 @@ class CDashboardPage {
 		 */
 		if (overlap > 0) {
 			// Scanline is virtual box that utilizes whole width/height depending on its direction defined by size_key.
-			const scanline = Object.assign({x: 0, y: 0}, axis.scanline);
+			const scanline = {'x': 0, 'y': 0, ...axis.scanline};
 			const axis_boundaries = {};
 
 			let slot = axis_pos[axis_key] + axis_pos[size_key];
@@ -1865,7 +1870,8 @@ class CDashboardPage {
 								if (margin && margin < size_max) {
 									box.new_pos[axis_key] = box.current_pos[axis_key];
 									continue;
-								} else {
+								}
+								else {
 									for (let i = start_pos; i < stop_pos; i++) {
 										margins[i] = margins_backup[i] - scanline[size_key];
 									}
@@ -1878,7 +1884,8 @@ class CDashboardPage {
 								for (let i = start_pos; i < stop_pos; i++) {
 									collapsed_pos[i] = 1;
 								}
-							} else {
+							}
+							else {
 								collapsed = false;
 								break;
 							}
@@ -1906,7 +1913,8 @@ class CDashboardPage {
 
 					overlap -= 1;
 					new_max -= 1;
-				} else {
+				}
+				else {
 					margins = margins_backup;
 					slot += scanline[size_key];
 				}
@@ -2168,12 +2176,10 @@ class CDashboardPage {
 					w.current_pos = {...data.undo_pos[w.uniqueid]};
 				}
 				pos = widget.current_pos;
-			} else {
+			}
+			else {
 				// store all widget current_pos objects
 				data.undo_pos = {};
-				data.widgets.forEach((w) => {
-					data.undo_pos[w.uniqueid] = Object.assign({}, w.current_pos);
-				});
 				for (const w of data.widgets) {
 					data.undo_pos[w.uniqueid] = {...w.current_pos};
 				}
@@ -2432,7 +2438,8 @@ class CDashboardPage {
 	_showPreloader(widget) {
 		if (widget.iterator) {
 			widget.div.find('.dashbrd-grid-iterator-content').addClass('is-loading');
-		} else {
+		}
+		else {
 			widget.div.find('.dashbrd-grid-widget-content').addClass('is-loading');
 		}
 	}
@@ -2440,7 +2447,8 @@ class CDashboardPage {
 	_hidePreloader(widget) {
 		if (widget.iterator) {
 			widget.div.find('.dashbrd-grid-iterator-content').removeClass('is-loading');
-		} else {
+		}
+		else {
 			widget.div.find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
 	}
@@ -2488,7 +2496,8 @@ class CDashboardPage {
 				if (!active.length && !this._doAction('timer_refresh', widget)) {
 					// No active popup or hintbox AND no triggers executed => update now.
 					this._updateWidgetContent(widget);
-				} else {
+				}
+				else {
 					// Active popup or hintbox OR triggers executed => just setup the next cycle.
 					this._setUpdateWidgetContentTimer(widget);
 				}
@@ -2597,7 +2606,8 @@ class CDashboardPage {
 					'width': 'auto',
 					'right': '0px'
 				};
-			} else {
+			}
+			else {
 				css = {
 					...css,
 					'width': `${Math.round(width / pos.width * 100 * 100) / 100}%`,
@@ -2607,7 +2617,8 @@ class CDashboardPage {
 
 			if (index < iterator.children.length) {
 				iterator.children[index].div.css(css);
-			} else {
+			}
+			else {
 				$placeholders.eq(index - iterator.children.length).css(css);
 			}
 		}
@@ -2696,7 +2707,8 @@ class CDashboardPage {
 				iterator.page = 1;
 				iterator.page_count = 1;
 				this._updateIteratorPager(iterator);
-			} else {
+			}
+			else {
 				iterator.update_pending = true;
 			}
 
@@ -2720,7 +2732,8 @@ class CDashboardPage {
 		for (const child of current_children) {
 			if (child.widgetid !== '') {
 				current_children_by_widgetid[child.widgetid] = child;
-			} else {
+			}
+			else {
 				// Child widgets without 'uniqueid' are never persisted.
 				this._removeWidget(child);
 			}
@@ -2741,7 +2754,8 @@ class CDashboardPage {
 
 					iterator.children.push(current_children_by_widgetid[child.widgetid]);
 					reused_widgetids.push(child.widgetid);
-				} else {
+				}
+				else {
 					this._addWidgetOfIterator(iterator, child);
 				}
 			});
@@ -2871,7 +2885,8 @@ class CDashboardPage {
 				ready_updated = !widget.ready;
 				widget.ready = true;
 			}
-		} else if (widget.parent) {
+		}
+		else if (widget.parent) {
 			widget.ready = true;
 
 			let children = widget.parent.children,
@@ -2885,7 +2900,8 @@ class CDashboardPage {
 				ready_updated = !widget.parent.ready;
 				widget.parent.ready = true;
 			}
-		} else {
+		}
+		else {
 			ready_updated = !widget.ready;
 			widget.ready = true;
 		}
@@ -2900,7 +2916,8 @@ class CDashboardPage {
 
 			if (dashboard_was_ready) {
 				this._registerDataExchangeCommit();
-			} else {
+			}
+			else {
 				const dashboard_is_ready = !data.widgets.filter(function(widget) {
 					return !widget.ready;
 				}).length;
@@ -3017,7 +3034,8 @@ class CDashboardPage {
 				widget.update_pending = true;
 
 				return;
-			} else {
+			}
+			else {
 				this._setIteratorTooSmallState(widget, false);
 				widget.update_pending = false;
 			}
@@ -3043,7 +3061,8 @@ class CDashboardPage {
 
 		if (widget.iterator) {
 			ajax_data.page = widget.page;
-		} else {
+		}
+		else {
 			ajax_data = {...ajax_data, ...widget.content_size};
 		}
 
@@ -3083,7 +3102,8 @@ class CDashboardPage {
 
 				if (widget.iterator) {
 					this._updateIteratorCallback(widget, response, options);
-				} else {
+				}
+				else {
 					this._updateWidgetCallback(widget, response);
 				}
 
@@ -3149,9 +3169,11 @@ class CDashboardPage {
 
 		if (wrapper_scrollTop < wrapper_scrollTop_min) {
 			return $wrapper.animate({scrollTop: wrapper_scrollTop_min}).promise();
-		} else if (wrapper_scrollTop > wrapper_scrollTop_max) {
+		}
+		else if (wrapper_scrollTop > wrapper_scrollTop_max) {
 			return $wrapper.animate({scrollTop: wrapper_scrollTop_max}).promise();
-		} else {
+		}
+		else {
 			return $.Deferred().resolve();
 		}
 	}
@@ -3239,7 +3261,8 @@ class CDashboardPage {
 					$save_btn.prop('disabled', false);
 
 					return $.Deferred().reject();
-				} else {
+				}
+				else {
 					// Set view mode of a reusable widget early to escape focus flickering.
 					if (widget !== null && widget.type === type) {
 						this._setWidgetViewMode(widget, view_mode);
@@ -3281,18 +3304,18 @@ class CDashboardPage {
 					// In case of ADD widget, create and add widget to the dashboard.
 
 					if (widget && 'pos' in widget) {
-						pos = Object.assign({}, data.widget_defaults[type].size, widget.pos);
+						pos = {...data.widget_defaults[type].size, ...widget.pos};
 
 						data.widgets.filter((w) => {
 							return this._rectOverlap(w.pos, pos);
 						}).forEach((w) => {
-							if (!this._rectOverlap(w.pos, pos)) {
-								return;
-							}
-							if (pos.x + pos.width > w.pos.x && pos.x < w.pos.x) {
-								pos.width = w.pos.x - pos.x;
-							} else if (pos.y + pos.height > w.pos.y && pos.y < w.pos.y) {
-								pos.height = w.pos.y - pos.y;
+							if (this._rectOverlap(w.pos, pos)) {
+								if (pos.x + pos.width > w.pos.x && pos.x < w.pos.x) {
+									pos.width = w.pos.x - pos.x;
+								}
+								else if (pos.y + pos.height > w.pos.y && pos.y < w.pos.y) {
+									pos.height = w.pos.y - pos.y;
+								}
 							}
 						});
 
@@ -3319,7 +3342,8 @@ class CDashboardPage {
 							this._setWidgetModeEdit(widget);
 							this._updateWidgetContent(widget);
 						});
-				} else if (widget.type === type) {
+				}
+				else if (widget.type === type) {
 					// In case of EDIT widget, if type has not changed, update the widget.
 
 					widget.header = name;
@@ -3337,10 +3361,12 @@ class CDashboardPage {
 						this._updateWidgetContent(widget, {
 							'update_policy': 'resize_or_refresh'
 						});
-					} else {
+					}
+					else {
 						this._updateWidgetContent(widget);
 					}
-				} else {
+				}
+				else {
 					// In case of EDIT widget, if type has changed, replace the widget.
 
 					this._removeWidget(widget);
@@ -3541,7 +3567,8 @@ class CDashboardPage {
 				if (dimension.y === 0) {
 					options.position.my[1] = 'top';
 					options.position.at[1] = (dimension.top > dimension.y) ? 'top' : 'bottom';
-				} else if (dimension.top > dimension.y) {
+				}
+				else if (dimension.top > dimension.y) {
 					options.position.my[1] = 'bottom';
 					options.position.at[1] = 'top';
 				}
@@ -3550,7 +3577,8 @@ class CDashboardPage {
 				options.position.at = options.position.at.join(' ');
 
 				data.new_widget_placeholder.getObject().menuPopup(menu, e, options);
-			} else {
+			}
+			else {
 				this.addNewWidget(null, dimension);
 			}
 		});
@@ -3660,16 +3688,19 @@ class CDashboardPage {
 					if (overlap) {
 						pos = data.add_widget_dimension;
 					}
-				} else {
+				}
+				else {
 					if ((pos.x + pos.width) > data.options['max-columns']) {
 						pos.x = data.options['max-columns'] - pos.width;
-					} else if (data.add_widget_dimension.x < pos.x) {
+					}
+					else if (data.add_widget_dimension.x < pos.x) {
 						--pos.x;
 					}
 
 					if ((pos.y + pos.height) > data.options['max-rows']) {
 						pos.y = data.options['max-rows'] - pos.height;
-					} else if (data.add_widget_dimension.y < pos.y) {
+					}
+					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 
@@ -3812,7 +3843,8 @@ class CDashboardPage {
 			this._doAction('onWidgetDelete', widget);
 			this._removeWidgetActions(widget);
 			widget.div.remove();
-		} else {
+		}
+		else {
 			const index = widget.div.data('widget-index');
 
 			this._doAction('onWidgetDelete', widget);
@@ -3880,7 +3912,8 @@ class CDashboardPage {
 		if (widget.iterator) {
 			// Iterators will sync first, then selectively propagate the resize event to the child widgets.
 			success = this._doAction('onResizeEnd', widget);
-		} else {
+		}
+		else {
 			const size_old = widget.content_size;
 			const size_new = this._getWidgetContentSize(widget);
 
@@ -3995,7 +4028,8 @@ class CDashboardPage {
 
 		if (data.widgets.length) {
 			data.new_widget_placeholder.hide();
-		} else {
+		}
+		else {
 			data.new_widget_placeholder
 				.setState(data.new_widget_placeholder.STATE_ADD_NEW)
 				.showAtDefaultPosition();
@@ -4021,7 +4055,8 @@ class CDashboardPage {
 
 		if (widget === null) {
 			triggers = data.triggers[hook_name];
-		} else {
+		}
+		else {
 			for (const trigger of data.triggers[hook_name]) {
 				if (trigger.uniqueid === null || widget.uniqueid === trigger.uniqueid) {
 					triggers.push(trigger);
@@ -4048,7 +4083,8 @@ class CDashboardPage {
 			if (typeof trigger.function === typeof Function) {
 				// A function given?
 				trigger_function = trigger.function;
-			} else if (typeof window[trigger.function] === typeof Function) {
+			}
+			else if (typeof window[trigger.function] === typeof Function) {
 				// A name of function given?
 				trigger_function = window[trigger.function];
 			}
@@ -4068,7 +4104,8 @@ class CDashboardPage {
 				if (trigger.options['grid'].widget) {
 					if (widget !== null) {
 						grid.widget = widget;
-					} else if (trigger.uniqueid !== null) {
+					}
+					else if (trigger.uniqueid !== null) {
 						const widgets = this.getWidgetsBy('uniqueid', trigger.uniqueid);
 						if (widgets.length > 0) {
 							grid.widget = widgets[0];
