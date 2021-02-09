@@ -44,6 +44,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 	if test "x$_libnetsnmp_config" = "xno"; then
 		AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [])
 		want_static_netsnmp="no"
+		test "x$enable_static_libs" = "xyes" && want_static_netsnmp="yes"
 	else
 		want_static_netsnmp="yes"
 	fi
