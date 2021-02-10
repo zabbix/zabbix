@@ -1440,8 +1440,8 @@ class CDashboardPage {
 		});
 	}
 
-	_resetCurrentPositions(widgets) {
-		for (const w of widgets) {
+	_resetCurrentPositions() {
+		for (const w of this._widgets) {
 			w.current_pos = {...w.pos};
 		}
 	}
@@ -1451,7 +1451,7 @@ class CDashboardPage {
 		this._data.cell_width = this._getCurrentCellWidth();
 		this._data.placeholder.css('visibility', (action === 'resize') ? 'hidden' : 'visible').show();
 		this._data.new_widget_placeholder.hide();
-		this._resetCurrentPositions(this._widgets);
+		this._resetCurrentPositions();
 	}
 
 	_posEquals(pos1, pos2) {
@@ -1606,7 +1606,6 @@ class CDashboardPage {
 	/**
 	 * Resize widgets.
 	 *
-	 * @param {array}  widgets        Array of widget objects.
 	 * @param {object} widget         Resized widget object.
 	 * @param {object} axis           Resized axis options.
 	 * @param {string} axis.axis_key  Axis key as string: 'x', 'y'.
@@ -1614,7 +1613,7 @@ class CDashboardPage {
 	 * @param {number} axis.size_min  Minimum size allowed for one item.
 	 * @param {number} axis.size_max  Maximum size allowed for one item, also is used as maximum size of dashboard.
 	 */
-	_fitWidgetsIntoBox(widgets, widget, axis) {
+	_fitWidgetsIntoBox(widget, axis) {
 		const axis_key = axis.axis_key;
 		const size_key = axis.size_key;
 
@@ -1632,7 +1631,7 @@ class CDashboardPage {
 		};
 
 		const markAffectedWidgets = (pos, uid) => {
-			widgets.filter((w) => {
+			this._widgets.filter((w) => {
 				return !('affected_axis' in w) && w.uniqueid !== uid && this._rectOverlap(pos, w.current_pos);
 			}).forEach((w) => {
 				const boundary = {...w.current_pos};
@@ -1653,7 +1652,7 @@ class CDashboardPage {
 
 		// Resize action for left/up is mirrored right/down action.
 		if ('mirrored' in axis) {
-			for (const w of widgets) {
+			for (const w of this._widgets) {
 				w.current_pos[axis_key] = size_max - w.current_pos[axis_key] - w.current_pos[size_key];
 				w.pos[axis_key] = size_max - w.pos[axis_key] - w.pos[size_key];
 			}
@@ -1663,7 +1662,7 @@ class CDashboardPage {
 		// Get array containing only widgets affected by resize operation.
 		markAffectedWidgets(widget.current_pos, widget.uniqueid);
 
-		affected = widgets
+		affected = this._widgets
 			.filter((w) => {
 				return 'affected_axis' in w && w.affected_axis === axis_key && w.uniqueid !== widget.uniqueid;
 			})
@@ -1898,7 +1897,7 @@ class CDashboardPage {
 
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
 		if ('mirrored' in axis) {
-			for (const w of widgets) {
+			for (const w of this._widgets) {
 				w.current_pos[axis_key] = size_max - w.current_pos[axis_key] - w.current_pos[size_key];
 				w.pos[axis_key] = size_max - w.pos[axis_key] - w.pos[size_key];
 			}
@@ -2011,7 +2010,7 @@ class CDashboardPage {
 				}
 			}
 
-			this._fitWidgetsIntoBox(this._widgets, widget, axis);
+			this._fitWidgetsIntoBox(widget, axis);
 
 			if ('overflow' in widget.current_pos) {
 				// Store 'corrected' size.
@@ -2027,7 +2026,7 @@ class CDashboardPage {
 	}
 
 	_checkWidgetOverlap() {
-		this._resetCurrentPositions(this._widgets);
+		this._resetCurrentPositions();
 
 		for (const w of this._widgets) {
 			if (!this._posEquals(w.pos, w.current_pos)) {
