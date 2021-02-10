@@ -506,15 +506,20 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() output: null", __func__);
 		}
-		else if (NULL != script_ret)
+		else
 		{
-			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), script_ret)))
+			char	*output;
+
+			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), &output)))
 				*error = zbx_strdup(*error, "could not convert return value to utf8");
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *script_ret);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+
+			if (SUCCEED == ret && NULL != script_ret)
+				*script_ret = output;
+			else
+				zbx_free(output);
 		}
-		else
-			ret = SUCCEED;
 	}
 	else
 		*error = zbx_strdup(*error, "undefined return value");
