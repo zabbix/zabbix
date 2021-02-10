@@ -569,13 +569,21 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 	history_seconds = *rule->poption;
 
-	if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
+	if (0 == history_seconds)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
-		return;
+		keep_from = INT_MAX;
+	}
+	else
+	{
+		if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
+			return;
+		}
+
+		keep_from = now - history_seconds;
 	}
 
-	keep_from = now - history_seconds;
 	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
 
 	result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
