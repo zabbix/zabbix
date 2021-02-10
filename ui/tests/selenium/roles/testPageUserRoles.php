@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 class testPageUserRoles extends CWebTest {
 
 	use TableTrait;
-	
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -84,7 +84,7 @@ class testPageUserRoles extends CWebTest {
 			}
 		}
 	}
-	
+
 	public static function getFilterData() {
 		return [
 			[
@@ -157,32 +157,32 @@ class testPageUserRoles extends CWebTest {
 			]
 		];
 	}
-	
+
 	/**
 	 * Filter user roles.
-	 * 
+	 *
 	 * @dataProvider getFilterData
 	 */
 	public function testPageUserRoles_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
-		
+
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
 			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
 			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
 		}
-		
+
 		$before_filtering = $this->getTableResult('Name');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Name' => $data['name']])->submit();
 		$this->assertTableDataColumn($data['result'], 'Name');
-		
+
 		// Check that result reseted and Name field is empty after pressing reset button.
 		$this->query('button:Reset')->one()->click();
 		$form->checkValue('Name', '');
 		$this->assertTableDataColumn($before_filtering, 'Name');
 	}
-	
+
 	/**
 	 * Function used to create roles.
 	 */
@@ -260,7 +260,7 @@ class testPageUserRoles extends CWebTest {
 
 	/**
 	 * Delete user roles.
-	 * 
+	 *
 	 * @on-before-once prepareRoleData
 	 * @dataProvider getDeleteData
 	 */
