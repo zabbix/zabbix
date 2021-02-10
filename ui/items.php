@@ -354,12 +354,22 @@ if (hasRequest('filter_set')) {
 	$filter_valuemapids = getRequest('filter_valuemapids', []);
 
 	if ($filter_hostids && $filter_valuemapids) {
-		$valuemap_hosts = API::Host()->get([
-			'output' => [],
-			'selectParentTemplates' => ['templateid'],
-			'hostids' => $filter_hostids,
-			'preservekeys' => true
-		]);
+		if (getRequest('context') === 'host') {
+			$valuemap_hosts = API::Host()->get([
+				'output' => [],
+				'selectParentTemplates' => ['templateid'],
+				'hostids' => $filter_hostids,
+				'preservekeys' => true
+			]);
+		}
+		else {
+			$valuemap_hosts = API::Template()->get([
+				'output' => [],
+				'selectParentTemplates' => ['templateid'],
+				'templateids' => $filter_hostids,
+				'preservekeys' => true
+			]);
+		}
 		$valuemap_hostids = array_keys($valuemap_hosts);
 
 		foreach ($valuemap_hosts as $valuemap_host) {
