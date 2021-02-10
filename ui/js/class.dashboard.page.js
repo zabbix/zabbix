@@ -2672,7 +2672,7 @@ class CDashboardPage {
 			});
 
 		for (const child of current_children_by_widgetid) {
-			if (reused_widgetids.includes(child.widgetid)) {
+			if (!reused_widgetids.includes(child.widgetid)) {
 				this._removeWidget(child);
 			}
 		}
@@ -2699,7 +2699,7 @@ class CDashboardPage {
 
 			let update_policy = 'refresh';
 
-			if (reused_widgetids.includes(child.widgetid) && 'update_policy' in options) {
+			if (!reused_widgetids.includes(child.widgetid) && 'update_policy' in options) {
 				// Allow to override update_policy only for existing (not new) widgets.
 				update_policy = options['update_policy'];
 			}
@@ -3629,7 +3629,7 @@ class CDashboardPage {
 							for (const box of this._data.widgets) {
 								overlap |= this._rectOverlap(box.pos, c_pos);
 
-								if (!overlap) {
+								if (overlap) {
 									break;
 								}
 							}
