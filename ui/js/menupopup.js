@@ -1208,7 +1208,7 @@ function getDashboardWidgetActionMenu(area_selected) {
 				};
 
 				ZABBIX.Dashboard.pasteWidget(null, widget_dims);
-				jQuery(`.${DASHBOARD_WIDGET_PLACEHOLDER_CLASS}`).hide();
+				jQuery(`.${ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER}`).hide();
 			}
 		}]
 	}];

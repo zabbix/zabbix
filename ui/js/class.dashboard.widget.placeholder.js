@@ -24,12 +24,12 @@ const DASHBOARD_WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
 const DASHBOARD_WIDGET_PLACEHOLDER_STATE_KIOSK_MODE = 3;
 const DASHBOARD_WIDGET_PLACEHOLDER_STATE_READONLY = 4;
 
-const DASHBOARD_WIDGET_PLACEHOLDER_CLASS = 'dashbrd-grid-new-widget-placeholder';
-const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX = 'dashbrd-grid-widget-new-box';
-const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX_LABEL = 'dashbrd-grid-new-widget-label';
-const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_RESIZING = 'dashbrd-grid-widget-set-size';
-const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_POSITIONING = 'dashbrd-grid-widget-set-position';
-const DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN = 'hidden';
+const ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER = 'dashbrd-grid-new-widget-placeholder';
+const ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_BOX = 'dashbrd-grid-widget-new-box';
+const ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_BOX_LABEL = 'dashbrd-grid-new-widget-label';
+const ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_RESIZING = 'dashbrd-grid-widget-set-size';
+const ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_POSITIONING = 'dashbrd-grid-widget-set-position';
+const ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN = 'hidden';
 
 /**
  * New widget placeholder class.
@@ -49,13 +49,13 @@ class CDashboardWidgetPlaceholder {
 		this._add_new_callback = add_new_callback;
 
 		this._placeholder = document.createElement('div');
-		this._placeholder.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS);
+		this._placeholder.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER);
 
 		this._placeholder_box = document.createElement('div');
-		this._placeholder_box.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX);
+		this._placeholder_box.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_BOX);
 
 		this._placeholder_box_label = document.createElement('div');
-		this._placeholder_box_label.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_BOX_LABEL);
+		this._placeholder_box_label.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_BOX_LABEL);
 
 		this._placeholder_box_label_wrap = document.createElement('span');
 
@@ -83,12 +83,12 @@ class CDashboardWidgetPlaceholder {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	setState(state) {
-		this._placeholder.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+		this._placeholder.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 
 		this._placeholder.classList.remove('disabled');
 		this._placeholder.removeEventListener('click', this._add_new_callback);
-		this._placeholder_box.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_RESIZING,
-			DASHBOARD_WIDGET_PLACEHOLDER_CLASS_POSITIONING
+		this._placeholder_box.classList.remove(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_RESIZING,
+			ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_POSITIONING
 		);
 		this._placeholder_box_label_wrap.textContent = '';
 
@@ -104,13 +104,13 @@ class CDashboardWidgetPlaceholder {
 				break;
 
 			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_RESIZING:
-				this._placeholder_box.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_RESIZING);
+				this._placeholder_box.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_RESIZING);
 				this._placeholder_box_label_wrap.textContent = t('Release to create a widget.');
 
 				break;
 
 			case DASHBOARD_WIDGET_PLACEHOLDER_STATE_POSITIONING:
-				this._placeholder_box.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_POSITIONING);
+				this._placeholder_box.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_POSITIONING);
 				this._placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
 
 				break;
@@ -137,10 +137,10 @@ class CDashboardWidgetPlaceholder {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	resize() {
-		if (!this._placeholder.classList.contains(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN)) {
-			this._placeholder_box_label_wrap.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+		if (!this._placeholder.classList.contains(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN)) {
+			this._placeholder_box_label_wrap.classList.remove(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 			if (this._placeholder_box_label.scrollHeight > this._placeholder_box_label.clientHeight) {
-				this._placeholder_box_label_wrap.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+				this._placeholder_box_label_wrap.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 			}
 		}
 
@@ -160,7 +160,7 @@ class CDashboardWidgetPlaceholder {
 		this._placeholder.style.top = `${pos.y * this._cell_height}px`;
 		this._placeholder.style.width = `${pos.width * this._cell_width}%`;
 		this._placeholder.style.height = `${pos.height * this._cell_height}px`;
-		this._placeholder.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+		this._placeholder.classList.remove(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 
 		this.resize();
 
@@ -178,7 +178,7 @@ class CDashboardWidgetPlaceholder {
 		this._placeholder.style.top = '';
 		this._placeholder.style.width = '';
 		this._placeholder.style.height = '';
-		this._placeholder.classList.remove(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+		this._placeholder.classList.remove(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 
 		this.resize();
 
@@ -191,7 +191,7 @@ class CDashboardWidgetPlaceholder {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	hide() {
-		this._placeholder.classList.add(DASHBOARD_WIDGET_PLACEHOLDER_CLASS_HIDDEN);
+		this._placeholder.classList.add(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 
 		return this;
 	};
