@@ -629,45 +629,60 @@ switch ($data['popup_type']) {
 		unset($data['table_records']);
 		break;
 
+	case 'valuemap_names':
+		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
+
+		foreach ($data['table_records'] as $valuemap) {
+			$table->addRow([
+				new CCheckBox('item['.$valuemap['id'].']', $valuemap['id']),
+				(new CLink($valuemap['name'], '#'))
+					->setId('spanid'.$valuemap['id'])
+					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick))
+			]);
+		}
+		break;
+
 	case 'valuemaps':
-		foreach ($data['table_records'] as $item) {
+		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
+
+		foreach ($data['table_records'] as $valuemap) {
 			$name = [];
 			$check_box = $data['multiselect']
-				? new CCheckBox('item['.$item['id'].']', $item['id'])
+				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
 				: null;
 
-			if (array_key_exists('hostname', $item)) {
-				$name[] = (new CSpan($item['hostname']))->addClass(ZBX_STYLE_GREY);
+			if (array_key_exists('hostname', $valuemap)) {
+				$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
 				$name[] = NAME_DELIMITER;
 			}
 
-			if (array_key_exists('_disabled', $item) && $item['_disabled']) {
+			if (array_key_exists('_disabled', $valuemap) && $valuemap['_disabled']) {
 				if ($data['multiselect']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);
 				}
-				$name[] = (new CSpan($item['name']))->addClass(ZBX_STYLE_GREY);
+				$name[] = (new CSpan($valuemap['name']))->addClass(ZBX_STYLE_GREY);
 
-				unset($data['table_records'][$item['id']]);
+				unset($data['table_records'][$valuemap['id']]);
 			}
 			else {
 				$js_action = 'addValue('.json_encode($options['reference']).', '.
-					json_encode($item['id']).', '.$options['parentid'].');';
+					json_encode($valuemap['id']).', '.$options['parentid'].');';
 
-				$name[] = (new CLink($item['name'], '#'))
-					->setId('spanid'.$item['id'])
-					->onClick($js_action.$js_action_onclick);
+				$name[] = (new CLink($valuemap['name'], '#'))
+					->setId('spanid'.$valuemap['id'])
+					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick));
 			}
 
 			$span = [];
 
-			foreach (array_slice($item['mappings'], 0, 3) as $mapping) {
+			foreach (array_slice($valuemap['mappings'], 0, 3) as $mapping) {
 				$span[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
 				$span[] = BR();
 			}
 
-			if (count($item['mappings']) > 3) {
-				$span[] = '...';
+			if (count($valuemap['mappings']) > 3) {
+				$span[] = '&hellip;';
 			}
 
 			$table->addRow([$check_box, $name, $span]);
