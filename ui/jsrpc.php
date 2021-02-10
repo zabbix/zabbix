@@ -545,39 +545,42 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'valuemaps':
+			case 'valuemap_names':
+				$result = [];
+
+				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
+					break;
+				}
+
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
-					$host = API::Host()->get([
-						'output' => [],
-						'selectParentTemplates' => ['templateid'],
-						'hostids' => $hostids
-					]);
-
-					if (!$host) {
-						$host = API::Template()->get([
+					if ($data['context'] === 'host') {
+						$templates = API::Host()->get([
 							'output' => [],
 							'selectParentTemplates' => ['templateid'],
-							'templateids' => $hostids
+							'hostids' => $hostids
+						]);
+					}
+					else {
+						$templates = API::Template()->get([
+							'output' => [],
+							'selectParentTemplates' => ['templateid'],
+							'hostids' => $hostids
 						]);
 					}
 
-					$host = reset($host);
-
-					if ($host) {
-						$hostids = array_merge($hostids, array_column($host['parentTemplates'], 'templateid'));
-					}
+					$hostids = array_keys(CValueMapHelper::getParentTemplatesRecursive($templates, ['templateid']));
 				}
 
 				$result = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name'],
-					'hostids' => array_keys(array_flip($hostids)),
-					'search' => ['name' => $data['search'] ? $data['search'] : null]
+					'hostids' => $hostids,
+					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 				]);
 				$result = array_column($result, null, 'name');
 				$result = CArrayHelper::renameObjectsKeys($result, ['valuemapid' => 'id']);
-				$result = array_column($result, null, 'id');
 				CArrayHelper::sort($result, ['name']);
 				break;
 		}

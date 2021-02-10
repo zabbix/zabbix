@@ -741,6 +741,7 @@ $form_list
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'valuemapid',
 					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
 					'editable' => true
 				]
 			]

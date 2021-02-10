@@ -353,16 +353,16 @@ if ($data['single_host_selected']) {
 		(new CDiv([
 			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
-				'multiple' => false,
+				'object_name' => 'valuemap_names',
 				'data' => [],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => 'valuemap_names',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
 						'hostids' => [$data['hostid']],
+						'context' => $data['context'],
 						'editable' => true
 					]
 				]

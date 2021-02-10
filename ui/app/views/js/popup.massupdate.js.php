@@ -280,6 +280,8 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 // Value maps.
 (() => {
 	const valuemap = document.querySelector('#valuemap-div');
+	const form = document.querySelector('#massupdate-form');
+	const action = form.querySelector('#action').value;
 
 	if (!valuemap) {
 		return false;
@@ -339,7 +341,8 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 			hostids: hostids,
 			disable_names: disable_names,
 			editable: true,
-			show_host_name: 1
+			show_host_name: 1,
+			context: (action === 'popup.massupdate.host') ? 'host' : 'template'
 		}, null, elm);
 	}
 

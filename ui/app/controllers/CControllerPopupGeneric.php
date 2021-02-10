@@ -404,6 +404,18 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
+			'valuemap_names' => [
+				'title' => _('Value mapping'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'valuemapid,name',
+				'form' => [
+					'name' => 'valuemapform',
+					'id' => 'valuemaps'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 			'valuemaps' => [
 				'title' => _('Value mapping'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -468,6 +480,7 @@ class CControllerPopupGeneric extends CController {
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
+			'context' =>							'string|in host,template',
 			'show_host_name' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
@@ -1363,48 +1376,112 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name']);
 				break;
 
-			case 'valuemaps':
+			case 'valuemap_names':
 				/**
-				 * with_inherited    Show list of value map on host and host template.
-				 * show_host_name    Display host name as value map prefix in value maps popup. If this property is not
-				 *                   set only unique names of value maps will be shown.
+				 * Show list of value maps with unique names for defined hosts or templates.
+				 *
+				 * hostids           (required) Array of host or template ids to get value maps from.
+				 * context           (required) Define context for inherited value maps: host, template
+				 * with_inherited    Include value maps from inherited templates.
 				 */
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
-				$options = [];
+				$context = $this->getInput('context', '');
 
-				if ($this->getInput('with_inherited', 0)) {
-					$options['selectParentTemplates'] = ['templateid', 'host'];
+				if (!$hostids || $context === '') {
+					break;
 				}
 
-				$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
-					'output' => ['hostid', 'host'],
-					'hostids' => $hostids,
-					'preservekeys' => true
-				] + $options), ['hostid' => 'templateid']);
-
-				if (!$hosts) {
-					$hosts = API::Template()->get([
-						'output' => ['templateid', 'host'],
-						'templateids' => $hostids,
-						'preservekeys' => true
-					] + $options);
-				}
-
-				if ($this->getInput('with_inherited', 0) && $hosts) {
-					$templates = [];
-
-					foreach ($hosts as $host) {
-						$templates += array_column($host['parentTemplates'], null, 'templateid');
+				if ($this->hasInput('with_inherited')) {
+					if ($context === 'host') {
+						$hosts = API::Host()->get([
+							'output' => [],
+							'selectParentTemplates' => ['templateid'],
+							'hostids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
+					else {
+						$hosts = API::Template()->get([
+							'output' => [],
+							'selectParentTemplates' => ['templateid'],
+							'templateids' => $hostids,
+							'preservekeys' => true
+						]);
 					}
 
-					$hosts += $templates;
+					$hostids = array_keys(CValueMapHelper::getParentTemplatesRecursive($hosts, ['templateid']));
+				}
+
+				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'hostids' => $hostids
+				]), ['valuemapid' => 'id']);
+				// Remove value maps with duplicate names.
+				$records = array_column($records, null, 'name');
+				$records = array_column($records, null, 'id');
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'valuemaps':
+				/**
+				 * Show list of value maps with their mappings for defined hosts or templates.
+				 *
+				 * hostids           (required) Array of host or template ids to get value maps from.
+				 * context           (required) Define context for inherited value maps: host, template
+				 * with_inherited    Include value map inherited from template.
+				 * show_host_name    Display host name as value map prefix in value maps popup.
+				 */
+				$records = [];
+				$options = [];
+				$hostids = $this->getInput('hostids', []);
+				$context = $this->getInput('context', '');
+
+				if (!$hostids || $context === '') {
+					break;
+				}
+
+				if ($this->hasInput('with_inherited')) {
+					if ($context === 'host') {
+						$hosts = API::Host()->get([
+							'output' => [],
+							'selectParentTemplates' => ['templateid'],
+							'hostids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
+					else {
+						$hosts = API::Template()->get([
+							'output' => [],
+							'selectParentTemplates' => ['templateid'],
+							'templateids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
+
+					$hosts = CValueMapHelper::getParentTemplatesRecursive($hosts, ['templateid', 'host']);
+				}
+				else {
+					if ($context === 'host') {
+						$hosts = API::Host()->get([
+							'output' => ['host'],
+							'hostids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
+					else {
+						$hosts = API::Template()->get([
+							'output' => ['host'],
+							'templateids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
 				}
 
 				$db_valuemaps = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name', 'hostid'],
 					'selectMappings' => ['value', 'newvalue'],
-					'hostids' => $hosts ? array_keys($hosts) : null
+					'hostids' => array_keys($hosts)
 				]);
 
 				if (!$db_valuemaps) {
@@ -1414,20 +1491,18 @@ class CControllerPopupGeneric extends CController {
 				$disable_names = $this->getInput('disable_names', []);
 
 				foreach ($db_valuemaps as $db_valuemap) {
-					$records[$db_valuemap['valuemapid']] = [
+					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
 						'name' => $db_valuemap['name'],
-						'mappings' => array_key_exists('mappings', $db_valuemap) ? $db_valuemap['mappings'] : [],
+						'mappings' => $db_valuemap['mappings'],
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
 					];
 
-					if ($this->getInput('show_host_name', 0)) {
-						$records[$db_valuemap['valuemapid']]['hostname'] = $hosts[$db_valuemap['hostid']]['host'];
+					if ($this->hasInput('show_host_name')) {
+						$valuemap['hostname'] = $hosts[$db_valuemap['hostid']]['host'];
 					}
-				}
 
-				if (!$this->getInput('show_host_name', 0)) {
-					$records = array_column($records, null, 'name');
+					$records[$db_valuemap['valuemapid']] = $valuemap;
 				}
 
 				$records = array_column($records, null, 'id');

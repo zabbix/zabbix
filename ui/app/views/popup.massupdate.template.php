@@ -162,7 +162,8 @@ $tabs->addTab('macros_tab', _('Macros'), new CPartial('massupdate.macros.tab', [
 // Value mappping.
 $tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
 	'visible' => [],
-	'hostids' => $data['ids']
+	'hostids' => $data['ids'],
+	'context' => 'template'
 ]));
 
 $form->addItem($tabs);

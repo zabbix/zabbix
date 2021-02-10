@@ -340,18 +340,17 @@ function getItemFilterForm(&$data) {
 		$filterColumn2->addRow(_('Value mapping'),
 			(new CMultiSelect([
 				'name' => 'filter_valuemapids[]',
-				'object_name' => 'valuemaps',
+				'object_name' => 'valuemap_names',
 				'data' => array_values(array_column($valuemaps_filter, null, 'name')),
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => 'valuemap_names',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $filter->getName(),
 						'dstfld1' => 'filter_valuemapids_',
 						'hostids' => array_column($host_template_filter, 'id'),
-						'show_host_name' => true,
 						'with_inherited' => true,
-						'editable' => true
+						'context' => $data['context']
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)

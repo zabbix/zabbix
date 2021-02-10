@@ -23,7 +23,7 @@
  * @var CPartial $this
  */
 $change_container = new CDiv(new CPartial('configuration.valuemap', [
-	'source' => 'template',
+	'context' => $data['context'],
 	'valuemaps' => [],
 	'readonly' => false,
 	'form' => 'massupdate'
@@ -53,15 +53,16 @@ $remove_container = (new CDiv())->addClass('valuemap-remove');
 $remove_container->addItem([
 	(new CMultiSelect([
 		'name' => 'valuemap_remove[]',
-		'object_name' => 'valuemaps',
+		'object_name' => 'valuemap_names',
 		'data' => [],
 		'popup' => [
 			'parameters' => [
-				'srctbl' => 'valuemaps',
+				'srctbl' => 'valuemap_names',
 				'srcfld1' => 'valuemapid',
 				'dstfrm' => 'massupdate-form',
 				'dstfld1' => 'valuemap_remove_',
 				'hostids' => $data['hostids'],
+				'context' => $data['context'],
 				'editable' => true
 			]
 		]
