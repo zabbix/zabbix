@@ -3836,7 +3836,7 @@ int	check_vcenter_vm_guest_memory_size_swapped(AGENT_REQUEST *request, const cha
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/swapped[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/swapped[average]", ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3874,7 +3874,7 @@ int	check_vcenter_vm_memory_size_consumed(AGENT_REQUEST *request, const char *us
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/consumed[average]", 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/consumed[average]", ZBX_KIBIBYTE, result);
 unlock:
 	zbx_vmware_unlock();
 out:

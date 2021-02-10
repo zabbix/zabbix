@@ -835,7 +835,7 @@ class CHelpItems {
 					'description' => _('VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
-					'key' => 'vmware.hv.cpu.usage.perf[<url>,<uuid>,<avg>]',
+					'key' => 'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
 					'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
@@ -971,16 +971,16 @@ class CHelpItems {
 					'description' => _('Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
-					'key' => 'vmware.vm.cpu.readiness[<url>,<uuid>]',
-					'description' => _('Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
+					'description' => _('Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance')
 				],
 				[
 					'key' => 'vmware.vm.cpu.ready[<url>,<uuid>]',
 					'description' => _('VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
-					'key' => 'vmware.vm.cpu.swapwait[<url>,<uuid>]',
-					'description' => _('CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.cpu.swapwait[<url>,<uuid>,<instance>]',
+					'description' => _('CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance')
 				],
 				[
 					'key' => 'vmware.vm.cpu.usage[<url>,<uuid>]',
@@ -1087,16 +1087,16 @@ class CHelpItems {
 					'description' => _('VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
-					'key' => 'vmware.vm.storage.readoio[<url>,<uuid>]',
-					'description' => _('Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
+					'description' => _('Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
-					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>]',
-					'description' => _('	The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
+					'description' => _('	The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
-					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>]',
-					'description' => _('The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
+					'description' => _('The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
 					'key' => 'vmware.vm.storage.uncommitted[<url>,<uuid>]',
@@ -1107,8 +1107,8 @@ class CHelpItems {
 					'description' => _('VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
-					'key' => 'vmware.vm.storage.writeoio[<url>,<uuid>]',
-					'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+					'key' => 'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]',
+					'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
 					'key' => 'vmware.vm.uptime[<url>,<uuid>]',
