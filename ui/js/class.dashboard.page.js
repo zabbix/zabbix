@@ -2636,7 +2636,7 @@ class CDashboardPage {
 		this._updateIteratorPager(iterator);
 
 		const current_children = iterator.children;
-		const current_children_by_widgetid = {};
+		const current_children_by_widgetid = [];
 
 		iterator.children = [];
 
