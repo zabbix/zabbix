@@ -456,12 +456,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		goto fail;
 	}
 
-	if (0 < groupid && SUCCEED != zbx_check_script_permissions(groupid, hostid))
-	{
-		zbx_strlcpy(error, "Script does not have permission to be executed on the host.", sizeof(error));
-		goto fail;
-	}
-
 	/* get host or event details */
 
 	if (0 != hostid)
@@ -533,6 +527,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		if (SUCCEED != get_host_from_event((NULL != recovery_event) ? recovery_event : problem_event,
 				&host, error, sizeof(error)))
 			goto fail;
+	}
+
+	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
+	{
+		zbx_strlcpy(error, "Script does not have permission to be executed on the host.", sizeof(error));
+		goto fail;
 	}
 
 	if (USER_TYPE_SUPER_ADMIN != user->type &&
