@@ -426,37 +426,6 @@ out:
 	return ret;
 }
 
-/**************************************************************************************************
- *                                                                                                *
- * Function: zbx_execute_webhook                                                                  *
- *                                                                                                *
- * Purpose: executes webhook                                                                      *
- *                                                                                                *
- * Parameters:  script         - [IN] the script to be executed                                   *
- *              params         - [IN] parameters for the script                                   *
- *              result         - [OUT] the result of a script execution                           *
- *              error          - [IN/OUT] the error reported by the script (or the script engine) *
- *              max_error_len  - [IN] the maximum error length                                    *
- *              debug          - [OUT] the debug data (optional)                                  *
- *                                                                                                *
- * Return value:  SUCCEED - processed successfully                                                *
- *                FAIL - an error occurred                                                        *
- *                                                                                                *
- **************************************************************************************************/
-static int	zbx_execute_webhook(const zbx_script_t *script, const char *params, char **result, char *error,
-		size_t max_error_len, char **debug)
-{
-	int	ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	ret = zbx_es_execute_command(script->command, params, script->timeout, result, error, max_error_len, debug);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_script_execute                                               *
@@ -488,7 +457,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_execute_webhook(script, params, result, error, max_error_len, debug);
+			ret = zbx_es_execute_command(script->command, params, script->timeout, result, error,
+					max_error_len, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
