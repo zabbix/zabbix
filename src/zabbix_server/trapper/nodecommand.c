@@ -313,76 +313,72 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_find_related_eventid                                         *
+ * Function: zbx_check_event_end_recovery_event                               *
  *                                                                            *
- * Purpose: for the specified event id find the problem event id or recovery  *
- *          event id                                                          *
+ * Purpose: check if the specified event id corresponds to a problem event    *
+ *          caused by a trigger, find its recovery event (if it exists)       *
  *                                                                            *
- * Parameters:  input_eventid - [IN] the id of event                          *
- *              eventid       - [OUT] the id of problem event                 *
- *              r_eventid     - [OUT] the id of recovery event                *
+ * Parameters:  eventid       - [IN] the id of event                          *
+ *              r_eventid     - [OUT] the id of recovery event (0 if there is *
+ *                              no recovery event                             *
  *              error         - [OUT] the error message buffer                *
  *              error_len     - [IN] the size of error message buffer         *
  *                                                                            *
- * Return value:  SUCCEED (eventid and r_eventid are set) or FAIL ('error' is *
- *                set)                                                        *
- *                                                                            *
- * Comments: this funcion tries to determine if the 'input_eventid' refers to *
- *           a problem event or a recovery event. In both cases it tries to   *
- *           find the related (recovery or problem, respectively) event id.   *
- *           If 'input_eventid' has no corresponding recovery event then 0    *
- *           is returned as r_eventid.                                        *
- *           If 'input_eventid' refers to a recovery event which "closes"     *
- *           multiple problem events then the oldest (with the smallest id)   *
- *           one is set as the 'eventid'.                                     *
+ * Return value:  SUCCEED or FAIL (with 'error' message)                      *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_find_related_eventid(zbx_uint64_t input_eventid, zbx_uint64_t *eventid, zbx_uint64_t *r_eventid,
-		char *error, size_t error_len)
+static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t *r_eventid, char *error,
+		size_t error_len)
 {
 	DB_RESULT	db_result;
 	DB_ROW		row;
-	int		ret = SUCCEED;
+	int		ret = FAIL;
 
-	db_result = DBselect("select min(eventid),r_eventid"
-			" from event_recovery"
-			" where eventid="ZBX_FS_UI64
-			" or r_eventid="ZBX_FS_UI64
-			" group by r_eventid",
-			input_eventid, input_eventid);
+	db_result = DBselect("select e.source,e.value,er.r_eventid"
+			" from events e"
+			" left join event_recovery er"
+				" on e.eventid=er.eventid"
+			" where e.eventid="ZBX_FS_UI64, eventid);
 
 	if (NULL == db_result)
 	{
-		zbx_strlcpy(error, "Database error, cannot read from 'event_recovery' table.", error_len);
+		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.", error_len);
 		return FAIL;
 	}
 
-	if (NULL == (row = DBfetch(db_result)))		/* the input event has no recovery event */
+	if (NULL == (row = DBfetch(db_result)))
 	{
-		*eventid = input_eventid;
+		zbx_strlcpy(error, "Cannot find the specified event.", error_len);
+		goto fail;
+	}
+
+	if (EVENT_SOURCE_TRIGGERS != atoi(row[0]))
+	{
+		zbx_strlcpy(error, "The source of specified event is not a trigger.", error_len);
+		goto fail;
+	}
+
+	if (TRIGGER_VALUE_PROBLEM != atoi(row[1]))
+	{
+		zbx_strlcpy(error, "The specified event is not a problem event.", error_len);
+		goto fail;
+	}
+
+	if (SUCCEED == DBis_null(row[2]))	/* the input event has no recovery event */
+	{
 		*r_eventid = 0;
 	}
-	else	/* the input event has a recovery event or is itself a recovery event */
+	else
 	{
-		zbx_uint64_t	eventid_loc, r_eventid_loc;
+		zbx_uint64_t	r_eventid_loc;
 
-		ZBX_DBROW2UINT64(eventid_loc, row[0]);
-		ZBX_DBROW2UINT64(r_eventid_loc, row[1]);
+		ZBX_DBROW2UINT64(r_eventid_loc, row[2]);
 
-		if (input_eventid == eventid_loc || input_eventid == r_eventid_loc)
-		{
-			*eventid = eventid_loc;
-			*r_eventid = r_eventid_loc;
-		}
-		else
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_snprintf(error, sizeof(error), "Internal error in %s() input_eventid:" ZBX_FS_UI64
-					" eventid:%s r_eventid:%s", __func__, input_eventid, row[0], row[1]);
-			ret = FAIL;
-		}
+		*r_eventid = r_eventid_loc;
 	}
 
+	ret = SUCCEED;
+fail:
 	DBfree_result(db_result);
 
 	return ret;
@@ -478,18 +474,18 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else /* eventid */
 	{
-		zbx_uint64_t	eventid_loc, r_eventid_loc;
+		zbx_uint64_t	r_eventid;
 
-		if (SUCCEED != zbx_find_related_eventid(eventid, &eventid_loc, &r_eventid_loc, error, sizeof(error)))
+		if (SUCCEED != zbx_check_event_end_recovery_event(eventid, &r_eventid, error, sizeof(error)))
 			goto fail;
 
 		zbx_vector_uint64_reserve(&eventids, 2);
 		zbx_vector_ptr_reserve(&events, 2);
 
-		zbx_vector_uint64_append(&eventids, eventid_loc);	/* primary event in element [0]*/
+		zbx_vector_uint64_append(&eventids, eventid);	/* problem event in element [0]*/
 
-		if (0 != r_eventid_loc)					/* optional recovery event in element [1] */
-			zbx_vector_uint64_append(&eventids, r_eventid_loc);
+		if (0 != r_eventid)				/* optional recovery event in element [1] */
+			zbx_vector_uint64_append(&eventids, r_eventid);
 
 		zbx_db_get_events_by_eventids(&eventids, &events);
 
@@ -498,17 +494,28 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			case 0:
 				zbx_strlcpy(error, "Specified event data not found.", sizeof(error));
 				goto fail;
-			case 2:
-				if (r_eventid_loc == ((DB_EVENT *)(events.values[0]))->eventid)
-					recovery_event = events.values[0];
-				else if (r_eventid_loc == ((DB_EVENT *)(events.values[1]))->eventid)
-					recovery_event = events.values[1];
-				ZBX_FALLTHROUGH;
 			case 1:
-				if (eventid_loc == ((DB_EVENT *)(events.values[0]))->eventid)
+				if (eventid == ((DB_EVENT *)(events.values[0]))->eventid)
+				{
 					problem_event = events.values[0];
-				else if (eventid_loc == ((DB_EVENT *)(events.values[1]))->eventid)
+				}
+				else
+				{
+					zbx_strlcpy(error, "Specified event data not found.", sizeof(error));
+					goto fail;
+				}
+				break;
+			case 2:
+				if (r_eventid == ((DB_EVENT *)(events.values[0]))->eventid)
+				{
 					problem_event = events.values[1];
+					recovery_event = events.values[0];
+				}
+				else
+				{
+					problem_event = events.values[0];
+					recovery_event = events.values[1];
+				}
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -517,13 +524,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				goto fail;
 		}
 
-		if (NULL == problem_event)
-		{
-			zbx_snprintf(error, sizeof(error), "Internal error in %s() problem_event:NULL", __func__);
-			goto fail;
-		}
-
-		if (0 != r_eventid_loc && NULL == recovery_event)
+		if (0 != r_eventid && NULL == recovery_event)
 		{
 			zbx_snprintf(error, sizeof(error), "Internal error in %s() recovery_event:NULL", __func__);
 			goto fail;
