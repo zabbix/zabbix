@@ -5002,9 +5002,9 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"net/packetsRx[summation]", "net/packetsTx[summation]",
 						"net/received[average]", "net/transmitted[average]",
 						"datastore/totalReadLatency[average]",
-						"datastore/totalWriteLatency[average]", "cpu/usage[none]",
-						"cpu/usage[average]", "cpu/utilization[average]",
-						"power/power[average]", "power/powerCap[average]",
+						"datastore/totalWriteLatency[average]", "cpu/usage[average]",
+						"cpu/utilization[average]", "power/power[average]",
+						"power/powerCap[average]",
 						NULL
 					};
 
@@ -5014,14 +5014,14 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"virtualDisk/numberWriteAveraged[average]",
 						"net/packetsRx[summation]", "net/packetsTx[summation]",
 						"net/received[average]", "net/transmitted[average]",
-						"cpu/ready[summation]", "net/usage[average]", "cpu/usage[none]",
-						"cpu/usage[average]", "cpu/latency[average]",
-						"cpu/readiness[average]", "cpu/swapwait[summation]",
-						"sys/osUptime[latest]", "mem/consumed[average]",
-						"mem/usage[average]", "mem/swapped[average]",
+						"cpu/ready[summation]", "net/usage[average]", "cpu/usage[average]",
+						"cpu/latency[average]", "cpu/readiness[average]",
+						"cpu/swapwait[summation]", "sys/osUptime[latest]",
+						"mem/consumed[average]", "mem/usage[average]", "mem/swapped[average]",
 						"net/received[average]", "net/transmitted[average]",
 						"net/usage[average]", "virtualDisk/readOIO[latest]",
-						"virtualDisk/writeOIO[latest]", "virtualDisk/totalWriteLatency[average]",
+						"virtualDisk/writeOIO[latest]",
+						"virtualDisk/totalWriteLatency[average]",
 						"virtualDisk/totalReadLatency[average]",
 						NULL
 					};

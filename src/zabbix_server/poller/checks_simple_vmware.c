@@ -912,14 +912,14 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	char			*url, *uuid, *avg, path[32];
+	char			*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 > request->nparam || request->nparam > 3)
+	if (2 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -927,26 +927,12 @@ int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 
 	url = get_rparam(request, 0);
 	uuid = get_rparam(request, 1);
-	avg = get_rparam(request, 2);
 
 	if ('\0' == *uuid)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto out;
 	}
-
-	if (NULL != avg && '\0' != *avg)
-	{
-		if (0 != strcmp(avg, "avg"))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			goto out;
-		}
-		else
-			zbx_strlcpy(path, "cpu/usage[average]", sizeof(path));
-	}
-	else
-		zbx_strlcpy(path, "cpu/usage[none]", sizeof(path));
 
 	zbx_vmware_lock();
 
@@ -959,7 +945,8 @@ int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, path, "", ZBX_KIBIBYTE, result);
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/usage[average]", "", 1,
+			result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -999,7 +986,7 @@ int	check_vcenter_hv_cpu_utilization(AGENT_REQUEST *request, const char *usernam
 	}
 
 	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, "cpu/utilization[average]", "",
-			ZBX_KIBIBYTE, result);
+			1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4061,12 +4048,11 @@ int	check_vcenter_vm_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 {
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid, *avg;
-	char			path[32];
+	const char		*url, *uuid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 > request->nparam || request->nparam > 3)
+	if (2 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -4074,7 +4060,6 @@ int	check_vcenter_vm_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 
 	url = get_rparam(request, 0);
 	uuid = get_rparam(request, 1);
-	avg = get_rparam(request, 2);
 
 	if ('\0' == *uuid)
 	{
@@ -4082,25 +4067,12 @@ int	check_vcenter_vm_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 		goto out;
 	}
 
-	if (NULL != avg && '\0' != *avg)
-	{
-		if (0 != strcmp(avg, "avg"))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			goto out;
-		}
-		else
-			zbx_strlcpy(path, "cpu/usage[average]", sizeof(path));
-	}
-	else
-		zbx_strlcpy(path, "cpu/usage[none]", sizeof(path));
-
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	ret = vmware_service_get_vm_counter(service, uuid, "", path, 1, result);
+	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/usage[average]", 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
