@@ -346,10 +346,25 @@ static int			destinations_count = 0;
 volatile sig_atomic_t	sig_exiting = 0;
 
 #if !defined(_WINDOWS)
-
 static void	sender_signal_handler(int sig)
 {
-	ZBX_UNUSED(sig);
+#define CASE_LOG_WARNING(signal) \
+	case signal:							\
+		zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
+		break
+
+	switch (sig)
+	{
+		CASE_LOG_WARNING(SIGALRM);
+		CASE_LOG_WARNING(SIGINT);
+		CASE_LOG_WARNING(SIGQUIT);
+		CASE_LOG_WARNING(SIGTERM);
+		CASE_LOG_WARNING(SIGHUP);
+		CASE_LOG_WARNING(SIGPIPE);
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "signal %d while executing operation", sig);
+	}
+#undef CASE_LOG_WARNING
 
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
@@ -361,23 +376,7 @@ static void	main_signal_handler(int sig)
 	if (0 == sig_exiting)
 	{
 		int	i;
-#define CASE_LOG_WARNING(signal) \
-		case signal:							\
-			zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
-			break
 
-		switch (sig)
-		{
-			CASE_LOG_WARNING(SIGALRM);
-			CASE_LOG_WARNING(SIGINT);
-			CASE_LOG_WARNING(SIGQUIT);
-			CASE_LOG_WARNING(SIGTERM);
-			CASE_LOG_WARNING(SIGHUP);
-			CASE_LOG_WARNING(SIGPIPE);
-			default:
-				zabbix_log(LOG_LEVEL_WARNING, "signal %d while executing operation", sig);
-		}
-#undef CASE_LOG_WARNING
 		sig_exiting = 1;
 
 		for (i = 0; i < destinations_count; i++)
