@@ -350,9 +350,40 @@ $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
  * Filter
  */
 if (hasRequest('filter_set')) {
+	$filter_hostids = getRequest('filter_hostids', []);
+	$filter_valuemapids = getRequest('filter_valuemapids', []);
+
+	if ($filter_hostids && $filter_valuemapids) {
+		$valuemap_hosts = API::Host()->get([
+			'output' => [],
+			'selectParentTemplates' => ['templateid'],
+			'hostids' => $filter_hostids,
+			'preservekeys' => true
+		]);
+		$valuemap_hostids = array_keys($valuemap_hosts);
+
+		foreach ($valuemap_hosts as $valuemap_host) {
+			$valuemap_hostids = array_merge($valuemap_hostids,
+				array_column($valuemap_host['parentTemplates'], 'templateid')
+			);
+		}
+
+		$valuemap_name = API::ValueMap()->get([
+			'output' => ['name'],
+			'valuemapids' => $filter_valuemapids
+		]);
+		$valuemap_name = array_flip(array_column($valuemap_name, 'name'));
+		$valuemapids = API::ValueMap()->get([
+			'output' => ['valuemapid'],
+			'hostids' => $valuemap_hostids,
+			'filter' => ['name' => array_keys($valuemap_name)]
+		]);
+		$filter_valuemapids = array_column($valuemapids, 'valuemapid');
+	}
+
 	CProfile::updateArray($prefix.'items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
-	CProfile::updateArray($prefix.'items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
-	CProfile::updateArray($prefix.'items.filter_valuemapids', getRequest('filter_valuemapids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'items.filter_hostids', $filter_hostids, PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'items.filter_valuemapids', $filter_valuemapids, PROFILE_TYPE_ID);
 	CProfile::update($prefix.'items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
@@ -1345,7 +1376,7 @@ else {
 			&& $_REQUEST['filter_value_type'] != -1) {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
-	if ($_REQUEST['filter_valuemapids']) {
+	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
 		$options['filter']['valuemapid'] = $_REQUEST['filter_valuemapids'];
 	}
 

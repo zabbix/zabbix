@@ -325,37 +325,43 @@ function getItemFilterForm(&$data) {
 	);
 
 	// row 5
-	$valuemaps_filter = $filter_valuemapids
-		? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $filter_valuemapids,
-			'editable' => true
-		]), ['valuemapid' => 'id'])
-		: [];
-
 	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-	$filterColumn2->addRow(_('Value mapping'),
-		(new CMultiSelect([
-			'name' => 'filter_valuemapids[]',
-			'object_name' => 'valuemaps',
-			'data' => $valuemaps_filter,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'valuemaps',
-					'srcfld1' => 'valuemapid',
-					'dstfrm' => $filter->getName(),
-					'dstfld1' => 'filter_valuemapids_',
-					'hostids' => array_column($host_template_filter, 'id'),
-					'show_host_name' => true,
-					'with_inherited' => true,
-					'editable' => true
+	if ($host_template_filter) {
+		$valuemaps_filter = $filter_valuemapids
+			? CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'valuemapids' => $filter_valuemapids
+			]), ['valuemapid' => 'id'])
+			: [];
+
+		$filterColumn2->addRow(_('Value mapping'),
+			(new CMultiSelect([
+				'name' => 'filter_valuemapids[]',
+				'object_name' => 'valuemaps',
+				'data' => array_values(array_column($valuemaps_filter, null, 'name')),
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'valuemaps',
+						'srcfld1' => 'valuemapid',
+						'dstfrm' => $filter->getName(),
+						'dstfld1' => 'filter_valuemapids_',
+						'hostids' => array_column($host_template_filter, 'id'),
+						'show_host_name' => true,
+						'with_inherited' => true,
+						'editable' => true
+					]
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	);
+			]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		);
+	}
+	else {
+		foreach ($filter_valuemapids as $filter_valuemapid) {
+			$filter->addVar('filter_valuemapids[]', $filter_valuemapid);
+		}
+	}
 
 	if ($data['context'] === 'host') {
 		$filterColumn4->addRow(_('Discovered'),
