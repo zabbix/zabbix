@@ -7470,6 +7470,10 @@ z-select,
 	tbody {
 		td {
 			border-bottom: 1px solid $table-border-color;
+
+			&.wordwrap {
+				white-space: normal;
+			}
 		}
 
 		tr:first-child td {
@@ -7480,4 +7484,12 @@ z-select,
 
 .valuemap-checkbox {
 	margin-top: 10px;
+}
+
+.overlay-dialogue {
+	.valuemap-list-table {
+		td {
+			vertical-align: top;
+		}
+	}
 }

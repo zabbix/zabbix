@@ -6153,11 +6153,16 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .valuemap-list-table tbody td {
   border-bottom: 1px solid #383838; }
+  .valuemap-list-table tbody td.wordwrap {
+    white-space: normal; }
 .valuemap-list-table tbody tr:first-child td {
   border-top: 1px solid #383838; }
 
 .valuemap-checkbox {
   margin-top: 10px; }
+
+.overlay-dialogue .valuemap-list-table td {
+  vertical-align: top; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
