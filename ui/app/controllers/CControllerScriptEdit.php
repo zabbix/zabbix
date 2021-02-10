@@ -108,7 +108,8 @@ class CControllerScriptEdit extends CController {
 			'host_access' => PERM_READ,
 			'confirmation' => '',
 			'enable_confirmation' => false,
-			'hgstype' => 0
+			'hgstype' => 0,
+			'has_action' => false
 		];
 
 		// Get values from the dabatase.

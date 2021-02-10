@@ -758,10 +758,6 @@ class CScript extends CApiService {
 				break;
 		}
 
-//		$api_input_rules['fields'] += $common_fields + [
-//			'menu_path' => ['type' => API_STRING_UTF8]
-//		];
-
 		return $api_input_rules;
 	}
 

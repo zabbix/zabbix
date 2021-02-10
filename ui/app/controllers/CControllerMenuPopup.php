@@ -122,12 +122,38 @@ class CControllerMenuPopup extends CController {
 				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
 				: [];
 
-			foreach ($scripts as &$script) {
-				$script['name'] = trimPath($script['name']);
-			}
-			unset($script);
+			// Filter only host scope scripts and get rid of excess spaces and create full name with menu path included.
+			if ($scripts) {
+				foreach ($scripts as $num => &$script) {
+					if ($script['scope'] != ZBX_SCRIPT_SCOPE_HOST) {
+						unset($scripts[$num]);
+						continue;
+					}
 
-			CArrayHelper::sort($scripts, ['name']);
+					$script['menu_path'] = trimPath($script['menu_path']);
+
+					if (strlen($script['menu_path']) > 0) {
+						// First or only slash from beginning is trimmed.
+						if (substr($script['menu_path'], 0, 1) === '/') {
+							$script['menu_path'] = substr($script['menu_path'], 1);
+						}
+
+						// If there is something more, check if last slash is present.
+						if (strlen($script['menu_path']) > 0) {
+							if (substr($script['menu_path'], -1) !== '/') {
+								$script['menu_path'] .= '/';
+							}
+						}
+					}
+
+					$script['name'] = $script['menu_path'].$script['name'];
+				}
+				unset($script);
+			}
+
+			if ($scripts) {
+				CArrayHelper::sort($scripts, ['name']);
+			}
 
 			$menu_data = [
 				'type' => 'host',
@@ -627,11 +653,31 @@ class CControllerMenuPopup extends CController {
 				? $event ? API::Script()->getScriptsByHosts(array_keys($hosts)) : []
 				: [];
 
+			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
 			$scripts = [];
 			foreach ($scripts_by_hosts as &$host_scripts) {
 				foreach ($host_scripts as &$host_script) {
-					if (!array_key_exists($host_script['scriptid'], $scripts)) {
-						$host_script['name'] = trimPath($host_script['name']);
+					if (!array_key_exists($host_script['scriptid'], $scripts)
+							&& $host_script['scope'] == ZBX_SCRIPT_SCOPE_EVENT) {
+
+						$host_script['menu_path'] = trimPath($host_script['menu_path']);
+
+						if (strlen($host_script['menu_path']) > 0) {
+							// First or only slash from beginning is trimmed.
+							if (substr($host_script['menu_path'], 0, 1) === '/') {
+								$host_script['menu_path'] = substr($host_script['menu_path'], 1);
+							}
+
+							// If there is something more, check if last slash is present.
+							if (strlen($host_script['menu_path']) > 0) {
+								if (substr($host_script['menu_path'], -1) !== '/') {
+									$host_script['menu_path'] .= '/';
+								}
+							}
+						}
+
+						$host_script['name'] = $host_script['menu_path'].$host_script['name'];
+
 						$scripts[$host_script['scriptid']] = $host_script;
 					}
 				}
