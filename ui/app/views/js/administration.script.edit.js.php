@@ -261,6 +261,7 @@
 		$('#clone').click(function() {
 			$('#scriptid, #delete, #clone').remove();
 			$('#update').text(<?= json_encode(_('Add')) ?>);
+			$('input[name=scope]').prop('disabled', false);
 			$('#update')
 				.val('script.create')
 				.attr({id: 'add'});

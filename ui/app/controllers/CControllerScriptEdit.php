@@ -152,6 +152,10 @@ class CControllerScriptEdit extends CController {
 				$data['port'] = $script['port'];
 				$data['menu_path'] = $script['menu_path'];
 				$data['parameters'] = $script['parameters'];
+				$data['has_action'] = (bool) API::Action()->get([
+					'output' => [],
+					'scriptids' => $script['scriptid']
+				]);
 			}
 		}
 

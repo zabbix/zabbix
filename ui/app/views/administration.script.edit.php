@@ -102,11 +102,11 @@ $form_list = (new CFormList())
 			->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 			->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
 			->setModern(true)
+			->setEnabled(!$data['has_action'])
 	)
 	->addRow(new CLabel(_('Menu path'), 'menu_path'),
 		(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
 			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
 	)
 	->addRow((new CLabel(_('Type'), 'type')),

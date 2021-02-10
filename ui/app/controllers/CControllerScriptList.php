@@ -32,7 +32,8 @@ class CControllerScriptList extends CController {
 			'uncheck' =>		'in 1',
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
-			'filter_name' =>	'string'
+			'filter_name' =>	'string',
+			'filter_scope' =>	'in '.implode(',', [-1, ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,13 +59,16 @@ class CControllerScriptList extends CController {
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.scripts.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.scripts.filter_scope', $this->getInput('filter_scope', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.scripts.filter_name');
+			CProfile::delete('web.scripts.filter_scope');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.scripts.filter_name', '')
+			'name' => CProfile::get('web.scripts.filter_name', ''),
+			'scope' => CProfile::get('web.scripts.filter_scope', -1)
 		];
 
 		$data = [
@@ -79,9 +83,14 @@ class CControllerScriptList extends CController {
 		// list of scripts
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['scripts'] = API::Script()->get([
-			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'],
+			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on',
+				'scope'
+			],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
+			],
+			'filter' => [
+				'scope' => ($filter['scope'] == -1) ? null : $filter['scope']
 			],
 			'editable' => true,
 			'limit' => $limit
@@ -96,8 +105,33 @@ class CControllerScriptList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		// find script host group name and user group name. set to '' if all host/user groups used.
+		// Get list of actions.
+		$actions = [];
 
+		if ($data['scripts']) {
+			$action_scriptids = [];
+
+			foreach ($data['scripts'] as $script) {
+				if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+					$action_scriptids[$script['scriptid']] = true;
+				}
+			}
+
+			if ($action_scriptids) {
+				$actions = API::Action()->get([
+					'output' => ['actionid', 'name'],
+					'scriptids' => array_keys($action_scriptids),
+					'selectOperations' => ['opcommand'],
+					'selectRecoveryOperations' => ['opcommand'],
+					'selectAcknowledgeOperations' => ['opcommand']
+				]);
+			}
+		}
+
+		/*
+		 * Find script host group name and user group name. Set to '' if all host/user groups used. Find associated
+		 * actions in any of operations.
+		 */
 		$usrgrpids = [];
 		$groupids = [];
 
@@ -115,6 +149,47 @@ class CControllerScriptList extends CController {
 
 			if ($script['groupid'] != 0) {
 				$groupids[] = $script['groupid'];
+			}
+
+			$script['actions']  = [];
+
+			if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION && $actions) {
+				foreach ($actions as $action) {
+					if ($action['operations']) {
+						// Find at least one usage of script in any of operations.
+						foreach ($action['operations'] as $operation) {
+							if (array_key_exists('opcommand', $operation)
+									&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+								$script['actions'][$action['actionid']] = $action['name'];
+								break;
+							}
+						}
+					}
+
+					if ($action['recoveryOperations']) {
+						foreach ($action['recoveryOperations'] as $operation) {
+							if (array_key_exists('opcommand', $operation)
+									&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+								$script['actions'][$action['actionid']] = $action['name'];
+								break;
+							}
+						}
+					}
+
+					if ($action['acknowledgeOperations']) {
+						foreach ($action['acknowledgeOperations'] as $operation) {
+							if (array_key_exists('opcommand', $operation)
+									&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+								$script['actions'][$action['actionid']] = $action['name'];
+								break;
+							}
+						}
+					}
+				}
+
+				if ($script['actions']) {
+					order_result($script['actions']);
+				}
 			}
 		}
 		unset($script);
@@ -150,6 +225,10 @@ class CControllerScriptList extends CController {
 			}
 			unset($script);
 		}
+
+		$data['config'] = [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));

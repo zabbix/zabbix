@@ -200,7 +200,9 @@ class CControllerActionOperationGet extends CController {
 		if ($scripts_allowed) {
 			$db_scripts = API::Script()->get([
 				'output' => ['name', 'scriptid'],
-				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION]
+				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP
 			]);
 
 			if ($db_scripts) {
