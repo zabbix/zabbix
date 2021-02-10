@@ -2636,7 +2636,7 @@ class CDashboardPage {
 		this._updateIteratorPager(iterator);
 
 		const current_children = iterator.children;
-		const current_children_by_widgetid = [];
+		const current_children_by_widgetid = {};
 
 		iterator.children = [];
 
@@ -2671,7 +2671,7 @@ class CDashboardPage {
 				}
 			});
 
-		for (const child of current_children_by_widgetid) {
+		for (const child of Object.values(current_children_by_widgetid)) {
 			if (!reused_widgetids.includes(child.widgetid)) {
 				this._removeWidget(child);
 			}
