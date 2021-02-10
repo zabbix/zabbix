@@ -355,7 +355,7 @@ if (hasRequest('filter_set')) {
 
 	if ($filter_hostids && $filter_valuemapids) {
 		if (getRequest('context') === 'host') {
-			$valuemap_hosts = API::Host()->get([
+			$valuemap_templates = API::Host()->get([
 				'output' => [],
 				'selectParentTemplates' => ['templateid'],
 				'hostids' => $filter_hostids,
@@ -363,21 +363,15 @@ if (hasRequest('filter_set')) {
 			]);
 		}
 		else {
-			$valuemap_hosts = API::Template()->get([
+			$valuemap_templates = API::Template()->get([
 				'output' => [],
 				'selectParentTemplates' => ['templateid'],
 				'templateids' => $filter_hostids,
 				'preservekeys' => true
 			]);
 		}
-		$valuemap_hostids = array_keys($valuemap_hosts);
 
-		foreach ($valuemap_hosts as $valuemap_host) {
-			$valuemap_hostids = array_merge($valuemap_hostids,
-				array_column($valuemap_host['parentTemplates'], 'templateid')
-			);
-		}
-
+		$valuemap_templates = CValueMapHelper::getParentTemplatesRecursive($valuemap_templates, ['templateid']);
 		$valuemap_name = API::ValueMap()->get([
 			'output' => ['name'],
 			'valuemapids' => $filter_valuemapids
@@ -385,7 +379,7 @@ if (hasRequest('filter_set')) {
 		$valuemap_name = array_flip(array_column($valuemap_name, 'name'));
 		$valuemapids = API::ValueMap()->get([
 			'output' => ['valuemapid'],
-			'hostids' => $valuemap_hostids,
+			'hostids' => array_keys($valuemap_templates),
 			'filter' => ['name' => array_keys($valuemap_name)]
 		]);
 		$filter_valuemapids = array_column($valuemapids, 'valuemapid');
