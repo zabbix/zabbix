@@ -13544,6 +13544,15 @@ static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 	}
 }
 
+void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+{
+	RDLOCK_CACHE;
+
+	zbx_get_item_tags(itemid, item_tags);
+
+	UNLOCK_CACHE;
+}
+
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num,
 		zbx_vector_ptr_t *item_tags)
 {

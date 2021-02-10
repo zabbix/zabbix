@@ -588,7 +588,7 @@ static int	DBpatch_5030049(void)
 	result = DBselect(
 			"select i.itemid,a.name from items i"
 			" join items_applications ip on i.itemid=ip.itemid"
-			" join applications a on ip.applicationid=a.applicationid;");
+			" join applications a on ip.applicationid=a.applicationid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -622,7 +622,7 @@ static int	DBpatch_5030050(void)
 	result = DBselect(
 			"select i.itemid,ap.name from items i"
 			" join item_application_prototype ip on i.itemid=ip.itemid"
-			" join application_prototype ap on ip.application_prototypeid=ap.application_prototypeid;");
+			" join application_prototype ap on ip.application_prototypeid=ap.application_prototypeid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -655,7 +655,7 @@ static int	DBpatch_5030051(void)
 	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
 	result = DBselect(
 			"select h.httptestid,a.name from httptest h"
-			" join applications a on h.applicationid=a.applicationid;");
+			" join applications a on h.applicationid=a.applicationid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -687,7 +687,7 @@ static int	DBpatch_5030052(void)
 	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
 	result = DBselect(
 			"select selementid,application from sysmaps_elements"
-			" where elementtype in (0,3) and application<>'';");
+			" where elementtype in (0,3) and application<>''");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -718,12 +718,12 @@ static int	DBpatch_5030053(void)
 
 	result = DBselect(
 			"select distinct e.eventid,it.tag,it.value from events e"
-			" left join triggers t on e.objectid=t.triggerid"
-			" left join functions f on t.triggerid=f.triggerid"
-			" left join items i on i.itemid=f.itemid"
+			" join triggers t on e.objectid=t.triggerid"
+			" join functions f on t.triggerid=f.triggerid"
+			" join items i on i.itemid=f.itemid"
 			" join item_tag it on i.itemid=it.itemid"
-			" where e.source=%d and e.object=%d and t.flags in (%d,%d) order by e.eventid;",
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, ZBX_FLAG_DISCOVERY_NORMAL,
+			" where e.source in (%d,%d) and e.object=%d and t.flags in (%d,%d) order by e.eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, ZBX_FLAG_DISCOVERY_NORMAL,
 			ZBX_FLAG_DISCOVERY_CREATED);
 
 	while (NULL != (row = DBfetch(result)))
@@ -759,6 +759,58 @@ static int	DBpatch_5030053(void)
 }
 
 static int	DBpatch_5030054(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_db_insert_t	db_insert;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+
+	result = DBselect(
+			"select distinct e.eventid,it.tag,it.value from events e"
+			" join items i on i.itemid=e.objectid"
+			" join item_tag it on i.itemid=it.itemid"
+			" where e.source=%d and e.object=%d and i.flags in (%d,%d)",
+			EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		rowN;
+		DB_RESULT	resultN;
+		zbx_uint64_t	eventid;
+		char		*tag, *value, tmp[MAX_STRING_LEN];
+
+		ZBX_DBROW2UINT64(eventid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		value = DBdyn_escape_string(row[2]);
+		zbx_snprintf(tmp, sizeof(tmp),
+				"select null from event_tag where eventid=" ZBX_FS_UI64 " and tag='%s' and value='%s'",
+				eventid, tag, value);
+
+		resultN = DBselectN(tmp, 1);
+
+		if (NULL == (rowN = DBfetch(resultN)))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, tag, value);
+
+		DBfree_result(resultN);
+		zbx_free(tag);
+		zbx_free(value);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "eventtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_5030055(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -804,43 +856,9 @@ static int	DBpatch_5030054(void)
 	return ret;
 }
 
-#define CONDITION_TYPE_APPLICATION	15
-static int	DBpatch_5030055(void)
-{
-	DB_ROW		row;
-	DB_RESULT	result;
-	zbx_uint64_t	conditionid;
-	char		*value;
-
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	result = DBselect(
-			"select c.conditionid,c.value,c.conditiontype,a.eventsource from conditions c"
-			" left join actions a on a.actionid=c.actionid"
-			" where a.eventsource=%d and c.conditiontype=%d",
-			EVENT_SOURCE_TRIGGERS, CONDITION_TYPE_APPLICATION);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_DBROW2UINT64(conditionid, row[0]);
-		value = DBdyn_escape_string(row[1]);
-
-		if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application',value='%s'"
-				" where conditionid=" ZBX_FS_UI64, CONDITION_TYPE_EVENT_TAG_VALUE, value, conditionid))
-		{
-			return FAIL;
-		}
-
-		zbx_free(value);
-	}
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
 static int	DBpatch_5030056(void)
 {
+#define CONDITION_TYPE_APPLICATION	15
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -851,9 +869,8 @@ static int	DBpatch_5030056(void)
 	}
 
 	return SUCCEED;
-
-}
 #undef CONDITION_TYPE_APPLICATION
+}
 
 static int	DBpatch_5030057(void)
 {

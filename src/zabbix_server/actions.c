@@ -2513,126 +2513,6 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 
 /******************************************************************************
  *                                                                            *
- * Function: check_intern_item_tag_condition                                  *
- *                                                                            *
- * Purpose: check item tag condition for internal events                      *
- *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
- *             condition  - [IN/OUT] condition for matching, outputs          *
- *                                   event ids that match condition           *
- *                                                                            *
- * Return value: SUCCEED - supported operator                                 *
- *               NOTSUPPORTED - not supported operator                        *
- *                                                                            *
- ******************************************************************************/
-static int	check_intern_item_tag_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
-{
-	char			*sql = NULL;
-	size_t			sql_alloc = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE}, i, j;
-	zbx_vector_uint64_t	objectids[3];
-	zbx_uint64_t		objectid;
-
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_LIKE != condition->op &&
-			CONDITION_OPERATOR_NOT_LIKE != condition->op)
-		return NOTSUPPORTED;
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-		zbx_vector_uint64_create(&objectids[i]);
-
-	get_object_ids_internal(esc_events, objectids, objects, (int)ARRSIZE(objects));
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-	{
-		size_t	sql_offset = 0;
-
-		if (0 == objectids[i].values_num)
-			continue;
-
-		if (EVENT_OBJECT_TRIGGER == objects[i])
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct t.triggerid,it.tag,it.value"
-					" from item_tag it,functions f,triggers t"
-					" where it.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and");
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
-					objectids[i].values, objectids[i].values_num);
-		}
-		else	/* EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE */
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct i.itemid,it.tag,it.value"
-					" from item_tag it"
-					" where it.itemid=i.itemid"
-						" and");
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
-					objectids[i].values, objectids[i].values_num);
-		}
-
-		result = DBselect("%s", sql);
-
-		switch (condition->op)
-		{
-			case CONDITION_OPERATOR_EQUAL:
-				while (NULL != (row = DBfetch(result)))
-				{
-					if (0 == strcmp(row[1], condition->value2) &&
-							0 == strcmp(row[2], condition->value))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-						add_condition_match(esc_events, condition, objectid, objects[i]);
-					}
-				}
-				break;
-			case CONDITION_OPERATOR_LIKE:
-				while (NULL != (row = DBfetch(result)))
-				{
-					if (0 == strcmp(row[1], condition->value2) &&
-							NULL != strstr(row[2], condition->value))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-						add_condition_match(esc_events, condition, objectid, objects[i]);
-					}
-				}
-				break;
-			case CONDITION_OPERATOR_NOT_LIKE:
-				while (NULL != (row = DBfetch(result)))
-				{
-					if (0 == strcmp(row[1], condition->value2) &&
-							NULL != strstr(row[2], condition->value))
-					{
-						ZBX_STR2UINT64(objectid, row[0]);
-						if (FAIL != (j = zbx_vector_uint64_search(&objectids[i], objectid,
-								ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-						{
-							zbx_vector_uint64_remove_noorder(&objectids[i], j);
-						}
-					}
-				}
-
-				for (j = 0; j < objectids[i].values_num; j++)
-					add_condition_match(esc_events, condition, objectids[i].values[j], objects[i]);
-				break;
-		}
-		DBfree_result(result);
-	}
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-		zbx_vector_uint64_destroy(&objectids[i]);
-
-	zbx_free(sql);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: check_internal_condition                                         *
  *                                                                            *
  * Purpose: check if internal event matches single condition                  *
@@ -2663,8 +2543,13 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 		case CONDITION_TYPE_HOST:
 			ret = check_intern_host_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_ITEM_TAG:
-			ret = check_intern_item_tag_condition(esc_events, condition);
+		case CONDITION_TYPE_EVENT_TAG:
+			check_condition_event_tag(esc_events, condition);
+			ret = SUCCEED;
+			break;
+		case CONDITION_TYPE_EVENT_TAG_VALUE:
+			check_condition_event_tag_value(esc_events,condition);
+			ret = SUCCEED;
 			break;
 		default:
 			ret = FAIL;
