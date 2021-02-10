@@ -407,7 +407,7 @@ fail:
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
 		const char *clientip, char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0, i;
+	int			ret = FAIL, scope = 0, i, macro_type;
 	DC_HOST			host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
@@ -544,88 +544,47 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	user_timezone = get_user_timezone(user->userid);
 
-	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
-	{
-		if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
-			goto fail;
-	}
-
 	/* substitute macros in script body and webhook parameters */
 
 	if (0 != hostid)	/* script on host */
+		macro_type = MACRO_TYPE_SCRIPT;
+	else
+		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
+
+	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
-		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
+				NULL, &host, NULL, NULL, NULL, user_timezone, &script.command, macro_type, error,
+				sizeof(error)))
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL, &host,
-					NULL, NULL, NULL, user_timezone, &script.command, MACRO_TYPE_SCRIPT, error,
-					sizeof(error)))
-			{
-				goto fail;
-			}
-
-			/* expand macros in command_orig used for non-secure logging */
-			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, &user->userid, NULL, &host,
-					NULL, NULL, NULL, user_timezone, &script.command_orig, MACRO_TYPE_SCRIPT, error,
-					sizeof(error)))
-			{
-				/* script command_orig is a copy of script command - if the script command  */
-				/* macro substitution succeeded, then it will succeed also for command_orig */
-				THIS_SHOULD_NEVER_HAPPEN;
-				goto fail;
-			}
+			goto fail;
 		}
-		else
-		{
-			for (i = 0; i < webhook_params.values_num; i++)
-			{
-				if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, &user->userid, NULL,
-						&host, NULL, NULL, NULL, user_timezone,
-						(char **)&webhook_params.values[i].second, MACRO_TYPE_SCRIPT, error,
-						sizeof(error)))
-				{
-					goto fail;
-				}
-			}
 
-			zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
+		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
+				NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
+				sizeof(error)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto fail;
 		}
 	}
-	else	/* script on event */
+	else
 	{
-		int	macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
+		if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+			goto fail;
 
-		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
+		for (i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
-					&script.command, macro_type, error, sizeof(error)))
+					(char **)&webhook_params.values[i].second, macro_type, error,
+					sizeof(error)))
 			{
 				goto fail;
 			}
-
-			if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
-					&script.command_orig, macro_type, error, sizeof(error)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				goto fail;
-			}
 		}
-		else
-		{
-			for (i = 0; i < webhook_params.values_num; i++)
-			{
-				if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-						&user->userid, NULL, &host, NULL, NULL, NULL, user_timezone,
-						(char **)&webhook_params.values[i].second, macro_type, error,
-						sizeof(error)))
-				{
-					goto fail;
-				}
-			}
 
-			zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
-		}
+		zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
 	}
 
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
