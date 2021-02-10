@@ -32,6 +32,7 @@ if (array_key_exists('error', $data)) {
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.page.js');
+$this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
