@@ -332,56 +332,21 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 {
 	DB_RESULT	db_result;
 	DB_ROW		row;
-	int		ret = FAIL;
 
-	db_result = DBselect("select e.source,e.value,er.r_eventid"
-			" from events e"
-			" left join event_recovery er"
-				" on e.eventid=er.eventid"
-			" where e.eventid="ZBX_FS_UI64, eventid);
-
-	if (NULL == db_result)
+	if (NULL == (db_result = DBselect("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
 	{
 		zbx_strlcpy(error, "Database error, cannot read from 'events' and 'event_recovery' tables.", error_len);
 		return FAIL;
 	}
 
 	if (NULL == (row = DBfetch(db_result)))
-	{
-		zbx_strlcpy(error, "Cannot find the specified event.", error_len);
-		goto fail;
-	}
-
-	if (EVENT_SOURCE_TRIGGERS != atoi(row[0]))
-	{
-		zbx_strlcpy(error, "The source of specified event is not a trigger.", error_len);
-		goto fail;
-	}
-
-	if (TRIGGER_VALUE_PROBLEM != atoi(row[1]))
-	{
-		zbx_strlcpy(error, "The specified event is not a problem event.", error_len);
-		goto fail;
-	}
-
-	if (SUCCEED == DBis_null(row[2]))	/* the input event has no recovery event */
-	{
 		*r_eventid = 0;
-	}
 	else
-	{
-		zbx_uint64_t	r_eventid_loc;
+		ZBX_DBROW2UINT64(*r_eventid, row[0]);
 
-		ZBX_DBROW2UINT64(r_eventid_loc, row[2]);
-
-		*r_eventid = r_eventid_loc;
-	}
-
-	ret = SUCCEED;
-fail:
 	DBfree_result(db_result);
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -483,11 +448,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		zbx_db_get_events_by_eventids(&eventids, &events);
 
+		if (events.values_num != eventids.values_num)
+		{
+			zbx_strlcpy(error, "Specified event data not found.", sizeof(error));
+			goto fail;
+		}
+
 		switch (events.values_num)
 		{
-			case 0:
-				zbx_strlcpy(error, "Specified event data not found.", sizeof(error));
-				goto fail;
 			case 1:
 				if (eventid == ((DB_EVENT *)(events.values[0]))->eventid)
 				{
@@ -518,15 +486,17 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				goto fail;
 		}
 
-		if (0 != r_eventid && NULL == recovery_event)
+		if (EVENT_SOURCE_TRIGGERS != problem_event->source)
 		{
-			zbx_snprintf(error, sizeof(error), "Internal error in %s() recovery_event:NULL", __func__);
+			zbx_strlcpy(error, "The source of specified event is not a trigger.", sizeof(error));
 			goto fail;
 		}
 
 		if (SUCCEED != get_host_from_event((NULL != recovery_event) ? recovery_event : problem_event,
 				&host, error, sizeof(error)))
+		{
 			goto fail;
+		}
 	}
 
 	if (SUCCEED != zbx_check_script_permissions(groupid, host.hostid))
