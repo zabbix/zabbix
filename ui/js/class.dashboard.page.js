@@ -3356,6 +3356,7 @@ class CDashboardPage {
 			delete this._data.options['config_dialogue_active'];
 			$.unsubscribe('overlay.close', config_dialogue_close);
 
+			this._data.pos_action = '';
 			this._resetNewWidgetPlaceholderState();
 		};
 
@@ -3382,10 +3383,7 @@ class CDashboardPage {
 				{
 					'title': t('Cancel'),
 					'class': 'btn-alt',
-					'action': () => {
-						// Clear action.
-						this._data.pos_action = '';
-					}
+					'action': () => {}
 				}
 			],
 			'dialogueid': 'widgetConfg'
