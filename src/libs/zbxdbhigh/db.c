@@ -893,11 +893,14 @@ void	DBcheck_capabilities(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")))
-		goto out;
-
-	if (NULL == (row = DBfetch(result)))
-		goto clean;
+	if (NULL == (result = DBselect("select extversion from pg_extension where extname = 'timescaledb'")) ||
+			NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Could not determine TimescaleDB version");
+		DBfree_result(result);
+		DBclose();
+		exit(EXIT_FAILURE);
+	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "TimescaleDB version: %s", (char*)row[0]);
 
