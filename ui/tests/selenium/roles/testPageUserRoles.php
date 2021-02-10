@@ -20,9 +20,13 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 class testPageUserRoles extends CWebTest {
 
+	use TableTrait;
+	
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -35,33 +39,168 @@ class testPageUserRoles extends CWebTest {
 	/**
 	 * Check everything in user roles list.
 	 */
-	public function testPageUserRoles_RoleList() {
+	public function testPageUserRoles_Layout() {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 
 		// Table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['', 'Name', '#', 'Users'], $table->getHeadersText());
+		$headers = $table->getHeadersText();
+		array_shift($headers);
+		$this->assertEquals(['Name', '#', 'Users'], $headers);
+
+		// Check that headers is not clickable.
+		foreach (['#', 'Users'] as $header) {
+			$this->assertFalse($table->query('xpath://th/a[text()="'.$header.'"]')->one(false)->isValid());
+		}
 
 		// Check roles list sort order.
 		$before_listing = $this->getTableResult('Name');
-		$this->query('xpath://a[text()="Name"]')->one()->click();
+		$name_header = $this->query('xpath://a[text()="Name"]')->one();
+		$name_header->click();
 		$after_listing = $this->getTableResult('Name');
 		$this->assertEquals($after_listing, array_reverse($before_listing));
-		$this->query('xpath://a[text()="Name"]')->one()->click();
+		$name_header->click();
 
-		// Super admin role check box is disabled.
-		$this->assertTrue($this->query('id:roleids_3')->one()->isEnabled(false));
+		// Check that check boxes for all roles are enabled except Super admin.
+		$roleids = CDBHelper::getAll('SELECT roleid FROM role');
+		foreach ($roleids as $id) {
+			if ($id['roleid'] === '3') {
+				$this->assertFalse($this->query('id:roleids_'.$id['roleid'])->one()->isEnabled());
+			}
+			else {
+				$this->assertTrue($this->query('id:roleids_'.$id['roleid'])->one()->isEnabled());
+			}
+		}
 
 		// Check that number displayed near Users and # columns are equal.
-		$users_count = $table->getRow(0)->getColumn('Users')->query('xpath:./*[contains(@class, "link-alt")]')->count();
-		$users_amount = $table->getRow(0)->getColumn('#')->query('xpath:./sup')->one()->getText();
-		$this->assertEquals($users_count, intval($users_amount));
-
-		// Check filter.
+		foreach ($table->getRows() as $row) {
+			$users_count = $row->getColumn('Users')->query('xpath:./*[contains(@class, "link-alt")]')->count();
+			if ($users_count !== 0) {
+				$users_amount = $row->getColumn('#')->query('xpath:./sup')->one()->getText();
+				$this->assertEquals($users_count, intval($users_amount));
+			}
+			else {
+				$this->assertFalse($table->query('xpath://td/a[text()="Users"]/sup')->one(false)->isValid());
+			}
+		}
+	}
+	
+	public static function getFilterData() {
+		return [
+			[
+				[
+					'name' => 'Admin',
+					'result' => [
+						'Admin role',
+						'Super admin role'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'gu est',
+					'result' => []
+				]
+			],
+			[
+				[
+					'name' => ' ',
+					'result' => [
+						'Admin role',
+						'Guest role',
+						'Super admin role',
+						'User role'
+					]
+				]
+			],
+			[
+				[
+					'name' => '',
+					'result' => [
+						'$^&#%*',
+						'Admin role',
+						'Guest role',
+						'Super admin role',
+						'User role'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Super admin role',
+					'result' => [
+						'Super admin role'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'GUEST ROLE',
+					'result' => [
+						'Guest role'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'non_existing',
+					'result' => []
+				]
+			],
+			[
+				[
+					'name' => '*',
+					'result' => [
+						'$^&#%*'
+					]
+				]
+			]
+		];
+	}
+	
+	/**
+	 * Filter user roles.
+	 * 
+	 * @dataProvider getFilterData
+	 */
+	public function testPageUserRoles_Filter($data) {
+		$this->page->login()->open('zabbix.php?action=userrole.list');
+		
+		// Check filter collapse/expand.
+		foreach (['true', 'false'] as $status) {
+			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
+			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+		}
+		
+		$before_filtering = $this->getTableResult('Name');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill(['Name' => 'admin'])->submit();
-		$this->assertEquals(['Admin role', 'Super admin role'], $this->getTableResult('Name'));
+		$form->fill(['Name' => $data['name']])->submit();
+		$this->assertTableDataColumn($data['result'], 'Name');
+		
+		// Check that result reseted and Name field is empty after pressing reset button.
 		$this->query('button:Reset')->one()->click();
+		$form->checkValue('Name', '');
+		$this->assertTableDataColumn($before_filtering, 'Name');
+	}
+	
+	/**
+	 * Function used to create roles.
+	 */
+	public function prepareRoleData() {
+		CDataHelper::call('role.create', [
+			[
+				'name' => 'Remove_role_1',
+				'type' => 1
+			],
+			[
+				'name' => 'Remove_role_2',
+				'type' => 2
+			],
+			[
+				'name' => 'Remove_role_3',
+				'type' => 3
+			]
+		]);
 	}
 
 	public static function getDeleteData() {
@@ -121,39 +260,42 @@ class testPageUserRoles extends CWebTest {
 
 	/**
 	 * Delete user roles.
-	 *
-	 * @backup-once role
-	 * @backup-once role_rule
+	 * 
+	 * @on-before-once prepareRoleData
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageUserRoles_Delete($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$this->query('button:Reset')->one()->click();
 		$before_delete = $this->getTableResult('Name');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertTrue($this->query('button:Delete')->one()->isEnabled(false));
+		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 
 		foreach ($data['roles'] as $role) {
-			($data['roles'] === ['All'])
-				? $table->getRows()->select()
-				: $table->findRow('Name', $role)->select();
+			if ($role === 'All') {
+				$table->getRows()->select();
+			}
+			else {
+				$table->findRow('Name', $role)->select();
+			}
 		}
+
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
-		switch ($data['expected']) {
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
-				break;
-
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, $data['message_header']);
-				$after_delete = array_values(array_diff($before_delete, $data['roles']));
-				$this->assertEquals($after_delete, $this->getTableResult('Name'));
-				break;
+		// After deleting role check role list and database.
+		if ($data['expected'] === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, $data['message_header']);
+			$after_delete = array_values(array_diff($before_delete, $data['roles']));
+			$this->assertTableDataColumn($after_delete, 'Name');
+			foreach ($data['roles'] as $role_name) {
+				$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM role WHERE name='.zbx_dbstr($role_name)));
+			}
 		}
-
-		$this->query('button:Reset')->one()->click();
+		else {
+			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
+		}
 	}
 
 	/**
