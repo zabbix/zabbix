@@ -343,8 +343,9 @@ zbx_send_destinations_t;
 static zbx_send_destinations_t	*destinations = NULL;		/* list of servers to send data to */
 static int			destinations_count = 0;
 
-#if !defined(_WINDOWS)
 volatile sig_atomic_t	sig_exiting = 0;
+
+#if !defined(_WINDOWS)
 
 static void	sender_signal_handler(int sig)
 {
