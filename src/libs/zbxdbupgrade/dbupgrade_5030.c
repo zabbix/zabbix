@@ -863,7 +863,7 @@ static int	DBpatch_5030056(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
-			CONDITION_TYPE_ITEM_TAG, CONDITION_TYPE_APPLICATION))
+			CONDITION_TYPE_EVENT_TAG_VALUE, CONDITION_TYPE_APPLICATION))
 	{
 		return FAIL;
 	}

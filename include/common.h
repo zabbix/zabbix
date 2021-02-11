@@ -363,7 +363,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_METADATA		24
 #define CONDITION_TYPE_EVENT_TAG		25
 #define CONDITION_TYPE_EVENT_TAG_VALUE		26
-#define CONDITION_TYPE_ITEM_TAG			27
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
