@@ -53,7 +53,7 @@ class CControllerPopupMassupdateItem extends CController {
 			'posts' => 'string',
 			'preprocessing' => 'array',
 			'privatekey' => 'string',
-			'prototype' => 'in 0,1',
+			'prototype' => 'required|in 0,1',
 			'publickey' => 'string',
 			'status' => 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
 			'trapper_hosts' => 'string',
@@ -86,7 +86,7 @@ class CControllerPopupMassupdateItem extends CController {
 	}
 
 	protected function checkPermissions() {
-		$entity = ($this->getInput('prototype', 0) == 1) ? API::ItemPrototype() : API::Item();
+		$entity = ($this->getInput('prototype') == 1) ? API::ItemPrototype() : API::Item();
 
 		return (bool) $entity->get([
 			'output' => [],
@@ -167,7 +167,7 @@ class CControllerPopupMassupdateItem extends CController {
 	protected function update(): CControllerResponse {
 		$result = true;
 		$ids = $this->getInput('ids');
-		$prototype = (bool) $this->getInput('prototype', 0);
+		$prototype = (bool) $this->getInput('prototype');
 		$applicationids = [];
 		$applications_action = $this->getInput('massupdate_app_action', -1);
 		$application_prototypes_action = $this->getInput('massupdate_app_prot_action', -1);
@@ -479,7 +479,7 @@ class CControllerPopupMassupdateItem extends CController {
 			'interfaces' => [],
 			'multiple_interface_types' => false,
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', ''),
-			'prototype' => $this->getInput('prototype', 0),
+			'prototype' => $this->getInput('prototype'),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'title' => _('Mass update')
 		];

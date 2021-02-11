@@ -404,7 +404,6 @@ class CControllerPopupMassupdateTemplate extends CController {
 					}
 				}
 
-
 				// Value mapping.
 				if (array_key_exists('valuemaps', $visible)) {
 					$this->updateValueMaps($templateids);
