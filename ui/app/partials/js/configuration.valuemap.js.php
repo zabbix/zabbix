@@ -95,7 +95,7 @@ var AddValueMap = class {
 		const btn = document.createElement('button');
 		btn.type = 'button';
 		btn.classList.add('btn-link', 'element-table-remove');
-		btn.innerHTML = t('Remove');
+		btn.innerHTML = <?= json_encode(_('Remove')) ?>;
 		btn.addEventListener('click', () => this.row.remove());
 
 		cell.appendChild(btn);
