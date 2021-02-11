@@ -41,6 +41,8 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function testPageUserRoles_Layout() {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$this->assertPageTitle('Configuration of user roles');
+		$this->assertPageHeader('User roles');
 
 		// Table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -71,6 +73,14 @@ class testPageUserRoles extends CWebTest {
 				$this->assertTrue($this->query('id:roleids_'.$id['roleid'])->one()->isEnabled());
 			}
 		}
+
+		// Check number of displayed user roles.
+		$this->assertTableStats(CDBHelper::getCount('SELECT roleid FROM role'));
+
+		// Check selected rows counter.
+		$this->query('id:all_roles')->asCheckbox()->one()->check();
+		$selected = $table->query('class:row-selected')->all()->count();
+		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check that number displayed near Users and # columns are equal.
 		foreach ($table->getRows() as $row) {
