@@ -1452,8 +1452,6 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
  * @return string
  */
 function formatHistoryValue($value, array $item, $trim = true) {
-	$mapping = false;
-
 	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$value = convertUnits([
@@ -1465,8 +1463,11 @@ function formatHistoryValue($value, array $item, $trim = true) {
 		$value = _('Unknown value type');
 	}
 
-	// Apply value mapping.
-	return CValueMapHelper::applyValueMap($value, $item, $trim);
+	if ($item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip;' : $value;
+	}
+
+	return CValueMapHelper::applyValueMap($value, $item);
 }
 
 /**
