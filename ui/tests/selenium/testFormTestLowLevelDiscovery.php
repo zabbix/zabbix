@@ -31,7 +31,7 @@ class testFormTestLowLevelDiscovery extends testItemTest{
 	const TEMPLATE_ID = 99137;	//'Test Item Template'
 
 	/**
-	 * Check Test LLD Button enabled/disabled state depending on item type for host.
+	 * Check Test LLD Button enabled/disabled state depending on item type for Host.
 	 *
 	 * @backup-once items
 	 */
@@ -41,7 +41,7 @@ class testFormTestLowLevelDiscovery extends testItemTest{
 	}
 
 	/**
-	 * Check Test LLD Button enabled/disabled state depending on item type for template.
+	 * Check Test LLD Button enabled/disabled state depending on item type for Template.
 	 */
 	public function testFormTestLowLevelDiscovery_CheckButtonStateTemplate() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(), 'LLD for Test Button check', 'Discovery rule',
@@ -49,7 +49,7 @@ class testFormTestLowLevelDiscovery extends testItemTest{
 	}
 
 	/**
-	 * Check Test LLD form.
+	 * Check Test LLD form for Host.
 	 *
 	 * @dataProvider getCommonTestItemData
 	 *
@@ -60,7 +60,7 @@ class testFormTestLowLevelDiscovery extends testItemTest{
 	}
 
 	/**
-	 * Check Test LLD form.
+	 * Check Test LLD form for Template.
 	 *
 	 * @dataProvider getCommonTestItemData
 	 *

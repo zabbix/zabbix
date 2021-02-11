@@ -49,7 +49,7 @@ class testFormTestItem extends testItemTest{
 	}
 
 	/**
-	 * Check Test item form.
+	 * Check Test item form for Host.
 	 *
 	 * @dataProvider getItemTestItemData
 	 *
@@ -60,7 +60,7 @@ class testFormTestItem extends testItemTest{
 	}
 
 	/**
-	 * Check Test item form.
+	 * Check Test item form for Template.
 	 *
 	 * @dataProvider getItemTestItemData
 	 *

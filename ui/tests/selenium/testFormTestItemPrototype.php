@@ -49,7 +49,7 @@ class testFormTestItemPrototype extends testItemTest {
 	}
 
 	/**
-	 * Check Test item prototype form for host.
+	 * Check Test item prototype form for Host.
 	 *
 	 * @dataProvider getPrototypeTestItemData
 	 *
@@ -60,7 +60,7 @@ class testFormTestItemPrototype extends testItemTest {
 	}
 
 	/**
-	 * Check Test item prototype form for template.
+	 * Check Test item prototype form for Template.
 	 *
 	 * @dataProvider getPrototypeTestItemData
 	 *
