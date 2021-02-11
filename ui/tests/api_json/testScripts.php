@@ -1959,6 +1959,13 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/scope": value must be one of '.ZBX_SCRIPT_SCOPE_ACTION.', '.ZBX_SCRIPT_SCOPE_HOST.', '.ZBX_SCRIPT_SCOPE_EVENT.'.'
 			],
+			'Test scope change assigned to action' => [
+				'script' => [
+					'scriptid' => 11,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST
+				],
+				'expected_error' => 'Cannot update script scope. Script "API script in action" is used in action "API action with script".'
+			],
 			// Check script menu path.
 			'Test invalid menu_path for host scope' => [
 				'script' => [

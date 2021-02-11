@@ -558,6 +558,80 @@ class CScript extends CApiService {
 			}
 		}
 
+		// Validate if scripts belong to actions and scope can be changed.
+		$action_scriptids = [];
+
+		foreach ($scripts as $script) {
+			$db_script = $db_scripts[$script['scriptid']];
+
+			if (array_key_exists('scope', $script) && $script['scope'] != ZBX_SCRIPT_SCOPE_ACTION
+					&& $db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+				$action_scriptids[$script['scriptid']] = true;
+			}
+		}
+
+		if ($action_scriptids) {
+			$actions = API::Action()->get([
+				'output' => ['actionid', 'name'],
+				'scriptids' => array_keys($action_scriptids),
+				'selectOperations' => ['opcommand'],
+				'selectRecoveryOperations' => ['opcommand'],
+				'selectAcknowledgeOperations' => ['opcommand']
+			]);
+
+			if ($actions) {
+				foreach ($scripts as $script) {
+					$db_script = $db_scripts[$script['scriptid']];
+
+					if (array_key_exists('scope', $script) && $script['scope'] != ZBX_SCRIPT_SCOPE_ACTION
+							&& $db_script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+						foreach ($actions as $action) {
+							if ($action['operations']) {
+								// Find at least one usage of script in any of operations.
+								foreach ($action['operations'] as $operation) {
+									if (array_key_exists('opcommand', $operation)
+											&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Cannot update script scope. Script "%1$s" is used in action "%2$s".',
+												$db_script['name'], $action['name']
+											)
+										);
+									}
+								}
+							}
+
+							if ($action['recoveryOperations']) {
+								foreach ($action['recoveryOperations'] as $operation) {
+									if (array_key_exists('opcommand', $operation)
+											&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Cannot update script scope. Script "%1$s" is used in action "%2$s".',
+												$db_script['name'], $action['name']
+											)
+										);
+									}
+								}
+							}
+
+							if ($action['acknowledgeOperations']) {
+								foreach ($action['acknowledgeOperations'] as $operation) {
+									if (array_key_exists('opcommand', $operation)
+											&& bccomp($operation['opcommand']['scriptid'], $script['scriptid']) == 0) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Cannot update script scope. Script "%1$s" is used in action "%2$s".',
+												$db_script['name'], $action['name']
+											)
+										);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// Populate common and mandatory fields.
 		$scripts = zbx_toHash($scripts, 'scriptid');
 		$scripts = $this->extendFromObjects($scripts, $db_scripts, ['name', 'type', 'command', 'scope']);
