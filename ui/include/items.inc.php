@@ -625,7 +625,7 @@ function copyItems($srcHostId, $dstHostId) {
 	$valuemap_map = [];
 
 	foreach ($srcItems as $src_item) {
-		if ($src_item['valuemap']) {
+		if ($src_item['valuemap'] && $src_item['templateid'] == 0) {
 			$src_valuemaps[$src_item['valuemap']['name']] = 1;
 		}
 	}
@@ -690,7 +690,7 @@ function copyItems($srcHostId, $dstHostId) {
 			$create_items = [];
 		}
 
-		if ($srcItem['templateid']) {
+		if ($srcItem['templateid'] != 0) {
 			$srcItem = get_same_item_for_host($srcItem, $dstHost['hostid']);
 
 			if (!$srcItem) {
@@ -699,7 +699,7 @@ function copyItems($srcHostId, $dstHostId) {
 			$itemkey_to_id[$srcItem['key_']] = $srcItem['itemid'];
 			continue;
 		}
-		else if ($srcItem['valuemapid']) {
+		else if ($srcItem['valuemapid'] != 0) {
 			$srcItem['valuemapid'] = $valuemap_map[$srcItem['valuemap']['name']];
 		}
 
