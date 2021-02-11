@@ -562,14 +562,16 @@ switch ($data['method']) {
 						$templates = API::Host()->get([
 							'output' => [],
 							'selectParentTemplates' => ['templateid'],
-							'hostids' => $hostids
+							'hostids' => $hostids,
+							'preservekeys' => true
 						]);
 					}
 					else {
 						$templates = API::Template()->get([
 							'output' => [],
 							'selectParentTemplates' => ['templateid'],
-							'hostids' => $hostids
+							'templateids' => $hostids,
+							'preservekeys' => true
 						]);
 					}
 
