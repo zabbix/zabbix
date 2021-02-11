@@ -58,7 +58,7 @@ class CDashboardWidget extends CBaseComponent {
 			'initial_load': true,
 			'ready': false,
 			'storage': {},
-			iterator: true,
+			iterator: false,
 			is_editable: false,
 			'parent': false,
 			...widget,
