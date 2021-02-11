@@ -1247,6 +1247,8 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 ))*? # matches non comma separated brackets with parameters zero or more times
 )');
 
+define('TRIGGER_QUERY_PLACEHOLDER', '$');
+
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
 
