@@ -3050,6 +3050,7 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_
 		*replace_to = format_user_fullname(*user_name, *user_surname, *user_alias);
 	}
 }
+
 static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_INTERFACE *interface,
 		int *require_address, char **replace_to)
 {
@@ -3091,6 +3092,7 @@ static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_
 
 	return ret;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: substitute_simple_macros_impl                                    *
@@ -3554,7 +3556,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 							&replace_to);
 				}
 			}
-			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object )
+			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
