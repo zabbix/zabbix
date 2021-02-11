@@ -40,7 +40,7 @@ type process struct {
 
 var ntResumeProcess *syscall.Proc
 
-func Execute(s string, timeout time.Duration, path string) (out string, err error) {
+func execute(s string, timeout time.Duration, path string, strict bool) (out string, err error) {
 	cmd := exec.Command("cmd")
 	cmd.Dir = path
 
@@ -89,10 +89,15 @@ func Execute(s string, timeout time.Duration, path string) (out string, err erro
 		return
 	}
 
-	_ = cmd.Wait()
+	werr := cmd.Wait()
 
 	if !t.Stop() {
 		return "", fmt.Errorf("Timeout while executing a shell script.")
+	}
+
+	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
+	if strict && werr != nil {
+		return "", fmt.Errorf("Command execution failed: %s", werr)
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {
