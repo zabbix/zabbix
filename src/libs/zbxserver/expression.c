@@ -3050,7 +3050,47 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_
 		*replace_to = format_user_fullname(*user_name, *user_surname, *user_alias);
 	}
 }
+static int	resolve_host_target_macros(const char *m, const DC_HOST *dc_host, DC_INTERFACE *interface,
+		int *require_address, char **replace_to)
+{
+	int	ret = SUCCEED;
 
+	if (NULL == dc_host)
+		return SUCCEED;
+
+	if (0 == strcmp(m, MVAR_HOST_TARGET_DNS))
+	{
+		if (SUCCEED == (ret = DCconfig_get_interface(interface, dc_host->hostid, 0)))
+			*replace_to = zbx_strdup(*replace_to, interface->dns_orig);
+
+		*require_address = 1;
+	}
+	else if (0 == strcmp(m, MVAR_HOST_TARGET_CONN))
+	{
+		if (SUCCEED == (ret = DCconfig_get_interface(interface, dc_host->hostid, 0)))
+			*replace_to = zbx_strdup(*replace_to, interface->addr);
+
+		*require_address = 1;
+
+	}
+	else if (0 == strcmp(m, MVAR_HOST_TARGET_HOST))
+	{
+		*replace_to = zbx_strdup(*replace_to, dc_host->host);
+	}
+	else if (0 == strcmp(m, MVAR_HOST_TARGET_IP))
+	{
+		if (SUCCEED == (ret = DCconfig_get_interface(interface, dc_host->hostid, 0)))
+			*replace_to = zbx_strdup(*replace_to, interface->ip_orig);
+
+		*require_address = 1;
+	}
+	else if (0 == strcmp(m, MVAR_HOST_TARGET_NAME))
+	{
+		*replace_to = zbx_strdup(*replace_to, dc_host->name);
+	}
+
+	return ret;
+}
 /******************************************************************************
  *                                                                            *
  * Function: substitute_simple_macros_impl                                    *
@@ -3510,55 +3550,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				}
 				else if (0 == (macro_type & (MACRO_TYPE_SCRIPT_NORMAL | MACRO_TYPE_SCRIPT_RECOVERY)))
 				{
-					if (0 == strcmp(m, MVAR_HOST_TARGET_DNS))
-					{
-						if (NULL != dc_host)
-						{
-							if (SUCCEED == (ret = DCconfig_get_interface(&interface,
-									dc_host->hostid, 0)))
-							{
-								replace_to = zbx_strdup(replace_to, interface.dns_orig);
-							}
-
-							require_address = 1;
-						}
-					}
-					else if (0 == strcmp(m, MVAR_HOST_TARGET_CONN))
-					{
-						if (NULL != dc_host)
-						{
-							if (SUCCEED == (ret = DCconfig_get_interface(&interface,
-									dc_host->hostid, 0)))
-							{
-								replace_to = zbx_strdup(replace_to, interface.addr);
-							}
-
-							require_address = 1;
-						}
-					}
-					else if (0 == strcmp(m, MVAR_HOST_TARGET_HOST))
-					{
-						if (NULL != dc_host && NULL != dc_host->host)
-							replace_to = zbx_strdup(replace_to, dc_host->host);
-					}
-					else if (0 == strcmp(m, MVAR_HOST_TARGET_IP))
-					{
-						if (NULL != dc_host)
-						{
-							if (SUCCEED == (ret = DCconfig_get_interface(&interface,
-									dc_host->hostid, 0)))
-							{
-								replace_to = zbx_strdup(replace_to, interface.ip_orig);
-							}
-
-							require_address = 1;
-						}
-					}
-					else if (0 == strcmp(m, MVAR_HOST_TARGET_NAME))
-					{
-						if (NULL != dc_host && NULL != dc_host->name)
-							replace_to = zbx_strdup(replace_to, dc_host->name);
-					}
+					ret = resolve_host_target_macros(m, dc_host, &interface, &require_address,
+							&replace_to);
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object )
@@ -3785,7 +3778,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
-					DCget_user_macro(NULL, 0, m, &replace_to);
+					if (NULL == dc_host)
+						DCget_user_macro(NULL, 0, m, &replace_to);
+					else
+						DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+
 					pos = token.loc.r;
 				}
 				else if (NULL != actionid &&
@@ -3921,12 +3918,21 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
 				}
+				else
+				{
+					ret = resolve_host_target_macros(m, dc_host, &interface, &require_address,
+							&replace_to);
+				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
-					DCget_user_macro(NULL, 0, m, &replace_to);
+					if (NULL == dc_host)
+						DCget_user_macro(NULL, 0, m, &replace_to);
+					else
+						DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
+
 					pos = token.loc.r;
 				}
 				else if (NULL != actionid &&
@@ -4012,6 +4018,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				{
 					if (NULL != alert)
 						replace_to = zbx_strdup(replace_to, alert->message);
+				}
+				else
+				{
+					ret = resolve_host_target_macros(m, dc_host, &interface, &require_address,
+							&replace_to);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
