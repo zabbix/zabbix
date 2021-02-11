@@ -242,17 +242,29 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
-		CElementQuery::getDriver()->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
-				'.menu-main *{transition: none !important;}\'; document.body.appendChild(style);');
 		$this->assertTrue($this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady()->exists());
+
+		// Sidebar main menu or user menu.
+		$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
+
+		// Menu section.
+		$main_section = $this->query('xpath://ul[@class="menu-'.$menu.'"]')->query('link', $data['section']);
+
+		// Section page.
+		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page']);
 
 		// When login in Zabbix, Monitoring section is opened.
 		if ($data['section'] !== 'Monitoring') {
-			$this->query('xpath://ul[@class="menu-main"]/li/a[text()="'.$data['section'].'"]')->waitUntilReady()->one()->click();
+			$main_section->waitUntilReady()->one()->click();
+			$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
+			CElementQuery::wait()->until(function () use ($element) {
+				return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
+						' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
+			});
 		}
 
-		$this->query('xpath://nav/ul/li[contains(@class, "has-submenu")]/a[text()="'.$data['section'].'"]/following::ul/li/a[text()="'.
-				$data['page'].'"]')->waitUntilClickable()->one()->click();
+		// Click on page.
+		$submenu->waitUntilClickable()->one()->click();
 		$this->page->assertHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
 	}
 
@@ -277,18 +289,27 @@ class testSidebarMenu extends CWebTest {
 			$this->query('button', $hide)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
 
-			// One second needed for menu to collapse or hide after clicking.
-			sleep(1);
-
 			// Checking that collapsed, hiden sidemenu appears on clicking.
+			if ($view === 'compact') {
+				$this->query('class:zabbix-sidebar-logo')->one(false)->waitUntilNotVisible();
+			}
+			if ($view === 'hidden') {
+				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();
+			}
+
 			$this->query('id', $id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
 
-			// One second needed for menu to appear after clicking.
-			sleep(1);
+			// Checking that collapsed, hiden sidemenu appears on clicking.
+			if ($view === 'compact') {
+				$this->query('xpath://aside[@class="sidebar is-compact is-opened"]')->one()->waitUntilVisible();
+			}
+			if ($view === 'hidden') {
+				$this->query('xpath://aside[@class="sidebar is-hidden is-opened"]')->one()->waitUntilVisible();
+			}
 
 			// Returning standart sidemenu view clicking on unhide, expand button.
-			$this->query('button', $unhide)->one()->click();
+			$this->query('button', $unhide)->one()->waitUntilClickable()->click();
 			$this->assertTrue($this->query('class:sidebar')->exists());
 		}
 	}
