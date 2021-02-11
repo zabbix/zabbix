@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-07T19:40:49Z</date>
+   <date>2021-02-11T12:31:10Z</date>
    <groups>
       <group>
-         <name>Templates/Modules</name>
+         <name>Templates/SAN</name>
       </group>
    </groups>
    <templates>
@@ -18,7 +18,7 @@ You can discuss this template or leave feedback on our forum https://www.zabbix.
 Template tooling version used: 0.38</description>
          <groups>
             <group>
-               <name>Templates/Modules</name>
+               <name>Templates/SAN</name>
             </group>
          </groups>
          <applications>
@@ -123,11 +123,101 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops other</name>
+               <name>Cluster iops raw other</name>
+               <type>DEPENDENT</type>
+               <key>netapp.aff.cluster.statistics.iops_raw.other</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.other</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.aff.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster iops raw read</name>
+               <type>DEPENDENT</type>
+               <key>netapp.aff.cluster.statistics.iops_raw.read</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.read</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.aff.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster iops raw total</name>
+               <type>DEPENDENT</type>
+               <key>netapp.aff.cluster.statistics.iops_raw.total</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.total</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.aff.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster iops raw write</name>
+               <type>DEPENDENT</type>
+               <key>netapp.aff.cluster.statistics.iops_raw.write</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.statistics.iops_raw.write</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>netapp.aff.cluster.get</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Cluster IOPS, other rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.iops.other.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                <applications>
                   <application>
@@ -149,11 +239,13 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops read</name>
+               <name>Cluster IOPS, read rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.iops.read.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
                <applications>
                   <application>
@@ -175,11 +267,13 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops total</name>
+               <name>Cluster IOPS, total rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.iops.total.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                <applications>
                   <application>
@@ -201,11 +295,13 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops write</name>
+               <name>Cluster IOPS, write rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.iops.write.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
                <applications>
                   <application>
@@ -227,17 +323,16 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster latency other</name>
+               <name>Cluster latency raw, other</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency.other</key>
+               <key>netapp.aff.cluster.statistics.latency_raw.other</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>s</units>
-               <description>The latency in seconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
                <preprocessing>
@@ -245,31 +340,22 @@ Template tooling version used: 0.38</description>
                      <type>JSONPATH</type>
                      <params>$.statistics.latency_raw.other</params>
                   </step>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.000001</params>
-                  </step>
-                  <step>
-                     <type>CHANGE_PER_SECOND</type>
-                     <params/>
-                  </step>
                </preprocessing>
                <master_item>
                   <key>netapp.aff.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster latency read</name>
+               <name>Cluster latency raw, read</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency.read</key>
+               <key>netapp.aff.cluster.statistics.latency_raw.read</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>s</units>
-               <description>The latency in seconds observed at the storage object. Performance metric for read I/O operations.</description>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric for read I/O operations.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
                <preprocessing>
@@ -277,30 +363,22 @@ Template tooling version used: 0.38</description>
                      <type>JSONPATH</type>
                      <params>$.statistics.latency_raw.read</params>
                   </step>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.000001</params>
-                  </step>
-                  <step>
-                     <type>CHANGE_PER_SECOND</type>
-                     <params/>
-                  </step>
                </preprocessing>
                <master_item>
                   <key>netapp.aff.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster latency total</name>
+               <name>Cluster latency raw, total</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency.total</key>
+               <key>netapp.aff.cluster.statistics.latency_raw.total</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>s</units>
-               <description>The latency in seconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Performance metric aggregated over all types of I/O operations.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
                <preprocessing>
@@ -308,31 +386,22 @@ Template tooling version used: 0.38</description>
                      <type>JSONPATH</type>
                      <params>$.statistics.latency_raw.total</params>
                   </step>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.000001</params>
-                  </step>
-                  <step>
-                     <type>CHANGE_PER_SECOND</type>
-                     <params/>
-                  </step>
                </preprocessing>
                <master_item>
                   <key>netapp.aff.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster latency write</name>
+               <name>Cluster latency raw, write</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency.write</key>
+               <key>netapp.aff.cluster.statistics.latency_raw.write</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>s</units>
-               <description>The latency in seconds observed at the storage object. Peformance metric for write I/O operations.</description>
+               <units>!mcs</units>
+               <description>The raw latency in microseconds observed at the storage object. This can be divided by the raw IOPS value to calculate the average latency per I/O operation. Peformance metric for write I/O operations.</description>
                <applications>
                   <application>
-                     <name>General</name>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
                <preprocessing>
@@ -340,25 +409,86 @@ Template tooling version used: 0.38</description>
                      <type>JSONPATH</type>
                      <params>$.statistics.latency_raw.write</params>
                   </step>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.000001</params>
-                  </step>
-                  <step>
-                     <type>CHANGE_PER_SECOND</type>
-                     <params/>
-                  </step>
                </preprocessing>
                <master_item>
                   <key>netapp.aff.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster throughput other</name>
+               <name>Cluster latency, other</name>
+               <type>CALCULATED</type>
+               <key>netapp.aff.cluster.statistics.latency.other</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.aff.cluster.statistics.latency_raw.other) - prev(netapp.aff.cluster.statistics.latency_raw.other)) /
+(last(netapp.aff.cluster.statistics.iops_raw.other) - prev(netapp.aff.cluster.statistics.iops_raw.other) +
+(last(netapp.aff.cluster.statistics.iops_raw.other) - prev(netapp.aff.cluster.statistics.iops_raw.other) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster latency, read</name>
+               <type>CALCULATED</type>
+               <key>netapp.aff.cluster.statistics.latency.read</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.aff.cluster.statistics.latency_raw.read) - prev(netapp.aff.cluster.statistics.latency_raw.read)) /
+( last(netapp.aff.cluster.statistics.iops_raw.read) - prev(netapp.aff.cluster.statistics.iops_raw.read) +
+(last(netapp.aff.cluster.statistics.iops_raw.read) - prev(netapp.aff.cluster.statistics.iops_raw.read) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster latency, total</name>
+               <type>CALCULATED</type>
+               <key>netapp.aff.cluster.statistics.latency.total</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.aff.cluster.statistics.latency_raw.total) - prev(netapp.aff.cluster.statistics.latency_raw.total)) /
+( last(netapp.aff.cluster.statistics.iops_raw.total) - prev(netapp.aff.cluster.statistics.iops_raw.total) +
+(last(netapp.aff.cluster.statistics.iops_raw.total) - prev(netapp.aff.cluster.statistics.iops_raw.total) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster latency, write</name>
+               <type>CALCULATED</type>
+               <key>netapp.aff.cluster.statistics.latency.write</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>!ms</units>
+               <params>(last(netapp.aff.cluster.statistics.latency_raw.write) - prev(netapp.aff.cluster.statistics.latency_raw.write)) /
+( last(netapp.aff.cluster.statistics.iops_raw.write) - prev(netapp.aff.cluster.statistics.iops_raw.write) +
+(last(netapp.aff.cluster.statistics.iops_raw.write) - prev(netapp.aff.cluster.statistics.iops_raw.write) = 0) ) * 0.001</params>
+               <description>The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.</description>
+               <applications>
+                  <application>
+                     <name>General</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Cluster throughput, other rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.throughput.other.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Throughput bytes observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                <applications>
@@ -381,11 +511,12 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster throughput read</name>
+               <name>Cluster throughput, read rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.throughput.read.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Throughput bytes observed at the storage object. Performance metric for read I/O operations.</description>
                <applications>
@@ -408,11 +539,12 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster throughput total</name>
+               <name>Cluster throughput, total rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.throughput.total.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Throughput bytes observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                <applications>
@@ -435,11 +567,12 @@ Template tooling version used: 0.38</description>
                </master_item>
             </item>
             <item>
-               <name>Cluster throughput write</name>
+               <name>Cluster throughput, write rate</name>
                <type>DEPENDENT</type>
                <key>netapp.aff.cluster.statistics.throughput.write.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Throughput bytes observed at the storage object. Peformance metric for write I/O operations.</description>
                <applications>
@@ -491,7 +624,7 @@ Template tooling version used: 0.38</description>
                <triggers>
                   <trigger>
                      <expression>({last()}&lt;&gt;"ok")</expression>
-                     <name>Cluster has status different from normal</name>
+                     <name>Cluster status is abnormal</name>
                      <priority>AVERAGE</priority>
                      <description>Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes does not have the latest data.</description>
                   </trigger>
@@ -739,7 +872,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}="error")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="ok")</recovery_expression>
-                           <name>{#ID}: Chassis "{#ID}" has something errors</name>
+                           <name>{#ID}: Chassis has something errors</name>
                            <priority>AVERAGE</priority>
                            <description>Something wrong with the chassis.</description>
                            <manual_close>YES</manual_close>
@@ -805,7 +938,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}&lt;&gt;"present")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="present")</recovery_expression>
-                           <name>{#DISKNAME}: Node "{#NODENAME}" Disk "{#DISKNAME}" has state different from "present"</name>
+                           <name>{#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"</name>
                            <priority>AVERAGE</priority>
                            <description>Something wrong with the disk.</description>
                            <manual_close>YES</manual_close>
@@ -866,7 +999,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}="error")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="ok")</recovery_expression>
-                           <name>{#FRUID}: Chassis "{#ID}" "{#FRUID}" state is error</name>
+                           <name>{#FRUID}: FRU of the chassis "{#ID}" state is error</name>
                            <priority>AVERAGE</priority>
                            <description>Something wrong with the FRU.</description>
                            <manual_close>YES</manual_close>
@@ -908,7 +1041,7 @@ return JSON.stringify(result);
                <url>{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state</url>
                <item_prototypes>
                   <item_prototype>
-                     <name>LUN "{#LUNNAME}": Space size</name>
+                     <name>{#LUNNAME}: Space size</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.lun.space.size[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
@@ -935,7 +1068,7 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>LUN "{#LUNNAME}": Space used</name>
+                     <name>{#LUNNAME}: Space used</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.lun.space.used[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
@@ -962,7 +1095,7 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>LUN "{#LUNNAME}": Container state</name>
+                     <name>{#LUNNAME}: Container state</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.lun.status.container_state[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
@@ -993,7 +1126,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
-                           <name>LUN "{#LUNNAME}": SVM "{#SVMNAME}" LUN "{#LUNNAME}" has abnormal container state</name>
+                           <name>{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state</name>
                            <priority>AVERAGE</priority>
                            <description>LUNs are only available when their containers are available.</description>
                            <manual_close>YES</manual_close>
@@ -1001,7 +1134,7 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>LUN "{#LUNNAME}": State</name>
+                     <name>{#LUNNAME}: State</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.lun.status.state[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
@@ -1032,7 +1165,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
-                           <name>LUN "{#LUNNAME}": SVM "{#SVMNAME}" LUN "{#LUNNAME}" has abnormal state</name>
+                           <name>{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state</name>
                            <priority>AVERAGE</priority>
                            <description>Normal states for a LUN are online and offline. Other states indicate errors.</description>
                            <manual_close>YES</manual_close>
@@ -1067,7 +1200,7 @@ return JSON.stringify(result);
                <url>{$URL}/api/cluster/nodes?fields=name</url>
                <item_prototypes>
                   <item_prototype>
-                     <name>: {#NODENAME} software version</name>
+                     <name>{#NODENAME}: Software version</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.node.version[{#NODENAME}]</key>
                      <delay>0</delay>
@@ -1096,15 +1229,15 @@ return JSON.stringify(result);
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                           <name>: Version has changed (new version: {ITEM.VALUE})</name>
+                           <name>{#NODENAME}: Version has changed (new version: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
-                           <description>version has changed. Ack to close.</description>
+                           <description>{#NODENAME} version has changed. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>: {#NODENAME} controller.over_temperature</name>
+                     <name>{#NODENAME}: Controller over temperature</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.nodes.controller.over_temperature[{#NODENAME}]</key>
                      <delay>0</delay>
@@ -1133,14 +1266,14 @@ return JSON.stringify(result);
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>({last()}&lt;&gt;"normal")</expression>
-                           <name>: Node {#NODENAME} has over temperature</name>
+                           <name>{#NODENAME}: Node has over temperature</name>
                            <priority>AVERAGE</priority>
                            <description>The hardware shuts down if the temperature exceeds critical thresholds(item's value is "over").</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>: {#NODENAME} location</name>
+                     <name>{#NODENAME}: Location</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.nodes.location[{#NODENAME}]</key>
                      <delay>0</delay>
@@ -1168,7 +1301,7 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>: {#NODENAME} membership</name>
+                     <name>{#NODENAME}: Membership</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.nodes.membership[{#NODENAME}]</key>
                      <delay>0</delay>
@@ -1199,7 +1332,7 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>: {#NODENAME} state</name>
+                     <name>{#NODENAME}: State</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.nodes.state[{#NODENAME}]</key>
                      <delay>0</delay>
@@ -1235,7 +1368,7 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>({last()}&lt;&gt;"up")</expression>
-                           <name>: Node {#NODENAME} has state different from normal</name>
+                           <name>{#NODENAME}: Node state is abnormal</name>
                            <priority>AVERAGE</priority>
                            <description>The state of the node is different from up:&#13;
 booting - Node is booting up.&#13;
@@ -1248,7 +1381,7 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>: {#NODENAME} uptime</name>
+                     <name>{#NODENAME}: Uptime</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.nodes.uptime[{#NODENAME}]</key>
                      <delay>0</delay>
@@ -1272,7 +1405,7 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&lt;10m</expression>
-                           <name>: Node {#NODENAME} has been restarted (uptime &lt; 10m)</name>
+                           <name>{#NODENAME}: Node has been restarted (uptime &lt; 10m)</name>
                            <priority>INFO</priority>
                            <description>Uptime is less than 10 minutes</description>
                            <manual_close>YES</manual_close>
@@ -1338,7 +1471,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}="down")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="up")</recovery_expression>
-                           <name>{#ETHPORTNAME}: Node {#NODENAME} Ethernet port "{#ETHPORTNAME}" is down</name>
+                           <name>{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down</name>
                            <priority>AVERAGE</priority>
                            <description>Something wrong with the ethernet port.</description>
                            <manual_close>YES</manual_close>
@@ -1439,7 +1572,7 @@ node_offline - The state information for the port cannot be retrieved. The node 
                            <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
-                           <name>{#FCPORTNAME}: Node "{#NODENAME}" FC port "{#FCPORTNAME}" has state different from "online"</name>
+                           <name>{#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"</name>
                            <priority>AVERAGE</priority>
                            <description>Something wrong with the ethernet port.</description>
                            <manual_close>YES</manual_close>
@@ -1533,7 +1666,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}&lt;&gt;"running")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="running")</recovery_expression>
-                           <name>{#SVMNAME}: SVM "{#SVMNAME}" has abnormal state</name>
+                           <name>{#SVMNAME}: SVM state is abnormal</name>
                            <priority>AVERAGE</priority>
                            <description>Something wrong with the SVM.</description>
                            <manual_close>YES</manual_close>
@@ -1708,7 +1841,7 @@ return JSON.stringify(result);
                            <expression>({diff()}=1 and {last()}&lt;&gt;"online")</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>({diff()}=1 and {last()}="online")</recovery_expression>
-                           <name>{#VOLUMENAME}: Volume "{#VOLUMENAME}" has abnormal state</name>
+                           <name>{#VOLUMENAME}: Volume state is abnormal</name>
                            <priority>AVERAGE</priority>
                            <description>A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ‘mixed’ state applies to FlexGroup volumes only and cannot be specified as a target state. An ‘error’ state implies that the volume is not in a state to serve data.</description>
                            <manual_close>YES</manual_close>
@@ -1716,11 +1849,105 @@ return JSON.stringify(result);
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume iops other</name>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, other</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.other.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.aff.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, read</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.read.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.aff.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, total</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.total.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.aff.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS raw, write</name>
+                     <type>DEPENDENT</type>
+                     <key>netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>!iops</units>
+                     <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.iops_raw.write.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>netapp.aff.volumes.get</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume IOPS, other rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.iops.other.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
                      <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1742,11 +1969,13 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume iops read</name>
+                     <name>{#VOLUMENAME}: Volume IOPS, read rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.iops.read.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
                      <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1768,11 +1997,13 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume iops total</name>
+                     <name>{#VOLUMENAME}: Volume IOPS, total rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.iops.total.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
                      <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1794,11 +2025,13 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume iops write</name>
+                     <name>{#VOLUMENAME}: Volume IOPS, write rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.iops.write.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!iops</units>
                      <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -1820,139 +2053,172 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume latency other</name>
+                     <name>{#VOLUMENAME}: Volume latency raw, other</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                     <key>netapp.aff.volume.statistics.latency_raw.other[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <units>s</units>
+                     <units>!mcs</units>
                      <description>The raw latency in microseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Volume "{#VOLUMENAME}"</name>
-                        </application_prototype>
-                     </application_prototypes>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
                            <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.other.first()</params>
                         </step>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>0.000001</params>
-                        </step>
-                        <step>
-                           <type>SIMPLE_CHANGE</type>
-                           <params/>
-                        </step>
                      </preprocessing>
                      <master_item>
                         <key>netapp.aff.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume latency read</name>
+                     <name>{#VOLUMENAME}: Volume latency raw, read</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                     <key>netapp.aff.volume.statistics.latency_raw.read[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <units>s</units>
+                     <units>!mcs</units>
                      <description>The raw latency in microseconds observed at the storage object. Performance metric for read I/O operations.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Volume "{#VOLUMENAME}"</name>
-                        </application_prototype>
-                     </application_prototypes>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
                            <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.read.first()</params>
                         </step>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>0.000001</params>
-                        </step>
-                        <step>
-                           <type>SIMPLE_CHANGE</type>
-                           <params/>
-                        </step>
                      </preprocessing>
                      <master_item>
                         <key>netapp.aff.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume latency total</name>
+                     <name>{#VOLUMENAME}: Volume latency raw, total</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                     <key>netapp.aff.volume.statistics.latency_raw.total[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <units>s</units>
+                     <units>!mcs</units>
                      <description>The raw latency in microseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Volume "{#VOLUMENAME}"</name>
-                        </application_prototype>
-                     </application_prototypes>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
                            <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.total.first()</params>
                         </step>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>0.000001</params>
-                        </step>
-                        <step>
-                           <type>SIMPLE_CHANGE</type>
-                           <params/>
-                        </step>
                      </preprocessing>
                      <master_item>
                         <key>netapp.aff.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume latency write</name>
+                     <name>{#VOLUMENAME}: Volume latency raw, write</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                     <key>netapp.aff.volume.statistics.latency_raw.write[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <units>s</units>
+                     <units>!mcs</units>
                      <description>The raw latency in microseconds observed at the storage object. Peformance metric for write I/O operations.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Volume "{#VOLUMENAME}"</name>
-                        </application_prototype>
-                     </application_prototypes>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
                            <params>$.records[?(@.name=='{#VOLUMENAME}')].statistics.latency_raw.write.first()</params>
                         </step>
-                        <step>
-                           <type>MULTIPLIER</type>
-                           <params>0.000001</params>
-                        </step>
-                        <step>
-                           <type>SIMPLE_CHANGE</type>
-                           <params/>
-                        </step>
                      </preprocessing>
                      <master_item>
                         <key>netapp.aff.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume throughput other</name>
+                     <name>{#VOLUMENAME}: Volume latency, other</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.aff.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.aff.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.other[{#VOLUMENAME}])) /
+( last(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) +
+(last(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, read</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.aff.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.aff.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.read[{#VOLUMENAME}])) /
+( last(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) +
+(last(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) = 0)) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, total</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.aff.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.aff.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.total[{#VOLUMENAME}])) /
+( last(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) +
+(last(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume latency, write</name>
+                     <type>CALCULATED</type>
+                     <key>netapp.aff.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!ms</units>
+                     <params>(last(netapp.aff.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.write[{#VOLUMENAME}])) /
+( last(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) +
+(last(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Volume "{#VOLUMENAME}"</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#VOLUMENAME}: Volume throughput, other rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.throughput.other.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>Bps</units>
                      <description>Throughput bytes observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                      <application_prototypes>
@@ -1975,11 +2241,12 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume throughput read</name>
+                     <name>{#VOLUMENAME}: Volume throughput, read rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.throughput.read.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>Bps</units>
                      <description>Throughput bytes observed at the storage object. Performance metric for read I/O operations.</description>
                      <application_prototypes>
@@ -2002,11 +2269,12 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume throughput total</name>
+                     <name>{#VOLUMENAME}: Volume throughput, total rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.throughput.total.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>Bps</units>
                      <description>Throughput bytes observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                      <application_prototypes>
@@ -2029,11 +2297,12 @@ return JSON.stringify(result);
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#VOLUMENAME}: Volume throughput write</name>
+                     <name>{#VOLUMENAME}: Volume throughput, write rate</name>
                      <type>DEPENDENT</type>
                      <key>netapp.aff.volume.statistics.throughput.write.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>Bps</units>
                      <description>Throughput bytes observed at the storage object. Peformance metric for write I/O operations.</description>
                      <application_prototypes>
@@ -2116,6 +2385,64 @@ ls ‐ load-sharing dp volume.</description>
                   </item_prototype>
                </item_prototypes>
                <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>{#VOLUMENAME}: Volume latency</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.aff.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.aff.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.aff.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>3</sortorder>
+                           <color>A54F10</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.aff.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>{#VOLUMENAME}: Volume size</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.aff.volume.space_used[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template SAN NetApp AFF A700 by HTTP</host>
+                              <key>netapp.aff.volume.space_available[{#VOLUMENAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -2152,4 +2479,114 @@ return JSON.stringify(result);
          </macros>
       </template>
    </templates>
+   <graphs>
+      <graph>
+         <name>Cluster IOPS</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.iops.other.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.iops.read.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.iops.write.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.iops.total.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Cluster latency</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.latency.other</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.latency.read</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.latency.write</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.latency.total</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Cluster throughput</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.throughput.other.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.throughput.read.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.throughput.write.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template SAN NetApp AFF A700 by HTTP</host>
+                  <key>netapp.aff.cluster.statistics.throughput.total.rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
 </zabbix_export>
