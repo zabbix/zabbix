@@ -54,10 +54,6 @@ class CScreenPlainText extends CScreenBase {
 		$item = reset($items);
 		$host = reset($item['hosts']);
 
-		if ($item['valuemap']) {
-			$item['valuemap'] = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
-		}
-
 		$table = (new CTableInfo())
 			->setHeader([_('Timestamp'), _('Value')]);
 
@@ -88,9 +84,7 @@ class CScreenPlainText extends CScreenBase {
 					break;
 			}
 
-			if ($item['valuemap'] && array_key_exists($value, $item['valuemap'])) {
-				$value = $item['valuemap'][$value].' ('.$value.')';
-			}
+			$value = CValueMapHelper::applyValueMap($value, $item);
 
 			if ($this->screenitem['style'] == 0) {
 				$value = new CPre($value);

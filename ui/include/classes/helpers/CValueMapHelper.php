@@ -55,4 +55,31 @@ class CValueMapHelper {
 
 		return $all_templates;
 	}
+
+	/**
+	 * Apply value mapping to value.
+	 * If value map or mapping is not found, unchanged value is returned,
+	 * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
+	 *
+	 * @param string $value  Value that mapping should be applied to.
+	 * @param array  $item   Item array
+	 * @param bool   $trim
+	 *
+	 * @return string
+	 */
+	static public function applyValueMap(string $value, array $item, bool $trim = false): string {
+		if (!$item['valuemap']) {
+			return $value;
+		}
+
+		$mappings = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
+		$mapping_value = array_key_exists($value, $mappings) ? $mappings[$value] : null;
+
+		if ($mapping_value !== null) {
+			$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip' : $value;
+			return $mapping_value.' ('.$value.')';
+		}
+
+		return $value;
+	}
 }

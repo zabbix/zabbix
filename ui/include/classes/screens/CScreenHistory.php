@@ -144,13 +144,6 @@ class CScreenHistory extends CScreenBase {
 
 		$items = CMacrosResolverHelper::resolveItemNames($items);
 
-		foreach ($items as &$item) {
-			if ($item['valuemap']) {
-				$item['valuemap'] = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
-			}
-		}
-		unset($item);
-
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
 			ITEM_VALUE_TYPE_TEXT => 1
@@ -431,9 +424,7 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
-					if ($item['valuemap'] && array_key_exists($value, $item['valuemap'])) {
-						$value = $item['valuemap'][$value].' ('.$value.')';
-					}
+					$value = CValueMapHelper::applyValueMap($value, $item);
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
@@ -517,9 +508,7 @@ class CScreenHistory extends CScreenBase {
 							$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 						}
 
-						if ($item['valuemap'] && array_key_exists($value, $item['valuemap'])) {
-							$value = $item['valuemap'][$value].' ('.$value.')';
-						}
+						$value = CValueMapHelper::applyValueMap($value, $item);
 
 						$row[] = ($value === '') ? '' : new CPre($value);
 					}

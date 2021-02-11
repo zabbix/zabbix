@@ -264,7 +264,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			if ($valuemap) {
 				$valuemap = reset($valuemap);
-				$valuemap = array_column($valuemap['mappings'], 'newvalue', 'value');
 			}
 		}
 
@@ -416,8 +415,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if ($valuemap && array_key_exists($result['result'], $valuemap)) {
-							$output['mapped_value'] = $valuemap[$result['result']].' ('.$result['result'].')';
+						if ($valuemap) {
+							$output['mapped_value'] = CValueMapHelper::applyValueMap($result['result'],
+								['valuemap' => $valuemap]
+							);
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

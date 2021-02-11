@@ -192,10 +192,6 @@ abstract class CControllerLatest extends CController {
 					? array_column($item['applications'], 'applicationid')
 					: [0];
 
-				if ($item['valuemap']) {
-					$item['valuemap'] = array_column($item['valuemap']['mappings'], 'newvalue', 'value');
-				}
-
 				foreach ($item_applicationids as $applicationid) {
 					if ($applicationid != 0 && !array_key_exists($applicationid, $applications)) {
 						continue;

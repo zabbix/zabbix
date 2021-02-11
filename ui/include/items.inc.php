@@ -1466,16 +1466,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 	}
 
 	// Apply value mapping.
-	$mapping = ($item['valuemap'] && array_key_exists($value, $item['valuemap']))
-		? $item['valuemap'][$value]
-		: false;
-
-	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
-			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip' : $value;
-	}
-
-	return ($mapping === false) ? $value : $mapping.' ('.$value.')';
+	return CValueMapHelper::applyValueMap($value, $item, $trim);
 }
 
 /**
