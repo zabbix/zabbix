@@ -54,7 +54,7 @@ class CBaseComponent {
 	}
 
 	one(types, listener, options = false) {
-		return this.on(types, listener, Object.assign({once: true}, options));
+		return this.on(types, listener, {once: true, ...options});
 	}
 
 	off(types, listener, options = false) {
@@ -63,7 +63,7 @@ class CBaseComponent {
 	}
 
 	fire(type, options = {}) {
-		this._target.dispatchEvent(new CustomEvent(type, {detail: Object.assign({target: this}, options)}));
+		this._target.dispatchEvent(new CustomEvent(type, {detail: {target: this, ...options}}));
 		return this;
 	}
 }

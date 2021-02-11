@@ -176,92 +176,77 @@ class CDashboardPage {
 	}
 
 	addWidget(widget) {
-		// Replace empty arrays (or anything non-object) with empty objects.
-		if (typeof widget.fields !== 'object') {
-			widget.fields = {};
-		}
+		widget = new CDashboardWidget({
+			...JSON.parse(JSON.stringify(widget)),
+			uniqueid: this._generateUniqueId(),
+			index: this._widgets.length,
+			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null,
+			min_width: this._options['widget-width'],
+			min_height: this._options['widget-height'],
+			is_editable: this._options['editable'] && !this._options['kioskmode'],
+			defaults: this._data.widget_defaults[widget.type]
+		});
 
-		if (typeof widget.configuration !== 'object') {
-			widget.configuration = {};
-		}
+		widget
+			.on(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK, (e) => {
+				const w = e.detail.target;
 
-		widget = {
-			'widgetid': '',
-			'type': '',
-			'header': '',
-			'view_mode': ZBX_WIDGET_VIEW_MODE_NORMAL,
-			'pos': {
-				'x': 0,
-				'y': 0,
-				'width': 1,
-				'height': 1
-			},
-			'rf_rate': 0,
-			'preloader_timeout': 10000,	// in milliseconds
-			'update_paused': false,
-			'initial_load': true,
-			'ready': false,
-			'storage': {},
-			...widget,
-			'parent': false
-		};
+				if (w.page > 1) {
+					w.page--;
+					this._updateWidgetContent(w);
+				}
+			})
+			.on(WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK, (e) => {
+				const w = e.detail.target;
 
-		if (typeof widget.new_widget === 'undefined') {
-			widget.new_widget = !widget.widgetid.length;
-		}
+				if (w.page < w.page_count) {
+					w.page++;
+					this._updateWidgetContent(w);
+				}
+			})
+			.on(WIDGET_EVENT_EDIT_CLICK, (e) => {
+				this.editWidget(e.detail.target, e.target);
+			})
+			.on(WIDGET_EVENT_ENTER, (e) => {
+				console.log(e);
+				this._enterWidget(e.detail.target);
+			})
+			.on(WIDGET_EVENT_LEAVE, (e) => {
+				this._leaveWidget(e.detail.target);
+			});
 
-		let widget_local = JSON.parse(JSON.stringify(widget));
+		this._widgets.push(widget);
+		this._$target.append(widget.div);
 
-		const widget_type_defaults = this._data.widget_defaults[widget_local.type];
-
-		widget_local.iterator = widget_type_defaults.iterator;
-
-		if (widget_local.iterator) {
-			widget_local = {
-				...widget_local,
-				'page': 1,
-				'page_count': 1,
-				'children': [],
-				'update_pending': false
-			};
-		}
-
-		widget_local.uniqueid = this._generateUniqueId();
-		widget_local.div = this._makeWidgetDiv(widget_local);
-		widget_local.div.data('widget-index', this._widgets.length);
-
-		this._widgets.push(widget_local);
-		this._$target.append(widget_local.div);
-
-		this._setDivPosition(widget_local.div, widget_local.pos);
+		this._setDivPosition(widget.div, widget.pos);
 
 		if (this._data.pos_action !== 'updateWidgetConfig') {
 			this._checkWidgetOverlap();
 			this._resizeDashboardGrid();
 		}
 
-		this._showPreloader(widget_local);
+		widget.showPreloader();
 		this._data.new_widget_placeholder.hide();
 
-		if (widget_local.iterator) {
+		if (widget.iterator) {
 			// Placeholders will be shown while the iterator will be loading.
-			this._addIteratorPlaceholders(widget_local,
-				this._numIteratorColumns(widget_local) * this._numIteratorRows(widget_local)
+			this._addIteratorPlaceholders(widget,
+				this._numIteratorColumns(widget) * this._numIteratorRows(widget)
 			);
-			this._alignIteratorContents(widget_local, widget_local.pos);
+			this._alignIteratorContents(widget, widget.pos);
 
-			this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget_local.uniqueid, {
-				trigger_name: `onIteratorResizeEnd_${widget_local.uniqueid}`,
-				parameters: [this._data, widget_local]
+			this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget.uniqueid, {
+				trigger_name: `onIteratorResizeEnd_${widget.uniqueid}`,
+				parameters: [this._data, widget]
 			});
 		}
 
 		if (this._options['edit_mode']) {
-			widget_local.rf_rate = 0;
-			this._setWidgetModeEdit(widget_local);
+			widget.rf_rate = 0;
+			this._setWidgetModeEdit(widget);
 		}
 
-		this._doAction('onWidgetAdd', widget_local);
+		this._doAction('onWidgetAdd', widget);
 	}
 
 	addNewWidget(trigger_element, pos) {
@@ -812,188 +797,6 @@ class CDashboardPage {
 				'options': options
 			});
 		}
-	}
-
-	_makeWidgetDiv(widget) {
-		const iterator_classes = {
-			'root': 'dashbrd-grid-iterator',
-			'container': 'dashbrd-grid-iterator-container',
-			'head': 'dashbrd-grid-iterator-head',
-			'content': 'dashbrd-grid-iterator-content',
-			'focus': 'dashbrd-grid-iterator-focus',
-			'actions': 'dashbrd-grid-iterator-actions',
-			'mask': 'dashbrd-grid-iterator-mask',
-			'hidden_header': 'dashbrd-grid-iterator-hidden-header'
-		};
-
-		const widget_classes = {
-			'root': 'dashbrd-grid-widget',
-			'container': 'dashbrd-grid-widget-container',
-			'head': 'dashbrd-grid-widget-head',
-			'content': 'dashbrd-grid-widget-content',
-			'focus': 'dashbrd-grid-widget-focus',
-			'actions': 'dashbrd-grid-widget-actions',
-			'mask': 'dashbrd-grid-widget-mask',
-			'hidden_header': 'dashbrd-grid-widget-hidden-header'
-		};
-
-		const widget_actions = {
-			'widgetType': widget.type,
-			'currentRate': widget.rf_rate,
-			'widget_uniqueid': widget.uniqueid,
-			'multiplier': '0'
-		};
-
-		const classes = widget.iterator ? iterator_classes : widget_classes;
-
-		if ('graphid' in widget.fields) {
-			widget_actions.graphid = widget.fields['graphid'];
-		}
-
-		if ('itemid' in widget.fields) {
-			widget_actions.itemid = widget.fields['itemid'];
-		}
-
-		if (widget.fields.dynamic && widget.fields.dynamic == 1 && this._data.dashboard.dynamic_hostid !== null) {
-			widget_actions.dynamic_hostid = this._data.dashboard.dynamic_hostid;
-		}
-
-		widget.content_header = $('<div>', {'class': classes.head})
-			.append(
-				$('<h4>').text((widget.header !== '') ? widget.header : this._data.widget_defaults[widget.type].header)
-			);
-
-		if (!widget.parent) {
-			// Do not add action buttons for child widgets of iterators.
-			widget.content_header
-				.append(widget.iterator
-					? $('<div>', {'class': 'dashbrd-grid-iterator-pager'}).append(
-						$('<button>', {
-							'type': 'button',
-							'class': 'btn-iterator-page-previous',
-							'title': t('Previous page')
-						}).on('click', () => {
-							if (widget.page > 1) {
-								widget.page--;
-								this._updateWidgetContent(widget);
-							}
-						}),
-						$('<span>', {'class': 'dashbrd-grid-iterator-pager-info'}),
-						$('<button>', {
-							'type': 'button',
-							'class': 'btn-iterator-page-next',
-							'title': t('Next page')
-						}).on('click', () => {
-							if (widget.page < widget.page_count) {
-								widget.page++;
-								this._updateWidgetContent(widget);
-							}
-						})
-					)
-					: ''
-				)
-				.append($('<ul>', {'class': classes.actions})
-					.append((this._options['editable'] && !this._options['kioskmode'])
-						? $('<li>').append(
-							$('<button>', {
-								'type': 'button',
-								'class': 'btn-widget-edit',
-								'title': t('Edit')
-							}).on('click', (e) => {
-								this.editWidget(widget, e.target);
-							})
-						)
-						: ''
-					)
-					.append(
-						$('<li>').append(
-							$('<button>', {
-								'type': 'button',
-								'class': 'btn-widget-action',
-								'title': t('Actions'),
-								'data-menu-popup': JSON.stringify({
-									'type': 'widget_actions',
-									'data': widget_actions
-								}),
-								'attr': {
-									'aria-expanded': false,
-									'aria-haspopup': true
-								}
-							})
-						)
-					)
-				);
-		}
-
-		widget.content_body = $('<div>', {'class': classes.content})
-			.toggleClass('no-padding', !widget.iterator && !widget.configuration['padding']);
-
-		widget.container = $('<div>', {'class': classes.container})
-			.append(widget.content_header)
-			.append(widget.content_body);
-
-		if (widget.iterator) {
-			widget.container
-				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
-					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
-				);
-		}
-		else {
-			widget.content_script = $('<div>');
-			widget.container.append(widget.content_script);
-		}
-
-		const $div = $('<div>', {'class': classes.root})
-			.toggleClass(classes.hidden_header, widget.view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
-			.toggleClass('new-widget', widget.new_widget);
-
-		if (!widget.parent) {
-			$div.css({
-				'min-height': `${this._options['widget-height']}px`,
-				'min-width': `${this._options['widget-width']}%`
-			});
-		}
-
-		// Used for disabling widget interactivity in edit mode while resizing.
-		widget.mask = $('<div>', {'class': classes.mask});
-
-		$div.append(widget.container, widget.mask);
-
-		widget.content_header
-			.on('focusin', () => {
-				this._enterWidget(widget);
-			})
-			.on('focusout', (e) => {
-				if (!widget.content_header.has(e.relatedTarget).length) {
-					this._leaveWidget(widget);
-				}
-			})
-			.on('focusin focusout', () => {
-				// Skip mouse events caused by animations which were caused by focus change.
-				this._options['mousemove_waiting'] = true;
-			});
-
-		$div
-			// "Mouseenter" is required, since "mousemove" may not always bubble.
-			.on('mouseenter mousemove', () => {
-				this._enterWidget(widget);
-
-				delete this._options['mousemove_waiting'];
-			})
-			.on('mouseleave', () => {
-				if (!this._options['mousemove_waiting']) {
-					this._leaveWidget(widget);
-				}
-			});
-
-		$div.on('load.image', () => {
-			// Call refreshCallback handler for expanded popup menu items.
-			if ($div.find('[data-expanded="true"][data-menu-popup]').length) {
-				$div.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
-			}
-		});
-
-		return $div;
 	}
 
 	/**
@@ -2350,15 +2153,6 @@ class CDashboardPage {
 		}
 	}
 
-	_showPreloader(widget) {
-		if (widget.iterator) {
-			widget.div.find('.dashbrd-grid-iterator-content').addClass('is-loading');
-		}
-		else {
-			widget.div.find('.dashbrd-grid-widget-content').addClass('is-loading');
-		}
-	}
-
 	_hidePreloader(widget) {
 		if (widget.iterator) {
 			widget.div.find('.dashbrd-grid-iterator-content').removeClass('is-loading');
@@ -2378,7 +2172,7 @@ class CDashboardPage {
 		widget.preloader_timeoutid = setTimeout(() => {
 			delete widget.preloader_timeoutid;
 
-			this._showPreloader(widget);
+			widget.showPreloader();
 		}, timeout);
 	}
 
@@ -2475,7 +2269,7 @@ class CDashboardPage {
 
 		if (this._getIteratorTooSmallState(iterator) && iterator.update_pending) {
 			this._setIteratorTooSmallState(iterator, false);
-			this._showPreloader(iterator);
+			iterator.showPreloader();
 			this._updateWidgetContent(iterator);
 
 			return;
@@ -2534,15 +2328,7 @@ class CDashboardPage {
 	}
 
 	_addWidgetOfIterator(iterator, child) {
-		// Replace empty arrays (or anything non-object) with empty objects.
-		if (typeof child.fields !== 'object') {
-			child.fields = {};
-		}
-		if (typeof child.configuration !== 'object') {
-			child.configuration = {};
-		}
-
-		child = {
+		child = new CDashboardWidget({
 			'widgetid': '',
 			'type': '',
 			'header': '',
@@ -2555,16 +2341,18 @@ class CDashboardPage {
 			...child,
 			'iterator': false,
 			'parent': iterator,
-			'new_widget': false
-		};
-
-		child.uniqueid = this._generateUniqueId();
-		child.div = this._makeWidgetDiv(child);
+			'new_widget': false,
+			uniqueid: this._generateUniqueId(),
+			min_width: this._options['widget-width'],
+			min_height: this._options['widget-height'],
+			is_editable: this._options['editable'] && !this._options['kioskmode'],
+			defaults: this._data.widget_defaults[child.type]
+		});
 
 		iterator.content_body.append(child.div);
 		iterator.children.push(child);
 
-		this._showPreloader(child);
+		child.showPreloader();
 	}
 
 	_hasEqualProperties(object_1, object_2) {
