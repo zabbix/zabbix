@@ -399,31 +399,40 @@ function submitPopup(overlay) {
 	const form = document.querySelector('#massupdate-form');
 	const action = form.querySelector('#action').value;
 	const location_url = form.querySelector('#location_url').value;
+	let valuemaps_removeall_warning = (form.querySelector('#visible_valuemaps:checked')
+		&& form.querySelector('[name="valuemap_massupdate"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
+		&& (form.querySelector('#valuemap_remove_all').checked === false)
+	);
+	let macros_removeall_warning = (form.querySelector('#visible_macros:checked')
+		&& form.querySelector('[name="mass_update_macros"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
+		&& (form.querySelector('#macros_remove_all').checked === false)
+	);
+	let warning_message = '';
 
-	// Check "remove all" checkbox in macro tab.
-	const macro_tab_visible = form.querySelector('#visible_macros');
-	if (macro_tab_visible && macro_tab_visible.checked) {
-		const is_checked = form.querySelector('#macros_remove_all').checked;
-		const is_remove_block =
-				form.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
-		if (is_remove_block && !is_checked) {
-			overlayDialogue({
-				'title': <?= json_encode(_('Warning')) ?>,
-				'type': 'popup',
-				'class': 'modal-popup modal-popup-medium',
-				'content': $('<span>').text(<?= json_encode(_('Please confirm that you want to remove all macros.')) ?>),
-				'buttons': [
-					{
-						'title': <?= json_encode(_('Ok')) ?>,
-						'focused': true,
-						'action': () => {}
-					}
-				]
-			}, overlay);
+	if (macros_removeall_warning) {
+		warning_message = <?= json_encode(_('Please confirm that you want to remove all macros.')) ?>;
+	}
+	else if (valuemaps_removeall_warning) {
+		warning_message = <?= json_encode(_('Please confirm that you want to remove all value mappings.')) ?>;
+	}
 
-			overlay.unsetLoading();
-			return false;
-		}
+	if (warning_message !== '') {
+		overlayDialogue({
+			'title': <?= json_encode(_('Warning')) ?>,
+			'type': 'popup',
+			'class': 'modal-popup modal-popup-medium',
+			'content': $('<span>').text(warning_message),
+			'buttons': [
+				{
+					'title': <?= json_encode(_('Ok')) ?>,
+					'focused': true,
+					'action': () => {}
+				}
+			]
+		}, overlay);
+
+		overlay.unsetLoading();
+		return false;
 	}
 
 	if (action == 'popup.massupdate.host') {
