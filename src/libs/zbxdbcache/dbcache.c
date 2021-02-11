@@ -3086,12 +3086,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					DCexport_history_and_trends(history, history_num, &itemids, items, errcodes,
 							NULL, 0);
 
-				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 					DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes,
 							trends, trends_num);
 			}
 
-			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 				zbx_export_events();
 		}
 
