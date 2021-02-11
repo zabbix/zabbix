@@ -31,6 +31,8 @@ function submitValueMap(overlay) {
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
 
+	$form.trimValues(['input[type="text"]']);
+
 	fetch(url.getUrl(), {
 		method: 'POST',
 		body: new URLSearchParams(new FormData($form.get(0)))
