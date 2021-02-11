@@ -80,6 +80,7 @@ class testPageUserRoles extends CWebTest {
 		// Check selected rows counter.
 		$this->query('id:all_roles')->asCheckbox()->one()->check();
 		$selected = $table->query('class:row-selected')->all()->count();
+		$this->assertEquals(4, $selected);
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check that number displayed near Users and # columns are equal.
