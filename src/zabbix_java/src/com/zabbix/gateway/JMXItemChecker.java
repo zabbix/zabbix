@@ -59,7 +59,7 @@ class JMXItemChecker extends ItemChecker
 		BEANS
 	}
 
-	static HashMap<String, Boolean> useRMISSLforURLHintCache = new HashMap<String, Boolean>();
+	private static HashMap<String, Boolean> useRMISSLforURLHintCache = new HashMap<String, Boolean>();
 
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
@@ -649,5 +649,12 @@ class JMXItemChecker extends ItemChecker
 		return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
 				(!(obj instanceof CompositeData)) && (!(obj instanceof TabularDataSupport)) &&
 				(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
+	}
+
+	public void cleanUseRMISSLforURLHintCache()
+	{
+		int s = useRMISSLforURLHintCache.size();
+		useRMISSLforURLHintCache.clear();
+		logger.debug("Finished cleanup of RMI SSL hint cache. " + s + " entries removed.");
 	}
 }
