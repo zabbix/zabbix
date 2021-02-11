@@ -2368,8 +2368,8 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)
 		{
-			char			buffer[64];
-			zbx_vmware_diskextent_t *extent = datastore->diskextents.values[j];
+			char			buffer[MAX_ID_LEN];
+			zbx_vmware_diskextent_t	*extent = datastore->diskextents.values[j];
 
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, extent->partitionid);
 			zbx_json_addstring(&json_data, extent->diskname, buffer, ZBX_JSON_TYPE_INT);
