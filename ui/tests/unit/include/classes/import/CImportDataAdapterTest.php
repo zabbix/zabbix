@@ -4304,7 +4304,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 			->setStrict(true)
 			->validate($source, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4'] as $version) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2'] as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}
