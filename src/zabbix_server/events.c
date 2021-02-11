@@ -266,9 +266,10 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 
 		zbx_vector_ptr_destroy(&item_tags);
 	}
-	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
+	else if (EVENT_SOURCE_INTERNAL == source)
 	{
-		event->name = zbx_strdup(NULL, error);
+		if (NULL != error)
+			event->name = zbx_strdup(NULL, error);
 
 		zbx_vector_ptr_create(&event->tags);
 		zbx_vector_ptr_create(&item_tags);
