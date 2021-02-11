@@ -2032,33 +2032,9 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_SCRIPT_NAME, 'length' => 23],
-				'folder1/folder2\/',
-				'/1/name',
-				'folder1/folder2\/'
-			],
-			[
-				['type' => API_SCRIPT_NAME, 'length' => 23],
 				'Detect operating system+',
 				'/1/name',
 				'Invalid parameter "/1/name": value is too long.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'',
-				'/1/name',
-				'Invalid parameter "/1/name": cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/b/c/',
-				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
-			],
-			[
-				['type' => API_SCRIPT_NAME],
-				'a/'.'/c',
-				'/1/name',
-				'Invalid parameter "/1/name": directory or script name cannot be empty.'
 			],
 			[
 				['type' => API_SCRIPT_NAME],
@@ -2084,6 +2060,108 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Detect '."\xd1".'perating system',
 				'/1/name',
 				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'',
+				'/1/name',
+				'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'script_name/',
+				'/1/name',
+				'Invalid parameter "/1/name": contains invalid characters.'
+			],
+			[
+				['type' => API_SCRIPT_NAME, 'length' => 23],
+				'script_name/',
+				'/1/name',
+				'Invalid parameter "/1/name": contains invalid characters.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'a/b/c/',
+				'/1/name',
+				'Invalid parameter "/1/name": contains invalid characters.'
+			],
+			[
+				['type' => API_SCRIPT_NAME],
+				'a/'.'/c',
+				'/1/name',
+				'Invalid parameter "/1/name": contains invalid characters.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				[],
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				true,
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				null,
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": a character string is expected.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'folder1/'.'/folder2',
+				'/1/menu_path',
+				'Invalid parameter "/1/menu_path": directory cannot be empty.'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'',
+				'/1/menu_path',
+				''
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/',
+				'/1/menu_path',
+				'/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/',
+				'/1/menu_path',
+				'/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'folder1/',
+				'/1/menu_path',
+				'folder1/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1',
+				'/1/menu_path',
+				'/folder1'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/',
+				'/1/menu_path',
+				'/folder1/'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/folder2',
+				'/1/menu_path',
+				'/folder1/folder2'
+			],
+			[
+				['type' => API_SCRIPT_MENU_PATH],
+				'/folder1/folder2/',
+				'/1/menu_path',
+				'/folder1/folder2/'
 			],
 			[
 				['type' => API_USER_MACRO, 'length' => 8],
