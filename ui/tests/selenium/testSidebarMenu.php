@@ -294,8 +294,6 @@ class testSidebarMenu extends CWebTest {
 	 */
 	public function testSidebarMenu_Main($data) {
 		$this->page->login()->open('')->waitUntilReady();
-//		CElementQuery::getDriver()->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
-//				'.menu-main *{transition: none !important;}\'; document.body.appendChild(style);');
 		$this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady();
 
 		// Sidebar main menu or user menu.
@@ -310,7 +308,11 @@ class testSidebarMenu extends CWebTest {
 		// Check section from data provider and click on it.
 		if ($data['section'] !== 'Monitoring') {
 			$main_section->waitUntilReady()->one()->click();
-			$main_section->one()->parents('xpath:/li[contains(@class, "has-submenu") and contains(@class, "is-expanded")]')->one(false)->waitUntilVisible();
+			$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
+			CElementQuery::wait()->until(function () use ($element) {
+				return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
+						' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
+			});
 		}
 
 		// Click on page.
