@@ -21,7 +21,7 @@ This template was tested on:
 
 2\. Link the template to the host.
 
-3\. Customize macros values if needed.
+3\. Customize macro values if needed.
 
 
 
@@ -46,15 +46,15 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Nodes discovery |<p>-</p> |HTTP_AGENT |netapp.aff.nodes.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Ethernet ports discovery |<p>-</p> |HTTP_AGENT |netapp.aff.ports.ether.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|FC ports discovery |<p>-</p> |HTTP_AGENT |netapp.aff.ports.fc.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Disks discovery |<p>-</p> |HTTP_AGENT |netapp.aff.disks.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Chassis discovery |<p>-</p> |HTTP_AGENT |netapp.aff.chassis.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|FRUs discovery |<p>-</p> |DEPENDENT |netapp.aff.frus.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|SVMs discovery |<p>-</p> |HTTP_AGENT |netapp.aff.svms.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|LUNs discovery |<p>-</p> |HTTP_AGENT |netapp.aff.luns.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
-|Volumes discovery |<p>-</p> |HTTP_AGENT |netapp.aff.volumes.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Nodes discovery |<p>-</p> |HTTP_AGENT |netapp.aff.nodes.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Ethernet ports discovery |<p>-</p> |HTTP_AGENT |netapp.aff.ports.ether.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|FC ports discovery |<p>-</p> |HTTP_AGENT |netapp.aff.ports.fc.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Disks discovery |<p>-</p> |HTTP_AGENT |netapp.aff.disks.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Chassis discovery |<p>-</p> |HTTP_AGENT |netapp.aff.chassis.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|FRUs discovery |<p>-</p> |DEPENDENT |netapp.aff.frus.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|SVMs discovery |<p>-</p> |HTTP_AGENT |netapp.aff.svms.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|LUNs discovery |<p>-</p> |HTTP_AGENT |netapp.aff.luns.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Volumes discovery |<p>-</p> |HTTP_AGENT |netapp.aff.volumes.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Items collected
 
