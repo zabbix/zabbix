@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-01-12T13:47:41Z</date>
+   <date>2021-02-10T14:35:58Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -724,7 +724,7 @@ UNION
                </master_item>
             </item>
             <item>
-               <name>Oracle: FRA, Used space in %</name>
+               <name>Oracle: FRA, Usable space in %</name>
                <type>DEPENDENT</type>
                <key>oracle.fra_usable_pct</key>
                <delay>0</delay>
@@ -1958,6 +1958,10 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                            <type>JSONPATH</type>
                            <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()</params>
                         </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
                      </preprocessing>
                      <master_item>
                         <key>db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]</key>
@@ -2004,6 +2008,10 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         <step>
                            <type>JSONPATH</type>
                            <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
                         </step>
                      </preprocessing>
                      <master_item>
