@@ -208,7 +208,6 @@ class CDashboardPage {
 				this.editWidget(e.detail.target, e.target);
 			})
 			.on(WIDGET_EVENT_ENTER, (e) => {
-				console.log(e);
 				this._enterWidget(e.detail.target);
 			})
 			.on(WIDGET_EVENT_LEAVE, (e) => {
@@ -454,7 +453,7 @@ class CDashboardPage {
 				new_widget.update_paused = true;
 
 				this._setWidgetModeEdit(new_widget);
-				this._disableWidgetControls(new_widget);
+				new_widget.disableWidgetControls();
 
 				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'dashboard.widget.sanitize');
@@ -476,7 +475,7 @@ class CDashboardPage {
 
 				new_widget.fields = response.fields;
 				new_widget.update_paused = false;
-				this._enableWidgetControls(new_widget);
+				new_widget.enableWidgetControls();
 				this._updateWidgetContent(new_widget);
 
 				this._options['updated'] = true;
@@ -1109,12 +1108,6 @@ class CDashboardPage {
 					)
 			);
 		}
-	}
-
-	_removeWidgetInfoButtons($content_header) {
-		// Note: this function is used only for widgets and not iterators.
-
-		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
 	}
 
 	_setWidgetPadding(widget, padding) {
@@ -2186,7 +2179,7 @@ class CDashboardPage {
 	}
 
 	_setUpdateWidgetContentTimer(widget, rf_rate) {
-		this._clearUpdateWidgetContentTimer(widget);
+		widget.clearUpdateWidgetContentTimer();
 
 		if (widget.updating_content) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -2211,13 +2204,6 @@ class CDashboardPage {
 					this._setUpdateWidgetContentTimer(widget);
 				}
 			}, rf_rate * 1000);
-		}
-	}
-
-	_clearUpdateWidgetContentTimer(widget) {
-		if (typeof widget.rf_timeoutid !== 'undefined') {
-			clearTimeout(widget.rf_timeoutid);
-			delete widget.rf_timeoutid;
 		}
 	}
 
@@ -2329,15 +2315,7 @@ class CDashboardPage {
 
 	_addWidgetOfIterator(iterator, child) {
 		child = new CDashboardWidget({
-			'widgetid': '',
-			'type': '',
-			'header': '',
 			'view_mode': iterator.view_mode,
-			'preloader_timeout': 10000,	// in milliseconds
-			'update_paused': false,
-			'initial_load': true,
-			'ready': false,
-			'storage': {},
 			...child,
 			'iterator': false,
 			'parent': iterator,
@@ -2345,7 +2323,7 @@ class CDashboardPage {
 			uniqueid: this._generateUniqueId(),
 			min_width: this._options['widget-width'],
 			min_height: this._options['widget-height'],
-			is_editable: this._options['editable'] && !this._options['kioskmode'],
+			// is_editable: this._options['editable'] && !this._options['kioskmode'],
 			defaults: this._data.widget_defaults[child.type]
 		});
 
@@ -2526,7 +2504,7 @@ class CDashboardPage {
 			$(response.debug).appendTo(widget.content_body);
 		}
 
-		this._removeWidgetInfoButtons(widget.content_header);
+		widget.removeWidgetInfoButtons();
 		if (typeof response.info !== 'undefined' && !this._options['edit_mode']) {
 			this._addWidgetInfoButtons(widget.content_header, response.info);
 		}
@@ -2696,7 +2674,7 @@ class CDashboardPage {
 	}
 
 	_updateWidgetContent(widget, options = {}) {
-		this._clearUpdateWidgetContentTimer(widget);
+		widget.clearUpdateWidgetContentTimer();
 
 		if (widget.updating_content) {
 			// Waiting for another AJAX request to either complete or fail.
@@ -3454,10 +3432,10 @@ class CDashboardPage {
 	}
 
 	_setWidgetModeEdit(widget) {
-		this._clearUpdateWidgetContentTimer(widget);
+		widget.clearUpdateWidgetContentTimer();
 
 		if (!widget.iterator) {
-			this._removeWidgetInfoButtons(widget.content_header);
+			widget.removeWidgetInfoButtons();
 		}
 
 		this._makeDraggable(widget);
@@ -3478,24 +3456,6 @@ class CDashboardPage {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Enable user functional interaction with widget.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_enableWidgetControls(widget) {
-		widget.content_header.find('button').prop('disabled', false);
-	}
-
-	/**
-	 * Disable user functional interaction with widget.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_disableWidgetControls(widget) {
-		widget.content_header.find('button').prop('disabled', true);
 	}
 
 	/**

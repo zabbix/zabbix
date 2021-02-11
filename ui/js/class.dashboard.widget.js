@@ -58,8 +58,10 @@ class CDashboardWidget extends CBaseComponent {
 			'initial_load': true,
 			'ready': false,
 			'storage': {},
-			...widget,
+			iterator: true,
+			is_editable: false,
 			'parent': false,
+			...widget,
 			$button_iterator_previous_page: undefined,
 			$button_iterator_next_page: undefined,
 			$button_edit: undefined
@@ -103,6 +105,33 @@ class CDashboardWidget extends CBaseComponent {
 		}
 	}
 
+	clearUpdateWidgetContentTimer() {
+		if (typeof this.rf_timeoutid !== 'undefined') {
+			clearTimeout(this.rf_timeoutid);
+			delete this.rf_timeoutid;
+		}
+	}
+
+	/**
+	 * Enable user functional interaction with widget.
+	 */
+	enableWidgetControls() {
+		this.content_header.find('button').prop('disabled', false);
+	}
+
+	/**
+	 * Disable user functional interaction with widget.
+	 */
+	disableWidgetControls() {
+		this.content_header.find('button').prop('disabled', true);
+	}
+
+	removeWidgetInfoButtons() {
+		// Note: this function is used only for widgets and not iterators.
+
+		$('.dashbrd-grid-widget-actions', this.content_header).find('.widget-info-button').remove();
+	}
+
 	_makeWidgetDiv() {
 		const iterator_classes = {
 			'root': 'dashbrd-grid-iterator',
@@ -126,31 +155,31 @@ class CDashboardWidget extends CBaseComponent {
 			'hidden_header': 'dashbrd-grid-widget-hidden-header'
 		};
 
-		const widget_actions = {
-			'widgetType': this.type,
-			'currentRate': this.rf_rate,
-			'widget_uniqueid': this.uniqueid,
-			'multiplier': '0'
-		};
-
 		const classes = this.iterator ? iterator_classes : widget_classes;
-
-		if ('graphid' in this.fields) {
-			widget_actions.graphid = this.fields['graphid'];
-		}
-
-		if ('itemid' in this.fields) {
-			widget_actions.itemid = this.fields['itemid'];
-		}
-
-		if (this.dynamic_hostid !== null) {
-			widget_actions.dynamic_hostid = this.dynamic_hostid;
-		}
 
 		this.content_header = $('<div>', {'class': classes.head})
 			.append($('<h4>').text((this.header !== '') ? this.header : this.defaults.header));
 
 		if (!this.parent) {
+			const widget_actions = {
+				'widgetType': this.type,
+				'currentRate': this.rf_rate,
+				'widget_uniqueid': this.uniqueid,
+				'multiplier': '0'
+			};
+
+			if ('graphid' in this.fields) {
+				widget_actions.graphid = this.fields['graphid'];
+			}
+
+			if ('itemid' in this.fields) {
+				widget_actions.itemid = this.fields['itemid'];
+			}
+
+			if (this.dynamic_hostid !== null) {
+				widget_actions.dynamic_hostid = this.dynamic_hostid;
+			}
+
 			if (this.iterator) {
 				this.$button_iterator_previous_page = $('<button>', {
 					'type': 'button',
@@ -249,7 +278,6 @@ class CDashboardWidget extends CBaseComponent {
 			}
 		});
 	}
-
 
 	registerEvents() {
 		this._events = {
