@@ -220,7 +220,8 @@ class testPageTemplates extends CLegacyWebTest {
 					'evaluation_type' => 'And/Or',
 					'tags' => [
 						['name' => 'action', 'operator' => 'Equals']
-					]
+					],
+					'expected_templates' => []
 				]
 			],
 			[
@@ -386,8 +387,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// Check that correct result displayed.
-		$filtering = $this->getTableResult('Name');
 		if (array_key_exists('absence_templates', $data)) {
+			$filtering = $this->getTableResult('Name');
 			foreach ($data['absence_templates'] as $absence) {
 				if (($key = array_search($absence, $filtering)) !== false) {
 					unset($filtering[$key]);
