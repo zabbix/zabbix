@@ -545,6 +545,9 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'valuemaps':
+				// Is required for item and item prototype form.
+				// break; is not missing here
 			case 'valuemap_names':
 				$result = [];
 
