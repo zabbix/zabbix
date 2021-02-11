@@ -106,12 +106,15 @@ var AddValueMap = class {
 	createMappingCell() {
 		let i = 0;
 		const cell = document.createElement('td');
+		const hellip = document.createElement('span');
+		hellip.innerHTML = '&hellip;';
+
 		cell.classList.add('wordwrap');
 		for (let value of this.data.mappings) {
 			if (i <= this.MAX_MAPPINGS) {
 				cell.append((i < this.MAX_MAPPINGS)
 					? `${value.value} ⇒ ${value.newvalue}`
-					: '&hellip',
+					: hellip,
 					document.createElement('br')
 				);
 			}
