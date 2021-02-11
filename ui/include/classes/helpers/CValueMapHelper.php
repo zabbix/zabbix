@@ -76,7 +76,7 @@ class CValueMapHelper {
 		$mapping_value = array_key_exists($value, $mappings) ? $mappings[$value] : null;
 
 		if ($mapping_value !== null) {
-			$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip' : $value;
+			$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip;' : $value;
 			return $mapping_value.' ('.$value.')';
 		}
 
