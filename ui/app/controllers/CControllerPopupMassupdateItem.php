@@ -473,18 +473,18 @@ class CControllerPopupMassupdateItem extends CController {
 			'action' => $this->getAction(),
 			'context' => $this->getInput('context'),
 			'delay_flex' => [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]],
-			'ids' => $this->getInput('ids', []),
+			'ids' => $this->getInput('ids'),
 			'initial_item_type' => null,
 			'interfaceids' => [],
 			'interfaces' => [],
 			'multiple_interface_types' => false,
-			'parent_discoveryid' => $this->getInput('parent_discoveryid', ''),
 			'prototype' => $this->getInput('prototype'),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'title' => _('Mass update')
 		];
 
 		if ($data['prototype']) {
+			$data['parent_discoveryid'] = $this->getInput('parent_discoveryid', 0);
 			$data += [
 				'location_url' => (new CUrl('disc_prototypes.php'))
 					->setArgument('context', $this->getInput('context'))
