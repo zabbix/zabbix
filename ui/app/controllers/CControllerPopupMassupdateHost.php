@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateHost extends CController {
+class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract {
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -46,13 +46,13 @@ class CControllerPopupMassupdateHost extends CController {
 			'tls_subject' => 'string',
 			'tls_psk_identity' => 'string',
 			'tls_psk' => 'string',
-			'valuemap' => 'array',
+			'valuemaps' => 'array',
 			'valuemap_remove' => 'array',
-			'valuemap_remove_except' => 'in 0,1',
-			'valuemap_remove_all' => 'in 0,1',
+			'valuemap_remove_except' => 'in 1',
+			'valuemap_remove_all' => 'in 1',
 			'valuemap_rename' => 'array',
-			'valuemap_update_existing' => 'in 0,1',
-			'valuemap_add_missing' => 'in 0,1',
+			'valuemap_update_existing' => 'in 1',
+			'valuemap_add_missing' => 'in 1',
 			'macros_add' => 'in 0,1',
 			'macros_update' => 'in 0,1',
 			'macros_remove' => 'in 0,1',
@@ -71,7 +71,7 @@ class CControllerPopupMassupdateHost extends CController {
 			'ipmi_privilege' => 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER, IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM])
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateValueMaps();
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$output = [];
@@ -87,33 +87,6 @@ class CControllerPopupMassupdateHost extends CController {
 		return $ret;
 	}
 
-	/**
-	 * Validate submited data for value map mass updates.
-	 *
-	 * @return bool
-	 */
-	protected function validateValueMaps(): bool {
-		$visible = $this->getInput('visible', []);
-
-		if (!array_key_exists('valuemaps', $visible)) {
-			return true;
-		}
-
-		if ($this->getInput('valuemap_massupdate') == ZBX_ACTION_RENAME) {
-			foreach ($this->getInput('valuemap_rename', []) as $rename) {
-				$from = trim($rename['from']);
-				$to = trim($rename['to']);
-
-				if ($from.$to !== '' && ($from === '' || $to === '')) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty')));
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
 	protected function checkPermissions() {
 		$hosts = API::Host()->get([
 			'output' => [],
@@ -121,11 +94,7 @@ class CControllerPopupMassupdateHost extends CController {
 			'editable' => true
 		]);
 
-		if (!$hosts) {
-			return false;
-		}
-
-		return true;
+		return count($hosts) > 0;
 	}
 
 	protected function doAction() {
@@ -521,188 +490,6 @@ class CControllerPopupMassupdateHost extends CController {
 			]);
 
 			$this->setResponse(new CControllerResponseData($data));
-		}
-	}
-
-	/**
-	 * Apply mass update changes for value maps.
-	 *
-	 * @throws Exception
-	 */
-	protected function updateValueMaps(array $hostids) {
-		$db_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name', 'hostid'],
-			'hostids' => $hostids,
-			'preservekeys' => true
-		]);
-		$create = [];
-		$update = [];
-		$delete = [];
-
-		switch ($this->getInput('valuemap_massupdate')) {
-			case ZBX_ACTION_ADD:
-				$valuemaps = $this->getInput('valuemap', []);
-
-				if (!$valuemaps) {
-					break;
-				}
-
-				$host_valuemaps = [];
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					$host_valuemaps[$db_valuemap['name']][] = $db_valuemap['hostid'];
-				}
-
-				$host_valuemaps += array_fill_keys(array_column($valuemaps, 'name'), []);
-
-				foreach ($valuemaps as $valuemap) {
-					foreach (array_diff($hostids, $host_valuemaps[$valuemap['name']]) as $hostid) {
-						$create[] = [
-							'hostid' => $hostid,
-							'name' => $valuemap['name'],
-							'mappings' => $valuemap['mappings']
-						];
-					}
-				}
-
-				// Update existing.
-				if (!$this->getInput('valuemap_update_existing', 0)) {
-					break;
-				}
-
-				$valuemaps = array_column($valuemaps, null, 'name');
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					if (!array_key_exists($db_valuemap['name'], $valuemaps)) {
-						continue;
-					}
-
-					$update[] = [
-						'valuemapid' => $db_valuemap['valuemapid'],
-						'name' => $db_valuemap['name'],
-						'mappings' => $valuemaps[$db_valuemap['name']]['mappings']
-					];
-				}
-				break;
-
-			case ZBX_ACTION_REPLACE:
-				$valuemaps = $this->getInput('valuemap', []);
-
-				if (!$valuemaps) {
-					break;
-				}
-
-				$valuemaps = array_column($valuemaps, null, 'name');
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					if (!array_key_exists($db_valuemap['name'], $valuemaps)) {
-						continue;
-					}
-
-					$update[] = [
-						'valuemapid' => $db_valuemap['valuemapid'],
-						'name' => $db_valuemap['name'],
-						'mappings' => $valuemaps[$db_valuemap['name']]['mappings']
-					];
-				}
-
-				// Create missing.
-				if (!$this->getInput('valuemap_add_missing', 0)) {
-					break;
-				}
-
-				$host_valuemaps = [];
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					$host_valuemaps[$db_valuemap['name']][] = $db_valuemap['hostid'];
-				}
-
-				$host_valuemaps += array_fill_keys(array_column($valuemaps, 'name'), []);
-
-				foreach ($valuemaps as $valuemap) {
-					foreach (array_diff($hostids, $host_valuemaps[$valuemap['name']]) as $hostid) {
-						$create[] = [
-							'hostid' => $hostid,
-							'name' => $valuemap['name'],
-							'mappings' => $valuemap['mappings']
-						];
-					}
-				}
-				break;
-
-			case ZBX_ACTION_RENAME:
-				if (!$this->getInput('valuemap_rename', [])) {
-					break;
-				}
-
-				$valuemaps = [];
-
-				foreach ($this->getInput('valuemap_rename', []) as $valuemap) {
-					$from = trim($valuemap['from']);
-
-					if ($from !== '') {
-						$valuemaps[$from] = trim($valuemap['to']);
-					}
-				}
-
-				if (!$valuemaps) {
-					break;
-				}
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					if (!array_key_exists($db_valuemap['name'], $valuemaps)) {
-						continue;
-					}
-
-					$update[] = [
-						'valuemapid' => $db_valuemap['valuemapid'],
-						'name' => $valuemaps[$db_valuemap['name']]
-					];
-				}
-				break;
-
-			case ZBX_ACTION_REMOVE:
-				$valuemaps = $this->getInput('valuemap_remove', []);
-
-				if (!$valuemaps) {
-					break;
-				}
-
-				$remove_except = $this->getInput('valuemap_remove_except', 0);
-				$delete_names = [];
-
-				foreach ($valuemaps as $valuemapid) {
-					$delete_names[] = $db_valuemaps[$valuemapid]['name'];
-				}
-
-				if ($remove_except) {
-					$delete_names = array_diff(array_column($db_valuemaps, 'name', 'name'), $delete_names);
-				}
-
-				foreach ($db_valuemaps as $db_valuemap) {
-					if (in_array($db_valuemap['name'], $delete_names)) {
-						$delete[] = $db_valuemap['valuemapid'];
-					}
-				}
-				break;
-
-			case ZBX_ACTION_REMOVE_ALL:
-				if ($this->getInput('valuemap_remove_all', 0)) {
-					$delete = array_column($db_valuemaps, 'valuemapid');
-				}
-				break;
-		}
-
-		if ($update && !API::ValueMap()->update($update)) {
-			throw new Exception();
-		}
-
-		if ($create && !API::ValueMap()->create($create)) {
-			throw new Exception();
-		}
-
-		if ($delete && !API::ValueMap()->delete($delete)) {
-			throw new Exception();
 		}
 	}
 }
