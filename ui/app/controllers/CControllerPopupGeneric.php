@@ -406,7 +406,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'valuemap_names' => [
 				'title' => _('Value mapping'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
 				'allowed_src_fields' => 'valuemapid,name',
 				'form' => [
 					'name' => 'valuemapform',
@@ -418,7 +418,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'valuemaps' => [
 				'title' => _('Value mapping'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
 				'allowed_src_fields' => 'valuemapid,name',
 				'form' => [
 					'name' => 'valuemapform',
