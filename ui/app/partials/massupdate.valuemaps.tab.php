@@ -77,7 +77,7 @@ $remove_container->addItem([
 
 $remove_all_container = (new CDiv())->addItem((new CDiv(
 	(new CCheckBox('valuemap_remove_all'))
-		->setLabel(_('I confirm to remove all value maps'))
+		->setLabel(_('I confirm to remove all value mappings'))
 )));
 
 $form_list = (new CFormList('valuemap-form-list'))
