@@ -492,6 +492,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
+		if (TRIGGER_VALUE_PROBLEM != problem_event->value)
+		{
+			zbx_strlcpy(error, "The specified event is not a problem event.", sizeof(error));
+			goto fail;
+		}
+
 		if (SUCCEED != get_host_from_event((NULL != recovery_event) ? recovery_event : problem_event,
 				&host, error, sizeof(error)))
 		{
