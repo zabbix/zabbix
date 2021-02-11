@@ -297,22 +297,22 @@ class testSidebarMenu extends CWebTest {
 //		CElementQuery::getDriver()->executeScript('var style = document.createElement(\'style\'); style.innerHTML = \''.
 //				'.menu-main *{transition: none !important;}\'; document.body.appendChild(style);');
 		$this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady();
-		
+
 		// Sidebar main menu or user menu.
 		$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
-		
+
 		// Menu section.
 		$main_section = $this->query('xpath://ul[@class="menu-'.$menu.'"]')->query('link', $data['section']);
-		
+
 		// Section page.
 		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page']);
-		
+
 		// Check section from data provider and click on it.
 		if ($data['section'] !== 'Monitoring') {
 			$main_section->waitUntilReady()->one()->click();
 			$main_section->one()->parents('xpath:/li[contains(@class, "has-submenu") and contains(@class, "is-expanded")]')->one(false)->waitUntilVisible();
 		}
-		
+
 		// Click on page.
 		$submenu->waitUntilClickable()->one()->click();
 
@@ -360,7 +360,7 @@ class testSidebarMenu extends CWebTest {
 			if ($view === 'hidden') {
 				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();
 			}
-			
+
 			$this->query('id', $id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
 
@@ -371,7 +371,7 @@ class testSidebarMenu extends CWebTest {
 			if ($view === 'hidden') {
 				$this->query('xpath://aside[@class="sidebar is-hidden is-opened"]')->one()->waitUntilVisible();
 			}
-			
+
 			// Returning standart sidemenu view clicking on unhide, expand button.
 			$this->query('button', $unhide)->one()->waitUntilClickable()->click();
 			$this->assertTrue($this->query('class:sidebar')->exists());
