@@ -40,14 +40,13 @@
 })();
 </script>
 <script type="text/javascript">
-const MAX_MAPPINGS = 3;
-
 var valuemap_number = 0;
 
 var AddValueMap = class {
 
 	constructor(data, edit = null) {
 		this.data = data;
+		this.MAX_MAPPINGS = 3;
 
 		this.row = document.createElement('tr');
 		this.row.appendChild(this.createNameCell());
@@ -109,10 +108,10 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		cell.classList.add('wordwrap');
 		for (let value of this.data.mappings) {
-			if (i <= MAX_MAPPINGS) {
-				cell.append((i < MAX_MAPPINGS)
+			if (i <= this.MAX_MAPPINGS) {
+				cell.append((i < this.MAX_MAPPINGS)
 					? `${value.value} ⇒ ${value.newvalue}`
-					: '...',
+					: '&hellip',
 					document.createElement('br')
 				);
 			}

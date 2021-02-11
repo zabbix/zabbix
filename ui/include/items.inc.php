@@ -1472,7 +1472,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
 			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'...' : $value;
+		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip' : $value;
 	}
 
 	return ($mapping === false) ? $value : $mapping.' ('.$value.')';
