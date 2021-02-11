@@ -975,7 +975,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 									$this->assertTrue(str_contains($mappings_text, $db_mapping['value'].' ⇒ '.$db_mapping['newvalue']));
 								}
 								else {
-									$this->assertTrue(str_contains($mappings_text, '...'));
+									$this->assertTrue(str_contains($mappings_text, '…'));
 
 									break;
 								}
