@@ -1,0 +1,1827 @@
+zabbix_export:
+  version: '5.2'
+  date: '2021-02-12T10:53:08Z'
+  groups:
+    -
+      name: Templates/Databases
+  templates:
+    -
+      template: 'Ignite by JMX'
+      name: 'Ignite by JMX'
+      description: |
+        The template to monitor Apache Ignite by Zabbix that work without any external scripts.
+          It works with both standalone and cluster instances.
+          The metrics are discoverable and collected by JMX.  
+          Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.
+          You can set {$IGNITE.USER} and {$IGNITE.PASSWORD} macros in the template for using on the host level.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.38
+      groups:
+        -
+          name: Templates/Databases
+      applications:
+        -
+          name: Ignite
+      discovery_rules:
+        -
+          name: 'Data region metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]'
+          delay: 10m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXNAME}'
+                value: '{$IGNITE.LLD.FILTER.DATA.REGION.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#JMXNAME}'
+                value: '{$IGNITE.LLD.FILTER.DATA.REGION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              name: 'Data region {#JMXNAME}: Allocation, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",AllocationRate]'
+              history: 7d
+              value_type: FLOAT
+              units: '!pps'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Allocation rate (pages per second) averaged across rateTimeInternal.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Checkpoint buffer size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CheckpointBufferSize]'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total size in bytes for checkpoint buffer.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Dirty pages'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",DirtyPages]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Number of pages in memory not yet synchronized with persistent storage.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Eviction, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",EvictionRate]'
+              history: 7d
+              value_type: FLOAT
+              units: '!pps'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Eviction rate (pages per second).'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>0'
+                  name: 'Data region {#JMXNAME}: Node started to evict pages'
+                  priority: INFO
+                  description: 'You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: 'Data region {#JMXNAME}: Size, max'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",MaxSize]'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Maximum memory region size defined by its data region.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Offheap size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",OffHeapSize]'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Offheap size in bytes.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Offheap used size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",OffheapUsedSize]'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total used offheap size in bytes.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Pages fill factor'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PagesFillFactor]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The percentage of the used space.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Pages replace, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PagesReplaceRate]'
+              history: 7d
+              value_type: FLOAT
+              units: '!pps'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Rate at which pages in memory are replaced with pages from persistent storage (pages per second).'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)}>0'
+                  name: 'Data region {#JMXNAME}: Pages replace rate more than 0'
+                  priority: WARNING
+                  description: 'There is more data than DataRegionMaxSize. Сluster started to replace pages in memory. Page replacement can slow down operations.'
+            -
+              name: 'Data region {#JMXNAME}: Allocated, bytes'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalAllocatedSize]'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total size of memory allocated in bytes.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Data region {#JMXNAME}: Used checkpoint buffer size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Used checkpoint buffer size in bytes.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Data region [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          trigger_prototypes:
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
+              priority: HIGH
+              description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m)'
+              priority: WARNING
+              description: 'Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.'
+              dependencies:
+                -
+                  name: 'Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)'
+                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+              priority: HIGH
+              description: 'Data region utilization is high. Increase data region size or delete any data.'
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
+              name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)'
+              priority: WARNING
+              description: 'Data region utilization is high. Increase data region size or delete any data.'
+              dependencies:
+                -
+                  name: 'Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)'
+                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+          graph_prototypes:
+            -
+              name: 'Data region {#JMXNAME}: Checkpoint buffer utilization'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CheckpointBufferSize]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",UsedCheckpointBufferSize]'
+            -
+              name: 'Data region {#JMXNAME}: DataRegion utilisation'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",OffHeapSize]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",OffheapUsedSize]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          name: 'Local node metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]'
+          delay: 30m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs active, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CurrentActiveJobs]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Number of currently active jobs concurrently executing on the node.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CurrentCancelledJobs]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Number of cancelled jobs that are still running.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CurrentPmeDuration]'
+              history: 7d
+              units: ms
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Current PME duration in milliseconds.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
+                  priority: HIGH
+                  description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.'
+                -
+                  expression: '{min(5m)} > {$IGNITE.PME.DURATION.MAX.WARN}'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.WARN} for 5 min)'
+                  priority: WARNING
+                  description: 'PME duration is over {$IGNITE.PME.DURATION.MAX.WARN}ms.'
+                  dependencies:
+                    -
+                      name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
+                      expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rejected, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CurrentRejectedJobs]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Number of jobs rejected after more recent collision resolution operation.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Threads count, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CurrentThreadCount]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Current number of live threads.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{min(15m)} > {$IGNITE.THREADS.COUNT.MAX.WARN}'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high (over {$IGNITE.THREADS.COUNT.MAX.WARN} for 15 min)'
+                  priority: WARNING
+                  description: 'Number of running threads is over {$IGNITE.THREADS.COUNT.MAX.WARN}.'
+                  dependencies:
+                    -
+                      name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)'
+                      expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} > {$IGNITE.PME.DURATION.MAX.HIGH}'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs waiting, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CurrentWaitingJobs]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Number of queued jobs currently waiting to be executed.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{min(15m)} > {$IGNITE.JOBS.QUEUE.MAX.WARN}'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high (over {$IGNITE.JOBS.QUEUE.MAX.WARN} for 15 min)'
+                  priority: WARNING
+                  description: 'Number of queued jobs is over {$IGNITE.JOBS.QUEUE.MAX.WARN}.'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Heap memory used'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",HeapMemoryUsed]'
+              history: 7d
+              units: B
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Current heap size that is used for object allocation.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+                -
+                  name: 'Ignite instance {#JMXIGNITEINSTANCENAME}'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs cancelled, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalCancelledJobs]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total number of jobs cancelled by the node per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs executed, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalExecutedJobs]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total number of jobs handled by the node per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rejects, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalRejectedJobs]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total number of jobs this node rejects during collision resolution operations since node startup per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          graph_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs current state'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CurrentActiveJobs]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CurrentWaitingJobs]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CurrentRejectedJobs]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CurrentCancelledJobs]'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TotalCancelledJobs]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TotalRejectedJobs]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TotalExecutedJobs]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+        -
+          name: 'Cluster metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]'
+          delay: 30m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",ActiveBaselineNodes]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of nodes that are currently active in the baseline topology.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalBaselineNodes]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total baseline nodes that are registered in the baseline topology.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Client'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalClientNodes]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of client nodes in the cluster.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, total'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalNodes]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Total number of nodes.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Server'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalServerNodes]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of server nodes in the cluster.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{change()}>0'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology'
+                  priority: INFO
+                  description: 'One or more server node added to the topology. Ack to close.'
+                  manual_close: 'YES'
+                -
+                  expression: '{change()}<0'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology'
+                  priority: WARNING
+                  description: 'One or more server node left the topology. Ack to close.'
+                  manual_close: 'YES'
+          trigger_prototypes:
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",TotalServerNodes].last()}>{Ignite by JMX:jmx["{#JMXOBJ}",TotalBaselineNodes].last()}'
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology'
+              priority: INFO
+              description: 'One or more server node left the topology. Ack to close.'
+              manual_close: 'YES'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+        -
+          name: 'Ingite kernal metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]'
+          delay: 30m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",FullVersion]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Version of Ignite instance.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: REGEX
+                  parameters:
+                    - '(.*)-\d+'
+                    - \1
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
+                  priority: INFO
+                  description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Local node ID'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",LocalNodeId]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Unique identifier for this node within grid.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Uptime'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",UpTime]'
+              history: 7d
+              units: uptime
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Uptime of Ignite instance.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{nodata(10m)}=1'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)'
+                  priority: WARNING
+                  description: 'Zabbix has not received data for items for the last 10 minutes.'
+                  manual_close: 'YES'
+                -
+                  expression: '{last()}<10m'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+                  
+        -
+          name: 'TCP Ccmmunication SPI metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]'
+          delay: 30m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication outbound messages queue'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",OutboundMessagesQueueSize]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Outbound messages queue size.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages received, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",ReceivedMessagesCount]'
+              history: 7d
+              value_type: FLOAT
+              units: '!msg/s'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of  messages received per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages sent, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",SentMessagesCount]'
+              history: 7d
+              value_type: FLOAT
+              units: '!msg/s'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of  messages sent per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          graph_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",SentMessagesCount]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",ReceivedMessagesCount]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+                  
+                  
+        -
+          name: 'TCP discovery SPI'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]'
+          delay: 30m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",Coordinator]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Current coordinator UUID.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
+                  priority: WARNING
+                  description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery message worker queue'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",MessageWorkerQueueSize]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Message worker queue current size.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes failed'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",NodesFailed]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Nodes failed count.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes joined'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",NodesJoined]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Nodes join count.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes left'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",NodesLeft]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Nodes left count.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery reconnect, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",ReconnectCount]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Number of times node tries to (re)establish connection to another node per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+                -
+                  name: 'Ignite instance {#JMXIGNITEINSTANCENAME}'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: TotalProcessedMessages'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalProcessedMessages]'
+              history: 7d
+              value_type: FLOAT
+              units: '!msg/s'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of messages received per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery messages received, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TotalReceivedMessages]'
+              history: 7d
+              value_type: FLOAT
+              units: '!msg/s'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of messages processed per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          graph_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery messages rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TotalProcessedMessages]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TotalReceivedMessages]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+                  
+                  
+        -
+          name: 'Transaction metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]'
+          delay: 30m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          item_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Locked keys'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",LockedKeysNumber]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of keys locked on the node.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions owner, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",OwnerTransactionsNumber]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of active transactions for which this node is the initiator.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions committed, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TransactionsCommittedNumber]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of transactions which were committed per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions holding lock, current'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of active transactions holding at least one key lock.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions rolledback, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",TransactionsRolledBackNumber]'
+              history: 7d
+              value_type: FLOAT
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of transactions which were rollback per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite instance [{#JMXIGNITEINSTANCENAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          graph_prototypes:
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",OwnerTransactionsNumber]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]'
+            -
+              name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TransactionsRolledBackNumber]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",TransactionsCommittedNumber]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+                  
+                  
+        -
+          name: 'Cache groups'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]'
+          delay: 10m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXNAME}'
+                value: '{$IGNITE.LLD.FILTER.CACHE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#JMXNAME}'
+                value: '{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              name: 'Cache group [{#JMXNAME}]: Backups'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",Backups]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Count of backups configured for cache group.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXNAME}]: Caches'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",Caches]'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'List of caches.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{diff()}=1 and {strlen()}>0'
+                  name: 'Cache group [{#JMXNAME}]: List of caches has changed'
+                  priority: INFO
+                  description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: 'Cache group [{#JMXNAME}]: Local node partitions, moving'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Count of partitions with state MOVING for this cache group located on this node.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{max(30m)}>0'
+                  name: 'Cache group [{#JMXNAME}]: Rebalance in progress'
+                  priority: INFO
+                  description: 'Ack to close.'
+                  manual_close: 'YES'
+            -
+              name: 'Cache group [{#JMXNAME}]: Local node partitions, owning'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",LocalNodeOwningPartitionsCount]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Count of partitions with state OWNING for this cache group located on this node.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXNAME}]: Local node entries, renting'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Count of entries remains to evict in RENTING partitions located on this node for this cache group.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXNAME}]: Local node partitions, renting'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Count of partitions with state RENTING for this cache group located on this node.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXNAME}]: Partition copies, max'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",MaximumNumberOfPartitionCopies]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Maximum number of partition copies for all partitions of this cache group.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXNAME}]: Partition copies, min'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Minimum number of partition copies for all partitions of this cache group.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{max(30m)}=0'
+                  name: 'Cache group [{#JMXNAME}]: There is no copy for partitions'
+                  priority: WARNING
+            -
+              name: 'Cache group [{#JMXNAME}]: Partitions'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",Partitions]'
+              history: 7d
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Count of partitions for cache group.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          trigger_prototypes:
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}'
+              name: 'Cache group [{#JMXNAME}]: One or more backups are unavaliable'
+              priority: WARNING
+          graph_prototypes:
+            -
+              name: 'Cache group [{#JMXNAME}]: Partitions'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",LocalNodeOwningPartitionsCount]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          name: 'Thread pool metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]'
+          delay: 10m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXNAME}'
+                value: '{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#JMXNAME}'
+                value: '{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              name: 'Thread pool [{#JMXNAME}]: Pool size, core'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CorePoolSize]'
+              history: 7d
+              units: '!msg'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The core number of threads.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Thread pool [{#JMXNAME}]: Pool size, max'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",MaximumPoolSize]'
+              history: 7d
+              units: '!msg'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The maximum allowed number of threads.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Thread pool [{#JMXNAME}]: Pool size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",PoolSize]'
+              history: 7d
+              units: '!msg'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Current number of threads in the pool.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Thread pool [{#JMXNAME}]: Queue size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",QueueSize]'
+              history: 7d
+              units: '!msg'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Current size of the execution queue.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Thread pool [{#JMXNAME}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+              trigger_prototypes:
+                -
+                  expression: '{min(5m)} > {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}'
+                  name: 'Thread pool [{#JMXNAME}]: Too many messages in queue (over {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"} for 5 min)'
+                  priority: AVERAGE
+                  description: 'Number of messages in queue more than {$IGNITE.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.'
+          graph_prototypes:
+            -
+              name: 'Thread pool [{#JMXNAME}]: Thread pool size'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",PoolSize]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",MaximumPoolSize]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CorePoolSize]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          name: 'Cache metrics'
+          type: JMX
+          key: 'jmx.discovery[beans,"org.apache:name=\"org.apache.ignite.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]'
+          delay: 10m
+          username: '{$IGNITE.USER}'
+          password: '{$IGNITE.PASSWORD}'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#JMXGROUP}'
+                value: '{$IGNITE.LLD.FILTER.CACHE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#JMXGROUP}'
+                value: '{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache gets, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheGets]'
+              history: 7d
+              value_type: FLOAT
+              units: ops
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of gets to the cache per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache hits, pct'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheHitPercentage]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Percentage of successful hits.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache misses, pct'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheMissPercentage]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'Percentage of accesses that failed to find anything.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache puts, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CachePuts]'
+              history: 7d
+              value_type: FLOAT
+              units: ops
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of puts to the cache per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache removals, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheRemovals]'
+              history: 7d
+              value_type: FLOAT
+              units: ops
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of removals from the cache per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache size'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheSize]'
+              history: 7d
+              units: '!keys'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of non-null values in the cache as a long value.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache transaction commits, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheTxCommits]'
+              history: 7d
+              value_type: FLOAT
+              units: '!tps'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of transaction commits per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache transaction rollbacks, rate'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",CacheTxRollbacks]'
+              history: 7d
+              value_type: FLOAT
+              units: '!tps'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of transaction rollback per second.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache heap entries'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",HeapEntriesCount]'
+              history: 7d
+              units: '!keys'
+              username: '{$IGNITE.USER}'
+              password: '{$IGNITE.PASSWORD}'
+              description: 'The number of entries in heap memory.'
+              application_prototypes:
+                -
+                  name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Cache group [{#JMXGROUP}]'
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          trigger_prototypes:
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheSize].last()}={Ignite by JMX:jmx["{#JMXOBJ}",HeapEntriesCount].last()}'
+              name: 'Cache group [{#JMXGROUP}]: All entries are in heap'
+              priority: INFO
+              description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.'
+              manual_close: 'YES'
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)} > {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}'
+              name: 'Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
+                  expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}>0 and {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0'
+            -
+              expression: '{Ignite by JMX:jmx["{#JMXOBJ}",CacheTxRollbacks].min(5m)}>0 and {Ignite by JMX:jmx["{#JMXOBJ}",CacheTxCommits].max(5m)}=0'
+              name: 'Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m'
+              priority: AVERAGE
+          graph_prototypes:
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache hits'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CacheHitPercentage]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CacheMissPercentage]'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache ops'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CacheGets]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CachePuts]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CacheRemovals]'
+            -
+              name: 'Cache group [{#JMXGROUP}]: Cache transactions'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CacheTxCommits]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Ignite by JMX'
+                    key: 'jmx["{#JMXOBJ}",CacheTxRollbacks]'
+          jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value);
+                  for (var item, i = 0; item = data.data[i++];) {
+                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                          Object.assign(item, {
+                              '{#JMXIGNITEINSTANCENAME}': 'null'
+                          });
+                      }
+                  
+                  }
+                  
+                  return JSON.stringify(data)
+                  
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      macros:
+        -
+          macro: '{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}'
+          value: '80'
+          description: 'The maximum percent of checkpoint buffer utilization for high trigger expression.'
+        -
+          macro: '{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}'
+          value: '66'
+          description: 'The maximum percent of checkpoint buffer utilization for warning trigger expression.'
+        -
+          macro: '{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}'
+          value: '90'
+          description: 'The maximum percent of data region utilization for high trigger expression.'
+        -
+          macro: '{$IGNITE.DATA.REGION.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'The maximum percent of data region utilization for warning trigger expression.'
+        -
+          macro: '{$IGNITE.JOBS.QUEUE.MAX.WARN}'
+          value: '10'
+          description: 'The maximum number of queued jobs for trigger expression.'
+        -
+          macro: '{$IGNITE.LLD.FILTER.CACHE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable cache groups.'
+        -
+          macro: '{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered cache groups.'
+        -
+          macro: '{$IGNITE.LLD.FILTER.DATA.REGION.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable data regions.'
+        -
+          macro: '{$IGNITE.LLD.FILTER.DATA.REGION.NOT_MATCHES}'
+          value: ^(sysMemPlc|TxLog)$
+          description: 'Filter to exclude discovered data regions.'
+        -
+          macro: '{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable thread pools.'
+        -
+          macro: '{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}'
+          value: ^(GridCallbackExecutor|GridRebalanceStripedExecutor|GridDataStreamExecutor|StripedExecutor)$
+          description: 'Filter to exclude discovered thread pools.'
+        -
+          macro: '{$IGNITE.PASSWORD}'
+          value: '<secret>'
+        -
+          macro: '{$IGNITE.PME.DURATION.MAX.HIGH}'
+          value: '60000'
+          description: 'The maximum PME duration in ms for high trigger expression.'
+        -
+          macro: '{$IGNITE.PME.DURATION.MAX.WARN}'
+          value: '10000'
+          description: 'The maximum PME duration in ms for warning trigger expression.'
+        -
+          macro: '{$IGNITE.THREAD.QUEUE.MAX.WARN}'
+          value: '1000'
+          description: 'Threshold for thread pool queue size. Can be used with thread pool name as context.'
+        -
+          macro: '{$IGNITE.THREADS.COUNT.MAX.WARN}'
+          value: '1000'
+          description: 'The maximum number of running threads for trigger expression.'
+        -
+          macro: '{$IGNITE.USER}'
+          value: zabbix
