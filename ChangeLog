@@ -2358,6 +2358,9 @@ Changes for 4.0.29rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
 ...G...... [ZBX-18845] fixed 'UserParameter' possible buffer overrun (viktors)
 A......... [ZBX-18449] reworked trigger API validation (miks)
 ..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
