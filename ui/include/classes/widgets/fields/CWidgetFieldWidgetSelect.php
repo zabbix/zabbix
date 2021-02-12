@@ -68,7 +68,6 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	 * @return string
 	 */
 	public function getJavascript() {
-		// TODO need to fix ZABBIX.Dashboard._target.data
 		return
 			'var dashboard_data = ZABBIX.Dashboard.getDashboardData(),'.
 				'filter_select = jQuery("#'.$this->getName().'").get(0);'.

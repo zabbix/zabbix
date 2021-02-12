@@ -115,7 +115,7 @@ class CDashboardPage {
 	}
 
 	getDashboardData() {
-		return {...this._data.dashboard};
+		return {...this._data};
 	}
 
 	getWidgets() {
@@ -721,7 +721,7 @@ class CDashboardPage {
 					if (widget.length) {
 						for (const task of this._data.widget_relations.tasks[dest_uid]) {
 							if (task.data_name === buffer_data.data_name) {
-								task.callback.apply([widget[0], buffer_data.args]);
+								task.callback.apply(this, [widget[0], buffer_data.args]);
 							}
 						}
 
