@@ -908,9 +908,10 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$value = UNRESOLVED_MACRO_STRING;
 
-				$history = Manager::History()->getLastValues([$function], 1,
+				$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 					CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-				);
+				));
+
 				if (!array_key_exists($function['itemid'], $history)) {
 					continue;
 				}
@@ -1217,7 +1218,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
 										$value['value'] = $val;
 										break;
 									}
@@ -1294,7 +1295,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+						if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default

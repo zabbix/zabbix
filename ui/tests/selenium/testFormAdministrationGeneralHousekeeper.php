@@ -105,8 +105,8 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	 */
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
 		$this->page->login()->open($this->config_link);
-		$this->assertPageTitle('Configuration of housekeeping');
-		$this->assertPageHeader('Housekeeping');
+		$this->page->assertTitle('Configuration of housekeeping');
+		$this->page->assertHeader('Housekeeping');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$headers = ['Events and alerts', 'Services', 'Audit', 'User sessions', 'History', 'Trends'];
@@ -852,7 +852,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_audit' => '0',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
-						'id:hk_sessions' => '0',
+						'id:hk_sessions' => '0'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
@@ -884,7 +884,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_audit' => '0s',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
-						'id:hk_sessions' => '0s',
+						'id:hk_sessions' => '0s'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
@@ -916,7 +916,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_audit' => '0m',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
-						'id:hk_sessions' => '0m',
+						'id:hk_sessions' => '0m'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
@@ -948,7 +948,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_audit' => '0h',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
-						'id:hk_sessions' => '0h',
+						'id:hk_sessions' => '0h'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
@@ -980,7 +980,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_audit' => '0d',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
-						'id:hk_sessions' => '0d',
+						'id:hk_sessions' => '0d'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
@@ -1012,7 +1012,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 						'id:hk_audit' => '0w',
 						// User sessions.
 						'id:hk_sessions_mode' => true,
-						'id:hk_sessions' => '0w',
+						'id:hk_sessions' => '0w'
 					],
 					'details' => [
 						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',

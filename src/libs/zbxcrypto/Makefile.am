@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxcrypto.a
 libzbxcrypto_a_SOURCES = \
 	base64.c \
 	md5.c \
+	sha256crypt.c \
 	sha512crypt.c \
 	tls.c \
 	tls.h \

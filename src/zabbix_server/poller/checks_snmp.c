@@ -355,6 +355,45 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session *session)
+{
+	int	ret = SUCCEED;
+
+	switch (item->snmpv3_authprotocol)
+	{
+		case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
+			session->securityAuthProto = usmHMACMD5AuthProtocol;
+			session->securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA1:
+			session->securityAuthProto = usmHMACSHA1AuthProtocol;
+			session->securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
+			break;
+#ifdef HAVE_NETSNMP_STRONG_AUTH
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA224:
+			session->securityAuthProto = usmHMAC128SHA224AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC128SHA224AuthProtocol);
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA256:
+			session->securityAuthProto = usmHMAC192SHA256AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC192SHA256AuthProtocol);
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA384:
+			session->securityAuthProto = usmHMAC256SHA384AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC256SHA384AuthProtocol);
+			break;
+		case ITEM_SNMPV3_AUTHPROTOCOL_SHA512:
+			session->securityAuthProto = usmHMAC384SHA512AuthProtocol;
+			session->securityAuthProtoLen = OID_LENGTH(usmHMAC384SHA512AuthProtocol);
+			break;
+#endif
+		default:
+			ret = FAIL;
+	}
+
+	return ret;
+}
+
 static char	*zbx_get_snmp_type_error(u_char type)
 {
 	switch (type)
@@ -500,23 +539,11 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 			case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
 
-				switch (item->snmpv3_authprotocol)
+				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
 				{
-					case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
-						/* set the authentication protocol to MD5 */
-						session.securityAuthProto = usmHMACMD5AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
-						break;
-					case ITEM_SNMPV3_AUTHPROTOCOL_SHA:
-						/* set the authentication protocol to SHA */
-						session.securityAuthProto = usmHMACSHA1AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
-						break;
-					default:
-						zbx_snprintf(error, max_error_len,
-								"Unsupported authentication protocol [%d]",
-								item->snmpv3_authprotocol);
-						goto end;
+					zbx_snprintf(error, max_error_len, "Unsupported authentication protocol [%d]",
+							item->snmpv3_authprotocol);
+					goto end;
 				}
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
@@ -534,23 +561,11 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 			case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
 
-				switch (item->snmpv3_authprotocol)
+				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
 				{
-					case ITEM_SNMPV3_AUTHPROTOCOL_MD5:
-						/* set the authentication protocol to MD5 */
-						session.securityAuthProto = usmHMACMD5AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
-						break;
-					case ITEM_SNMPV3_AUTHPROTOCOL_SHA:
-						/* set the authentication protocol to SHA */
-						session.securityAuthProto = usmHMACSHA1AuthProtocol;
-						session.securityAuthProtoLen = USM_AUTH_PROTO_SHA_LEN;
-						break;
-					default:
-						zbx_snprintf(error, max_error_len,
-								"Unsupported authentication protocol [%d]",
-								item->snmpv3_authprotocol);
-						goto end;
+					zbx_snprintf(error, max_error_len, "Unsupported authentication protocol [%d]",
+							item->snmpv3_authprotocol);
+					goto end;
 				}
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
@@ -572,11 +587,33 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 						session.securityPrivProto = usmDESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
 						break;
-					case ITEM_SNMPV3_PRIVPROTOCOL_AES:
-						/* set the privacy protocol to AES */
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES128:
+						/* set the privacy protocol to AES128 */
 						session.securityPrivProto = usmAESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
 						break;
+#ifdef HAVE_NETSNMP_STRONG_PRIV
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES192:
+						/* set the privacy protocol to AES192 */
+						session.securityPrivProto = usmAES192PrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES192PrivProtocol);
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES256:
+						/* set the privacy protocol to AES256 */
+						session.securityPrivProto = usmAES256PrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES256PrivProtocol);
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES192C:
+						/* set the privacy protocol to AES192 (Cisco version) */
+						session.securityPrivProto = usmAES192CiscoPrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES192CiscoPrivProtocol);
+						break;
+					case ITEM_SNMPV3_PRIVPROTOCOL_AES256C:
+						/* set the privacy protocol to AES256 (Cisco version) */
+						session.securityPrivProto = usmAES256CiscoPrivProtocol;
+						session.securityPrivProtoLen = OID_LENGTH(usmAES256CiscoPrivProtocol);
+						break;
+#endif
 					default:
 						zbx_snprintf(error, max_error_len,
 								"Unsupported privacy protocol [%d]",
@@ -642,7 +679,7 @@ static void	zbx_snmp_close_session(struct snmp_session *session)
 static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type)
 {
 	const char	*hint;
-	char		buffer[MAX_STRING_LEN];
+	char		buffer[MAX_BUFFER_LEN];
 	char		*strval_dyn = NULL;
 	struct tree	*subtree;
 	unsigned char	type;

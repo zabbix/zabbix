@@ -40,7 +40,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					'name' => 'API create script',
 					'type' => '',
-					'command' => ''
+					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
@@ -48,7 +48,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					'name' => 'API create script',
 					'type' => 'abc',
-					'command' => ''
+					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
@@ -56,7 +56,7 @@ class testScripts extends CAPITest {
 				'script' => [
 					'name' => 'API create script',
 					'type' => 999999,
-					'command' => ''
+					'command' => 'reboot server'
 				],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.', '.ZBX_SCRIPT_TYPE_IPMI.', '.ZBX_SCRIPT_TYPE_SSH.', '.ZBX_SCRIPT_TYPE_TELNET.', '.ZBX_SCRIPT_TYPE_WEBHOOK.'.'
 			],
@@ -991,6 +991,24 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/parameters/1": the parameter "value" is missing.'
 			],
+			'Test duplicate parameters' => [
+				'script' => [
+					'name' => 'Webhook validation with params',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'command' => 'Script command',
+					'parameters' => [
+						[
+							'name' => 'param1',
+							'value' => 'value1'
+						],
+						[
+							'name' => 'param1',
+							'value' => 'value1'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/parameters/2": value (name)=(param1) already exists.'
+			],
 			'Test unexpected parameters field for custom script type (empty)' => [
 				'script' => [
 					'name' => 'API create script',
@@ -1258,12 +1276,28 @@ class testScripts extends CAPITest {
 						'menu_path' => 'folder1/folder2',
 						'parameters' => [
 							[
-								'name' => 'username',
-								'value' => 'John'
+								'name' => '!@#$%^&*()_+<>,.\/',
+								'value' => '!@#$%^&*()_+<>,.\/'
 							],
 							[
-								'name' => 'password',
-								'value' => 'Ada'
+								'name' => str_repeat('n', 255),
+								'value' => str_repeat('v', 2048)
+							],
+							[
+								'name' => '{$MACRO:A}',
+								'value' => '{$MACRO:A}'
+							],
+							[
+								'name' => '{$USERMACRO}',
+								'value' => ''
+							],
+							[
+								'name' => '{HOST.HOST}',
+								'value' => '{EVENT.NAME}'
+							],
+							[
+								'name' => 'Имя',
+								'value' => 'Значение'
 							]
 						]
 					]
@@ -1456,13 +1490,75 @@ class testScripts extends CAPITest {
 					'groupsObjectProperties' => ['flags'],
 					'result_keys' => ['groups', 'scriptid']
 				]
+			],
+			// Get scripts parameters.
+			'Test get scripts parameters' => [
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => ['parameters'],
+					'scriptids' => 59
+				],
+				'expect' => [
+					'error' => null,
+					'result_keys' => ['parameters'],
+					'parameters' => [
+						[
+							'name' => 'param 1',
+							'value' => 'value 1'
+						],
+						[
+							'name' => 'param 2',
+							'value' => 'value 2'
+						]
+					]
+				]
+			],
+			// Filter webhooks.
+			'Test filter webhooks' => [
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => [ 'scriptid', 'parameters'],
+					'scriptids' => [59, 60],
+					'filter' => ['type' => ZBX_SCRIPT_TYPE_WEBHOOK]
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['59'],
+					'!has.scriptid' => ['60'],
+					'result_keys' => ['scriptid', 'parameters'],
+					'parameters' => [
+						[
+							'name' => 'param 1',
+							'value' => 'value 1'
+						],
+						[
+							'name' => 'param 2',
+							'value' => 'value 2'
+						]
+					]
+				]
+			],
+			// Filter IPMI.
+			'Test filter IPMI' => [
+				'params' => [
+					'__auth' => ['Admin', 'zabbix'],
+					'output' => ['scriptid'],
+					'scriptids' => [59, 60],
+					'filter' => ['type' => ZBX_SCRIPT_TYPE_IPMI]
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['60'],
+					'!has.scriptid' => ['59'],
+					'result_keys' => ['scriptid']
+				]
 			]
 		];
 	}
 
 	/**
-	* @dataProvider script_get
-	*/
+	 * @dataProvider script_get
+	 */
 	public function testScripts_Get($params, $expect) {
 		if (array_key_exists('__auth', $params)) {
 			$this->authorize($params['__auth'][0], $params['__auth'][1]);
@@ -1533,10 +1629,13 @@ class testScripts extends CAPITest {
 				sort($expect['result_keys']);
 				ksort($script);
 				$this->assertEquals($expect['result_keys'], array_keys($script));
+				if (array_key_exists('parameters', $expect)) {
+					$this->assertEquals($expect['parameters'], $script['parameters']);
+				}
 			}
 		}
 
-		$this->markTestIncomplete('This test has not been implemented yet. Missing Javascript script parameter test cases, filter options, search options and others.');
+		$this->markTestIncomplete('This test has not been fully implemented yet.');
 	}
 
 	/**
