@@ -1,6 +1,12 @@
 Changes for 5.4.0alpha2
 
 New features:
+.........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
+.......PS. [ZBXNEXT-6301] extended set of collected VMware metrics for VM and HV (asestakovs)
+A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption protocols for SNMPv3 (dgoloscapov, talbergs)
+...G...... [ZBXNEXT-6339] added smart plugin to support S.M.A.R.T monitoring in Zabbix Agent 2 (esneiders)
+...G...... [ZBXNEXT-6437] added native support for system.sw.packages plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6306] added native linux support for key vm.memory.size in Zabbix agent 2 (esneiders)
 .......PS. [ZBXNEXT-6443] added sha256() function to JavaScript preprocessing (viktors)
 .........T [ZBXNEXT-5809] added VictorOps media (tuskov)
 .........T [ZBXNEXT-6394] added template "Hikvision camera by HTTP" (abakaldin)
@@ -8,6 +14,14 @@ New features:
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 
 Bug fixes:
+........S. [ZBX-18917] disabled global script webhook execution on proxy (dgoloscapov)
+.........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+.........T [ZBX-18963] fixed preprocessing for archivelog items in Oracle Templates (ychukina)
+..F....... [ZBX-18741] fixed numeric value encountered (rlataria)
+.........T [ZBX-18967] moved template "Hikvision camera by HTTP" from "templates/cctv/" to "templates/cctv/hikvision" (abakaldin)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
+.........T [ZBX-18638] removed triggers of the "Temperature" items, added the "Temperature sensor condition" items with triggers, removed unnecessary macros (mchudinov)
 ..F....... [ZBX-18720] fixed full clone of discovered host having duplicate interfaces (Ivo)
 A......... [ZBX-18449] reworked trigger API validation (miks)
 ..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
