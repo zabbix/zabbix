@@ -3082,13 +3082,27 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			if (0 != history_num)
 			{
+				const ZBX_DC_HISTORY	*phistory = NULL;
+				const ZBX_DC_TREND	*ptrends = NULL;
+				int			history_num_loc = 0, trends_num_loc = 0;
+
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
-					DCexport_history_and_trends(history, history_num, &itemids, items, errcodes,
-							NULL, 0);
+				{
+					phistory = history;
+					history_num_loc = history_num;
+				}
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
-					DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes,
-							trends, trends_num);
+				{
+					ptrends = trends;
+					trends_num_loc = trends_num;
+				}
+
+				if (NULL != phistory || NULL != ptrends)
+				{
+					DCexport_history_and_trends(phistory, history_num_loc, &itemids, items,
+							errcodes, ptrends, trends_num_loc);
+				}
 			}
 
 			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))

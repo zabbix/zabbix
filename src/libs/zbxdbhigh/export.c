@@ -38,10 +38,77 @@ static zbx_export_file_t	*trends_file;
 static zbx_export_file_t	*problems_file;
 
 static char	*export_dir;
+static int	export_types;
 
+#define ZBX_OPTION_EXPTYPE_EVENTS	"events"
+#define ZBX_OPTION_EXPTYPE_HISTORY	"history"
+#define ZBX_OPTION_EXPTYPE_TRENDS	"trends"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_export_type                                         *
+ *                                                                            *
+ * Purpose: validate export type                                              *
+ *                                                                            *
+ * Return value: SUCCED  - valid configuration                                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_export_type(void)
+{
+	int	i, ret = SUCCEED;
+	char	*ptr = CONFIG_EXPORT_TYPE;
+	char	*patterns[] = {
+			ZBX_OPTION_EXPTYPE_EVENTS,
+			ZBX_OPTION_EXPTYPE_HISTORY,
+			ZBX_OPTION_EXPTYPE_TRENDS,
+			NULL};
+	size_t	lengths[] = {
+			ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_EVENTS),
+			ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_HISTORY),
+			ZBX_CONST_STRLEN(ZBX_OPTION_EXPTYPE_TRENDS),
+			0};
+
+	if (NULL != ptr)
+	{
+		do
+		{
+			for (i = 0; NULL != patterns[i]; i++)
+			{
+				if (0 == strncmp(ptr, patterns[i], lengths[i]))
+					break;
+			}
+
+			if (NULL == patterns[i])
+			{
+				ret = FAIL;
+				break;
+			}
+
+			ptr = strchr(ptr, ',');
+		} while(NULL != ptr++);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_export_enabled                                            *
+ *                                                                            *
+ * Purpose: checks if export is enabled for given type(s)                     *
+ *                                                                            *
+ * Parameters: flag - ZBX_FLAG_EXPTYPE_EVENTS events are enabled              *
+ *                    ZBX_FLAG_EXPTYPE_HISTORY history is enabled             *
+ *                    ZBX_FLAG_EXPTYPE_TRENDS trends are enabled              *
+ *                                                                            *
+ * Return value: SUCCED  - export enabled                                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_is_export_enabled(int flags)
 {
-	int ret = FAIL;
+	int		ret = FAIL;
 
 	if (NULL == CONFIG_EXPORT_DIR)
 		return ret;
@@ -52,11 +119,17 @@ int	zbx_is_export_enabled(int flags)
 		char	*types[] = {ZBX_OPTION_EXPTYPE_EVENTS, ZBX_OPTION_EXPTYPE_HISTORY, ZBX_OPTION_EXPTYPE_TRENDS,
 				NULL};
 
-		for (i = 0; NULL != types[i]; i++)
+		if (0 == export_types)
 		{
-			if (NULL != strstr(CONFIG_EXPORT_TYPE, types[i]) && 0 != (flags & (1 << i)))
-				ret = SUCCEED;
+			for (i = 0; NULL != types[i]; i++)
+			{
+				if (NULL != strstr(CONFIG_EXPORT_TYPE, types[i]))
+					export_types |= 1 << i;
+			}
 		}
+
+		if (0 != (export_types & flags))
+			ret = SUCCEED;
 	}
 	else
 		ret = SUCCEED;
@@ -68,12 +141,14 @@ int	zbx_export_init(char **error)
 {
 	struct stat	fs;
 
+	export_types = 0;
+
 	if (FAIL == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_TRENDS | ZBX_FLAG_EXPTYPE_HISTORY))
 	{
 		if (NULL != CONFIG_EXPORT_TYPE)
 		{
-			*error = zbx_dsprintf(*error, "Misconfiguration: \"ExportType\" is set "
-					"while \"ExportDir\" not.");
+			*error = zbx_dsprintf(*error, "Misconfiguration: \"ExportType\" is set to '%s' "
+					"while \"ExportDir\" not.", CONFIG_EXPORT_TYPE);
 			return FAIL;
 		}
 		return SUCCEED;
