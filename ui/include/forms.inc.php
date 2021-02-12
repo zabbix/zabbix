@@ -900,7 +900,7 @@ function prepareScriptItemFormData(array $item): array {
  */
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
-		'form' => getRequest('form'),
+		'form' => array_key_exists('form', $options) ? $options['form'] : getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
@@ -1287,7 +1287,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if (!$data['is_discovery_rule'] && $item['form'] === 'clone') {
+	if (!$data['is_discovery_rule'] && $data['form'] === 'clone') {
 		if ($data['valuemapid'] != 0) {
 			$entity = ($data['parent_discoveryid'] == 0) ? API::Item() : API::ItemPrototype();
 			$cloned_item = $entity->get([
@@ -1315,7 +1315,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['itemid'] = 0;
-		$data['form'] = 'clone';
 	}
 
 	if ($data['is_discovery_rule']) {

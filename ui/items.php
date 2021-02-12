@@ -1245,8 +1245,8 @@ if ((getRequest('form') === 'create' || getRequest('form') === 'update')
 		}
 	}
 
-	$item['form'] = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
-	$data = getItemFormData($item);
+	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
+	$data = getItemFormData($item, ['form' => $form_action]);
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
