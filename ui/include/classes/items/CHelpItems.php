@@ -835,6 +835,14 @@ class CHelpItems {
 					'description' => _('VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
+					'key' => 'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
+					'key' => 'vmware.hv.cpu.utilization[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
 					'key' => 'vmware.hv.datacenter.name[<url>,<uuid>]',
 					'description' => _('VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string')
 				],
@@ -845,6 +853,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.hv.datastore.list[<url>,<uuid>]',
 					'description' => _('VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+				],
+				[
+					'key' => 'vmware.hv.datastore.multipath[<url>,<uuid>,<datastore>,<partitionid>]',
+					'description' => _('Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery')
 				],
 				[
 					'key' => 'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
@@ -919,6 +931,10 @@ class CHelpItems {
 					'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance')
 				],
 				[
+					'key' => 'vmware.hv.power[<url>,<uuid>,<max>]',
+					'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage')
+				],
+				[
 					'key' => 'vmware.hv.sensor.health.state[<url>,<uuid>]',
 					'description' => _('VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red')
 				],
@@ -947,16 +963,32 @@ class CHelpItems {
 					'description' => _('VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.cpu.latency[<url>,<uuid>]',
+					'description' => _('Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
 					'key' => 'vmware.vm.cpu.num[<url>,<uuid>]',
 					'description' => _('Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.cpu.readiness[<url>,<uuid>,<instance>]',
+					'description' => _('Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance')
 				],
 				[
 					'key' => 'vmware.vm.cpu.ready[<url>,<uuid>]',
 					'description' => _('VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.cpu.swapwait[<url>,<uuid>,<instance>]',
+					'description' => _('CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance')
+				],
+				[
 					'key' => 'vmware.vm.cpu.usage[<url>,<uuid>]',
 					'description' => _('VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.cpu.usage.perf[<url>,<uuid>]',
+					'description' => _('CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.datacenter.name[<url>,<uuid>]',
@@ -966,7 +998,15 @@ class CHelpItems {
 					'key' => 'vmware.vm.discovery[<url>]',
 					'description' => _('Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON')
 				],
-								[
+				[
+					'key' => 'vmware.vm.guest.memory.size.swapped[<url>,<uuid>]',
+					'description' => _('Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.guest.osuptime[<url>,<uuid>]',
+					'description' => _('Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
 					'key' => 'vmware.vm.hv.name[<url>,<uuid>]',
 					'description' => _('VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
@@ -981,6 +1021,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.vm.memory.size.compressed[<url>,<uuid>]',
 					'description' => _('VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.memory.size.consumed[<url>,<uuid>]',
+					'description' => _('Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.memory.size.private[<url>,<uuid>]',
@@ -1003,6 +1047,10 @@ class CHelpItems {
 					'description' => _('VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.memory.usage[<url>,<uuid>]',
+					'description' => _('Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
 					'key' => 'vmware.vm.net.if.discovery[<url>,<uuid>]',
 					'description' => 'Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON'
 				],
@@ -1013,6 +1061,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.vm.net.if.out[<url>,<uuid>,<instance>,<mode>]',
 					'description' => _('VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second')
+				],
+				[
+					'key' => 'vmware.vm.net.if.usage[<url>,<uuid>,<instance>]',
+					'description' => _('Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance')
 				],
 				[
 					'key' => 'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
@@ -1027,12 +1079,28 @@ class CHelpItems {
 					'description' => _('VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
+					'key' => 'vmware.vm.storage.readoio[<url>,<uuid>,<instance>]',
+					'description' => _('Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
+					'key' => 'vmware.vm.storage.totalreadlatency[<url>,<uuid>,<instance>]',
+					'description' => _('	The average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
+					'key' => 'vmware.vm.storage.totalwritelatency[<url>,<uuid>,<instance>]',
+					'description' => _('The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
+				],
+				[
 					'key' => 'vmware.vm.storage.uncommitted[<url>,<uuid>]',
 					'description' => _('VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
 				],
 				[
 					'key' => 'vmware.vm.storage.unshared[<url>,<uuid>]',
 					'description' => _('VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name')
+				],
+				[
+					'key' => 'vmware.vm.storage.writeoio[<url>,<uuid>,<instance>]',
+					'description' => _('Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance')
 				],
 				[
 					'key' => 'vmware.vm.uptime[<url>,<uuid>]',
