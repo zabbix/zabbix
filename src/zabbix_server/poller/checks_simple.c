@@ -112,8 +112,6 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.net.if.discovery", VMCHECK_FUNC(check_vcenter_vm_net_if_discovery)},
 	{"vm.net.if.in", VMCHECK_FUNC(check_vcenter_vm_net_if_in)},
 	{"vm.net.if.out", VMCHECK_FUNC(check_vcenter_vm_net_if_out)},
-	{"vm.net.if.received", VMCHECK_FUNC(check_vcenter_vm_net_if_received)},
-	{"vm.net.if.tramsmitted", VMCHECK_FUNC(check_vcenter_vm_net_if_transmitted)},
 	{"vm.net.if.usage", VMCHECK_FUNC(check_vcenter_vm_net_if_usage)},
 	{"vm.perfcounter", VMCHECK_FUNC(check_vcenter_vm_perfcounter)},
 	{"vm.powerstate", VMCHECK_FUNC(check_vcenter_vm_powerstate)},

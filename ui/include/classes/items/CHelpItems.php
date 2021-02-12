@@ -1067,14 +1067,6 @@ class CHelpItems {
 					'description' => _('Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance')
 				],
 				[
-					'key' => 'vmware.vm.net.if.received[<url>,<uuid>,<instance>]',
-					'description' => _('Average rate at which data was received during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance')
-				],
-				[
-					'key' => 'vmware.vm.net.if.transmitted[<url>,<uuid>,<instance>]',
-					'description' => _('Average rate at which data was transmitted during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance')
-				],
-				[
 					'key' => 'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]',
 					'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance')
 				],
