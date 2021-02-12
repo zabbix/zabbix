@@ -1661,7 +1661,7 @@ class testFormHost extends CWebTest {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Host deleted');
 				// Check if all host records have been deleted.
-				$tables=['hosts', 'interface', 'items', 'applications', 'hostmacro', 'hosts_groups', 'hosts_templates',
+				$tables=['hosts', 'interface', 'items', 'hostmacro', 'hosts_groups', 'hosts_templates',
 					'maintenances_hosts', 'host_inventory'];
 				foreach ($tables as $table) {
 					$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM '.$table.' WHERE hostid='.$hostid));

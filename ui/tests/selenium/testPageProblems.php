@@ -33,7 +33,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Problems');
 
 		$this->assertTrue($this->zbxTestCheckboxSelected('show_10'));
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem', 'Not classified',
+		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
 			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Age less than', 'Host inventory', 'Tags',
 			'Show suppressed problems', 'Show unacknowledged only', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
 			'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
@@ -49,7 +49,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->query('name:filter_apply')->one()->click();
 		$this->assertTrue($this->zbxTestCheckboxSelected('show_20'));
 		$this->zbxTestAssertNotVisibleId('age_state_0');
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem', 'Not classified',
+		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
 			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Host inventory', 'Tags', 'Show suppressed problems',
 			'Show unacknowledged only', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
 			'Ack', 'Actions', 'Tags']);
@@ -167,9 +167,6 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickButtonMultiselect('hostids_0');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
 		$this->zbxTestClickWait('spanid10084');
-
-		// Type application
-		$this->zbxTestInputType('application_0', 'General');
 
 		// Select trigger
 		$this->zbxTestClickButtonMultiselect('triggerids_0');

@@ -62,7 +62,6 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//div[@id="filter_proxyids_"]/..//button[@disabled]');
 
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
-		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Applications')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Items')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Triggers')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Graphs')]");
@@ -102,8 +101,6 @@ class testPageHosts extends CLegacyWebTest {
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlItems = "select * from items where hostid=$hostid order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
-		$sqlApplications = "select * from applications where hostid=$hostid order by applicationid";
-		$oldHashApplications = CDBHelper::getHash($sqlApplications);
 		$sqlInterface = "select * from interface where hostid=$hostid order by interfaceid";
 		$oldHashInterface = CDBHelper::getHash($sqlInterface);
 		$sqlHostMacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
@@ -131,7 +128,6 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
-		$this->assertEquals($oldHashApplications, CDBHelper::getHash($sqlApplications));
 		$this->assertEquals($oldHashInterface, CDBHelper::getHash($sqlInterface));
 		$this->assertEquals($oldHashHostMacro, CDBHelper::getHash($sqlHostMacro));
 		$this->assertEquals($oldHashHostsGroups, CDBHelper::getHash($sqlHostsGroups));

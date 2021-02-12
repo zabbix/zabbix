@@ -132,7 +132,10 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => 'Triggers', 'evaltype' => 'Or']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Application']
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Tag name']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Tag value']
 			],
 			[
 				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host group']
@@ -365,7 +368,10 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => 'Internal', 'recovery_msg' => true]
 			],
 			[
-				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Application']
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Tag name']
+			],
+			[
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Tag value']
 			],
 			[
 				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Event type']
@@ -504,7 +510,8 @@ class testFormAction extends CLegacyWebTest {
 		switch ($eventsource) {
 			case 'Triggers':
 				$this->zbxTestDropdownHasOptions('condition_type', [
-						'Application',
+						'Tag name',
+						'Tag value',
 						'Host group',
 						'Template',
 						'Host',
@@ -538,7 +545,8 @@ class testFormAction extends CLegacyWebTest {
 				break;
 			case 'Internal':
 				$this->zbxTestDropdownHasOptions('condition_type', [
-						'Application',
+						'Tag name',
+						'Tag value',
 						'Event type',
 						'Host group',
 						'Template',
@@ -552,9 +560,11 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		switch ($new_condition_conditiontype) {
-			case 'Application':
+			case 'Tag name':
+			case 'Tag value':
 				$this->zbxTestTextPresent([
 					'equals',
+					'does not equal',
 					'contains',
 					'does not contain'
 				]);
@@ -626,7 +636,8 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		switch ($new_condition_conditiontype) {
-			case 'Application':
+			case 'Tag name':
+			case 'Tag value':
 			case 'Trigger name':
 			case 'Time period':
 			case 'Host IP':
@@ -643,7 +654,8 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		switch ($new_condition_conditiontype) {
-			case 'Application':
+			case 'Tag name':
+			case 'Tag value':
 			case 'Trigger name':
 			case 'Time period':
 			case 'Host IP':
@@ -660,7 +672,8 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		switch ($new_condition_conditiontype) {
-			case 'Application':
+			case 'Tag name':
+			case 'Tag value':
 			case 'Trigger name':
 			case 'Received value':
 			case 'Host name':
@@ -1396,10 +1409,6 @@ class testFormAction extends CLegacyWebTest {
 						'value' => 'Warning'
 					],
 					[
-						'type' => 'Application',
-						'value' => 'application'
-					],
-					[
 						'type' => 'Tag name',
 						'operator' => 'does not contain',
 						'value' => 'Does not contain Tag'
@@ -1507,8 +1516,9 @@ class testFormAction extends CLegacyWebTest {
 						'value' => 'Trigger in "unknown" state'
 					],
 					[
-						'type' => 'Application',
-						'value' => 'application'
+						'type' => 'Tag name',
+						'operator' => 'does not contain',
+						'value' => 'Does not contain Tag'
 					]
 				],
 				'operations' => [
@@ -1553,7 +1563,6 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestDropdownSelectWait('condition_type', $condition['type']);
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				switch ($condition['type']) {
-					case 'Application':
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
@@ -1564,10 +1573,6 @@ class testFormAction extends CLegacyWebTest {
 						$this->zbxTestInputTypeWait('value', $condition['value']);
 						$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
 						switch($condition['type']){
-							case 'Application':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Application equals '.$condition['value']);
-								$conditionCount++;
-								break;
 							case 'Host name':
 								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host name contains '.$condition['value']);
 								$conditionCount++;
@@ -1711,10 +1716,10 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
-		$this->zbxTestDropdownSelectWait('condition_type', 'Application');
-		$this->zbxTestInputTypeWait('value', 'app');
+		$this->zbxTestDropdownSelectWait('condition_type', 'Tag name');
+		$this->zbxTestInputTypeWait('value', 'zabbix');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Application equals app');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Tag name equals zabbix');
 
 // adding operations
 		$this->zbxTestTabSwitch('Operations');
