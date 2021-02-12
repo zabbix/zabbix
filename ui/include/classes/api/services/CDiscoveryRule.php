@@ -2225,14 +2225,6 @@ class CDiscoveryRule extends CItemGeneral {
 				'filter' => ['name' => array_keys($src_valuemaps)]
 			]);
 			$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
-			$unknown_valuemaps = array_diff_key($src_valuemaps, $valuemap_map);
-
-			if ($unknown_valuemaps) {
-				reset($unknown_valuemaps);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap "%1$s" is not available on "%2$s".',
-					key($unknown_valuemaps), $dstHost['host'])
-				);
-			}
 		}
 
 		if ($item_prototypes) {
@@ -2320,8 +2312,10 @@ class CDiscoveryRule extends CItemGeneral {
 				$item_prototype['ruleid'] = $dstDiscovery['itemid'];
 				$item_prototype['hostid'] = $dstDiscovery['hostid'];
 
-				if ($item_prototype['valuemapid']) {
-					$item_prototype['valuemapid'] = $valuemap_map[$item_prototype['valuemap']['name']];
+				if ($item_prototype['valuemapid'] != 0) {
+					$item_prototype['valuemapid'] = array_key_exists($item_prototype['valuemap']['name'], $valuemap_map)
+						? $valuemap_map[$item_prototype['valuemap']['name']]
+						: 0;
 				}
 
 				// map prototype interfaces

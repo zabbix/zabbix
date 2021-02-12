@@ -533,16 +533,13 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			}
 			unset($item['itemid']);
 
-			if ($item['valuemapid']) {
+			if ($item['valuemapid'] != 0) {
 				if (array_key_exists($item['valuemapid'], $valuemapids_map)
 						&& array_key_exists($dstHost['hostid'], $valuemapids_map[$item['valuemapid']])) {
 					$item['valuemapid'] = $valuemapids_map[$item['valuemapid']][$dstHost['hostid']];
 				}
 				else {
-					error(_s('Valuemap "%1$s" is not available on "%2$s".', $src_valuemaps[$item['valuemapid']]['name'],
-						$dstHost['host']
-					));
-					return false;
+					$item['valuemapid'] = 0;
 				}
 			}
 
@@ -631,19 +628,12 @@ function copyItems($srcHostId, $dstHostId) {
 	}
 
 	if ($src_valuemaps) {
-		$valuemap_map = API::ValueMap()->get([
+		$valuemap_map = array_column(API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'hostids' => $dstHostId,
 			'filter' => ['name' => array_keys($src_valuemaps)]
-		]);
+		]), 'valuemapid', 'name');
 		$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
-		$unknown_valuemaps = array_diff_key($src_valuemaps, $valuemap_map);
-
-		if ($unknown_valuemaps) {
-			reset($unknown_valuemaps);
-			error(_s('Valuemap "%1$s" is not available on "%2$s".', key($unknown_valuemaps), $dstHost['host']));
-			return false;
-		}
 	}
 
 	$create_order = [];
@@ -700,7 +690,9 @@ function copyItems($srcHostId, $dstHostId) {
 			continue;
 		}
 		else if ($srcItem['valuemapid'] != 0) {
-			$srcItem['valuemapid'] = $valuemap_map[$srcItem['valuemap']['name']];
+			$srcItem['valuemapid'] = array_key_exists($srcItem['valuemap']['name'], $valuemap_map)
+				? $valuemap_map[$srcItem['valuemap']['name']]
+				: 0;
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
