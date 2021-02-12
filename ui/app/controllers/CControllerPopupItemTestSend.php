@@ -102,7 +102,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-			'valuemapid'			=> 'int32',
+			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
 			'not_supported'			=> 'in 1'
@@ -255,7 +255,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		$valuemap = [];
 
-		if ($this->getInput('valuemapid', 0)) {
+		if ($this->getInput('valuemapid', 0) != 0) {
 			$valuemap = API::ValueMap()->get([
 				'output' => [],
 				'selectMappings' => ['newvalue', 'value'],
