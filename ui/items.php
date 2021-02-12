@@ -376,11 +376,11 @@ if (hasRequest('filter_set')) {
 			'output' => ['name'],
 			'valuemapids' => $filter_valuemapids
 		]);
-		$valuemap_name = array_flip(array_column($valuemap_name, 'name'));
+		$valuemap_name = array_unique(array_column($valuemap_name, 'name'));
 		$valuemapids = API::ValueMap()->get([
 			'output' => ['valuemapid'],
 			'hostids' => array_keys($valuemap_templates),
-			'filter' => ['name' => array_keys($valuemap_name)]
+			'filter' => ['name' => $valuemap_name]
 		]);
 		$filter_valuemapids = array_column($valuemapids, 'valuemapid');
 	}
