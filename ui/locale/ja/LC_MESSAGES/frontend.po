@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 19:57+0200\n"
-"PO-Revision-Date: 2021-01-19 02:25+0300\n"
+"POT-Creation-Date: 2021-02-12 19:53+0200\n"
+"PO-Revision-Date: 2021-02-08 03:31+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1611015933.000000\n"
+"X-POOTLE-MTIME: 1612747862.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -7310,7 +7310,7 @@ msgstr "ホストのアドレス"
 msgid "Host availability"
 msgstr "ホスト稼働状況"
 
-#: include/classes/api/services/CHostInterface.php:1077
+#: include/classes/api/services/CHostInterface.php:1083
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "ホストに同じタイプのデフォルトインターフェースは2つ以上設定できません。"
 
@@ -8254,11 +8254,11 @@ msgstr "設定項目が間違っています"
 #: include/classes/api/services/CHostInterface.php:452
 #: include/classes/api/services/CHostInterface.php:627
 #: include/classes/api/services/CHostInterface.php:871
-#: include/classes/api/services/CHostInterface.php:1112
-#: include/classes/api/services/CHostInterface.php:1127
-#: include/classes/api/services/CHostInterface.php:1163
-#: include/classes/api/services/CHostInterface.php:1181
-#: include/classes/api/services/CHostInterface.php:1198
+#: include/classes/api/services/CHostInterface.php:1118
+#: include/classes/api/services/CHostInterface.php:1133
+#: include/classes/api/services/CHostInterface.php:1169
+#: include/classes/api/services/CHostInterface.php:1187
+#: include/classes/api/services/CHostInterface.php:1204
 #: include/classes/api/services/CHost.php:1352
 #: include/classes/api/services/CHostPrototype.php:457
 #: include/classes/api/services/CHostPrototype.php:478
@@ -8303,7 +8303,7 @@ msgstr "設定項目が間違っています"
 msgid "Incorrect arguments passed to function."
 msgstr "不正な引数が関数に渡されました。"
 
-#: include/classes/api/services/CHostInterface.php:1145
+#: include/classes/api/services/CHostInterface.php:1151
 msgid "Incorrect bulk value for interface."
 msgstr "インターフェースのbulkの値が正しくありません。"
 
@@ -9258,7 +9258,7 @@ msgstr "インストーラ名"
 msgid "Interface"
 msgstr "インターフェース"
 
-#: include/classes/api/services/CHostInterface.php:1098
+#: include/classes/api/services/CHostInterface.php:1104
 #, c-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "インターフェースは\"%2$s\"のアイテム\"%1$s\"にリンクされています。"
@@ -11894,8 +11894,8 @@ msgstr "データがありません。"
 msgid "No data."
 msgstr "データがありません。"
 
-#: include/classes/api/services/CHostInterface.php:998
-#: include/classes/api/services/CHostInterface.php:1070
+#: include/classes/api/services/CHostInterface.php:999
+#: include/classes/api/services/CHostInterface.php:1074
 #, c-format
 msgid "No default interface for \"%1$s\" type on \"%2$s\"."
 msgstr "\"%2$s\"上の\"%1$s\"タイプのデフォルトインターフェースが設定されていません。"
@@ -19974,12 +19974,12 @@ msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 
 #: include/classes/parsers/CTriggerExpression.php:501
 msgid "incorrect trigger expression"
-msgstr ""
+msgstr "トリガー条件式が正しくありません"
 
 #: include/classes/parsers/CTriggerExpression.php:515
 #, c-format
 msgid "incorrect trigger expression starting from \"%1$s\""
-msgstr ""
+msgstr "\"%1$s\"で始まるトリガー条件式が正しくありません"
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -20594,7 +20594,7 @@ msgstr "トリガーは手動クローズを許可されていません"
 
 #: include/classes/validators/CApiInputValidator.php:1847
 msgid "trigger expression must contain at least one host:key reference"
-msgstr ""
+msgstr "トリガー条件式は少なくとも1つのhost:keyの参照が必要です"
 
 #: include/classes/api/services/CTriggerGeneral.php:1634
 msgid "trigger prototype cannot be moved to another template or host"
