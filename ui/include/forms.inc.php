@@ -1287,6 +1287,37 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
+	if (!$data['is_discovery_rule'] && $item['form'] === 'clone') {
+		if ($data['valuemapid'] != 0) {
+			$entity = ($data['parent_discoveryid'] == 0) ? API::Item() : API::ItemPrototype();
+			$cloned_item = $entity->get([
+				'output' => ['templateid'],
+				'selectValueMap' => ['name'],
+				'itemids' => $data['itemid']
+			]);
+			$cloned_item = reset($cloned_item);
+
+			if ($cloned_item['templateid'] != 0) {
+				$host_valuemap = API::ValueMap()->get([
+					'output' => ['valuemapid'],
+					'hostids' => $data['hostid'],
+					'filter' => ['name' => $cloned_item['valuemap']['name']]
+				]);
+
+				if ($host_valuemap) {
+					$host_valuemap = reset($host_valuemap);
+					$data['valuemapid'] = $host_valuemap['valuemapid'];
+				}
+				else {
+					$data['valuemapid'] = 0;
+				}
+			}
+		}
+
+		$data['itemid'] = 0;
+		$data['form'] = 'clone';
+	}
+
 	if ($data['is_discovery_rule']) {
 		unset($data['valuemapid']);
 	}

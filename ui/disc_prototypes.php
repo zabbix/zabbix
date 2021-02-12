@@ -304,10 +304,6 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (hasRequest('add') || hasRequest('update')) {
 	$applications = getRequest('applications', []);
 	$application = reset($applications);
@@ -730,11 +726,11 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$itemPrototype = [];
 	$has_errors = false;
 
-	if (hasRequest('itemid')) {
+	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$itemPrototype = API::ItemPrototype()->get([
 			'itemids' => getRequest('itemid'),
 			'output' => [
@@ -801,6 +797,7 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
+	$itemPrototype['form'] = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
 	$data = getItemFormData($itemPrototype);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;

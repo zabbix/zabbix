@@ -514,10 +514,6 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
-	$_REQUEST['form'] = 'clone';
-}
 elseif (hasRequest('add') || hasRequest('update')) {
 	$applications = getRequest('applications', []);
 	$application = reset($applications);
@@ -1166,11 +1162,12 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 /*
  * Display
  */
-if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'update', 'clone'])) {
+if ((getRequest('form') === 'create' || getRequest('form') === 'update')
+		|| (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$master_item_options = [];
 	$has_errors = false;
 
-	if (hasRequest('itemid')) {
+	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
@@ -1248,6 +1245,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		}
 	}
 
+	$item['form'] = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
 	$data = getItemFormData($item);
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['host'] = $host;
