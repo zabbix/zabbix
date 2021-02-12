@@ -1184,6 +1184,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
@@ -1194,6 +1195,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'selectHosts' => ['name'],
+			'selectValueMap' => ['mappings'],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'monitored' => true,
@@ -1249,6 +1251,7 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 			'value_type' => $db_item['value_type'],
 			'units' => $db_item['units'],
 			'valuemapid' => $db_item['valuemapid'],
+			'valuemap' => $db_item['valuemap'],
 			'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
 		];
 
