@@ -1878,7 +1878,7 @@ zabbix_export:
                 key: 'redis.info["{$REDIS.CONN.URI}"]'
           trigger_prototypes:
             -
-              expression: '{Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}/{Redis:redis.memory.used_memory.last()}*100>{$REDIS.MEM.PUSED.MAX.WARN}'
+              expression: '{Redis:redis.memory.used_memory.last()}/{Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}*100>{$REDIS.MEM.PUSED.MAX.WARN}'
               name: 'Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
               priority: WARNING
           master_item:

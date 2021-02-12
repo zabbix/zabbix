@@ -152,7 +152,7 @@ class testTriggerValidation extends CAPITest {
 					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
-			],
+			]
 		];
 	}
 
@@ -486,7 +486,7 @@ class testTriggerValidation extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/dependencies/1": an array is expected.'
-			],
+			]
 		];
 	}
 

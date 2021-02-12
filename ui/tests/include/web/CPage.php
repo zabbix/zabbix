@@ -576,4 +576,39 @@ class CPage {
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 	}
+
+	/**
+	 * Check page title text.
+	 *
+	 * @param string $title		page title
+	 *
+	 * @throws Exception
+	 */
+	public function assertTitle($title) {
+		global $ZBX_SERVER_NAME;
+
+		if ($ZBX_SERVER_NAME !== '') {
+			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
+		}
+
+		$text = $this->getTitle();
+		if ($text !== $title) {
+			throw new \Exception('Title of the page "'.$text.'" is not equal to "'.$title.'".');
+		}
+	}
+
+	/**
+	 * Check page header.
+	 *
+	 * @param string $header	page header to be compared
+	 *
+	 * @throws Exception
+	 */
+	public function assertHeader($header) {
+		$text = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
+
+		if ($text !== $header) {
+			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
+		}
+	}
 }
