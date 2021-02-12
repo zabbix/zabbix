@@ -192,7 +192,6 @@ class CControllerPopupMassupdateItem extends CController {
 			'preprocessing' => [],
 			'privatekey' => '',
 			'publickey' => '',
-			'snmp_oid' => 0,
 			'status' => ITEM_STATUS_ACTIVE,
 			'timeout' => '',
 			'trapper_hosts' => '',
