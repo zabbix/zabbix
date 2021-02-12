@@ -105,8 +105,8 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 	 */
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
 		$this->page->login()->open($this->config_link);
-		$this->assertPageTitle('Configuration of housekeeping');
-		$this->assertPageHeader('Housekeeping');
+		$this->page->assertTitle('Configuration of housekeeping');
+		$this->page->assertHeader('Housekeeping');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		$headers = ['Events and alerts', 'Services', 'Audit', 'User sessions', 'History', 'Trends'];
