@@ -1,6 +1,10 @@
 Changes for 5.0.9rc1
 
 New features:
+.........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
+...G...... [ZBXNEXT-6339] added smart plugin to support S.M.A.R.T monitoring in Zabbix Agent 2 (esneiders)
+...G...... [ZBXNEXT-6437] added native support for system.sw.packages plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-6306] added native linux support for key vm.memory.size in Zabbix agent 2 (esneiders)
 .......PS. [ZBXNEXT-6443] added sha256() function to JavaScript preprocessing (viktors)
 .........T [ZBXNEXT-5809] added VictorOps media (tuskov)
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
@@ -8,6 +12,13 @@ New features:
 .......PS. [ZBXNEXT-6183] added md5 checksum computation to preprocessing (viktors)
 
 Bug fixes:
+A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
+.........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
+...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
+.........T [ZBX-18963] fixed preprocessing for archivelog items in Oracle Templates (ychukina)
+...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
+..F....... [ZBX-18825] fixed last year period calculation in service availability report daily mode (miks)
+.........T [ZBX-18638] removed triggers of the "Temperature" items, added the "Temperature sensor condition" items with triggers, removed unnecessary macros (mchudinov)
 A......... [ZBX-18449] reworked trigger API validation (miks)
 ..F....... [ZBX-18887] fixed user session expiration when notification checks are performed in background (miks)
 ..F....... [ZBX-18209] fixed RegEx delimiter not being escaped in macro resolver (talbergs)
