@@ -97,7 +97,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}$ 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}($|\n) 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |PHP-FPM |PHP-FPM: Processes, active |<p>The total number of active processes.</p> |DEPENDENT |php-fpm.processes_active<p>**Preprocessing**:</p><p>- JSONPATH: `$.['active processes']`</p> |
 |PHP-FPM |PHP-FPM: Version |<p>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</p> |DEPENDENT |php-fpm.version<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*X-Powered-By: PHP/([.\d]{1,}) \1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |PHP-FPM |PHP-FPM: Pool name |<p>The name of current pool.</p> |DEPENDENT |php-fpm.name<p>**Preprocessing**:</p><p>- JSONPATH: `$.pool`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |

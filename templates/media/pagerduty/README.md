@@ -67,7 +67,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 [![](images/tn_7.png?raw=true)](images/7.png)
 
-3\. Select Import file [media_pagerduty.xml](media_pagerduty.xml) and click the **Import** button at the bottom to import the PagerDuty media type.
+3\. Select Import file [media_pagerduty.yaml](media_pagerduty.yaml) and click the **Import** button at the bottom to import the PagerDuty media type.
 
 4\. Change the value of the variable token
 
@@ -106,7 +106,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 8\. Use the PagerDuty User in any Actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/5.2/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
 
 # Supported Versions
 

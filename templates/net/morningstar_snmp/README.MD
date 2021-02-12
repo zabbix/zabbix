@@ -53,4 +53,4 @@ To do so, first create a host to represent your Morningstar device:
 
 1. Repeat step 3 for each Morningstar device you want to monitor.
 
-By now, Zabbix is configured to generate alerts if something goes wrong with the device. The alerts will be displayed in the Zabbix dashboard. If you would like to receive notifications about problems by e-mail, phone, or some other channel, follow instructions for configuring [notifications upon events](https://www.zabbix.com/documentation/current/manual/config/notifications) provided in Zabbix documentation.
+By now, Zabbix is configured to generate alerts if something goes wrong with the device. The alerts will be displayed in the Zabbix dashboard. If you would like to receive notifications about problems by e-mail, phone, or some other channel, follow instructions for configuring [notifications upon events](https://www.zabbix.com/documentation/5.2/manual/config/notifications) provided in Zabbix documentation.

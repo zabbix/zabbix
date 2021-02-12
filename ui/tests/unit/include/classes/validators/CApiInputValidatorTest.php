@@ -3489,6 +3489,126 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'65536',
 				'/1/port',
 				'Invalid parameter "/1/port": value must be one of 0-65535.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				null,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/expression',
+				'Invalid parameter "/1/expression": cannot be empty.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": value is too long.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last() = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'9 and 1',
+				'/1/expression',
+				'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {#LLD_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'{host:item.last()} = 0'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {$USER_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {$USER_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'',
+				'/1/expression',
+				''
+			],
+			[
+				['type' => API_EVENT_NAME],
+				null,
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": a character string is expected.'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				[],
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": a character string is expected.'
+			],
+			[
+				['type' => API_EVENT_NAME, 'length' => 10],
+				'12345678901',
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": value is too long.'
+			],
+			[
+				['type' => API_EVENT_NAME, 'length' => 10],
+				'1234567890',
+				'/1/event_name',
+				'1234567890'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last() = 0}',
+				'/1/event_name',
+				'Invalid parameter "/1/event_name": incorrect syntax near "{host:item.last() = 0}".'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?9 and 1}',
+				'/1/event_name',
+				'event name {?9 and 1}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last()} = 0}',
+				'/1/event_name',
+				'event name {?{host:item.last()} = 0}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'event name {?{host:item.last()} = {$USER_MACRO}}',
+				'/1/event_name',
+				'event name {?{host:item.last()} = {$USER_MACRO}}'
+			],
+			[
+				['type' => API_EVENT_NAME],
+				'',
+				'/1/event_name',
+				''
 			]
 		];
 	}

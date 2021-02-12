@@ -21,9 +21,10 @@ package redis
 
 import (
 	"fmt"
-	"github.com/mediocregopher/radix/v3"
 	"reflect"
 	"testing"
+
+	"github.com/mediocregopher/radix/v3"
 )
 
 func TestPlugin_pingHandler(t *testing.T) {
@@ -56,7 +57,7 @@ func TestPlugin_pingHandler(t *testing.T) {
 
 	type args struct {
 		conn   redisClient
-		params []string
+		params map[string]string
 	}
 	tests := []struct {
 		name    string

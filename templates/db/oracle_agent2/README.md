@@ -40,19 +40,21 @@ No specific Zabbix configuration is required.
 |{$ORACLE.DBNAME.NOT_MATCHES} |<p>This macro is used in database discovery. It can be overridden on a host or linked template level.</p> |`PDB\$SEED` |
 |{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>Number of days of warning before password expires (for trigger expression).</p> |`7` |
 |{$ORACLE.PASSWORD} |<p>Oracle user password.</p> |`zabbix_password` |
-|{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage alert treshold (for trigger expression).</p> |`90` |
-|{$ORACLE.PROCESSES.MAX.WARN} |<p>Maximum percentage of active processes alert treshold (for trigger expression).</p> |`80` |
-|{$ORACLE.REDO.MIN.WARN} |<p>Minimum number of REDO logs alert treshold (for trigger expression).</p> |`3` |
+|{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage alert threshold (for trigger expression).</p> |`90` |
+|{$ORACLE.PROCESSES.MAX.WARN} |<p>Maximum percentage of active processes alert threshold (for trigger expression).</p> |`80` |
+|{$ORACLE.REDO.MIN.WARN} |<p>Minimum number of REDO logs alert threshold (for trigger expression).</p> |`3` |
 |{$ORACLE.SERVICE} |<p>Oracle Service Name</p> |`ORA` |
 |{$ORACLE.SESSION.LOCK.MAX.TIME} |<p>Maximum session lock duration in seconds for count the session as a prolongely locked query.</p> |`600` |
-|{$ORACLE.SESSION.LONG.LOCK.MAX.WARN} |<p>Maximum number of the prolongely locked sessions alert treshold (for trigger expression).</p> |`3` |
-|{$ORACLE.SESSIONS.LOCK.MAX.WARN} |<p>Maximum percentage of locked sessions alert treshold (for trigger expression).</p> |`20` |
-|{$ORACLE.SESSIONS.MAX.WARN} |<p>Maximum percentage of active sessions alert treshold (for trigger expression).</p> |`80` |
-|{$ORACLE.SHARED.FREE.MIN.WARN} |<p>Minimum percentage of free shared pool alert treshold (for trigger expression).</p> |`5` |
+|{$ORACLE.SESSION.LONG.LOCK.MAX.WARN} |<p>Maximum number of the prolongely locked sessions alert threshold (for trigger expression).</p> |`3` |
+|{$ORACLE.SESSIONS.LOCK.MAX.WARN} |<p>Maximum percentage of locked sessions alert threshold (for trigger expression).</p> |`20` |
+|{$ORACLE.SESSIONS.MAX.WARN} |<p>Maximum percentage of active sessions alert threshold (for trigger expression).</p> |`80` |
+|{$ORACLE.SHARED.FREE.MIN.WARN} |<p>Minimum percentage of free shared pool alert threshold (for trigger expression).</p> |`5` |
 |{$ORACLE.TABLESPACE.NAME.MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on a host or linked template level.</p> |`.*` |
 |{$ORACLE.TABLESPACE.NAME.NOT_MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on a host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$ORACLE.TBS.USED.PCT.MAX.HIGH} |<p>Maximum percentage of used tablespace high severity alert treshold (for trigger expression).</p> |`90` |
-|{$ORACLE.TBS.USED.PCT.MAX.WARN} |<p>Maximum percentage of used tablespace warning severity alert treshold (for trigger expression).</p> |`80` |
+|{$ORACLE.TBS.USED.PCT.MAX.HIGH} |<p>Maximum percentage of used (Used bytes/Allocated bytes) tablespace high severity alert threshold (for trigger expression).</p> |`95` |
+|{$ORACLE.TBS.USED.PCT.MAX.WARN} |<p>Maximum percentage of used (Used bytes/Allocated bytes) tablespace warning severity alert threshold (for trigger expression).</p> |`90` |
+|{$ORACLE.TBS.UTIL.PCT.MAX.HIGH} |<p>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace high severity alert threshold (for trigger expression).</p> |`90` |
+|{$ORACLE.TBS.UTIL.PCT.MAX.WARN} |<p>Maximum percentage of utilization (Allocated bytes/Max bytes) tablespace warning severity alert threshold (for trigger expression).</p> |`80` |
 |{$ORACLE.USER} |<p>Oracle username.</p> |`zabbix` |
 
 ## Template links
@@ -126,7 +128,7 @@ There are no template links in this template.
 |Oracle |Oracle: FRA, Used space |<p>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</p> |DEPENDENT |oracle.fra_space_used<p>**Preprocessing**:</p><p>- JSONPATH: `$.space_used`</p> |
 |Oracle |Oracle: FRA, Space reclaimable |<p>Total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the fast recovery area.</p> |DEPENDENT |oracle.fra_space_reclaimable<p>**Preprocessing**:</p><p>- JSONPATH: `$.space_reclaimable`</p> |
 |Oracle |Oracle: FRA, Number of files |<p>Number of files in the fast recovery area</p> |DEPENDENT |oracle.fra_number_of_files<p>**Preprocessing**:</p><p>- JSONPATH: `$.number_of_files`</p> |
-|Oracle |Oracle: FRA, Used space in % | |DEPENDENT |oracle.fra_usable_pct<p>**Preprocessing**:</p><p>- JSONPATH: `$.usable_pct`</p> |
+|Oracle |Oracle: FRA, Usable space in % | |DEPENDENT |oracle.fra_usable_pct<p>**Preprocessing**:</p><p>- JSONPATH: `$.usable_pct`</p> |
 |Oracle |Oracle: FRA, Number of restore points | |DEPENDENT |oracle.fra_restore_point<p>**Preprocessing**:</p><p>- JSONPATH: `$.restore_point`</p> |
 |Oracle |Oracle: SGA, java pool |<p>Memory is allocated from the java pool.</p> |DEPENDENT |oracle.sga_java_pool<p>**Preprocessing**:</p><p>- JSONPATH: `$.java_pool`</p> |
 |Oracle |Oracle: SGA, large pool |<p>Memory is allocated from the large pool.</p> |DEPENDENT |oracle.sga_large_pool<p>**Preprocessing**:</p><p>- JSONPATH: `$.large_pool`</p> |
@@ -143,14 +145,16 @@ There are no template links in this template.
 |Oracle |Oracle Database '{#DBNAME}': Log mode |<p>Archive log mode, 0 - 'NOARCHIVELOG', 1 - 'ARCHIVELOG', 2 - 'MANUAL'</p> |DEPENDENT |oracle.db_log_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.log_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 |Oracle |Oracle Database '{#DBNAME}': Force logging |<p>Indicates whether the database is under force logging mode (YES) or not (NO)</p> |DEPENDENT |oracle.db_force_logging["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.force_logging.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 |Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</p> |DEPENDENT |oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.open_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes |<p>Currently allocated bytes for tablespace (sum of the current size of datafiles).</p> |DEPENDENT |oracle.tbs_alloc_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#TABLESPACE}.used_bytes.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes |<p>Maximum size of tablespace.</p> |DEPENDENT |oracle.tbs_max_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#TABLESPACE}.max_bytes.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace free, bytes |<p>Free bytes of allocated space.</p> |DEPENDENT |oracle.tbs_free_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#TABLESPACE}.free_bytes.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace usage percent |<p>Allocated bytes/Max bytes*100</p> |DEPENDENT |oracle.tbs_used_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#TABLESPACE}.used_pct.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Open status |<p>Tablespace status. 1 - 'ONLINE' 2 - 'OFFLINE' 3- 'READ ONLY'</p> |DEPENDENT |oracle.tbs_status["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#TABLESPACE}.status.first()`</p> |
-|Oracle |Archivelog '{#DEST_NAME}': Error |<p>Displays the error text</p> |DEPENDENT |oracle.archivelog_error["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].log_sequence.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes |<p>Currently allocated bytes for tablespace (sum of the current size of datafiles).</p> |DEPENDENT |oracle.tbs_alloc_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].file_bytes.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes |<p>Maximum size of tablespace.</p> |DEPENDENT |oracle.tbs_max_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].max_bytes.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace used, bytes |<p>Currently used bytes for tablespace (current size of datafiles-free space).</p> |DEPENDENT |oracle.tbs_used_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].used_bytes.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace free, bytes |<p>Free bytes of allocated space.</p> |DEPENDENT |oracle.tbs_free_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].free_bytes.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace usage, percent |<p>Used bytes/Allocated bytes*100</p> |DEPENDENT |oracle.tbs_used_file_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].used_file_pct.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent |<p>Allocated bytes/Max bytes*100</p> |DEPENDENT |oracle.tbs_used_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].used_pct_max.first()`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Open status |<p>Tablespace status. 1 - 'ONLINE' 2 - 'OFFLINE' 3- 'READ ONLY'</p> |DEPENDENT |oracle.tbs_status["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].status.first()`</p> |
+|Oracle |Archivelog '{#DEST_NAME}': Error |<p>Displays the error text</p> |DEPENDENT |oracle.archivelog_error["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].error.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Oracle |Archivelog '{#DEST_NAME}': Last sequence |<p>Identifies the sequence number of the last archived redo log to be archived</p> |DEPENDENT |oracle.archivelog_log_sequence["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].log_sequence.first()`</p> |
-|Oracle |Archivelog '{#DEST_NAME}': Status |<p> Identifies the current status of the destination: 1 - 'Valid', 2 - 'Dederred',3 - 'Error', 0 - 'Unknown'</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].log_sequence.first()`</p> |
+|Oracle |Archivelog '{#DEST_NAME}': Status |<p> Identifies the current status of the destination: 1 - 'Valid', 2 - 'Dederred',3 - 'Error', 0 - 'Unknown'</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Oracle |ASM '{#DG_NAME}': Total size |<p>Total size of ASM disk group.</p> |DEPENDENT |oracle.asm_total_size["{#DG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DG_NAME}'].size_byte.first()`</p> |
 |Oracle |ASM '{#DG_NAME}': Free size |<p>Free size of ASM disk group.</p> |DEPENDENT |oracle.asm_free_size["{#DG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DG_NAME}'].free_size_byte.first()`</p> |
 |Oracle |ASM '{#DG_NAME}': Free size |<p>Usage percent of ASM disk group.</p> |DEPENDENT |oracle.asm_used_pct["{#DG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DG_NAME}'].used_percent.first()`</p> |
@@ -193,8 +197,10 @@ There are no template links in this template.
 |Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog |<p>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to the REDO.</p> |`{TEMPLATE_NAME:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Oracle by Zabbix Agent 2:oracle.db_log_mode["{#DBNAME}"].last()} = 1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status in mount mode |<p>The Oracle DB has a MOUNTED state.</p> |`{TEMPLATE_NAME:oracle.pdb_open_mode["{#DBNAME}"].last()}=1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE}) |<p>Oracle DB open status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.pdb_open_mode["{#DBNAME}"].diff()}=1` |INFO |<p>Manual close: YES</p> |
-|Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</p> |
-|Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}` |HIGH | |
+|Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</p> |
+|Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_file_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}` |HIGH | |
+|Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</p> |
+|Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}` |HIGH | |
 |Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE |<p>The tablespase is in the offline state.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].last()}=2` |WARNING | |
 |Oracle TBS '{#TABLESPACE}': Tablespace status has changed (new value received: {ITEM.VALUE}) |<p>Oracle tablespace status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].diff()}=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</p> |
 |Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>ARL destination not in 3 - Valid or 2 - Deferred.</p> |`{TEMPLATE_NAME:oracle.archivelog_log_status["{#DEST_NAME}"].last()}<2` |HIGH | |

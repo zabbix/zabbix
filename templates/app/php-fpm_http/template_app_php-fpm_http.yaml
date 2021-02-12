@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-16T09:33:06Z'
+  date: '2021-01-11T16:16:40Z'
   groups:
     -
       name: Templates/Applications
@@ -9,7 +9,7 @@ zabbix_export:
       template: 'PHP-FPM by HTTP'
       name: 'PHP-FPM by HTTP'
       description: |
-        Get PHP-FPM metrics using Zabbix agent running on Linux.
+        Get PHP-FPM metrics using the Zabbix HTTP agent.
         
         Template tooling version used: 0.38
       groups:
@@ -194,7 +194,7 @@ zabbix_export:
             -
               type: REGEX
               parameters:
-                - '{$PHP_FPM.PING.REPLY}$'
+                - '{$PHP_FPM.PING.REPLY}($|\n)'
                 - '1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'

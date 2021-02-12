@@ -4355,7 +4355,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		}
 		else if (0 == indexed_macro &&
 				0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD |
-						MACRO_TYPE_LLD_FILTER | MACRO_TYPE_ALLOWED_HOSTS)))
+						MACRO_TYPE_LLD_FILTER | MACRO_TYPE_ALLOWED_HOSTS |
+						MACRO_TYPE_SCRIPT_PARAMS_FIELD)))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
@@ -4400,6 +4401,21 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = get_interface_value(dc_item->host.hostid, dc_item->itemid, &replace_to,
 							ZBX_REQUEST_HOST_CONN);
+				}
+			}
+			else if (0 != (macro_type & MACRO_TYPE_SCRIPT_PARAMS_FIELD))
+			{
+				if (0 == strcmp(m, MVAR_ITEM_ID))
+				{
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, dc_item->itemid);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY))
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->key);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+				{
+					replace_to = zbx_strdup(replace_to, dc_item->key_orig);
 				}
 			}
 		}

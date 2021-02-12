@@ -102,10 +102,10 @@ zabbix_export:
         try {
             var params = JSON.parse(value);
         
-            if (!params.teams_endpoint) {
+            if (typeof params.teams_endpoint !== 'string' || params.teams_endpoint.trim() === '') {
                 throw 'Cannot get teams_endpoint';
             }
-            else if (!params.teams_endpoint.startsWith('https://outlook.office.com/webhook/')) {
+            else if (!params.teams_endpoint.startsWith('http')) {
                 throw 'Invalid MS Teams webhook URL: ' + params.teams_endpoint;
             }
         
@@ -123,7 +123,7 @@ zabbix_export:
         
             // Check {EVENT.VALUE} for trigger-based and internal events.
             if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
+                    && (params.event_source === '0' || params.event_source === '3')) {
                 throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 0 or 1.';
             }
         

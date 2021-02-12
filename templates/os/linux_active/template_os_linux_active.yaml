@@ -1272,7 +1272,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
-          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params'
+          description: 'Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/5.2/manual/appendix/items/vm.memory.size_params'
           applications:
             -
               name: Memory
@@ -1283,7 +1283,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Available memory as percentage of total. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params'
+          description: 'Available memory as percentage of total. See also: https://www.zabbix.com/documentation/5.2/manual/appendix/items/vm.memory.size_params'
           applications:
             -
               name: Memory

@@ -81,6 +81,14 @@ class CPage {
 	 * Web driver and CElementQuery initialization.
 	 */
 	public function __construct() {
+		$this->connect();
+		CElementQuery::setPage($this);
+	}
+
+	/**
+	 * Web driver initialization.
+	 */
+	public function connect() {
 		$capabilities = DesiredCapabilities::chrome();
 		if (defined('PHPUNIT_BROWSER_NAME')) {
 			$capabilities->setBrowserName(PHPUNIT_BROWSER_NAME);
@@ -97,13 +105,17 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
-		$this->driver = RemoteWebDriver::create('http://'.PHPUNIT_DRIVER_ADDRESS.':4444/wd/hub', $capabilities);
+		$phpunit_driver_address = PHPUNIT_DRIVER_ADDRESS;
+
+		if (strpos($phpunit_driver_address, ':') === false) {
+			$phpunit_driver_address .= ':4444';
+		}
+
+		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
 		);
-
-		CElementQuery::setPage($this);
 	}
 
 	/**
@@ -162,6 +174,14 @@ class CPage {
 	public function destroy() {
 		$this->driver->quit();
 		self::$cookie = null;
+	}
+
+	/**
+	 * Reconnect web driver.
+	 */
+	public function reset() {
+		$this->destroy();
+		$this->connect();
 	}
 
 	/**
@@ -492,9 +512,11 @@ class CPage {
 	 */
 	public function removeFocus() {
 		try {
-			$this->driver->executeScript('document.activeElement.blur();');
-		} catch (Exception $ex) {
-			// Code is not missing here.
+			$this->driver->executeScript('for (var i = 0; i < 5; i++) if (document.activeElement.tagName !== "BODY")'.
+					' document.activeElement.blur(); else break;');
+		}
+		catch (\Exception $ex) {
+			throw new \Exception('Cannot remove focus.');
 		}
 	}
 
@@ -553,5 +575,40 @@ class CPage {
 		$this->query('id:password')->one()->fill($password);
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
+	}
+
+	/**
+	 * Check page title text.
+	 *
+	 * @param string $title		page title
+	 *
+	 * @throws Exception
+	 */
+	public function assertTitle($title) {
+		global $ZBX_SERVER_NAME;
+
+		if ($ZBX_SERVER_NAME !== '') {
+			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
+		}
+
+		$text = $this->getTitle();
+		if ($text !== $title) {
+			throw new \Exception('Title of the page "'.$text.'" is not equal to "'.$title.'".');
+		}
+	}
+
+	/**
+	 * Check page header.
+	 *
+	 * @param string $header	page header to be compared
+	 *
+	 * @throws Exception
+	 */
+	public function assertHeader($header) {
+		$text = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
+
+		if ($text !== $header) {
+			throw new \Exception('Header of the page "'.$text.'" is not equal to "'.$header.'".');
+		}
 	}
 }

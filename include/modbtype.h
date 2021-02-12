@@ -124,6 +124,7 @@ typedef enum
 } modbus_endianness_t;
 
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int 	zbx_init_modbus(char **error);
+int	zbx_init_modbus(char **error);
+void	zbx_deinit_modbus(void);
 
 #endif /* ZABBIX_SYSINFO_COMMON_MODBTYPE_H */

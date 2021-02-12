@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	NOOP = 0x0a
-	STAT = 0x10
+	Noop = 0x0a
+	Stat = 0x10
 )
 
 const (
-	SUCCESS         = 0x00
-	UNKNOWN_COMMAND = 0x81
+	Success        = 0x00
+	UnknownCommand = 0x81
 )
 
 const debug = false
