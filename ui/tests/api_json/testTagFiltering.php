@@ -266,8 +266,6 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE',
-					'Host OS', 'Host OS - Android', 'Host OS - Linux', 'Host OS - Mac', 'Host OS - Windows',
 					'Host without tags', 'Host with very general tags only'
 				]
 			],
@@ -476,7 +474,6 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Windows',
 					'Workstation'
 				]
 			],
@@ -671,7 +668,7 @@ class testTagFiltering extends CAPITest {
 					]
 				],
 				'expected' => [
-					'trigger1', 'trigger2', 'trigger3', 'trigger4'
+					'trigger2', 'trigger4'
 				]
 			],
 			'events-not-contain-single-tag' => [

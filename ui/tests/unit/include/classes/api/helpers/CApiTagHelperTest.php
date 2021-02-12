@@ -351,24 +351,22 @@ class CApiTagHelperTest extends PHPUnit_Framework_TestCase {
 					],
 					TAG_EVAL_TYPE_AND_OR
 				] + $sql_args,
-				'NOT ('.
-					'EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_tag'.
-						' WHERE'.
-							' e.eventid=event_tag.eventid'.
-							' AND event_tag.tag=\'tag1\''.
-							' AND UPPER(event_tag.value) LIKE \'%VALUE%\' ESCAPE \'!\''.
-					')'.
-					' AND EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_tag'.
-						' WHERE'.
-							' e.eventid=event_tag.eventid'.
-							' AND event_tag.tag=\'OS\''.
-							' AND UPPER(event_tag.value) LIKE \'%WIN%\' ESCAPE \'!\''.
-						')'.
-					')'
+				'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'tag1\''.
+						' AND UPPER(event_tag.value) LIKE \'%VALUE%\' ESCAPE \'!\''.
+				')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_tag'.
+					' WHERE'.
+						' e.eventid=event_tag.eventid'.
+						' AND event_tag.tag=\'OS\''.
+						' AND UPPER(event_tag.value) LIKE \'%WIN%\' ESCAPE \'!\''.
+				')'
 			]
 		];
 	}
