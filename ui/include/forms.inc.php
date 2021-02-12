@@ -1315,6 +1315,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['itemid'] = 0;
+		$data['form'] = 'create';
 	}
 
 	if ($data['is_discovery_rule']) {
