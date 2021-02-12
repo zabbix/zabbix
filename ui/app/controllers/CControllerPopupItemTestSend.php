@@ -416,9 +416,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						];
 
 						if ($valuemap) {
-							$output['mapped_value'] = CValueMapHelper::applyValueMap($result['result'],
-								['valuemap' => $valuemap]
-							);
+							$output['mapped_value'] = CValueMapHelper::applyValueMap($result['result'], $valuemap);
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

@@ -84,7 +84,7 @@ class CScreenPlainText extends CScreenBase {
 					break;
 			}
 
-			$value = CValueMapHelper::applyValueMap($value, $item);
+			$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
 
 			if ($this->screenitem['style'] == 0) {
 				$value = new CPre($value);

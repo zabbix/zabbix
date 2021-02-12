@@ -1470,7 +1470,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip;' : $value;
 	}
 
-	return CValueMapHelper::applyValueMap($value, $item);
+	return CValueMapHelper::applyValueMap($value, $item['valuemap']);
 }
 
 /**
