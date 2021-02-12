@@ -856,7 +856,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.hv.datastore.multipath[<url>,<uuid>,<datastore>,<partitionid>]',
-					'description' => _('Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+					'description' => _('Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery')
 				],
 				[
 					'key' => 'vmware.hv.datastore.read[<url>,<uuid>,<datastore>,<mode>]',
