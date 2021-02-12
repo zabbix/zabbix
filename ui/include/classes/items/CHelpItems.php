@@ -932,7 +932,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'vmware.hv.power[<url>,<uuid>,<max>]',
-					'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name')
+					'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage')
 				],
 				[
 					'key' => 'vmware.hv.sensor.health.state[<url>,<uuid>]',
