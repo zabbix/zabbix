@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 20:03+0200\n"
+"POT-Creation-Date: 2021-02-12 19:54+0200\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -14,6 +14,10 @@ msgstr ""
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1510338737.000000\n"
+
+#: include/classes/items/CHelpItems.php:1087
+msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -1021,6 +1025,14 @@ msgstr ""
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatif olarak elle yükleyebilirsiniz:"
 
+#: include/classes/items/CHelpItems.php:1003
+msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1027
+msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
 #: include/triggers.inc.php:1283
 #: include/views/configuration.action.edit.php:120
@@ -1468,6 +1480,14 @@ msgstr "Mevcut"
 msgid "Average"
 msgstr "Ortalama"
 
+#: include/classes/items/CHelpItems.php:1083
+msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1103
+msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
+
 #: include/classes/widgets/views/widget.svggraph.form.view.php:293
 msgid "Axes"
 msgstr ""
@@ -1624,6 +1644,22 @@ msgstr "CPU bilgisi. Karakter dizgisi veya tamsayı döndürür"
 #: include/classes/items/CHelpItems.php:559
 msgid "CPU load. Returns float"
 msgstr "CPU yükü. Float döndürür"
+
+#: include/classes/items/CHelpItems.php:983
+msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:843
+msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:839
+msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:991
+msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:571
@@ -3161,11 +3197,11 @@ msgstr ""
 msgid "Catalan (ca_ES)"
 msgstr "Katalanca (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:1069
+#: include/classes/items/CHelpItems.php:1137
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Regex ile eşleşen tüm SNMP trap'lerini yakalar. Regexp belirtilmemişse bütün trap'leri yakalar."
 
-#: include/classes/items/CHelpItems.php:1065
+#: include/classes/items/CHelpItems.php:1133
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "snmptrap[] öğelerinden herhangi biri tarafından yakalanmayan tüm SNMP trap'lerini yakalar."
 
@@ -3635,7 +3671,7 @@ msgstr "Korelasyon \"%1$s\" için durum yinelemeleri."
 msgid "Configuration"
 msgstr "Yapılandırma"
 
-#: include/classes/items/CHelpItems.php:1159
+#: include/classes/items/CHelpItems.php:1227
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Yapılandırma önbellek istatistikleri. Önbellek - arabellek (kipler: pfree, total, used, free)."
 
@@ -4103,11 +4139,11 @@ msgstr "Kayıt rotasyon desteğiyle kayıt dosyasında eşleşen satırların sa
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Kayıt dosyası izlenmesinde eşleşen satır sayısı. Tam sayı döndürür"
 
-#: include/classes/items/CHelpItems.php:1135
+#: include/classes/items/CHelpItems.php:1203
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1139
+#: include/classes/items/CHelpItems.php:1207
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -5473,23 +5509,23 @@ msgstr ""
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:851
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:875
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1043
+#: include/classes/items/CHelpItems.php:1111
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1123
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:999
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -8053,7 +8089,7 @@ msgstr "IPMI betikleri yalnızca sunucu tarafından çalıştırılabilir."
 msgid "IPMI sensor"
 msgstr "IPMI algılayıcısı"
 
-#: include/classes/items/CHelpItems.php:1241
+#: include/classes/items/CHelpItems.php:1309
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -12049,6 +12085,10 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
+#: include/classes/items/CHelpItems.php:1067
+msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:157 include/func.inc.php:191
 msgid "Never"
 msgstr "Hiç"
@@ -12844,7 +12884,11 @@ msgstr "Kasım"
 msgid "Number of CPUs. Returns integer"
 msgstr "CPU sayısı. Tam sayı döndürür"
 
-#: include/classes/items/CHelpItems.php:1099
+#: include/classes/items/CHelpItems.php:859
+msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1167
 msgid "Number of enabled items on the host."
 msgstr "Ana makinedeki etkin öğelerin sayısı."
 
@@ -12856,25 +12900,25 @@ msgstr ""
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Öğe sayısı (etkin/devre dışı/desteklenmiyor)"
 
-#: include/classes/items/CHelpItems.php:1123
+#: include/classes/items/CHelpItems.php:1191
 msgid "Number of items in Zabbix database."
 msgstr "Zabbix veritabanındaki öğe sayısı."
 
-#: include/classes/items/CHelpItems.php:1151
+#: include/classes/items/CHelpItems.php:1219
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Henüz sunucuya gönderilmeyen vekil sunucu geçmişindeki öğelerin sayısı"
 
-#: include/classes/items/CHelpItems.php:1155
+#: include/classes/items/CHelpItems.php:1223
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Kuyrukta, başlangıçtan belli saniye kadar ötelenen öğelerin sayısı, kapsayıcı."
 
 #: include/classes/items/CHelpItems.php:389
 #: include/classes/items/CHelpItems.php:739
-#: include/classes/items/CHelpItems.php:1171
+#: include/classes/items/CHelpItems.php:1239
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1119
+#: include/classes/items/CHelpItems.php:1187
 msgid "Number of monitored hosts"
 msgstr "İzlenen ana makine sayısı"
 
@@ -12891,15 +12935,15 @@ msgstr "Problem sayısı"
 msgid "Number of problems and expand most critical one"
 msgstr "Problem sayısı ve en kritik olanı genişlet"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:891
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü üzerindeki işlemci çekirdeği sayısı,<url> - VMware servis URL, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizöründeki işlemci iş parçacığı sayısı, <url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:971
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware hipervizörü üzerindeki işlemci sayısı,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
@@ -12928,15 +12972,15 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Tetikleyicilerin sayısı (etkin/devre dışı [problem/tamam])"
 
-#: include/classes/items/CHelpItems.php:1183
+#: include/classes/items/CHelpItems.php:1251
 msgid "Number of triggers in Zabbix database."
 msgstr "Zabbix veritabanındaki tetikleyicilerin sayısı."
 
-#: include/classes/items/CHelpItems.php:1127
+#: include/classes/items/CHelpItems.php:1195
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Zabbix veritabanındaki desteklenmeyen öğelerin sayısı."
 
-#: include/classes/items/CHelpItems.php:1103
+#: include/classes/items/CHelpItems.php:1171
 msgid "Number of unsupported items on the host."
 msgstr "Ana makinedeki desteklenmeyen öğelerin sayısı."
 
@@ -12949,35 +12993,35 @@ msgstr "Kullanıcıların sayısı (çevrimiçi)"
 msgid "Number of users logged in. Returns integer"
 msgstr "Oturum açan kullanıcı sayısı. Tam sayı döndürür"
 
-#: include/classes/items/CHelpItems.php:1079
+#: include/classes/items/CHelpItems.php:1147
 msgid "Number of values stored in table HISTORY."
 msgstr "HISTORY tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:1083
+#: include/classes/items/CHelpItems.php:1151
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "HISTORY_LOG tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1155
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "HISTORY_STR tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1159
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "HISTORY_TEXT tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1163
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "HISTORY_UINT tablosunda depolanan değerlerin sayısı."
 
-#: include/classes/items/CHelpItems.php:1175
+#: include/classes/items/CHelpItems.php:1243
 msgid "Number of values stored in table TRENDS."
 msgstr "TRENDS tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:1179
+#: include/classes/items/CHelpItems.php:1247
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "TRENDS_UINT tablosunda depolanan değer sayısı."
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü üzerindeki sanal makine sayısı,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
@@ -13886,9 +13930,21 @@ msgstr ""
 msgid "Peak memory usage: %1$s"
 msgstr "En üst bellek kullanımı: %1$s"
 
+#: include/classes/items/CHelpItems.php:967
+msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:164
 msgid "Percentage"
 msgstr "Yüzde oranı"
+
+#: include/classes/items/CHelpItems.php:1051
+msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:975
+msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
+msgstr ""
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:145
 msgid "Percentile line (left)"
@@ -14068,6 +14124,10 @@ msgstr "Gönderi alanları"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Gönderi türü"
+
+#: include/classes/items/CHelpItems.php:935
+msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:65
 #: include/classes/setup/CSetupWizard.php:564
@@ -14927,7 +14987,7 @@ msgstr "Ana makine izinleri gerekli"
 msgid "Required performance (vps)"
 msgstr "Gerekli performans (vps)"
 
-#: include/classes/items/CHelpItems.php:1163
+#: include/classes/items/CHelpItems.php:1231
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Saniye başına beklenen yeni değerler cinsinden gerekli Zabbix sunucu performansı."
 
@@ -15090,19 +15150,19 @@ msgstr "Bir dosyanın içeriği alınıyor. Metin döndürür"
 msgid "Retry"
 msgstr "Tekrar dene"
 
-#: include/classes/items/CHelpItems.php:1231
+#: include/classes/items/CHelpItems.php:1299
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1235
+#: include/classes/items/CHelpItems.php:1303
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1213
+#: include/classes/items/CHelpItems.php:1281
 msgid "Return first column of the first row of the SQL query result."
 msgstr "SQL sorgu sonucunun ilk satırının ilk sütununu döndürür."
 
-#: include/classes/items/CHelpItems.php:1227
+#: include/classes/items/CHelpItems.php:1295
 msgid "Return value of an attribute of MBean object."
 msgstr "Bir MBean nesne özniteliğinin dönüş değeri."
 
@@ -15110,25 +15170,25 @@ msgstr "Bir MBean nesne özniteliğinin dönüş değeri."
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "ICMP ping yanıt süresini saniye cinsinden döndürür. Örnek: 0.02"
 
-#: include/classes/items/CHelpItems.php:1111
+#: include/classes/items/CHelpItems.php:1179
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:385
 #: include/classes/items/CHelpItems.php:735
-#: include/classes/items/CHelpItems.php:1167
+#: include/classes/items/CHelpItems.php:1235
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1115
+#: include/classes/items/CHelpItems.php:1183
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Ana makinede belirli bir denetim türünün kullanılabilirliğini döndürür. Bu öğenin değeri, ana makine listesindeki kullanılabilirlik simgelerine karşılık gelir. Geçerli türler: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:1107
+#: include/classes/items/CHelpItems.php:1175
 msgid "Returns current maintenance status of the host."
 msgstr "Ana makinenin mevcut bakım durumunu döndürür."
 
-#: include/classes/items/CHelpItems.php:1131
+#: include/classes/items/CHelpItems.php:1199
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Zabbix Java ağ geçidiyle ilişkili bilgileri döndürür. Geçerli parametreler şunlardır: ping, version."
 
@@ -16570,7 +16630,7 @@ msgstr "Başlama yeri"
 msgid "Starting TLS failed."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1075
+#: include/classes/items/CHelpItems.php:1143
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Zabbix sunucusunun başlatılma zamanı, Unix zaman damgası."
 
@@ -16588,7 +16648,7 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1207
+#: include/classes/items/CHelpItems.php:1275
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
@@ -17272,6 +17332,10 @@ msgstr "Uygulama artık keşfedilemiyor ve %1$s gün içinde (%2$s günü, %3$s 
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Uygulama artık keşfedilemiyor ve keşif kuralı bir sonraki sefer işlendiğinde silinecek."
 
+#: include/classes/items/CHelpItems.php:1091
+msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
+
 #: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
@@ -17476,7 +17540,7 @@ msgstr "Zaman (artan)"
 msgid "Time (descending)"
 msgstr "Zaman (azalan)"
 
-#: include/classes/items/CHelpItems.php:1143
+#: include/classes/items/CHelpItems.php:1211
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
 
@@ -17488,7 +17552,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1147
+#: include/classes/items/CHelpItems.php:1215
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -17596,6 +17660,10 @@ msgstr ""
 msgid "Total SQL time: %1$s"
 msgstr "Toplam SQL süresi: %1$s"
 
+#: include/classes/items/CHelpItems.php:1007
+msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:147
 #, c-format
 msgid "Total time: %1$s"
@@ -17613,11 +17681,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "İşlem kapatılmadı. Durduruluyor..."
 
-#: include/classes/items/CHelpItems.php:1217
+#: include/classes/items/CHelpItems.php:1285
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1221
+#: include/classes/items/CHelpItems.php:1289
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -18495,7 +18563,7 @@ msgstr "Daha üst seviye haritalar"
 msgid "Uptime"
 msgstr "Çalışma Süresi"
 
-#: include/classes/items/CHelpItems.php:1187
+#: include/classes/items/CHelpItems.php:1255
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Zabbix sunucu işleminin saniye cinsinden çalışma süresi."
 
@@ -18850,7 +18918,7 @@ msgstr ""
 msgid "Users"
 msgstr "Kullanıcılar"
 
-#: include/classes/items/CHelpItems.php:1203
+#: include/classes/items/CHelpItems.php:1271
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware önbellek istatistikleri. Geçerli kipler: total, free, pfree, used ve pused."
 
@@ -18863,7 +18931,7 @@ msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:811
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Bayt cinsinden veya toplamın yüzdesi olarak VMware veri deposu kapasite istatistikleri. Bayt için tam sayı; yüzde için float döndürür"
 
@@ -18883,11 +18951,11 @@ msgstr ""
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü BIOS uuid'si,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü balonlaşmış bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
@@ -18895,51 +18963,51 @@ msgstr "VMware hipervizörü balonlaşmış bellek boyutu, <url> - VMware servis
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizörü cluster adı,<url> - VMware servis URL'si, <uuid> - VMware hipervizörü ana makine adı"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware hipervizör veri deposu okuma istatistikleri <url> - VMware servis URL'si,<uuid> - VMware hipervizör ana makine adı, <datastore> - veri deposu adı, <mode> - gecikme"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware hipervizör veri deposu yazma istatistikleri <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <datastore> - veri deposu adı, <mode> - gecikme"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör modeli,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör adı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hipervizör ağ giriş istatistikleri <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hipervizör ağ çıkış istatistikleri <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware hipervizör performans sayacı, <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı, <path> - performans sayacı yolu, <instance> - performans sayacı örneği"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör işlemci frekansı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör işlemci modeli,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
@@ -18947,27 +19015,27 @@ msgstr "VMware hipervizör işlemci modeli,<url> - VMware servis URL'si, <uuid> 
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör Hz olarak işlemci kullanımı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:943
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör durumu,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör toplam bellek miktarı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:947
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör çalışma süresi, <url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör kullanılan bellek miktarı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör üretici adı,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:951
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hipervizör sürümü,<url> - VMware servis URL'si, <uuid> - VMware hipervizör ana makine adı"
 
@@ -18975,103 +19043,103 @@ msgstr "VMware hipervizör sürümü,<url> - VMware servis URL'si, <uuid> - VMwa
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware servis tam adı, <url> - VMware servis URL'si"
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:959
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware servis sürümü, <url> - VMware servis URL'si"
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine balonlaşmış bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1079
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine taahhüt edilen depolama alanı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine sıkıştırılmış bellek miktarı,<url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1047
+#: include/classes/items/CHelpItems.php:1115
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware sanal makine disk aygıtı okuma istatistikleri,<url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - disk aygıtı örneği, <mode> - bps/ops - saniyedeki byte/operasyon"
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1119
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware sanal makine disk aygıtı yazma istatistikleri,<url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - disk aygıtı örneği, <mode> - bps/ops - saniyedeki byte/operasyon"
 
-#: include/classes/items/CHelpItems.php:1059
+#: include/classes/items/CHelpItems.php:1127
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware sanal makine dosya sistemi istatistikleri, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <fsname> - dosya sistemi adı, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine konuk bellek kullanımı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1047
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine ana makine bellek kullanımı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:1011
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine hipervizör adı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine adı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1059
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware sanal makine ağ arayüzü giriş istatistikleri, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - ağ arayüzü örneği, <mode> - bps/pps - saniye başına bayt/paket"
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware sanal makine ağ arayüzü çıkış istatistikleri, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <instance> - ağ arayüzü örneği, <mode> - bps/pps - saniye başına bayt/paket"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1071
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware sanal makine performans sayacı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı, <path> - performans sayacı yolu, <instance> - performans sayacı örneği"
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1075
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine güç durumu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine özel bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine işlemci hazırlama süresi ms, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine işlemci kullanımı (Hz), <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine paylaşımlı bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine takas bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine toplam bellek boyutu, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1095
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine kaydedilmemiş depolama alanı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1099
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine paylaşılmayan depolama alanı, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
-#: include/classes/items/CHelpItems.php:1039
+#: include/classes/items/CHelpItems.php:1107
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware sanal makine çalışma süresi, <url> - VMware servis URL'si, <uuid> - VMware sanal makine ana makine adı"
 
@@ -19162,11 +19230,11 @@ msgstr "\"%1$s\" değeri \"grid_show\" parametresi için geçersiz. Seçenekler 
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk %4$d karakter."
 
-#: include/classes/items/CHelpItems.php:1195
+#: include/classes/items/CHelpItems.php:1263
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Değer önbellek etkinliği. Geçerli parametreler: istekler, isabetler ve kaçırılanlar."
 
-#: include/classes/items/CHelpItems.php:1191
+#: include/classes/items/CHelpItems.php:1259
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Değer önbellek istatistikleri. Geçerli kipler şunlardır: total, free, pfree, used ve pused."
 
@@ -19308,7 +19376,7 @@ msgstr ""
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Zabbix aracısının sürümü. String döndürür"
 
-#: include/classes/items/CHelpItems.php:1199
+#: include/classes/items/CHelpItems.php:1267
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
