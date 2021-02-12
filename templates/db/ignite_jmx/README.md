@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 5.0 and higher  
-Official JMX Template for Apache Ignite and Gridgain computing platform.
+Official JMX Template for Apache Ignite computing platform.
 This template is based on the original template developed by Igor Akkuratov, Senior Engineer at GridGain Systems and Apache Ignite Contributor.
 
 
@@ -19,7 +19,7 @@ This template was tested on:
 
 This template works with standalone and cluster instances. Metrics are collected by JMX. All metrics are discoverable.
 
-1. Enable and configure JMX access to Apache Ignite. See documentation for [instructions](). Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name. You can configure Cache and Data Region metrics which you want using [officcial guide](https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics).
+1. Enable and configure JMX access to Apache Ignite. See documentation for [instructions](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html). Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name. You can configure Cache and Data Region metrics which you want using [officcial guide](https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics).
 2. Set the user name and password in host macros {$IGNITE.USER} and {$IGNITE.PASSWORD}.
 
 ## Zabbix configuration
@@ -161,6 +161,7 @@ There are no template links in this template.
 |Data region {#JMXNAME}: Node started to evict pages |<p>You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",EvictionRate].min(5m)}>0` |INFO |<p>Manual close: YES</p> |
 |Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m) |<p>Data region utilization is high. Increase data region size or delete any data.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)</p> |
 |Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m) |<p>Data region utilization is high. Increase data region size or delete any data.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}` |HIGH | |
+|Data region {#JMXNAME}: Pages replace rate more than 0 |<p>There is more data than DataRegionMaxSize. Сluster started to replace pages in memory. Page replacement can slow down operations.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",PagesReplaceRate].min(5m)}>0` |WARNING | |
 |Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m) |<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)</p> |
 |Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m) |<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}` |HIGH | |
 |Cache group [{#JMXNAME}]: One or more backups are unavaliable |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}` |WARNING | |

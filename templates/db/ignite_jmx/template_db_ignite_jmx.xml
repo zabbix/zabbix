@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-05T09:07:35Z</date>
+   <date>2021-02-12T10:37:20Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template DB Ignite by JMX</template>
          <name>Template DB Ignite by JMX</name>
-         <description>The template to monitor Apache Ignite and Gridgain by Zabbix that work without any external scripts.&#13;
+         <description>The template to monitor Apache Ignite by Zabbix that work without any external scripts.&#13;
   It works with both standalone and cluster instances.&#13;
   The metrics are discoverable and collected by JMX.  &#13;
   Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.&#13;
@@ -629,6 +629,14 @@ return JSON.stringify(data)
                         </application_prototype>
                      </application_prototypes>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;0</expression>
+                           <name>Data region {#JMXNAME}: Pages replace rate more than 0</name>
+                           <priority>WARNING</priority>
+                           <description>There is more data than DataRegionMaxSize. Сluster started to replace pages in memory. Page replacement can slow down operations.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>Data region {#JMXNAME}: Allocated, bytes</name>
