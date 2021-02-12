@@ -734,7 +734,7 @@ class CItem extends CItemGeneral {
 			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
 				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
 					// Reset valuemapid when value_type is LOG or TEXT.
-					$item['valuemapid'] = null;
+					$item['valuemapid'] = 0;
 				}
 				else {
 					unset($item['valuemapid']);
