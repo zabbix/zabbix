@@ -72,8 +72,8 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 				if ($items && $is_dynamic_item && $dynamic_hostid) {
 					$items = API::Item()->get([
 						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
-						'selectValueMap' => ['mappings'],
 						'selectHosts' => ['name'],
+						'selectValueMap' => ['mappings'],
 						'filter' => [
 							'hostid' => $dynamic_hostid,
 							'key_' => array_keys($keys)
