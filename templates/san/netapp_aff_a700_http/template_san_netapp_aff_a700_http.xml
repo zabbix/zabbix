@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-11T12:31:10Z</date>
+   <date>2021-02-12T09:55:38Z</date>
    <groups>
       <group>
          <name>Templates/SAN</name>
@@ -31,9 +31,9 @@ Template tooling version used: 0.38</description>
          </applications>
          <items>
             <item>
-               <name>Get Chassis metrics</name>
+               <name>Get chassis</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.chassis.get</key>
+               <key>netapp.chassis.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -49,9 +49,9 @@ Template tooling version used: 0.38</description>
                <url>{$URL}/api/cluster/chassis?fields=id,state</url>
             </item>
             <item>
-               <name>Get cluster metrics</name>
+               <name>Get cluster</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.cluster.get</key>
+               <key>netapp.cluster.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -69,7 +69,7 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Cluster location</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.location</key>
+               <key>netapp.cluster.location</key>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -91,13 +91,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster name</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.name</key>
+               <key>netapp.cluster.name</key>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -119,15 +119,16 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops raw other</name>
+               <name>Cluster IOPS raw, other</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops_raw.other</key>
+               <key>netapp.cluster.statistics.iops_raw.other</key>
                <delay>0</delay>
                <history>7d</history>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                <applications>
                   <application>
@@ -141,15 +142,16 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops raw read</name>
+               <name>Cluster IOPS raw, read</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops_raw.read</key>
+               <key>netapp.cluster.statistics.iops_raw.read</key>
                <delay>0</delay>
                <history>7d</history>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Performance metric for read I/O operations.</description>
                <applications>
                   <application>
@@ -163,15 +165,16 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops raw total</name>
+               <name>Cluster IOPS raw, total</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops_raw.total</key>
+               <key>netapp.cluster.statistics.iops_raw.total</key>
                <delay>0</delay>
                <history>7d</history>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                <applications>
                   <application>
@@ -185,15 +188,16 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
-               <name>Cluster iops raw write</name>
+               <name>Cluster IOPS raw, write</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops_raw.write</key>
+               <key>netapp.cluster.statistics.iops_raw.write</key>
                <delay>0</delay>
                <history>7d</history>
+               <units>!iops</units>
                <description>The number of I/O operations observed at the storage object. Peformance metric for write I/O operations.</description>
                <applications>
                   <application>
@@ -207,13 +211,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster IOPS, other rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops.other.rate</key>
+               <key>netapp.cluster.statistics.iops.other.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -235,13 +239,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster IOPS, read rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops.read.rate</key>
+               <key>netapp.cluster.statistics.iops.read.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -263,13 +267,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster IOPS, total rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops.total.rate</key>
+               <key>netapp.cluster.statistics.iops.total.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -291,13 +295,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster IOPS, write rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.iops.write.rate</key>
+               <key>netapp.cluster.statistics.iops.write.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -319,13 +323,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster latency raw, other</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency_raw.other</key>
+               <key>netapp.cluster.statistics.latency_raw.other</key>
                <delay>0</delay>
                <history>7d</history>
                <units>!mcs</units>
@@ -342,13 +346,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster latency raw, read</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency_raw.read</key>
+               <key>netapp.cluster.statistics.latency_raw.read</key>
                <delay>0</delay>
                <history>7d</history>
                <units>!mcs</units>
@@ -365,13 +369,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster latency raw, total</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency_raw.total</key>
+               <key>netapp.cluster.statistics.latency_raw.total</key>
                <delay>0</delay>
                <history>7d</history>
                <units>!mcs</units>
@@ -388,13 +392,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster latency raw, write</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.latency_raw.write</key>
+               <key>netapp.cluster.statistics.latency_raw.write</key>
                <delay>0</delay>
                <history>7d</history>
                <units>!mcs</units>
@@ -411,19 +415,19 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster latency, other</name>
                <type>CALCULATED</type>
-               <key>netapp.aff.cluster.statistics.latency.other</key>
+               <key>netapp.cluster.statistics.latency.other</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>!ms</units>
-               <params>(last(netapp.aff.cluster.statistics.latency_raw.other) - prev(netapp.aff.cluster.statistics.latency_raw.other)) /
-(last(netapp.aff.cluster.statistics.iops_raw.other) - prev(netapp.aff.cluster.statistics.iops_raw.other) +
-(last(netapp.aff.cluster.statistics.iops_raw.other) - prev(netapp.aff.cluster.statistics.iops_raw.other) = 0) ) * 0.001</params>
+               <params>(last(netapp.cluster.statistics.latency_raw.other) - prev(netapp.cluster.statistics.latency_raw.other)) /
+(last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) +
+(last(netapp.cluster.statistics.iops_raw.other) - prev(netapp.cluster.statistics.iops_raw.other) = 0) ) * 0.001</params>
                <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                <applications>
                   <application>
@@ -434,13 +438,13 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Cluster latency, read</name>
                <type>CALCULATED</type>
-               <key>netapp.aff.cluster.statistics.latency.read</key>
+               <key>netapp.cluster.statistics.latency.read</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>!ms</units>
-               <params>(last(netapp.aff.cluster.statistics.latency_raw.read) - prev(netapp.aff.cluster.statistics.latency_raw.read)) /
-( last(netapp.aff.cluster.statistics.iops_raw.read) - prev(netapp.aff.cluster.statistics.iops_raw.read) +
-(last(netapp.aff.cluster.statistics.iops_raw.read) - prev(netapp.aff.cluster.statistics.iops_raw.read) = 0) ) * 0.001</params>
+               <params>(last(netapp.cluster.statistics.latency_raw.read) - prev(netapp.cluster.statistics.latency_raw.read)) /
+( last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) +
+(last(netapp.cluster.statistics.iops_raw.read) - prev(netapp.cluster.statistics.iops_raw.read) = 0) ) * 0.001</params>
                <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.</description>
                <applications>
                   <application>
@@ -451,13 +455,13 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Cluster latency, total</name>
                <type>CALCULATED</type>
-               <key>netapp.aff.cluster.statistics.latency.total</key>
+               <key>netapp.cluster.statistics.latency.total</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>!ms</units>
-               <params>(last(netapp.aff.cluster.statistics.latency_raw.total) - prev(netapp.aff.cluster.statistics.latency_raw.total)) /
-( last(netapp.aff.cluster.statistics.iops_raw.total) - prev(netapp.aff.cluster.statistics.iops_raw.total) +
-(last(netapp.aff.cluster.statistics.iops_raw.total) - prev(netapp.aff.cluster.statistics.iops_raw.total) = 0) ) * 0.001</params>
+               <params>(last(netapp.cluster.statistics.latency_raw.total) - prev(netapp.cluster.statistics.latency_raw.total)) /
+( last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) +
+(last(netapp.cluster.statistics.iops_raw.total) - prev(netapp.cluster.statistics.iops_raw.total) = 0) ) * 0.001</params>
                <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                <applications>
                   <application>
@@ -468,13 +472,13 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Cluster latency, write</name>
                <type>CALCULATED</type>
-               <key>netapp.aff.cluster.statistics.latency.write</key>
+               <key>netapp.cluster.statistics.latency.write</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>!ms</units>
-               <params>(last(netapp.aff.cluster.statistics.latency_raw.write) - prev(netapp.aff.cluster.statistics.latency_raw.write)) /
-( last(netapp.aff.cluster.statistics.iops_raw.write) - prev(netapp.aff.cluster.statistics.iops_raw.write) +
-(last(netapp.aff.cluster.statistics.iops_raw.write) - prev(netapp.aff.cluster.statistics.iops_raw.write) = 0) ) * 0.001</params>
+               <params>(last(netapp.cluster.statistics.latency_raw.write) - prev(netapp.cluster.statistics.latency_raw.write)) /
+( last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) +
+(last(netapp.cluster.statistics.iops_raw.write) - prev(netapp.cluster.statistics.iops_raw.write) = 0) ) * 0.001</params>
                <description>The average latency per I/O operation in milliseconds observed at the storage object. Peformance metric for write I/O operations.</description>
                <applications>
                   <application>
@@ -485,7 +489,7 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Cluster throughput, other rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.throughput.other.rate</key>
+               <key>netapp.cluster.statistics.throughput.other.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -507,13 +511,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster throughput, read rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.throughput.read.rate</key>
+               <key>netapp.cluster.statistics.throughput.read.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -535,13 +539,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster throughput, total rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.throughput.total.rate</key>
+               <key>netapp.cluster.statistics.throughput.total.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -563,13 +567,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster throughput, write rate</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.statistics.throughput.write.rate</key>
+               <key>netapp.cluster.statistics.throughput.write.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -591,13 +595,13 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
             </item>
             <item>
                <name>Cluster status</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.status</key>
+               <key>netapp.cluster.status</key>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -619,7 +623,7 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -633,7 +637,7 @@ Template tooling version used: 0.38</description>
             <item>
                <name>Cluster software version</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.cluster.version</key>
+               <key>netapp.cluster.version</key>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
@@ -655,7 +659,7 @@ Template tooling version used: 0.38</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>netapp.aff.cluster.get</key>
+                  <key>netapp.cluster.get</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -668,9 +672,9 @@ Template tooling version used: 0.38</description>
                </triggers>
             </item>
             <item>
-               <name>Get disks metrics</name>
+               <name>Get disks</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.disks.get</key>
+               <key>netapp.disks.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -686,9 +690,9 @@ Template tooling version used: 0.38</description>
                <url>{$URL}/api/storage/disks?fields=state,node.name</url>
             </item>
             <item>
-               <name>Get FRUs metrics</name>
+               <name>Get FRUs</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.frus.get</key>
+               <key>netapp.frus.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -720,9 +724,9 @@ return JSON.stringify(result);
                <url>{$URL}/api/cluster/chassis?fields=id,frus.id,frus.state</url>
             </item>
             <item>
-               <name>Get LUNs metrics</name>
+               <name>Get LUNs</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.luns.get</key>
+               <key>netapp.luns.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -738,9 +742,9 @@ return JSON.stringify(result);
                <url>{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state</url>
             </item>
             <item>
-               <name>Get nodes metrics</name>
+               <name>Get nodes</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.nodes.get</key>
+               <key>netapp.nodes.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -756,9 +760,9 @@ return JSON.stringify(result);
                <url>{$URL}/api/cluster/nodes?fields=*</url>
             </item>
             <item>
-               <name>Get ehternet ports metrics</name>
+               <name>Get ehternet ports</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.ports.eth.get</key>
+               <key>netapp.ports.eth.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -774,9 +778,9 @@ return JSON.stringify(result);
                <url>{$URL}/api/network/ethernet/ports?fields=name,type,node.name,broadcast_domain.name,enabled,state,mtu,speed</url>
             </item>
             <item>
-               <name>Get FC ports metrics</name>
+               <name>Get FC ports</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.ports.fc.get</key>
+               <key>netapp.ports.fc.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -792,9 +796,9 @@ return JSON.stringify(result);
                <url>{$URL}/api/network/fc/ports?fields=name,node.name,description,enabled,fabric.switch_port,state</url>
             </item>
             <item>
-               <name>Get SVMs metrics</name>
+               <name>Get SVMs</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.svms.get</key>
+               <key>netapp.svms.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -810,9 +814,9 @@ return JSON.stringify(result);
                <url>{$URL}/api/svm/svms?fields=name,state,comment</url>
             </item>
             <item>
-               <name>Get volumes metrics</name>
+               <name>Get volumes</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.volumes.get</key>
+               <key>netapp.volumes.get</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -832,7 +836,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>Chassis discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.chassis.discovery</key>
+               <key>netapp.chassis.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -843,7 +847,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#ID}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.chassis.state[{#ID}]</key>
+                     <key>netapp.chassis.state[{#ID}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -865,7 +869,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.chassis.get</key>
+                        <key>netapp.chassis.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -898,7 +902,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>Disks discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.disks.discovery</key>
+               <key>netapp.disks.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -909,7 +913,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#DISKNAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.disk.state[{#NODENAME},{#DISKNAME}]</key>
+                     <key>netapp.disk.state[{#NODENAME},{#DISKNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -931,7 +935,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.disks.get</key>
+                        <key>netapp.disks.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -964,13 +968,13 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>FRUs discovery</name>
                <type>DEPENDENT</type>
-               <key>netapp.aff.frus.discovery</key>
+               <key>netapp.frus.discovery</key>
                <delay>0</delay>
                <item_prototypes>
                   <item_prototype>
                      <name>{#FRUID}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.chassis.fru.state[{#CHASSISID},{#FRUID}]</key>
+                     <key>netapp.chassis.fru.state[{#CHASSISID},{#FRUID}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -992,7 +996,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.frus.get</key>
+                        <key>netapp.frus.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1009,7 +1013,7 @@ return JSON.stringify(result);
                </item_prototypes>
                <host_prototypes/>
                <master_item>
-                  <key>netapp.aff.frus.get</key>
+                  <key>netapp.frus.get</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -1032,7 +1036,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>LUNs discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.luns.discovery</key>
+               <key>netapp.luns.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -1043,7 +1047,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#LUNNAME}: Space size</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.lun.space.size[{#SVMNAME},{#LUNNAME}]</key>
+                     <key>netapp.lun.space.size[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1064,13 +1068,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.luns.get</key>
+                        <key>netapp.luns.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#LUNNAME}: Space used</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.lun.space.used[{#SVMNAME},{#LUNNAME}]</key>
+                     <key>netapp.lun.space.used[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1091,13 +1095,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.luns.get</key>
+                        <key>netapp.luns.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#LUNNAME}: Container state</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.lun.status.container_state[{#SVMNAME},{#LUNNAME}]</key>
+                     <key>netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1119,7 +1123,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.luns.get</key>
+                        <key>netapp.luns.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1136,7 +1140,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#LUNNAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.lun.status.state[{#SVMNAME},{#LUNNAME}]</key>
+                     <key>netapp.lun.status.state[{#SVMNAME},{#LUNNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1158,7 +1162,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.luns.get</key>
+                        <key>netapp.luns.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1191,7 +1195,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>Nodes discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.nodes.discovery</key>
+               <key>netapp.nodes.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -1202,7 +1206,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#NODENAME}: Software version</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.node.version[{#NODENAME}]</key>
+                     <key>netapp.node.version[{#NODENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1224,7 +1228,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.nodes.get</key>
+                        <key>netapp.nodes.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1239,7 +1243,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#NODENAME}: Controller over temperature</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.nodes.controller.over_temperature[{#NODENAME}]</key>
+                     <key>netapp.nodes.controller.over_temperature[{#NODENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1261,7 +1265,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.nodes.get</key>
+                        <key>netapp.nodes.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1275,7 +1279,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#NODENAME}: Location</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.nodes.location[{#NODENAME}]</key>
+                     <key>netapp.nodes.location[{#NODENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1297,13 +1301,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.nodes.get</key>
+                        <key>netapp.nodes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#NODENAME}: Membership</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.nodes.membership[{#NODENAME}]</key>
+                     <key>netapp.nodes.membership[{#NODENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1328,13 +1332,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.nodes.get</key>
+                        <key>netapp.nodes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#NODENAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.nodes.state[{#NODENAME}]</key>
+                     <key>netapp.nodes.state[{#NODENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1363,7 +1367,7 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.nodes.get</key>
+                        <key>netapp.nodes.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1383,7 +1387,7 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                   <item_prototype>
                      <name>{#NODENAME}: Uptime</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.nodes.uptime[{#NODENAME}]</key>
+                     <key>netapp.nodes.uptime[{#NODENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>s</units>
@@ -1400,7 +1404,7 @@ unknown - Node or its HA partner cannot be contacted and there is no information
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.nodes.get</key>
+                        <key>netapp.nodes.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1431,7 +1435,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>Ethernet ports discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.ports.ether.discovery</key>
+               <key>netapp.ports.ether.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -1442,7 +1446,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#ETHPORTNAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.port.eth.state[{#NODENAME},{#ETHPORTNAME}]</key>
+                     <key>netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1464,7 +1468,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.ports.eth.get</key>
+                        <key>netapp.ports.eth.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1497,7 +1501,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>FC ports discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.ports.fc.discovery</key>
+               <key>netapp.ports.fc.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -1508,7 +1512,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#FCPORTNAME}: Description</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.port.fc.description[{#NODENAME},{#FCPORTNAME}]</key>
+                     <key>netapp.port.fc.description[{#NODENAME},{#FCPORTNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1530,13 +1534,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.ports.fc.get</key>
+                        <key>netapp.ports.fc.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#FCPORTNAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.port.fc.state[{#NODENAME},{#FCPORTNAME}]</key>
+                     <key>netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1565,7 +1569,7 @@ node_offline - The state information for the port cannot be retrieved. The node 
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.ports.fc.get</key>
+                        <key>netapp.ports.fc.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1598,7 +1602,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>SVMs discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.svms.discovery</key>
+               <key>netapp.svms.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -1609,7 +1613,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#SVMNAME}: Comment</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.svm.comment[{#SVMNAME}]</key>
+                     <key>netapp.svm.comment[{#SVMNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1631,13 +1635,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.svms.get</key>
+                        <key>netapp.svms.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SVMNAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.svm.state[{#SVMNAME}]</key>
+                     <key>netapp.svm.state[{#SVMNAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1659,7 +1663,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.svms.get</key>
+                        <key>netapp.svms.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1692,7 +1696,7 @@ return JSON.stringify(result);
             <discovery_rule>
                <name>Volumes discovery</name>
                <type>HTTP_AGENT</type>
-               <key>netapp.aff.volumes.discovery</key>
+               <key>netapp.volumes.discovery</key>
                <delay>1h</delay>
                <authtype>BASIC</authtype>
                <username>{$USERNAME}</username>
@@ -1703,7 +1707,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#VOLUMENAME}: Comment</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.comment[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.comment[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1725,13 +1729,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Available size</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.space_available[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.space_available[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1752,13 +1756,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Space size</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.space_size[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.space_size[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1779,13 +1783,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Used size</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.space_used[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.space_used[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1806,13 +1810,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: State</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.state[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.state[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1834,7 +1838,7 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1851,7 +1855,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS raw, other</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!iops</units>
@@ -1868,13 +1872,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS raw, read</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!iops</units>
@@ -1891,13 +1895,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS raw, total</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!iops</units>
@@ -1914,13 +1918,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS raw, write</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!iops</units>
@@ -1937,13 +1941,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS, other rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops.other.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops.other.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1965,13 +1969,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS, read rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops.read.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops.read.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -1993,13 +1997,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS, total rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops.total.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops.total.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2021,13 +2025,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume IOPS, write rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.iops.write.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.iops.write.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2049,13 +2053,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency raw, other</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency_raw.other[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!mcs</units>
@@ -2072,13 +2076,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency raw, read</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency_raw.read[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!mcs</units>
@@ -2095,13 +2099,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency raw, total</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency_raw.total[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!mcs</units>
@@ -2118,13 +2122,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency raw, write</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.latency_raw.write[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>!mcs</units>
@@ -2141,19 +2145,19 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency, other</name>
                      <type>CALCULATED</type>
-                     <key>netapp.aff.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency.other[{#VOLUMENAME}]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
-                     <params>(last(netapp.aff.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.other[{#VOLUMENAME}])) /
-( last(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) +
-(last(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.other[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <params>(last(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.other[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.other[{#VOLUMENAME}]) = 0) ) * 0.001</params>
                      <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for other I/O operations. Other I/O operations can be metadata operations, such as directory lookups and so on.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2164,13 +2168,13 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency, read</name>
                      <type>CALCULATED</type>
-                     <key>netapp.aff.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency.read[{#VOLUMENAME}]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
-                     <params>(last(netapp.aff.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.read[{#VOLUMENAME}])) /
-( last(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) +
-(last(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.read[{#VOLUMENAME}]) = 0)) * 0.001</params>
+                     <params>(last(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.read[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.read[{#VOLUMENAME}]) = 0)) * 0.001</params>
                      <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for read I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2181,13 +2185,13 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency, total</name>
                      <type>CALCULATED</type>
-                     <key>netapp.aff.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency.total[{#VOLUMENAME}]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
-                     <params>(last(netapp.aff.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.total[{#VOLUMENAME}])) /
-( last(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) +
-(last(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.total[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <params>(last(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.total[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.total[{#VOLUMENAME}]) = 0) ) * 0.001</params>
                      <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric aggregated over all types of I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2198,13 +2202,13 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume latency, write</name>
                      <type>CALCULATED</type>
-                     <key>netapp.aff.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.latency.write[{#VOLUMENAME}]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>!ms</units>
-                     <params>(last(netapp.aff.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.latency_raw.write[{#VOLUMENAME}])) /
-( last(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) +
-(last(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.aff.volume.statistics.iops_raw.write[{#VOLUMENAME}]) = 0) ) * 0.001</params>
+                     <params>(last(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.latency_raw.write[{#VOLUMENAME}])) /
+( last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) +
+(last(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) - prev(netapp.volume.statistics.iops_raw.write[{#VOLUMENAME}]) = 0) ) * 0.001</params>
                      <description>The average latency per I/O operation in milliseconds observed at the storage object. Performance metric for write I/O operations.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -2215,7 +2219,7 @@ return JSON.stringify(result);
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume throughput, other rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.throughput.other.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.throughput.other.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2237,13 +2241,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume throughput, read rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.throughput.read.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.throughput.read.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2265,13 +2269,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume throughput, total rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.throughput.total.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.throughput.total.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2293,13 +2297,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Volume throughput, write rate</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.statistics.throughput.write.rate[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.statistics.throughput.write.rate[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2321,13 +2325,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: SVM name</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.svm_name[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.svm_name[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -2349,13 +2353,13 @@ return JSON.stringify(result);
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>{#VOLUMENAME}: Type</name>
                      <type>DEPENDENT</type>
-                     <key>netapp.aff.volume.type[{#VOLUMENAME}]</key>
+                     <key>netapp.volume.type[{#VOLUMENAME}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -2380,7 +2384,7 @@ ls ‐ load-sharing dp volume.</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>netapp.aff.volumes.get</key>
+                        <key>netapp.volumes.get</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
@@ -2393,7 +2397,7 @@ ls ‐ load-sharing dp volume.</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template SAN NetApp AFF A700 by HTTP</host>
-                              <key>netapp.aff.volume.statistics.latency.other[{#VOLUMENAME}]</key>
+                              <key>netapp.volume.statistics.latency.other[{#VOLUMENAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2401,7 +2405,7 @@ ls ‐ load-sharing dp volume.</description>
                            <color>2774A4</color>
                            <item>
                               <host>Template SAN NetApp AFF A700 by HTTP</host>
-                              <key>netapp.aff.volume.statistics.latency.read[{#VOLUMENAME}]</key>
+                              <key>netapp.volume.statistics.latency.read[{#VOLUMENAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2409,7 +2413,7 @@ ls ‐ load-sharing dp volume.</description>
                            <color>F63100</color>
                            <item>
                               <host>Template SAN NetApp AFF A700 by HTTP</host>
-                              <key>netapp.aff.volume.statistics.latency.write[{#VOLUMENAME}]</key>
+                              <key>netapp.volume.statistics.latency.write[{#VOLUMENAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2417,7 +2421,7 @@ ls ‐ load-sharing dp volume.</description>
                            <color>A54F10</color>
                            <item>
                               <host>Template SAN NetApp AFF A700 by HTTP</host>
-                              <key>netapp.aff.volume.statistics.latency.total[{#VOLUMENAME}]</key>
+                              <key>netapp.volume.statistics.latency.total[{#VOLUMENAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2429,7 +2433,7 @@ ls ‐ load-sharing dp volume.</description>
                            <color>1A7C11</color>
                            <item>
                               <host>Template SAN NetApp AFF A700 by HTTP</host>
-                              <key>netapp.aff.volume.space_used[{#VOLUMENAME}]</key>
+                              <key>netapp.volume.space_used[{#VOLUMENAME}]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2437,7 +2441,7 @@ ls ‐ load-sharing dp volume.</description>
                            <color>2774A4</color>
                            <item>
                               <host>Template SAN NetApp AFF A700 by HTTP</host>
-                              <key>netapp.aff.volume.space_available[{#VOLUMENAME}]</key>
+                              <key>netapp.volume.space_available[{#VOLUMENAME}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2487,7 +2491,7 @@ return JSON.stringify(result);
                <color>1A7C11</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.iops.other.rate</key>
+                  <key>netapp.cluster.statistics.iops.other.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2495,7 +2499,7 @@ return JSON.stringify(result);
                <color>2774A4</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.iops.read.rate</key>
+                  <key>netapp.cluster.statistics.iops.read.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2503,7 +2507,7 @@ return JSON.stringify(result);
                <color>F63100</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.iops.write.rate</key>
+                  <key>netapp.cluster.statistics.iops.write.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2511,7 +2515,7 @@ return JSON.stringify(result);
                <color>A54F10</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.iops.total.rate</key>
+                  <key>netapp.cluster.statistics.iops.total.rate</key>
                </item>
             </graph_item>
          </graph_items>
@@ -2523,7 +2527,7 @@ return JSON.stringify(result);
                <color>1A7C11</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.latency.other</key>
+                  <key>netapp.cluster.statistics.latency.other</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2531,7 +2535,7 @@ return JSON.stringify(result);
                <color>2774A4</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.latency.read</key>
+                  <key>netapp.cluster.statistics.latency.read</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2539,7 +2543,7 @@ return JSON.stringify(result);
                <color>F63100</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.latency.write</key>
+                  <key>netapp.cluster.statistics.latency.write</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2547,7 +2551,7 @@ return JSON.stringify(result);
                <color>A54F10</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.latency.total</key>
+                  <key>netapp.cluster.statistics.latency.total</key>
                </item>
             </graph_item>
          </graph_items>
@@ -2559,7 +2563,7 @@ return JSON.stringify(result);
                <color>1A7C11</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.throughput.other.rate</key>
+                  <key>netapp.cluster.statistics.throughput.other.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2567,7 +2571,7 @@ return JSON.stringify(result);
                <color>2774A4</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.throughput.read.rate</key>
+                  <key>netapp.cluster.statistics.throughput.read.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2575,7 +2579,7 @@ return JSON.stringify(result);
                <color>F63100</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.throughput.write.rate</key>
+                  <key>netapp.cluster.statistics.throughput.write.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2583,7 +2587,7 @@ return JSON.stringify(result);
                <color>A54F10</color>
                <item>
                   <host>Template SAN NetApp AFF A700 by HTTP</host>
-                  <key>netapp.aff.cluster.statistics.throughput.total.rate</key>
+                  <key>netapp.cluster.statistics.throughput.total.rate</key>
                </item>
             </graph_item>
          </graph_items>
