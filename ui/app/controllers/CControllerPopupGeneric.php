@@ -1491,6 +1491,7 @@ class CControllerPopupGeneric extends CController {
 				$disable_names = $this->getInput('disable_names', []);
 
 				foreach ($db_valuemaps as $db_valuemap) {
+					order_result($db_valuemap['mappings'], 'value');
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
 						'name' => $db_valuemap['name'],

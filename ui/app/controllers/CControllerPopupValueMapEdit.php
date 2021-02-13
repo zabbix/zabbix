@@ -124,6 +124,7 @@ class CControllerPopupValueMapEdit extends CController {
 	protected function update(): CControllerResponse {
 		$data = [];
 		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit', 'name_readonly']);
+		order_result($data['mappings'], 'value');
 		$data['mappings'] = array_values($data['mappings']);
 
 		return (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();

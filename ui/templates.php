@@ -522,7 +522,14 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
-			CArrayHelper::sort($data['dbTemplate']['valuemaps'], ['name']);
+			order_result($data['dbTemplate']['valuemaps'], 'name');
+
+			foreach ($data['dbTemplate']['valuemaps'] as &$valuemap) {
+				order_result($valuemap['mappings'], 'value');
+				$valuemap['mappings'] = array_values($valuemap['mappings']);
+			}
+			unset($valuemap);
+
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}
 	}
