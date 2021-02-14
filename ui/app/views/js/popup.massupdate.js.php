@@ -399,13 +399,13 @@ function submitPopup(overlay) {
 	const form = document.querySelector('#massupdate-form');
 	const action = form.querySelector('#action').value;
 	const location_url = form.querySelector('#location_url').value;
-	let valuemaps_removeall_warning = (form.querySelector('#visible_valuemaps:checked')
-		&& form.querySelector('[name="valuemap_massupdate"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
-		&& (form.querySelector('#valuemap_remove_all').checked === false)
-	);
 	let macros_removeall_warning = (form.querySelector('#visible_macros:checked')
 		&& form.querySelector('[name="mass_update_macros"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
 		&& (form.querySelector('#macros_remove_all').checked === false)
+	);
+	let valuemaps_removeall_warning = (form.querySelector('#visible_valuemaps:checked')
+		&& form.querySelector('[name="valuemap_massupdate"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
+		&& (form.querySelector('#valuemap_remove_all').checked === false)
 	);
 	let warning_message = '';
 
