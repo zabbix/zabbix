@@ -1517,12 +1517,11 @@ function formatHistoryValue($value, array $item, $trim = true) {
 			'units' => $item['units']
 		]);
 	}
-	elseif (!in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG])) {
-		$value = _('Unknown value type');
-	}
-
-	if ($item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+	elseif ($item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
 		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip;' : $value;
+	}
+	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR) {
+		$value = _('Unknown value type');
 	}
 
 	return CValueMapHelper::applyValueMap($value, $item['valuemap']);
