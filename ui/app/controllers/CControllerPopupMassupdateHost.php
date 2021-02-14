@@ -90,7 +90,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function checkPermissions() {
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => $this->getInput('ids', []),
+			'hostids' => $this->getInput('ids'),
 			'editable' => true
 		]);
 

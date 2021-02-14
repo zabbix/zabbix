@@ -32,24 +32,21 @@ abstract class CControllerPopupMassupdateAbstract extends CController {
 			'hostids' => $hostids,
 			'preservekeys' => true
 		]);
+		$action = $this->getInput('valuemap_massupdate');
 		$ins_valuemaps = [];
-		$upd_valuemaps  = [];
-		$del_valuemapids  = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = [];
 
-		switch ($this->getInput('valuemap_massupdate')) {
+		switch ($action) {
 			case ZBX_ACTION_ADD:
 			case ZBX_ACTION_REPLACE:
-				$valuemaps = $this->getInput('valuemaps', []);
+				$valuemaps = array_column($this->getInput('valuemaps', []), null, 'name');
 
 				if (!$valuemaps) {
 					break;
 				}
 
-				$action = $this->getInput('valuemap_massupdate');
-				$valuemaps = array_column($valuemaps, null, 'name');
-
-				if (($this->hasInput('valuemap_update_existing') && $action == ZBX_ACTION_ADD)
-						|| $action == ZBX_ACTION_REPLACE) {
+				if ($action == ZBX_ACTION_REPLACE || $this->hasInput('valuemap_update_existing')) {
 					foreach ($db_valuemaps as $db_valuemap) {
 						if (!array_key_exists($db_valuemap['name'], $valuemaps)) {
 							continue;
@@ -62,8 +59,7 @@ abstract class CControllerPopupMassupdateAbstract extends CController {
 					}
 				}
 
-				if (($this->hasInput('valuemap_add_missing') && $action == ZBX_ACTION_REPLACE)
-						|| $action == ZBX_ACTION_ADD) {
+				if ($action == ZBX_ACTION_ADD || $this->hasInput('valuemap_add_missing')) {
 					$host_valuemaps = [];
 
 					foreach ($db_valuemaps as $db_valuemap) {
