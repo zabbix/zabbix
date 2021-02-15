@@ -29,9 +29,12 @@
 			->addStyle('width: 100%;'),
 		(new CTextBox('valuemap_rename[#{rowNum}][to]', '', false, DB::getFieldLength('valuemap', 'name')))
 			->addStyle('width: 100%;'),
-		(new CButton(null, _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
+		(new CCol(
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove'))
+		)
+			->addClass(ZBX_STYLE_TOP)
 	]))->addClass('form_row')
 ); ?>
 

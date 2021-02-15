@@ -40,23 +40,17 @@ $add_missing = (new CDiv(
 $rename_container = (new CTable())
 	->setId('valuemap-rename-table')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setColumns([
-		(new CTableColumn(_('From')))
-			->addStyle('width: 250px;')
-			->addClass('table-col-handle'),
-		(new CTableColumn(_('To')))
-			->addStyle('width: 250px;')
-			->addClass('table-col-handle'),
-		(new CTableColumn(_('Action')))
-			->addClass('table-col-handle')
+	->addStyle('width:100%;')
+	->setHeader([
+		_('From'),
+		_('To'),
+		_('Action')
 	])
-	->addItem([
-		new CCol([
-			(new CButton(null, _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-		])
-	]);
+	->setFooter(new CCol(
+		(new CButton('null', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	));
 
 $remove_container = (new CDiv())->addClass('valuemap-remove');
 

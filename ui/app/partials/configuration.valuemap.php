@@ -27,10 +27,10 @@ $table = (new CTable())
 	->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE)
 	->setColumns([
 		(new CTableColumn(_('Name')))
-			->addStyle('width: 250px;')
+			->addStyle('width: '.ZBX_TEXTAREA_MAPING_VALUE_WIDTH.'px;')
 			->addClass('table-col-handle'),
 		(new CTableColumn(_('Value')))
-			->addStyle('width: 250px;')
+			->addStyle('width: '.ZBX_TEXTAREA_MAPING_NEWVALUE_WIDTH.'px;')
 			->addClass('table-col-handle'),
 		(new CTableColumn(_('Action')))
 			->addClass('table-col-handle')
