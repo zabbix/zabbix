@@ -39,6 +39,7 @@ $add_missing = (new CDiv(
 
 $rename_container = (new CTable())
 	->setId('valuemap-rename-table')
+	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setColumns([
 		(new CTableColumn(_('From')))
 			->addStyle('width: 250px;')
