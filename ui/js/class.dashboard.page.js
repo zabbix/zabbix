@@ -127,7 +127,7 @@ class CDashboardPage {
 	deactivate(excluded_widgetids) {
 		this._is_active = false;
 
-		this._registerEvents();
+		this._unregisterEvents();
 
 		for (const w of this._widgets) {
 			if (!excluded_widgetids.contains(w.widgetid)) {
