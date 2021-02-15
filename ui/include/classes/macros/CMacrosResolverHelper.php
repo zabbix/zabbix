@@ -576,7 +576,7 @@ class CMacrosResolverHelper {
 		return self::$macrosResolver->resolveItemDescriptions($items);
 	}
 
-		/**
+	/**
 	 * Resolves function items value maps, valuemap property will be added to every function item.
 	 *
 	 * @param array $functions                  Array of functions items.
@@ -597,7 +597,7 @@ class CMacrosResolverHelper {
 			return $functions;
 		}
 
-		// Only "item.get" API can return mappings for templated items from inaccessible host or template.
+		// Only "item.get" API can return mappings for templated items from inaccessible template.
 		$db_valuemaps = API::Item()->get([
 			'output' => [],
 			'selectValueMap' => ['valuemapid', 'mappings'],
