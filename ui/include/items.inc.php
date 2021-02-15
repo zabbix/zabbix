@@ -1174,7 +1174,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 
 	if ($application !== '') {
 		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
 			'selectHosts' => ['name'],
 			'selectValueMap' => ['mappings'],
 			'applicationids' => $applicationids,
@@ -1185,7 +1185,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 	}
 	else {
 		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
 			'selectHosts' => ['name'],
 			'selectValueMap' => ['mappings'],
 			'hostids' => $hostids,
@@ -1242,7 +1242,6 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 			'itemid' => $db_item['itemid'],
 			'value_type' => $db_item['value_type'],
 			'units' => $db_item['units'],
-			'valuemapid' => $db_item['valuemapid'],
 			'valuemap' => $db_item['valuemap'],
 			'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
 		];
@@ -1502,9 +1501,9 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
  *
  * @param mixed     $value
  * @param array     $item
- * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param string    $item['units']          units of item
- * @param int       $item['valuemapid']     id of mapping set of values
+ * @param int       $item['value_type']  type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param string    $item['units']       units of item
+ * @param array     $item['valuemap']
  * @param bool      $trim
  *
  * @return string
