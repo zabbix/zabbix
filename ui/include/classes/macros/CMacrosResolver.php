@@ -1913,15 +1913,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$itemHost = $expressionData->expressions[0]['host'];
 				$key = $expressionData->expressions[0]['item'];
 				$function = $expressionData->expressions[0]['functionName'];
-
-				$item = API::Item()->get([
-					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock'],
+				$options = [
+					'output' => ['itemid', 'value_type', 'units', 'lastvalue', 'lastclock'],
 					'webitems' => true,
 					'filter' => [
 						'host' => $itemHost,
 						'key_' => $key
 					]
-				]);
+				];
+
+				if ($function === 'last') {
+					$options['selectValueMap'] = ['mappings'];
+				}
+
+				$item = API::Item()->get($options);
 
 				$item = reset($item);
 
