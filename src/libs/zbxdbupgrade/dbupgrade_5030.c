@@ -1100,28 +1100,27 @@ static int	DBpatch_5030059(void)
 		zbx_vector_patch_filtertag_create(&tags);
 		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-		if (SUCCEED != (ret = zbx_json_open(row[1], &jp)) ||
-				SUCCEED != (ret = DBpatch_parse_applications_json(&jp, &json, &tags, &app, 0)))
+		if (SUCCEED == (ret = zbx_json_open(row[1], &jp)) &&
+				SUCCEED == (ret = DBpatch_parse_applications_json(&jp, &json, &tags, &app, 0)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to parse web.monitoring.problem.properties JSON");
+			ZBX_DBROW2UINT64(profileid, row[0]);
+			value_str = DBdyn_escape_string(json.buffer);
+
+			if (ZBX_DB_OK > DBexecute("update profiles set value_str='%s' where profileid=" ZBX_FS_UI64,
+					value_str, profileid))
+			{
+				ret = FAIL;
+			}
+
+			zbx_free(value_str);
 		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "failed to parse web.monitoring.problem.properties JSON");
 
 		zbx_vector_patch_filtertag_clear_ext(&tags, patch_filtertag_free);
 		zbx_vector_patch_filtertag_destroy(&tags);
 		zbx_free(app);
-
-		value_str = DBdyn_escape_string(json.buffer);
 		zbx_json_free(&json);
-
-		ZBX_DBROW2UINT64(profileid, row[0]);
-
-		if (ZBX_DB_OK > DBexecute("update profiles set value_str='%s' where profileid=" ZBX_FS_UI64,
-				value_str, profileid))
-		{
-			ret = FAIL;
-		}
-
-		zbx_free(value_str);
 	}
 	DBfree_result(result);
 
