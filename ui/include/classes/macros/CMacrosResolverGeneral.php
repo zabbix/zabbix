@@ -764,6 +764,7 @@ class CMacrosResolverGeneral {
 		));
 
 		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+		$functions = CMacrosResolverHelper::resolveItemsValueMaps($functions);
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
@@ -903,6 +904,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+		$functions = CMacrosResolverHelper::resolveItemsValueMaps($functions);
 
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
