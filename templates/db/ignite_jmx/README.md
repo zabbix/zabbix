@@ -19,7 +19,7 @@ This template was tested on:
 
 This template works with standalone and cluster instances. Metrics are collected by JMX. All metrics are discoverable.
 
-1. Enable and configure JMX access to Apache Ignite. See documentation for [instructions](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html). Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name. You can configure Cache and Data Region metrics which you want using [officcial guide](https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics).
+1. Enable and configure JMX access to Apache Ignite. See documentation for [instructions](https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html). Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name. You can configure Cache and Data Region metrics which you want using [officcial guide](https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics).
 2. Set the user name and password in host macros {$IGNITE.USER} and {$IGNITE.PASSWORD}.
 
 ## Zabbix configuration
@@ -56,7 +56,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Ingite kernal metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Ignite kernal metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Cluster metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |Local node metrics |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
 |TCP discovery SPI |<p>-</p> |JMX |jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
@@ -164,7 +164,7 @@ There are no template links in this template.
 |Data region {#JMXNAME}: Pages replace rate more than 0 |<p>There is more data than DataRegionMaxSize. Сluster started to replace pages in memory. Page replacement can slow down operations.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",PagesReplaceRate].min(5m)}>0` |WARNING | |
 |Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.WARN} in 5m) |<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m)</p> |
 |Data region {#JMXNAME}: Checkpoint buffer utilization is too high (over {$IGNITE.CHECKPOINT.PUSED.MAX.HIGH} in 5m) |<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100>{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}` |HIGH | |
-|Cache group [{#JMXNAME}]: One or more backups are unavaliable |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}` |WARNING | |
+|Cache group [{#JMXNAME}]: One or more backups are unavailable |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",Backups].min(5m)}>={Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}` |WARNING | |
 |Cache group [{#JMXNAME}]: List of caches has changed |<p>List of caches has changed. Significant changes have occurred in the cluster. Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",Caches].diff()}=1 and {TEMPLATE_NAME:jmx["{#JMXOBJ}",Caches].strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Cache group [{#JMXNAME}]: Rebalance in progress |<p>Ack to close.</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount].max(30m)}>0` |INFO |<p>Manual close: YES</p> |
 |Cache group [{#JMXNAME}]: There is no copy for partitions |<p>-</p> |`{TEMPLATE_NAME:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(30m)}=0` |WARNING | |
