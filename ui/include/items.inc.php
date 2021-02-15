@@ -634,7 +634,6 @@ function copyItems($srcHostId, $dstHostId) {
 			'hostids' => $dstHostId,
 			'filter' => ['name' => array_keys($src_valuemaps)]
 		]), 'valuemapid', 'name');
-		$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
 	}
 
 	$create_order = [];
