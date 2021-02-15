@@ -466,6 +466,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		$dst_valuemaps = API::ValueMap()->get([
 			'output' => ['name', 'hostid'],
 			'hostids' => $dst_hostids,
+			'filter' => ['name' => array_column($src_valuemaps, 'name')],
 			'preservekeys' => true
 		]);
 
