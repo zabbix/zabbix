@@ -1963,8 +1963,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.29rc1
 
-New features:
-
 Bug fixes:
 A......... [ZBX-18966] fixed interface related errors when changing proxy type from passive to active (Ivo)
 ...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
