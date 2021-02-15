@@ -619,20 +619,20 @@ function copyItems($srcHostId, $dstHostId) {
 		'templated_hosts' => true
 	]);
 	$dstHost = reset($dstHosts);
-	$src_valuemaps = [];
+	$src_valuemap_names = [];
 	$valuemap_map = [];
 
 	foreach ($srcItems as $src_item) {
 		if ($src_item['valuemap'] && $src_item['templateid'] == 0) {
-			$src_valuemaps[$src_item['valuemap']['name']] = 1;
+			$src_valuemap_names[] = $src_item['valuemap']['name'];
 		}
 	}
 
-	if ($src_valuemaps) {
+	if ($src_valuemap_names) {
 		$valuemap_map = array_column(API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'hostids' => $dstHostId,
-			'filter' => ['name' => array_keys($src_valuemaps)]
+			'filter' => ['name' => $src_valuemap_names]
 		]), 'valuemapid', 'name');
 	}
 

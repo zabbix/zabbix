@@ -2209,20 +2209,20 @@ class CDiscoveryRule extends CItemGeneral {
 		$new_itemids = [];
 		$itemkey_to_id = [];
 		$create_items = [];
-		$src_valuemaps = [];
+		$src_valuemap_names = [];
 		$valuemap_map = [];
 
 		foreach ($item_prototypes as $item_prototype) {
 			if ($item_prototype['valuemap']) {
-				$src_valuemaps[$item_prototype['valuemap']['name']] = 1;
+				$src_valuemap_names[] = $item_prototype['valuemap']['name'];
 			}
 		}
 
-		if ($src_valuemaps) {
+		if ($src_valuemap_names) {
 			$valuemap_map = array_column(API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'hostids' => $dstHost['hostid'],
-				'filter' => ['name' => array_keys($src_valuemaps)]
+				'filter' => ['name' => $src_valuemap_names]
 			]), 'valuemapid', 'name');
 		}
 
