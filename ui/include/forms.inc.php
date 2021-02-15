@@ -894,13 +894,14 @@ function prepareScriptItemFormData(array $item): array {
  *
  * @param array  $item                          Item, item prototype, LLD rule or LLD item to take the data from.
  * @param array  $options
- * @param bool   $options['is_discovery_rule']
+ * @param bool   $options['form']               (mandatory)
+ * @param bool   $options['is_discovery_rule']  (optional)
  *
  * @return array
  */
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
-		'form' => array_key_exists('form', $options) ? $options['form'] : getRequest('form'),
+		'form' => $options['form'],
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
@@ -1298,19 +1299,13 @@ function getItemFormData(array $item = [], array $options = []) {
 			$cloned_item = reset($cloned_item);
 
 			if ($cloned_item['templateid'] != 0) {
-				$host_valuemap = API::ValueMap()->get([
+				$host_valuemaps = API::ValueMap()->get([
 					'output' => ['valuemapid'],
 					'hostids' => $data['hostid'],
 					'filter' => ['name' => $cloned_item['valuemap']['name']]
 				]);
 
-				if ($host_valuemap) {
-					$host_valuemap = reset($host_valuemap);
-					$data['valuemapid'] = $host_valuemap['valuemapid'];
-				}
-				else {
-					$data['valuemapid'] = 0;
-				}
+				$data['valuemapid'] = $host_valuemaps ? $host_valuemaps[0]['valuemapid'] : 0;
 			}
 		}
 

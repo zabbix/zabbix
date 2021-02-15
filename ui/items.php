@@ -1162,7 +1162,7 @@ if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
 /*
  * Display
  */
-if ((getRequest('form') === 'create' || getRequest('form') === 'update')
+if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		|| (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$master_item_options = [];
 	$has_errors = false;
