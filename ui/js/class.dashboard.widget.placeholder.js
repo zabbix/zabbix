@@ -150,16 +150,14 @@ class CDashboardWidgetPlaceholder {
 	/**
 	 * Show new widget placeholder at given position.
 	 *
-	 * @param {object} pos  Object with position and dimension.
-	 *
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
-	showAtPosition(pos) {
+	showAtPosition({left, top, width, height}) {
 		this._placeholder.style.position = 'absolute';
-		this._placeholder.style.left = `${pos.x * this._cell_width}%`;
-		this._placeholder.style.top = `${pos.y * this._cell_height}px`;
-		this._placeholder.style.width = `${pos.width * this._cell_width}%`;
-		this._placeholder.style.height = `${pos.height * this._cell_height}px`;
+		this._placeholder.style.left = `${x * this._cell_width}%`;
+		this._placeholder.style.top = `${y * this._cell_height}px`;
+		this._placeholder.style.width = `${width * this._cell_width}%`;
+		this._placeholder.style.height = `${height * this._cell_height}px`;
 		this._placeholder.classList.remove(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);
 
 		this.resize();

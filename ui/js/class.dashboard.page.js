@@ -54,6 +54,8 @@ class CDashboardPage {
 
 		this._widgets = [];
 
+		this._is_active = false;
+
 		const add_new_widget_callback = (e) => {
 			if (!this.isEditMode()) {
 				this.editDashboard();
@@ -94,24 +96,8 @@ class CDashboardPage {
 			this._editDashboard();
 		}
 
-		$(window).on('resize', () => {
-			clearTimeout(resize_timeout);
-			resize_timeout = setTimeout(() => {
-				for (const w of this._widgets) {
-					this._resizeWidget(w);
-				}
-			}, 200);
-
-			// Recalculate dashboard container minimal required height.
-			this._data.minimal_height = this._calculateGridMinHeight();
-			this._data.cell_width = this._getCurrentCellWidth();
-			this._data.new_widget_placeholder.resize();
-			this._resizeDashboardGrid();
-		});
-
-		['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach((action) => {
-			this.addAction(action, this._hideMessageExhausted);
-		});
+		// TODO if activation is from CDashboard
+		this.activate();
 	}
 
 	getDashboardData() {
@@ -124,6 +110,64 @@ class CDashboardPage {
 
 	getOptions() {
 		return this._options;
+	}
+
+	activate(excluded_widgetids) {
+		this._is_active = true;
+
+		this._registerEvents();
+
+		for (const w of this._widgets) {
+			if (!excluded_widgetids.contains(w.widgetid)) {
+				w.activate();
+			}
+		}
+	}
+
+	deactivate(excluded_widgetids) {
+		this._is_active = false;
+
+		this._registerEvents();
+
+		for (const w of this._widgets) {
+			if (!excluded_widgetids.contains(w.widgetid)) {
+				w.deactivate();
+			}
+		}
+	}
+
+	_registerEvents() {
+		this._events = {
+			resize: () => {
+				clearTimeout(this._events_resize_timeout);
+				this._events_resize_timeout = setTimeout(() => {
+					for (const w of this._widgets) {
+						this._resizeWidget(w);
+					}
+				}, 200);
+
+				// Recalculate dashboard container minimal required height.
+				this._data.minimal_height = this._calculateGridMinHeight();
+				this._data.cell_width = this._getCurrentCellWidth();
+				this._data.new_widget_placeholder.resize();
+				this._resizeDashboardGrid();
+			}
+		}
+
+		for (const action of ['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition']) {
+			this.addAction(action, this._hideMessageExhausted);
+		}
+
+		$(window).on('resize', this._events.resize);
+	}
+
+	_unregisterEvents() {
+		for (const action of ['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition']) {
+			this.removeAction(action, this._hideMessageExhausted);
+		}
+
+		$(window).off('resize', this._events.resize);
+		clearTimeout(this._events_resize_timeout);
 	}
 
 	/**
@@ -181,8 +225,8 @@ class CDashboardPage {
 			uniqueid: this._generateUniqueId(),
 			index: this._widgets.length,
 			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null,
-			min_width: this._options['widget-width'],
-			min_height: this._options['widget-height'],
+			cell_width: this._options['widget-width'],
+			cell_height: this._options['widget-height'],
 			is_editable: this._options['editable'] && !this._options['kioskmode'],
 			defaults: this._data.widget_defaults[widget.type]
 		});
@@ -795,6 +839,18 @@ class CDashboardPage {
 				'uniqueid': uniqueid,
 				'options': options
 			});
+		}
+	}
+
+	removeAction(hook_name, function_to_call) {
+		if (typeof this._data.triggers[hook_name] === 'undefined') {
+			return;
+		}
+
+		for (const i in this._data.triggers[hook_name]) {
+			if (this._data.triggers[hook_name][i].function === function_to_call) {
+				delete this._data.triggers[hook_name][i];
+			}
 		}
 	}
 

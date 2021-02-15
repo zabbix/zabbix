@@ -58,6 +58,8 @@ class CDashboardWidget extends CBaseComponent {
 			'initial_load': true,
 			'ready': false,
 			'storage': {},
+			cell_width: 0,
+			cell_height: 0,
 			iterator: false,
 			is_editable: false,
 			'parent': false,
@@ -91,9 +93,19 @@ class CDashboardWidget extends CBaseComponent {
 			this[key] = widget[key];
 		}
 
+		this._is_active = false;
+
 		this._makeWidgetDiv();
 
 		this.registerEvents();
+	}
+
+	activate() {
+		this._is_active = true;
+	}
+
+	deactivate() {
+		this._is_active = false;
 	}
 
 	showPreloader() {
@@ -261,8 +273,8 @@ class CDashboardWidget extends CBaseComponent {
 
 		if (!this.parent) {
 			this.div.css({
-				'min-height': `${this.min_height}px`,
-				'min-width': `${this.min_width}%`
+				'min-height': `${this.cell_height}px`,
+				'min-width': `${this.cell_width}%`
 			});
 		}
 
