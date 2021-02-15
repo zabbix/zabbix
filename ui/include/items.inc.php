@@ -463,16 +463,16 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'valuemapids' => $src_valuemapids,
 			'preservekeys' => true
 		]);
-		$dest_valuemaps = API::ValueMap()->get([
+		$dst_valuemaps = API::ValueMap()->get([
 			'output' => ['name', 'hostid'],
 			'hostids' => $dst_hostids,
 			'preservekeys' => true
 		]);
 
 		foreach ($src_valuemaps as $src_valuemapid => $src_valuemap) {
-			foreach ($dest_valuemaps as $dest_valuemapid => $dest_valuemap) {
-				if ($dest_valuemap['name'] === $src_valuemap['name']) {
-					$valuemapids_map[$src_valuemapid][$dest_valuemap['hostid']] = $dest_valuemapid;
+			foreach ($dst_valuemaps as $dst_valuemapid => $dst_valuemap) {
+				if ($dst_valuemap['name'] === $src_valuemap['name']) {
+					$valuemapids_map[$src_valuemapid][$dst_valuemap['hostid']] = $dst_valuemapid;
 				}
 			}
 		}
