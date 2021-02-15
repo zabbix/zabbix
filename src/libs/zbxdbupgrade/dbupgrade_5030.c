@@ -1134,7 +1134,7 @@ static int	DBpatch_5030060(void)
 	DB_RESULT		result;
 	zbx_db_insert_t		db_insert;
 	zbx_vector_uint64_t	widget_fieldids;
-	int			ret = SUCCEED;
+	int			ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
