@@ -719,11 +719,12 @@ class CControllerPopupTriggerExpr extends CController {
 						$quoted_params[] = quoteFunctionParam($param);
 					}
 
-					$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
+					$fn_params = rtrim(implode(',', $quoted_params), ',');
+					$data['expression'] = sprintf('%s(/%s/%s%s)%s%s',
+						$function,
 						$item_host_data['host'],
 						$data['item_key'],
-						$function,
-						rtrim(implode(',', $quoted_params), ','),
+						($fn_params === '') ? '' : ','.$fn_params,
 						$operator,
 						CTriggerExpression::quoteString($data['value'])
 					);
@@ -737,7 +738,7 @@ class CControllerPopupTriggerExpr extends CController {
 						// Validate trigger function.
 						$trigger_function_validator = new CFunctionValidator();
 						$is_valid = $trigger_function_validator->validate([
-							'function' => $expression_data['function'],
+							'function' => $expression_data['expression'],
 							'functionName' => $expression_data['functionName'],
 							'functionParamList' => $expression_data['functionParamList'],
 							'valueType' => $data['itemValueType']
