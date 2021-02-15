@@ -577,24 +577,23 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolves function items value maps, valuemap property will be added to every function item.
+	 * Resolves items value maps, valuemap property will be added to every item.
 	 *
-	 * @param array $functions                  Array of functions items.
-	 * @param int   $functions[]['valuemapid']  Function item valuemapid.
-	 * @param int   $functions[]['itemid]       Function item itemid.
+	 * @param array $items                  Array of items.
+	 * @param int   $items[]['valuemapid']  Item valuemapid.
+	 * @param int   $items[]['itemid]       Item itemid.
 	 * @return array
 	 */
-	public static function resolveItemsValueMaps(array $functions): array {
-		$itemid_valuemapid = array_column($functions, 'valuemapid', 'itemid');
-		$itemid_valuemapid = array_filter($itemid_valuemapid);
+	public static function resolveItemsValueMaps(array $items): array {
+		$itemid_valuemapid = array_filter(array_column($items, 'valuemapid', 'itemid'));
 
-		foreach ($functions as &$function) {
-			$function['valuemap'] = [];
+		foreach ($items as &$item) {
+			$item['valuemap'] = [];
 		}
-		unset($function);
+		unset($item);
 
 		if (!$itemid_valuemapid) {
-			return $functions;
+			return $items;
 		}
 
 		// Only "item.get" API can return mappings for templated items from inaccessible template.
@@ -609,14 +608,14 @@ class CMacrosResolverHelper {
 			$valuemaps[$db_valuemap['valuemap']['valuemapid']] = $db_valuemap['valuemap'];
 		}
 
-		foreach ($functions as &$function) {
-			if (array_key_exists($function['valuemapid'], $valuemaps)) {
-				$function['valuemap'] = $valuemaps[$function['valuemapid']];
+		foreach ($items as &$item) {
+			if (array_key_exists($item['valuemapid'], $valuemaps)) {
+				$item['valuemap'] = $valuemaps[$item['valuemapid']];
 			}
 		}
-		unset($function);
+		unset($item);
 
-		return $functions;
+		return $items;
 	}
 
 	/**
