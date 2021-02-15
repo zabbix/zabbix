@@ -176,7 +176,7 @@ class testLanguage extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
-		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.zbx_dbstr('user-zabbix')));
+		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.zbx_dbstr('user-zabbix')));
 
 
 		// After logout, login menu has system language.
