@@ -28,7 +28,11 @@ $form = (new CForm())
 	->setName('valuemap-edit-form')
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
-	->addVar('source-name', $data['name']);
+	->addVar('source-name', $data['name'])
+	->addItem((new CInput('submit', 'submit'))
+		->addStyle('display: none;')
+		->removeId()
+	);
 
 if ($data['valuemapid']) {
 	$form->addVar('valuemapid', $data['valuemapid']);
