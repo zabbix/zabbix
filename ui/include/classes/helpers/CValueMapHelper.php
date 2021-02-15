@@ -62,8 +62,8 @@ class CValueMapHelper {
 	 * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
 	 *
 	 * @param string $value                 Value that mapping should be applied to.
-	 * @param array  $valuemap              Valuemaps
-	 * @param array  $valuemap['mappings']  Valuemap mappings
+	 * @param array  $valuemap              Valuemaps.
+	 * @param array  $valuemap['mappings']  (optional) Valuemap mappings.
 	 *
 	 * @return string
 	 */
