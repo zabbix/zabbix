@@ -15,6 +15,7 @@ New features:
 ..F.....S. [ZBXNEXT-6399] added support of host and item macros for Script item parameters (viktors, vmaksimovs)
 
 Bug fixes:
+...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
 .........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
 ...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
 .........T [ZBX-18963] fixed preprocessing for archivelog items in Oracle Templates (ychukina)
