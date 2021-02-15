@@ -2219,12 +2219,11 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($src_valuemaps) {
-			$valuemap_map = API::ValueMap()->get([
+			$valuemap_map = array_column(API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'hostids' => $dstHost['hostid'],
 				'filter' => ['name' => array_keys($src_valuemaps)]
-			]);
-			$valuemap_map = array_column($valuemap_map, 'valuemapid', 'name');
+			]), 'valuemapid', 'name');
 		}
 
 		if ($item_prototypes) {
