@@ -21,6 +21,8 @@
 #include "log.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "zbxjson.h"
+#include "../zbxalgo/vectorimpl.h"
 
 /*
  * 5.4 development database patches
@@ -577,7 +579,7 @@ static int	DBpatch_5030049(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	itemid, itemtagid = 1;
-	int		ret = SUCCEED;
+	int		ret;
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
@@ -610,7 +612,7 @@ static int	DBpatch_5030050(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	itemid;
-	int		ret = SUCCEED;
+	int		ret;
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
@@ -645,7 +647,7 @@ static int	DBpatch_5030051(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	httptestid, httptesttagid = 1;
-	int		ret = SUCCEED;
+	int		ret;
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
@@ -677,7 +679,7 @@ static int	DBpatch_5030052(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	selementid, selementtagid = 1;
-	int		ret = SUCCEED;
+	int		ret;
 	char		*value;
 	zbx_db_insert_t	db_insert;
 
@@ -709,7 +711,7 @@ static int	DBpatch_5030053(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_db_insert_t	db_insert;
-	int		ret = SUCCEED;
+	int		ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -763,7 +765,7 @@ static int	DBpatch_5030054(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_db_insert_t	db_insert;
-	int		ret = SUCCEED;
+	int		ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -815,7 +817,7 @@ static int	DBpatch_5030055(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_db_insert_t	db_insert;
-	int		ret = SUCCEED;
+	int		ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -900,52 +902,345 @@ static int	DBpatch_5030058(void)
 	return SUCCEED;
 }
 
+typedef struct
+{
+	char	*tag;
+	char	*op;
+	char	*value;
+}
+patch_filtertag_t;
+
+ZBX_PTR_VECTOR_DECL(patch_filtertag, patch_filtertag_t);
+ZBX_PTR_VECTOR_IMPL(patch_filtertag, patch_filtertag_t);
+
+static void	patch_filtertag_free(patch_filtertag_t tag)
+{
+	zbx_free(tag.tag);
+	zbx_free(tag.op);
+	zbx_free(tag.value);
+}
+
+static int	DBpatch_parse_tags_json(struct zbx_json_parse *jp, zbx_vector_patch_filtertag_t *tags)
+{
+	const char		*p = NULL;
+	struct zbx_json_parse	jp_data;
+	patch_filtertag_t	tag;
+	size_t			tag_alloc, op_alloc, val_alloc;
+
+	while (NULL != (p = zbx_json_next(jp, p)))
+	{
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_data))
+			return FAIL;
+
+		tag.tag = NULL;
+		tag.op = NULL;
+		tag.value = NULL;
+
+		tag_alloc = 0;
+		op_alloc = 0;
+		val_alloc = 0;
+
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "tag", &tag.tag, &tag_alloc, NULL) ||
+				SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "operator", &tag.op, &op_alloc, NULL) ||
+				SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "value", &tag.value, &val_alloc, NULL))
+		{
+			patch_filtertag_free(tag);
+			return FAIL;
+		}
+
+		zbx_vector_patch_filtertag_append(tags, tag);
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_parse_applications_json(struct zbx_json_parse *jp, struct zbx_json *json_dest,
+		zbx_vector_patch_filtertag_t *tags, char **app, int depth)
+{
+	struct zbx_json_parse	jp_sub;
+	const char		*p = NULL, *prev = NULL;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN];
+	zbx_json_type_t		type;
+
+	do
+	{
+		if (NULL != (p = zbx_json_pair_next(jp, p, name, sizeof(name))))
+		{
+			if (NULL == zbx_json_decodevalue(p, value, sizeof(value), NULL))
+			{
+				type = zbx_json_valuetype(p);
+
+				if (type == ZBX_JSON_TYPE_ARRAY)
+				{
+					if (0 == depth && 0 == strcmp(name, "tags"))
+					{
+						if (SUCCEED != zbx_json_brackets_open(p, &jp_sub) ||
+								SUCCEED != DBpatch_parse_tags_json(&jp_sub, tags))
+						{
+							return FAIL;
+						}
+
+						continue;
+					}
+
+					zbx_json_addarray(json_dest, name);
+				}
+				else if (type == ZBX_JSON_TYPE_OBJECT)
+				{
+					zbx_json_addobject(json_dest, name);
+				}
+			}
+			else
+			{
+				if (0 == depth && 0 == strcmp(name, "application"))
+					*app = zbx_strdup(*app, value);
+				else
+					zbx_json_addstring(json_dest, name, value, ZBX_JSON_TYPE_STRING);
+			}
+		}
+		else
+		{
+			p = prev;
+
+			if (NULL == (p = zbx_json_next_value(jp, p, value, sizeof(value), NULL)))
+			{
+				p = prev;
+
+				if (NULL != (p = zbx_json_next(jp, p)))
+				{
+					type = zbx_json_valuetype(p);
+
+					if (type == ZBX_JSON_TYPE_OBJECT)
+						zbx_json_addobject(json_dest, NULL);
+					else if (type == ZBX_JSON_TYPE_ARRAY)
+						zbx_json_addarray(json_dest, NULL);
+				}
+				else
+				{
+					if (0 == depth)
+					{
+						if (NULL != *app)
+						{
+							patch_filtertag_t	tag;
+
+							tag.tag = zbx_strdup(NULL, "Application");
+							tag.op = zbx_strdup(NULL, "1");
+							tag.value = zbx_strdup(NULL, *app);
+
+							zbx_vector_patch_filtertag_append(tags, tag);
+						}
+
+						if (0 < tags->values_num)
+						{
+							int	i;
+
+							zbx_json_addarray(json_dest, "tags");
+
+							for (i = 0; i < tags->values_num; i++)
+							{
+								zbx_json_addobject(json_dest, NULL);
+								zbx_json_addstring(json_dest, "tag",
+										tags->values[i].tag,
+										ZBX_JSON_TYPE_STRING);
+								zbx_json_addstring(json_dest, "operator",
+										tags->values[i].op,
+										ZBX_JSON_TYPE_STRING);
+								zbx_json_addstring(json_dest, "value",
+										tags->values[i].value,
+										ZBX_JSON_TYPE_STRING);
+								zbx_json_close(json_dest);
+							}
+						}
+
+						zbx_json_close(json_dest);
+					}
+
+					zbx_json_close(json_dest);
+				}
+			}
+			else
+				zbx_json_addstring(json_dest, NULL, value, ZBX_JSON_TYPE_STRING);
+		}
+
+		if (NULL != p && SUCCEED == zbx_json_brackets_open(p, &jp_sub))
+		{
+			if (SUCCEED != DBpatch_parse_applications_json(&jp_sub, json_dest, tags, app, depth + 1))
+				return FAIL;
+		}
+
+		prev = p;
+	} while (NULL != p);
+
+	return SUCCEED;
+}
+
 static int	DBpatch_5030059(void)
 {
-	return DBdrop_foreign_key("httptest", 1);
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect("select profileid,value_str from profiles"
+			" where idx='web.monitoring.problem.properties'");
+
+	while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
+	{
+		struct zbx_json_parse		jp;
+		struct zbx_json			json;
+		zbx_vector_patch_filtertag_t	tags;
+		char				*app, *value_str;
+		zbx_uint64_t			profileid;
+
+		app = NULL;
+		zbx_vector_patch_filtertag_create(&tags);
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+		if (SUCCEED != (ret = zbx_json_open(row[1], &jp)) ||
+				SUCCEED != (ret = DBpatch_parse_applications_json(&jp, &json, &tags, &app, 0)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to parse web.monitoring.problem.properties JSON");
+		}
+
+		zbx_vector_patch_filtertag_clear_ext(&tags, patch_filtertag_free);
+		zbx_vector_patch_filtertag_destroy(&tags);
+		zbx_free(app);
+
+		value_str = DBdyn_escape_string(json.buffer);
+		zbx_json_free(&json);
+
+		ZBX_DBROW2UINT64(profileid, row[0]);
+
+		if (ZBX_DB_OK > DBexecute("update profiles set value_str='%s' where profileid=" ZBX_FS_UI64,
+				value_str, profileid))
+		{
+			ret = FAIL;
+		}
+
+		zbx_free(value_str);
+	}
+	DBfree_result(result);
+
+	return ret;
 }
 
 static int	DBpatch_5030060(void)
 {
-	return DBdrop_index("httptest", "httptest_1");
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_uint64_t	widget_fieldids;
+	int			ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			"value_str", NULL);
+
+	zbx_vector_uint64_create(&widget_fieldids);
+
+	result = DBselect(
+			"select w.widgetid,wf.value_str,wf.widget_fieldid from widget w"
+			" join widget_field wf on wf.widgetid=w.widgetid"
+			" where w.type in ('dataover','trigover') and wf.type=1 and wf.name='application'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	widgetid, widget_fieldid;
+		char		*tag, *value_str;
+
+		ZBX_DBROW2UINT64(widgetid, row[0]);
+		tag = DBdyn_escape_string(row[1]);
+		ZBX_DBROW2UINT64(widget_fieldid, row[2]);
+
+		value_str = zbx_dsprintf(NULL, "Application: %s", tag);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "tags.operator.0", 0, "");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.tag.0", 0, value_str);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "tags.operator.0", 0, "");
+
+		zbx_vector_uint64_append(&widget_fieldids, widget_fieldid);
+
+		zbx_free(tag);
+		zbx_free(value_str);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
+
+	if (0 < widget_fieldids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", widget_fieldids.values,
+				widget_fieldids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+out:
+	zbx_db_insert_clean(&db_insert);
+	zbx_vector_uint64_destroy(&widget_fieldids);
+
+	return ret;
 }
 
 static int	DBpatch_5030061(void)
 {
-	return DBdrop_field("httptest", "applicationid");
+	return DBdrop_foreign_key("httptest", 1);
 }
 
 static int	DBpatch_5030062(void)
 {
-	return DBdrop_field("sysmaps_elements", "application");
+	return DBdrop_index("httptest", "httptest_1");
 }
 
 static int	DBpatch_5030063(void)
 {
-	return DBdrop_table("application_discovery");
+	return DBdrop_field("httptest", "applicationid");
 }
 
 static int	DBpatch_5030064(void)
 {
-	return DBdrop_table("item_application_prototype");
+	return DBdrop_field("sysmaps_elements", "application");
 }
 
 static int	DBpatch_5030065(void)
 {
-	return DBdrop_table("application_prototype");
+	return DBdrop_table("application_discovery");
 }
 
 static int	DBpatch_5030066(void)
 {
-	return DBdrop_table("application_template");
+	return DBdrop_table("item_application_prototype");
 }
 
 static int	DBpatch_5030067(void)
 {
-	return DBdrop_table("items_applications");
+	return DBdrop_table("application_prototype");
 }
 
 static int	DBpatch_5030068(void)
+{
+	return DBdrop_table("application_template");
+}
+
+static int	DBpatch_5030069(void)
+{
+	return DBdrop_table("items_applications");
+}
+
+static int	DBpatch_5030070(void)
 {
 	return DBdrop_table("applications");
 }
@@ -1025,5 +1320,7 @@ DBPATCH_ADD(5030065, 0, 1)
 DBPATCH_ADD(5030066, 0, 1)
 DBPATCH_ADD(5030067, 0, 1)
 DBPATCH_ADD(5030068, 0, 1)
+DBPATCH_ADD(5030069, 0, 1)
+DBPATCH_ADD(5030070, 0, 1)
 
 DBPATCH_END()
