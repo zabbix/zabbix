@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-12T10:37:20Z</date>
+   <date>2021-02-15T11:54:08Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -14,7 +14,7 @@
          <description>The template to monitor Apache Ignite by Zabbix that work without any external scripts.&#13;
   It works with both standalone and cluster instances.&#13;
   The metrics are discoverable and collected by JMX.  &#13;
-  Current jmx tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.&#13;
+  Current JMX tree hierarchy contains classloader by default. Add the following jvm option `-DIGNITE_MBEAN_APPEND_CLASS_LOADER_ID=false`to will exclude one level with Classloader name.&#13;
   You can set {$IGNITE.USER} and {$IGNITE.PASSWORD} macros in the template for using on the host level.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
@@ -229,7 +229,7 @@ Template tooling version used: 0.38</description>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}&gt;={Template DB Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}</expression>
-                     <name>Cache group [{#JMXNAME}]: One or more backups are unavaliable</name>
+                     <name>Cache group [{#JMXNAME}]: One or more backups are unavailable</name>
                      <priority>WARNING</priority>
                   </trigger_prototype>
                </trigger_prototypes>
@@ -1248,7 +1248,7 @@ return JSON.stringify(data)
                </preprocessing>
             </discovery_rule>
             <discovery_rule>
-               <name>Ingite kernal metrics</name>
+               <name>Ignite kernal metrics</name>
                <type>JMX</type>
                <key>jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]</key>
                <delay>30m</delay>
