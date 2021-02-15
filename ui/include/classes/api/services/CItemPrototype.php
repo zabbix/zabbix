@@ -890,10 +890,11 @@ class CItemPrototype extends CItemGeneral {
 				}
 			}
 
-			// Reset valuemapid when value_type is LOG or TEXT.
-			if (($item['value_type'] != $db_items[$item['itemid']]['value_type'])
-					&& ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT)) {
-				$item['valuemapid'] = 0;
+			if ($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_TEXT) {
+				if ($item['value_type'] != $db_items[$item['itemid']]['value_type']) {
+					// Reset valuemapid when value_type is LOG or TEXT.
+					$item['valuemapid'] = 0;
+				}
 			}
 		}
 		unset($item);
