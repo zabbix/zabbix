@@ -112,19 +112,19 @@ class CDashboardPage {
 		return this._options;
 	}
 
-	activate(excluded_widgetids) {
+	activate(excluded_widgetids = []) {
 		this._is_active = true;
-
-		this._registerEvents();
 
 		for (const w of this._widgets) {
 			if (!excluded_widgetids.contains(w.widgetid)) {
 				w.activate();
 			}
 		}
+
+		this._registerEvents();
 	}
 
-	deactivate(excluded_widgetids) {
+	deactivate(excluded_widgetids = []) {
 		this._is_active = false;
 
 		this._unregisterEvents();
@@ -139,8 +139,8 @@ class CDashboardPage {
 	_registerEvents() {
 		this._events = {
 			resize: () => {
-				clearTimeout(this._events_resize_timeout);
-				this._events_resize_timeout = setTimeout(() => {
+				clearTimeout(this._events._resize_timeout);
+				this._events._resize_timeout = setTimeout(() => {
 					for (const w of this._widgets) {
 						this._resizeWidget(w);
 					}
@@ -158,6 +158,17 @@ class CDashboardPage {
 			this.addAction(action, this._hideMessageExhausted);
 		}
 
+		for (const w of this._widgets) {
+			if (w._is_active) {
+				if (w.iterator) {
+					this.addAction('onResizeEnd', this._onIteratorResizeEnd, w.uniqueid, {
+						trigger_name: `onIteratorResizeEnd_${w.uniqueid}`,
+						parameters: [w]
+					});
+				}
+			}
+		}
+
 		$(window).on('resize', this._events.resize);
 	}
 
@@ -166,8 +177,16 @@ class CDashboardPage {
 			this.removeAction(action, this._hideMessageExhausted);
 		}
 
+		for (const w of this._widgets) {
+			if (w._is_active) {
+				if (w.iterator) {
+					this.removeAction('onResizeEnd', this._onIteratorResizeEnd);
+				}
+			}
+		}
+
 		$(window).off('resize', this._events.resize);
-		clearTimeout(this._events_resize_timeout);
+		clearTimeout(this._events._resize_timeout);
 	}
 
 	/**
@@ -278,10 +297,11 @@ class CDashboardPage {
 			);
 			this._alignIteratorContents(widget, widget.pos);
 
-			this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget.uniqueid, {
-				trigger_name: `onIteratorResizeEnd_${widget.uniqueid}`,
-				parameters: [this._data, widget]
-			});
+			// TODO moved to eventRegister
+			// this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget.uniqueid, {
+			// 	trigger_name: `onIteratorResizeEnd_${widget.uniqueid}`,
+			// 	parameters: [this._data, widget]
+			// });
 		}
 
 		if (this._options['edit_mode']) {
