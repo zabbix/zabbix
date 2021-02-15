@@ -904,7 +904,6 @@ class CMacrosResolverGeneral {
 		}
 
 		$functions = CMacrosResolverHelper::resolveItemNames($functions);
-		$functions = CMacrosResolverHelper::resolveItemsValueMaps($functions);
 
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
@@ -943,13 +942,7 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_value = UNRESOLVED_MACRO_STRING;
-
-					if ($value !== null) {
-						$macro_value = formatHistoryValue($value, $function);
-					}
-
-					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+					$macro_values[$function['triggerid']][$token['token']] = $value;
 				}
 			}
 		}
