@@ -1297,6 +1297,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				' AND ('.join(' OR ', $queryParts).')'
 		), 'itemid');
 
+		foreach ($matches['functions'] as $function) {
+			if ($function[0] === 'last') {
+				$items = CMacrosResolverHelper::resolveItemsValueMaps($items);
+				break;
+			}
+		}
+
 		// Get items for which user has permission.
 		$allowedItems = API::Item()->get([
 			'itemids' => array_keys($items),
