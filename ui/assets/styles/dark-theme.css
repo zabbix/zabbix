@@ -5991,7 +5991,6 @@ svg {
       background: url("../img/icon-sprite.svg?20200407") no-repeat -604px -503px; }
 
 .checkbox-block {
-  display: none;
   margin: 10px 0; }
 
 #tbl_macros.massupdate-remove th,
