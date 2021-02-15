@@ -14,6 +14,7 @@ A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption proto
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 
 Bug fixes:
+...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
 ........S. [ZBX-18917] disabled global script webhook execution on proxy (dgoloscapov)
 .........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
 ...G...... [ZBX-18886] implemented proper resource cleanup when sender terminates by signal (dgoloscapov)
