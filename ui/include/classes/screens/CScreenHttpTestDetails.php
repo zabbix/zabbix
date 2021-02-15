@@ -67,7 +67,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 				' AND hi.httpstepid=hs.httpstepid'.
 				' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
 		));
-
+		$items = CMacrosResolverHelper::resolveItemsValueMaps($items);
 		$step_items = [];
 
 		foreach ($items as $item) {
@@ -124,7 +124,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 				// Skip steps that come after a failed step.
 				if (!$status['afterError'] && $item['type'] == HTTPSTEP_ITEM_TYPE_TIME) {
 					$total_time['value_type'] = $item['value_type'];
-					$total_time['valuemapid'] = $item['valuemapid'];
+					$total_time['valuemap'] = $item['valuemap'];
 					$total_time['units'] = $item['units'];
 
 					if (array_key_exists($item['itemid'], $item_history)) {
