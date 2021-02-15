@@ -824,7 +824,9 @@ static int	DBpatch_5030055(void)
 
 	zbx_db_insert_prepare(&db_insert, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
 
-	result = DBselect("select eventid,tag,value from event_tag");
+	result = DBselect(
+			"select distinct e.eventid,e.tag,e.value from event_tag e"
+			" join problem p on e.eventid=p.eventid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
