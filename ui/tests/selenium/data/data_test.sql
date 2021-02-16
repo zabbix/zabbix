@@ -175,7 +175,7 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (16, 1
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 16, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 19, 1);
 
-INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (20, 0, NULL, 0, '', 0, '', '', '', '', '/sbin/shutdown -r');
+-- INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (20, 0, NULL, 0, '', 0, '', '', '', '', '/sbin/shutdown -r');
 
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (1, 20, NULL);
 
@@ -208,8 +208,8 @@ INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (18, 2
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (19, 28, 7);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (20, 29, 7);
 
-INSERT INTO opcommand (operationid, type, command) VALUES (23, 0, 'echo TEST');
-INSERT INTO opcommand (operationid, type, command) VALUES (30, 0, 'echo TEST');
+-- INSERT INTO opcommand (operationid, type, command) VALUES (23, 0, 'echo TEST');
+-- INSERT INTO opcommand (operationid, type, command) VALUES (30, 0, 'echo TEST');
 
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (2, 23, NULL);
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 30, NULL);
