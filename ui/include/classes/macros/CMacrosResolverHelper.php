@@ -577,48 +577,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolves items value maps, valuemap property will be added to every item.
-	 *
-	 * @param array $items                  Array of items.
-	 * @param int   $items[]['valuemapid']  Item valuemapid.
-	 * @param int   $items[]['itemid]       Item itemid.
-	 * @return array
-	 */
-	public static function resolveItemsValueMaps(array $items): array {
-		$itemid_valuemapid = array_filter(array_column($items, 'valuemapid', 'itemid'));
-
-		foreach ($items as &$item) {
-			$item['valuemap'] = [];
-		}
-		unset($item);
-
-		if (!$itemid_valuemapid) {
-			return $items;
-		}
-
-		// Only "item.get" API can return mappings for templated items from inaccessible template.
-		$db_valuemaps = API::Item()->get([
-			'output' => [],
-			'selectValueMap' => ['valuemapid', 'mappings'],
-			'itemids' => array_values(array_flip($itemid_valuemapid))
-		]);
-		$valuemaps = [];
-
-		foreach ($db_valuemaps as $db_valuemap) {
-			$valuemaps[$db_valuemap['valuemap']['valuemapid']] = $db_valuemap['valuemap'];
-		}
-
-		foreach ($items as &$item) {
-			if (array_key_exists($item['valuemapid'], $valuemaps)) {
-				$item['valuemap'] = $valuemaps[$item['valuemapid']];
-			}
-		}
-		unset($item);
-
-		return $items;
-	}
-
-	/**
 	 * Resolve function parameter macros to "parameter_expanded" field.
 	 *
 	 * @static

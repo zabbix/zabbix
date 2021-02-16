@@ -732,6 +732,49 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolves items value maps, valuemap property will be added to every item.
+	 *
+	 * @param array $items
+	 * @param int   $items[]['itemid']
+	 * @param int   $items[]['valuemapid']
+	 *
+	 * @return array
+	 */
+	private static function getItemsValueMaps(array $items): array {
+		$itemid_valuemapid = array_filter(array_column($items, 'valuemapid', 'itemid'));
+
+		foreach ($items as &$item) {
+			$item['valuemap'] = [];
+		}
+		unset($item);
+
+		if (!$itemid_valuemapid) {
+			return $items;
+		}
+
+		// Only "item.get" API can return mappings for templated items from inaccessible template.
+		$db_valuemaps = API::Item()->get([
+			'output' => [],
+			'selectValueMap' => ['valuemapid', 'mappings'],
+			'itemids' => array_values(array_flip($itemid_valuemapid))
+		]);
+		$valuemaps = [];
+
+		foreach ($db_valuemaps as $db_valuemap) {
+			$valuemaps[$db_valuemap['valuemap']['valuemapid']] = $db_valuemap['valuemap'];
+		}
+
+		foreach ($items as &$item) {
+			if (array_key_exists($item['valuemapid'], $valuemaps)) {
+				$item['valuemap'] = $valuemaps[$item['valuemapid']];
+			}
+		}
+		unset($item);
+
+		return $items;
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -764,7 +807,7 @@ class CMacrosResolverGeneral {
 		));
 
 		$functions = CMacrosResolverHelper::resolveItemNames($functions);
-		$functions = CMacrosResolverHelper::resolveItemsValueMaps($functions);
+		$functions = self::getItemsValueMaps($functions);
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
