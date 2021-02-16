@@ -61,7 +61,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 
 		// fetch HTTP step items
 		$items = DBfetchArray(DBselect(
-			'SELECT i.value_type,i.valuemapid,i.units,i.itemid,hi.type,hs.httpstepid'.
+			'SELECT i.value_type,i.units,i.itemid,hi.type,hs.httpstepid'.
 			' FROM items i,httpstepitem hi,httpstep hs'.
 			' WHERE hi.itemid=i.itemid'.
 				' AND hi.httpstepid=hs.httpstepid'.
