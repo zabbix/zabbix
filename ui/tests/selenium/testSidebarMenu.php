@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * @backup sessions
  *
- * Test Zabbix side menu.
+ * Test side menu.
  */
 class testSidebarMenu extends CWebTest {
 
@@ -288,7 +288,7 @@ class testSidebarMenu extends CWebTest {
 	}
 
 	/**
-	 * Check menu pages that allows to navigate in Zabbix.
+	 * Check menu pages that allows to navigate.
 	 *
 	 * @dataProvider getMainData
 	 */
@@ -296,16 +296,13 @@ class testSidebarMenu extends CWebTest {
 		$this->page->login()->open('')->waitUntilReady();
 		$this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady();
 
-		// Sidebar main menu or user menu.
-		$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
-
-		// Menu section.
-		$main_section = $this->query('xpath://ul[@class="menu-'.$menu.'"]')->query('link', $data['section']);
-
-		// Section page.
+		$menu__type = ($data['section'] === 'User settings') ? 'user' : 'main';
+		// First level menu.
+		$main_section = $this->query('xpath://ul[@class="menu-'.$menu__type.'"]')->query('link', $data['section']);
+		// Second level menu.
 		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page']);
 
-		// Check section from data provider and click on it.
+		// Click on the first level menu and wait for it to fully open.
 		if ($data['section'] !== 'Monitoring') {
 			$main_section->waitUntilReady()->one()->click();
 			$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
@@ -315,10 +312,9 @@ class testSidebarMenu extends CWebTest {
 			});
 		}
 
-		// Click on page.
 		$submenu->waitUntilClickable()->one()->click();
 
-		// Checking if 3rd level side menu exists.
+		// Checking 3rd level menu.
 		if (array_key_exists('third_level', $data)) {
 			foreach ($data['third_level'] as $third_level) {
 				$submenu->one()->parents('tag:li')->query('xpath://ul/li/a[text()="'.$third_level.'"]')
@@ -351,11 +347,11 @@ class testSidebarMenu extends CWebTest {
 				$id = 'sidebar-button-toggle';
 			}
 
-			// Clicking hide, collapse button.
+			// Clicking hide/collapse button.
 			$this->query('button', $hide)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
 
-			// Checking that collapsed, hiden sidemenu appears on clicking.
+			// Waiting sidemenu to hide/collapse.
 			if ($view === 'compact') {
 				$this->query('class:zabbix-sidebar-logo')->one(false)->waitUntilNotVisible();
 			}
@@ -366,7 +362,7 @@ class testSidebarMenu extends CWebTest {
 			$this->query('id', $id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
 
-			// Checking that collapsed, hiden sidemenu appears on clicking.
+			// Checking that collapsed, hidden sidemenu appears on clicking.
 			if ($view === 'compact') {
 				$this->query('xpath://aside[@class="sidebar is-compact is-opened"]')->one()->waitUntilVisible();
 			}
