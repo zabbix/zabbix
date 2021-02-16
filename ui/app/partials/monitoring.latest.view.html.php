@@ -86,7 +86,7 @@ foreach ($data['items'] as $itemid => $item) {
 
 	// Row history data preparation.
 	$last_history = array_key_exists($itemid, $data['history'])
-		? (count($data['history'][$itemid]) > 0) ? $data['history'][$itemid][0] : null
+		? ((count($data['history'][$itemid]) > 0) ? $data['history'][$itemid][0] : null)
 		: null;
 
 	if ($last_history) {

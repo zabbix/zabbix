@@ -651,7 +651,7 @@ class CHttpTestManager {
 	 * Create items required for web scenario.
 	 *
 	 * @param array $http_test
-	 * @param array $itemids_combined
+	 * @param array  $_itemids
 	 *
 	 * @throws Exception
 	 */
@@ -1193,7 +1193,7 @@ class CHttpTestManager {
 
 	/**
 	 * Create tags for http test and http test step items.
-	 * All items are assumed to belonged to the same http test and should have same set of tags.
+	 * All items should belong to the same http test and should have same set of tags.
 	 *
 	 * @static
 	 *

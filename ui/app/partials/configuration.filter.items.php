@@ -28,13 +28,13 @@ $filter_column_1 = new CFormList();
 $filter_column_2 = new CFormList();
 $filter_column_3 = new CFormList();
 
-// type select
+// Type select.
 $filter_type_visibility = [];
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay');
 
 $item_types = item_type2str();
-unset($item_types[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
+unset($item_types[ITEM_TYPE_HTTPTEST]); // Httptest items are only for internal Zabbix logic.
 
 foreach (array_keys($item_types) as $type) {
 	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
@@ -50,7 +50,7 @@ zbx_add_post_js("var filterTypeSwitcher".
 	" = new CViewSwitcher('filter_type', 'change', ".json_encode($filter_type_visibility).");"
 );
 
-// First column
+// First column.
 $filter_column_1
 	->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
 		(new CMultiSelect([
@@ -95,7 +95,7 @@ $filter_column_1
 		(new CTextBox('filter_key', $data['filter_data']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-// Second column
+// Second column.
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setValue((int) $data['filter_data']['filter_type'])
@@ -136,7 +136,7 @@ $filter_column_2
 		'filter_delay_row'
 	);
 
-// Third column
+// Third column.
 $filter_column_3->addRow(_('Tags'),
 	CTagFilterFieldHelper::getTagFilterField([
 		'evaltype' => $data['filter_data']['filter_evaltype'],

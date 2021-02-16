@@ -340,8 +340,7 @@ class CControllerPopupMassupdateItem extends CController {
 												$diff_tags = [];
 												foreach ($items[$itemid]['tags'] as $a) {
 													foreach ($tags as $b) {
-														if ($a['tag'] === $b['tag']
-																&& $a['value'] === $b['value']) {
+														if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
 															continue 2;
 														}
 													}
