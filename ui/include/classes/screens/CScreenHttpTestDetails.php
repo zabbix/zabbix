@@ -88,7 +88,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 		$total_time = [
 			'value' => 0,
 			'value_type' => null,
-			'valuemapid' => null,
+			'valuemap' => [],
 			'units' => null
 		];
 
