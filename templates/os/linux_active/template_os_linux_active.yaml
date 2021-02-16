@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-10-23T09:41:24Z'
+  date: '2021-02-16T06:38:22Z'
   groups:
     -
       name: Templates/Modules
@@ -350,10 +350,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -366,10 +362,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -381,10 +373,6 @@ zabbix_export:
               width: '12'
               height: '5'
               fields:
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
                 -
                   type: GRAPH
                   name: graphid
@@ -399,10 +387,6 @@ zabbix_export:
               height: '5'
               fields:
                 -
-                  type: INTEGER
-                  name: source_type
-                  value: '0'
-                -
                   type: GRAPH
                   name: graphid
                   value:
@@ -412,7 +396,7 @@ zabbix_export:
               type: GRAPH_PROTOTYPE
               'y': '10'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -421,11 +405,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -434,9 +414,9 @@ zabbix_export:
                     host: 'Linux by Zabbix agent active'
             -
               type: GRAPH_PROTOTYPE
-              'y': '15'
+              'y': '22'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -445,11 +425,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -458,9 +434,9 @@ zabbix_export:
                     host: 'Linux by Zabbix agent active'
             -
               type: GRAPH_PROTOTYPE
-              'y': '20'
+              'y': '34'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -469,11 +445,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -482,9 +454,9 @@ zabbix_export:
                     host: 'Linux by Zabbix agent active'
             -
               type: GRAPH_PROTOTYPE
-              'y': '25'
+              'y': '46'
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -493,11 +465,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -506,7 +474,7 @@ zabbix_export:
                     host: 'Linux by Zabbix agent active'
             -
               type: GRAPH_PROTOTYPE
-              'y': '30'
+              'y': '58'
               width: '24'
               height: '5'
               fields:
@@ -514,14 +482,6 @@ zabbix_export:
                   type: INTEGER
                   name: columns
                   value: '1'
-                -
-                  type: INTEGER
-                  name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid
@@ -1655,7 +1615,7 @@ zabbix_export:
             -
               type: GRAPH_PROTOTYPE
               width: '24'
-              height: '5'
+              height: '12'
               fields:
                 -
                   type: INTEGER
@@ -1664,11 +1624,7 @@ zabbix_export:
                 -
                   type: INTEGER
                   name: rows
-                  value: '1'
-                -
-                  type: INTEGER
-                  name: source_type
-                  value: '2'
+                  value: '3'
                 -
                   type: GRAPH_PROTOTYPE
                   name: graphid

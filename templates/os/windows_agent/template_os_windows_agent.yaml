@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.2'
-  date: '2020-11-23T21:11:10Z'
+  date: '2021-02-16T06:44:29Z'
   groups:
     -
       name: Templates/Modules
@@ -1023,9 +1023,7 @@ zabbix_export:
                 -
                   type: JAVASCRIPT
                   parameters:
-                    - |
-                      return (value=='9223372036854775807' ? 0 : value)
-                      
+                    - 'return (value==''9223372036854775807'' ? 0 : value)'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
