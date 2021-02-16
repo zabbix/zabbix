@@ -180,7 +180,7 @@ switch ($data['method']) {
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'host_templates') {
@@ -224,7 +224,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'item_prototypes') {
@@ -265,7 +265,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				if ($data['object_name'] === 'graph_prototypes') {
@@ -560,7 +560,7 @@ switch ($data['method']) {
 					'output' => ['valuemapid', 'name'],
 					'hostids' => $hostids,
 					'search' => ['name' => $data['search'] ? $data['search'] : null],
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 				$result = array_column($result, null, 'name');
 				$result = CArrayHelper::renameObjectsKeys($result, ['valuemapid' => 'id']);
@@ -591,7 +591,7 @@ switch ($data['method']) {
 					'output' => ['valuemapid', 'name', 'hostid'],
 					'hostids' => $data['hostids'],
 					'search' => ['name' => $data['search'] ? $data['search'] : null],
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				foreach ($valuemaps as &$valuemap) {
@@ -618,7 +618,7 @@ switch ($data['method']) {
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				$db_result = API::Host()->get($options);
@@ -635,7 +635,7 @@ switch ($data['method']) {
 					],
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				$db_result = API::Item()->get($options);
@@ -648,7 +648,7 @@ switch ($data['method']) {
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				];
 
 				$db_result = API::Graph()->get($options);
