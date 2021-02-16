@@ -31,6 +31,7 @@ if (array_key_exists('error', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
@@ -51,7 +52,6 @@ $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.tab-indicators.js');
 $this->addJsFile('class.sortable.js');
 
-$this->includeJsFile('dashboard/class.dashboard.js.php');
 $this->includeJsFile('dashboard/class.dashboard-share.js.php');
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
@@ -98,7 +98,7 @@ $widget = (new CWidget())
 				(new CList())
 					->addItem(
 						(new CButton('dashbrd-edit', _('Edit dashboard')))
-							->setEnabled($data['allowed_edit'] && $data['dashboard']['editable'])
+							->setEnabled($data['dashboard']['allowed_edit'] && $data['dashboard']['editable'])
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
@@ -106,7 +106,7 @@ $widget = (new CWidget())
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
-							->setEnabled($data['allowed_edit'])
+							->setEnabled($data['dashboard']['allowed_edit'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
 								$data['dashboard']['editable']
@@ -157,47 +157,36 @@ if ($data['time_selector'] !== null) {
 	);
 }
 
-$tabs = new CSortable();
-
-$tabs->add((new CDiv('The first'))->addClass('selected-page'));
-
-for ($i = 1; $i < 30; $i++) {
-	$tabs->add((new CDiv('Short '.$i))->addClass(CSortable::ZBX_STYLE_SORTABLE_DRAG_HANDLE));
-	$tabs->add((new CDiv('Longer name '.$i))->addClass(CSortable::ZBX_STYLE_SORTABLE_DRAG_HANDLE));
-	$tabs->add(
-		(new CDiv('With properties '.$i))
-			->addClass(CSortable::ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-			->addItem(
-				(new CTag('a', true, '[ - ]'))
-					->setAttribute('href', '#')
-					->addStyle('margin-left: 5px;')
-					->onClick('alert(1);')
-			)
-	);
-}
-
-$controls = [
-	(new CSimpleButton())
-		->setEnabled(false)
-		->addClass('previous-page btn-iterator-page-previous'),
-	(new CSimpleButton())
-		->setEnabled(true) // num of pages > 1
-		->addClass('next-page btn-iterator-page-next'),
-	(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
-];
-
 $widget
 	->addItem(
 		(new CDiv())
-			->addItem((new CDiv($tabs))->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
-			->addItem((new CDiv($controls))->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS))
-			->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+			->addClass(ZBX_STYLE_DASHBRD)
+			->addItem(
+				(new CDiv())
+					->addClass(ZBX_STYLE_DASHBRD_NAVIGATION)
+					->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_TABS))
+					->addItem(
+						(new CDiv())
+							->addClass(ZBX_STYLE_DASHBRD_NAVIGATION_CONTROLS)
+							->addItem([
+								(new CSimpleButton())
+									->addClass(ZBX_STYLE_DASHBRD_PREVIOUS_PAGE)
+									->addClass('btn-iterator-page-previous')
+									->setEnabled(false),
+								(new CSimpleButton())
+									->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
+									->addClass('btn-iterator-page-next')
+									->setEnabled(false),
+								(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
+							])
+					)
+			)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
 	)
-	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
 	->show();
 
 (new CScriptTag(
-	'initializeDashboard('.
+	'initializeView('.
 		json_encode($data['dashboard']).','.
 		json_encode($data['widget_defaults']).','.
 		json_encode($data['time_selector']).','.

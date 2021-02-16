@@ -164,7 +164,7 @@ class CSortable extends CBaseComponent {
 		}
 
 		this._cancelDragging();
-		item.remove();
+		this._list.removeChild(item);
 
 		return this;
 	}
@@ -193,7 +193,17 @@ class CSortable extends CBaseComponent {
 	 * Initialize the instance.
 	 */
 	_init() {
+		this._target.classList.add(ZBX_STYLE_SORTABLE);
+
 		this._list = this._target.querySelector(`.${ZBX_STYLE_SORTABLE_LIST}`);
+
+		if (this._list === null) {
+			this._list = document.createElement('ul');
+			this._target.appendChild(this._list);
+		}
+
+		this._list.classList.add(ZBX_STYLE_SORTABLE_LIST);
+
 		this._list_pos = -parseFloat(window.getComputedStyle(this._list).getPropertyValue(
 			this._is_vertical ? 'top' : 'left'
 		));
@@ -344,7 +354,7 @@ class CSortable extends CBaseComponent {
 			drag_item.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		}
 
-		this._drag_item.remove();
+		this._target.removeChild(this._drag_item);
 		this._drag_item = null;
 
 		this._target.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
@@ -758,8 +768,8 @@ class CSortable extends CBaseComponent {
 				}
 
 				const reference_item = (e.key === 'ArrowLeft')
-					? e.target.previousSibling
-					: (e.target.nextSibling ? e.target.nextSibling.nextSibling : null);
+					? e.target.previousElementSibling
+					: (e.target.nextElementSibling ? e.target.nextElementSibling.nextElementSibling : null);
 
 				// Leftmost item already focused?
 				if (e.key === 'ArrowLeft' && reference_item === null) {

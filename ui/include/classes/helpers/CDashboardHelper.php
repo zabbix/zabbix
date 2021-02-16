@@ -63,29 +63,35 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Prepare widgets for dashboard grid.
+	 * Prepare widget pages for dashboard grid.
 	 *
 	 * @static
 	 *
-	 * @param array  $widgets
+	 * @param array  $pages
 	 * @param string $templateid
 	 * @param bool   $with_rf_rate
 	 *
 	 * @return array
 	 */
-	public static function prepareWidgetsForGrid(array $widgets, ?string $templateid, bool $with_rf_rate): array {
-		$grid_widgets = [];
+	public static function preparePagesForGrid(array $pages, ?string $templateid, bool $with_rf_rate): array {
+		if (!$pages) {
+			return [];
+		}
 
-		if ($widgets) {
-			CArrayHelper::sort($widgets, ['y', 'x']);
+		$grid_pages = [];
 
-			$context = ($templateid === null)
-				? CWidgetConfig::CONTEXT_DASHBOARD
-				: CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD;
+		$context = ($templateid === null)
+			? CWidgetConfig::CONTEXT_DASHBOARD
+			: CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD;
 
-			$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes($context));
+		$known_widget_types = array_keys(CWidgetConfig::getKnownWidgetTypes($context));
 
-			foreach ($widgets as $widget) {
+		foreach ($pages as $page) {
+			$grid_page_widgets = [];
+
+			CArrayHelper::sort($page['widgets'], ['y', 'x']);
+
+			foreach ($page['widgets'] as $widget) {
 				if (!in_array($widget['type'], $known_widget_types)) {
 					continue;
 				}
@@ -116,7 +122,7 @@ class CDashboardHelper {
 					$rf_rate = 0;
 				}
 
-				$grid_widgets[] = [
+				$grid_page_widgets[] = [
 					'widgetid' => $widgetid,
 					'type' => $widget['type'],
 					'header' => $widget['name'],
@@ -132,24 +138,32 @@ class CDashboardHelper {
 					'configuration' => CWidgetConfig::getConfiguration($widget['type'], $fields, $widget['view_mode'])
 				];
 			}
+
+			$grid_pages[] = [
+				'dashboard_pageid' => $page['dashboard_pageid'],
+				'name' => $page['name'],
+				'display_period' => $page['display_period'],
+				'widgets' => $grid_page_widgets
+			];
 		}
 
-		return $grid_widgets;
+		return $grid_pages;
 	}
 
 	/**
-	 * Returns array of widgets without inaccessible fields.
+	 * Get widget pages with inaccessible fields unset.
 	 *
 	 * @static
 	 *
-	 * @param array $widgets
-	 * @param array $widgets[]['fields']
-	 * @param array $widgets[]['fields'][]['type']
-	 * @param array $widgets[]['fields'][]['value']
+	 * @param array $pages
+	 * @param array $pages[]['widgets']
+	 * @param array $pages[]['widgets'][]['fields']
+	 * @param array $pages[]['widgets'][]['fields'][]['type']
+	 * @param array $pages[]['widgets'][]['fields'][]['value']
 	 *
 	 * @return array
 	 */
-	public static function unsetInaccessibleFields(array $widgets): array {
+	public static function unsetInaccessibleFields(array $pages): array {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],
@@ -160,9 +174,13 @@ class CDashboardHelper {
 			ZBX_WIDGET_FIELD_TYPE_MAP => []
 		];
 
-		foreach ($widgets as $w_index => $widget) {
-			foreach ($widget['fields'] as $f_index => $field) {
-				$ids[$field['type']][$field['value']][] = ['w' => $w_index, 'f' => $f_index];
+		foreach ($pages as $p_index => $page) {
+			foreach ($page['widgets'] as $w_index => $widget) {
+				foreach ($widget['fields'] as $f_index => $field) {
+					if (array_key_exists($field['type'], $ids)) {
+						$ids[$field['type']][$field['value']][] = ['p' => $p_index, 'w' => $w_index, 'f' => $f_index];
+					}
+				}
 			}
 		}
 
@@ -268,10 +286,10 @@ class CDashboardHelper {
 		}
 
 		foreach ($inaccessible_indexes as $index) {
-			unset($widgets[$index['w']]['fields'][$index['f']]);
+			unset($pages[$index['p']]['widgets'][$index['w']]['fields'][$index['f']]);
 		}
 
-		return $widgets;
+		return $pages;
 	}
 
 	/**
@@ -304,14 +322,16 @@ class CDashboardHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $widgets
+	 * @param array $pages
 	 *
 	 * @return bool
 	 */
-	public static function hasTimeSelector(array $widgets): bool {
-		foreach ($widgets as $widget) {
-			if (CWidgetConfig::usesTimeSelector($widget)) {
-				return true;
+	public static function hasTimeSelector(array $pages): bool {
+		foreach ($pages as $page) {
+			foreach ($page['widgets'] as $widget) {
+				if (CWidgetConfig::usesTimeSelector($widget)) {
+					return true;
+				}
 			}
 		}
 
@@ -422,6 +442,8 @@ class CDashboardHelper {
 	 * @return array
 	 */
 	public static function prepareForClone(array $dashboards, $templateid): array {
+		// TODO: implement PAGES here.
+
 		foreach ($dashboards as &$dashboard) {
 			// Remove dashboard id.
 			unset($dashboard['dashboardid']);

@@ -96,7 +96,7 @@ if ($data['time_selector'] !== null) {
 
 if ($data['dashboard']['widgets']) {
 	$widget
-		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
 		->show();
 
 	(new CScriptTag(

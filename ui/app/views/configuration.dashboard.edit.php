@@ -57,7 +57,7 @@ $this->includeJsFile('configuration.dashboard.edit.js.php');
 		])))
 	)
 	->setNavigation(getHostNavigation('dashboards', $data['dashboard']['templateid']))
-	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_CONTAINER))
+	->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID))
 	->show();
 
 (new CScriptTag(

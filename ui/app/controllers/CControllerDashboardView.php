@@ -86,6 +86,8 @@ class CControllerDashboardView extends CController {
 			return;
 		}
 
+		$dashboard['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
 		$time_selector_options = [
 			'profileIdx' => 'web.dashbrd.filter',
 			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
@@ -98,14 +100,13 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
+			'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages'])
 				? getTimeSelectorPeriod($time_selector_options)
 				: null,
-			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
-			'allowed_edit' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 		];
 
-		if (self::hasDynamicWidgets($dashboard['widgets'])) {
+		if (self::hasDynamicWidgets($dashboard['pages'])) {
 			$hostid = $this->getInput('hostid', CProfile::get('web.dashbrd.hostid', 0));
 
 			$hosts = ($hostid != 0)
@@ -146,7 +147,7 @@ class CControllerDashboardView extends CController {
 				'dashboardid' => null,
 				'name' => _('New dashboard'),
 				'editable' => true,
-				'widgets' => [],
+				'pages' => [[]],
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
@@ -157,7 +158,7 @@ class CControllerDashboardView extends CController {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name', 'private'],
-				'selectPages' => ['widgets'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => [$this->getInput('source_dashboardid')]
@@ -168,8 +169,8 @@ class CControllerDashboardView extends CController {
 					'dashboardid' => null,
 					'name' => $dashboards[0]['name'],
 					'editable' => true,
-					'widgets' => CDashboardHelper::prepareWidgetsForGrid(
-						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages'][0]['widgets']), null, true
+					'pages' => CDashboardHelper::prepareWidgetsForGrid(
+						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages']), null, true
 					),
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
@@ -208,7 +209,7 @@ class CControllerDashboardView extends CController {
 			if ($dashboardid !== null) {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
-					'selectPages' => ['widgets'],
+					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 					'dashboardids' => [$dashboardid],
 					'preservekeys' => true
 				]);
@@ -217,7 +218,7 @@ class CControllerDashboardView extends CController {
 					CDashboardHelper::updateEditableFlag($dashboards);
 
 					$dashboard = array_shift($dashboards);
-					$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['pages'][0]['widgets'], null, true);
+					$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
@@ -234,26 +235,24 @@ class CControllerDashboardView extends CController {
 			}
 		}
 
-		if ($dashboard !== null) {
-			$dashboard['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
-		}
-
 		return [$dashboard, $error];
 	}
 
 	/**
 	 * Checks, if any of widgets has checked dynamic field.
 	 *
-	 * @param array $grid_widgets
+	 * @param array $grid_pages
 	 *
 	 * @static
 	 *
 	 * @return bool
 	 */
-	private static function hasDynamicWidgets($grid_widgets) {
-		foreach ($grid_widgets as $widget) {
-			if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
-				return true;
+	private static function hasDynamicWidgets($grid_pages) {
+		foreach ($grid_pages as $page) {
+			foreach ($page['widgets'] as $widget) {
+				if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
+					return true;
+				}
 			}
 		}
 

@@ -1286,7 +1286,7 @@ class CDashboardPage {
 	}
 
 	_getCurrentCellWidth() {
-		return $('.dashbrd-grid-container').width() / this._options['max-columns'];
+		return this._$target.width() / this._options['max-columns'];
 	}
 
 	_setDivPosition($div, pos) {

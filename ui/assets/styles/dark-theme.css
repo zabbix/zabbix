@@ -3113,7 +3113,7 @@ z-select[disabled] button,
   margin: 10px 0 8px 0; }
 
 .dashbrd-navigation-tabs {
-  margin: -2px 10px 0 0;
+  margin: -2px 10px -2px 0;
   overflow: hidden; }
   .dashbrd-navigation-tabs .csortable {
     padding: 2px 0;
@@ -3152,7 +3152,7 @@ z-select[disabled] button,
   .dashbrd-navigation-tabs .csortable > .csortable-item > div, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div:hover {
     background: #e8f5ff;
     border: 1px solid #c7e1f7; }
-  .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-page, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-page {
+  .dashbrd-navigation-tabs .csortable > .csortable-item > div.selected-tab, .dashbrd-navigation-tabs .csortable-list > .csortable-item > div.selected-tab {
     color: #ffffff;
     background: #4f4f4f;
     border: 1px solid transparent; }
@@ -3162,7 +3162,7 @@ z-select[disabled] button,
   flex-shrink: 0; }
   .dashbrd-navigation-controls button {
     margin-left: 10px; }
-    .dashbrd-navigation-controls button.previous-page, .dashbrd-navigation-controls button.next-page {
+    .dashbrd-navigation-controls button.dashbrd-previous-page, .dashbrd-navigation-controls button.dashbrd-next-page {
       display: none;
       margin: 0; }
 
