@@ -909,6 +909,13 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 		init_result(result);
 
+		if (0 != ISSET_META(request->value.result_ptr->result))
+		{
+			result->type = AR_META;
+			result->lastlogsize = request->value.result_ptr->result->lastlogsize;
+			result->mtime = request->value.result_ptr->result->mtime;
+		}
+
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
