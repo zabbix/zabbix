@@ -163,13 +163,6 @@ class CTriggerExpression {
 	protected $function_parser;
 
 	/**
-	 * Parser for trigger functions.
-	 *
-	 * @var CTriggerFunctionParser
-	 */
-	protected $trigger_function_parser;
-
-	/**
 	 * Parser for LLD macros.
 	 *
 	 * @var CLLDMacroParser
@@ -225,7 +218,6 @@ class CTriggerExpression {
 			$this->host_macro_parser = new CSetParser($this->options['host_macro']);
 		}
 		$this->function_parser = new CFunctionParser();
-		$this->trigger_function_parser = new CTriggerFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		$this->user_macro_parser = new CUserMacroParser();
@@ -559,7 +551,19 @@ class CTriggerExpression {
 	 * @return array
 	 */
 	public function getHosts(): array {
-		return $this->is_valid ? array_unique(array_column($this->expressions, 'host')) : [];
+		$hosts = [];
+		if ($this->is_valid) {
+			foreach ($this->result->getTokens() as $param) {
+				if ($param instanceof CQueryParserResult) {
+					$hosts[] = $param->host;
+				}
+				elseif ($param instanceof CFunctionParserResult) {
+					$hosts = array_merge($hosts, $param->getHosts());
+				}
+			}
+		}
+
+		return array_keys(array_flip($hosts));
 	}
 
 	/**
@@ -605,12 +609,11 @@ class CTriggerExpression {
 			return true;
 		}
 
-		if ($this->options['collapsed_expression']) {
-			if ($this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
-				return true;
-			}
+		if ($this->options['collapsed_expression']
+				&& $this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
+			return true;
 		}
-		elseif ($this->parseTriggerFunction() || $this->parseFunction()) {
+		elseif ($this->parseFunction()) {
 			return true;
 		}
 
@@ -647,65 +650,13 @@ class CTriggerExpression {
 			$function_param_list[] = $this->function_parser->getParam($n);
 		}
 
-		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION,
-			$this->function_parser->getMatch(), $start_pos, $this->function_parser->getLength(),
-			[
-				'functionName' => $this->function_parser->getFunction(),
-				'functionParams' => $function_param_list
-			]
-		);
+		$this->result->addFunctionToken($this->function_parser->result);
 
 		$this->expressions[] = [
-			'expression' => $this->function_parser->getMatch(),
+			'expression' => $this->function_parser->result->match,
 			'pos' => $start_pos,
 			'functionName' => $this->function_parser->getFunction(),
 			'functionParam' => $this->function_parser->getParameters(),
-			'functionParamList' => $function_param_list
-		];
-
-		return true;
-	}
-
-	/**
-	 * Parses a trigger function constant in the trigger expression and moves a current position ($this->pos) on a last
-	 * symbol of the trigger function.
-	 *
-	 * @return bool  Returns true if parsed successfully, false otherwise.
-	 */
-	private function parseTriggerFunction(): bool {
-		$start_pos = $this->pos;
-
-		if ($this->trigger_function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
-			return false;
-		}
-
-		$this->pos += $this->trigger_function_parser->getLength() - 1;
-
-		$function_param_list = [];
-
-		for ($n = 0; $n < $this->trigger_function_parser->getParamsNum(); $n++) {
-			$function_param_list[] = $this->trigger_function_parser->getParam($n);
-		}
-
-		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION,
-			$this->function_parser->getMatch(), $start_pos, $this->trigger_function_parser->getLength(),
-			[
-				'host' => $this->trigger_function_parser->getHost(),
-				'item' => $this->trigger_function_parser->getItem(),
-				'function' => $this->trigger_function_parser->getFunction(),
-				'functionName' => $this->trigger_function_parser->getFunction(),
-				'functionParams' => $function_param_list
-			]
-		);
-
-		$this->expressions[] = [
-			'expression' => $this->trigger_function_parser->getMatch(),
-			'pos' => $start_pos,
-			'host' => $this->trigger_function_parser->getHost(),
-			'item' => $this->trigger_function_parser->getItem(),
-			'function' => $this->trigger_function_parser->getFunction(),
-			'functionName' => $this->trigger_function_parser->getFunction(),
-			'functionParam' => $this->trigger_function_parser->getParameters(),
 			'functionParamList' => $function_param_list
 		];
 

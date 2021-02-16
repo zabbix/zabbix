@@ -34,16 +34,19 @@ class CFunctionParser extends CParser {
 	public const PARAM_UNQUOTED = 1;
 	public const PARAM_QUOTED = 2;
 
-	protected $function = '';
-	protected $parameters = '';
-	protected $params_raw = [];
-
 	/**
 	 * An array of options.
 	 *
 	 * @var array
 	 */
 	protected $options = [];
+
+	/**
+	 * Object of parsed function.
+	 *
+	 * @var CFunctionParserResult
+	 */
+	public $result;
 
 	/**
 	 * Returns true if the char is allowed in the function name, false otherwise.
@@ -63,11 +66,8 @@ class CFunctionParser extends CParser {
 	 * @param int     $pos
 	 */
 	public function parse($source, $pos = 0): int {
+		$this->result = new CFunctionParserResult();
 		$this->length = 0;
-		$this->match = '';
-		$this->function = '';
-		$this->parameters = '';
-		$this->params_raw = [];
 
 		for ($p = $pos; isset($source[$p]) && $this->isFunctionChar($source[$p]); $p++) {
 		}
@@ -91,10 +91,12 @@ class CFunctionParser extends CParser {
 		$params_raw['raw'] = substr($source, $p2, $p - $p2);
 
 		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
-		$this->function = substr($source, $pos, $p2 - $pos);
-		$this->parameters = substr($source, $p2 + 1, $p - $p2 - 2);
-		$this->params_raw = $params_raw;
+		$this->result->length = $this->length;
+		$this->result->match = substr($source, $pos, $this->length);
+		$this->result->function = substr($source, $pos, $p2 - $pos);
+		$this->result->parameters = substr($source, $p2 + 1, $p - $p2 - 2);
+		$this->result->params_raw = $params_raw;
+		$this->result->pos = $pos;
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
@@ -113,15 +115,17 @@ class CFunctionParser extends CParser {
 
 		$p = $pos + 1;
 
-		if (!isset($source[$p]) || $source[$p] === '/') {
-			return false;
-		}
-
 		$_parameters = [];
 		$state = self::STATE_NEW;
 		$num = 0;
 
-		for (; isset($source[$p]); $p++) {
+		$query_parser = new CQueryParser();
+		$function_parser = new self();
+
+		// TODO miks: invent $this->options['collapsed_expression'] to check if this parser is needed.
+		$functionid_parser = new CFunctionIdParser();
+
+		while (isset($source[$p])) {
 			switch ($state) {
 				// a new parameter started
 				case self::STATE_NEW:
@@ -130,19 +134,14 @@ class CFunctionParser extends CParser {
 							break;
 
 						case ',':
-							$_parameters[$num++] = [
+							$_parameters[$num] = [
 								'type' => self::PARAM_UNQUOTED,
 								'raw' => '',
-								'pos' => $p - $pos
+								'pos' => $p
 							];
 							break;
 
 						case ')':
-							$_parameters[$num] = [
-								'type' => self::PARAM_UNQUOTED,
-								'raw' => '',
-								'pos' => $p - $pos
-							];
 							$state = self::STATE_END_OF_PARAMS;
 							break;
 
@@ -150,18 +149,46 @@ class CFunctionParser extends CParser {
 							$_parameters[$num] = [
 								'type' => self::PARAM_QUOTED,
 								'raw' => $source[$p],
-								'pos' => $p - $pos
+								'pos' => $p
 							];
 							$state = self::STATE_QUOTED;
 							break;
 
 						default:
-							$_parameters[$num] = [
-								'type' => self::PARAM_UNQUOTED,
-								'raw' => $source[$p],
-								'pos' => $p - $pos
-							];
-							$state = self::STATE_UNQUOTED;
+							if ($query_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$p += $query_parser->getLength();
+								$_parameters[$num++] = $query_parser->result;
+								$state = self::STATE_NEW;
+								$p--;
+							}
+							elseif ($function_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$p += $function_parser->getLength();
+								$_parameters[$num++] = $function_parser->result;
+								$state = self::STATE_NEW;
+								$p--;
+							}
+							// TODO miks: invent $this->options['collapsed_expression'].
+							elseif (/*$this->options['collapsed_expression'] && */
+									$functionid_parser->parse($source, $p) != CParser::PARSE_FAIL) {
+								$p += $functionid_parser->getLength();
+								$_parameters[$num++] = $functionid_parser->result;
+								$state = self::STATE_NEW;
+								$p--;
+							}
+							else {
+								if (!array_key_exists($num, $_parameters)) {
+									$_parameters[$num] = [
+										'type' => self::PARAM_UNQUOTED,
+										'raw' => $source[$p],
+										'pos' => $p
+									];
+								}
+								else {
+									$_parameters[$num]['raw'] .= $source[$p];
+								}
+
+								$state = self::STATE_UNQUOTED;
+							}
 					}
 					break;
 
@@ -215,6 +242,8 @@ class CFunctionParser extends CParser {
 				case self::STATE_END_OF_PARAMS:
 					break 2;
 			}
+
+			$p++;
 		}
 
 		if ($state == self::STATE_END_OF_PARAMS) {
@@ -233,7 +262,7 @@ class CFunctionParser extends CParser {
 	 * @return string
 	 */
 	public function getFunction(): string {
-		return $this->function;
+		return $this->result->function;
 	}
 
 	/**
@@ -242,7 +271,7 @@ class CFunctionParser extends CParser {
 	 * @return string
 	 */
 	public function getParameters(): string {
-		return $this->parameters;
+		return $this->result->parameters;
 	}
 
 	/**
@@ -251,7 +280,7 @@ class CFunctionParser extends CParser {
 	 * @return array
 	 */
 	public function getParamsRaw(): array {
-		return $this->params_raw;
+		return $this->result->params_raw;
 	}
 
 	/**
@@ -260,7 +289,9 @@ class CFunctionParser extends CParser {
 	 * @return int
 	 */
 	public function getParamsNum(): int {
-		return array_key_exists('parameters', $this->params_raw) ? count($this->params_raw['parameters']) : 0;
+		return array_key_exists('parameters', $this->result->params_raw)
+			? count($this->result->params_raw['parameters'])
+			: 0;
 	}
 
 	/*
@@ -294,14 +325,17 @@ class CFunctionParser extends CParser {
 	public function getParam(int $n): ?string {
 		$num = 0;
 
-		foreach ($this->params_raw['parameters'] as $param) {
+		foreach ($this->result->params_raw['parameters'] as $param) {
 			if ($num++ == $n) {
-				switch ($param['type']) {
-					case self::PARAM_UNQUOTED:
-						// return parameter without any changes
-						return $param['raw'];
-					case self::PARAM_QUOTED:
-						return self::unquoteParam($param['raw']);
+				if ($param instanceof CParserResult) {
+					return $param->match;
+				}
+				elseif ($param['type'] == self::PARAM_UNQUOTED) {
+					// return parameter without any changes
+					return $param['raw'];
+				}
+				elseif ($param['type'] == self::PARAM_QUOTED) {
+					return self::unquoteParam($param['raw']);
 				}
 			}
 		}

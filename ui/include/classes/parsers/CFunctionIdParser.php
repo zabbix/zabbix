@@ -25,6 +25,13 @@
 class CFunctionIdParser extends CParser {
 
 	/**
+	 * Parsed data.
+	 *
+	 * @var CFunctionIdParserResult
+	 */
+	public $result;
+
+	/**
 	 * @param string    $source
 	 * @param int       $pos
 	 *
@@ -32,7 +39,7 @@ class CFunctionIdParser extends CParser {
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
-		$this->match = '';
+		$this->result = new CFunctionIdParserResult();
 
 		$p = $pos;
 
@@ -58,6 +65,12 @@ class CFunctionIdParser extends CParser {
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
+
+		// TODO miks: 'match' shouldn't duplicate.
+		$this->result->length = $this->length;
+		$this->result->match = $this->match;
+		$this->result->functionid = $functionid;
+		$this->result->pos = $pos;
 
 		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}

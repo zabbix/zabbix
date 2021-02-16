@@ -19,6 +19,7 @@
 **/
 
 
+// TODO miks: delete thist file. There will be no separate parser for trigger/math functions. One parser will parse all functions.
 class CTriggerFunctionParserTest extends PHPUnit_Framework_TestCase {
 
 	/**

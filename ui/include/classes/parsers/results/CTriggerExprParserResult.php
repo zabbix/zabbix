@@ -90,6 +90,15 @@ class CTriggerExprParserResult extends CParserResult {
 	}
 
 	/**
+	 * Add function a token to the result.
+	 *
+	 * @param CParserResult  $fn_result
+	 */
+	public function addFunctionToken(CParserResult $fn_result) {
+		$this->tokens[] = $fn_result;
+	}
+
+	/**
 	 * Returns all tokens of the given type.
 	 *
 	 * @param $type
@@ -100,7 +109,7 @@ class CTriggerExprParserResult extends CParserResult {
 		$result = [];
 
 		foreach ($this->tokens as $token) {
-			if ($token['type'] == $type) {
+			if ($token['type'] == $type) { // TODO miks: $this->tokens may contain objects.
 				$result[] = $token;
 			}
 		}
@@ -117,11 +126,147 @@ class CTriggerExprParserResult extends CParserResult {
 	 */
 	public function hasTokenOfType($type) {
 		foreach ($this->tokens as $token) {
-			if ($token['type'] == $type) {
+			if ($token['type'] == $type) { // TODO miks: $this->tokens may contain objects.
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Return array containing all tokens of type CFunctionParserResult.
+	 *
+	 * @return array
+	 */
+	public function getFunctions(): array {
+		$params_stack = $this->tokens;
+		$functions = [];
+
+		while ($params_stack) {
+			$param = array_shift($params_stack);
+			if ($param instanceof CFunctionParserResult) {
+				$functions[] = $param;
+				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
+			}
+		}
+
+		return $functions;
+	}
+
+	/**
+	 * Return array containing all tokens of type CFunctionIdParserResult.
+	 *
+	 * @return array
+	 */
+	public function getFunctionIds(): array {
+		$params_stack = $this->tokens;
+		$return = [];
+
+		while ($params_stack) {
+			$param = array_shift($params_stack);
+			if ($param instanceof CFunctionParserResult) {
+				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
+			}
+			elseif ($param instanceof CFunctionIdParserResult
+					|| (is_array($param) && $param['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO )) {
+				$return[] = $param;
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Return array containing all user macros found in trigger expression.
+	 *
+	 * @return array
+	 */
+	public function getUserMacros(): array {
+		$params_stack = $this->tokens;
+		$return = [];
+
+		while ($params_stack) {
+			$param = array_shift($params_stack);
+			if ($param instanceof CFunctionParserResult) {
+				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
+			}
+			elseif (is_array($param) && $param['type'] == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
+				$return[] = $param;
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Return list hosts found in parsed trigger expression.
+	 *
+	 * @return array
+	 */
+	public function getHosts():array {
+		$hosts = [];
+		foreach ($this->params_raw['parameters'] as $param) {
+			if ($param instanceof CFunctionParserResult) {
+				$hosts = array_merge($hosts, $param->getHosts());
+			}
+			elseif ($param instanceof CQueryParserResult) {
+				$hosts[] = $param->host;
+			}
+		}
+
+		return array_keys(array_flip($hosts));
+	}
+
+	/**
+	 * Return array containing items found in parsed trigger expression grouped by host.
+	 *
+	 * Example:
+	 * [
+	 *   'host1' => [
+	 *     'item1' => 'item1',
+	 *     'item2' => 'item2'
+	 *   ]
+	 * ],
+	 * [
+	 *   'host2' => [
+	 *     'item3' => 'item3',
+	 *   ]
+	 * ]
+	 *
+	 * @return array
+	 */
+	public function getItemsGroupedByHosts():array {
+		$params_stack = $this->tokens;
+		$hosts = [];
+
+		while ($params_stack) {
+			$param = array_shift($params_stack);
+			if ($param instanceof CFunctionParserResult) {
+				$params_stack = array_merge($params_stack, $param->params_raw['parameters']);
+
+				foreach ($param->getItemsGroupedByHosts() as $host => $items) {
+					if (!array_key_exists($host, $hosts)) {
+						$hosts[$host] = [
+							'hostid' => null,
+							'host' => $host,
+							'status' => null,
+							'keys' => []
+						];
+					}
+
+					foreach ($items as $item) {
+						$hosts[$host]['keys'][$item] = [
+							'itemid' => null,
+							'key' => $item,
+							'value_type' => null,
+							'flags' => null
+						];
+					}
+				}
+			}
+		}
+
+		return $hosts;
 	}
 }
