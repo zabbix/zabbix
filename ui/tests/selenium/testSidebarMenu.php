@@ -244,16 +244,13 @@ class testSidebarMenu extends CWebTest {
 		$this->page->login()->open('')->waitUntilReady();
 		$this->assertTrue($this->query('xpath://li[@class="is-selected"]/a[text()="Dashboard"]')->waitUntilReady()->exists());
 
-		// Sidebar main menu or user menu.
-		$menu = ($data['section'] === 'User settings') ? 'user' : 'main';
-
-		// Menu section.
-		$main_section = $this->query('xpath://ul[@class="menu-'.$menu.'"]')->query('link', $data['section']);
-
-		// Section page.
+		$menu__type = ($data['section'] === 'User settings') ? 'user' : 'main';
+		// First level menu.
+		$main_section = $this->query('xpath://ul[@class="menu-'.$menu__type.'"]')->query('link', $data['section']);
+		// Second level menu.
 		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page']);
 
-		// When login in Zabbix, Monitoring section is opened.
+		// Click on the first level menu and wait for it to fully open.
 		if ($data['section'] !== 'Monitoring') {
 			$main_section->waitUntilReady()->one()->click();
 			$element = $this->query('xpath://a[text()="'.$data['section'].'"]/../ul[@class="submenu"]')->one();
@@ -263,7 +260,6 @@ class testSidebarMenu extends CWebTest {
 			});
 		}
 
-		// Click on page.
 		$submenu->waitUntilClickable()->one()->click();
 		$this->page->assertHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
 	}
@@ -285,11 +281,11 @@ class testSidebarMenu extends CWebTest {
 				$id = 'sidebar-button-toggle';
 			}
 
-			// Clicking hide, collapse button.
+			// Clicking hide/collapse button.
 			$this->query('button', $hide)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.'"]')->waitUntilReady()->exists());
 
-			// Checking that collapsed, hiden sidemenu appears on clicking.
+			// Waiting sidemenu to hide/collapse.
 			if ($view === 'compact') {
 				$this->query('class:zabbix-sidebar-logo')->one(false)->waitUntilNotVisible();
 			}
@@ -300,7 +296,7 @@ class testSidebarMenu extends CWebTest {
 			$this->query('id', $id)->one()->click();
 			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
 
-			// Checking that collapsed, hiden sidemenu appears on clicking.
+			// Checking that collapsed, hidden sidemenu appears on clicking.
 			if ($view === 'compact') {
 				$this->query('xpath://aside[@class="sidebar is-compact is-opened"]')->one()->waitUntilVisible();
 			}
