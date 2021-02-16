@@ -125,6 +125,8 @@ require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testFormTagsHost.php';
 require_once dirname(__FILE__).'/testFormTagsHostPrototype.php';
+require_once dirname(__FILE__).'/testFormTagsItem.php';
+require_once dirname(__FILE__).'/testFormTagsItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTagsTemplate.php';
 require_once dirname(__FILE__).'/testFormTagsTrigger.php';
 require_once dirname(__FILE__).'/testFormTagsTriggerPrototype.php';
@@ -275,6 +277,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
+		$suite->addTestSuite('testFormTagsItem');
+		$suite->addTestSuite('testFormTagsItemPrototype');
 		$suite->addTestSuite('testFormTagsTemplate');
 		$suite->addTestSuite('testFormTagsTrigger');
 		$suite->addTestSuite('testFormTagsTriggerPrototype');

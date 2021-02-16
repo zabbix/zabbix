@@ -171,20 +171,32 @@ class testFormTags extends CWebTest {
 	 * Check create host, template, trigger or prototype with tags.
 	 *
 	 * @param arary    $data         data provider
-	 * @param string   $object       host, template, trigger or prototype
+	 * @param string   $object       host, template, trigger, item or prototype
 	 * @param string   $expression   trigger or trigger prototype expression
 	 */
 	public function checkTagsCreate($data, $object, $expression = null) {
 		$sql = null;
 		$old_hash = null;
 
-		if ($object === 'trigger' || $object === 'trigger prototype') {
-			$sql = 'SELECT * FROM triggers ORDER BY triggerid';
-			$locator = 'name:triggersForm';
-		}
-		else {
-			$sql = 'SELECT * FROM hosts ORDER BY hostid';
-			$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
+		switch ($object) {
+			case 'trigger':
+			case 'trigger prototype':
+				$sql = 'SELECT * FROM triggers ORDER BY triggerid';
+				$locator = 'name:triggersForm';
+				$fields = ['Name' => $data['name'], 'Expression' => $expression];
+				break;
+
+			case 'item':
+			case 'item prototype':
+				$sql = 'SELECT * FROM items ORDER BY itemid';
+				$locator = 'name:itemForm';
+				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true)];
+				break;
+
+			default:
+				$sql = 'SELECT * FROM hosts ORDER BY hostid';
+				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
+				$fields = [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers'];
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -194,10 +206,6 @@ class testFormTags extends CWebTest {
 		$this->page->login()->open($this->link);
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
 		$form = $this->query($locator)->waitUntilPresent()->asForm()->one();
-
-		$fields = ($object === 'host' || $object === 'template')
-			? [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers']
-			: ['Name' => $data['name'], 'Expression' => $expression];
 
 		if ($object === 'host prototype') {
 			$data['name'] = $data['name'].' {#KEY}';
@@ -316,13 +324,22 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 
-		if ($object === 'trigger' || $object === 'trigger prototype') {
-			$sql = 'SELECT * FROM triggers ORDER BY triggerid';
-			$locator = 'name:triggersForm';
-		}
-		else {
-			$sql = 'SELECT * FROM hosts ORDER BY hostid';
-			$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
+		switch ($object) {
+			case 'trigger':
+			case 'trigger prototype':
+				$sql = 'SELECT * FROM triggers ORDER BY triggerid';
+				$locator = 'name:triggersForm';
+				break;
+
+			case 'item':
+			case 'item prototype':
+				$sql = 'SELECT * FROM items ORDER BY itemid';
+				$locator = 'name:itemForm';
+				break;
+
+			default:
+				$sql = 'SELECT * FROM hosts ORDER BY hostid';
+				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -345,32 +362,41 @@ class testFormTags extends CWebTest {
 	 * Check result after creating or updating object with tags.
 	 *
 	 * @param arary     $data        data provider
-	 * @param string    $object      host, template, trigger or prototype
+	 * @param string    $object      host, template, trigger, item or prototype
 	 * @param element   $form        object configuration form
 	 * @param string    $action      create or update object
 	 * @param string    $sql         selected table from db
 	 * @param string    $old_hash    db hash before changes
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
+
+		switch ($object) {
+			case 'host':
+			case 'template':
+				$error_details = CTestArrayHelper::get($data, 'error_details');
+				$success_sql = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
+				break;
+
+			case 'trigger':
+			case 'trigger prototype':
+				$error_details = CTestArrayHelper::get($data, 'trigger_error_details');
+				$success_sql = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name']);
+				break;
+
+			case 'host prototype':
+				$error_details = CTestArrayHelper::get($data, 'host_prototype_error_details');
+				$success_sql = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
+				break;
+
+			case 'item':
+			case 'item prototype':
+				$error_details = CTestArrayHelper::get($data, 'host_prototype_error_details');
+				$success_sql = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($data['name']);
+				break;
+		}
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$title = ($action === 'add') ? 'Cannot add '.$object : 'Cannot update '.$object;
-
-			switch ($object) {
-				case 'host':
-				case 'template':
-					$error_details = $data['error_details'];
-					break;
-
-				case 'trigger':
-				case 'trigger prototype':
-					$error_details = $data['trigger_error_details'];
-					break;
-
-				case 'host prototype':
-					$error_details = $data['host_prototype_error_details'];
-					break;
-			}
-
 			$this->assertMessage(TEST_BAD, $title, $error_details);
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -378,11 +404,6 @@ class testFormTags extends CWebTest {
 		else {
 			$title = ($action === 'add') ? ucfirst($object).' added' : ucfirst($object).' updated';
 			$this->assertMessage(TEST_GOOD, $title);
-
-			$success_sql = ($object === 'trigger' || $object === 'trigger prototype')
-				? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($data['name'])
-				: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name']);
-
 			$this->assertEquals(1, CDBHelper::getCount($success_sql));
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
@@ -406,6 +427,16 @@ class testFormTags extends CWebTest {
 			case 'trigger prototype':
 				$form = $this->query('name:triggersForm')->asForm()->waitUntilPresent()->one();
 				$form->fill(['Name' => $new_name]);
+				$sql_old_name = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name);
+				$sql_new_name = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name);
+				break;
+
+			case 'item':
+			case 'item prototype':
+				$form = $this->query('name:itemForm')->asForm()->waitUntilPresent()->one();
+				$form->fill(['Name' => $new_name, 'Key' => 'newkey_'.microtime(true)]);
+				$sql_old_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($this->clone_name);
+				$sql_new_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($new_name);
 				break;
 
 			case 'host':
@@ -413,11 +444,15 @@ class testFormTags extends CWebTest {
 				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:hostsForm';
 				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
 				$form->fill(['Host name' => $new_name]);
+				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
+				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
 
 			case 'template':
 				$form = $this->query('name:templatesForm')->asForm()->waitUntilPresent()->one();
 				$form->fill(['Template name' => $new_name]);
+				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
+				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
 		}
 
@@ -432,16 +467,7 @@ class testFormTags extends CWebTest {
 		$this->assertMessage(TEST_GOOD, ucfirst($object).' added');
 
 		// Check the results in DB.
-		$sql_old_name = ($object === 'trigger' || $object === 'trigger prototype')
-			? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name)
-			: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
-
 		$this->assertEquals(1, CDBHelper::getCount($sql_old_name));
-
-		$sql_new_name = ($object === 'trigger' || $object === 'trigger prototype')
-			? 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name)
-			: 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
-
 		$this->assertEquals(1, CDBHelper::getCount($sql_new_name));
 
 		// Check created clone.
@@ -472,13 +498,19 @@ class testFormTags extends CWebTest {
 	 * Function for checking saved tag fields in form.
 	 *
 	 * @param arary    $data     data provider
-	 * @param string   $object   host, template, trigger or prototype
+	 * @param string   $object   host, template, trigger, item or prototype
 	 * @param string   $form     object configuration form
 	 */
 	private function checkTagFields($data, $object, $form) {
-		$id = ($object === 'trigger' || $object === 'trigger prototype')
-			? CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['name']))
-			: CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
+		if ($object === 'trigger' || $object === 'trigger prototype') {
+			$id = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr($data['name']));
+		}
+		elseif ($object === 'item' || $object === 'item prototype') {
+			$id = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($data['name']));
+		}
+		else {
+			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
+		}
 
 		$this->page->open($this->saved_link.$id);
 		$form->selectTab('Tags');

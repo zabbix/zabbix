@@ -2179,6 +2179,24 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (1
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (184, 100112, 'action', 'update');
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 100112, 'tag', 'trigger');
 
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99116, 2, 99109, 'Item with tags for updating', 'tags.update', '', '', '', '');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99004, 99116, 'action', 'update');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99005, 99116, 'without value', '');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99117, 2, 99109, 'Item with tags for cloning', 'tags.cloning', '', '', '', '');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99006, 99117, 'action', 'clone');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99007, 99117, 'without value', '');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99118, 2, 40001, 'Item prototype with tags for updating', 'prototype.tags.update', '', 2, '', '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15090, 99118, 33800);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99008, 99118, 'action', 'update');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99009, 99118, 'without value prototype', '');
+
+INSERT INTO items (itemid, type, hostid, name, key_, params, flags, description, posts, headers) VALUES (99119, 2, 40001, 'Item prototype with tags for cloning', 'prototype.tags.cloning', '', 2,  '', '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15091, 99119, 33800);
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99010, 99119, 'action', 'clone');
+INSERT INTO item_tag (itemtagid, itemid, tag, value) VALUES (99011, 99119, 'without value prototype', '');
+
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
 
