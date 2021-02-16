@@ -267,26 +267,10 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->functions = [
-			'abschange' => [
-				'description' => _('abschange() - Absolute difference between last and previous value'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
 			'avg' => [
 				'description' => _('avg() - Average value of a period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'delta' => [
-				'description' => _('delta() - Difference between MAX and MIN value of a period T'),
-				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'change' => [
-				'description' => _('change() - Difference between last and previous value'),
-				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'count' => [
@@ -294,11 +278,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'params' => $this->param3SecVal,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'diff' => [
-				'description' => _('diff() - Difference between last and preceding values (1 - true, 0 - false)'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>']
 			],
 			'last' => [
 				'description' => _('last() - Last (most recent) T value'),
@@ -322,11 +301,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('percentile() - Percentile P of a period T'),
 				'params' => $this->param3SecPercent,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'prev' => [
-				'description' => _('prev() - Previous value'),
-				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'str' => [
@@ -441,12 +415,6 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('trendcount() - Number of successfully retrieved values V (which fulfill operator O) for period T with exact period shift'),
 				'params' => $this->param1Period,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'trenddelta' => [
-				'description' => _('trenddelta() - Difference between MAX and MIN value of a period T with exact period shift'),
-				'params' => $this->param1Period,
-				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'trendmax' => [

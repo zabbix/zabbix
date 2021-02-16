@@ -1878,16 +1878,12 @@ function get_item_function_info($expr) {
 	];
 
 	$functions = [
-		'abschange' => $rules['numeric'] + $rules['string_as_0or1'],
 		'avg' => $rules['numeric_as_float'],
 		'band' => $rules['integer'],
-		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'date' => $rules['date'],
 		'dayofmonth' => $rules['day_of_month'],
 		'dayofweek' => $rules['day_of_week'],
-		'delta' => $rules['numeric'],
-		'diff' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'iregexp' => $rules['string_as_0or1'],
@@ -1900,7 +1896,6 @@ function get_item_function_info($expr) {
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'percentile' => $rules['numeric'],
-		'prev' => $rules['numeric'] + $rules['string'],
 		'regexp' => $rules['string_as_0or1'],
 		'str' => $rules['string_as_0or1'],
 		'strlen' => $rules['string_as_uint'],
@@ -1909,7 +1904,6 @@ function get_item_function_info($expr) {
 		'timeleft' => $rules['numeric_as_float'],
 		'trendavg' => $rules['numeric'],
 		'trendcount' => $rules['numeric'],
-		'trenddelta' => $rules['numeric'],
 		'trendmax' => $rules['numeric'],
 		'trendmin' => $rules['numeric'],
 		'trendsum' => $rules['numeric']
