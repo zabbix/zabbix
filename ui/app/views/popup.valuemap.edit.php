@@ -42,10 +42,6 @@ if ($data['edit']) {
 	$form->addVar('edit', $data['edit']);
 }
 
-if ($data['name_readonly']) {
-	$form->addVar('name_readonly', $data['name_readonly']);
-}
-
 foreach (array_values($data['valuemap_names']) as $index => $name) {
 	$form->addVar('valuemap_names['.$index.']', $name);
 }
@@ -70,7 +66,7 @@ $form_grid
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], $data['name_readonly'], DB::getFieldLength('valuemap', 'name')))
+			(new CTextBox('name', $data['name'], false, DB::getFieldLength('valuemap', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired()

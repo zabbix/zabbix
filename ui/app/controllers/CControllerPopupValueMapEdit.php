@@ -30,7 +30,6 @@ class CControllerPopupValueMapEdit extends CController {
 			'edit' => 'in 1,0',
 			'mappings' => 'array',
 			'name' => 'string',
-			'name_readonly' => 'in 1,0',
 			'update' => 'in 1',
 			'valuemapid' => 'id',
 			'valuemap_names' => 'array'
@@ -123,7 +122,7 @@ class CControllerPopupValueMapEdit extends CController {
 	 */
 	protected function update(): CControllerResponse {
 		$data = [];
-		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit', 'name_readonly']);
+		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit']);
 		order_result($data['mappings'], 'value');
 		$data['mappings'] = array_values($data['mappings']);
 
@@ -141,7 +140,6 @@ class CControllerPopupValueMapEdit extends CController {
 			'edit' => 0,
 			'mappings' => [],
 			'name' => '',
-			'name_readonly' => 0,
 			'valuemap_names' => [],
 			'valuemapid' => 0
 		];
@@ -157,7 +155,6 @@ class CControllerPopupValueMapEdit extends CController {
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
-		$data['name_readonly'] = (bool) $data['name_readonly'];
 
 		return new CControllerResponseData($data);
 	}
