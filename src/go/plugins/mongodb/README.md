@@ -82,13 +82,13 @@ parameters: Uri, User and Password. It's a bit more secure way to store credenti
 E.g: suppose you have two MongoDB instances: "Prod" and "Test". 
 You should add the following options to the agent configuration file:   
 
-    Plugins.MongoDB.Sessions.Prod.Uri=tcp://192.168.1.1:27017
-    Plugins.MongoDB.Sessions.Prod.User=<UserForProd>  
-    Plugins.MongoDB.Sessions.Prod.Password=<PasswordForProd>  
+    Plugins.Mongo.Sessions.Prod.Uri=tcp://192.168.1.1:27017
+    Plugins.Mongo.Sessions.Prod.User=<UserForProd>
+    Plugins.Mongo.Sessions.Prod.Password=<PasswordForProd>
       
-    Plugins.MongoDB.Sessions.Test.Uri=tcp://192.168.0.1:27017
-    Plugins.MongoDB.Sessions.Test.User=<UserForTest>   
-    Plugins.MongoDB.Sessions.Test.Password=<PasswordForTest>
+    Plugins.Mongo.Sessions.Test.Uri=tcp://192.168.0.1:27017
+    Plugins.Mongo.Sessions.Test.User=<UserForTest>
+    Plugins.Mongo.Sessions.Test.Password=<PasswordForTest>
         
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 
