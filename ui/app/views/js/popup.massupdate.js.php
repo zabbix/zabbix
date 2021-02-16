@@ -338,6 +338,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 			srcfld1: 'valuemapid',
 			hostids: hostids,
 			disable_names: disable_names,
+			with_filter_hostgroup: 1,
 			editable: true,
 			context: (action === 'popup.massupdate.host') ? 'host' : 'template'
 		}, null, elm);
