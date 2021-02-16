@@ -651,10 +651,8 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
 				: null;
 
-			if (array_key_exists('hostname', $valuemap)) {
-				$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
-				$name[] = NAME_DELIMITER;
-			}
+			$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
+			$name[] = NAME_DELIMITER;
 
 			if (array_key_exists('_disabled', $valuemap) && $valuemap['_disabled']) {
 				if ($data['multiselect']) {
