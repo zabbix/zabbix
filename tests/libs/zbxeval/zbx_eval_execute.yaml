@@ -704,5 +704,29 @@ in:
 out:
   result: SUCCEED
   value: '1024'
+---
+test case: Expression '3 + 4 * 2 / ( 1 - 5 )'
+in:
+  rules: []
+  expression: '3 + 4 * 2 / ( 1 - 5 )'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression '1 + 3*4 = 13'
+in:
+  rules: []
+  expression: '1 + 3*4 = 13'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression '1 + 2*4 = 13'
+in:
+  rules: []
+  expression: '1 + 2*4 = 13'
+out:
+  result: SUCCEED
+  value: 0
 ...
 
