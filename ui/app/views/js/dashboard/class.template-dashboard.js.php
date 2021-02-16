@@ -60,6 +60,7 @@
 
 			ZABBIX.Dashboard.setWidgetDefaults(this.widget_defaults);
 			ZABBIX.Dashboard.addWidgets(this.data.widgets);
+			ZABBIX.Dashboard.activate();
 
 			$('#dashbrd-config').on('click', () => this.openProperties());
 			$('#dashbrd-add-widget').on('click', () => ZABBIX.Dashboard.addNewWidget(this));

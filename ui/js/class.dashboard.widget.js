@@ -41,6 +41,13 @@ class CDashboardWidget extends CBaseComponent {
 			widget.configuration = {};
 		}
 
+		this._cell_width = 0;
+		this._cell_height = 0;
+
+		this._is_active = false;
+		this._is_iterator = widget.defaults.iterator;
+		this._is_editable = false;
+
 		widget = {
 			'widgetid': '',
 			'type': '',
@@ -58,10 +65,6 @@ class CDashboardWidget extends CBaseComponent {
 			'initial_load': true,
 			'ready': false,
 			'storage': {},
-			cell_width: 0,
-			cell_height: 0,
-			iterator: false,
-			is_editable: false,
 			'parent': false,
 			...widget,
 			$button_iterator_previous_page: undefined,
@@ -77,9 +80,7 @@ class CDashboardWidget extends CBaseComponent {
 			this.dynamic_hostid = null;
 		}
 
-		widget.iterator = widget.defaults.iterator;
-
-		if (widget.iterator) {
+		if (this._is_iterator) {
 			widget = {
 				...widget,
 				'page': 1,
@@ -93,23 +94,35 @@ class CDashboardWidget extends CBaseComponent {
 			this[key] = widget[key];
 		}
 
-		this._is_active = false;
-
 		this._makeWidgetDiv();
-
-		this.registerEvents();
 	}
 
 	activate() {
 		this._is_active = true;
+
+		this._registerEvents();
+
+		return this;
 	}
 
 	deactivate() {
 		this._is_active = false;
+
+		this._unregisterEvents();
+
+		return this;
+	}
+
+	isEditable() {
+		return this._is_editable;
+	}
+
+	isIterator() {
+		return this._is_iterator;
 	}
 
 	showPreloader() {
-		if (this.iterator) {
+		if (this._is_iterator) {
 			this.div.find('.dashbrd-grid-iterator-content').addClass('is-loading');
 		}
 		else {
@@ -167,7 +180,7 @@ class CDashboardWidget extends CBaseComponent {
 			'hidden_header': 'dashbrd-grid-widget-hidden-header'
 		};
 
-		const classes = this.iterator ? iterator_classes : widget_classes;
+		const classes = this._is_iterator ? iterator_classes : widget_classes;
 
 		this.content_header = $('<div>', {'class': classes.head})
 			.append($('<h4>').text((this.header !== '') ? this.header : this.defaults.header));
@@ -192,7 +205,7 @@ class CDashboardWidget extends CBaseComponent {
 				widget_actions.dynamic_hostid = this.dynamic_hostid;
 			}
 
-			if (this.iterator) {
+			if (this._is_iterator) {
 				this.$button_iterator_previous_page = $('<button>', {
 					'type': 'button',
 					'class': 'btn-iterator-page-previous',
@@ -205,7 +218,7 @@ class CDashboardWidget extends CBaseComponent {
 				});
 			}
 
-			if (this.is_editable) {
+			if (this._is_editable) {
 				this.$button_edit = $('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-edit',
@@ -215,7 +228,7 @@ class CDashboardWidget extends CBaseComponent {
 
 			// Do not add action buttons for child widgets of iterators.
 			this.content_header
-				.append(this.iterator
+				.append(this._is_iterator
 					? $('<div>', {'class': 'dashbrd-grid-iterator-pager'}).append(
 						this.$button_iterator_previous_page,
 						$('<span>', {'class': 'dashbrd-grid-iterator-pager-info'}),
@@ -225,7 +238,7 @@ class CDashboardWidget extends CBaseComponent {
 				)
 
 				.append($('<ul>', {'class': classes.actions})
-					.append(this.is_editable
+					.append(this._is_editable
 						? $('<li>').append(this.$button_edit)
 						: ''
 					)
@@ -250,13 +263,13 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		this.content_body = $('<div>', {'class': classes.content})
-			.toggleClass('no-padding', !this.iterator && !this.configuration['padding']);
+			.toggleClass('no-padding', !this._is_iterator && !this.configuration['padding']);
 
 		this.container = $('<div>', {'class': classes.container})
 			.append(this.content_header)
 			.append(this.content_body);
 
-		if (this.iterator) {
+		if (this._is_iterator) {
 			this.container
 				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
 					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
@@ -273,8 +286,8 @@ class CDashboardWidget extends CBaseComponent {
 
 		if (!this.parent) {
 			this.div.css({
-				'min-height': `${this.cell_height}px`,
-				'min-width': `${this.cell_width}%`
+				'min-height': `${this._cell_height}px`,
+				'min-width': `${this._cell_width}%`
 			});
 		}
 
@@ -291,7 +304,7 @@ class CDashboardWidget extends CBaseComponent {
 		});
 	}
 
-	registerEvents() {
+	_registerEvents() {
 		this._events = {
 			iteratorPreviousPage: () => {
 				this.fire(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK);
@@ -315,12 +328,12 @@ class CDashboardWidget extends CBaseComponent {
 		};
 
 		if (!this.parent) {
-			if (this.iterator) {
+			if (this._is_iterator) {
 				this.$button_iterator_previous_page.on('click', this._events.iteratorPreviousPage);
 				this.$button_iterator_next_page.on('click', this._events.iteratorNextPage);
 			}
 
-			if (this.is_editable) {
+			if (this._is_editable) {
 				this.$button_edit.on('click', this._events.edit);
 			}
 		}
@@ -349,5 +362,22 @@ class CDashboardWidget extends CBaseComponent {
 					this._events.leave();
 				}
 			});
+	}
+
+	_unregisterEvents() {
+		if (!this.parent) {
+			if (this._is_iterator) {
+				this.$button_iterator_previous_page.off('click', this._events.iteratorPreviousPage);
+				this.$button_iterator_next_page.off('click', this._events.iteratorNextPage);
+			}
+
+			if (this._is_editable) {
+				this.$button_edit.off('click', this._events.edit);
+			}
+		}
+
+		this.content_header.off('focusin focusout');
+
+		this.div.off('mouseenter mousemove mouseleave');
 	}
 }

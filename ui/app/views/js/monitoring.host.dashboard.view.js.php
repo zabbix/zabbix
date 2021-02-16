@@ -49,6 +49,7 @@
 
 		ZABBIX.Dashboard.setWidgetDefaults(widget_defaults);
 		ZABBIX.Dashboard.addWidgets(data.widgets);
+		ZABBIX.Dashboard.activate();
 
 		jqBlink.blink();
 	}

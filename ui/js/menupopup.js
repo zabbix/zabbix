@@ -585,7 +585,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
  * @return array
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
-	var dashboard_data = ZABBIX.Dashboard.getDashboardData(),
+	var dashboard_data = ZABBIX.Dashboard.getDashboardData().dashboard,
 		editMode = ZABBIX.Dashboard.isEditMode(),
 		widget = ZABBIX.Dashboard.getWidgetsBy('uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,

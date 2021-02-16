@@ -87,6 +87,7 @@
 
 			ZABBIX.Dashboard.setWidgetDefaults(this.widget_defaults);
 			ZABBIX.Dashboard.addWidgets(this.data.widgets);
+			ZABBIX.Dashboard.activate();
 
 			this._livePages();
 
