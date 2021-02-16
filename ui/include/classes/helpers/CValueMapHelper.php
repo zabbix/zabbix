@@ -22,41 +22,6 @@
 class CValueMapHelper {
 
 	/**
-	 * Get host or template parent templates recursively, input host or template will be added to result array.
-	 *
-	 * @param array $hosts          Hosts or templates array to get parent templates for.
-	 * @param array $parent_fields  Fields to select for parent templates.
-	 * @return array
-	 */
-	static public function getParentTemplatesRecursive(array $hosts, array $parent_fields): array {
-		$all_templates = $hosts;
-		$templates = $hosts;
-
-		while (true) {
-			$parent_templates = [];
-
-			foreach ($templates as $template) {
-				$parent_templates += array_column($template['parentTemplates'], null, 'templateid');
-			}
-
-			$temlpateids = array_diff_key($parent_templates, $all_templates);
-			$all_templates += $parent_templates;
-
-			if (!$temlpateids) {
-				break;
-			}
-
-			$templates = API::Template()->get([
-				'output' => [],
-				'selectParentTemplates' => $parent_fields,
-				'templateids' => array_keys($temlpateids)
-			]);
-		};
-
-		return $all_templates;
-	}
-
-	/**
 	 * Apply value mapping to value.
 	 * If value map or mapping is not found, unchanged value is returned,
 	 * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".

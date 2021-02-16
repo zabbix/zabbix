@@ -341,7 +341,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 			hostids: hostids,
 			disable_names: disable_names,
 			editable: true,
-			show_host_name: 1,
 			context: (action === 'popup.massupdate.host') ? 'host' : 'template'
 		}, null, elm);
 	}

@@ -350,44 +350,9 @@ $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
  * Filter
  */
 if (hasRequest('filter_set')) {
-	$filter_hostids = getRequest('filter_hostids', []);
-	$filter_valuemapids = getRequest('filter_valuemapids', []);
-
-	if ($filter_hostids && $filter_valuemapids) {
-		if (getRequest('context') === 'host') {
-			$valuemap_templates = API::Host()->get([
-				'output' => [],
-				'selectParentTemplates' => ['templateid'],
-				'hostids' => $filter_hostids,
-				'preservekeys' => true
-			]);
-		}
-		else {
-			$valuemap_templates = API::Template()->get([
-				'output' => [],
-				'selectParentTemplates' => ['templateid'],
-				'templateids' => $filter_hostids,
-				'preservekeys' => true
-			]);
-		}
-
-		$valuemap_templates = CValueMapHelper::getParentTemplatesRecursive($valuemap_templates, ['templateid']);
-		$valuemap_name = API::ValueMap()->get([
-			'output' => ['name'],
-			'valuemapids' => $filter_valuemapids
-		]);
-		$valuemap_name = array_unique(array_column($valuemap_name, 'name'));
-		$valuemapids = API::ValueMap()->get([
-			'output' => ['valuemapid'],
-			'hostids' => array_keys($valuemap_templates),
-			'filter' => ['name' => $valuemap_name]
-		]);
-		$filter_valuemapids = array_column($valuemapids, 'valuemapid');
-	}
-
 	CProfile::updateArray($prefix.'items.filter_groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
-	CProfile::updateArray($prefix.'items.filter_hostids', $filter_hostids, PROFILE_TYPE_ID);
-	CProfile::updateArray($prefix.'items.filter_valuemapids', $filter_valuemapids, PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'items.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+	CProfile::updateArray($prefix.'items.filter_valuemapids', getRequest('filter_valuemapids', []), PROFILE_TYPE_ID);
 	CProfile::update($prefix.'items.filter_application', getRequest('filter_application', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'items.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
@@ -1379,7 +1344,18 @@ else {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
 	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
-		$options['filter']['valuemapid'] = $_REQUEST['filter_valuemapids'];
+		$hostids = CTemplateHelper::getParentTemplatesRecursive($filter_hostids, $data['context']);
+
+		$valuemap_names = array_unique(array_column(API::ValueMap()->get([
+			'output' => ['name'],
+			'valuemapids' => $_REQUEST['filter_valuemapids']
+		]), 'name'));
+
+		$options['filter']['valuemapid'] = array_column(API::ValueMap()->get([
+			'output' => ['valuemapid'],
+			'hostids' => $hostids,
+			'filter' => ['name' => $valuemap_names]
+		]), 'valuemapid');
 	}
 
 	/*

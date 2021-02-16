@@ -481,7 +481,6 @@ class CControllerPopupGeneric extends CController {
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'context' =>							'string|in host,template',
-			'show_host_name' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
@@ -1393,24 +1392,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				if ($this->hasInput('with_inherited')) {
-					if ($context === 'host') {
-						$hosts = API::Host()->get([
-							'output' => [],
-							'selectParentTemplates' => ['templateid'],
-							'hostids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-					else {
-						$hosts = API::Template()->get([
-							'output' => [],
-							'selectParentTemplates' => ['templateid'],
-							'templateids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-
-					$hostids = array_keys(CValueMapHelper::getParentTemplatesRecursive($hosts, ['templateid']));
+					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $context);
 				}
 
 				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
@@ -1429,8 +1411,6 @@ class CControllerPopupGeneric extends CController {
 				 *
 				 * hostids           (required) Array of host or template ids to get value maps from.
 				 * context           (required) Define context for inherited value maps: host, template
-				 * with_inherited    Include value map inherited from template.
-				 * show_host_name    Display host name as value map prefix in value maps popup.
 				 */
 				$records = [];
 				$options = [];
@@ -1441,51 +1421,29 @@ class CControllerPopupGeneric extends CController {
 					break;
 				}
 
-				if ($this->hasInput('with_inherited')) {
-					if ($context === 'host') {
-						$hosts = API::Host()->get([
-							'output' => [],
-							'selectParentTemplates' => ['templateid'],
-							'hostids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-					else {
-						$hosts = API::Template()->get([
-							'output' => [],
-							'selectParentTemplates' => ['templateid'],
-							'templateids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-
-					$hosts = CValueMapHelper::getParentTemplatesRecursive($hosts, ['templateid', 'host']);
-				}
-				else {
-					if ($context === 'host') {
-						$hosts = API::Host()->get([
-							'output' => ['host'],
-							'hostids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-					else {
-						$hosts = API::Template()->get([
-							'output' => ['host'],
-							'templateids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-				}
-
 				$db_valuemaps = API::ValueMap()->get([
 					'output' => ['valuemapid', 'name', 'hostid'],
 					'selectMappings' => ['value', 'newvalue'],
-					'hostids' => array_keys($hosts)
+					'hostids' => $hostids
 				]);
 
 				if (!$db_valuemaps) {
 					break;
+				}
+
+				if ($context === 'host') {
+					$hosts = API::Host()->get([
+						'output' => ['name'],
+						'hostids' => $hostids,
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$hosts = API::Template()->get([
+						'output' => ['name'],
+						'templateids' => $hostids,
+						'preservekeys' => true
+					]);
 				}
 
 				$disable_names = $this->getInput('disable_names', []);
@@ -1494,14 +1452,11 @@ class CControllerPopupGeneric extends CController {
 					order_result($db_valuemap['mappings'], 'value');
 					$valuemap = [
 						'id' => $db_valuemap['valuemapid'],
+						'hostname' => $hosts[$db_valuemap['hostid']]['name'],
 						'name' => $db_valuemap['name'],
 						'mappings' => array_values($db_valuemap['mappings']),
 						'_disabled' => in_array($db_valuemap['name'], $disable_names)
 					];
-
-					if ($this->hasInput('show_host_name')) {
-						$valuemap['hostname'] = $hosts[$db_valuemap['hostid']]['host'];
-					}
 
 					$records[$db_valuemap['valuemapid']] = $valuemap;
 				}

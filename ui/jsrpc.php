@@ -545,12 +545,7 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'valuemaps':
-				// Is required for item and item prototype form.
-				// break; is not missing here
 			case 'valuemap_names':
-				$result = [];
-
 				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
 					break;
 				}
@@ -558,24 +553,7 @@ switch ($data['method']) {
 				$hostids = $data['hostids'];
 
 				if (array_key_exists('with_inherited', $data)) {
-					if ($data['context'] === 'host') {
-						$templates = API::Host()->get([
-							'output' => [],
-							'selectParentTemplates' => ['templateid'],
-							'hostids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-					else {
-						$templates = API::Template()->get([
-							'output' => [],
-							'selectParentTemplates' => ['templateid'],
-							'templateids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-
-					$hostids = array_keys(CValueMapHelper::getParentTemplatesRecursive($templates, ['templateid']));
+					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $data['context']);
 				}
 
 				$result = API::ValueMap()->get([
@@ -586,6 +564,43 @@ switch ($data['method']) {
 				]);
 				$result = array_column($result, null, 'name');
 				$result = CArrayHelper::renameObjectsKeys($result, ['valuemapid' => 'id']);
+				CArrayHelper::sort($result, ['name']);
+				break;
+
+			case 'valuemaps':
+				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
+					break;
+				}
+
+				if ($data['context'] === 'host') {
+					$hosts = API::Host()->get([
+						'output' => ['name'],
+						'hostids' => $data['hostids'],
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$hosts = API::Template()->get([
+						'output' => ['name'],
+						'templateids' => $data['hostids'],
+						'preservekeys' => true
+					]);
+				}
+
+				$valuemaps = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name', 'hostid'],
+					'hostids' => $data['hostids'],
+					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+				]);
+
+				foreach ($valuemaps as &$valuemap) {
+					$valuemap['prefix'] = $hosts[$valuemap['hostid']]['name'].NAME_DELIMITER;
+					unset($valuemap['hostid']);
+				}
+				unset($valuemap);
+
+				$result = CArrayHelper::renameObjectsKeys($valuemaps, ['valuemapid' => 'id']);
 				CArrayHelper::sort($result, ['name']);
 				break;
 		}
