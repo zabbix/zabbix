@@ -292,11 +292,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		obj = valuemap.originalObject;
 	}
 
-	var hostids = [];
-
-	document.getElementById('massupdate-form').querySelectorAll('[type="hidden"][name^="ids["]').forEach(
-		hostid => hostids.push(hostid.value)
-	);
 	obj.querySelectorAll('[name=valuemap_massupdate]').forEach((elem) => elem.addEventListener('click',
 		(event) => toggleVisible(obj, event.currentTarget.value)
 	));
@@ -336,11 +331,8 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		PopUp('popup.generic', {
 			srctbl: 'valuemaps',
 			srcfld1: 'valuemapid',
-			hostids: hostids,
 			disable_names: disable_names,
-			with_filter_hostgroup: 1,
-			editable: true,
-			context: (action === 'popup.massupdate.host') ? 'host' : 'template'
+			editable: true
 		}, null, elm);
 	}
 

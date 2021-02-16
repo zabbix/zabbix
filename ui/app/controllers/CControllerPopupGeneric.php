@@ -478,7 +478,6 @@ class CControllerPopupGeneric extends CController {
 			'with_hosts_and_templates' =>			'in 1',
 			'with_webitems' =>						'in 1',
 			'with_inherited' =>						'in 1',
-			'with_filter_hostgroup' =>				'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'context' =>							'string|in host,template',
@@ -678,11 +677,6 @@ class CControllerPopupGeneric extends CController {
 			}
 		}
 
-		// Valuemap mass update uses host group filter.
-		if ($this->source_table === 'valuemaps' && $this->hasInput('with_filter_hostgroup')) {
-			$this->group_preselect_required = true;
-		}
-
 		// Host group dropdown.
 		if ($this->group_preselect_required
 				&& ($this->source_table !== 'item_prototypes' || !$this->page_options['parent_discoveryid'])) {
@@ -835,7 +829,8 @@ class CControllerPopupGeneric extends CController {
 
 		// Set popup options.
 		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
-		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
+		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER)
+			|| ($this->source_table === 'valuemaps' && !$this->hasInput('hostids'));
 		$this->page_options = $this->getPageOptions();
 
 		// Make control filters. Must be called before extending groupids.
@@ -1414,50 +1409,52 @@ class CControllerPopupGeneric extends CController {
 				/**
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
-				 * hostids                  (required) Array of host or template ids to get value maps from.
-				 * context                  (required) Define context for hostids value maps: host, template
-				 * with_filter_hostgroup    If set adds filter by host group, also host ids can be omitted in this case.
-				 * groupid                  Host or template group to filter by.
+				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
+				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be diplayed if
+				 *          this parameter is not set;
 				 */
 				$records = [];
-				$options = [];
-				$hostids = $this->getInput('hostids', []);
-				$groupid = $this->hasInput('with_filter_hostgroup') ? $this->getInput('groupid', 0) : 0;
-				$context = $this->getInput('context', '');
 
-				if ((!$hostids && $groupid == 0) || $context === '') {
+				if (($this->hasInput('hostids') && !$this->hasInput('context'))
+						|| (!$this->hasInput('hostids') && !$this->groupids)) {
 					break;
 				}
 
 				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
-				if ($groupid != 0) {
+				if ($this->hasInput('hostids')) {
+					$hostids = $this->getInput('hostids');
+					$context = $this->getInput('context');
+
+					if ($context === 'host') {
+						$hosts = API::Host()->get([
+							'output' => ['name'],
+							'hostids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
+					else {
+						$hosts = API::Template()->get([
+							'output' => ['name'],
+							'templateids' => $hostids,
+							'preservekeys' => true
+						]);
+					}
+				}
+				else {
 					$hosts = API::Host()->get([
 						'output' => ['name'],
-						'groupids' => $groupid,
+						'groupids' => $this->groupids,
 						'preservekeys' => true,
 						'limit' => $limit
 					]) + API::Template()->get([
 						'output' => ['name'],
-						'groupids' => $groupid,
+						'groupids' => $this->groupids,
 						'preservekeys' => true,
 						'limit' => $limit
 					]);
+
 					$hostids = array_keys($hosts);
-				}
-				else if ($context === 'host') {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'hostids' => $hostids,
-						'preservekeys' => true
-					]);
-				}
-				else {
-					$hosts = API::Template()->get([
-						'output' => ['name'],
-						'templateids' => $hostids,
-						'preservekeys' => true
-					]);
 				}
 
 				$db_valuemaps = API::ValueMap()->get([
@@ -1466,10 +1463,6 @@ class CControllerPopupGeneric extends CController {
 					'hostids' => $hostids,
 					'limit' => $limit
 				]);
-
-				if (!$db_valuemaps) {
-					break;
-				}
 
 				$disable_names = $this->getInput('disable_names', []);
 
