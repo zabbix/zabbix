@@ -67,11 +67,10 @@ class CScreenHttpTestDetails extends CScreenBase {
 				' AND hi.httpstepid=hs.httpstepid'.
 				' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
 		));
-		$items = CMacrosResolverHelper::resolveItemsValueMaps($items);
 		$step_items = [];
 
 		foreach ($items as $item) {
-			$step_items[$item['httpstepid']][$item['type']] = $item;
+			$step_items[$item['httpstepid']][$item['type']] = $item + ['valuemap' => []];
 		}
 
 		// fetch HTTP item history

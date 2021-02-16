@@ -1299,7 +1299,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		foreach ($matches['functions'] as $function) {
 			if ($function[0] === 'last') {
-				$items = CMacrosResolverHelper::resolveItemsValueMaps($items);
+				$items = self::getItemsValueMaps($items);
 				break;
 			}
 		}
