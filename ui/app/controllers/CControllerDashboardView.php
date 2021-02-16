@@ -169,7 +169,7 @@ class CControllerDashboardView extends CController {
 					'dashboardid' => null,
 					'name' => $dashboards[0]['name'],
 					'editable' => true,
-					'pages' => CDashboardHelper::prepareWidgetsForGrid(
+					'pages' => CDashboardHelper::preparePagesForGrid(
 						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages']), null, true
 					),
 					'owner' => [
