@@ -90,9 +90,9 @@ class CMathFunctionValidator extends CValidator {
 				return false;
 			}
 			// TODO miks: Not clear what should be validated?
-			//elseif ($param instanceof CFunctionParserResult) {
-			//	continue;
-			//}
+			/*elseif ($param instanceof CFunctionParserResult) {
+				continue;
+			}*/
 
 			/*
 			// user macro
