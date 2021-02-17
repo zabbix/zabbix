@@ -681,6 +681,13 @@ class CControllerPopupTriggerExpr extends CController {
 						$data['params']['last'] = '';
 					}
 
+					// Combince sec|#num and <time_shift> parameters into one.
+					array_unshift($data['params'], implode(':', array_filter([
+						$data['params']['last'],
+						array_key_exists('shift', $data['params']) ? $data['params']['shift'] : null
+					])));
+					unset($data['params']['last'], $data['params']['shift']);
+
 					// Quote function param.
 					$quoted_params = [];
 					foreach ($data['params'] as $param) {

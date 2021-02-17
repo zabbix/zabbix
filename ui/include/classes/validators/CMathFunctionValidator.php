@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class to validate mathematical functions used in trigger expressions.
+ */
 class CMathFunctionValidator extends CValidator {
 
 	/**
@@ -27,10 +30,22 @@ class CMathFunctionValidator extends CValidator {
 	 * @var array
 	 */
 	private $allowed = [
+		'abs',
 		'avg',
-		'min',
 		'max',
+		'min',
+		'length',
 		'sum'
+	];
+
+	/**
+	 * The array containing functions with supported exactly one parameter.
+	 *
+	 * @var array
+	 */
+	private $single_parameter_functions = [
+		'abs',
+		'length'
 	];
 
 	/**
@@ -38,7 +53,7 @@ class CMathFunctionValidator extends CValidator {
 	 *
 	 * @var bool
 	 */
-	private $lldmacros = true;
+	private $lldmacros = false;
 
 	public function __construct(array $options = []) {
 		/*
@@ -70,41 +85,18 @@ class CMathFunctionValidator extends CValidator {
 			return false;
 		}
 
-		if (count($fn->params_raw['parameters']) == 0) {
+		if ((in_array($fn->function, $this->single_parameter_functions) && count($fn->params_raw['parameters']) != 1)
+				|| count($fn->params_raw['parameters']) == 0) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $fn->match).' '.
 				_('Invalid number of parameters.'));
 			return false;
 		}
-
-		$user_macro_parser = new CUserMacroParser();
-		if ($this->lldmacros) {
-			$lld_macro_parser = new CLLDMacroParser();
-			$lld_macro_function_parser = new CLLDMacroFunctionParser();
-		}
-
-		$func_args = [];
 
 		foreach ($fn->params_raw['parameters'] as $param) {
 			if ($param instanceof CQueryParserResult) {
 				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $param->match));
 				return false;
 			}
-			// TODO miks: Not clear what should be validated?
-			/*elseif ($param instanceof CFunctionParserResult) {
-				continue;
-			}*/
-
-			/*
-			// user macro
-			if ($user_macro_parser->parse($param['raw']) != CParser::PARSE_SUCCESS) {
-				return false;
-			}
-
-			if ($this->lldmacros
-					&& ($lld_macro_function_parser->parse($param['raw']) != CParser::PARSE_SUCCESS
-						|| $lld_macro_parser->parse($param['raw']) != CParser::PARSE_SUCCESS)) {
-				return false;
-			}*/
 		}
 
 		return true;

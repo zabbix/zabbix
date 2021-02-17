@@ -88,34 +88,27 @@ class CFunctionValidator extends CValidator {
 		$args_ignored = [['type' => 'str']];
 
 		$this->allowed = [
-//			'abs' => [
-//				'args' => [],
-//				'value_types'
-//			],
 			'avg' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'band' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
-					['type' => 'num_unsigned', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'scale', 'mandat' => true],
+					['type' => 'num_unsigned', 'mandat' => true]
 				],
 				'value_types' => $value_types_int
 			],
 			'count' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'scale', 'mandat' => true],
 					['type' => 'str'],
-					['type' => 'operation'],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'operation']
 				],
 				'value_types' => $value_types_all
 			],
@@ -131,15 +124,19 @@ class CFunctionValidator extends CValidator {
 				'args' => $args_ignored,
 				'value_types' => $value_types_all
 			],
-//			'find' => [
-//				'args' => [],
-//				'value_types'
-//			],
+			'find' => [
+				'args' => [
+					['type' => 'query', 'mandat' => true],
+					['type' => 'scale', 'mandat' => true],
+					['type' => 'operator'],
+					['type' => 'pattern']
+				],
+				'value_types' => $value_types_all
+			],
 			'forecast' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'scale', 'mandat' => true],
 					['type' => 'sec_neg', 'mandat' => true],
 					['type' => 'fit', 'can_be_empty' => true],
 					['type' => 'mode', 'can_be_empty' => true]
@@ -149,22 +146,21 @@ class CFunctionValidator extends CValidator {
 			'fuzzytime' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_zero', 'mandat' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'last' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num_zero', 'can_be_empty' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_all
 			],
-//			'length' => [
-//				'args' => [],
-//				'value_types'
-//			],
+			'length' => [
+				'args' => [],
+				'value_types' => $value_types_all
+			],
 			'logeventid' => [
 				'args' => [
 					['type' => 'str', 'mandat' => true]
@@ -187,23 +183,21 @@ class CFunctionValidator extends CValidator {
 			'max' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'min' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'nodata'=> [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec', 'mandat' => true],
+					['type' => 'scale', 'mandat' => true],
 					['type' => 'nodata_mode', 'can_be_empty' => true]
 				],
 				'value_types' => $value_types_all
@@ -215,8 +209,7 @@ class CFunctionValidator extends CValidator {
 			'percentile' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'scale', 'mandat' => true],
 					['type' => 'percent', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
@@ -224,8 +217,7 @@ class CFunctionValidator extends CValidator {
 			'sum' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
@@ -236,8 +228,7 @@ class CFunctionValidator extends CValidator {
 			'timeleft' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'sec_num', 'mandat' => true],
-					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'scale', 'mandat' => true],
 					['type' => 'num_suffix', 'mandat' => true],
 					['type' => 'fit', 'can_be_empty' => true]
 				],
@@ -246,40 +237,35 @@ class CFunctionValidator extends CValidator {
 			'trendavg' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'period', 'mandat' => true],
-					['type' => 'period_shift', 'mandat' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'trendcount' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'period', 'mandat' => true],
-					['type' => 'period_shift', 'mandat' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_all
 			],
 			'trendmax' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'period', 'mandat' => true],
-					['type' => 'period_shift', 'mandat' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'trendmin' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'period', 'mandat' => true],
-					['type' => 'period_shift', 'mandat' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			],
 			'trendsum' => [
 				'args' => [
 					['type' => 'query', 'mandat' => true],
-					['type' => 'period', 'mandat' => true],
-					['type' => 'period_shift', 'mandat' => true]
+					['type' => 'scale', 'mandat' => true]
 				],
 				'value_types' => $value_types_num
 			]
@@ -354,7 +340,7 @@ class CFunctionValidator extends CValidator {
 
 			$param = ($value['functionParamList'][$aNum] instanceof CParserResult)
 					? $value['functionParamList'][$aNum]->match
-					: $value['functionParamList'][$aNum];
+					: $value['functionParamList'][$aNum]['raw'];
 
 			if (isset($arg['can_be_empty']) && $param === '') {
 				continue;
@@ -430,6 +416,9 @@ class CFunctionValidator extends CValidator {
 			case 'query':
 				return $this->validateQuery($param);
 
+			case 'scale':
+				return $this->validateScale($param);
+
 			case 'sec':
 				return $this->validateSec($param);
 
@@ -485,9 +474,24 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateQuery(string $param): bool {
-		// TODO miks
-		return true;
-		//return preg_match('/^\/'.ZBX_PREG_HOST_FORMAT.'\/'.ZBX_PREG_ITEM_KEY_FORMAT.'/', $param);
+		$parser = new CQueryParser();
+		return ($parser->parse($param) === CParser::PARSE_SUCCESS);
+	}
+
+	/**
+	 * Validate joint "sec|#num:<time_shift>" syntax.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateScale(string $param): bool {
+		$param = explode(':', $param) + ['', ''];
+		$sec_num = $param[0];
+		$time_shift = $param[1];
+
+		return ($this->validateSecNum($sec_num)
+			&& ($time_shift === '' || $this->validatePeriodShift($time_shift)));
 	}
 
 	/**
@@ -538,7 +542,7 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain seconds greater zero or count.
+	 * Validate trigger function parameter which can contain seconds greater than zero or count.
 	 * Examples: 1, 5w, #1
 	 *
 	 * @param string $param
