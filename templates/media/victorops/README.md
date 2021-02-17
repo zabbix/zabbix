@@ -17,7 +17,7 @@ This guide describes how to integrate Zabbix 5.2 installation with VictorOps usi
 2\. Open the newly added **VictorOps** media type and replace *&lt;PLACE ENDPOINT URL HERE&gt;* placeholder with your REST integration endpiont URL.<br>
 The following parameters should be filled:<br>
 **vops_endpoint** - URL of your VictorOps REST endpoint.<br>
-**vops_routing_key** - routhong key of the escalation policy.<br>
+**vops_routing_key** - routing key of the escalation policy.<br>
 
 3\. The following parameters can help you customize the alerts ([documentation](https://help.victorops.com/knowledge-base/incident-fields-glossary/#glossary-of-fields) for the information):<br>
 **priority_severity** - value for the VictorOps *message_type* field. *severity* is the severity's name in the default Zabbix installation.<br>
