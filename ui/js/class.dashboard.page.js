@@ -228,9 +228,9 @@ class CDashboardPage {
 	addWidget(widget) {
 		widget = new CDashboardWidget({
 			...JSON.parse(JSON.stringify(widget)),
-			_is_editable: this._options['editable'] && !this._options['kioskmode'],
-			_cell_height: this._options['widget-height'],
-			_cell_width: this._options['widget-width'],
+			is_editable: this._options['editable'] && !this._options['kioskmode'],
+			cell_height: this._options['widget-height'],
+			cell_width: this._options['widget-width'],
 			uniqueid: this._generateUniqueId(),
 			index: this._widgets.length,
 			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null,
@@ -2379,12 +2379,12 @@ class CDashboardPage {
 		child = new CDashboardWidget({
 			view_mode: iterator.view_mode,
 			...child,
-			_is_editable: this._options['editable'] && !this._options['kioskmode'],
-			_is_iterator: false,
-			_cell_height: this._options['widget-height'],
-			_cell_width: this._options['widget-width'],
+			is_editable: this._options['editable'] && !this._options['kioskmode'],
+			is_iterator: false,
+			cell_height: this._options['widget-height'],
+			cell_width: this._options['widget-width'],
 			parent: iterator,
-			new_widget: false,
+			is_new: false,
 			uniqueid: this._generateUniqueId(),
 			defaults: this._data.widget_defaults[child.type]
 		});
@@ -3100,13 +3100,13 @@ class CDashboardPage {
 					this._removeWidget(widget);
 
 					const widget_data = {
-						'type': type,
-						'header': name,
-						'view_mode': view_mode,
-						'pos': widget.pos,
-						'fields': fields,
-						'configuration': configuration,
-						'new_widget': false
+						type: type,
+						header: name,
+						view_mode: view_mode,
+						pos: widget.pos,
+						fields: fields,
+						configuration: configuration,
+						is_new: false
 					};
 
 					// Disable position/size checking during addWidget call.

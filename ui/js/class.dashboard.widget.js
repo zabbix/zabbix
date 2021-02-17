@@ -26,72 +26,72 @@ const WIDGET_EVENT_LEAVE                        = 'leave';
 
 class CDashboardWidget extends CBaseComponent {
 
-	constructor(widget) {
-		const $target = $('<div>');
-		super($target[0]);
+	constructor({
+		defaults,
+		widgetid = '',
+		uniqueid,
+		index = 0,
+		type = '',
+		fields,
+		configuration,
+		storage = {},
+		header = '',
+		dynamic_hostid = null,
+		view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL,
+		rf_rate = 0,
+		preloader_timeout = 10000,
+		pos = {x: 0, y: 0, width: 1, height: 1},
+		cell_width = 0,
+		cell_height = 0,
+		is_new = !widgetid.length,
+		parent = false,
+		update_paused = false,
+		initial_load = true,
+		ready = false,
+		is_editable = false,
+		is_iterator = defaults.iterator
+	} = {}) {
+		super(document.createElement('div'));
 
-		this.div = $target;
+		this.div = $(this._target);
+
+		this.defaults = defaults;
+		this.widgetid = widgetid;
+		this.uniqueid = uniqueid;
+		this.index = index;
+		this.type = type;
 
 		// Replace empty arrays (or anything non-object) with empty objects.
-		if (typeof widget.fields !== 'object') {
-			widget.fields = {};
-		}
+		this.fields = (typeof fields === 'object') ? fields : {};
+		this.configuration = (typeof configuration === 'object') ? configuration : {};
+		this.storage = storage;
 
-		if (typeof widget.configuration !== 'object') {
-			widget.configuration = {};
-		}
+		this.header = header;
+		// TODO Remove dynamic_hostid from widget class
+		this.dynamic_hostid = (!this.fields.dynamic || this.fields.dynamic != 1) ? null : dynamic_hostid;
+		this.view_mode = view_mode;
 
-		this._cell_width = 0;
-		this._cell_height = 0;
+		this.rf_rate = rf_rate;
+		this.preloader_timeout = preloader_timeout;
 
+		this.pos = pos;
+		this._cell_width = cell_width;
+		this._cell_height = cell_height;
+
+		this._is_new = is_new;
+		this.parent = parent;
+		this.update_paused = update_paused;
+		this.initial_load = initial_load;
+		this.ready = ready;
 		this._is_active = false;
-		this._is_iterator = widget.defaults.iterator;
-		this._is_editable = false;
-
-		widget = {
-			'widgetid': '',
-			'type': '',
-			'header': '',
-			'view_mode': ZBX_WIDGET_VIEW_MODE_NORMAL,
-			'pos': {
-				'x': 0,
-				'y': 0,
-				'width': 1,
-				'height': 1
-			},
-			'rf_rate': 0,
-			'preloader_timeout': 10000,	// in milliseconds
-			'update_paused': false,
-			'initial_load': true,
-			'ready': false,
-			'storage': {},
-			'parent': false,
-			...widget,
-			$button_iterator_previous_page: undefined,
-			$button_iterator_next_page: undefined,
-			$button_edit: undefined
-		};
-
-		if (typeof widget.new_widget === 'undefined') {
-			widget.new_widget = !widget.widgetid.length;
-		}
-
-		if (!widget.fields.dynamic || widget.fields.dynamic != 1) {
-			this.dynamic_hostid = null;
-		}
+		this._is_iterator = is_iterator;
+		this._is_editable = is_editable;
 
 		if (this._is_iterator) {
-			widget = {
-				...widget,
-				'page': 1,
-				'page_count': 1,
-				'children': [],
-				'update_pending': false
-			};
-		}
-
-		for (const key in widget) {
-			this[key] = widget[key];
+			this.page = 1;
+			this.page_count = 1;
+			this.children = [];
+			this.update_pending = false
 		}
 
 		this._makeWidgetDiv();
@@ -193,6 +193,7 @@ class CDashboardWidget extends CBaseComponent {
 				'multiplier': '0'
 			};
 
+			// TODO Remove graphid, itemid, dynamic_hostid from widget class
 			if ('graphid' in this.fields) {
 				widget_actions.graphid = this.fields['graphid'];
 			}
@@ -282,7 +283,7 @@ class CDashboardWidget extends CBaseComponent {
 
 		this.div = $('<div>', {'class': classes.root})
 			.toggleClass(classes.hidden_header, this.view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
-			.toggleClass('new-widget', this.new_widget);
+			.toggleClass('new-widget', this._is_new);
 
 		if (!this.parent) {
 			this.div.css({
