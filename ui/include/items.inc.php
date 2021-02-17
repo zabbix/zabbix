@@ -1503,7 +1503,7 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
  * @param array     $item
  * @param int       $item['value_type']  type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
  * @param string    $item['units']       units of item
- * @param int       $item['mappings']    mapping set of values
+ * @param array     $item['valuemap']
  * @param bool      $trim
  *
  * @return string

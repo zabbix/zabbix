@@ -33,10 +33,6 @@ class CValueMapHelper {
 	 * @return string
 	 */
 	static public function applyValueMap(string $value, array $valuemap): string {
-		if (!$valuemap) {
-			return $value;
-		}
-
 		$newvalue = static::getMappedValue($value, $valuemap);
 
 		return ($newvalue !== false) ? $newvalue.' ('.$value.')' : $value;
@@ -52,6 +48,10 @@ class CValueMapHelper {
 	 * @return string|bool     If there is no mapping return false, return mapped value otherwise.
 	 */
 	static public function getMappedValue(string $value, array $valuemap) {
+		if (!$valuemap) {
+			return false;
+		}
+
 		$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
 
 		return array_key_exists($value, $mappings) ? $mappings[$value] : false;
