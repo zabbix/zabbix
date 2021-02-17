@@ -879,11 +879,22 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
+		AGENT_RESULT	*result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+
+		init_result(result);
+
+		if (0 != ISSET_META(request->value.result_ptr->result))
+		{
+			result->type = AR_META;
+			result->lastlogsize = request->value.result_ptr->result->lastlogsize;
+			result->mtime = request->value.result_ptr->result->mtime;
+		}
+
 		preproc_item_result_free(&request->value);
 		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
 		request->value.result_ptr->refcount = 1;
-		request->value.result_ptr->result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
-		init_result(request->value.result_ptr->result);
+		request->value.result_ptr->result = result;
+
 		ret = FAIL;
 
 		goto out;
