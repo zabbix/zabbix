@@ -70,7 +70,7 @@ class CDashboardWidget extends CBaseComponent {
 		this.view_mode = view_mode;
 
 		this.rf_rate = rf_rate;
-		this.preloader_timeout = preloader_timeout;
+		this._preloader_timeout = preloader_timeout;
 
 		this.pos = pos;
 		this._cell_width = cell_width;
@@ -178,6 +178,27 @@ class CDashboardWidget extends CBaseComponent {
 		else {
 			this.div.find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
+	}
+
+	startPreloader(timeout = this._preloader_timeout) {
+		if (typeof this._preloader_timeoutid !== 'undefined' || this.div.find('.is-loading').length) {
+			return;
+		}
+
+		this._preloader_timeoutid = setTimeout(() => {
+			delete this._preloader_timeoutid;
+
+			this.showPreloader();
+		}, timeout);
+	}
+
+	stopPreloader() {
+		if (typeof this._preloader_timeoutid !== 'undefined') {
+			clearTimeout(this._preloader_timeoutid);
+			delete this._preloader_timeoutid;
+		}
+
+		this.hidePreloader();
 	}
 
 	getContentSize() {

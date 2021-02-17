@@ -152,10 +152,10 @@ class CDashboardWidgetPlaceholder {
 	 *
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
-	showAtPosition({left, top, width, height}) {
+	showAtPosition({x, y, width, height}) {
 		this._placeholder.style.position = 'absolute';
-		this._placeholder.style.left = `${left * this._cell_width}%`;
-		this._placeholder.style.top = `${top * this._cell_height}px`;
+		this._placeholder.style.left = `${x * this._cell_width}%`;
+		this._placeholder.style.top = `${y * this._cell_height}px`;
 		this._placeholder.style.width = `${width * this._cell_width}%`;
 		this._placeholder.style.height = `${height * this._cell_height}px`;
 		this._placeholder.classList.remove(ZBX_STYLE_DASHBOARD_WIDGET_PLACEHOLDER_HIDDEN);

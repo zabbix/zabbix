@@ -1172,6 +1172,12 @@ class CDashboardPage {
 		}
 	}
 
+	_applyWidgetConfiguration(widget, configuration) {
+		if ('padding' in configuration) {
+			this._setWidgetPadding(widget, configuration['padding']);
+		}
+	}
+
 	_setWidgetPadding(widget, padding) {
 		// Note: this function is used only for widgets and not iterators.
 
@@ -1179,12 +1185,6 @@ class CDashboardPage {
 			widget.configuration['padding'] = padding;
 			widget.content_body.toggleClass('no-padding', !padding);
 			this._resizeWidget(widget);
-		}
-	}
-
-	_applyWidgetConfiguration(widget, configuration) {
-		if ('padding' in configuration) {
-			this._setWidgetPadding(widget, configuration['padding']);
 		}
 	}
 
@@ -2208,29 +2208,6 @@ class CDashboardPage {
 		}
 	}
 
-	_startPreloader(widget, timeout) {
-		timeout = timeout || widget.preloader_timeout;
-
-		if (typeof widget.preloader_timeoutid !== 'undefined' || widget.div.find('.is-loading').length) {
-			return;
-		}
-
-		widget.preloader_timeoutid = setTimeout(() => {
-			delete widget.preloader_timeoutid;
-
-			widget.showPreloader();
-		}, timeout);
-	}
-
-	_stopPreloader(widget) {
-		if (typeof widget.preloader_timeoutid !== 'undefined') {
-			clearTimeout(widget.preloader_timeoutid);
-			delete widget.preloader_timeoutid;
-		}
-
-		widget.hidePreloader();
-	}
-
 	_setUpdateWidgetContentTimer(widget, rf_rate) {
 		widget.clearUpdateContentTimer();
 
@@ -2676,7 +2653,7 @@ class CDashboardPage {
 			if (this._isIteratorTooSmall(widget, pos)) {
 				this._clearIterator(widget);
 
-				this._stopPreloader(widget);
+				widget.stopPreloader();
 				this._setIteratorTooSmallState(widget, true);
 				widget.update_pending = true;
 
@@ -2725,7 +2702,7 @@ class CDashboardPage {
 
 		this._setDashboardBusy('updateWidgetContent', widget.uniqueid);
 
-		this._startPreloader(widget);
+		widget.startPreloader();
 
 		widget.updating_content = true;
 
@@ -2740,7 +2717,7 @@ class CDashboardPage {
 			.then((response) => {
 				delete widget.updating_content;
 
-				this._stopPreloader(widget);
+				widget.stopPreloader();
 
 				if (this._isDeletedWidget(widget)) {
 					return $.Deferred().reject();
@@ -3026,7 +3003,7 @@ class CDashboardPage {
 					widget.fields = fields;
 
 					// Set preloader to widget content after overlayDialogueDestroy as fast as we can.
-					this._startPreloader(widget, 100);
+					widget.startPreloader(100);
 
 					// View mode was just set after the overlayDialogueDestroy was called in first 'then' section.
 
