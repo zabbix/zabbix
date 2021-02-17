@@ -189,7 +189,6 @@ $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {
 	if ($tag['tag'] === '' && $tag['value'] === '') {
 		unset($tags[$key]);
-		continue;
 	}
 	elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 		unset($tags[$key]);

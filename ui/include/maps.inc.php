@@ -700,7 +700,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	foreach ($selements as &$selement) {
 		// Find problems originated from $selement triggers.
-		$filtered_problems = array_filter($problems, function($problem) use ($selement) {
+		$filtered_problems = array_filter($problems, function ($problem) use ($selement) {
 			return array_key_exists($problem['objectid'], $selement['triggers']);
 		});
 
@@ -1388,7 +1388,7 @@ function getProblemsMatchingTags(array $problems, array $filter_tags, int $evalt
 	$filtered_problems = [];
 	foreach ($problems as $problem) {
 		$matching_tags = array_fill_keys(array_keys($tags), 0);
-		array_walk($matching_tags, function(&$match, $key) use ($tags, $problem) {
+		array_walk($matching_tags, function (&$match, $key) use ($tags, $problem) {
 			foreach ($tags[$key] as $tag) {
 				if (checkIfProblemTagsMatches($tag, $problem['tags'])) {
 					$match = 1;

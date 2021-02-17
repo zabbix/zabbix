@@ -178,7 +178,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 	$simple_interval_parser = new CSimpleIntervalParser();
 
 	// Unset empty fields.
-	$filter_data['filter_tags'] = array_filter($filter_data['filter_tags'], function($tag) {
+	$filter_data['filter_tags'] = array_filter($filter_data['filter_tags'], function ($tag) {
 		return ($tag['tag'] !== '' || $tag['value'] !== '');
 	});
 

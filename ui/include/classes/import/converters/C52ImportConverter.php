@@ -50,7 +50,7 @@ class C52ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert hosts and templates.
+	 * Convert hosts.
 	 *
 	 * @static
 	 *
