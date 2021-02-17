@@ -723,23 +723,28 @@ static int	DBpatch_5030046(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select i.hostid,i.valuemapid,i.itemid"
+	result = DBselect("select h.flags,i.hostid,i.valuemapid,i.itemid"
 			" from items i,hosts h"
 			" where i.templateid is null"
 				" and i.valuemapid is not null"
 				" and i.flags in (0,2)"
-				" and h.hostid=i.hostid"
-				" and h.flags<>%d",
-				ZBX_FLAG_DISCOVERY_CREATED);
+				" and h.hostid=i.hostid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_host_t	host_local, *host;
 		zbx_uint64_t	itemid;
+		unsigned char	flags;
 
-		ZBX_STR2UINT64(host_local.hostid, row[0]);
-		ZBX_STR2UINT64(host_local.valuemapid, row[1]);
-		ZBX_STR2UINT64(itemid, row[2]);
+		ZBX_STR2UCHAR(flags, row[0]);
+		ZBX_STR2UINT64(host_local.hostid, row[1]);
+
+		if (ZBX_FLAG_DISCOVERY_CREATED == flags)
+			host_local.valuemapid = 0;
+		else
+			ZBX_STR2UINT64(host_local.valuemapid, row[2]);
+
+		ZBX_STR2UINT64(itemid, row[3]);
 
 		if (FAIL == (i = zbx_vector_ptr_search(&hosts, &host_local, host_compare_func)))
 		{
