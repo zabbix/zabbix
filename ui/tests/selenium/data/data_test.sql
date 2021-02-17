@@ -2896,10 +2896,3 @@ INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
 INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');
-
--- testPageUserRoles
-INSERT INTO role (roleid, name, type, readonly) VALUES (5, '$^&#%*', 1, 0);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int, value_moduleid) VALUES (21, 5, 0, 'ui.default_access', 1, NULL);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int, value_moduleid) VALUES (22, 5, 0, 'api.access', 1, NULL);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int, value_moduleid) VALUES (23, 5, 0, 'modules.default_access', 1, NULL);
-INSERT INTO role_rule (role_ruleid, roleid, type, name, value_int, value_moduleid) VALUES (24, 5, 0, 'actions.default_access', 1, NULL);

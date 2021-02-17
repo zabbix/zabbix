@@ -23,6 +23,11 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
+/**
+ * @backup role
+ * @backup role_rule
+ * @on-before prepareRoleData
+ */
 class testPageUserRoles extends CWebTest {
 
 	use TableTrait;
@@ -34,6 +39,30 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
+	}
+
+	/**
+	 * Function used to create roles.
+	 */
+	public function prepareRoleData() {
+		CDataHelper::call('role.create', [
+			[
+				'name' => 'Remove_role_1',
+				'type' => 1
+			],
+			[
+				'name' => 'Remove_role_2',
+				'type' => 2
+			],
+			[
+				'name' => 'Remove_role_3',
+				'type' => 3
+			],
+			[
+				'name' => '$^&#%*',
+				'type' => 1
+			]
+		]);
 	}
 
 	/**
@@ -80,7 +109,7 @@ class testPageUserRoles extends CWebTest {
 		// Check selected rows counter.
 		$this->query('id:all_roles')->asCheckbox()->one()->check();
 		$selected = $table->query('class:row-selected')->all()->count();
-		$this->assertEquals(4, $selected);
+		$this->assertEquals(7, $selected);
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check that number displayed near Users and # columns are equal.
@@ -131,6 +160,9 @@ class testPageUserRoles extends CWebTest {
 						'$^&#%*',
 						'Admin role',
 						'Guest role',
+						'Remove_role_1',
+						'Remove_role_2',
+						'Remove_role_3',
 						'Super admin role',
 						'User role'
 					]
@@ -194,26 +226,6 @@ class testPageUserRoles extends CWebTest {
 		$this->assertTableDataColumn($before_filtering, 'Name');
 	}
 
-	/**
-	 * Function used to create roles.
-	 */
-	public function prepareRoleData() {
-		CDataHelper::call('role.create', [
-			[
-				'name' => 'Remove_role_1',
-				'type' => 1
-			],
-			[
-				'name' => 'Remove_role_2',
-				'type' => 2
-			],
-			[
-				'name' => 'Remove_role_3',
-				'type' => 3
-			]
-		]);
-	}
-
 	public static function getDeleteData() {
 		return [
 			[
@@ -272,7 +284,6 @@ class testPageUserRoles extends CWebTest {
 	/**
 	 * Delete user roles.
 	 *
-	 * @on-before-once prepareRoleData
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageUserRoles_Delete($data) {
