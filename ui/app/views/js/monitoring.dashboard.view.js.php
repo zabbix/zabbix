@@ -136,10 +136,12 @@
 			);
 
 			if (ZABBIX.Dashboard.getCopiedWidget() !== null) {
-				$('#dashbrd-paste-widget').attr('disabled', false);
+				document.getElementById('dashbrd-paste-widget').disabled = false;
 			}
 			else {
-				$.subscribe('dashboard.grid.copyWidget', () => $('#dashbrd-paste-widget').attr('disabled', false));
+				$.subscribe('dashboard.grid.copyWidget', () => {
+					document.getElementById('dashbrd-paste-widget').disabled = false;
+				});
 			}
 
 			$.subscribe('dashboard.grid.busy', (e, data) => {
