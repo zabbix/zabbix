@@ -347,7 +347,7 @@ $item_form_list->addRow(
 );
 
 // Append value map select when only one host or template is selected.
-if ($data['single_host_selected']) {
+if ($data['single_host_selected'] && !$data['discovered_host']) {
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
 		(new CDiv([

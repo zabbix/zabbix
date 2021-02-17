@@ -508,11 +508,13 @@ class CControllerPopupMassupdateItem extends CController {
 
 		if ($data['context'] === 'host') {
 			$hosts = API::Host()->get([
-				'output' => ['hostid'],
+				'output' => ['hostid', 'flags'],
 				'itemids' => $data['ids'],
 				'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
 				'limit' => 2
 			]);
+			$hosts_flag = array_column($hosts, 'flags');
+			$data['discovered_host'] = (array_search(ZBX_FLAG_DISCOVERY_CREATED, $hosts_flag) !== false);
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
 			$data['interfaces'] = $host['interfaces'];
