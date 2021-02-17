@@ -513,9 +513,8 @@ class CControllerPopupMassupdateItem extends CController {
 				'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
 				'limit' => 2
 			]);
-			$hosts_flag = array_column($hosts, 'flags');
-			$data['discovered_host'] = (array_search(ZBX_FLAG_DISCOVERY_CREATED, $hosts_flag) !== false);
 			$host = reset($hosts);
+			$data['discovered_host'] = ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 			$data['hostid'] = $host['hostid'];
 			$data['interfaces'] = $host['interfaces'];
 			CArrayHelper::sort($data['interfaces'], [['field' => 'main', 'order' => ZBX_SORT_DOWN]]);
