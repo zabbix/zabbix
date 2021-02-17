@@ -301,12 +301,15 @@ $tabs = (new CTabView())
 	]))
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
 	->addTab('encryptionTab', _('Encryption'), $encryption_form_list)
-	->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
+	->setSelected(0);
+
+if (!$data['discovered_host']) {
+	$tabs->addTab('valuemaps_tab', _('Value mapping'), new CPartial('massupdate.valuemaps.tab', [
 		'visible' => [],
 		'hostids' => $data['ids'],
 		'context' => 'host'
-	]))
-	->setSelected(0);
+	]));
+}
 
 $form->addItem($tabs);
 

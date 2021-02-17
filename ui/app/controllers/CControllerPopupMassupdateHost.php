@@ -477,6 +477,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					'debug_mode' => $this->getDebugMode()
 				],
 				'ids' => $this->getInput('ids', []),
+				'discovered_host' => false,
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => 'hosts.php'
 			];
@@ -488,6 +489,14 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				],
 				'sortfield' => 'host'
 			]);
+
+			if ($data['ids']) {
+				$data['discovered_host'] = (count($data['ids']) == count(API::Host()->get([
+					'output' => [],
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+					'hostids' => $data['ids']
+				])));
+			}
 
 			$this->setResponse(new CControllerResponseData($data));
 		}
