@@ -38,7 +38,8 @@
 				},
 				buttons: {
 					previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_PREVIOUS_PAGE ?>'),
-					next_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NEXT_PAGE ?>')
+					next_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NEXT_PAGE ?>'),
+					slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBRD_TOGGLE_SLIDESHOW ?>')
 				},
 				dashboard: {
 					templateid: data.templateid,
@@ -53,7 +54,8 @@
 					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 					'editable': false,
 					'edit_mode': false,
-					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>),
+					'allowed_edit': true
 				}
 			});
 

@@ -117,7 +117,8 @@ if (count($data['dashboard']['pages']) > 1
 									(new CSimpleButton())
 										->addClass(ZBX_STYLE_DASHBRD_NEXT_PAGE)
 										->addClass('btn-iterator-page-next')
-										->setEnabled(false)
+										->setEnabled(false),
+									(new CSimpleButton('Start slideshow'))->addClass(ZBX_STYLE_BTN_ALT)
 								])
 						)
 				)
