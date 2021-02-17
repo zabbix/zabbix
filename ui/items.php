@@ -1142,7 +1142,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 				'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
 				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
-			'selectHosts' => ['status', 'name'],
+			'selectHosts' => ['status', 'name', 'flags'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -1182,7 +1182,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status'],
+			'output' => ['hostid', 'name', 'status', 'flags'],
 			'hostids' => getRequest('hostid'),
 			'templated_hosts' => true
 		]);

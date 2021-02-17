@@ -809,8 +809,10 @@ $form_list
 	->addRow(_('Log time format'),
 		(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_logtimefmt'
-	)
-	->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
+	);
+
+if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	$form_list->addRow(new CLabel(_('Value mapping'), 'valuemapid_ms'),
 		(new CMultiSelect([
 			'name' => 'valuemapid',
 			'object_name' => 'valuemaps',
@@ -831,7 +833,10 @@ $form_list
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'row_valuemap'
-	)
+	);
+}
+
+$form_list
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[

@@ -1033,11 +1033,13 @@ function getItemFormData(array $item = [], array $options = []) {
 	if ($data['parent_discoveryid'] != 0) {
 		$discoveryRule = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
+			'selectHosts' => ['flags'],
 			'itemids' => $data['parent_discoveryid'],
 			'editable' => true
 		]);
 		$discoveryRule = reset($discoveryRule);
 		$data['hostid'] = $discoveryRule['hostid'];
+		$data['host'] = $discoveryRule['hosts'][0];
 
 		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
 		$data['application_prototypes'] = getRequest('application_prototypes', []);
