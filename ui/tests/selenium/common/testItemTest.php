@@ -34,9 +34,6 @@ class testItemTest extends CWebTest {
 	use MacrosTrait;
 	use PreprocessingTrait;
 
-	public $create_link;
-	public $saved_link;
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
