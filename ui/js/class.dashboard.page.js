@@ -2779,7 +2779,7 @@ class CDashboardPage {
 						return !w.isReady();
 					}).length;
 
-					if (widget.setReady()) {
+					if (widget.updateReady()) {
 						/*
 					 * The conception:
 					 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.

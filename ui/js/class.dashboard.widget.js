@@ -125,16 +125,18 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	/**
-	 * Set widget state to ready.
+	 * Update widget to ready state.
 	 *
 	 * @returns {boolean}  Returns true, if status updated.
 	 */
-	setReady() {
-		let is_ready = this._is_ready;
+	updateReady() {
+		let is_ready_updated = false;
 
 		if (this._is_iterator) {
 			if (!this.children.length) {
 				// Set empty iterator to ready state.
+
+				is_ready_updated = !this._is_ready;
 				this._is_ready = true;
 			}
 		}
@@ -142,21 +144,22 @@ class CDashboardWidget extends CBaseComponent {
 			this._is_ready = true;
 
 			const children_not_ready = this.parent.children.filter(function(w) {
-				return !w.isReady();
+				return !w._is_ready;
 			});
 
 			if (!children_not_ready.length) {
 				// Set parent iterator to ready state.
 
-				is_ready = !this.parent.isReady();
+				is_ready_updated = !this.parent._is_ready;
 				this.parent._is_ready = true;
 			}
 		}
 		else {
+			is_ready_updated = !this._is_ready;
 			this._is_ready = true;
 		}
 
-		return is_ready !== this._is_ready;
+		return is_ready_updated;
 	}
 
 	showPreloader() {
