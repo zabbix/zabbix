@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2021-01-28T10:57:12Z'
   groups:
     -
       name: Templates/Applications
@@ -223,6 +223,7 @@ zabbix_export:
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
+              error_handler: DISCARD_VALUE
           url: '{$VAULT.API.SCHEME}://{$VAULT.HOST}:{$VAULT.API.PORT}/v1/sys/leader'
           headers:
             -
@@ -243,6 +244,7 @@ zabbix_export:
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
+              error_handler: DISCARD_VALUE
           url: '{$VAULT.API.SCHEME}://{$VAULT.HOST}:{$VAULT.API.PORT}/v1/sys/metrics?format=prometheus'
           status_codes: '200,503,403'
           headers:
@@ -2661,25 +2663,116 @@ zabbix_export:
           macro: '{$VAULT.TOKEN.TTL.MIN.WARN}'
           value: 7d
           description: 'Token TTL warning threshold.'
-      valuemaps:
+      dashboards:
         -
-          name: 'Service state'
-          mappings:
+          name: 'Vault overview'
+          widgets:
             -
-              value: '0'
-              newvalue: Down
+              type: GRAPH_CLASSIC
+              name: Cache
+              x: '12'
+              'y': '10'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Cache rate'
+                    host: 'HashiCorp Vault by HTTP'
             -
-              value: '1'
-              newvalue: Up
-        -
-          name: 'Vault flag'
-          mappings:
+              type: GRAPH_CLASSIC
+              name: 'K/V entries'
+              x: '12'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: K/V secret engine entries'
+                    host: 'HashiCorp Vault by HTTP'
             -
-              value: '0'
-              newvalue: 'False'
+              type: GRAPH_CLASSIC
+              name: Leases
+              x: '12'
+              'y': '15'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Expiring leases'
+                    host: 'HashiCorp Vault by HTTP'
             -
-              value: '1'
-              newvalue: 'True'
+              type: GRAPH_CLASSIC
+              name: Requests
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Requests rate'
+                    host: 'HashiCorp Vault by HTTP'
+            -
+              type: GRAPH_CLASSIC
+              name: 'Runtime memory'
+              x: '12'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Runtime memory'
+                    host: 'HashiCorp Vault by HTTP'
+            -
+              type: GRAPH_CLASSIC
+              name: 'Token checks'
+              'y': '15'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Token checks'
+                    host: 'HashiCorp Vault by HTTP'
+            -
+              type: GRAPH_CLASSIC
+              name: 'Tokens count'
+              'y': '5'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Tokens count'
+                    host: 'HashiCorp Vault by HTTP'
+            -
+              type: GRAPH_CLASSIC
+              name: 'Tokens lookup'
+              'y': '10'
+              width: '12'
+              height: '5'
+              fields:
+                -
+                  type: GRAPH
+                  name: graphid
+                  value:
+                    name: 'Vault: Token lookup'
+                    host: 'HashiCorp Vault by HTTP'
   triggers:
     -
       expression: '{HashiCorp Vault by HTTP:vault.metrics.process.open.fds.min(5m)}/{HashiCorp Vault by HTTP:vault.metrics.process.max.fds.last()}*100>{$VAULT.OPEN.FDS.MAX.WARN}'
@@ -2786,3 +2879,22 @@ zabbix_export:
           item:
             host: 'HashiCorp Vault by HTTP'
             key: vault.metrics.token
+  value_maps:
+    -
+      name: 'Service state'
+      mappings:
+        -
+          value: '0'
+          newvalue: Down
+        -
+          value: '1'
+          newvalue: Up
+    -
+      name: 'Vault flag'
+      mappings:
+        -
+          value: '0'
+          newvalue: 'False'
+        -
+          value: '1'
+          newvalue: 'True'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-02-17T05:00:00Z'
+  date: '2020-12-07T08:59:43Z'
   groups:
     -
       name: Templates/Applications
@@ -241,6 +241,7 @@ zabbix_export:
               type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
+              error_handler: DISCARD_VALUE
             -
               type: PROMETHEUS_TO_JSON
               parameters:
@@ -777,7 +778,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Average RSSMemory usage in bytes.'
+          description: "Average RSS\tMemory usage in bytes."
           applications:
             -
               name: GitLab
@@ -796,7 +797,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Maxinun RSSMemory usage in bytes.'
+          description: "Maxinun RSS\tMemory usage in bytes."
           applications:
             -
               name: GitLab
@@ -815,7 +816,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Minimum RSSMemory usage in bytes.'
+          description: "Minimum RSS\tMemory usage in bytes."
           applications:
             -
               name: GitLab
@@ -954,7 +955,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$[?(@.name=="upload_file_does_not_exist")].value.first()'
+                - "$[?(@.name==\"upload_file_does_not_exist\t\")].value.first()"
               error_handler: DISCARD_VALUE
           master_item:
             key: gitlab.get_metrics
@@ -1291,16 +1292,6 @@ zabbix_export:
           macro: '{$GITLAB.URL}'
           value: localhost
           description: 'GitLab instance URL'
-      valuemaps:
-        -
-          name: 'GitLab healthcheck'
-          mappings:
-            -
-              value: '0'
-              newvalue: Failed
-            -
-              value: '1'
-              newvalue: Ok
   triggers:
     -
       expression: '{GitLab by HTTP:gitlab.ruby.file_descriptors.max.min(5m)}/{GitLab by HTTP:gitlab.ruby.process_max_fds.last()}*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
@@ -1457,3 +1448,13 @@ zabbix_export:
           item:
             host: 'GitLab by HTTP'
             key: gitlab.ruby.process_resident_memory_bytes.max
+  value_maps:
+    -
+      name: 'GitLab healthcheck'
+      mappings:
+        -
+          value: '0'
+          newvalue: Failed
+        -
+          value: '1'
+          newvalue: Ok
