@@ -2597,69 +2597,6 @@ class CDashboardPage {
 		return !widgets_found.length;
 	}
 
-	_setWidgetReady(widget) {
-		if (widget.isReady()) {
-			return;
-		}
-
-		const dashboard_was_ready = !this._widgets.filter((w) => {
-			return !w.isReady();
-		}).length;
-
-		let ready_updated = false;
-
-		if (widget.isIterator()) {
-			if (!widget.children.length) {
-				// Set empty iterator to ready state.
-
-				ready_updated = !widget.isReady();
-				widget.setIsReady(true);
-			}
-		}
-		else if (widget.parent) {
-			widget.setIsReady(true);
-
-			let children = widget.parent.children,
-				children_not_ready = children.filter(function(widget) {
-					return !widget.isReady();
-				});
-
-			if (!children_not_ready.length) {
-				// Set parent iterator to ready state.
-
-				ready_updated = !widget.parent.isReady();
-				widget.parent.setIsReady(true);
-			}
-		}
-		else {
-			ready_updated = !widget.isReady();
-			widget.setIsReady(true);
-		}
-
-		if (ready_updated) {
-			/*
-			 * The conception:
-			 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
-			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
-			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
-			 */
-
-			if (dashboard_was_ready) {
-				this._registerDataExchangeCommit();
-			}
-			else {
-				const dashboard_is_ready = !this._widgets.filter(function(widget) {
-					return !widget.isReady();
-				}).length;
-
-				if (dashboard_is_ready) {
-					this._registerDataExchangeCommit();
-					this._doAction('onDashboardReady');
-				}
-			}
-		}
-	}
-
 	_registerDataExchangeCommit() {
 		const used_indexes = []
 
@@ -2844,7 +2781,34 @@ class CDashboardPage {
 			.then(() => {
 				// Separate 'then' section allows to execute JavaScripts added by widgets in previous section first.
 
-				this._setWidgetReady(widget);
+				if (!widget.isReady()) {
+					const dashboard_was_ready = !this._widgets.filter((w) => {
+						return !w.isReady();
+					}).length;
+
+					if (widget.setReady()) {
+						/*
+					 * The conception:
+					 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
+					 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
+					 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
+					 */
+
+						if (dashboard_was_ready) {
+							this._registerDataExchangeCommit();
+						}
+						else {
+							const dashboard_is_ready = !this._widgets.filter(function(w) {
+								return !w.isReady();
+							}).length;
+
+							if (dashboard_is_ready) {
+								this._registerDataExchangeCommit();
+								this._doAction('onDashboardReady');
+							}
+						}
+					}
+				}
 
 				if (!widget.parent) {
 					// Iterator child widgets are excluded here.

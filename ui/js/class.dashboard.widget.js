@@ -124,8 +124,34 @@ class CDashboardWidget extends CBaseComponent {
 		return this._is_ready;
 	}
 
-	setIsReady(is_ready) {
-		this._is_ready = is_ready;
+	setReady() {
+		let is_ready = this._is_ready;
+
+		if (this._is_iterator) {
+			if (!this.children.length) {
+				// Set empty iterator to ready state.
+				this._is_ready = true;
+			}
+		}
+		else if (this.parent) {
+			this._is_ready = true;
+
+			const children_not_ready = this.parent.children.filter(function(w) {
+				return !w.isReady();
+			});
+
+			if (!children_not_ready.length) {
+				// Set parent iterator to ready state.
+
+				is_ready = !this.parent.isReady();
+				this.parent._is_ready = true;
+			}
+		}
+		else {
+			this._is_ready = true;
+		}
+
+		return is_ready !== this._is_ready;
 	}
 
 	showPreloader() {
