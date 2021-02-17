@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:04:13Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -323,6 +323,28 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          name: 'MY-SYSTEM-MIB::mySystemFanIsNormal'
+          mappings:
+            -
+              value: '1'
+              newvalue: noexist
+            -
+              value: '2'
+              newvalue: existnopower
+            -
+              value: '3'
+              newvalue: existreadypower
+            -
+              value: '4'
+              newvalue: normal
+            -
+              value: '5'
+              newvalue: powerbutabnormal
+            -
+              value: '6'
+              newvalue: unknown
   graphs:
     -
       name: 'CPU utilization'
@@ -335,25 +357,3 @@ zabbix_export:
           item:
             host: 'D-Link DES 7200 SNMP'
             key: 'system.cpu.util[myCPUUtilization5Min.0]'
-  value_maps:
-    -
-      name: 'MY-SYSTEM-MIB::mySystemFanIsNormal'
-      mappings:
-        -
-          value: '1'
-          newvalue: noexist
-        -
-          value: '2'
-          newvalue: existnopower
-        -
-          value: '3'
-          newvalue: existreadypower
-        -
-          value: '4'
-          newvalue: normal
-        -
-          value: '5'
-          newvalue: powerbutabnormal
-        -
-          value: '6'
-          newvalue: unknown

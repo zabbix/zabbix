@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:08:22Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -386,40 +386,40 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN:"Routing Engine"}'
           value: '70'
-  value_maps:
-    -
-      name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: unknown
+          name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: running
+            -
+              value: '3'
+              newvalue: ready
+            -
+              value: '4'
+              newvalue: reset
+            -
+              value: '5'
+              newvalue: runningAtFullSpeed
+            -
+              value: '6'
+              newvalue: 'down or off'
+            -
+              value: '7'
+              newvalue: standby
         -
-          value: '2'
-          newvalue: running
-        -
-          value: '3'
-          newvalue: ready
-        -
-          value: '4'
-          newvalue: reset
-        -
-          value: '5'
-          newvalue: runningAtFullSpeed
-        -
-          value: '6'
-          newvalue: 'down or off'
-        -
-          value: '7'
-          newvalue: standby
-    -
-      name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
-      mappings:
-        -
-          value: '1'
-          newvalue: other
-        -
-          value: '2'
-          newvalue: 'off'
-        -
-          value: '3'
-          newvalue: 'on - RedAlarm'
+          name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: 'off'
+            -
+              value: '3'
+              newvalue: 'on - RedAlarm'
