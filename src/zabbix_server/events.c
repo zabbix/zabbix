@@ -393,7 +393,7 @@ static int	save_events(void)
 
 		num++;
 
-		if (EVENT_SOURCE_TRIGGERS != event->source)
+		if (EVENT_SOURCE_TRIGGERS != event->source && EVENT_SOURCE_INTERNAL != event->source)
 			continue;
 
 		if (0 == event->tags.values_num)
@@ -464,10 +464,14 @@ static void	save_problems(void)
 				case EVENT_OBJECT_TRIGGER:
 					if (TRIGGER_STATE_UNKNOWN != event->value)
 						continue;
+
+					tags_num += event->tags.values_num;
 					break;
 				case EVENT_OBJECT_ITEM:
 					if (ITEM_STATE_NOTSUPPORTED != event->value)
 						continue;
+
+					tags_num += event->tags.values_num;
 					break;
 				case EVENT_OBJECT_LLDRULE:
 					if (ITEM_STATE_NOTSUPPORTED != event->value)
@@ -513,7 +517,7 @@ static void	save_problems(void)
 			{
 				const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
 
-				if (EVENT_SOURCE_TRIGGERS != event->source)
+				if (EVENT_SOURCE_TRIGGERS != event->source && EVENT_SOURCE_INTERNAL != event->source)
 					continue;
 
 				for (k = 0; k < event->tags.values_num; k++)
