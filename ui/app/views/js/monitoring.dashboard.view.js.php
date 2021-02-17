@@ -25,7 +25,7 @@
 ?>
 
 <script>
-	const DASHBOARD_VIEW_EVENT_APPLY_PROPERTIES = 'apply_properties';
+	const DASHBOARD_EVENT_APPLY_PROPERTIES = 'apply_properties';
 
 	function initializeView(data, widget_defaults, time_selector, dynamic, web_layout_mode) {
 
@@ -65,7 +65,12 @@
 			ZABBIX.Dashboard.activate();
 
 			if (dynamic.has_dynamic_widgets) {
-				liveDynamicHost();
+				// Perform dynamic host switch when browser back/previous buttons are pressed.
+				window.addEventListener('popstate', events.popState);
+
+				document
+					.getElementById('dynamic_hostid')
+					.addEventListener('change', events.dynamicHostChange);
 			}
 
 			jqBlink.blink();
@@ -81,17 +86,6 @@
 			}
 
 			$.subscribe('dashboard.grid.editDashboard', () => edit());
-
-			document.addEventListener(DASHBOARD_VIEW_EVENT_APPLY_PROPERTIES, events.applyProperties);
-		};
-
-		const liveDynamicHost = () => {
-			// Perform dynamic host switch when browser back/previous buttons are pressed.
-			window.addEventListener('popstate', events.popState);
-
-			document
-				.getElementById('dynamic_hostid')
-				.addEventListener('change', events.dynamicHostChange);
 		};
 
 		const edit = () => {
@@ -117,7 +111,7 @@
 
 			document
 				.getElementById('dashbrd-add-widget')
-				.addEventListener('click', () => ZABBIX.Dashboard.addNewWidget(this));
+				.addEventListener('click', (e) => ZABBIX.Dashboard.addNewWidget(e.target));
 
 			document
 				.getElementById('dashbrd-paste-widget')
@@ -149,11 +143,14 @@
 				updateBusy();
 			});
 
+			document.addEventListener(DASHBOARD_EVENT_APPLY_PROPERTIES, events.applyProperties);
+
 			enableNavigationWarning();
 		};
 
 		const save = (widgets) => {
-			const url = new Curl('zabbix.php');
+			clearMessages();
+
 			const ajax_data = {
 				dashboardid: (data.dashboardid !== null) ? data.dashboardid : undefined,
 				userid: data.owner.id,
@@ -161,8 +158,6 @@
 				widgets: [],
 				sharing: data.sharing
 			};
-
-			clearMessages();
 
 			for (const widget of widgets) {
 				const ajax_widget = {};
@@ -183,6 +178,8 @@
 
 			is_busy_saving = true;
 			updateBusy();
+
+			const url = new Curl('zabbix.php');
 
 			url.setArgument('action', 'dashboard.update');
 
@@ -255,9 +252,10 @@
 		};
 
 		const events = {
-			beforeUnload: () => {
+			beforeUnload: (e) => {
 				if (has_properties_modified || ZABBIX.Dashboard.isDashboardUpdated()) {
-					return true;
+					// Display confirmation message.
+					e.preventDefault();
 				}
 			},
 
@@ -312,12 +310,14 @@
 				url.setArgument('action', 'dashboard.properties.check');
 
 				overlay.setLoading();
+
 				overlay.xhr = $.ajax({
 					data: form_data,
 					url: url.getUrl(),
 					dataType: 'json',
 					method: 'POST'
 				});
+
 				overlay.xhr
 					.always(() => overlay.unsetLoading())
 					.done((response) => {

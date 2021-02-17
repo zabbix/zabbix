@@ -75,7 +75,7 @@ $output = [
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'document.dispatchEvent('.
-				'new CustomEvent(DASHBOARD_VIEW_EVENT_APPLY_PROPERTIES, {detail: {overlay: overlay}})'.
+				'new CustomEvent(DASHBOARD_EVENT_APPLY_PROPERTIES, {detail: {overlay: overlay}})'.
 			');'
 		]
 	]

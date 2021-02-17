@@ -147,7 +147,14 @@ class CControllerDashboardView extends CController {
 				'dashboardid' => null,
 				'name' => _('New dashboard'),
 				'editable' => true,
-				'pages' => [[]],
+				'pages' => [
+					[
+						'dashboard_pageid' => null,
+						'name' => '',
+						'display_period' => 0,
+						'widgets' => []
+					]
+				],
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
