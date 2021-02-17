@@ -37,7 +37,7 @@ class testFormTestItemPrototype extends testItemTest {
 	 */
 	public function testFormTestItemPrototype_CheckButtonStateHost() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item prototype for Test Button check',
-			'Item prototype', ' added', false, true, self::HOST_LLD_ID, null);
+				'Item prototype', ' added', false, true, self::HOST_LLD_ID, null);
 	}
 
 	/**
@@ -45,7 +45,7 @@ class testFormTestItemPrototype extends testItemTest {
 	 */
 	public function testFormTestItemPrototype_CheckButtonStateTemplate() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item prototype for Test Button check',
-			'Item prototype', ' added', false, false, self::TEMPLATE_LLD_ID, null);
+				'Item prototype', ' added', false, false, self::TEMPLATE_LLD_ID, null);
 	}
 
 	/**
