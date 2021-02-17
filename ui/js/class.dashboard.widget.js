@@ -143,7 +143,7 @@ class CDashboardWidget extends CBaseComponent {
 		else if (this.parent) {
 			this._is_ready = true;
 
-			const children_not_ready = this.parent.children.filter(function(w) {
+			const children_not_ready = this.parent.children.filter((w) => {
 				return !w._is_ready;
 			});
 
@@ -168,6 +168,15 @@ class CDashboardWidget extends CBaseComponent {
 		}
 		else {
 			this.div.find('.dashbrd-grid-widget-content').addClass('is-loading');
+		}
+	}
+
+	hidePreloader() {
+		if (this._is_iterator) {
+			this.div.find('.dashbrd-grid-iterator-content').removeClass('is-loading');
+		}
+		else {
+			this.div.find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
 	}
 

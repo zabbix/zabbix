@@ -2208,15 +2208,6 @@ class CDashboardPage {
 		}
 	}
 
-	_hidePreloader(widget) {
-		if (widget.isIterator()) {
-			widget.div.find('.dashbrd-grid-iterator-content').removeClass('is-loading');
-		}
-		else {
-			widget.div.find('.dashbrd-grid-widget-content').removeClass('is-loading');
-		}
-	}
-
 	_startPreloader(widget, timeout) {
 		timeout = timeout || widget.preloader_timeout;
 
@@ -2237,7 +2228,7 @@ class CDashboardPage {
 			delete widget.preloader_timeoutid;
 		}
 
-		this._hidePreloader(widget);
+		widget.hidePreloader();
 	}
 
 	_setUpdateWidgetContentTimer(widget, rf_rate) {
