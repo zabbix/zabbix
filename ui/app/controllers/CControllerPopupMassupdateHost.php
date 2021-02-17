@@ -100,7 +100,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function doAction() {
 		if ($this->hasInput('update')) {
 			$output = [];
-			$hostids = $this->getInput('ids', []);
+			$hostids = $this->getInput('ids');
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -476,8 +476,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'ids' => $this->getInput('ids', []),
-				'discovered_host' => false,
+				'ids' => $this->getInput('ids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => 'hosts.php'
 			];
@@ -490,13 +489,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'sortfield' => 'host'
 			]);
 
-			if ($data['ids']) {
-				$data['discovered_host'] = (count($data['ids']) == count(API::Host()->get([
-					'output' => [],
-					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-					'hostids' => $data['ids']
-				])));
-			}
+			$data['discovered_host'] = !(bool) API::Host()->get([
+				'output' => [],
+				'hostids' => $data['ids'],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+				'limit' => 1
+			]);
 
 			$this->setResponse(new CControllerResponseData($data));
 		}
