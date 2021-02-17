@@ -107,7 +107,7 @@ while (0)
 #define UNSET_RESULT_EXCLUDING(res, exc_type) 					\
 										\
 do										\
-{										\
+{	/* AR_META is always excluded */					\
 	if (!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res);			\
 	if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res);			\
 	if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res);			\

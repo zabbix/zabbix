@@ -850,6 +850,18 @@ static void	preprocessor_add_test_request(zbx_preprocessing_manager_t *manager, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	unset_result_excluding_meta(AGENT_RESULT *result, const AGENT_RESULT *result_old)
+{
+	init_result(result);
+
+	if (0 == ISSET_META(result_old))
+		return;
+
+	result->type = AR_META;
+	result->lastlogsize = result_old->lastlogsize;
+	result->mtime = result_old->mtime;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_set_variant_result                                  *
@@ -879,16 +891,11 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
-		AGENT_RESULT	*result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+		AGENT_RESULT	*result;
 
-		init_result(result);
+		result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
 
-		if (0 != ISSET_META(request->value.result_ptr->result))
-		{
-			result->type = AR_META;
-			result->lastlogsize = request->value.result_ptr->result->lastlogsize;
-			result->mtime = request->value.result_ptr->result->mtime;
-		}
+		unset_result_excluding_meta(result, request->value.result_ptr->result);
 
 		preproc_item_result_free(&request->value);
 		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
@@ -916,16 +923,11 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
 	{
 		/* old result is shared between dependent and master items, it cannot be modified, create new result */
-		AGENT_RESULT	*result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+		AGENT_RESULT	*result;
 
-		init_result(result);
+		result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
 
-		if (0 != ISSET_META(request->value.result_ptr->result))
-		{
-			result->type = AR_META;
-			result->lastlogsize = request->value.result_ptr->result->lastlogsize;
-			result->mtime = request->value.result_ptr->result->mtime;
-		}
+		unset_result_excluding_meta(result, request->value.result_ptr->result);
 
 		switch (request->value_type)
 		{
