@@ -25,23 +25,27 @@ class CValueMapHelper {
 	 * Apply value mapping to value.
 	 * If value map or mapping is not found, unchanged value is returned,
 	 * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
+	 * Substring with suffix "&hellip;" of initial value will be shown if $maxlength is defined.
 	 *
 	 * @param string $value                 Value that mapping should be applied to.
 	 * @param array  $valuemap              Valuemaps.
 	 * @param array  $valuemap['mappings']  (optional) Valuemap mappings.
+	 * @param int    $maxlength             (optional) How many characters in initial value should be shown.
 	 *
 	 * @return string
 	 */
-	static public function applyValueMap(string $value, array $valuemap): string {
+	static public function applyValueMap(string $value, array $valuemap, $maxlength = null): string {
 		if (!$valuemap) {
 			return $value;
 		}
 
 		$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
-		if (array_key_exists($value, $mappings)) {
-			return $mappings[$value].' ('.$value.')';
-		}
+		$initial_value = ($maxlength !== null && mb_strlen($value) > $maxlength)
+			? substr($value, 0, $maxlength).'&hellip;'
+			: $value;
 
-		return $value;
+		return array_key_exists($value, $mappings)
+			? $mappings[$value].' ('.$initial_value.')'
+			: $value;
 	}
 }
