@@ -77,20 +77,18 @@ class CControllerHostDashboardView extends CController {
 
 			$dashboards = API::TemplateDashboard()->get([
 				'output' => ['dashboardid', 'name', 'templateid'],
-				'selectPages' => ['widgets'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'dashboardids' => [$dashboardid]
 			]);
 
 			$dashboard = array_shift($dashboards);
-			$dashboard['widgets'] = [$dashboard['pages'][0]['widgets']];
-
 
 			if ($dashboard !== null) {
 				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
 					$this->getInput('hostid')
 				);
 
-				$dashboard['widgets'] = CDashboardHelper::prepareWidgetsForGrid($dashboard['widgets'],
+				$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'],
 					$dashboard['templateid'], true
 				);
 
@@ -108,7 +106,7 @@ class CControllerHostDashboardView extends CController {
 					'host_dashboards' => $host_dashboards,
 					'dashboard' => $dashboard,
 					'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
-					'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['widgets'])
+					'time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages'])
 						? getTimeSelectorPeriod($time_selector_options)
 						: null,
 					'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)

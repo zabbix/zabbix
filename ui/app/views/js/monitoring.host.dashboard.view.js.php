@@ -25,36 +25,53 @@
 ?>
 
 <script>
-	function initializeHostDashboard(host, data, widget_defaults, web_layout_mode) {
-		// Prevent page reloading on time selector events.
-		timeControl.refreshPage = false;
+	function initializeView(host, data, widget_defaults, web_layout_mode) {
 
-		ZABBIX.Dashboard = new CDashboardPage($('.dashbrd-grid-container'), {
-			dashboard: {
-				templateid: data.templateid,
-				dashboardid: data.dashboardid,
-				dynamic_hostid: host.hostid
-			},
-			options: {
-				'widget-height': 70,
-				'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
-				'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
-				'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-				'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				'editable': false,
-				'edit_mode': false,
-				'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+		const init = () => {
+			// Prevent page reloading on time selector events.
+			timeControl.refreshPage = false;
+
+			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBRD ?>'), {
+				containers: {
+					grid: document.querySelector('.<?= ZBX_STYLE_DASHBRD_GRID ?>'),
+					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NAVIGATION_TABS ?>')
+				},
+				buttons: {
+					previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_PREVIOUS_PAGE ?>'),
+					next_page: document.querySelector('.<?= ZBX_STYLE_DASHBRD_NEXT_PAGE ?>')
+				},
+				dashboard: {
+					templateid: data.templateid,
+					dashboardid: data.dashboardid,
+					dynamic_hostid: host.hostid
+				},
+				options: {
+					'widget-height': 70,
+					'max-rows': <?= DASHBOARD_MAX_ROWS ?>,
+					'max-columns': <?= DASHBOARD_MAX_COLUMNS ?>,
+					'widget-min-rows': <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+					'widget-max-rows': <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+					'editable': false,
+					'edit_mode': false,
+					'kioskmode': (web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>)
+				}
+			});
+
+			ZABBIX.Dashboard.setWidgetDefaults(widget_defaults);
+			ZABBIX.Dashboard.addPages(data.pages);
+			ZABBIX.Dashboard.activate();
+
+			jqBlink.blink();
+
+			document.getElementById('dashboardid').addEventListener('change', events.dashboardChange);
+		};
+
+		const events = {
+			dashboardChange: (e) => {
+				e.target.closest('form').submit();
 			}
-		});
+		};
 
-		ZABBIX.Dashboard.setWidgetDefaults(widget_defaults);
-		ZABBIX.Dashboard.addWidgets(data.widgets);
-		ZABBIX.Dashboard.activate();
-
-		jqBlink.blink();
+		init();
 	}
-
-	$(() => {
-		$('#dashboardid').on('change', (e) => $(e.target).closest('form').submit());
-	});
 </script>
