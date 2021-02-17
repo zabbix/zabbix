@@ -286,10 +286,11 @@ INDEX		|1		|hostid,type
 INDEX		|2		|ip,dns
 INDEX		|3		|available
 
-TABLE|valuemaps|valuemapid|ZBX_TEMPLATE
+TABLE|valuemap|valuemapid|ZBX_TEMPLATE
 FIELD		|valuemapid	|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
-UNIQUE		|1		|name
+UNIQUE		|1		|hostid,name
 
 TABLE|items|itemid|ZBX_TEMPLATE
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
@@ -308,7 +309,7 @@ FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|0			|2|items	|itemid
-FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemaps	|		|RESTRICT
+FIELD		|valuemapid	|t_id		|	|NULL		|0			|3|valuemap	|		|RESTRICT
 FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -799,12 +800,12 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|2|items
 UNIQUE		|1		|applicationid,itemid
 INDEX		|2		|itemid
 
-TABLE|mappings|mappingid|ZBX_TEMPLATE
-FIELD		|mappingid	|t_id		|	|NOT NULL	|0
-FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemaps
+TABLE|valuemap_mapping|valuemap_mappingid|ZBX_TEMPLATE
+FIELD		|valuemap_mappingid|t_id	|	|NOT NULL	|0
+FIELD		|valuemapid	|t_id		|	|NOT NULL	|0			|1|valuemap
 FIELD		|value		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|newvalue	|t_varchar(64)	|''	|NOT NULL	|0
-INDEX		|1		|valuemapid
+UNIQUE		|1		|valuemapid,value
 
 TABLE|media|mediaid|ZBX_DATA
 FIELD		|mediaid	|t_id		|	|NOT NULL	|0
@@ -1896,4 +1897,4 @@ INDEX	|4		|creator_userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030038	|5030038
+ROW		|5030050	|5030050

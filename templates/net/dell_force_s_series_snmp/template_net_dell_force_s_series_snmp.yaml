@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:02:56Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -363,28 +363,28 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '55'
-  value_maps:
-    -
-      name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: up
+          name: 'F10-S-SERIES-CHASSIS-MIB::chSysFanTrayOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: absent
         -
-          value: '2'
-          newvalue: down
-        -
-          value: '3'
-          newvalue: absent
-    -
-      name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: up
-        -
-          value: '2'
-          newvalue: down
-        -
-          value: '3'
-          newvalue: absent
+          name: 'F10-S-SERIES-CHASSIS-MIB::chSysPowerSupplyOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: absent

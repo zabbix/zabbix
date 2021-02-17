@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:34Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -287,31 +287,31 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN_STATUS}'
           value: '3'
-  value_maps:
-    -
-      name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: ok
+          name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: ok
+            -
+              value: '2'
+              newvalue: unavailable
+            -
+              value: '3'
+              newvalue: nonoperational
         -
-          value: '2'
-          newvalue: unavailable
-        -
-          value: '3'
-          newvalue: nonoperational
-    -
-      name: 'ENTITY-STATE-MIB::EntityOperState'
-      mappings:
-        -
-          value: '1'
-          newvalue: unknown
-        -
-          value: '2'
-          newvalue: disabled
-        -
-          value: '3'
-          newvalue: enabled
-        -
-          value: '4'
-          newvalue: testing
+          name: 'ENTITY-STATE-MIB::EntityOperState'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: disabled
+            -
+              value: '3'
+              newvalue: enabled
+            -
+              value: '4'
+              newvalue: testing

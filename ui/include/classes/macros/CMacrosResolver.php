@@ -1297,6 +1297,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				' AND ('.join(' OR ', $queryParts).')'
 		), 'itemid');
 
+		foreach ($matches['functions'] as $function) {
+			if ($function[0] === 'last') {
+				$items = self::getItemsValueMaps($items);
+				break;
+			}
+		}
+
 		// Get items for which user has permission.
 		$allowedItems = API::Item()->get([
 			'itemids' => array_keys($items),
@@ -1906,15 +1913,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$itemHost = $expressionData->expressions[0]['host'];
 				$key = $expressionData->expressions[0]['item'];
 				$function = $expressionData->expressions[0]['functionName'];
-
-				$item = API::Item()->get([
-					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'lastvalue', 'lastclock'],
+				$options = [
+					'output' => ['itemid', 'value_type', 'units', 'lastvalue', 'lastclock'],
 					'webitems' => true,
 					'filter' => [
 						'host' => $itemHost,
 						'key_' => $key
 					]
-				]);
+				];
+
+				if ($function === 'last') {
+					$options['selectValueMap'] = ['mappings'];
+				}
+
+				$item = API::Item()->get($options);
 
 				$item = reset($item);
 

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:32Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -499,6 +499,25 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '50'
+      valuemaps:
+        -
+          name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: bad
+            -
+              value: '3'
+              newvalue: warning
+            -
+              value: '4'
+              newvalue: good
+            -
+              value: '5'
+              newvalue: notPresent
   graphs:
     -
       name: 'CPU utilization'
@@ -511,22 +530,3 @@ zabbix_export:
           item:
             host: 'HP Enterprise Switch SNMP'
             key: 'system.cpu.util[hpSwitchCpuStat.0]'
-  value_maps:
-    -
-      name: 'HP-ICF-CHASSIS::hpicfSensorStatus'
-      mappings:
-        -
-          value: '1'
-          newvalue: unknown
-        -
-          value: '2'
-          newvalue: bad
-        -
-          value: '3'
-          newvalue: warning
-        -
-          value: '4'
-          newvalue: good
-        -
-          value: '5'
-          newvalue: notPresent

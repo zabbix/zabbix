@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-12-29T13:01:56Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -1559,6 +1559,16 @@ zabbix_export:
                   value:
                     name: 'MySQL: Threads'
                     host: 'MySQL by Zabbix agent'
+      valuemaps:
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   graphs:
     -
       name: 'MySQL: Bandwidth'
@@ -1700,13 +1710,3 @@ zabbix_export:
           item:
             host: 'MySQL by Zabbix agent'
             key: mysql.threads_running
-  value_maps:
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

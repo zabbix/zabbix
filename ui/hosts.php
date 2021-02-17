@@ -88,6 +88,7 @@ $fields = [
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'valuemaps' => 				[T_ZBX_STR, O_OPT, null,		null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"host.export","host.massdelete","host.massdisable", "host.massenable"'),
@@ -506,6 +507,48 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
+		$valuemaps = getRequest('valuemaps', []);
+		$ins_valuemaps = [];
+		$upd_valuemaps = [];
+		$del_valuemapids = [];
+
+		if ((getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone')
+				&& getRequest('clone_hostid', 0) != 0) {
+			foreach ($valuemaps as &$valuemap) {
+				unset($valuemap['valuemapid']);
+			}
+			unset($valuemap);
+		}
+		else if (hasRequest('update')) {
+			$del_valuemapids = API::ValueMap()->get([
+				'output' => [],
+				'hostids' => $hostId,
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($valuemaps as $valuemap) {
+			if (array_key_exists('valuemapid', $valuemap)) {
+				$upd_valuemaps[] = $valuemap;
+				unset($del_valuemapids[$valuemap['valuemapid']]);
+			}
+			else {
+				$ins_valuemaps[] = $valuemap + ['hostid' => $hostId];
+			}
+		}
+
+		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
+			throw new Exception();
+		}
+
+		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
+			throw new Exception();
+		}
+
+		if ($del_valuemapids && !API::ValueMap()->delete(array_keys($del_valuemapids))) {
+			throw new Exception();
+		}
+
 		// full clone
 		if (getRequest('form', '') === 'full_clone' && getRequest('clone_hostid', 0) != 0) {
 			$srcHostId = getRequest('clone_hostid');
@@ -718,7 +761,10 @@ if (hasRequest('form')) {
 		'tls_subject' => getRequest('tls_subject', ''),
 		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
 		'tls_psk' => getRequest('tls_psk', ''),
-		'psk_edit_mode' => getRequest('psk_edit_mode', 1)
+		'psk_edit_mode' => getRequest('psk_edit_mode', 1),
+
+		// Valuemap
+		'valuemaps' => array_values(getRequest('valuemaps', []))
 	];
 
 	if (!hasRequest('form_refresh')) {
@@ -735,6 +781,7 @@ if (hasRequest('form')) {
 				'selectHostDiscovery' => ['parent_hostid'],
 				'selectInventory' => API_OUTPUT_EXTEND,
 				'selectTags' => ['tag', 'value'],
+				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
@@ -798,6 +845,17 @@ if (hasRequest('form')) {
 			if ($data['host'] === $data['visiblename']) {
 				$data['visiblename'] = '';
 			}
+
+			// Valuemap
+			order_result($dbHost['valuemaps'], 'name');
+
+			foreach ($dbHost['valuemaps'] as &$valuemap) {
+				order_result($valuemap['mappings'], 'value');
+				$valuemap['mappings'] = array_values($valuemap['mappings']);
+			}
+			unset($valuemap);
+
+			$data['valuemaps'] = array_values($dbHost['valuemaps']);
 
 			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
 		}

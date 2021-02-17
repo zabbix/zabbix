@@ -61,17 +61,16 @@ class CScreenHttpTestDetails extends CScreenBase {
 
 		// fetch HTTP step items
 		$items = DBfetchArray(DBselect(
-			'SELECT i.value_type,i.valuemapid,i.units,i.itemid,hi.type,hs.httpstepid'.
+			'SELECT i.value_type,i.units,i.itemid,hi.type,hs.httpstepid'.
 			' FROM items i,httpstepitem hi,httpstep hs'.
 			' WHERE hi.itemid=i.itemid'.
 				' AND hi.httpstepid=hs.httpstepid'.
 				' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
 		));
-
 		$step_items = [];
 
 		foreach ($items as $item) {
-			$step_items[$item['httpstepid']][$item['type']] = $item;
+			$step_items[$item['httpstepid']][$item['type']] = $item + ['valuemap' => []];
 		}
 
 		// fetch HTTP item history
@@ -89,7 +88,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 		$total_time = [
 			'value' => 0,
 			'value_type' => null,
-			'valuemapid' => null,
+			'valuemap' => [],
 			'units' => null
 		];
 
@@ -124,7 +123,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 				// Skip steps that come after a failed step.
 				if (!$status['afterError'] && $item['type'] == HTTPSTEP_ITEM_TYPE_TIME) {
 					$total_time['value_type'] = $item['value_type'];
-					$total_time['valuemapid'] = $item['valuemapid'];
+					$total_time['valuemap'] = $item['valuemap'];
 					$total_time['units'] = $item['units'];
 
 					if (array_key_exists($item['itemid'], $item_history)) {

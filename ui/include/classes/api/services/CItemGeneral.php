@@ -607,6 +607,8 @@ abstract class CItemGeneral extends CApiService {
 		}
 		unset($item);
 
+		$this->validateValueMaps($items);
+
 		$this->checkExistingItems($items);
 	}
 
@@ -2087,6 +2089,50 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
+		// Add value mapping.
+		if (($this instanceof CItemPrototype || $this instanceof CItem) && $options['selectValueMap'] !== null) {
+			if ($options['selectValueMap'] === API_OUTPUT_EXTEND) {
+				$options['selectValueMap'] = ['valuemapid', 'name', 'mappings'];
+			}
+
+			foreach ($result as &$item) {
+				$item['valuemap'] = [];
+			}
+			unset($item);
+
+			$valuemaps = DB::select('valuemap', [
+				'output' => array_diff($this->outputExtend($options['selectValueMap'], ['valuemapid', 'hostid']),
+					['mappings']
+				),
+				'filter' => ['valuemapid' => array_keys(array_flip(array_column($result, 'valuemapid')))],
+				'preservekeys' => true
+			]);
+
+			if ($this->outputIsRequested('mappings', $options['selectValueMap']) && $valuemaps) {
+				$params = [
+					'output' => ['valuemapid', 'value', 'newvalue'],
+					'filter' => ['valuemapid' => array_keys($valuemaps)]
+				];
+				$query = DBselect(DB::makeSql('valuemap_mapping', $params));
+
+				while ($mapping = DBfetch($query)) {
+					$valuemaps[$mapping['valuemapid']]['mappings'][] = [
+						'value' => $mapping['value'],
+						'newvalue' => $mapping['newvalue']
+					];
+				}
+			}
+
+			foreach ($result as &$item) {
+				if (array_key_exists('valuemapid', $item) && array_key_exists($item['valuemapid'], $valuemaps)) {
+					$item['valuemap'] = array_intersect_key($valuemaps[$item['valuemapid']],
+						array_flip($options['selectValueMap'])
+					);
+				}
+			}
+			unset($item);
+		}
+
 		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {
 			$item_parameters = DBselect(
 				'SELECT ip.itemid,ip.name,ip.value'.
@@ -2694,5 +2740,51 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Check that valuemap belong to same host as item.
+	 *
+	 * @param array $items
+	 */
+	protected function validateValueMaps(array $items): void {
+		$valuemapids_by_hostid = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0) {
+				$valuemapids_by_hostid[$item['hostid']][$item['valuemapid']] = true;
+			}
+		}
+
+		$sql_where = [];
+		foreach ($valuemapids_by_hostid as $hostid => $valuemapids) {
+			$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
+				dbConditionId('vm.valuemapid', array_keys($valuemapids)).')';
+		}
+
+		if ($sql_where) {
+			$result = DBselect(
+				'SELECT vm.valuemapid,vm.hostid'.
+				' FROM valuemap vm'.
+				' WHERE '.implode(' OR ', $sql_where)
+			);
+			while ($row = DBfetch($result)) {
+				unset($valuemapids_by_hostid[$row['hostid']][$row['valuemapid']]);
+
+				if (!$valuemapids_by_hostid[$row['hostid']]) {
+					unset($valuemapids_by_hostid[$row['hostid']]);
+				}
+			}
+
+			if ($valuemapids_by_hostid) {
+				$hostid = key($valuemapids_by_hostid);
+				$valuemapid = key($valuemapids_by_hostid[$hostid]);
+
+				$host_row = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
+					$valuemapid, $host_row['host']
+				));
+			}
+		}
 	}
 }

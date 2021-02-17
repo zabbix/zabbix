@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:31Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -360,6 +360,55 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '65'
+      valuemaps:
+        -
+          name: 'EQUIPMENT-MIB::swFanStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: other
+            -
+              value: '1'
+              newvalue: working
+            -
+              value: '2'
+              newvalue: fail
+            -
+              value: '3'
+              newvalue: speed-0
+            -
+              value: '4'
+              newvalue: speed-low
+            -
+              value: '5'
+              newvalue: speed-middle
+            -
+              value: '6'
+              newvalue: speed-high
+        -
+          name: 'EQUIPMENT-MIB::swPowerStatus'
+          mappings:
+            -
+              value: '0'
+              newvalue: other
+            -
+              value: '1'
+              newvalue: lowVoltage
+            -
+              value: '2'
+              newvalue: overCurrent
+            -
+              value: '3'
+              newvalue: working
+            -
+              value: '4'
+              newvalue: fail
+            -
+              value: '5'
+              newvalue: connect
+            -
+              value: '6'
+              newvalue: disconnect
   graphs:
     -
       name: 'CPU utilization'
@@ -372,52 +421,3 @@ zabbix_export:
           item:
             host: 'D-Link DES_DGS Switch SNMP'
             key: 'system.cpu.util[agentCPUutilizationIn1min.0]'
-  value_maps:
-    -
-      name: 'EQUIPMENT-MIB::swFanStatus'
-      mappings:
-        -
-          value: '0'
-          newvalue: other
-        -
-          value: '1'
-          newvalue: working
-        -
-          value: '2'
-          newvalue: fail
-        -
-          value: '3'
-          newvalue: speed-0
-        -
-          value: '4'
-          newvalue: speed-low
-        -
-          value: '5'
-          newvalue: speed-middle
-        -
-          value: '6'
-          newvalue: speed-high
-    -
-      name: 'EQUIPMENT-MIB::swPowerStatus'
-      mappings:
-        -
-          value: '0'
-          newvalue: other
-        -
-          value: '1'
-          newvalue: lowVoltage
-        -
-          value: '2'
-          newvalue: overCurrent
-        -
-          value: '3'
-          newvalue: working
-        -
-          value: '4'
-          newvalue: fail
-        -
-          value: '5'
-          newvalue: connect
-        -
-          value: '6'
-          newvalue: disconnect

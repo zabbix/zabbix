@@ -628,6 +628,64 @@ switch ($data['popup_type']) {
 		}
 		unset($data['table_records']);
 		break;
+
+	case 'valuemap_names':
+		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
+
+		foreach ($data['table_records'] as $valuemap) {
+			$table->addRow([
+				new CCheckBox('item['.$valuemap['id'].']', $valuemap['id']),
+				(new CLink($valuemap['name'], '#'))
+					->setId('spanid'.$valuemap['id'])
+					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick))
+			]);
+		}
+		break;
+
+	case 'valuemaps':
+		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
+
+		foreach ($data['table_records'] as $valuemap) {
+			$name = [];
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$valuemap['id'].']', $valuemap['id'])
+				: null;
+
+			$name[] = (new CSpan($valuemap['hostname']))->addClass(ZBX_STYLE_GREY);
+			$name[] = NAME_DELIMITER;
+
+			if (array_key_exists('_disabled', $valuemap) && $valuemap['_disabled']) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$name[] = (new CSpan($valuemap['name']))->addClass(ZBX_STYLE_GREY);
+
+				unset($data['table_records'][$valuemap['id']]);
+			}
+			else {
+				$js_action = 'addValue('.json_encode($options['reference']).', '.
+					json_encode($valuemap['id']).', '.$options['parentid'].');';
+
+				$name[] = (new CLink($valuemap['name'], '#'))
+					->setId('spanid'.$valuemap['id'])
+					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick));
+			}
+
+			$span = [];
+
+			foreach (array_slice($valuemap['mappings'], 0, 3) as $mapping) {
+				$span[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
+				$span[] = BR();
+			}
+
+			if (count($valuemap['mappings']) > 3) {
+				$span[] = '&hellip;';
+			}
+
+			$table->addRow([$check_box, $name, $span]);
+		}
+		break;
 }
 
 // Add submit button at footer.
@@ -644,7 +702,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods'
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes', 'roles', 'api_methods', 'valuemaps'
 ];
 
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {

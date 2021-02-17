@@ -134,7 +134,8 @@ if ($trigger['opdata'] !== '') {
 }
 else {
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+		'selectValueMap' => ['mappings'],
 		'triggerids' => $event['objectid']
 	]);
 	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
