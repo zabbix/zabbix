@@ -1507,6 +1507,19 @@ zabbix_export:
         -
           macro: '{$USER}'
           value: admin
+      valuemaps:
+        -
+          name: 'Login status'
+          mappings:
+            -
+              value: '0'
+              newvalue: OK
+            -
+              value: '1'
+              newvalue: Unauthorized
+            -
+              value: '2'
+              newvalue: 'Connection error'
   triggers:
     -
       expression: |
@@ -1548,16 +1561,3 @@ zabbix_export:
           item:
             host: 'Hikvision camera by HTTP'
             key: hikvision_cam.memory.usage
-  value_maps:
-    -
-      name: 'Login status'
-      mappings:
-        -
-          value: '0'
-          newvalue: OK
-        -
-          value: '1'
-          newvalue: Unauthorized
-        -
-          value: '2'
-          newvalue: 'Connection error'
