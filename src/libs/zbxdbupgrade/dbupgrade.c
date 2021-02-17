@@ -544,8 +544,11 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 
 	if (NULL != old_field && (zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type) ||
 			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type) ||
-			(ZBX_TYPE_TEXT == field->type && ZBX_TYPE_SHORTTEXT == old_field->type)))
+			(ZBX_TYPE_TEXT == field->type && (ZBX_TYPE_SHORTTEXT == old_field->type ||
+				ZBX_TYPE_CHAR == old_field->type))))
+	{
 		return DBmodify_field_type_with_copy(table_name, field);
+	}
 #endif
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
