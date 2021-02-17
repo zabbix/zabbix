@@ -53,7 +53,7 @@ class testFormTestLowLevelDiscovery extends testItemTest{
 	 *
 	 * @dataProvider getCommonTestItemData
 	 *
-	 * depends testFormTestLowLevelDiscovery_CheckButtonStateHost
+	 * @depends testFormTestLowLevelDiscovery_CheckButtonStateHost
 	 */
 	public function testFormTestLowLevelDiscovery_TestLLDHost($data) {
 		$this->checkTestItem($data, true, self::HOST_ID, 'host_discovery', true);
