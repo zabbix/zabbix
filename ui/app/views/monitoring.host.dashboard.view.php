@@ -98,7 +98,6 @@ if ($data['time_selector'] !== null) {
 
 if (count($data['dashboard']['pages']) > 1
 		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets']))  {
-
 	$widget
 		->addItem(
 			(new CDiv())
