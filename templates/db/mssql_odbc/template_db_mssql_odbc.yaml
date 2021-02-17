@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:18Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -3041,6 +3041,205 @@ zabbix_export:
           macro: '{$MSSQL.WORK_TABLES.MAX}'
           value: '20'
           description: 'The maximum number of work tables created per second for trigger expression.'
+      valuemaps:
+        -
+          name: 'MSSQL - Yes / No'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
+        -
+          name: 'MSSQL AG Connected state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Disconnected
+            -
+              value: '1'
+              newvalue: Connected
+        -
+          name: 'MSSQL AG Join state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Not joined'
+            -
+              value: '1'
+              newvalue: 'Joined, standalone instance'
+            -
+              value: '2'
+              newvalue: 'Joined, failover cluster instance'
+        -
+          name: 'MSSQL AG Operational state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Pending failover'
+            -
+              value: '1'
+              newvalue: Pending
+            -
+              value: '2'
+              newvalue: Online
+            -
+              value: '3'
+              newvalue: Offline
+            -
+              value: '4'
+              newvalue: Failed
+            -
+              value: '5'
+              newvalue: 'Failed, no quorum'
+            -
+              value: '6'
+              newvalue: 'Replica is not local'
+        -
+          name: 'MSSQL AG Recovery health'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'In progress'
+            -
+              value: '1'
+              newvalue: Online
+            -
+              value: '2'
+              newvalue: 'Replica is not local'
+        -
+          name: 'MSSQL AG Role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Resolving
+            -
+              value: '1'
+              newvalue: Primary
+            -
+              value: '2'
+              newvalue: Secondary
+        -
+          name: 'MSSQL AG Synchronization health'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Not healthy'
+            -
+              value: '1'
+              newvalue: 'Partially healthy'
+            -
+              value: '2'
+              newvalue: Healthy
+        -
+          name: 'MSSQL DB state'
+          mappings:
+            -
+              value: '0'
+              newvalue: ONLINE
+            -
+              value: '1'
+              newvalue: RESTORING
+            -
+              value: '2'
+              newvalue: RECOVERING
+            -
+              value: '3'
+              newvalue: RECOVERY_PENDING
+            -
+              value: '4'
+              newvalue: SUSPECT
+            -
+              value: '5'
+              newvalue: EMERGENCY
+            -
+              value: '6'
+              newvalue: OFFLINE
+            -
+              value: '7'
+              newvalue: COPYING
+            -
+              value: '10'
+              newvalue: OFFLINE_SECONDARY
+        -
+          name: 'MSSQL Mirroring Role'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Database is inaccessible or is not mirrored'
+            -
+              value: '1'
+              newvalue: Principal
+            -
+              value: '2'
+              newvalue: Mirror
+        -
+          name: 'MSSQL Mirroring State'
+          mappings:
+            -
+              value: '0'
+              newvalue: Suspended
+            -
+              value: '1'
+              newvalue: 'Disconnected from the other partner'
+            -
+              value: '2'
+              newvalue: Synchronizing
+            -
+              value: '3'
+              newvalue: 'Pending Failover'
+            -
+              value: '4'
+              newvalue: Synchronized
+            -
+              value: '5'
+              newvalue: 'The partners are not synchronized. Failover is not possible now.'
+            -
+              value: '6'
+              newvalue: 'The partners are synchronized. Failover is potentially possible.'
+            -
+              value: '7'
+              newvalue: 'Database is inaccessible or is not mirrored'
+        -
+          name: 'MSSQL Safety level'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Unknown state'
+            -
+              value: '1'
+              newvalue: 'Off [asynchronous]'
+            -
+              value: '2'
+              newvalue: 'Full [synchronous]'
+            -
+              value: '3'
+              newvalue: 'Database is inaccessible or is not mirrored'
+        -
+          name: 'MSSQL Witness state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '1'
+              newvalue: Connected
+            -
+              value: '2'
+              newvalue: Disconnected
+            -
+              value: '3'
+              newvalue: 'No witness exists'
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 > 10 * {MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}'
@@ -3405,202 +3604,3 @@ zabbix_export:
           item:
             host: 'MSSQL by ODBC'
             key: mssql.lock_wait_time
-  value_maps:
-    -
-      name: 'MSSQL - Yes / No'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'No'
-        -
-          value: '1'
-          newvalue: 'Yes'
-    -
-      name: 'MSSQL AG Connected state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Disconnected
-        -
-          value: '1'
-          newvalue: Connected
-    -
-      name: 'MSSQL AG Join state'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'Not joined'
-        -
-          value: '1'
-          newvalue: 'Joined, standalone instance'
-        -
-          value: '2'
-          newvalue: 'Joined, failover cluster instance'
-    -
-      name: 'MSSQL AG Operational state'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'Pending failover'
-        -
-          value: '1'
-          newvalue: Pending
-        -
-          value: '2'
-          newvalue: Online
-        -
-          value: '3'
-          newvalue: Offline
-        -
-          value: '4'
-          newvalue: Failed
-        -
-          value: '5'
-          newvalue: 'Failed, no quorum'
-        -
-          value: '6'
-          newvalue: 'Replica is not local'
-    -
-      name: 'MSSQL AG Recovery health'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'In progress'
-        -
-          value: '1'
-          newvalue: Online
-        -
-          value: '2'
-          newvalue: 'Replica is not local'
-    -
-      name: 'MSSQL AG Role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Resolving
-        -
-          value: '1'
-          newvalue: Primary
-        -
-          value: '2'
-          newvalue: Secondary
-    -
-      name: 'MSSQL AG Synchronization health'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'Not healthy'
-        -
-          value: '1'
-          newvalue: 'Partially healthy'
-        -
-          value: '2'
-          newvalue: Healthy
-    -
-      name: 'MSSQL DB state'
-      mappings:
-        -
-          value: '0'
-          newvalue: ONLINE
-        -
-          value: '1'
-          newvalue: RESTORING
-        -
-          value: '2'
-          newvalue: RECOVERING
-        -
-          value: '3'
-          newvalue: RECOVERY_PENDING
-        -
-          value: '4'
-          newvalue: SUSPECT
-        -
-          value: '5'
-          newvalue: EMERGENCY
-        -
-          value: '6'
-          newvalue: OFFLINE
-        -
-          value: '7'
-          newvalue: COPYING
-        -
-          value: '10'
-          newvalue: OFFLINE_SECONDARY
-    -
-      name: 'MSSQL Mirroring Role'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'Database is inaccessible or is not mirrored'
-        -
-          value: '1'
-          newvalue: Principal
-        -
-          value: '2'
-          newvalue: Mirror
-    -
-      name: 'MSSQL Mirroring State'
-      mappings:
-        -
-          value: '0'
-          newvalue: Suspended
-        -
-          value: '1'
-          newvalue: 'Disconnected from the other partner'
-        -
-          value: '2'
-          newvalue: Synchronizing
-        -
-          value: '3'
-          newvalue: 'Pending Failover'
-        -
-          value: '4'
-          newvalue: Synchronized
-        -
-          value: '5'
-          newvalue: 'The partners are not synchronized. Failover is not possible now.'
-        -
-          value: '6'
-          newvalue: 'The partners are synchronized. Failover is potentially possible.'
-        -
-          value: '7'
-          newvalue: 'Database is inaccessible or is not mirrored'
-    -
-      name: 'MSSQL Safety level'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'Unknown state'
-        -
-          value: '1'
-          newvalue: 'Off [asynchronous]'
-        -
-          value: '2'
-          newvalue: 'Full [synchronous]'
-        -
-          value: '3'
-          newvalue: 'Database is inaccessible or is not mirrored'
-    -
-      name: 'MSSQL Witness state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Unknown
-        -
-          value: '1'
-          newvalue: Connected
-        -
-          value: '2'
-          newvalue: Disconnected
-        -
-          value: '3'
-          newvalue: 'No witness exists'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

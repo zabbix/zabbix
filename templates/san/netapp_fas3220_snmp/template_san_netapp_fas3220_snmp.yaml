@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-01-13T15:34:13Z'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/SAN
@@ -674,8 +674,7 @@ zabbix_export:
               key: 'fas3220.net.if[if64InDiscards, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.
+              description: 'The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.'
               application_prototypes:
                 -
                   name: '{#IFDESCR}'
@@ -691,8 +690,7 @@ zabbix_export:
               key: 'fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+              description: 'The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.'
               application_prototypes:
                 -
                   name: '{#IFDESCR}'
@@ -728,8 +726,7 @@ zabbix_export:
               key: 'fas3220.net.if[if64OutDiscards, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.
+              description: 'The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.'
               application_prototypes:
                 -
                   name: '{#IFDESCR}'
@@ -745,8 +742,7 @@ zabbix_export:
               key: 'fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"]'
               delay: 3m
               history: 7d
-              description: |
-                The number of outbound packets that could not be transmitted because of errors.
+              description: 'The number of outbound packets that could not be transmitted because of errors.'
               application_prototypes:
                 -
                   name: '{#IFDESCR}'
@@ -1098,6 +1094,199 @@ zabbix_export:
         -
           macro: '{$IF.UTIL.MAX}'
           value: '95'
+      valuemaps:
+        -
+          name: 'FAS3220 HA cannot takeover cause'
+          mappings:
+            -
+              value: '1'
+              newvalue: OK
+            -
+              value: '2'
+              newvalue: 'Unknown reason'
+            -
+              value: '3'
+              newvalue: 'Disabled by operator'
+            -
+              value: '4'
+              newvalue: 'Interconnect offline'
+            -
+              value: '5'
+              newvalue: 'Disabled by partner'
+            -
+              value: '6'
+              newvalue: 'Takeover failed'
+            -
+              value: '7'
+              newvalue: 'Mailbox is in degraded state'
+            -
+              value: '8'
+              newvalue: 'Partner mailbox is in uninitialised state'
+            -
+              value: '9'
+              newvalue: 'Mailbox version mismatch'
+            -
+              value: '10'
+              newvalue: 'NVRAM size mismatch'
+            -
+              value: '11'
+              newvalue: 'Kernel version mismatch'
+            -
+              value: '12'
+              newvalue: 'Partner is in booting stage'
+            -
+              value: '13'
+              newvalue: 'Disk shelf is too hot'
+            -
+              value: '14'
+              newvalue: 'Partner is performing revert'
+            -
+              value: '15'
+              newvalue: 'Node is performing revert'
+            -
+              value: '16'
+              newvalue: 'Same time partner is also trying to take us over'
+            -
+              value: '17'
+              newvalue: 'Already in takenover mode'
+            -
+              value: '18'
+              newvalue: 'NVRAM log unsynchronized'
+            -
+              value: '19'
+              newvalue: 'State of backup mailbox is doubtful'
+        -
+          name: 'FAS3220 HA settings'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Not configured'
+            -
+              value: '2'
+              newvalue: Enabled
+            -
+              value: '3'
+              newvalue: Disabled
+            -
+              value: '4'
+              newvalue: 'Takeover by partner disabled'
+            -
+              value: '5'
+              newvalue: 'This node dead'
+        -
+          name: 'FAS3220 NVRAM battery status'
+          mappings:
+            -
+              value: '1'
+              newvalue: OK
+            -
+              value: '2'
+              newvalue: 'Partially discharged'
+            -
+              value: '3'
+              newvalue: 'Fully discharged'
+            -
+              value: '4'
+              newvalue: 'Not present'
+            -
+              value: '5'
+              newvalue: 'Near end of life'
+            -
+              value: '6'
+              newvalue: 'At end of life'
+            -
+              value: '7'
+              newvalue: Unknown
+            -
+              value: '8'
+              newvalue: Overcharged
+            -
+              value: '9'
+              newvalue: 'Fully charged'
+        -
+          name: 'FAS3220 Port health'
+          mappings:
+            -
+              value: '0'
+              newvalue: Healthy
+            -
+              value: '1'
+              newvalue: Degraded
+        -
+          name: 'FAS3220 Port link state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undef
+            -
+              value: '1'
+              newvalue: 'Off'
+            -
+              value: '2'
+              newvalue: UP
+            -
+              value: '3'
+              newvalue: DOWN
+        -
+          name: 'FAS3220 Port role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undef
+            -
+              value: '1'
+              newvalue: Cluster
+            -
+              value: '2'
+              newvalue: Data
+            -
+              value: '3'
+              newvalue: Node-MGMT
+            -
+              value: '4'
+              newvalue: Intercluster
+            -
+              value: '5'
+              newvalue: Cluster-MGMT
+        -
+          name: 'FAS3220 Port speed'
+          mappings:
+            -
+              value: '0'
+              newvalue: Undef
+            -
+              value: '1'
+              newvalue: Auto
+            -
+              value: '2'
+              newvalue: '10 Mb/s'
+            -
+              value: '3'
+              newvalue: '100 Mb/s'
+            -
+              value: '4'
+              newvalue: '10 Gb/s'
+            -
+              value: '5'
+              newvalue: '100 Gb/s'
+        -
+          name: 'FAS3220 Port UP by administrator'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{NetApp FAS3220 SNMP:fas3220.disk[diskFailedCount].last()}>0 and {NetApp FAS3220 SNMP:fas3220.disk[diskFailedMessage].diff()}=1'
@@ -1108,196 +1297,3 @@ zabbix_export:
       priority: WARNING
       description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'
       type: MULTIPLE
-  value_maps:
-    -
-      name: 'FAS3220 HA cannot takeover cause'
-      mappings:
-        -
-          value: '1'
-          newvalue: OK
-        -
-          value: '2'
-          newvalue: 'Unknown reason'
-        -
-          value: '3'
-          newvalue: 'Disabled by operator'
-        -
-          value: '4'
-          newvalue: 'Interconnect offline'
-        -
-          value: '5'
-          newvalue: 'Disabled by partner'
-        -
-          value: '6'
-          newvalue: 'Takeover failed'
-        -
-          value: '7'
-          newvalue: 'Mailbox is in degraded state'
-        -
-          value: '8'
-          newvalue: 'Partner mailbox is in uninitialised state'
-        -
-          value: '9'
-          newvalue: 'Mailbox version mismatch'
-        -
-          value: '10'
-          newvalue: 'NVRAM size mismatch'
-        -
-          value: '11'
-          newvalue: 'Kernel version mismatch'
-        -
-          value: '12'
-          newvalue: 'Partner is in booting stage'
-        -
-          value: '13'
-          newvalue: 'Disk shelf is too hot'
-        -
-          value: '14'
-          newvalue: 'Partner is performing revert'
-        -
-          value: '15'
-          newvalue: 'Node is performing revert'
-        -
-          value: '16'
-          newvalue: 'Same time partner is also trying to take us over'
-        -
-          value: '17'
-          newvalue: 'Already in takenover mode'
-        -
-          value: '18'
-          newvalue: 'NVRAM log unsynchronized'
-        -
-          value: '19'
-          newvalue: 'State of backup mailbox is doubtful'
-    -
-      name: 'FAS3220 HA settings'
-      mappings:
-        -
-          value: '1'
-          newvalue: 'Not configured'
-        -
-          value: '2'
-          newvalue: Enabled
-        -
-          value: '3'
-          newvalue: Disabled
-        -
-          value: '4'
-          newvalue: 'Takeover by partner disabled'
-        -
-          value: '5'
-          newvalue: 'This node dead'
-    -
-      name: 'FAS3220 NVRAM battery status'
-      mappings:
-        -
-          value: '1'
-          newvalue: OK
-        -
-          value: '2'
-          newvalue: 'Partially discharged'
-        -
-          value: '3'
-          newvalue: 'Fully discharged'
-        -
-          value: '4'
-          newvalue: 'Not present'
-        -
-          value: '5'
-          newvalue: 'Near end of life'
-        -
-          value: '6'
-          newvalue: 'At end of life'
-        -
-          value: '7'
-          newvalue: Unknown
-        -
-          value: '8'
-          newvalue: Overcharged
-        -
-          value: '9'
-          newvalue: 'Fully charged'
-    -
-      name: 'FAS3220 Port health'
-      mappings:
-        -
-          value: '0'
-          newvalue: Healthy
-        -
-          value: '1'
-          newvalue: Degraded
-    -
-      name: 'FAS3220 Port link state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undef
-        -
-          value: '1'
-          newvalue: 'Off'
-        -
-          value: '2'
-          newvalue: UP
-        -
-          value: '3'
-          newvalue: DOWN
-    -
-      name: 'FAS3220 Port role'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undef
-        -
-          value: '1'
-          newvalue: Cluster
-        -
-          value: '2'
-          newvalue: Data
-        -
-          value: '3'
-          newvalue: Node-MGMT
-        -
-          value: '4'
-          newvalue: Intercluster
-        -
-          value: '5'
-          newvalue: Cluster-MGMT
-    -
-      name: 'FAS3220 Port speed'
-      mappings:
-        -
-          value: '0'
-          newvalue: Undef
-        -
-          value: '1'
-          newvalue: Auto
-        -
-          value: '2'
-          newvalue: '10 Mb/s'
-        -
-          value: '3'
-          newvalue: '100 Mb/s'
-        -
-          value: '4'
-          newvalue: '10 Gb/s'
-        -
-          value: '5'
-          newvalue: '100 Gb/s'
-    -
-      name: 'FAS3220 Port UP by administrator'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'False'
-        -
-          value: '1'
-          newvalue: 'True'
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up
