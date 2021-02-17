@@ -723,11 +723,14 @@ static int	DBpatch_5030046(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select hostid,valuemapid,itemid"
-			" from items"
-			" where templateid is null"
-				" and valuemapid is not null"
-				" and flags in (0,2)");
+	result = DBselect("select i.hostid,i.valuemapid,i.itemid"
+			" from items i,hosts h"
+			" where i.templateid is null"
+				" and i.valuemapid is not null"
+				" and i.flags in (0,2)"
+				" and h.hostid=i.hostid"
+				" and h.flags<>%d",
+				ZBX_FLAG_DISCOVERY_CREATED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
