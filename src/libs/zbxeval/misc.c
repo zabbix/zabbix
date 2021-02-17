@@ -914,3 +914,40 @@ void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const
 			zbx_variant_copy(&dst->stack.values[i].value, &src->stack.values[i].value);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_eval_format_function_error                                   *
+ *                                                                            *
+ * Purpose: format function evaluation error message                          *
+ *                                                                            *
+ * Parameters: function  - [IN] the function name                             *
+ *             host      - [IN] the host name, can be NULL                    *
+ *             key       - [IN] the item key, can be NULL                     *
+ *             parameter - [IN] the function parameters list                  *
+ *             error     - [IN] the error message                             *
+ *                                                                            *
+ * Return value: The formatted error message.                                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_eval_format_function_error(const char *function, const char *host, const char *key,
+		const char *parameter, const char *error)
+{
+	char	*msg = NULL;
+	size_t	msg_alloc = 0, msg_offset = 0;
+
+	zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "Cannot evaluate function \"%s(/%s/%s",
+			function, (NULL != host ? host : "?"), (NULL != key ? key : "?"));
+
+	if (NULL != parameter && '\0' != *parameter)
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, ",%s", parameter);
+
+	zbx_chrcpy_alloc(&msg, &msg_alloc, &msg_offset, ')');
+
+	if (NULL != error && '\0' != *error)
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, ": %s", error);
+
+	zbx_chrcpy_alloc(&msg, &msg_alloc, &msg_offset, '.');
+
+	return msg;
+}
