@@ -282,12 +282,6 @@ class CDashboardPage {
 				this._numIteratorColumns(widget) * this._numIteratorRows(widget)
 			);
 			this._alignIteratorContents(widget, widget.pos);
-
-			// TODO moved to eventRegister
-			// this.addAction('onResizeEnd', this._onIteratorResizeEnd, widget.uniqueid, {
-			// 	trigger_name: `onIteratorResizeEnd_${widget.uniqueid}`,
-			// 	parameters: [this._data, widget]
-			// });
 		}
 
 		if (this._options['edit_mode']) {
@@ -906,8 +900,8 @@ class CDashboardPage {
 		}
 
 		if (widget.parent) {
-			widget.parent.leaveOfIteratorExcept(widget);
-			widget.enterOfIterator();
+			widget.parent.leaveIteratorWidgetsExcept(widget);
+			widget.enterIteratorWidget();
 		}
 		else {
 			this._doLeaveWidgetsExcept(widget);
@@ -2266,6 +2260,8 @@ class CDashboardPage {
 		iterator.div.removeClass('iterator-alt-content');
 	}
 
+
+	// TODO move to widget.iterator
 	_updateIteratorCallback(iterator, response, options) {
 		const has_alt_content = typeof response.messages !== 'undefined' || typeof response.body !== 'undefined';
 
@@ -2395,30 +2391,6 @@ class CDashboardPage {
 				// No triggers executed for the widget, therefore update the conventional way.
 				this._updateWidgetContent(child);
 			}
-		}
-	}
-
-	_updateWidgetCallback(widget, response) {
-		widget.content_body.empty();
-		if (typeof response.messages !== 'undefined') {
-			widget.content_body.append(response.messages);
-		}
-		widget.content_body.append(response.body);
-
-		if (typeof response.debug !== 'undefined') {
-			$(response.debug).appendTo(widget.content_body);
-		}
-
-		widget.removeInfoButtons();
-		if (typeof response.info !== 'undefined' && !this._options['edit_mode']) {
-			widget.addInfoButtons(response.info);
-		}
-
-		// Creates new script elements and removes previous ones to force their re-execution.
-		widget.content_script.empty();
-		if (typeof response.script_inline !== 'undefined') {
-			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
-			widget.content_script.append($('<script>').text(response.script_inline));
 		}
 	}
 
@@ -2609,7 +2581,13 @@ class CDashboardPage {
 					this._updateIteratorCallback(widget, response, options);
 				}
 				else {
-					this._updateWidgetCallback(widget, response);
+					widget.update({
+						body: response.body,
+						messages: response.messages,
+						info: response.info,
+						debug: response.debug,
+						script_inline: response.script_inline
+					});
 				}
 
 				this._doAction('onContentUpdated');
@@ -3294,6 +3272,7 @@ class CDashboardPage {
 	}
 
 	_setWidgetModeEdit(widget) {
+		widget.setEditMode(true);
 		widget.clearUpdateContentTimer();
 
 		if (!widget.isIterator()) {

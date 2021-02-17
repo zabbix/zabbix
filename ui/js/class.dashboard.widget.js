@@ -47,6 +47,7 @@ class CDashboardWidget extends CBaseComponent {
 		update_paused = false,
 		initial_load = true,
 		is_editable = false,
+		is_edit_mode = false,
 		is_iterator = defaults.iterator,
 		is_new = !widgetid.length,
 		is_ready = false
@@ -83,6 +84,7 @@ class CDashboardWidget extends CBaseComponent {
 		this._is_active = false;
 		this._is_iterator = is_iterator;
 		this._is_editable = is_editable;
+		this._is_edit_mode = is_edit_mode;
 		this._is_new = is_new;
 		this._is_ready = is_ready;
 
@@ -128,7 +130,7 @@ class CDashboardWidget extends CBaseComponent {
 			}
 
 			if (child_hovered !== null) {
-				child_hovered.enterOfIterator();
+				child_hovered.enterIteratorWidget();
 			}
 		}
 	}
@@ -136,7 +138,7 @@ class CDashboardWidget extends CBaseComponent {
 	/**
 	 * Focus specified child widget of iterator.
 	 */
-	enterOfIterator() {
+	enterIteratorWidget() {
 		this.div.addClass('dashbrd-grid-widget-focus');
 
 		if (this.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
@@ -158,7 +160,7 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		if (this._is_iterator) {
-			this.leaveOfIteratorExcept();
+			this.leaveIteratorWidgetsExcept();
 			this.div.removeClass('iterator-double-header');
 		}
 
@@ -170,7 +172,7 @@ class CDashboardWidget extends CBaseComponent {
 	 *
 	 * @param {object} except_child  Dashboard widget object.
 	 */
-	leaveOfIteratorExcept(except_child = null) {
+	leaveIteratorWidgetsExcept(except_child = null) {
 		for (const child of this.children) {
 			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
 				continue;
@@ -180,8 +182,43 @@ class CDashboardWidget extends CBaseComponent {
 		}
 	}
 
+	update({body, messages, info, debug, script_inline}) {
+		this.content_body.empty();
+
+		if (messages !== undefined) {
+			this.content_body.append(messages);
+		}
+		this.content_body.append(body);
+
+		if (debug !== undefined) {
+			$(debug).appendTo(this.content_body);
+		}
+
+		this.removeInfoButtons();
+		if (info !== undefined && !this._is_edit_mode) {
+			this.addInfoButtons(info);
+		}
+
+		// Creates new script elements and removes previous ones to force their re-execution.
+		this.content_script.empty();
+		if (script_inline !== undefined) {
+			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
+			this.content_script.append($('<script>').text(script_inline));
+		}
+	}
+
 	isEditable() {
 		return this._is_editable;
+	}
+
+	isEditMode() {
+		return this._is_edit_mode;
+	}
+
+	setEditMode(is_edit_mode) {
+		this._is_edit_mode = is_edit_mode;
+
+		return this;
 	}
 
 	isIterator() {
