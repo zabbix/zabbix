@@ -906,12 +906,12 @@ class CDashboardPage {
 		}
 
 		if (widget.parent) {
-			this._doLeaveWidgetsOfIteratorExcept(widget.parent, widget);
-			this._doEnterWidgetOfIterator(widget);
+			widget.parent.leaveOfIteratorExcept(widget);
+			widget.enterOfIterator();
 		}
 		else {
 			this._doLeaveWidgetsExcept(widget);
-			this._doEnterWidget(widget);
+			widget.enter();
 		}
 
 		this._slideKiosk();
@@ -932,45 +932,9 @@ class CDashboardPage {
 			return;
 		}
 
-		this._doLeaveWidget(widget);
+		widget.leave();
 
 		this._slideKiosk();
-	}
-
-	/**
-	 * Focus specified top-level widget or iterator. If iterator is specified, focus it's hovered child widget as well.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_doEnterWidget(widget) {
-		widget.div.addClass(widget.isIterator() ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
-
-		if (widget.isIterator()) {
-			let child_hovered = null;
-
-			for (const child of widget.children) {
-				if (child.div.is(':hover')) {
-					child_hovered = child;
-				}
-			}
-
-			if (child_hovered !== null) {
-				this._doEnterWidgetOfIterator(child_hovered);
-			}
-		}
-	}
-
-	/**
-	 * Focus specified child widget of iterator.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_doEnterWidgetOfIterator(widget) {
-		widget.div.addClass('dashbrd-grid-widget-focus');
-
-		if (widget.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
-			widget.parent.div.toggleClass('iterator-double-header', widget.div.position().top === 0);
-		}
 	}
 
 	/**
@@ -985,47 +949,8 @@ class CDashboardPage {
 					continue;
 				}
 
-				this._doLeaveWidget(w);
+				w.leave();
 			}
-		}
-	}
-
-	/**
-	 * Blur specified top-level widget or iterator. If iterator is specified, blur it's focused child widget as well.
-	 *
-	 * @param {object} widget  Dashboard widget object.
-	 */
-	_doLeaveWidget(widget) {
-		// Widget placeholder doesn't have header.
-		if (!widget.content_header) {
-			return;
-		}
-
-		if (widget.content_header.has(document.activeElement).length) {
-			document.activeElement.blur();
-		}
-
-		if (widget.isIterator()) {
-			this._doLeaveWidgetsOfIteratorExcept(widget);
-			widget.div.removeClass('iterator-double-header');
-		}
-
-		widget.div.removeClass(widget.isIterator() ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
-	}
-
-	/**
-	 * Blur all child widgets of iterator, except the specified one.
-	 *
-	 * @param {object} iterator      Iterator object.
-	 * @param {object} except_child  Dashboard widget object.
-	 */
-	_doLeaveWidgetsOfIteratorExcept(iterator, except_child = null) {
-		for (const child of iterator.children) {
-			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
-				continue;
-			}
-
-			child.div.removeClass('dashbrd-grid-widget-focus');
 		}
 	}
 
@@ -1107,30 +1032,6 @@ class CDashboardPage {
 		}
 	}
 
-	_setWidgetViewMode(widget, view_mode) {
-		if (widget.view_mode == view_mode) {
-			return;
-		}
-
-		widget.view_mode = view_mode;
-
-		const hidden_header_class = widget.isIterator()
-			? 'dashbrd-grid-iterator-hidden-header'
-			: 'dashbrd-grid-widget-hidden-header';
-
-		if (widget.isIterator()) {
-			if (view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL) {
-				widget.div.removeClass('iterator-double-header');
-			}
-
-			for (const child of widget.children) {
-				this._setWidgetViewMode(child, view_mode);
-			}
-		}
-
-		widget.div.toggleClass(hidden_header_class, view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
-	}
-
 	_updateIteratorPager(iterator) {
 		$('.dashbrd-grid-iterator-pager-info', iterator.content_header)
 			.text(`${iterator.page} / ${iterator.page_count}`);
@@ -1144,32 +1045,6 @@ class CDashboardPage {
 		const is_pager_visible = iterator.page_count > 1 && !too_narrow && !this._getIteratorTooSmallState(iterator);
 
 		iterator.content_header.toggleClass('pager-visible', is_pager_visible);
-	}
-
-	_addWidgetInfoButtons($content_header, buttons) {
-		// Note: this function is used only for widgets and not iterators.
-
-		const $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
-
-		for (const button of buttons) {
-			$widget_actions.prepend(
-				$('<li>', {'class': 'widget-info-button'})
-					.append(
-						$('<button>', {
-							'type': 'button',
-							'class': button.icon,
-							'data-hintbox': 1,
-							'data-hintbox-static': 1
-						})
-					)
-					.append(
-						$('<div>', {
-							'class': 'hint-box',
-							'html': button.hint
-						}).hide()
-					)
-			);
-		}
 	}
 
 	_applyWidgetConfiguration(widget, configuration) {
@@ -2093,7 +1968,7 @@ class CDashboardPage {
 			minHeight: this._options['widget-min-rows'] * this._options['widget-height'],
 			start: (e) => {
 				this._doLeaveWidgetsExcept(widget);
-				this._doEnterWidget(widget);
+				widget.enter();
 
 				this._$target.addClass('dashbrd-positioning');
 
@@ -2158,7 +2033,7 @@ class CDashboardPage {
 				});
 			},
 			stop: () => {
-				this._doLeaveWidget(widget);
+				widget.leave();
 
 				delete widget.prev_pos;
 
@@ -2536,7 +2411,7 @@ class CDashboardPage {
 
 		widget.removeInfoButtons();
 		if (typeof response.info !== 'undefined' && !this._options['edit_mode']) {
-			this._addWidgetInfoButtons(widget.content_header, response.info);
+			widget.addInfoButtons(response.info);
 		}
 
 		// Creates new script elements and removes previous ones to force their re-execution.
@@ -2918,10 +2793,10 @@ class CDashboardPage {
 				else {
 					// Set view mode of a reusable widget early to escape focus flickering.
 					if (widget !== null && widget.type === type) {
-						this._setWidgetViewMode(widget, view_mode);
+						widget.setViewMode(view_mode);
 
 						this._doLeaveWidgetsExcept(widget);
-						this._doEnterWidget(widget);
+						widget.enter();
 					}
 				}
 			})

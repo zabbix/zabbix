@@ -112,6 +112,74 @@ class CDashboardWidget extends CBaseComponent {
 		return this;
 	}
 
+	/**
+	 * Focus specified top-level widget or iterator. If iterator is specified, focus it's hovered child widget as well.
+	 */
+	enter() {
+		this.div.addClass(this._is_iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
+
+		if (this._is_iterator) {
+			let child_hovered = null;
+
+			for (const child of this.children) {
+				if (child.div.is(':hover')) {
+					child_hovered = child;
+				}
+			}
+
+			if (child_hovered !== null) {
+				child_hovered.enterOfIterator();
+			}
+		}
+	}
+
+	/**
+	 * Focus specified child widget of iterator.
+	 */
+	enterOfIterator() {
+		this.div.addClass('dashbrd-grid-widget-focus');
+
+		if (this.parent.div.hasClass('dashbrd-grid-iterator-hidden-header')) {
+			this.parent.div.toggleClass('iterator-double-header', this.div.position().top === 0);
+		}
+	}
+
+	/**
+	 * Blur specified top-level widget or iterator. If iterator is specified, blur it's focused child widget as well.
+	 */
+	leave() {
+		// Widget placeholder doesn't have header.
+		if (!this.content_header) {
+			return;
+		}
+
+		if (this.content_header.has(document.activeElement).length) {
+			document.activeElement.blur();
+		}
+
+		if (this._is_iterator) {
+			this.leaveOfIteratorExcept();
+			this.div.removeClass('iterator-double-header');
+		}
+
+		this.div.removeClass(this._is_iterator ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
+	}
+
+	/**
+	 * Blur all child widgets of iterator, except the specified one.
+	 *
+	 * @param {object} except_child  Dashboard widget object.
+	 */
+	leaveOfIteratorExcept(except_child = null) {
+		for (const child of this.children) {
+			if (except_child !== null && child.uniqueid === except_child.uniqueid) {
+				continue;
+			}
+
+			child.div.removeClass('dashbrd-grid-widget-focus');
+		}
+	}
+
 	isEditable() {
 		return this._is_editable;
 	}
@@ -160,6 +228,30 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		return is_ready_updated;
+	}
+
+	setViewMode(view_mode) {
+		if (this.view_mode !== view_mode) {
+			this.view_mode = view_mode;
+
+			const hidden_header_class = this.isIterator()
+				? 'dashbrd-grid-iterator-hidden-header'
+				: 'dashbrd-grid-widget-hidden-header';
+
+			if (this._is_iterator) {
+				if (view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL) {
+					this.div.removeClass('iterator-double-header');
+				}
+
+				for (const child of this.children) {
+					child.setViewMode(view_mode);
+				}
+			}
+
+			this.div.toggleClass(hidden_header_class, view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
+		}
+
+		return this;
 	}
 
 	showPreloader() {
@@ -227,6 +319,32 @@ class CDashboardWidget extends CBaseComponent {
 	 */
 	disableControls() {
 		this.content_header.find('button').prop('disabled', true);
+	}
+
+	addInfoButtons(buttons) {
+		// Note: this function is used only for widgets and not iterators.
+
+		const $widget_actions = $('.dashbrd-grid-widget-actions', this.content_header);
+
+		for (const button of buttons) {
+			$widget_actions.prepend(
+				$('<li>', {'class': 'widget-info-button'})
+					.append(
+						$('<button>', {
+							'type': 'button',
+							'class': button.icon,
+							'data-hintbox': 1,
+							'data-hintbox-static': 1
+						})
+					)
+					.append(
+						$('<div>', {
+							'class': 'hint-box',
+							'html': button.hint
+						}).hide()
+					)
+			);
+		}
 	}
 
 	removeInfoButtons() {
