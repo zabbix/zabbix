@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 20:09+0200\n"
+"POT-Creation-Date: 2021-02-12 20:01+0200\n"
 "PO-Revision-Date: 2016-02-09 16:27+0300\n"
 "Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -14,6 +14,10 @@ msgstr ""
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
 "X-POOTLE-MTIME: 1455028074.000000\n"
+
+#: include/classes/items/CHelpItems.php:1091
+msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -33,7 +37,7 @@ msgstr ""
 #: include/classes/import/validators/C44XmlValidator.php:1741
 #: include/classes/import/validators/C50XmlValidator.php:1884
 #: include/classes/import/validators/C52XmlValidator.php:2016
-#: include/classes/import/validators/C54XmlValidator.php:2012
+#: include/classes/import/validators/C54XmlValidator.php:2030
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" очікувалось"
@@ -306,7 +310,7 @@ msgstr "(0 - використовувати замовчування дії)"
 msgid "(Only super admins can create groups)"
 msgstr "(Тільки супер адміністратори можуть створювати групи)"
 
-#: app/views/popup.itemtestedit.view.php:245
+#: app/views/popup.itemtestedit.view.php:240
 #: app/views/popup.massupdate.host.php:86
 #: include/views/configuration.host.edit.php:196
 #: include/views/configuration.host.prototype.edit.php:133
@@ -385,12 +389,6 @@ msgstr "<підменю/підменю/...>скрипт"
 msgid "ADD OVERRIDE"
 msgstr "ДОДАТИ ЗАМІЩЕННЯ"
 
-#: app/views/popup.discovery.check.php:113
-#: app/views/popup.itemtestedit.view.php:221
-#: include/views/js/configuration.host.edit.js.php:133
-msgid "AES"
-msgstr "AES"
-
 #: app/views/popup.triggerwizard.php:105
 msgid "AND"
 msgstr "ТА"
@@ -459,8 +457,8 @@ msgstr ""
 #: app/views/administration.user.token.list.php:67
 #: app/views/administration.user.token.view.php:27
 #: include/classes/helpers/CMenuHelper.php:262
-#: include/classes/helpers/CMenuHelper.php:384 include/html.inc.php:867
-#: include/html.inc.php:942
+#: include/classes/helpers/CMenuHelper.php:384 include/html.inc.php:866
+#: include/html.inc.php:941
 msgid "API tokens"
 msgstr ""
 
@@ -959,7 +957,7 @@ msgstr ""
 #: app/views/administration.script.list.php:90 app/views/popup.generic.php:610
 #: include/hosts.inc.php:1441 include/items.inc.php:348
 #: include/views/configuration.httpconf.edit.php:116
-#: include/views/js/configuration.host.edit.js.php:177
+#: include/views/js/configuration.host.edit.js.php:175
 msgid "Agent"
 msgstr "Агент"
 
@@ -1094,6 +1092,14 @@ msgstr ""
 #: include/classes/setup/CSetupWizard.php:668
 msgid "Alternatively, you can install it manually:"
 msgstr "Альтернативно, ви можете встановити його вручну:"
+
+#: include/classes/items/CHelpItems.php:1007
+msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1031
+msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
 
 #: app/partials/popup.operations.php:379
 #: app/views/configuration.correlation.edit.php:116
@@ -1277,7 +1283,7 @@ msgstr "Розмір області"
 msgid "Area type"
 msgstr "Тип області"
 
-#: include/items.inc.php:1820
+#: include/items.inc.php:1883
 msgid "Arithmetic"
 msgstr "Арифметика"
 
@@ -1453,8 +1459,8 @@ msgid "Authentication method"
 msgstr "Метод аутентифікації"
 
 #: app/views/popup.discovery.check.php:103
-#: app/views/popup.itemtestedit.view.php:203
-#: include/views/js/configuration.host.edit.js.php:124
+#: app/views/popup.itemtestedit.view.php:201
+#: include/views/js/configuration.host.edit.js.php:123
 msgid "Authentication passphrase"
 msgstr "Пароль для аутентифікації"
 
@@ -1520,7 +1526,7 @@ msgstr "Автоматичний вибір іконок"
 #: app/views/administration.autoreg.edit.php:89
 #: app/views/popup.mediatype.message.php:61
 #: include/classes/helpers/CMediatypeHelper.php:119
-#: include/classes/helpers/CMenuHelper.php:238 include/html.inc.php:933
+#: include/classes/helpers/CMenuHelper.php:238 include/html.inc.php:932
 msgid "Autoregistration"
 msgstr ""
 
@@ -1554,6 +1560,14 @@ msgstr "Доступний"
 #: app/views/administration.trigdisplay.edit.php:127
 msgid "Average"
 msgstr "Середня"
+
+#: include/classes/items/CHelpItems.php:1087
+msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1107
+msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:293
 msgid "Axes"
@@ -1632,7 +1646,7 @@ msgstr "Тіло та заголовки"
 msgid "Bold line"
 msgstr "Товста лінія"
 
-#: include/items.inc.php:1833
+#: include/items.inc.php:1896
 msgid "Boolean to decimal"
 msgstr "Логічне до десяткового"
 
@@ -1711,16 +1725,32 @@ msgstr "Інформація о CPU. Повертає текст або числ
 msgid "CPU load. Returns float"
 msgstr "Завантаження CPU. Повертає дробове значення"
 
+#: include/classes/items/CHelpItems.php:987
+msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:847
+msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:843
+msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:995
+msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:571
 msgid "CPU utilisation percentage. Returns float"
 msgstr "Утилізація CPU у відсотках. Повертає дробове число"
 
-#: app/views/popup.itemtestedit.view.php:304
+#: app/views/popup.itemtestedit.view.php:299
 msgid "CRLF"
 msgstr ""
 
-#: include/items.inc.php:1813
+#: include/items.inc.php:1876
 msgid "CSV to JSON"
 msgstr ""
 
@@ -3332,11 +3362,11 @@ msgstr "Логін чутливий до регістру"
 msgid "Catalan (ca_ES)"
 msgstr "Каталонська (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1141
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Ловить SNMP трапи, які співпадають з регулярним виразом. Якщо регулярний вираз не задано, ловить всі трапи."
 
-#: include/classes/items/CHelpItems.php:1069
+#: include/classes/items/CHelpItems.php:1137
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Ловить всі SNMP трапи, які не були піймані жодним елементом даних snmptrap[]."
 
@@ -3357,8 +3387,8 @@ msgid "Certificate"
 msgstr "Сертіфикат"
 
 #: app/partials/monitoring.latest.view.html.php:65
-#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1824
-#: include/items.inc.php:1828
+#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1887
+#: include/items.inc.php:1891
 msgctxt "noun"
 msgid "Change"
 msgstr "Зміна"
@@ -3386,7 +3416,7 @@ msgstr ""
 msgid "Change password"
 msgstr "Змінити пароль"
 
-#: include/items.inc.php:1829
+#: include/items.inc.php:1892
 msgid "Change per second"
 msgstr "Зміна в секунду"
 
@@ -3432,19 +3462,19 @@ msgstr "Перевірка вже існує."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Перевірте частину виразу починаючи з \"%1$s\"."
 
-#: include/items.inc.php:1861
+#: include/items.inc.php:1924
 msgid "Check for error in JSON"
 msgstr "Перевірка на помилки в JSON"
 
-#: include/items.inc.php:1865
+#: include/items.inc.php:1928
 msgid "Check for error in XML"
 msgstr "Перевірка на помилки в XML"
 
-#: include/items.inc.php:1869
+#: include/items.inc.php:1932
 msgid "Check for error using regular expression"
 msgstr "Перевірка на помилки при використанні регулярного виразу"
 
-#: include/items.inc.php:1873
+#: include/items.inc.php:1936
 msgid "Check for not supported value"
 msgstr ""
 
@@ -3521,7 +3551,7 @@ msgstr "Перевіряє швидкодію TCP сервісу. Поверта
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
 msgstr "Перевіряє швидкодію UDP сервісу. Повертає 0 - сервіс недоступний; секунди - тривалість секунд, затрачених в процесі під'єднання до сервісу"
 
-#: include/classes/api/services/CDRule.php:660
+#: include/classes/api/services/CDRule.php:658
 msgid "Checks should be unique."
 msgstr "Перевірки повинні бути унікальними."
 
@@ -3705,7 +3735,7 @@ msgstr "Команди"
 msgid "Communication with Zabbix server"
 msgstr ""
 
-#: include/html.inc.php:624 include/items.inc.php:1266
+#: include/items.inc.php:1316
 msgctxt "SNMP Community"
 msgid "Community"
 msgstr ""
@@ -3809,7 +3839,7 @@ msgstr "Дублікати умов для кореляції \"%1$s\"."
 msgid "Configuration"
 msgstr "Налаштування"
 
-#: include/classes/items/CHelpItems.php:1163
+#: include/classes/items/CHelpItems.php:1231
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфігураційного кешу. Кеш - буфер (режими: pfree, total, used, free)."
 
@@ -4171,8 +4201,7 @@ msgid "Content menu"
 msgstr "Меню вмісту"
 
 #: app/views/popup.discovery.check.php:81
-#: app/views/popup.itemtestedit.view.php:153 include/html.inc.php:623
-#: include/items.inc.php:1262
+#: app/views/popup.itemtestedit.view.php:153 include/items.inc.php:1301
 #: include/views/js/configuration.host.edit.js.php:95
 msgid "Context name"
 msgstr "Ім'я контексту"
@@ -4288,11 +4317,11 @@ msgstr "Кількість співпавших рядків в лог файл�
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Кількість співпавших рядків в лог файлі. Повертає ціле число"
 
-#: include/classes/items/CHelpItems.php:1139
+#: include/classes/items/CHelpItems.php:1207
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1143
+#: include/classes/items/CHelpItems.php:1211
 msgid "Count of values enqueued in the preprocessing queue."
 msgstr ""
 
@@ -4604,7 +4633,7 @@ msgstr "Ярлик користувача для елементів карти �
 msgid "Custom message"
 msgstr ""
 
-#: include/items.inc.php:1821
+#: include/items.inc.php:1884
 msgid "Custom multiplier"
 msgstr "Користувацький множник"
 
@@ -4621,7 +4650,7 @@ msgstr "Комплексні екрани користувачів"
 msgid "Custom script"
 msgstr "Користувацький скрипт"
 
-#: include/items.inc.php:1844
+#: include/items.inc.php:1907
 msgid "Custom scripts"
 msgstr "Довільні скрипти"
 
@@ -4645,12 +4674,6 @@ msgstr "Чеська (cs_CZ)"
 msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
-
-#: app/views/popup.discovery.check.php:112
-#: app/views/popup.itemtestedit.view.php:220
-#: include/views/js/configuration.host.edit.js.php:132
-msgid "DES"
-msgstr "DES"
 
 #: app/partials/monitoring.host.filter.php:108 app/views/search.php:32
 #: include/views/configuration.host.list.php:146
@@ -5630,11 +5653,11 @@ msgstr "Дезактивовано"
 msgid "Disaster"
 msgstr "Критична"
 
-#: include/items.inc.php:1877
+#: include/items.inc.php:1940
 msgid "Discard unchanged"
 msgstr "Відкинути без змін"
 
-#: include/items.inc.php:1881
+#: include/items.inc.php:1944
 msgid "Discard unchanged with heartbeat"
 msgstr "Відкинути без змін, з пульсом"
 
@@ -5721,23 +5744,23 @@ msgstr ""
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:855
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:879
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1047
+#: include/classes/items/CHelpItems.php:1115
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1059
+#: include/classes/items/CHelpItems.php:1127
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:1003
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
@@ -5772,8 +5795,8 @@ msgstr "Правило виявлення \"%1$s\" вже існує."
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr "Правило виявлення \"%1$s\" не може бути скопійоване без його майстер елемента даних."
 
-#: include/classes/api/services/CDRule.php:849
-#: include/classes/api/services/CDRule.php:866
+#: include/classes/api/services/CDRule.php:847
+#: include/classes/api/services/CDRule.php:864
 #, c-format
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
 msgstr "Правило виявлення \"%1$s\" використовується в \"%2$s\" дії."
@@ -5943,7 +5966,7 @@ msgstr ""
 msgid "Does not exist"
 msgstr ""
 
-#: include/items.inc.php:1857
+#: include/items.inc.php:1920
 msgid "Does not match regular expression"
 msgstr "Не відповідає регулярному виразу"
 
@@ -6488,7 +6511,7 @@ msgstr "Шифрування"
 msgid "Encryption level"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:300
+#: app/views/popup.itemtestedit.view.php:295
 msgid "End of line sequence"
 msgstr ""
 
@@ -6679,7 +6702,7 @@ msgstr ""
 msgid "Executed"
 msgstr "Виконано"
 
-#: include/items.inc.php:1750
+#: include/items.inc.php:1813
 #: include/views/configuration.host.discovery.edit.php:559
 #: include/views/configuration.item.edit.php:619
 #: include/views/configuration.item.prototype.edit.php:599
@@ -7147,7 +7170,7 @@ msgstr "Розмір шрифту"
 msgid "Form data"
 msgstr "Дані форми"
 
-#: include/items.inc.php:1754 include/views/configuration.item.edit.php:637
+#: include/items.inc.php:1817 include/views/configuration.item.edit.php:637
 #: include/views/configuration.item.prototype.edit.php:615
 msgid "Formula"
 msgstr "Формула"
@@ -7233,7 +7256,7 @@ msgstr "GSM модем"
 
 #: app/views/administration.gui.edit.php:30
 #: app/views/administration.gui.edit.php:143
-#: include/classes/helpers/CMenuHelper.php:236 include/html.inc.php:932
+#: include/classes/helpers/CMenuHelper.php:236 include/html.inc.php:931
 msgid "GUI"
 msgstr "Веб інтерфейс"
 
@@ -7269,12 +7292,12 @@ msgstr "Німецька (de_DE)"
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Отримання вмісту веб сторінки. Повертає джерельний код веб сторінки у вигляді тексту"
 
-#: app/views/popup.itemtestedit.view.php:255
+#: app/views/popup.itemtestedit.view.php:250
 msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:505
-#: app/views/popup.itemtestedit.view.php:439
+#: app/views/popup.itemtestedit.view.php:434
 msgid "Get value and test"
 msgstr ""
 
@@ -7758,7 +7781,7 @@ msgstr "Висота"
 msgid "Help"
 msgstr "Допомога"
 
-#: include/items.inc.php:1841
+#: include/items.inc.php:1904
 msgid "Hexadecimal to decimal"
 msgstr "Шістнадцяткове в десяткове"
 
@@ -8318,7 +8341,7 @@ msgstr "Годин"
 #: app/controllers/CControllerAuditLogList.php:220
 #: app/views/administration.housekeeping.edit.php:29
 #: app/views/administration.housekeeping.edit.php:188
-#: include/classes/helpers/CMenuHelper.php:240 include/html.inc.php:934
+#: include/classes/helpers/CMenuHelper.php:240 include/html.inc.php:933
 msgid "Housekeeping"
 msgstr "Очистка"
 
@@ -8380,7 +8403,7 @@ msgstr "Діапазон IP \"%1$s\" перевищує ліміт адрес \"
 #: include/hosts.inc.php:471 include/hosts.inc.php:1444
 #: include/items.inc.php:351 include/views/configuration.host.edit.php:337
 #: include/views/configuration.host.prototype.edit.php:325
-#: include/views/js/configuration.host.edit.js.php:180
+#: include/views/js/configuration.host.edit.js.php:178
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -8399,7 +8422,7 @@ msgstr "Інтерфейси IPMI"
 msgid "IPMI sensor"
 msgstr "IPMI датчик"
 
-#: include/classes/items/CHelpItems.php:1249
+#: include/classes/items/CHelpItems.php:1317
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -8459,7 +8482,7 @@ msgstr "Призначення іконок оновлено"
 #: app/controllers/CControllerAuditLogList.php:214
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27
-#: include/classes/helpers/CMenuHelper.php:245 include/html.inc.php:936
+#: include/classes/helpers/CMenuHelper.php:245 include/html.inc.php:935
 msgid "Icon mapping"
 msgstr "Призначення іконок"
 
@@ -8554,7 +8577,7 @@ msgstr "Картинку оновлено"
 
 #: app/views/administration.image.edit.php:29
 #: app/views/administration.image.list.php:30 app/views/popup.import.php:48
-#: include/classes/helpers/CMenuHelper.php:242 include/html.inc.php:935
+#: include/classes/helpers/CMenuHelper.php:242 include/html.inc.php:934
 msgid "Images"
 msgstr "Картинки"
 
@@ -8602,7 +8625,7 @@ msgstr "В періоді сервісу"
 msgid "In progress"
 msgstr "В роботі"
 
-#: include/items.inc.php:1849
+#: include/items.inc.php:1912
 msgid "In range"
 msgstr "В діапазоні"
 
@@ -8932,8 +8955,8 @@ msgstr "Функції передано некоректні параметри"
 #: include/classes/api/services/CHostInterface.php:1057
 #: include/classes/api/services/CHostInterface.php:1072
 #: include/classes/api/services/CHostInterface.php:1108
-#: include/classes/api/services/CHostInterface.php:1126
-#: include/classes/api/services/CHostInterface.php:1143
+#: include/classes/api/services/CHostInterface.php:1125
+#: include/classes/api/services/CHostInterface.php:1142
 #: include/classes/api/services/CHost.php:1404
 #: include/classes/api/services/CHost.php:2095
 #: include/classes/api/services/CHost.php:2288
@@ -9490,8 +9513,8 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:400
 #: include/classes/api/services/CDRule.php:452
 #: include/classes/api/services/CDRule.php:532
-#: include/classes/api/services/CDRule.php:594
-#: include/classes/api/services/CDRule.php:607
+#: include/classes/api/services/CDRule.php:593
+#: include/classes/api/services/CDRule.php:605
 #: include/classes/api/services/CItemGeneral.php:531
 #: include/classes/api/services/CItemGeneral.php:2560
 #: include/classes/validators/CNewValidator.php:122
@@ -9822,7 +9845,7 @@ msgstr "Некоректне значення для поля \"%1$s\"."
 #: include/classes/validators/CNewValidator.php:326
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:109
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:124
-#: include/items.inc.php:2061 include/screens.inc.php:292
+#: include/items.inc.php:2124 include/screens.inc.php:292
 #: include/screens.inc.php:306 include/screens.inc.php:421
 #: include/screens.inc.php:435 include/sounds.inc.php:113
 #: include/validate.inc.php:330
@@ -10343,14 +10366,14 @@ msgstr "Неправильний другий параметр."
 #: include/classes/import/validators/C52XmlValidator.php:2645
 #: include/classes/import/validators/C52XmlValidator.php:2678
 #: include/classes/import/validators/C52XmlValidator.php:2684
-#: include/classes/import/validators/C54XmlValidator.php:2012
-#: include/classes/import/validators/C54XmlValidator.php:2309
-#: include/classes/import/validators/C54XmlValidator.php:2494
-#: include/classes/import/validators/C54XmlValidator.php:2514
-#: include/classes/import/validators/C54XmlValidator.php:2538
-#: include/classes/import/validators/C54XmlValidator.php:2599
-#: include/classes/import/validators/C54XmlValidator.php:2632
-#: include/classes/import/validators/C54XmlValidator.php:2638
+#: include/classes/import/validators/C54XmlValidator.php:2030
+#: include/classes/import/validators/C54XmlValidator.php:2327
+#: include/classes/import/validators/C54XmlValidator.php:2512
+#: include/classes/import/validators/C54XmlValidator.php:2532
+#: include/classes/import/validators/C54XmlValidator.php:2556
+#: include/classes/import/validators/C54XmlValidator.php:2617
+#: include/classes/import/validators/C54XmlValidator.php:2650
+#: include/classes/import/validators/C54XmlValidator.php:2656
 #: include/classes/import/validators/CXmlValidatorGeneral.php:134
 #: include/classes/import/validators/CXmlValidatorGeneral.php:153
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
@@ -10483,7 +10506,7 @@ msgstr "Елемент даних \"%1$s\" в \"%2$s\": група елемен�
 msgid "Item added"
 msgstr "Елемент додано"
 
-#: app/views/popup.itemtestedit.view.php:424
+#: app/views/popup.itemtestedit.view.php:419
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
 msgstr ""
 
@@ -10609,15 +10632,15 @@ msgstr "Елемент даних використовує некоректни�
 msgid "Item values"
 msgstr "Значення елемента даних"
 
-#: include/items.inc.php:2097
+#: include/items.inc.php:2160
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемент не було оновлено. Будь ласка введіть коректний інтервал оновлення."
 
-#: include/items.inc.php:2084
+#: include/items.inc.php:2147
 msgid "Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval."
 msgstr "Елемент даних не може бути оновлено. Вказаний інтервал оновлення повинен мати принаймні один гнучкий або запланований інтервал."
 
-#: include/items.inc.php:2089
+#: include/items.inc.php:2152
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
 msgstr "Елемент даних не буде оновлено. Інтервал оновлення повинен бути між 1s та 1d. Також може використовуватись запланований/гнучкий інтервал."
 
@@ -10698,7 +10721,7 @@ msgstr "Елементи оновлено"
 #: include/classes/widgets/views/widget.hostavail.form.view.php:48
 #: include/hosts.inc.php:468 include/hosts.inc.php:1443
 #: include/items.inc.php:350
-#: include/views/js/configuration.host.edit.js.php:179
+#: include/views/js/configuration.host.edit.js.php:177
 msgid "JMX"
 msgstr "JMX"
 
@@ -10754,7 +10777,7 @@ msgstr "JSON-rpc параметри не являються масивом."
 msgid "JSON-rpc version is not specified."
 msgstr "Версію JSON-rpc не вказано."
 
-#: include/items.inc.php:1809
+#: include/items.inc.php:1872
 #: include/views/configuration.host.discovery.edit.php:780
 msgid "JSONPath"
 msgstr "JSONPath"
@@ -10773,7 +10796,7 @@ msgstr "Японська (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:220
 #: app/views/administration.script.edit.php:135 include/forms.inc.php:1432
-#: include/items.inc.php:1845
+#: include/items.inc.php:1908
 #: include/views/configuration.host.discovery.edit.php:231
 #: include/views/configuration.item.edit.php:267
 #: include/views/configuration.item.prototype.edit.php:248
@@ -10869,7 +10892,7 @@ msgstr "Вдалий вхід через LDAP"
 msgid "LDAP settings"
 msgstr "Налаштування LDAP"
 
-#: app/views/popup.itemtestedit.view.php:303
+#: app/views/popup.itemtestedit.view.php:298
 msgid "LF"
 msgstr ""
 
@@ -11081,7 +11104,7 @@ msgstr "З лівого боку"
 msgid "Left Y"
 msgstr "Вісь Y зліва"
 
-#: include/items.inc.php:1801
+#: include/items.inc.php:1864
 msgid "Left trim"
 msgstr "Обрізати зліва"
 
@@ -11387,12 +11410,6 @@ msgstr "MAC адреса B"
 msgid "MD2"
 msgstr "MD2"
 
-#: app/views/popup.discovery.check.php:98
-#: app/views/popup.itemtestedit.view.php:196 include/hosts.inc.php:34
-#: include/views/js/configuration.host.edit.js.php:119
-msgid "MD5"
-msgstr "MD5"
-
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:675
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
@@ -11431,10 +11448,10 @@ msgstr "Макросу з hostmacroid \"%1$s\" не існує."
 #: app/partials/massupdate.macros.tab.php:120
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:100
-#: app/views/popup.itemtestedit.view.php:311
+#: app/views/popup.itemtestedit.view.php:306
 #: app/views/popup.massupdate.host.php:295
 #: app/views/popup.massupdate.template.php:154
-#: include/classes/helpers/CMenuHelper.php:251 include/html.inc.php:938
+#: include/classes/helpers/CMenuHelper.php:251 include/html.inc.php:937
 #: include/views/configuration.host.edit.php:363
 #: include/views/configuration.host.prototype.edit.php:338
 #: include/views/configuration.template.edit.php:207
@@ -11514,15 +11531,15 @@ msgstr "Тип сервісу"
 msgid "Maintenance updated"
 msgstr "Сервіс оновлено"
 
-#: include/html.inc.php:986
+#: include/html.inc.php:985
 msgid "Maintenance with data collection"
 msgstr "Сервіс зі збором даних"
 
-#: include/html.inc.php:985
+#: include/html.inc.php:984
 msgid "Maintenance without data collection"
 msgstr "Сервіс без збору даних"
 
-#: include/html.inc.php:1022
+#: include/html.inc.php:1021
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Обслуговування: %1$s"
@@ -11706,7 +11723,7 @@ msgstr "Масове оновлення фігур"
 msgid "Master item"
 msgstr "Головний елемент даних"
 
-#: include/items.inc.php:1853
+#: include/items.inc.php:1916
 msgid "Matches regular expression"
 msgstr "Відповідає регулярному виразу"
 
@@ -12115,7 +12132,7 @@ msgstr ""
 #: app/controllers/CControllerModuleList.php:122
 #: app/views/administration.module.edit.php:23
 #: app/views/administration.module.list.php:27
-#: include/classes/helpers/CMenuHelper.php:258 include/html.inc.php:941
+#: include/classes/helpers/CMenuHelper.php:258 include/html.inc.php:940
 msgid "Modules"
 msgstr ""
 
@@ -12300,7 +12317,7 @@ msgstr "NTLM"
 #: app/views/monitoring.widget.plaintext.view.php:48
 #: app/views/popup.httpstep.php:45 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:328
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:323
 #: app/views/popup.lldoperation.php:270 app/views/popup.lldoverride.php:47
 #: app/views/popup.massupdate.host.php:208
 #: app/views/popup.massupdate.item.php:127
@@ -12444,6 +12461,10 @@ msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:151
 msgid "Network timeout for script execution"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1071
+msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
 
 #: app/views/administration.proxy.list.php:157 include/func.inc.php:191
@@ -12806,7 +12827,7 @@ msgstr "Інтерфейсу не знайдено."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
 
-#: include/views/js/configuration.host.edit.js.php:185
+#: include/views/js/configuration.host.edit.js.php:183
 msgid "No interfaces are defined."
 msgstr ""
 
@@ -12918,7 +12939,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:190
 #: include/classes/api/services/CDRule.php:316
 #: include/classes/api/services/CDRule.php:343
-#: include/classes/api/services/CDRule.php:833
+#: include/classes/api/services/CDRule.php:831
 #: include/classes/api/services/CEvent.php:825
 #: include/classes/api/services/CEvent.php:864
 #: include/classes/api/services/CEvent.php:889
@@ -13203,7 +13224,7 @@ msgstr "Не класифіковано"
 msgid "Not inherited items"
 msgstr "Не успадковані елементи дані"
 
-#: app/views/popup.itemtestedit.view.php:283 include/forms.inc.php:220
+#: app/views/popup.itemtestedit.view.php:278 include/forms.inc.php:220
 #: include/items.inc.php:158 include/items.inc.php:183
 #: include/views/configuration.host.discovery.list.php:159
 msgid "Not supported"
@@ -13250,7 +13271,11 @@ msgstr "Листопад"
 msgid "Number of CPUs. Returns integer"
 msgstr "Кількість CPU. Повертає ціле число"
 
-#: include/classes/items/CHelpItems.php:1103
+#: include/classes/items/CHelpItems.php:863
+msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1171
 msgid "Number of enabled items on the host."
 msgstr "Кількість активованих елементів даних у вузла мережі."
 
@@ -13262,25 +13287,25 @@ msgstr ""
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Кількість елементів даних (активовані/дезактивовані/не підтримуються)"
 
-#: include/classes/items/CHelpItems.php:1127
+#: include/classes/items/CHelpItems.php:1195
 msgid "Number of items in Zabbix database."
 msgstr "Кількість елементів даних в базі даних Zabbix."
 
-#: include/classes/items/CHelpItems.php:1155
+#: include/classes/items/CHelpItems.php:1223
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Кількість елементів даних в історії проксі, які ще не були відправлені на сервер"
 
-#: include/classes/items/CHelpItems.php:1159
+#: include/classes/items/CHelpItems.php:1227
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Кількість елементів даних в черзі, які затримується від і до секунд, включно."
 
 #: include/classes/items/CHelpItems.php:389
 #: include/classes/items/CHelpItems.php:739
-#: include/classes/items/CHelpItems.php:1175
+#: include/classes/items/CHelpItems.php:1243
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr "Кількість елементів даних в черзі, які затримуються у Zabbix сервер чи проксі  \"від\" - \"до\" секунд, включно."
 
-#: include/classes/items/CHelpItems.php:1123
+#: include/classes/items/CHelpItems.php:1191
 msgid "Number of monitored hosts"
 msgstr "Кількість вузлів мережі під спостереженням"
 
@@ -13297,15 +13322,15 @@ msgstr "Кількість проблем"
 msgid "Number of problems and expand most critical one"
 msgstr "Кількість проблем та розкривати найбільш критичну"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:895
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Кількість ядер процесора у гіпервізора VMware, <url> - URL сервісу VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:899
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Кількість потоків процесора у гіпервізора VMware, <url> - URL сервісу VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:975
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Кількість процесорів віртуальної машини VMware, <url> - URL сервіс VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
@@ -13334,15 +13359,15 @@ msgstr ""
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Кількість тригерів (активовані/дезактивовані [проблема/ок])"
 
-#: include/classes/items/CHelpItems.php:1191
+#: include/classes/items/CHelpItems.php:1259
 msgid "Number of triggers in Zabbix database."
 msgstr "Кількість тригерів в базі даних Zabbix."
 
-#: include/classes/items/CHelpItems.php:1131
+#: include/classes/items/CHelpItems.php:1199
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Кількість елементів даних в базі даних Zabbix, які не підтримуються."
 
-#: include/classes/items/CHelpItems.php:1107
+#: include/classes/items/CHelpItems.php:1175
 msgid "Number of unsupported items on the host."
 msgstr "Кількість елементів даних у вузла мережі, які не підтримуються."
 
@@ -13355,35 +13380,35 @@ msgstr "Кількість користувачів (підключених в �
 msgid "Number of users logged in. Returns integer"
 msgstr "Кількість користувачів в системі. Повертає ціле число"
 
-#: include/classes/items/CHelpItems.php:1083
+#: include/classes/items/CHelpItems.php:1151
 msgid "Number of values stored in table HISTORY."
 msgstr "Кількість значень збережених в таблиці HISTORY."
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1155
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Кількість значень збережених в таблиці HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1159
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Кількість значень збережених в таблиці HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1163
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Кількість значень збережених в таблиці HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:1099
+#: include/classes/items/CHelpItems.php:1167
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Кількість значень збережених в таблиці HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:1183
+#: include/classes/items/CHelpItems.php:1251
 msgid "Number of values stored in table TRENDS."
 msgstr "Кількість значень збережених в таблиці TRENDS."
 
-#: include/classes/items/CHelpItems.php:1187
+#: include/classes/items/CHelpItems.php:1255
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Кількість значений збережених в таблиці TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:959
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Кількість віртуальних машин на гіпервізорі VMware, <url> - URL служби VMware, <uuid> - ім'я хоста VMware гіпервізора"
 
@@ -13392,8 +13417,8 @@ msgstr "Кількість віртуальних машин на гіперві
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "Кількість inode у відсотках. Повертає ціле число для кількості; дробове - для відсотків"
 
-#: include/items.inc.php:1832 include/items.inc.php:1836
-#: include/items.inc.php:1840
+#: include/items.inc.php:1895 include/items.inc.php:1899
+#: include/items.inc.php:1903
 msgid "Numeral systems"
 msgstr "Числові системи"
 
@@ -13475,7 +13500,7 @@ msgstr ""
 msgid "Oct"
 msgstr "Жов"
 
-#: include/items.inc.php:1837
+#: include/items.inc.php:1900
 msgid "Octal to decimal"
 msgstr "Вісімкове в десяткове"
 
@@ -13605,7 +13630,7 @@ msgstr "Дозволено тільки один крок Prometheus."
 msgid "Only one change step is allowed."
 msgstr "Дозволено тільки один крок зміни."
 
-#: include/classes/api/services/CDRule.php:619
+#: include/classes/api/services/CDRule.php:617
 msgid "Only one check can be unique."
 msgstr "Тільки одна перевірка може бути унікальною."
 
@@ -13830,7 +13855,7 @@ msgstr "Або"
 msgid "Original"
 msgstr "Оригінальне"
 
-#: include/classes/helpers/CMenuHelper.php:266 include/html.inc.php:943
+#: include/classes/helpers/CMenuHelper.php:266 include/html.inc.php:942
 msgid "Other"
 msgstr "Інші"
 
@@ -14265,9 +14290,21 @@ msgstr "Призупиняти операції для подавлених пр
 msgid "Peak memory usage: %1$s"
 msgstr "Пікове використання пам'яті: %1$s"
 
+#: include/classes/items/CHelpItems.php:971
+msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:164
 msgid "Percentage"
 msgstr "Відсотки"
+
+#: include/classes/items/CHelpItems.php:1055
+msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:979
+msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
+msgstr ""
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:150
 msgid "Percentile line (left)"
@@ -14447,6 +14484,10 @@ msgstr "Поля Post"
 msgid "Post type"
 msgstr "Тип Post"
 
+#: include/classes/items/CHelpItems.php:939
+msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:65
 #: include/classes/setup/CSetupWizard.php:564
 msgid "Pre-installation summary"
@@ -14459,7 +14500,7 @@ msgstr "Узагальнення інсталяції"
 msgid "Preprocessing"
 msgstr "Попередня обробка"
 
-#: app/views/popup.itemtestedit.view.php:358
+#: app/views/popup.itemtestedit.view.php:353
 #: app/views/popup.massupdate.item.php:217
 #: include/views/configuration.host.discovery.edit.php:877
 #: include/views/configuration.item.edit.php:946
@@ -14472,7 +14513,7 @@ msgstr "Кроки попередньої обробки"
 #: app/controllers/CControllerPopupItemTestSend.php:186
 #: app/controllers/CControllerPopupItemTestSend.php:191
 #: app/controllers/CControllerPopupItemTestSend.php:196
-#: app/views/popup.itemtestedit.view.php:293
+#: app/views/popup.itemtestedit.view.php:288
 msgid "Prev. time"
 msgstr "Попер. час"
 
@@ -14491,7 +14532,7 @@ msgstr "Попередній місяць"
 msgid "Previous page"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:286
+#: app/views/popup.itemtestedit.view.php:281
 msgid "Previous value"
 msgstr "Попереднє значення"
 
@@ -14532,14 +14573,14 @@ msgid "Primary POC screen name"
 msgstr "Головне нік-ім'я для контакту"
 
 #: app/views/popup.discovery.check.php:117
-#: app/views/popup.itemtestedit.view.php:227
-#: include/views/js/configuration.host.edit.js.php:137
+#: app/views/popup.itemtestedit.view.php:222
+#: include/views/js/configuration.host.edit.js.php:135
 msgid "Privacy passphrase"
 msgstr "Ключова фраза приватності"
 
 #: app/views/popup.discovery.check.php:110
-#: app/views/popup.itemtestedit.view.php:214
-#: include/views/js/configuration.host.edit.js.php:130
+#: app/views/popup.itemtestedit.view.php:212
+#: include/views/js/configuration.host.edit.js.php:129
 msgid "Privacy protocol"
 msgstr "Протокол приватності"
 
@@ -14685,15 +14726,15 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: include/items.inc.php:1884 include/items.inc.php:1888
+#: include/items.inc.php:1947 include/items.inc.php:1951
 msgid "Prometheus"
 msgstr "Prometheus"
 
-#: include/items.inc.php:1885
+#: include/items.inc.php:1948
 msgid "Prometheus pattern"
 msgstr "Prometheus маска"
 
-#: include/items.inc.php:1889
+#: include/items.inc.php:1952
 msgid "Prometheus to JSON"
 msgstr "Prometheus в JSON"
 
@@ -14730,7 +14771,7 @@ msgstr "Проксі"
 #: app/views/administration.queue.overview.proxy.php:45
 #: app/views/configuration.discovery.list.php:77
 #: app/views/popup.condition.common.php:515
-#: app/views/popup.itemtestedit.view.php:241 include/actions.inc.php:63
+#: app/views/popup.itemtestedit.view.php:236 include/actions.inc.php:63
 #: include/views/configuration.host.list.php:160
 #: include/views/configuration.host.list.php:164
 #: include/views/configuration.host.list.php:203
@@ -15023,7 +15064,7 @@ msgid "Regular"
 msgstr "Звичайні"
 
 #: app/controllers/CControllerAuditLogList.php:209
-#: app/views/popup.lldoverride.php:101 include/items.inc.php:1785
+#: app/views/popup.lldoverride.php:101 include/items.inc.php:1848
 #: include/views/configuration.host.discovery.edit.php:687
 msgid "Regular expression"
 msgstr "Регулярний вираз"
@@ -15058,7 +15099,7 @@ msgstr "Регулярний вираз оновлено"
 
 #: app/views/administration.regex.edit.php:29
 #: app/views/administration.regex.list.php:31
-#: include/classes/helpers/CMenuHelper.php:248 include/html.inc.php:937
+#: include/classes/helpers/CMenuHelper.php:248 include/html.inc.php:936
 msgid "Regular expressions"
 msgstr "Регулярні вирази"
 
@@ -15263,7 +15304,7 @@ msgstr "Видалено, %1$s"
 #: app/views/popup.massupdate.template.php:54
 #: app/views/popup.massupdate.template.php:91
 #: app/views/popup.massupdate.template.php:136
-#: app/views/popup.massupdate.trigger.php:83 include/items.inc.php:1789
+#: app/views/popup.massupdate.trigger.php:83 include/items.inc.php:1852
 #: include/views/configuration.trigger.prototype.edit.php:169
 #: include/views/configuration.trigger.prototype.edit.php:362
 #: include/views/configuration.triggers.edit.php:191
@@ -15317,7 +15358,7 @@ msgstr "Необхідні права на вузел мережі"
 msgid "Required performance (vps)"
 msgstr "Необхідна продуктивність (знач/сек)"
 
-#: include/classes/items/CHelpItems.php:1167
+#: include/classes/items/CHelpItems.php:1235
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Необхідна швидкодія Zabbix сервера, в одиницях очікуваної кількості нових значень в секунду."
 
@@ -15433,8 +15474,8 @@ msgstr ""
 
 #: app/views/administration.regex.edit.php:123
 #: app/views/administration.regex.edit.php:128
-#: app/views/popup.itemtestedit.view.php:329
-#: app/views/popup.itemtestedit.view.php:369
+#: app/views/popup.itemtestedit.view.php:324
+#: app/views/popup.itemtestedit.view.php:364
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:179
 #: include/classes/debug/CProfiler.php:183
@@ -15480,19 +15521,19 @@ msgstr "Отримує вміст файлу. Повертає текст"
 msgid "Retry"
 msgstr "Повторити"
 
-#: include/classes/items/CHelpItems.php:1239
+#: include/classes/items/CHelpItems.php:1307
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1243
+#: include/classes/items/CHelpItems.php:1311
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1221
+#: include/classes/items/CHelpItems.php:1289
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Повертає першу колонку першого рядка результату SQL запиту."
 
-#: include/classes/items/CHelpItems.php:1235
+#: include/classes/items/CHelpItems.php:1303
 msgid "Return value of an attribute of MBean object."
 msgstr "Повертає значення атрибута MBean об'єкта."
 
@@ -15500,25 +15541,25 @@ msgstr "Повертає значення атрибута MBean об'єкта."
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Повертає час відповіді в секундах на ICMP ping. Наприклад: 0.02"
 
-#: include/classes/items/CHelpItems.php:1115
+#: include/classes/items/CHelpItems.php:1183
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:385
 #: include/classes/items/CHelpItems.php:735
-#: include/classes/items/CHelpItems.php:1171
+#: include/classes/items/CHelpItems.php:1239
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Повертає JSON об'єкт, який містить внутрішні метрики Zabbix сервер або проксі ."
 
-#: include/classes/items/CHelpItems.php:1119
+#: include/classes/items/CHelpItems.php:1187
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Повертає доступність певного типу перевірок на вузлі мережі. Значення цього елементу даних відповідає іконкам доступності в списку вузлів мережі. Допустимі типи: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:1111
+#: include/classes/items/CHelpItems.php:1179
 msgid "Returns current maintenance status of the host."
 msgstr "Повертає поточний стан сервісу вузла мережі."
 
-#: include/classes/items/CHelpItems.php:1135
+#: include/classes/items/CHelpItems.php:1203
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Повертає інформацію про Zabbix Java gateway. Допустимі параметри: ping, version."
 
@@ -15550,7 +15591,7 @@ msgstr "З правого боку"
 msgid "Right Y"
 msgstr "Вісь Y справа"
 
-#: include/items.inc.php:1797
+#: include/items.inc.php:1860
 msgid "Right trim"
 msgstr "Обрізати справа"
 
@@ -15653,12 +15694,6 @@ msgstr "Нд"
 msgid "SAML settings"
 msgstr ""
 
-#: app/views/popup.discovery.check.php:99
-#: app/views/popup.itemtestedit.view.php:197
-#: include/views/js/configuration.host.edit.js.php:120
-msgid "SHA"
-msgstr "SHA"
-
 #: app/views/report.services.php:80 app/views/report.services.php:81
 #: app/views/report.services.php:82 app/views/report.services.php:83
 #: srv_status.php:149
@@ -15700,7 +15735,7 @@ msgstr "Порт SMTP серверу"
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
 #: include/hosts.inc.php:465 include/hosts.inc.php:1442
 #: include/items.inc.php:349
-#: include/views/js/configuration.host.edit.js.php:178
+#: include/views/js/configuration.host.edit.js.php:176
 msgid "SNMP"
 msgstr "SNMP"
 
@@ -15741,8 +15776,7 @@ msgstr "Ключ SNMP trap помилковий."
 msgid "SNMP version"
 msgstr ""
 
-#: include/html.inc.php:623 include/html.inc.php:624
-#: include/items.inc.php:1261 include/items.inc.php:1265
+#: include/items.inc.php:1297
 #, c-format
 msgid "SNMPv%1$d"
 msgstr ""
@@ -15787,7 +15821,7 @@ msgstr ""
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr "SQL запитів: %1$s (selects: %2$s | executes: %3$s)"
 
-#: include/items.inc.php:1752
+#: include/items.inc.php:1815
 #: include/views/configuration.host.discovery.edit.php:567
 #: include/views/configuration.item.edit.php:628
 #: include/views/configuration.item.prototype.edit.php:607
@@ -16016,7 +16050,7 @@ msgstr "Комплексні екрани"
 #: app/views/administration.script.edit.php:133
 #: app/views/administration.script.edit.php:206
 #: app/views/administration.script.list.php:77 include/items.inc.php:104
-#: include/items.inc.php:1746 include/media.inc.php:25
+#: include/items.inc.php:1809 include/media.inc.php:25
 #: include/views/configuration.host.discovery.edit.php:229
 #: include/views/configuration.item.edit.php:265
 #: include/views/configuration.item.prototype.edit.php:246
@@ -16722,7 +16756,7 @@ msgstr "Вихід"
 msgid "Simple"
 msgstr "Простий"
 
-#: include/items.inc.php:1825
+#: include/items.inc.php:1888
 msgid "Simple change"
 msgstr "Проста зміна"
 
@@ -16974,7 +17008,7 @@ msgstr "Початок в"
 msgid "Starting TLS failed."
 msgstr "Старт TLS не вдалий."
 
-#: include/classes/items/CHelpItems.php:1079
+#: include/classes/items/CHelpItems.php:1147
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Час запуску Zabbix сервера, Unix timestamp."
 
@@ -16992,7 +17026,7 @@ msgctxt "history source selection method"
 msgid "Static"
 msgstr "Статично"
 
-#: include/classes/items/CHelpItems.php:1215
+#: include/classes/items/CHelpItems.php:1283
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr ""
 
@@ -17163,8 +17197,8 @@ msgstr ""
 msgid "String"
 msgstr ""
 
-#: include/items.inc.php:1804 include/items.inc.php:1808
-#: include/items.inc.php:1812 include/items.inc.php:1816
+#: include/items.inc.php:1867 include/items.inc.php:1871
+#: include/items.inc.php:1875 include/items.inc.php:1879
 msgid "Structured data"
 msgstr "Структуровані дані"
 
@@ -17225,7 +17259,7 @@ msgstr ""
 msgid "Support"
 msgstr "Підтримка"
 
-#: include/html.inc.php:1017
+#: include/html.inc.php:1016
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "Подавлено до: %1$s"
@@ -17580,7 +17614,7 @@ msgstr "Шаблони оновлено"
 #: app/views/administration.mediatype.list.php:141
 #: app/views/administration.regex.edit.php:140
 #: app/views/js/popup.itemtestedit.view.js.php:573
-#: app/views/popup.itemtestedit.view.php:439
+#: app/views/popup.itemtestedit.view.php:434
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1565
 #: include/views/configuration.host.discovery.edit.php:902
@@ -17643,9 +17677,9 @@ msgstr "Тема тесту"
 
 #: app/views/popup.massupdate.item.php:167
 #: include/classes/html/CMacroValue.php:156 include/forms.inc.php:211
-#: include/items.inc.php:132 include/items.inc.php:1784
-#: include/items.inc.php:1788 include/items.inc.php:1792
-#: include/items.inc.php:1796 include/items.inc.php:1800
+#: include/items.inc.php:132 include/items.inc.php:1847
+#: include/items.inc.php:1851 include/items.inc.php:1855
+#: include/items.inc.php:1859 include/items.inc.php:1863
 #: include/views/configuration.item.edit.php:657
 #: include/views/configuration.item.prototype.edit.php:634
 #: include/views/js/monitoring.sysmaps.js.php:350
@@ -17673,14 +17707,18 @@ msgstr "Y координата елементу комплексного екр�
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/html.inc.php:711
+#: include/html.inc.php:710
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Група елементів даних більше не виявляється та буде видалена через %1$s (%2$s о %3$s)."
 
-#: include/html.inc.php:706
+#: include/html.inc.php:705
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Група елементів даних більше не виявляється та буде видалена при наступному виконанні правила виявлення."
+
+#: include/classes/items/CHelpItems.php:1095
+msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
 
 #: hosts.php:324
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -17694,30 +17732,30 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: include/html.inc.php:738
+#: include/html.inc.php:737
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/html.inc.php:733
+#: include/html.inc.php:732
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
-#: include/html.inc.php:657
+#: include/html.inc.php:656
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Група вузлів мережі більше не виявляється та буде видалена через %1$s (%2$s о %3$s)."
 
-#: include/html.inc.php:652
+#: include/html.inc.php:651
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Група вузлів мережі більше не виявляється та буде видалена при наступному виконанні правила виявлення."
 
-#: include/html.inc.php:684
+#: include/html.inc.php:683
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Вузел мережі більше не виявляється та буде видалений через %1$s (%2$s о %3$s)."
 
-#: include/html.inc.php:679
+#: include/html.inc.php:678
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Вузел мережі більше не виявляється та буде видалений при наступному виконанні правила виявлення."
 
@@ -17737,12 +17775,12 @@ msgstr[0] "Картинка використовується у карті ме�
 msgstr[1] "Картинка використовується у картах мереж %1$s."
 msgstr[2] "Картинка використовується у картах мереж %1$s."
 
-#: include/html.inc.php:792
+#: include/html.inc.php:791
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "Елемент даних більш не виявляється і буде видалений через %1$s (%2$s о %3$s)."
 
-#: include/html.inc.php:787
+#: include/html.inc.php:786
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Елемент даних більше не виявляється та буде видалений при наступному виконанні правила виявлення."
 
@@ -17774,12 +17812,12 @@ msgstr ""
 msgid "The token has expired. Please update the expiry date to use the token."
 msgstr ""
 
-#: include/html.inc.php:765
+#: include/html.inc.php:764
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/html.inc.php:760
+#: include/html.inc.php:759
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
@@ -17840,7 +17878,7 @@ msgstr "Цей рік по нині"
 msgid "Threshold"
 msgstr "Межа"
 
-#: include/items.inc.php:1876 include/items.inc.php:1880
+#: include/items.inc.php:1939 include/items.inc.php:1943
 msgid "Throttling"
 msgstr "Дедуплікація"
 
@@ -17863,7 +17901,7 @@ msgstr "До"
 #: app/controllers/CControllerPopupTriggerExpr.php:202
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:38
-#: app/views/popup.itemtestedit.view.php:274
+#: app/views/popup.itemtestedit.view.php:269
 #: app/views/popup.triggerexpr.php:140 app/views/popup.triggerexpr.php:144
 #: app/views/reports.auditlog.list.php:86 include/actions.inc.php:1700
 #: include/actions.inc.php:1753 include/actions.inc.php:1833
@@ -17893,7 +17931,7 @@ msgstr "Час (в порядку зростання)"
 msgid "Time (descending)"
 msgstr "Час (в порядку спадання)"
 
-#: include/classes/items/CHelpItems.php:1147
+#: include/classes/items/CHelpItems.php:1215
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Час конкретного процесу Zabbix або групи процесів (задається <типом> та <режимом>), проведений у <стані> у відсотках."
 
@@ -17906,7 +17944,7 @@ msgstr ""
 msgid "Time filter default period"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1151
+#: include/classes/items/CHelpItems.php:1219
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
 msgstr ""
 
@@ -18014,6 +18052,10 @@ msgstr "Повний час Elasticsearch: %1$s"
 msgid "Total SQL time: %1$s"
 msgstr "Всього затрачено часу на SQL: %1$s"
 
+#: include/classes/items/CHelpItems.php:1011
+msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:147
 #, c-format
 msgid "Total time: %1$s"
@@ -18031,11 +18073,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакція не була закрита. Скасування..."
 
-#: include/classes/items/CHelpItems.php:1225
+#: include/classes/items/CHelpItems.php:1293
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1229
+#: include/classes/items/CHelpItems.php:1297
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -18066,7 +18108,7 @@ msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "Вважати як 0"
 
-#: include/classes/items/CHelpItems.php:1179
+#: include/classes/items/CHelpItems.php:1247
 msgid "Trend function cache statistics. Valid parameters are: all, hits, phits, misses, pmisses, items, pitems and requests."
 msgstr ""
 
@@ -18164,7 +18206,7 @@ msgstr[2] "Тригери дезактивовано"
 
 #: app/views/administration.trigdisplay.edit.php:31
 #: app/views/administration.trigdisplay.edit.php:165
-#: include/classes/helpers/CMenuHelper.php:256 include/html.inc.php:940
+#: include/classes/helpers/CMenuHelper.php:256 include/html.inc.php:939
 msgid "Trigger displaying options"
 msgstr "Параметри відображення тригера"
 
@@ -18328,7 +18370,7 @@ msgstr "Тригери видалено"
 msgid "Triggers top 100"
 msgstr "Найбільш активні 100 тригерів"
 
-#: include/items.inc.php:1793
+#: include/items.inc.php:1856
 msgid "Trim"
 msgstr "Обрізати"
 
@@ -18673,7 +18715,7 @@ msgstr "Невідомий ресурс"
 msgid "Unknown step failed: %1$s"
 msgstr "Помилка в невідомому кроці: %1$s"
 
-#: include/items.inc.php:1398
+#: include/items.inc.php:1461
 msgid "Unknown value type"
 msgstr "Невідомий тип"
 
@@ -18915,7 +18957,7 @@ msgstr "Карти верхнього рівня"
 msgid "Uptime"
 msgstr "Доступний"
 
-#: include/classes/items/CHelpItems.php:1195
+#: include/classes/items/CHelpItems.php:1263
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Час роботи процесу Zabbix сервера в секундах (uptime)."
 
@@ -18923,7 +18965,7 @@ msgstr "Час роботи процесу Zabbix сервера в секунд
 msgid "Uptime/Downtime"
 msgstr "Доступний/Недоступний"
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:141
 msgid "Use bulk requests"
 msgstr "Використовувати масові запити"
 
@@ -19140,7 +19182,7 @@ msgid "User password"
 msgstr "Пароль користувача"
 
 #: app/controllers/CControllerUserProfileEdit.php:137
-#: app/views/administration.user.edit.php:40 include/html.inc.php:866
+#: app/views/administration.user.edit.php:40 include/html.inc.php:865
 msgid "User profile"
 msgstr "Профіль користувача"
 
@@ -19281,7 +19323,7 @@ msgstr ""
 msgid "Users"
 msgstr "Користувачі"
 
-#: include/classes/items/CHelpItems.php:1211
+#: include/classes/items/CHelpItems.php:1279
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика VMware кешу. Можливі режими: total, free, pfree, used та pused."
 
@@ -19298,7 +19340,7 @@ msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:815
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Статистика розміру сховища VMware в байтах або відсотках від загального. Повертає ціле для байт; дробове для відсотків"
 
@@ -19318,11 +19360,11 @@ msgstr ""
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Лог подій VMware , <url> - URL VMware сервісу, <mode> - all (по замовчуванню), skip - пропустити обробку старіших даних"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "uuid BIOS гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:907
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Розмір ballooned пам'яті гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
@@ -19330,51 +19372,51 @@ msgstr "Розмір ballooned пам'яті гіпервізора VMware, <url
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Ім'я кластера гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика зчитування зі сховища даних гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware, <datastore> - ім'я сховища даних, <mode> - затримка"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:875
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика записування в сховище даних гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware, <datastore> - ім'я сховища даних, <mode> - затримка"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:943
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Ім'я гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика вхідного трафіку мережевого інтерфейсу гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика вихідного трафіку мережевого інтерфейсу гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Лічильник продуктивності гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware, <path> - шлях до лічильника продуктивності, <instance> - екземпляр лічильника продуктивності"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Частота процесора гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель процесора гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
@@ -19382,27 +19424,27 @@ msgstr "Модель процесора гіпервізора VMware, <url> - U
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Використання процесора гіпервізора VMware в Гц, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:947
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Стан гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Загальний розмір пам'ятні гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:951
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Час роботи гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:911
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Розмір використаної пам'ятні гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:903
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Ім'я постачальника гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:955
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Версія гіпервізора VMware, <url> - URL служби VMware, <uuid> - ім'я хоста гіпервізора VMware"
 
@@ -19410,103 +19452,103 @@ msgstr "Версія гіпервізора VMware, <url> - URL служби VMw
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Повне ім'я сервісу VMware, <url> - URL служби VMware"
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:963
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Версія сервісу VMware, <url> - URL служби VMware"
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір ballooned пам'яті віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1083
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір записаних даних в сховище віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір стисненої пам'яті віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1119
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика зчитування дискового пристрою віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware, <instance> - екземпляр дискового пристрою, <mode> - bps/ops - байт/операцій в секунду"
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1123
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика записування дискового пристрою віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware, <instance> - екземпляр дискового пристрою, <mode> - bps/ops - байт/операцій в секунду"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1131
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Статистика файлової системи віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware, <fsname> - ім'я файлової системи, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1047
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Використання пам'яті гостьової віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Використання пам'яті хоста віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Ім'я гіпервізора віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Ім'я віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика вхідного трафіку мережевого інтерфейсу віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware, <instance> - екземпляр мережевого інтерфейсу, <mode> - bps/pps - байт/пакетів в секунду"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1067
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика вихідного трафіку мережевого інтерфейсу віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware, <instance> - екземпляр мережевого інтерфейсу, <mode> - bps/pps - байт/пакетів в секунду"
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1075
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Лічильник продуктивності віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware, <path> - шлях до лічильника продуктивності, <instance> - екземпляр лічильника продуктивності"
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1079
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Стан живлення віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір приватної пам'яті віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Час готовності процесора віртуальної машини VMware в мілісекундах, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Використання процесора віртуальної машини VMware в Гц, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір спільної пам'яті віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір пам'яті в фалі підкачки віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Загальний розмір пам'яті віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1099
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір незаписаних даних в сховище віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:1039
+#: include/classes/items/CHelpItems.php:1103
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Розмір не спільного простору в сховищі віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
-#: include/classes/items/CHelpItems.php:1043
+#: include/classes/items/CHelpItems.php:1111
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Час роботи (uptime) віртуальної машини VMware, <url> - URL служби VMware, <uuid> - ім'я хоста віртуальної машини VMware"
 
@@ -19518,10 +19560,10 @@ msgstr ""
 msgid "Validate URI schemes"
 msgstr ""
 
-#: include/items.inc.php:1848 include/items.inc.php:1852
-#: include/items.inc.php:1856 include/items.inc.php:1860
-#: include/items.inc.php:1864 include/items.inc.php:1868
-#: include/items.inc.php:1872
+#: include/items.inc.php:1911 include/items.inc.php:1915
+#: include/items.inc.php:1919 include/items.inc.php:1923
+#: include/items.inc.php:1927 include/items.inc.php:1931
+#: include/items.inc.php:1935
 msgid "Validation"
 msgstr "Валідація"
 
@@ -19543,7 +19585,7 @@ msgstr "Валідація"
 #: app/views/popup.condition.common.php:590
 #: app/views/popup.condition.common.php:609 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:266
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:261
 #: app/views/popup.lldoperation.php:270
 #: app/views/popup.massupdate.host.php:208
 #: app/views/popup.massupdate.item.php:127
@@ -19597,11 +19639,11 @@ msgstr "Значення \"%1$s\" є недопустимим для парам�
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина %4$d символів."
 
-#: include/classes/items/CHelpItems.php:1203
+#: include/classes/items/CHelpItems.php:1271
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Ефективність кешу значень. Допустимі параметри: requests, hits та misses."
 
-#: include/classes/items/CHelpItems.php:1199
+#: include/classes/items/CHelpItems.php:1267
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кешу значень. Допустимі режими: total, free, pfree, used та pused."
 
@@ -19637,7 +19679,7 @@ msgstr "Перетворення значення оновлено"
 #: app/views/administration.valuemap.edit.php:29
 #: app/views/administration.valuemap.edit.php:89
 #: app/views/administration.valuemap.list.php:31
-#: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:939
+#: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:938
 msgid "Value mapping"
 msgstr "Перетворення значень"
 
@@ -19744,7 +19786,7 @@ msgstr ""
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Версія Zabbix агента. Повертає рядок"
 
-#: include/classes/items/CHelpItems.php:1207
+#: include/classes/items/CHelpItems.php:1275
 msgid "Version of Zabbix server or proxy"
 msgstr ""
 
@@ -20072,7 +20114,7 @@ msgstr "X2"
 msgid "XML"
 msgstr ""
 
-#: include/items.inc.php:1805
+#: include/items.inc.php:1868
 msgid "XML XPath"
 msgstr "XML XPath"
 
@@ -20091,7 +20133,7 @@ msgstr "XML пустий"
 msgid "XML is expected"
 msgstr ""
 
-#: include/items.inc.php:1817
+#: include/items.inc.php:1880
 msgid "XML to JSON"
 msgstr ""
 
@@ -20179,7 +20221,7 @@ msgstr ""
 #: include/classes/import/validators/C44XmlValidator.php:1741
 #: include/classes/import/validators/C50XmlValidator.php:1884
 #: include/classes/import/validators/C52XmlValidator.php:2016
-#: include/classes/import/validators/C54XmlValidator.php:2012
+#: include/classes/import/validators/C54XmlValidator.php:2030
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -20575,10 +20617,10 @@ msgstr ""
 #: include/classes/import/validators/C52XmlValidator.php:2518
 #: include/classes/import/validators/C52XmlValidator.php:2645
 #: include/classes/import/validators/C52XmlValidator.php:2684
-#: include/classes/import/validators/C54XmlValidator.php:2494
-#: include/classes/import/validators/C54XmlValidator.php:2514
-#: include/classes/import/validators/C54XmlValidator.php:2599
-#: include/classes/import/validators/C54XmlValidator.php:2638
+#: include/classes/import/validators/C54XmlValidator.php:2512
+#: include/classes/import/validators/C54XmlValidator.php:2532
+#: include/classes/import/validators/C54XmlValidator.php:2617
+#: include/classes/import/validators/C54XmlValidator.php:2656
 #: include/classes/import/validators/CXmlValidatorGeneral.php:254
 #: include/classes/validators/CApiInputValidator.php:449
 #: include/classes/validators/CApiInputValidator.php:581
@@ -21151,7 +21193,7 @@ msgstr "неправильний діапазон адрес \"%1$s\""
 msgid "invalid byte sequence in UTF-8"
 msgstr "помилкова послідовність байт в UTF-8"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2061
+#: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2124
 msgid "invalid delay"
 msgstr "некоректна затримка"
 
@@ -21763,7 +21805,7 @@ msgstr ""
 #: include/classes/import/validators/C44XmlValidator.php:2023
 #: include/classes/import/validators/C50XmlValidator.php:2166
 #: include/classes/import/validators/C52XmlValidator.php:2313
-#: include/classes/import/validators/C54XmlValidator.php:2309
+#: include/classes/import/validators/C54XmlValidator.php:2327
 #: include/classes/import/validators/CXmlValidatorGeneral.php:154
 #: include/classes/import/validators/CXmlValidatorGeneral.php:173
 #, c-format
@@ -21862,7 +21904,7 @@ msgstr ""
 #: include/classes/import/validators/C44XmlValidator.php:2178
 #: include/classes/import/validators/C50XmlValidator.php:2321
 #: include/classes/import/validators/C52XmlValidator.php:2543
-#: include/classes/import/validators/C54XmlValidator.php:2539
+#: include/classes/import/validators/C54XmlValidator.php:2557
 #, c-format
 msgid "unexpected constant value \"%1$s\""
 msgstr ""
@@ -22034,7 +22076,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1147
 #: include/classes/api/services/CMap.php:1153
 #: include/classes/import/validators/C52XmlValidator.php:2679
-#: include/classes/import/validators/C54XmlValidator.php:2633
+#: include/classes/import/validators/C54XmlValidator.php:2651
 #: include/classes/validators/CApiInputValidator.php:411
 #: include/classes/validators/CApiInputValidator.php:736
 #: include/classes/validators/CNewValidator.php:517
