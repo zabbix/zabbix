@@ -959,7 +959,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$table_rows = $valuemap_table->getRows();
 					$this->assertEquals($expected_count, $table_rows->count());
 					foreach($table_rows as $value_mapping) {
-						$valuemap_name = $value_mapping->getColumn('Name')->getText();
+						$valuemap_name = ltrim($value_mapping->getColumn('Name')->getText(), $host_name.': ');
 						$this->assertTrue(in_array($valuemap_name, $db_valuemap));
 
 						$mappings = [];
