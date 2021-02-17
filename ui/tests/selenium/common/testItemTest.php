@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for "Test item" function tests.
@@ -681,13 +682,10 @@ class testItemTest extends CWebTest {
 					$details = 'Connection to Zabbix server "localhost" refused. Possible reasons:';
 				}
 				else {
-					if (in_array($data['fields']['Type'], ['Simple check', 'SSH agent', 'TELNET agent'])) {
-						$details = 'Incorrect value for field "Host address": cannot be empty.';
-					}
-					else {
-						$details = ['Incorrect value for field "Host address": cannot be empty.',
-							'Incorrect value for field "Port": cannot be empty.'];
-					}
+					$details = (in_array($data['fields']['Type'], ['Simple check', 'SSH agent', 'TELNET agent']))
+						? 'Incorrect value for field "Host address": cannot be empty.'
+						: ['Incorrect value for field "Host address": cannot be empty.',
+								'Incorrect value for field "Port": cannot be empty.'];
 				}
 
 				// Click Get value button.
