@@ -89,6 +89,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'fields' =>  [
 						'Name' => 'Max webhook',
+						'Scope' => 'Manual host action',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
 						'Timeout' => '60s',
@@ -342,6 +343,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'fields' =>  [
 						'Name' => 'Max script',
+						'Scope' => 'Manual host action',
 						'Type' => 'Script',
 						'Execute on' => 'Zabbix server (proxy)',
 						'Commands' => 'Script command',
@@ -381,6 +383,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'fields' =>  [
 						'Name' => 'Max IPMI',
+						'Scope' => 'Manual host action',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI command',
 						'Description' => 'Test description',

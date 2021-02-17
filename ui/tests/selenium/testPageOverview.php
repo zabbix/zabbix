@@ -621,13 +621,7 @@ class testPageOverview extends CLegacyWebTest {
 						'Trigger URL',
 						'Webhook url for all',
 						'1_item',
-						'Detect operating system',
-						'Ping',
-						'Script for Clone',
-						'Script for Delete',
-						'Script for Update',
-						'Selenium script',
-						'Traceroute'
+						'Selenium script'
 					]
 				]
 			],
