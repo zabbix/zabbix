@@ -13,7 +13,7 @@
             <name>Template SAN Huawei OceanStor 5300 V5 SNMP</name>
             <description>The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.&#13;
 &#13;
-You can discuss this template or leave feedback on our forum none&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor&#13;
 &#13;
 Template tooling version used: 0.38</description>
             <templates>
@@ -167,7 +167,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>BBU {#ID} on {#LOCATION}: Health status in not Normal</name>
+                                    <name>BBU {#ID} on {#LOCATION}: Health status is not Normal</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -197,7 +197,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;2</expression>
-                                    <name>BBU {#ID} on {#LOCATION}: Running status in not Online</name>
+                                    <name>BBU {#ID} on {#LOCATION}: Running status is not Online</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -261,7 +261,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>Controller {#ID}: Health status in not Normal</name>
+                                    <name>Controller {#ID}: Health status is not Normal</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -282,7 +282,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.MEM.MAX.TIME})}&gt;{$HUAWEI.5300.MEM.MAX.WARN}</expression>
-                                    <name>Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} in {$HUAWEI.5300.MEM.MAX.TIME})</name>
+                                    <name>Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME})</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -342,7 +342,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;27</expression>
-                                    <name>Controller {#ID}: Running status in not Online</name>
+                                    <name>Controller {#ID}: Running status is not Online</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -418,7 +418,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>Disk {#MODEL} on {#LOCATION}: Health status in not Normal</name>
+                                    <name>Disk {#MODEL} on {#LOCATION}: Health status is not Normal</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -448,7 +448,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;27</expression>
-                                    <name>Disk {#MODEL} on {#LOCATION}: Running status in not Online</name>
+                                    <name>Disk {#MODEL} on {#LOCATION}: Running status is not Online</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -475,7 +475,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}&gt;{$HUAWEI.5300.DISK.TEMP.MAX.WARN:&quot;{#MODEL}&quot;}</expression>
-                                    <name>Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:&quot;{#MODEL}&quot;} in {$HUAWEI.5300.DISK.TEMP.MAX.TIME})</name>
+                                    <name>Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:&quot;{#MODEL}&quot;} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME})</name>
                                     <opdata>Current value: {ITEM.LASTVALUE}</opdata>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
@@ -516,7 +516,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>Enclosure {#NAME}: Health status in not Normal</name>
+                                    <name>Enclosure {#NAME}: Health status is not Normal</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -546,7 +546,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;27</expression>
-                                    <name>Enclosure {#NAME}: Running status in not Online</name>
+                                    <name>Enclosure {#NAME}: Running status is not Online</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -573,7 +573,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.TEMP.MAX.TIME})}&gt;{$HUAWEI.5300.TEMP.MAX.WARN}</expression>
-                                    <name>Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} in {$HUAWEI.5300.TEMP.MAX.TIME})</name>
+                                    <name>Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME})</name>
                                     <opdata>Current value: {ITEM.LASTVALUE}</opdata>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
@@ -614,7 +614,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>FAN {#ID} on {#LOCATION}: Health status in not Normal</name>
+                                    <name>FAN {#ID} on {#LOCATION}: Health status is not Normal</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -644,7 +644,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;2</expression>
-                                    <name>FAN {#ID} on {#LOCATION}: Running status in not Running</name>
+                                    <name>FAN {#ID} on {#LOCATION}: Running status is not Running</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -681,7 +681,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})}&gt;{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}</expression>
-                                    <name>LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms in {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})</name>
+                                    <name>LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})</name>
                                     <priority>WARNING</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -876,7 +876,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>LUN {#NAME}: Status in not Normal</name>
+                                    <name>LUN {#NAME}: Status is not Normal</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -1018,7 +1018,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{min({$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})}&gt;{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}</expression>
-                                    <name>Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms in {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})</name>
+                                    <name>Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})</name>
                                     <priority>WARNING</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -1274,7 +1274,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;1</expression>
-                                    <name>Pool {#NAME}: Health status in not Normal</name>
+                                    <name>Pool {#NAME}: Health status is not Normal</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
@@ -1304,7 +1304,7 @@ https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-p
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <expression>{last()}&lt;&gt;27</expression>
-                                    <name>Pool {#NAME}: Running status in not Online</name>
+                                    <name>Pool {#NAME}: Running status is not Online</name>
                                     <priority>AVERAGE</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>

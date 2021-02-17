@@ -122,30 +122,30 @@ No specific Zabbix configuration is required.
 |Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
 |Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
 |OceanStor 5300 V5: Storage version has been changed |<p>OceanStor 5300 V5 version has changed. Ack to close.</p> |`{TEMPLATE_NAME:huawei.5300.v5[version].diff()}=1 and {TEMPLATE_NAME:huawei.5300.v5[version].strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} in {$HUAWEI.5300.MEM.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"].min({$HUAWEI.5300.MEM.MAX.TIME})}>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
-|Controller {#ID}: Health status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"].last()}<>1` |HIGH | |
-|Controller {#ID}: Running status in not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"].last()}<>27` |AVERAGE | |
+|Controller {#ID}: Memory usage is too high (over {$HUAWEI.5300.MEM.MAX.WARN} for {$HUAWEI.5300.MEM.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"].min({$HUAWEI.5300.MEM.MAX.TIME})}>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
+|Controller {#ID}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"].last()}<>1` |HIGH | |
+|Controller {#ID}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"].last()}<>27` |AVERAGE | |
 |Controller {#ID}: Role has been changed |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoControllerRole, "{#ID}"].diff()}=1` |WARNING |<p>Manual close: YES</p> |
-|Enclosure {#NAME}: Health status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"].last()}<>1` |HIGH | |
-|Enclosure {#NAME}: Running status in not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"].last()}<>27` |AVERAGE | |
-|Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} in {$HUAWEI.5300.TEMP.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"].min({$HUAWEI.5300.TEMP.MAX.TIME})}>{$HUAWEI.5300.TEMP.MAX.WARN}` |HIGH | |
-|FAN {#ID} on {#LOCATION}: Health status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"].last()}<>1` |HIGH | |
-|FAN {#ID} on {#LOCATION}: Running status in not Running |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"].last()}<>2` |AVERAGE | |
-|BBU {#ID} on {#LOCATION}: Health status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"].last()}<>1` |HIGH | |
-|BBU {#ID} on {#LOCATION}: Running status in not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"].last()}<>2` |AVERAGE | |
-|Disk {#MODEL} on {#LOCATION}: Health status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"].last()}<>1` |HIGH | |
-|Disk {#MODEL} on {#LOCATION}: Running status in not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"].last()}<>27` |AVERAGE | |
-|Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} in {$HUAWEI.5300.DISK.TEMP.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"].min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}` |HIGH | |
-|Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms in {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"].min({$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})}>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}` |WARNING | |
-|LUN {#NAME}: Status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwStorageLunStatus, "{#NAME}"].last()}<>1` |AVERAGE | |
-|LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms in {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"].min({$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})}>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}` |WARNING | |
-|Pool {#NAME}: Health status in not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"].last()}<>1` |HIGH | |
-|Pool {#NAME}: Running status in not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"].last()}<>27` |AVERAGE | |
+|Enclosure {#NAME}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"].last()}<>1` |HIGH | |
+|Enclosure {#NAME}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"].last()}<>27` |AVERAGE | |
+|Enclosure {#NAME}: Temperature is too high (over {$HUAWEI.5300.TEMP.MAX.WARN} for {$HUAWEI.5300.TEMP.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"].min({$HUAWEI.5300.TEMP.MAX.TIME})}>{$HUAWEI.5300.TEMP.MAX.WARN}` |HIGH | |
+|FAN {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"].last()}<>1` |HIGH | |
+|FAN {#ID} on {#LOCATION}: Running status is not Running |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"].last()}<>2` |AVERAGE | |
+|BBU {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"].last()}<>1` |HIGH | |
+|BBU {#ID} on {#LOCATION}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"].last()}<>2` |AVERAGE | |
+|Disk {#MODEL} on {#LOCATION}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"].last()}<>1` |HIGH | |
+|Disk {#MODEL} on {#LOCATION}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"].last()}<>27` |AVERAGE | |
+|Disk {#MODEL} on {#LOCATION}: Temperature is too high (over {$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.5300.DISK.TEMP.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"].min({$HUAWEI.5300.DISK.TEMP.MAX.TIME})}>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}` |HIGH | |
+|Node {#NODE}: Average I/O latency is too high (over {$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}ms for {$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"].min({$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})}>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}` |WARNING | |
+|LUN {#NAME}: Status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwStorageLunStatus, "{#NAME}"].last()}<>1` |AVERAGE | |
+|LUN {#NAME}: Average I/O response time is too high (over {$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}ms for {$HUAWEI.5300.LUN.IO.TIME.MAX.TIME}) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"].min({$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})}>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}` |WARNING | |
+|Pool {#NAME}: Health status is not Normal |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"].last()}<>1` |HIGH | |
+|Pool {#NAME}: Running status is not Online |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"].last()}<>27` |AVERAGE | |
 |Pool {#NAME}: Used capacity is too high (over {#THRESHOLD}%) |<p>-</p> |`{TEMPLATE_NAME:huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"].min({$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})}>{#THRESHOLD}` |AVERAGE | |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](none).
+You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor).
 
