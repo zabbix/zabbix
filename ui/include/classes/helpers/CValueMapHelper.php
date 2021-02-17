@@ -27,8 +27,8 @@ class CValueMapHelper {
 	 * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
 	 *
 	 * @param string $value                 Value that mapping should be applied to.
-	 * @param array  $valuemap              Valuemaps.
-	 * @param array  $valuemap['mappings']  (optional) Valuemap mappings.
+	 * @param array  $valuemap              Valuemap array.
+	 * @param array  $valuemap['mappings']  (optional) Valuemap mappings array.
 	 *
 	 * @return string
 	 */
@@ -37,11 +37,23 @@ class CValueMapHelper {
 			return $value;
 		}
 
-		$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
-		if (array_key_exists($value, $mappings)) {
-			return $mappings[$value].' ('.$value.')';
-		}
+		$newvalue = static::getMappedValue($value, $valuemap);
 
-		return $value;
+		return ($newvalue !== false) ? $newvalue.' ('.$value.')' : $value;
+	}
+
+	/**
+	 * Get mapping for value.
+	 *
+	 * @param string $value                 Value that mapping should be applied to.
+	 * @param array  $valuemap              Valuemap array.
+	 * @param array  $valuemap['mappings']  (optional) Valuemap mappings array.
+	 *
+	 * @return string|bool     If there is no mapping return false, return mapped value otherwise.
+	 */
+	static public function getMappedValue(string $value, array $valuemap) {
+		$mappings = array_column($valuemap['mappings'], 'newvalue', 'value');
+
+		return array_key_exists($value, $mappings) ? $mappings[$value] : false;
 	}
 }

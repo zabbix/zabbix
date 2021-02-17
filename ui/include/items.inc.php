@@ -1503,29 +1503,48 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
  * @param array     $item
  * @param int       $item['value_type']  type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
  * @param string    $item['units']       units of item
- * @param array     $item['valuemap']
+ * @param int       $item['mappings']    mapping set of values
  * @param bool      $trim
  *
  * @return string
  */
 function formatHistoryValue($value, array $item, $trim = true) {
+	$mapping = false;
+
+	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$value = convertUnits([
 			'value' => $value,
 			'units' => $item['units']
 		]);
 	}
-	elseif ($item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		return ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip;' : $value;
-	}
-	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR) {
-		$value = ($trim && mb_strlen($value) > 20) ? mb_substr($value, 0, 20).'&hellip;' : $value;
-	}
-	else {
-		return _('Unknown value type');
+	elseif (!in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG])) {
+		$value = _('Unknown value type');
 	}
 
-	return CValueMapHelper::applyValueMap($value, $item['valuemap'], 20);
+	// apply value mapping
+	switch ($item['value_type']) {
+		case ITEM_VALUE_TYPE_STR:
+			$mapping = CValueMapHelper::getMappedValue($value, $item['valuemap']);
+			// break; is not missing here
+
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_LOG:
+			if ($trim && mb_strlen($value) > 20) {
+				$value = mb_substr($value, 0, 20).'...';
+			}
+
+			if ($mapping !== false) {
+				$value = $mapping.' ('.$value.')';
+			}
+
+			break;
+
+		default:
+			$value = CValueMapHelper::applyValueMap($value, $item['valuemap']);
+	}
+
+	return $value;
 }
 
 /**
