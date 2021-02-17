@@ -53,8 +53,6 @@ class CDashboardWidget extends CBaseComponent {
 	} = {}) {
 		super(document.createElement('div'));
 
-		this.div = $(this._target);
-
 		this.defaults = defaults;
 		this.widgetid = widgetid;
 		this.uniqueid = uniqueid;
@@ -94,7 +92,7 @@ class CDashboardWidget extends CBaseComponent {
 			this.update_pending = false
 		}
 
-		this._makeWidgetDiv();
+		this._makeView();
 	}
 
 	activate() {
@@ -157,7 +155,7 @@ class CDashboardWidget extends CBaseComponent {
 		$('.dashbrd-grid-widget-actions', this.content_header).find('.widget-info-button').remove();
 	}
 
-	_makeWidgetDiv() {
+	_makeView() {
 		const iterator_classes = {
 			'root': 'dashbrd-grid-iterator',
 			'container': 'dashbrd-grid-iterator-container',
@@ -281,7 +279,8 @@ class CDashboardWidget extends CBaseComponent {
 			this.container.append(this.content_script);
 		}
 
-		this.div = $('<div>', {'class': classes.root})
+		this.div = $(this._target)
+			.addClass(classes.root)
 			.toggleClass(classes.hidden_header, this.view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 			.toggleClass('new-widget', this._is_new);
 
@@ -296,13 +295,6 @@ class CDashboardWidget extends CBaseComponent {
 		this.mask = $('<div>', {'class': classes.mask});
 
 		this.div.append(this.container, this.mask);
-
-		this.div.on('load.image', () => {
-			// Call refreshCallback handler for expanded popup menu items.
-			if (this.div.find('[data-expanded="true"][data-menu-popup]').length) {
-				this.div.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', this);
-			}
-		});
 	}
 
 	_registerEvents() {
@@ -362,6 +354,14 @@ class CDashboardWidget extends CBaseComponent {
 				if (!this._mousemove_waiting) {
 					this._events.leave();
 				}
+			})
+			.on('load.image', () => {
+				// Call refreshCallback handler for expanded popup menu items.
+				const $menu_popup = this.div.find('[data-expanded="true"][data-menu-popup]');
+
+				if ($menu_popup.length) {
+					$menu_popup.menuPopup('refresh', this);
+				}
 			});
 	}
 
@@ -379,6 +379,6 @@ class CDashboardWidget extends CBaseComponent {
 
 		this.content_header.off('focusin focusout');
 
-		this.div.off('mouseenter mousemove mouseleave');
+		this.div.off('mouseenter mousemove mouseleave load.image');
 	}
 }
