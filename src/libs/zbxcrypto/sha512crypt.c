@@ -330,7 +330,7 @@ sha512_process_bytes (const void *buffer, size_t len, struct sha512_ctx *ctx)
 /* Maximum number of rounds.  */
 #define ROUNDS_MAX 999999999
 
-void sha512_hash(const char *in, char *out)
+void zbx_sha512_hash(const char *in, char *out)
 {
 	struct	sha512_ctx ctx;
 	sha512_init_ctx (&ctx);

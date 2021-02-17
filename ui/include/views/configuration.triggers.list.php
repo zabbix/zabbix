@@ -40,7 +40,7 @@ $filter_column1 = (new CFormList())
 					'dstfrm' => 'groupids',
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
-					'enrich_parent_groups' => true,
+					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
