@@ -2598,12 +2598,12 @@ class CDashboardPage {
 	}
 
 	_setWidgetReady(widget) {
-		if (widget.ready) {
+		if (widget.isReady()) {
 			return;
 		}
 
 		const dashboard_was_ready = !this._widgets.filter((w) => {
-			return !w.ready;
+			return !w.isReady();
 		}).length;
 
 		let ready_updated = false;
@@ -2612,28 +2612,28 @@ class CDashboardPage {
 			if (!widget.children.length) {
 				// Set empty iterator to ready state.
 
-				ready_updated = !widget.ready;
-				widget.ready = true;
+				ready_updated = !widget.isReady();
+				widget.setIsReady(true);
 			}
 		}
 		else if (widget.parent) {
-			widget.ready = true;
+			widget.setIsReady(true);
 
 			let children = widget.parent.children,
 				children_not_ready = children.filter(function(widget) {
-					return !widget.ready;
+					return !widget.isReady();
 				});
 
 			if (!children_not_ready.length) {
 				// Set parent iterator to ready state.
 
-				ready_updated = !widget.parent.ready;
-				widget.parent.ready = true;
+				ready_updated = !widget.parent.isReady();
+				widget.parent.setIsReady(true);
 			}
 		}
 		else {
-			ready_updated = !widget.ready;
-			widget.ready = true;
+			ready_updated = !widget.isReady();
+			widget.setIsReady(true);
 		}
 
 		if (ready_updated) {
@@ -2649,7 +2649,7 @@ class CDashboardPage {
 			}
 			else {
 				const dashboard_is_ready = !this._widgets.filter(function(widget) {
-					return !widget.ready;
+					return !widget.isReady();
 				}).length;
 
 				if (dashboard_is_ready) {

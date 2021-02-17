@@ -43,13 +43,13 @@ class CDashboardWidget extends CBaseComponent {
 		pos = {x: 0, y: 0, width: 1, height: 1},
 		cell_width = 0,
 		cell_height = 0,
-		is_new = !widgetid.length,
 		parent = false,
 		update_paused = false,
 		initial_load = true,
-		ready = false,
 		is_editable = false,
-		is_iterator = defaults.iterator
+		is_iterator = defaults.iterator,
+		is_new = !widgetid.length,
+		is_ready = false
 	} = {}) {
 		super(document.createElement('div'));
 
@@ -76,14 +76,15 @@ class CDashboardWidget extends CBaseComponent {
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
 
-		this._is_new = is_new;
 		this.parent = parent;
 		this.update_paused = update_paused;
 		this.initial_load = initial_load;
-		this.ready = ready;
+
 		this._is_active = false;
 		this._is_iterator = is_iterator;
 		this._is_editable = is_editable;
+		this._is_new = is_new;
+		this._is_ready = is_ready;
 
 		if (this._is_iterator) {
 			this.page = 1;
@@ -117,6 +118,14 @@ class CDashboardWidget extends CBaseComponent {
 
 	isIterator() {
 		return this._is_iterator;
+	}
+
+	isReady() {
+		return this._is_ready;
+	}
+
+	setIsReady(is_ready) {
+		this._is_ready = is_ready;
 	}
 
 	showPreloader() {
