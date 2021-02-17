@@ -124,6 +124,11 @@ class CDashboardWidget extends CBaseComponent {
 		return this._is_ready;
 	}
 
+	/**
+	 * Set widget state to ready.
+	 *
+	 * @returns {boolean}  Returns true, if status updated.
+	 */
 	setReady() {
 		let is_ready = this._is_ready;
 
@@ -163,7 +168,14 @@ class CDashboardWidget extends CBaseComponent {
 		}
 	}
 
-	clearUpdateWidgetContentTimer() {
+	getContentSize() {
+		return {
+			'content_width': Math.floor(this.content_body.width()),
+			'content_height': Math.floor(this.content_body.height())
+		};
+	}
+
+	clearUpdateContentTimer() {
 		if (typeof this.rf_timeoutid !== 'undefined') {
 			clearTimeout(this.rf_timeoutid);
 			delete this.rf_timeoutid;
@@ -173,18 +185,18 @@ class CDashboardWidget extends CBaseComponent {
 	/**
 	 * Enable user functional interaction with widget.
 	 */
-	enableWidgetControls() {
+	enableControls() {
 		this.content_header.find('button').prop('disabled', false);
 	}
 
 	/**
 	 * Disable user functional interaction with widget.
 	 */
-	disableWidgetControls() {
+	disableControls() {
 		this.content_header.find('button').prop('disabled', true);
 	}
 
-	removeWidgetInfoButtons() {
+	removeInfoButtons() {
 		// Note: this function is used only for widgets and not iterators.
 
 		$('.dashbrd-grid-widget-actions', this.content_header).find('.widget-info-button').remove();

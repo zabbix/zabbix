@@ -503,7 +503,7 @@ class CDashboardPage {
 				new_widget.update_paused = true;
 
 				this._setWidgetModeEdit(new_widget);
-				new_widget.disableWidgetControls();
+				new_widget.disableControls();
 
 				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'dashboard.widget.sanitize');
@@ -525,7 +525,7 @@ class CDashboardPage {
 
 				new_widget.fields = response.fields;
 				new_widget.update_paused = false;
-				new_widget.enableWidgetControls();
+				new_widget.enableControls();
 				this._updateWidgetContent(new_widget);
 
 				this._options['updated'] = true;
@@ -2241,7 +2241,7 @@ class CDashboardPage {
 	}
 
 	_setUpdateWidgetContentTimer(widget, rf_rate) {
-		widget.clearUpdateWidgetContentTimer();
+		widget.clearUpdateContentTimer();
 
 		if (widget.updating_content) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -2566,7 +2566,7 @@ class CDashboardPage {
 			$(response.debug).appendTo(widget.content_body);
 		}
 
-		widget.removeWidgetInfoButtons();
+		widget.removeInfoButtons();
 		if (typeof response.info !== 'undefined' && !this._options['edit_mode']) {
 			this._addWidgetInfoButtons(widget.content_header, response.info);
 		}
@@ -2657,13 +2657,6 @@ class CDashboardPage {
 		this.callWidgetDataShare();
 	}
 
-	_getWidgetContentSize(widget) {
-		return {
-			'content_width': Math.floor(widget.content_body.width()),
-			'content_height': Math.floor(widget.content_body.height())
-		};
-	}
-
 	_isEqualContentSize(size_1, size_2) {
 		if (size_1 === undefined || size_2 === undefined) {
 			return false;
@@ -2673,7 +2666,7 @@ class CDashboardPage {
 	}
 
 	_updateWidgetContent(widget, options = {}) {
-		widget.clearUpdateWidgetContentTimer();
+		widget.clearUpdateContentTimer();
 
 		if (widget.updating_content) {
 			// Waiting for another AJAX request to either complete or fail.
@@ -2726,7 +2719,7 @@ class CDashboardPage {
 			'view_mode': widget.view_mode
 		};
 
-		widget.content_size = this._getWidgetContentSize(widget);
+		widget.content_size = widget.getContentSize();
 
 		if (widget.isIterator()) {
 			ajax_data.page = widget.page;
@@ -3458,10 +3451,10 @@ class CDashboardPage {
 	}
 
 	_setWidgetModeEdit(widget) {
-		widget.clearUpdateWidgetContentTimer();
+		widget.clearUpdateContentTimer();
 
 		if (!widget.isIterator()) {
-			widget.removeWidgetInfoButtons();
+			widget.removeInfoButtons();
 		}
 
 		this._makeDraggable(widget);
@@ -3568,7 +3561,7 @@ class CDashboardPage {
 		}
 		else {
 			const size_old = widget.content_size;
-			const size_new = this._getWidgetContentSize(widget);
+			const size_new = widget.getContentSize();
 
 			if (!this._isEqualContentSize(size_old, size_new)) {
 				success = this._doAction('onResizeEnd', widget);
