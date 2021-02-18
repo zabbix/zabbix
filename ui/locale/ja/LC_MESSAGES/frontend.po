@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:54+0200\n"
-"PO-Revision-Date: 2021-02-08 03:33+0300\n"
+"POT-Creation-Date: 2021-02-18 11:10+0200\n"
+"PO-Revision-Date: 2021-02-16 07:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,11 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1612748000.000000\n"
+"X-POOTLE-MTIME: 1613452100.000000\n"
 
 #: include/classes/items/CHelpItems.php:1087
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "\t仮想ディスクからの読み込みにかかる平均時間、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ディスクデバイスのインスタンス"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -1006,11 +1006,11 @@ msgstr "代わりに、手動でインストールすることができます:"
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "スワップ領域にスワップアウトされるゲストの物理メモリ量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "ゲストの物理メモリページをバックアップするために消費されたホストの物理メモリ量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: app/partials/popup.operations.php:379 app/views/popup.lldoverride.php:68
 #: include/triggers.inc.php:1283
@@ -1251,8 +1251,8 @@ msgstr "少なくとも1つのUI要素をチェックしてください。"
 msgid "At least one action is mandatory."
 msgstr "少なくとも1つのアクションが必要です。"
 
-#: include/classes/api/services/CUser.php:550
-#: include/classes/api/services/CUser.php:1163
+#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:1161
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
 msgstr "少なくとも1人の有効なユーザーを役割\"%1$s\"と共に指定してください。"
@@ -1344,7 +1344,7 @@ msgstr "認証"
 msgid "Authentication algorithm"
 msgstr "認証アルゴリズム"
 
-#: include/classes/api/services/CUser.php:1799
+#: include/classes/api/services/CUser.php:1797
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "認証に失敗しました：%1$s。"
@@ -1394,7 +1394,7 @@ msgstr "自動"
 msgid "Auto-login"
 msgstr "自動ログイン (1ヶ月)"
 
-#: include/classes/api/services/CUser.php:896
+#: include/classes/api/services/CUser.php:895
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "自動ログインと自動ログアウトを同時に有効にすることはできません。"
 
@@ -1460,11 +1460,11 @@ msgstr "軽度の障害"
 
 #: include/classes/items/CHelpItems.php:1083
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "収集間隔内の仮想ディスクへの未処理の読み込みリクエスト数の平均、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ディスクデバイスのインスタンス"
 
 #: include/classes/items/CHelpItems.php:1103
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリクエスト数の平均、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ディスクデバイスのインスタンス"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:293
 msgid "Axes"
@@ -1624,19 +1624,19 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/items/CHelpItems.php:983
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "スワップインのために待たされ消費されたCPU時間、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - CPUのインスタンス"
 
 #: include/classes/items/CHelpItems.php:843
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "電源管理やHTに依存したインターバル中のCPU使用率、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/items/CHelpItems.php:991
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:571
@@ -2054,7 +2054,7 @@ msgstr "ユーザの役割が作成できません"
 msgid "Cannot create widget: %1$s."
 msgstr "ウィジェットを作成できません：%1$s。"
 
-#: include/classes/api/services/CUser.php:1133
+#: include/classes/api/services/CUser.php:1132
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbixユーザー\"%1$s\"を削除できません。ユーザーを無効に設定してください。"
@@ -2627,7 +2627,7 @@ msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
 msgstr[0] "%1$sにあるモジュールをロードできません。"
 
-#: include/classes/api/services/CUser.php:1309
+#: include/classes/api/services/CUser.php:1307
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
@@ -8884,7 +8884,7 @@ msgstr "メディアタイプIDが正しくありません。"
 
 #: include/classes/api/clients/CLocalApiClient.php:79
 #: include/classes/api/services/CSettings.php:102
-#: include/classes/api/services/CUser.php:1463
+#: include/classes/api/services/CUser.php:1461
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "メソッド\"%1$s.%2$s\"が正しくありません。"
@@ -9089,10 +9089,10 @@ msgstr "マップ\"%1$s\"の指定されたユーザーグループIDが正し�
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"の指定されたユーザーグループIDが正しくありません。"
 
-#: include/classes/api/services/CUser.php:1361
-#: include/classes/api/services/CUser.php:1375
-#: include/classes/api/services/CUser.php:1406
-#: include/classes/api/services/CUser.php:1794
+#: include/classes/api/services/CUser.php:1359
+#: include/classes/api/services/CUser.php:1373
+#: include/classes/api/services/CUser.php:1404
+#: include/classes/api/services/CUser.php:1792
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:83
 msgid "Incorrect user name or password or account is temporarily blocked."
 msgstr "不正なユーザー名やパスワードまたはアカウントは一時的にブロックされます。"
@@ -9390,7 +9390,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/api/services/CTriggerGeneral.php:738
 #: include/classes/api/services/CTriggerGeneral.php:744
 #: include/classes/api/services/CUserGroup.php:470
-#: include/classes/api/services/CUser.php:643
+#: include/classes/api/services/CUser.php:642
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CLineGraphDraw.php:250
@@ -9695,7 +9695,7 @@ msgstr "日付が正しくありません。"
 msgid "Invalid email address \"%1$s\"."
 msgstr "メールアドレス\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CUser.php:818
+#: include/classes/api/services/CUser.php:817
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが正しくありません。"
@@ -9811,8 +9811,8 @@ msgstr "パラメータの数が正しくありません。"
 #: include/classes/api/services/CModule.php:298
 #: include/classes/api/services/CTriggerGeneral.php:1692
 #: include/classes/api/services/CTriggerGeneral.php:1708
-#: include/classes/api/services/CUser.php:792
-#: include/classes/api/services/CUser.php:803
+#: include/classes/api/services/CUser.php:791
+#: include/classes/api/services/CUser.php:802
 #: include/classes/helpers/CDashboardHelper.php:346
 #: include/classes/helpers/CDashboardHelper.php:353
 #: include/classes/helpers/CDashboardHelper.php:361
@@ -10505,7 +10505,7 @@ msgstr "ラベルの位置"
 msgid "Language"
 msgstr "言語"
 
-#: include/classes/api/services/CUser.php:659
+#: include/classes/api/services/CUser.php:658
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr "言語\"%1$s\"はサポートしていません。"
@@ -10928,7 +10928,7 @@ msgstr "ログインの試行"
 msgid "Login blocking interval"
 msgstr "ログインブロックの間隔"
 
-#: include/classes/api/services/CUser.php:1399
+#: include/classes/api/services/CUser.php:1397
 msgid "Login failed."
 msgstr "ログイン失敗。"
 
@@ -11336,7 +11336,7 @@ msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "表示できる最大の期間は%1$s日です。"
 
-#: include/classes/api/services/CUser.php:825
+#: include/classes/api/services/CUser.php:824
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが最大長を超えています。"
@@ -11410,7 +11410,7 @@ msgstr "メディアタイプのテストに成功しました。"
 msgid "Media type updated"
 msgstr "メディアタイプを更新しました"
 
-#: include/classes/api/services/CUser.php:749
+#: include/classes/api/services/CUser.php:748
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のメディアタイプは使用できません。"
@@ -11999,7 +11999,7 @@ msgstr "スクリプト実行のためのネットワークタイムアウト"
 
 #: include/classes/items/CHelpItems.php:1067
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
-msgstr ""
+msgstr "インターバル中のネットワーク使用率(送信レートと受信レートの組み合わせ)、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ネットワークインターフェースのインスタンス"
 
 #: app/views/administration.proxy.list.php:157 include/func.inc.php:191
 msgid "Never"
@@ -12413,8 +12413,8 @@ msgstr "新しいモジュールは見つかりませんでした"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "相関関係\"%1$s\"に実行内容のタイプが定義されていません。"
 
-#: include/classes/api/services/CUser.php:1381
-#: include/classes/api/services/CUser.php:1809
+#: include/classes/api/services/CUser.php:1379
+#: include/classes/api/services/CUser.php:1807
 msgid "No permissions for system access."
 msgstr "システムへのアクセス権がありません。"
 
@@ -12582,7 +12582,7 @@ msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
 #: include/classes/api/services/CUserMacro.php:491
 #: include/classes/api/services/CUserMacro.php:870
 #: include/classes/api/services/CUser.php:486
-#: include/classes/api/services/CUser.php:1121
+#: include/classes/api/services/CUser.php:1120
 #: include/classes/api/services/CValueMap.php:247
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/helpers/CMapHelper.php:82
@@ -12798,7 +12798,7 @@ msgstr "CPU数。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
-msgstr ""
+msgstr "使用可能なDSパスの数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<datastore> - データストア名、<partitionid> - vmware.hv.datastore.discoveryで取得した物理デバイスの内部ID"
 
 #: include/classes/items/CHelpItems.php:1167
 msgid "Number of enabled items on the host."
@@ -13843,7 +13843,7 @@ msgstr "ピーク時のメモリ使用量: %1$s"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "物理CPUへのアクセスが競合して仮想マシンが実行できない時間の割合、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:164
 msgid "Percentage"
@@ -13851,11 +13851,11 @@ msgstr "パーセンテージ"
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "消費されたホストの物理メモリの割合、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/items/CHelpItems.php:975
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "仮想マシンは準備できているが、物理CPUで実行するようスケジュールできなかった時間の割合、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - CPUのインスタンス"
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:145
 msgid "Percentile line (left)"
@@ -14038,7 +14038,7 @@ msgstr "POSTデータの形式"
 
 #: include/classes/items/CHelpItems.php:935
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
-msgstr ""
+msgstr "電力使用量、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<max> - 許容される電力使用量の最大"
 
 #: include/classes/setup/CSetupWizard.php:65
 #: include/classes/setup/CSetupWizard.php:564
@@ -15974,9 +15974,9 @@ msgstr "サービスの依存関係が循環設定されています。"
 msgid "Session initialization error."
 msgstr "セッション初期化エラー。"
 
-#: include/classes/api/services/CUser.php:1512
-#: include/classes/api/services/CUser.php:1526
-#: include/classes/api/services/CUser.php:1563
+#: include/classes/api/services/CUser.php:1510
+#: include/classes/api/services/CUser.php:1524
+#: include/classes/api/services/CUser.php:1561
 msgid "Session terminated, re-login, please."
 msgstr "セッションが切断されました。再度ログインしてください。"
 
@@ -17241,7 +17241,7 @@ msgstr "ディスカバリされたアプリケーションが見つかりませ
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "仮想ディスクへの書き込み平均時間、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ディスクデバイスのインスタンス"
 
 #: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -17567,7 +17567,7 @@ msgstr "トータルSQL時間: %1$s"
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "オペレーティングシステムがブートしてからの経過時間秒数、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/debug/CProfiler.php:147
 #, c-format
@@ -18510,27 +18510,27 @@ msgstr "ユーザー"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "ユーザー\"%1$s\"にユーザーグループを設定してください。"
 
-#: include/classes/api/services/CUser.php:1236
+#: include/classes/api/services/CUser.php:1234
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "ユーザー\"%1$s\"はダッシュボード\"%2$s\"の所有者です。"
 
-#: include/classes/api/services/CUser.php:1193
+#: include/classes/api/services/CUser.php:1191
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "ユーザー\"%1$s\"はマップ\"%2$s\"の所有者です。"
 
-#: include/classes/api/services/CUser.php:1206
+#: include/classes/api/services/CUser.php:1204
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "ユーザー\"%1$s\"はスクリーン\"%2$s\"の所有者です。"
 
-#: include/classes/api/services/CUser.php:1221
+#: include/classes/api/services/CUser.php:1219
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "ユーザー\"%1$s\"はスライドショー\"%2$s\"の所有者です。"
 
-#: include/classes/api/services/CUser.php:1179
+#: include/classes/api/services/CUser.php:1177
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "ユーザー\"%1$s\"は\"%2$s\"アクション内で使用されています。"
@@ -18548,12 +18548,12 @@ msgid "User agent string"
 msgstr "ユーザーエージェント文字列"
 
 #: include/classes/api/services/CUserGroup.php:543
-#: include/classes/api/services/CUser.php:863
+#: include/classes/api/services/CUser.php:862
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
 #: app/views/administration.user.edit.php:362
-#: include/classes/api/services/CUser.php:850
+#: include/classes/api/services/CUser.php:849
 msgid "User cannot change own role."
 msgstr "ユーザーは自分の役割を変更できません。"
 
@@ -18630,7 +18630,7 @@ msgstr[0] "ユーザーグループを更新しました"
 #: include/classes/api/services/CDashboard.php:457
 #: include/classes/api/services/CScript.php:432
 #: include/classes/api/services/CSettings.php:285
-#: include/classes/api/services/CUser.php:625
+#: include/classes/api/services/CUser.php:624
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のユーザーグループは使用できません。"
@@ -18647,7 +18647,7 @@ msgstr "ID \"%1$s\"のユーザーグループは使用できません。"
 msgid "User groups"
 msgstr "ユーザーグループ"
 
-#: include/classes/api/services/CUser.php:1128
+#: include/classes/api/services/CUser.php:1127
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
 
@@ -18702,7 +18702,7 @@ msgstr[0] "ユーザーの役割を削除しました"
 msgid "User role updated"
 msgstr "ユーザーの役割を更新しました"
 
-#: include/classes/api/services/CUser.php:680
+#: include/classes/api/services/CUser.php:679
 #, c-format
 msgid "User role with ID \"%1$s\" is not available."
 msgstr "ID\"%1$s\"のユーザーの役割は存在しません。"
@@ -18763,7 +18763,7 @@ msgstr "ユーザーを更新しました"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のユーザーは使用できません。"
 
-#: include/classes/api/services/CUser.php:584
+#: include/classes/api/services/CUser.php:583
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
 msgstr "アカウント名\"%1$s\"を持つユーザーがすでに存在します。"
@@ -19942,7 +19942,7 @@ msgstr "DNS名を指定してください"
 msgid "a boolean is expected"
 msgstr "論理値で指定してください"
 
-#: include/classes/api/services/CUser.php:792
+#: include/classes/api/services/CUser.php:791
 #: include/classes/import/validators/CXmlValidatorGeneral.php:240
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:282
@@ -20269,8 +20269,8 @@ msgstr "変更できません"
 #: include/classes/api/services/CTriggerGeneral.php:738
 #: include/classes/api/services/CUserGroup.php:470
 #: include/classes/api/services/CUserMacro.php:795
-#: include/classes/api/services/CUser.php:643
-#: include/classes/api/services/CUser.php:803
+#: include/classes/api/services/CUser.php:642
+#: include/classes/api/services/CUser.php:802
 #: include/classes/import/CConfigurationImport.php:781
 #: include/classes/import/CConfigurationImport.php:1007
 #: include/classes/import/CConfigurationImport.php:1174
@@ -21184,7 +21184,7 @@ msgstr "合計"
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - 期間Tでの合計値"
 
-#: include/classes/api/services/CUser.php:1799
+#: include/classes/api/services/CUser.php:1797
 msgid "supplied credentials are not unique"
 msgstr "指定された資格情報はユニークではありません"
 

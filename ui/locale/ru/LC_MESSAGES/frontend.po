@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:54+0200\n"
+"POT-Creation-Date: 2021-02-18 11:10+0200\n"
 "PO-Revision-Date: 2020-11-23 10:05+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1295,8 +1295,8 @@ msgstr "Необходимо выбрать по крайней мере оди�
 msgid "At least one action is mandatory."
 msgstr "По крайней мере одно действие обязательно."
 
-#: include/classes/api/services/CUser.php:550
-#: include/classes/api/services/CUser.php:1163
+#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:1161
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
 msgstr "По крайней мере один активный пользователь должен существовать с \"%1$s\" ролью."
@@ -1388,7 +1388,7 @@ msgstr "Аутентификация"
 msgid "Authentication algorithm"
 msgstr "Алгоритм аутентификации"
 
-#: include/classes/api/services/CUser.php:1799
+#: include/classes/api/services/CUser.php:1797
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "Ошибка при аутентификации: %1$s."
@@ -1438,7 +1438,7 @@ msgstr "Авто"
 msgid "Auto-login"
 msgstr "Авто-вход"
 
-#: include/classes/api/services/CUser.php:896
+#: include/classes/api/services/CUser.php:895
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Опции авто-вход и авто-выход нельзя активировать вместе."
 
@@ -2106,7 +2106,7 @@ msgstr "Не удалось создать роль пользователя"
 msgid "Cannot create widget: %1$s."
 msgstr "Не удалось создать виджет: %1$s."
 
-#: include/classes/api/services/CUser.php:1133
+#: include/classes/api/services/CUser.php:1132
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Невозможно удалить внутреннего пользователя Zabbix \"%1$s\", попробуйте отключить его."
@@ -2747,7 +2747,7 @@ msgstr[0] "Не удалось загрузить модуль с: %1$s."
 msgstr[1] "Не удалось загрузить модули с: %1$s."
 msgstr[2] "Не удалось загрузить модули с: %1$s."
 
-#: include/classes/api/services/CUser.php:1309
+#: include/classes/api/services/CUser.php:1307
 msgid "Cannot logout."
 msgstr "Не удалось выполнить выход."
 
@@ -9042,7 +9042,7 @@ msgstr "Некорректный ID типа оповещений."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
 #: include/classes/api/services/CSettings.php:102
-#: include/classes/api/services/CUser.php:1463
+#: include/classes/api/services/CUser.php:1461
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Некорректный метод \"%1$s.%2$s\"."
@@ -9247,10 +9247,10 @@ msgstr "Указано некорректное значение ID группы
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
 msgstr "Указано некорректное значение ID группы пользователей у комплексного экрана \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1361
-#: include/classes/api/services/CUser.php:1375
-#: include/classes/api/services/CUser.php:1406
-#: include/classes/api/services/CUser.php:1794
+#: include/classes/api/services/CUser.php:1359
+#: include/classes/api/services/CUser.php:1373
+#: include/classes/api/services/CUser.php:1404
+#: include/classes/api/services/CUser.php:1792
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:83
 msgid "Incorrect user name or password or account is temporarily blocked."
 msgstr "Некорректные имя пользователя или пароль или аккаунт временно заблокирован."
@@ -9548,7 +9548,7 @@ msgstr "Некорректное значение для \"%1$s\" поля."
 #: include/classes/api/services/CTriggerGeneral.php:738
 #: include/classes/api/services/CTriggerGeneral.php:744
 #: include/classes/api/services/CUserGroup.php:470
-#: include/classes/api/services/CUser.php:643
+#: include/classes/api/services/CUser.php:642
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CLineGraphDraw.php:250
@@ -9853,7 +9853,7 @@ msgstr "Ошибочная дата."
 msgid "Invalid email address \"%1$s\"."
 msgstr "Ошибочный email адрес \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:818
+#: include/classes/api/services/CUser.php:817
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ошибочный email адрес у способа оповещения с ID \"%1$s\"."
@@ -9969,8 +9969,8 @@ msgstr "Ошибочное количество параметров."
 #: include/classes/api/services/CModule.php:298
 #: include/classes/api/services/CTriggerGeneral.php:1692
 #: include/classes/api/services/CTriggerGeneral.php:1708
-#: include/classes/api/services/CUser.php:792
-#: include/classes/api/services/CUser.php:803
+#: include/classes/api/services/CUser.php:791
+#: include/classes/api/services/CUser.php:802
 #: include/classes/helpers/CDashboardHelper.php:346
 #: include/classes/helpers/CDashboardHelper.php:353
 #: include/classes/helpers/CDashboardHelper.php:361
@@ -10671,7 +10671,7 @@ msgstr "Расположение подписи"
 msgid "Language"
 msgstr "Язык"
 
-#: include/classes/api/services/CUser.php:659
+#: include/classes/api/services/CUser.php:658
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr "Язык \"%1$s\" не поддерживается."
@@ -11106,7 +11106,7 @@ msgstr "Попыток входа в систему"
 msgid "Login blocking interval"
 msgstr "Интервал блокировки входа в систему"
 
-#: include/classes/api/services/CUser.php:1399
+#: include/classes/api/services/CUser.php:1397
 msgid "Login failed."
 msgstr "Ошибка входа."
 
@@ -11516,7 +11516,7 @@ msgstr[0] "Максимальный период времени отображе
 msgstr[1] "Максимальный период времени отображения %1$s дня."
 msgstr[2] "Максимальный период времени отображения %1$s дней."
 
-#: include/classes/api/services/CUser.php:825
+#: include/classes/api/services/CUser.php:824
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "Превышена максимальная длина email адреса у способа оповещения с ID \"%1$s\"."
@@ -11596,7 +11596,7 @@ msgstr "Успешное тестирование способа оповеще�
 msgid "Media type updated"
 msgstr "Способ оповещений обновлен"
 
-#: include/classes/api/services/CUser.php:749
+#: include/classes/api/services/CUser.php:748
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "Способ оповещения с ID \"%1$s\" недоступен."
@@ -12609,8 +12609,8 @@ msgstr "Новые модули не обнаружены"
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Тип операции не задан для корреляции \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1381
-#: include/classes/api/services/CUser.php:1809
+#: include/classes/api/services/CUser.php:1379
+#: include/classes/api/services/CUser.php:1807
 msgid "No permissions for system access."
 msgstr "Нет прав доступа в систему."
 
@@ -12778,7 +12778,7 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 #: include/classes/api/services/CUserMacro.php:491
 #: include/classes/api/services/CUserMacro.php:870
 #: include/classes/api/services/CUser.php:486
-#: include/classes/api/services/CUser.php:1121
+#: include/classes/api/services/CUser.php:1120
 #: include/classes/api/services/CValueMap.php:247
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/helpers/CMapHelper.php:82
@@ -16178,9 +16178,9 @@ msgstr "Услуги образуют круговую зависимость."
 msgid "Session initialization error."
 msgstr "Ошибка инициализации сессии."
 
-#: include/classes/api/services/CUser.php:1512
-#: include/classes/api/services/CUser.php:1526
-#: include/classes/api/services/CUser.php:1563
+#: include/classes/api/services/CUser.php:1510
+#: include/classes/api/services/CUser.php:1524
+#: include/classes/api/services/CUser.php:1561
 msgid "Session terminated, re-login, please."
 msgstr "Сессия завершена, пожалуйста, зайдите повторно в систему."
 
@@ -18728,27 +18728,27 @@ msgstr "Пользователь"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "Пользователь \"%1$s\" не может быть без группы пользователей."
 
-#: include/classes/api/services/CUser.php:1236
+#: include/classes/api/services/CUser.php:1234
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "Пользователь \"%1$s\" владелец панели \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1193
+#: include/classes/api/services/CUser.php:1191
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "Пользователь \"%1$s\" является владельцем \"%2$s\" карты сети."
 
-#: include/classes/api/services/CUser.php:1206
+#: include/classes/api/services/CUser.php:1204
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "Пользователь \"%1$s\" является владельцем \"%2$s\" комплексного экрана."
 
-#: include/classes/api/services/CUser.php:1221
+#: include/classes/api/services/CUser.php:1219
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "Пользователь \"%1$s\" является владельцем \"%2$s\" слайд-шоу."
 
-#: include/classes/api/services/CUser.php:1179
+#: include/classes/api/services/CUser.php:1177
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "Пользователь \"%1$s\" используется в \"%2$s\" действии."
@@ -18766,12 +18766,12 @@ msgid "User agent string"
 msgstr "Строка user agent"
 
 #: include/classes/api/services/CUserGroup.php:543
-#: include/classes/api/services/CUser.php:863
+#: include/classes/api/services/CUser.php:862
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Пользователь не может добавить себя в отключенную группу или в группу с отключенным доступом к Веб-интерфейсу."
 
 #: app/views/administration.user.edit.php:362
-#: include/classes/api/services/CUser.php:850
+#: include/classes/api/services/CUser.php:849
 msgid "User cannot change own role."
 msgstr "Пользовать не может изменить свою роль."
 
@@ -18854,7 +18854,7 @@ msgstr[2] "Группы пользователей обновлены"
 #: include/classes/api/services/CDashboard.php:457
 #: include/classes/api/services/CScript.php:432
 #: include/classes/api/services/CSettings.php:285
-#: include/classes/api/services/CUser.php:625
+#: include/classes/api/services/CUser.php:624
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "Группа пользователей с ID \"%1$s\" недоступна."
@@ -18871,7 +18871,7 @@ msgstr "Группа пользователей с ID \"%1$s\" недоступ�
 msgid "User groups"
 msgstr "Группы пользователей"
 
-#: include/classes/api/services/CUser.php:1128
+#: include/classes/api/services/CUser.php:1127
 msgid "User is not allowed to delete himself."
 msgstr "Пользователю не разрешается удалять самого себя."
 
@@ -18928,7 +18928,7 @@ msgstr[2] "Ролей пользователей удалено"
 msgid "User role updated"
 msgstr "Роль пользователей обновлена"
 
-#: include/classes/api/services/CUser.php:680
+#: include/classes/api/services/CUser.php:679
 #, c-format
 msgid "User role with ID \"%1$s\" is not available."
 msgstr "Роль пользователей с ID \"%1$s\" недоступна."
@@ -18991,7 +18991,7 @@ msgstr "Пользователь обновлен"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "Пользователь с ID \"%1$s\" недоступен."
 
-#: include/classes/api/services/CUser.php:584
+#: include/classes/api/services/CUser.php:583
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
 msgstr "Пользователь с \"%1$s\" псевдонимом уже существует."
@@ -20176,7 +20176,7 @@ msgstr "ожидается DNS имя"
 msgid "a boolean is expected"
 msgstr "ожидается логическое"
 
-#: include/classes/api/services/CUser.php:792
+#: include/classes/api/services/CUser.php:791
 #: include/classes/import/validators/CXmlValidatorGeneral.php:240
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:282
@@ -20503,8 +20503,8 @@ msgstr "нельзя изменить"
 #: include/classes/api/services/CTriggerGeneral.php:738
 #: include/classes/api/services/CUserGroup.php:470
 #: include/classes/api/services/CUserMacro.php:795
-#: include/classes/api/services/CUser.php:643
-#: include/classes/api/services/CUser.php:803
+#: include/classes/api/services/CUser.php:642
+#: include/classes/api/services/CUser.php:802
 #: include/classes/import/CConfigurationImport.php:781
 #: include/classes/import/CConfigurationImport.php:1007
 #: include/classes/import/CConfigurationImport.php:1174
@@ -21418,7 +21418,7 @@ msgstr "сумма"
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - Сумма значений за период Т"
 
-#: include/classes/api/services/CUser.php:1799
+#: include/classes/api/services/CUser.php:1797
 msgid "supplied credentials are not unique"
 msgstr "заданная учётная запись не уникальна"
 

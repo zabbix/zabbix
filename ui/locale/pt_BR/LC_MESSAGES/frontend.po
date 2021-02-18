@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 19:54+0200\n"
-"PO-Revision-Date: 2021-01-25 12:15+0300\n"
+"POT-Creation-Date: 2021-02-18 11:10+0200\n"
+"PO-Revision-Date: 2021-02-15 12:59+0300\n"
 "Last-Translator: Marlon <Marlon@outlook.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1611569707.000000\n"
+"X-POOTLE-MTIME: 1613386754.000000\n"
 
 #: include/classes/items/CHelpItems.php:1087
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1275,8 +1275,8 @@ msgstr "Pelo menos um elemento da UI precisa ser selecionado."
 msgid "At least one action is mandatory."
 msgstr "Pelo menos uma ação é obrigatória."
 
-#: include/classes/api/services/CUser.php:550
-#: include/classes/api/services/CUser.php:1163
+#: include/classes/api/services/CUser.php:549
+#: include/classes/api/services/CUser.php:1161
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
 msgstr "Pelo menos um usuário ativo precisa existir com a função \"%1$s\"."
@@ -1369,7 +1369,7 @@ msgstr "Autenticação"
 msgid "Authentication algorithm"
 msgstr "Algoritmo de autenticação"
 
-#: include/classes/api/services/CUser.php:1799
+#: include/classes/api/services/CUser.php:1797
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "Falha de autenticação: %1$s."
@@ -1419,7 +1419,7 @@ msgstr "Auto"
 msgid "Auto-login"
 msgstr "Login automático"
 
-#: include/classes/api/services/CUser.php:896
+#: include/classes/api/services/CUser.php:895
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "Não é possível habilitar as opções de login automático e logout automático ao mesmo tempo."
 
@@ -2084,7 +2084,7 @@ msgstr "Não foi possível criar função do usuário"
 msgid "Cannot create widget: %1$s."
 msgstr "Não foi possível criar o widget: %1$s."
 
-#: include/classes/api/services/CUser.php:1133
+#: include/classes/api/services/CUser.php:1132
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Não é possível excluir o usuário interno do Zabbix \"%1$s\", tente desabilitar esse usuário."
@@ -2688,10 +2688,10 @@ msgstr "Não foi possível vincular ao template."
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível carregar o módulo em: %1$s."
+msgstr[1] "Não foi possível carregar os módulos em: %1$s."
 
-#: include/classes/api/services/CUser.php:1309
+#: include/classes/api/services/CUser.php:1307
 msgid "Cannot logout."
 msgstr "Não foi possível desconectar a sessão."
 
@@ -3169,13 +3169,13 @@ msgstr "Usuário não foi atualizado"
 #: app/controllers/CControllerUsergroupUpdate.php:105
 msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível atualizar grupo de usuário"
+msgstr[1] "Não foi possível atualizar grupos de usuário"
 
 #: app/controllers/CControllerUserroleUpdate.php:93
 #: app/controllers/CControllerUserroleUpdate.php:157
 msgid "Cannot update user role"
-msgstr ""
+msgstr "Não foi possível atualizar função do usuário"
 
 #: app/controllers/CControllerValuemapUpdate.php:44
 #: app/controllers/CControllerValuemapUpdate.php:102
@@ -3243,7 +3243,7 @@ msgstr "Modificar"
 
 #: app/views/administration.autoreg.edit.php:80
 msgid "Change PSK"
-msgstr ""
+msgstr "Alterar PSK"
 
 #: app/views/administration.authentication.edit.php:81
 #: app/views/administration.mediatype.edit.php:138
@@ -3261,7 +3261,7 @@ msgstr "Mudar severidade"
 
 #: include/classes/html/CMacroValue.php:162
 msgid "Change type"
-msgstr ""
+msgstr "Alterar tipo"
 
 #: include/forms.inc.php:194 include/items.inc.php:128
 #: include/views/configuration.item.edit.php:655
@@ -3301,7 +3301,7 @@ msgstr "Verifique a expressão a partir de \"%1$s\"."
 
 #: include/items.inc.php:1855
 msgid "Check for error in JSON"
-msgstr ""
+msgstr "Verifique por erro no JSON"
 
 #: include/items.inc.php:1859
 msgid "Check for error in XML"
@@ -4168,15 +4168,15 @@ msgstr "Criar ação"
 
 #: include/classes/helpers/CRoleHelper.php:480
 msgid "Create and edit dashboards and screens"
-msgstr ""
+msgstr "Criar e editar dashboards e telas"
 
 #: include/classes/helpers/CRoleHelper.php:485
 msgid "Create and edit maintenance"
-msgstr ""
+msgstr "Criar e editar manutenções"
 
 #: include/classes/helpers/CRoleHelper.php:481
 msgid "Create and edit maps"
-msgstr ""
+msgstr "Criar e editar mapas"
 
 #: app/views/configuration.application.list.php:173
 msgid "Create application"
@@ -8972,7 +8972,7 @@ msgstr "ID inválido para o tipo de mídia."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
 #: include/classes/api/services/CSettings.php:102
-#: include/classes/api/services/CUser.php:1463
+#: include/classes/api/services/CUser.php:1461
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "Método incorreto \"%1$s.%2$s\"."
@@ -9177,10 +9177,10 @@ msgstr "O ID de grupo de usuários informado para o mapa \"%1$s\" é inválido."
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
 msgstr "Foi informado um ID de grupo de usuário inválido para a tela \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1361
-#: include/classes/api/services/CUser.php:1375
-#: include/classes/api/services/CUser.php:1406
-#: include/classes/api/services/CUser.php:1794
+#: include/classes/api/services/CUser.php:1359
+#: include/classes/api/services/CUser.php:1373
+#: include/classes/api/services/CUser.php:1404
+#: include/classes/api/services/CUser.php:1792
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:83
 msgid "Incorrect user name or password or account is temporarily blocked."
 msgstr ""
@@ -9478,7 +9478,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:738
 #: include/classes/api/services/CTriggerGeneral.php:744
 #: include/classes/api/services/CUserGroup.php:470
-#: include/classes/api/services/CUser.php:643
+#: include/classes/api/services/CUser.php:642
 #: include/classes/graphdraw/CLineGraphDraw.php:115
 #: include/classes/graphdraw/CLineGraphDraw.php:240
 #: include/classes/graphdraw/CLineGraphDraw.php:250
@@ -9784,7 +9784,7 @@ msgstr "Data inválida."
 msgid "Invalid email address \"%1$s\"."
 msgstr "Endereço de e-mail inválido: \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:818
+#: include/classes/api/services/CUser.php:817
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Endereço de e-mail inválido para o tipo de mídia com o ID \"%1$s\"."
@@ -9900,8 +9900,8 @@ msgstr "Quantidade de parâmetros inválida."
 #: include/classes/api/services/CModule.php:298
 #: include/classes/api/services/CTriggerGeneral.php:1692
 #: include/classes/api/services/CTriggerGeneral.php:1708
-#: include/classes/api/services/CUser.php:792
-#: include/classes/api/services/CUser.php:803
+#: include/classes/api/services/CUser.php:791
+#: include/classes/api/services/CUser.php:802
 #: include/classes/helpers/CDashboardHelper.php:346
 #: include/classes/helpers/CDashboardHelper.php:353
 #: include/classes/helpers/CDashboardHelper.php:361
@@ -10600,7 +10600,7 @@ msgstr "Localização do texto"
 msgid "Language"
 msgstr "Idioma"
 
-#: include/classes/api/services/CUser.php:659
+#: include/classes/api/services/CUser.php:658
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -11029,7 +11029,7 @@ msgstr ""
 msgid "Login blocking interval"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1399
+#: include/classes/api/services/CUser.php:1397
 msgid "Login failed."
 msgstr "Falha no login."
 
@@ -11438,7 +11438,7 @@ msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "O período máximo a ser exibido é de %1$s dia."
 msgstr[1] "O período máximo a ser exibido é de %1$s dias."
 
-#: include/classes/api/services/CUser.php:825
+#: include/classes/api/services/CUser.php:824
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "O tamanho máximo do endereço de e-mail foi excedito para o tipo de mídia com o ID \"%1$s\"."
@@ -11515,7 +11515,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "Mídia atualizada"
 
-#: include/classes/api/services/CUser.php:749
+#: include/classes/api/services/CUser.php:748
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "O tipo de mídia com o ID \"%1$s\" não está disponível."
@@ -12527,8 +12527,8 @@ msgstr ""
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Sem tipo de operação para o correlacionamento \"%1$s\"."
 
-#: include/classes/api/services/CUser.php:1381
-#: include/classes/api/services/CUser.php:1809
+#: include/classes/api/services/CUser.php:1379
+#: include/classes/api/services/CUser.php:1807
 msgid "No permissions for system access."
 msgstr "Sem permissão de acesso ao sistema."
 
@@ -12696,7 +12696,7 @@ msgstr ""
 #: include/classes/api/services/CUserMacro.php:491
 #: include/classes/api/services/CUserMacro.php:870
 #: include/classes/api/services/CUser.php:486
-#: include/classes/api/services/CUser.php:1121
+#: include/classes/api/services/CUser.php:1120
 #: include/classes/api/services/CValueMap.php:247
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/helpers/CMapHelper.php:82
@@ -16092,9 +16092,9 @@ msgstr "Os serviços formam uma dependência circular."
 msgid "Session initialization error."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1512
-#: include/classes/api/services/CUser.php:1526
-#: include/classes/api/services/CUser.php:1563
+#: include/classes/api/services/CUser.php:1510
+#: include/classes/api/services/CUser.php:1524
+#: include/classes/api/services/CUser.php:1561
 msgid "Session terminated, re-login, please."
 msgstr "Sessão terminada, conecte-se novamente por favor."
 
@@ -18635,27 +18635,27 @@ msgstr "Usuário"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "O usuário \"%1$s\" não pode ficar sem grupo."
 
-#: include/classes/api/services/CUser.php:1236
+#: include/classes/api/services/CUser.php:1234
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "O usuário \"%1$s\" é o proprietário do dashboad \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1193
+#: include/classes/api/services/CUser.php:1191
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "O usuário \"%1$s\" é o proprietário do mapa \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1206
+#: include/classes/api/services/CUser.php:1204
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "O usuário \"%1$s\" é o proprietário da tela \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1221
+#: include/classes/api/services/CUser.php:1219
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "O usuário \"%1$s\" é o proprietário da apresentação de telas \"%2$s\"."
 
-#: include/classes/api/services/CUser.php:1179
+#: include/classes/api/services/CUser.php:1177
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "O usuário \"%1$s\" é utilizado na ação \"%2$s\"."
@@ -18673,12 +18673,12 @@ msgid "User agent string"
 msgstr "Mensagem do agente de usuário"
 
 #: include/classes/api/services/CUserGroup.php:543
-#: include/classes/api/services/CUser.php:863
+#: include/classes/api/services/CUser.php:862
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Um usuário não pode se adicionar em um grupo desativado ou em um grupo com acesso à interface web desativado."
 
 #: app/views/administration.user.edit.php:362
-#: include/classes/api/services/CUser.php:850
+#: include/classes/api/services/CUser.php:849
 msgid "User cannot change own role."
 msgstr ""
 
@@ -18762,7 +18762,7 @@ msgstr[1] ""
 #: include/classes/api/services/CDashboard.php:457
 #: include/classes/api/services/CScript.php:432
 #: include/classes/api/services/CSettings.php:285
-#: include/classes/api/services/CUser.php:625
+#: include/classes/api/services/CUser.php:624
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "O grupo de usuários com o ID \"%1$s\" não está disponível."
@@ -18779,7 +18779,7 @@ msgstr "O grupo de usuários com o ID \"%1$s\" não está disponível."
 msgid "User groups"
 msgstr "Grupos de usuários"
 
-#: include/classes/api/services/CUser.php:1128
+#: include/classes/api/services/CUser.php:1127
 msgid "User is not allowed to delete himself."
 msgstr "Um usuário não pode excluir a sí próprio."
 
@@ -18835,7 +18835,7 @@ msgstr[1] ""
 msgid "User role updated"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:680
+#: include/classes/api/services/CUser.php:679
 #, c-format
 msgid "User role with ID \"%1$s\" is not available."
 msgstr ""
@@ -18897,7 +18897,7 @@ msgstr "Usuário atualizado"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "O usuário com o ID \"%1$s\" não está disponível."
 
-#: include/classes/api/services/CUser.php:584
+#: include/classes/api/services/CUser.php:583
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
 msgstr ""
@@ -20076,7 +20076,7 @@ msgstr ""
 msgid "a boolean is expected"
 msgstr "é aguardado um valor booleano"
 
-#: include/classes/api/services/CUser.php:792
+#: include/classes/api/services/CUser.php:791
 #: include/classes/import/validators/CXmlValidatorGeneral.php:240
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:282
@@ -20403,8 +20403,8 @@ msgstr "não pode ser modificado"
 #: include/classes/api/services/CTriggerGeneral.php:738
 #: include/classes/api/services/CUserGroup.php:470
 #: include/classes/api/services/CUserMacro.php:795
-#: include/classes/api/services/CUser.php:643
-#: include/classes/api/services/CUser.php:803
+#: include/classes/api/services/CUser.php:642
+#: include/classes/api/services/CUser.php:802
 #: include/classes/import/CConfigurationImport.php:781
 #: include/classes/import/CConfigurationImport.php:1007
 #: include/classes/import/CConfigurationImport.php:1174
@@ -21319,7 +21319,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - Total de valores em um período T"
 
-#: include/classes/api/services/CUser.php:1799
+#: include/classes/api/services/CUser.php:1797
 msgid "supplied credentials are not unique"
 msgstr "as credenciais informadas não são únicas"
 
