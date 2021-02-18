@@ -226,16 +226,23 @@ class CDashboardPage {
 	}
 
 	addWidget(widget) {
-		widget = new CDashboardWidget({
+		widget = {
 			...JSON.parse(JSON.stringify(widget)),
-			is_editable: this._options['editable'] && !this._options['kioskmode'],
-			cell_height: this._options['widget-height'],
-			cell_width: this._options['widget-width'],
+			defaults: this._data.widget_defaults[widget.type],
 			uniqueid: this._generateUniqueId(),
 			index: this._widgets.length,
-			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null,
-			defaults: this._data.widget_defaults[widget.type]
-		});
+			cell_height: this._options['widget-height'],
+			cell_width: this._options['widget-width'],
+			is_editable: this._options['editable'] && !this._options['kioskmode'],
+			dynamic_hostid: this._data.dashboard.dynamic_hostid !== null ? this._data.dashboard.dynamic_hostid : null
+		};
+
+		if (widget.defaults.iterator) {
+			widget = new CDashboardWidget(widget);
+		}
+		else {
+			widget = new CDashboardWidgetIterator(widget);
+		}
 
 		widget.on(WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK, (e) => {
 				const w = e.detail.target;

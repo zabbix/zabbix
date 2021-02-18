@@ -52,6 +52,7 @@ $availableJScripts = [
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.js' => '',
+	'class.dashboard.widget.iterator.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',

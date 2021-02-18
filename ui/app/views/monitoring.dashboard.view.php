@@ -34,6 +34,7 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.js');
+$this->addJsFile('class.dashboard.widget.iterator.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('multiselect.js');

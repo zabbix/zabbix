@@ -17,12 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-const WIDGET_EVENT_ITERATOR_PREVIOUS_PAGE_CLICK = 'iterator-previous-page-click';
-const WIDGET_EVENT_ITERATOR_NEXT_PAGE_CLICK     = 'iterator-next-page-click';
-const WIDGET_EVENT_EDIT_CLICK                   = 'edit-click';
-const WIDGET_EVENT_ENTER                        = 'enter';
-const WIDGET_EVENT_LEAVE                        = 'leave';
+const WIDGET_EVENT_EDIT_CLICK = 'edit-click';
+const WIDGET_EVENT_ENTER      = 'enter';
+const WIDGET_EVENT_LEAVE      = 'leave';
 
 class CDashboardWidget extends CBaseComponent {
 
