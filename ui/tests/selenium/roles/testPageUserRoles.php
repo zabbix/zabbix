@@ -78,6 +78,10 @@ class testPageUserRoles extends CWebTest {
 		array_shift($headers);
 		$this->assertEquals(['Name', '#', 'Users'], $headers);
 
+		// Forms fields.
+		$this->assertEquals(['Name'], $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->getLabels()->asText());
+
+
 		// Check that non-sortable headers is not clickable.
 		foreach (['#', 'Users'] as $header) {
 			$this->assertFalse($table->query('xpath://th/a[text()="'.$header.'"]')->one(false)->isValid());
@@ -106,8 +110,21 @@ class testPageUserRoles extends CWebTest {
 		$roles_count = CDBHelper::getCount('SELECT roleid FROM role');
 		$this->assertTableStats($roles_count);
 
+		// Check filter collapse/expand.
+		foreach (['true', 'false'] as $status) {
+			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
+			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+		}
+
+		// Filters buttons are enabled.
+		$this->assertTrue($this->query('button:Apply')->one()->isEnabled());
+		$this->assertTrue($this->query('button:Reset')->one()->isEnabled());
+		$this->assertTrue($this->query('button:Create user role')->one()->isEnabled());
+
 		// Check selected rows counter.
+		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 		$this->query('id:all_roles')->asCheckbox()->one()->check();
+		$this->assertTrue($this->query('button:Delete')->one()->isEnabled());
 		$selected = $table->query('class:row-selected')->all()->count();
 		$this->assertEquals($roles_count-1, $selected);
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
@@ -208,22 +225,9 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function testPageUserRoles_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
-
-		// Check filter collapse/expand.
-		foreach (['true', 'false'] as $status) {
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
-		}
-
-		$before_filtering = $this->getTableResult('Name');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Name' => $data['name']])->submit();
 		$this->assertTableDataColumn($data['result'], 'Name');
-
-		// Check that result reseted and Name field is empty after pressing reset button.
-		$this->query('button:Reset')->one()->click();
-		$form->checkValue('Name', '');
-		$this->assertTableDataColumn($before_filtering, 'Name');
 	}
 
 	public static function getDeleteData() {
@@ -232,7 +236,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user roles',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted',
+					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
 					'roles' => [
 						'Admin role',
 						'Remove_role_1'
@@ -291,7 +295,6 @@ class testPageUserRoles extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$before_delete = $this->getTableResult('Name');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 
 		foreach ($data['roles'] as $role) {
 			if ($role === 'All') {
@@ -307,16 +310,16 @@ class testPageUserRoles extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// After deleting role check role list and database.
-		if ($data['expected'] === TEST_GOOD) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
+		}
+		else {
 			$this->assertMessage(TEST_GOOD, $data['message_header']);
 			$after_delete = array_values(array_diff($before_delete, $data['roles']));
 			$this->assertTableDataColumn($after_delete, 'Name');
 			foreach ($data['roles'] as $role_name) {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM role WHERE name='.zbx_dbstr($role_name)));
 			}
-		}
-		else {
-			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
 		}
 	}
 
