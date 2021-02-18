@@ -403,7 +403,19 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
-			]
+			],
+			'dashboard' => [
+				'title' => _('Dashboards'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'dashboardid,name',
+				'form' => [
+					'name' => 'dashboardform',
+					'id' => 'dashboards'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
 		];
 	}
 
@@ -1344,6 +1356,17 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'dashboard':
+				$options += [
+					'output' => ['dashboardid', 'name'],
+					'preservekeys' => true
+				];
+
+				$records = API::Dashboard()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
 				break;
 		}
 
