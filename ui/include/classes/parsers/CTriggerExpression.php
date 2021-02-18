@@ -545,28 +545,6 @@ class CTriggerExpression {
 	}
 
 	/**
-	 * Returns a list of unique hosts used in a parsed trigger expression, or an empty array if the expression is
-	 * invalid.
-	 *
-	 * @return array
-	 */
-	public function getHosts(): array {
-		$hosts = [];
-		if ($this->is_valid) {
-			foreach ($this->result->getTokens() as $param) {
-				if ($param instanceof CQueryParserResult) {
-					$hosts[] = $param->host;
-				}
-				elseif ($param instanceof CFunctionParserResult) {
-					$hosts = array_merge($hosts, $param->getHosts());
-				}
-			}
-		}
-
-		return array_keys(array_flip($hosts));
-	}
-
-	/**
 	 * Parse the string using the given parser. If a match has been found, move the cursor to the last symbol of the
 	 * matched string.
 	 *

@@ -1878,16 +1878,19 @@ function get_item_function_info($expr) {
 	];
 
 	$functions = [
+		'abs' => $rules['numeric_as_float'],
 		'avg' => $rules['numeric_as_float'],
 		'band' => $rules['integer'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'date' => $rules['date'],
 		'dayofmonth' => $rules['day_of_month'],
 		'dayofweek' => $rules['day_of_week'],
+		'find' => $rules['string_as_0or1'],
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'iregexp' => $rules['string_as_0or1'],
 		'last' => $rules['numeric'] + $rules['string'],
+		'length' => $rules['numeric'] + $rules['string'],
 		'logeventid' => $rules['log_as_0or1'],
 		'logseverity' => $rules['log_as_uint'],
 		'logsource' => $rules['log_as_0or1'],
@@ -1936,7 +1939,7 @@ function get_item_function_info($expr) {
 
 			$host = API::Host()->get([
 				'output' => ['hostid'],
-				'filter' => ['host' => [$expr_part['host']]],
+				'filter' => ['host' => $expr_data->result->getHosts()[0]],
 				'templated_hosts' => true
 			]);
 
@@ -1947,9 +1950,9 @@ function get_item_function_info($expr) {
 
 			$item = API::Item()->get([
 				'output' => ['value_type'],
-				'hostids' => $host[0]['hostid'],
+				'hostids' => array_column($host, 'hostid'),
 				'filter' => [
-					'key_' => [$expr_part['item']]
+					'key_' => $expr_data->result->getItems()[0]
 				],
 				'webitems' => true
 			]);
@@ -1957,9 +1960,9 @@ function get_item_function_info($expr) {
 			if (!$item) {
 				$item = API::ItemPrototype()->get([
 					'output' => ['value_type'],
-					'hostids' => $host[0]['hostid'],
+					'hostids' => array_keys($hosts),
 					'filter' => [
-						'key_' => [$expr_part['item']]
+						'key_' => $item_keys
 					]
 				]);
 			}

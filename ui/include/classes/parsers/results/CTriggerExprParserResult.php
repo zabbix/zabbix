@@ -126,7 +126,11 @@ class CTriggerExprParserResult extends CParserResult {
 	 */
 	public function hasTokenOfType($type) {
 		foreach ($this->tokens as $token) {
-			if ($token['type'] == $type) { // TODO miks: $this->tokens may contain objects.
+			if ($type == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
+					&& $token instanceof CFunctionParserResult) {
+				return true;
+			}
+			elseif (is_array($token) && $token['type'] == $type) {
 				return true;
 			}
 		}
@@ -200,18 +204,30 @@ class CTriggerExprParserResult extends CParserResult {
 	}
 
 	/**
+	 * Return list item keys found in parsed trigger function.
+	 *
+	 * @return array
+	 */
+	public function getItems():array {
+		$items = [];
+		foreach ($this->tokens as $token) {
+			if ($token instanceof CFunctionParserResult) {
+				$items = array_merge($items, $token->getItems());
+			}
+		}
+
+		return array_keys(array_flip($items));
+	}
+	/**
 	 * Return list hosts found in parsed trigger expression.
 	 *
 	 * @return array
 	 */
 	public function getHosts():array {
 		$hosts = [];
-		foreach ($this->params_raw['parameters'] as $param) {
-			if ($param instanceof CFunctionParserResult) {
-				$hosts = array_merge($hosts, $param->getHosts());
-			}
-			elseif ($param instanceof CQueryParserResult) {
-				$hosts[] = $param->host;
+		foreach ($this->tokens as $token) {
+			if ($token instanceof CFunctionParserResult) {
+				$hosts = array_merge($hosts, $token->getHosts());
 			}
 		}
 

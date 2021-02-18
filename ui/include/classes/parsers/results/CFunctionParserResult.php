@@ -39,6 +39,25 @@ class CFunctionParserResult extends CParserResult {
 	}
 
 	/**
+	 * Return list items found in parsed trigger function.
+	 *
+	 * @return array
+	 */
+	public function getItems(): array {
+		$items = [];
+		foreach ($this->params_raw['parameters'] as $param) {
+			if ($param instanceof CFunctionParserResult) {
+				$items = array_merge($items, $param->getItems());
+			}
+			elseif ($param instanceof CQueryParserResult) {
+				$items[] = $param->item;
+			}
+		}
+
+		return array_keys(array_flip($items));
+	}
+
+	/**
 	 * Return list hosts found in parsed trigger function.
 	 *
 	 * @return array

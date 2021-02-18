@@ -636,7 +636,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$_db_triggers = $this->get([
 			'output' => ['expression', 'recovery_expression'],
 			'filter' => [
-				'host' => $expressionData->getHosts()[0],
+				'host' => $expressionData->result->getHosts()[0],
 				'description' => $trigger['description'],
 				'flags' => null
 			],
@@ -657,7 +657,7 @@ abstract class CTriggerGeneral extends CApiService {
 					&& $_db_trigger['recovery_expression'] === $trigger['recovery_expression']) {
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_params($error_already_exists, [$trigger['description'], $expressionData->getHosts()[0]])
+					_params($error_already_exists, [$trigger['description'], $expressionData->result->getHosts()[0]])
 				);
 			}
 		}
@@ -1820,12 +1820,12 @@ abstract class CTriggerGeneral extends CApiService {
 			// Triggers with children cannot be moved from one template to another host or template.
 			if ($class === 'CTrigger' && $db_triggers !== null && $expressions_changed) {
 				$expressionData->parse($db_triggers[$tnum]['expression']);
-				$old_hosts1 = $expressionData->getHosts();
+				$old_hosts1 = $expressionData->result->getHosts();
 				$old_hosts2 = [];
 
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 					$expressionData->parse($db_triggers[$tnum]['recovery_expression']);
-					$old_hosts2 = $expressionData->getHosts();
+					$old_hosts2 = $expressionData->result->getHosts();
 				}
 
 				$is_moved = true;
