@@ -194,4 +194,7 @@ void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_funct
 int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error);
 void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const char *expression);
 
+char	*zbx_eval_format_function_error(const char *function, const char *host, const char *key,
+		const char *parameter, const char *error);
+
 #endif

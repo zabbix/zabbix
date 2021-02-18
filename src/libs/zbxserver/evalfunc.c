@@ -3570,8 +3570,12 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 			(resolved_params = zbx_dc_expand_user_macros_in_func_params(parameter, item.host.hostid)),
 			&ts, &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate function \"%s:%s.%s(%s)\": %s", host, key, function,
-				parameter, (NULL == error ? "item does not exist" : error));
+		char	*msg;
+
+		msg = zbx_eval_format_function_error(function, host, key, parameter,
+				(NULL == error ? "item does not exist" : error));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
+		zbx_free(msg);
 		ret = FAIL;
 	}
 	else

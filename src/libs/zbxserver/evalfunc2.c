@@ -333,7 +333,7 @@ static int	evaluate_LOGEVENTID(char **value, DC_ITEM *item, const char *paramete
 
 	if (SUCCEED != get_function_parameter_str(parameters, 1, &arg1))
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -426,7 +426,7 @@ static int	evaluate_LOGSOURCE(char **value, DC_ITEM *item, const char *parameter
 
 	if (SUCCEED != get_function_parameter_str(parameters, 1, &arg1))
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -682,19 +682,19 @@ static int	evaluate_COUNT(char **value, DC_ITEM *item, const char *parameters, c
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
 	if (2 <= nparams && SUCCEED != get_function_parameter_str(parameters, 2, &arg2))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
 	if (3 <= nparams && SUCCEED != get_function_parameter_str(parameters, 3, &arg3))
 	{
-		*error = zbx_strdup(*error, "invalid third parameter");
+		*error = zbx_strdup(*error, "invalid fourth parameter");
 		goto out;
 	}
 
@@ -974,7 +974,7 @@ static int	evaluate_SUM(char **value, DC_ITEM *item, const char *parameters, con
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1062,7 +1062,7 @@ static int	evaluate_AVG(char **value, DC_ITEM *item, const char *parameters, con
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1148,7 +1148,7 @@ static int	evaluate_LAST(char **value, DC_ITEM *item, const char *parameters, co
 
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift))
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1243,7 +1243,7 @@ static int	evaluate_MIN(char **value, DC_ITEM *item, const char *parameters, con
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1343,7 +1343,7 @@ static int	evaluate_MAX(char **value, DC_ITEM *item, const char *parameters, con
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1462,7 +1462,7 @@ static int	evaluate_PERCENTILE(char **value, DC_ITEM *item, const char *paramete
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1484,7 +1484,7 @@ static int	evaluate_PERCENTILE(char **value, DC_ITEM *item, const char *paramete
 	if (SUCCEED != get_function_parameter_float(parameters, 2, ZBX_FLAG_DOUBLE_PLAIN, &percentage) ||
 			0.0 > percentage || 100.0 < percentage)
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
@@ -1560,14 +1560,14 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 	if (SUCCEED != get_function_parameter_int(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) ||
 			ZBX_VALUE_SECONDS != arg1_type || 0 >= arg1)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
 	if (1 < num && (SUCCEED != get_function_parameter_str(parameters, 2, &arg2) ||
 			('\0' != *arg2 && 0 != (lazy = strcmp("strict", arg2)))))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
@@ -1674,7 +1674,7 @@ static int	evaluate_FUZZYTIME(char **value, DC_ITEM *item, const char *parameter
 
 	if (SUCCEED != get_function_parameter_int(parameters, 1, ZBX_PARAM_MANDATORY, &arg1, &arg1_type) || 0 >= arg1)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
@@ -1761,7 +1761,7 @@ static int	evaluate_BAND(char **value, DC_ITEM *item, const char *parameters, co
 
 	if (SUCCEED != get_function_parameter_uint64(parameters, 2, &mask))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto clean;
 	}
 
@@ -1831,14 +1831,14 @@ static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
 	if (SUCCEED != get_function_parameter_int(parameters, 2, ZBX_PARAM_MANDATORY, &time, &time_type) ||
 			ZBX_VALUE_SECONDS != time_type)
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
@@ -1847,7 +1847,7 @@ static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters
 		if (SUCCEED != get_function_parameter_str(parameters, 3, &fit_str) ||
 				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
 		{
-			*error = zbx_strdup(*error, "invalid third parameter");
+			*error = zbx_strdup(*error, "invalid fourth parameter");
 			goto out;
 		}
 	}
@@ -1861,7 +1861,7 @@ static int	evaluate_FORECAST(char **value, DC_ITEM *item, const char *parameters
 		if (SUCCEED != get_function_parameter_str(parameters, 4, &mode_str) ||
 				SUCCEED != zbx_mode_code(mode_str, &mode, error))
 		{
-			*error = zbx_strdup(*error, "invalid fourth parameter");
+			*error = zbx_strdup(*error, "invalid fifth parameter");
 			goto out;
 		}
 	}
@@ -1988,13 +1988,13 @@ static int	evaluate_TIMELEFT(char **value, DC_ITEM *item, const char *parameters
 	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift) ||
 			ZBX_VALUE_NONE == arg1_type)
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
 
 	if (SUCCEED != get_function_parameter_float( parameters, 2, ZBX_FLAG_DOUBLE_SUFFIX, &threshold))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto out;
 	}
 
@@ -2003,7 +2003,7 @@ static int	evaluate_TIMELEFT(char **value, DC_ITEM *item, const char *parameters
 		if (SUCCEED != get_function_parameter_str(parameters, 3, &fit_str) ||
 				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
 		{
-			*error = zbx_strdup(*error, "invalid third parameter");
+			*error = zbx_strdup(*error, "invalid fourth parameter");
 			goto out;
 		}
 	}
@@ -2118,12 +2118,6 @@ static int	evaluate_TREND(char **value, DC_ITEM *item, const char *func, const c
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != get_function_parameter_str(parameters, 1, &period))
-	{
-		*error = zbx_strdup(*error, "invalid first parameter");
-		goto out;
-	}
-
-	if (SUCCEED != get_function_parameter_str(parameters, 2, &period_shift))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;

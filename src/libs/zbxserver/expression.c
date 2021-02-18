@@ -5094,9 +5094,9 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 
 		if (SUCCEED != errcodes[i])
 		{
-			func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s(%s)\":"
-					" item does not exist.",
-					func->function, func->parameter);
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, NULL, NULL, func->parameter,
+					" item does not exist");
 			continue;
 		}
 
@@ -5104,17 +5104,17 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 
 		if (ITEM_STATUS_ACTIVE != items[i].status)
 		{
-			func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
-					" item is disabled.",
-					items[i].host.host, items[i].key_orig, func->function, func->parameter);
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
+					items[i].key_orig, func->parameter, " item is disabled");
 			continue;
 		}
 
 		if (HOST_STATUS_MONITORED != items[i].host.status)
 		{
-			func->error = zbx_dsprintf(func->error, "Cannot evaluate function \"%s:%s.%s(%s)\":"
-					" item belongs to a disabled host.",
-					items[i].host.host, items[i].key_orig, func->function, func->parameter);
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, items[i].host.host,
+					items[i].key_orig, func->parameter, " item belongs to a disabled host.");
 			continue;
 		}
 
@@ -5122,9 +5122,9 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 				FAIL == zbx_evaluatable_for_notsupported(func->function))
 		{
 			/* set 'unknown' error value */
-			zbx_variant_set_error(&func->value, zbx_dsprintf(NULL,
-					"Cannot evaluate function \"%s:%s.%s(%s)\": item is not supported.",
-					items[i].host.host, items[i].key_orig, func->function, func->parameter));
+			zbx_variant_set_error(&func->value,
+					zbx_eval_format_function_error(func->function, items[i].host.host,
+							items[i].key_orig, func->parameter, "item is not supported."));
 			continue;
 		}
 
@@ -5132,22 +5132,10 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs)
 				&error))
 		{
 			/* compose and store error message for future use */
-			if (NULL != error)
-			{
-				zbx_variant_set_error(&func->value, zbx_dsprintf(NULL,
-						"Cannot evaluate function \"%s:%s.%s(%s)\": %s.",
-						items[i].host.host, items[i].key_orig, func->function,
-						func->parameter, error));
-				zbx_free(error);
-			}
-			else
-			{
-				zbx_variant_set_error(&func->value, zbx_dsprintf(NULL,
-						"Cannot evaluate function \"%s:%s.%s(%s)\".",
-						items[i].host.host, items[i].key_orig,
-						func->function, func->parameter));
-			}
-
+			zbx_variant_set_error(&func->value,
+					zbx_eval_format_function_error(func->function, items[i].host.host,
+							items[i].key_orig, func->parameter, error));
+			zbx_free(error);
 			continue;
 		}
 
