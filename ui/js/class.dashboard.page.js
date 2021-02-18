@@ -1315,7 +1315,8 @@ class CDashboardPage {
 						pos.height -= w.pos.y - pos.y;
 						overlaps = (pos.height < w.pos.height || pos.y >= w.pos.y);
 					}
-					else {
+
+					if (overlaps) {
 						break;
 					}
 				}
