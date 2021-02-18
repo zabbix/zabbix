@@ -1252,11 +1252,11 @@ class CDashboardPage {
 
 	_sortWidgets(widgets) {
 		widgets
-			.sort((box1, box2) => {
-				return box1.pos.y - box2.pos.y;
+			.sort((w1, w2) => {
+				return w1.pos.y - w2.pos.y;
 			})
-			.forEach((box, index) => {
-				box.div.data('widget-index', index);
+			.forEach((w, index) => {
+				w.setIndex(index);
 			});
 
 		return widgets;
@@ -3318,7 +3318,7 @@ class CDashboardPage {
 			widget.div.remove();
 		}
 		else {
-			const index = widget.div.data('widget-index');
+			const index = widget.getIndex();
 
 			this._doAction('onWidgetDelete', widget);
 			this._removeWidgetActions(widget);
@@ -3327,7 +3327,7 @@ class CDashboardPage {
 			this._widgets.splice(index, 1);
 
 			for (let i = index; i < this._widgets.length; i++) {
-				this._widgets[i].div.data('widget-index', i);
+				this._widgets[i].setIndex(i);
 			}
 		}
 	}

@@ -57,7 +57,7 @@ class CDashboardWidget extends CBaseComponent {
 		this.defaults = defaults;
 		this.widgetid = widgetid;
 		this.uniqueid = uniqueid;
-		this.index = index;
+		this._index = index;
 		this.type = type;
 
 		// Replace empty arrays (or anything non-object) with empty objects.
@@ -267,6 +267,16 @@ class CDashboardWidget extends CBaseComponent {
 		}
 
 		return is_ready_updated;
+	}
+
+	getIndex() {
+		return this._index;
+	}
+
+	setIndex(index) {
+		this._index = index;
+
+		return this;
 	}
 
 	setViewMode(view_mode) {
