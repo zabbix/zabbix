@@ -138,4 +138,4 @@ where the method is run.
 ## Troubleshooting
 The plugin uses Zabbix agent's logs. You can increase debugging level of Zabbix Agent if you need more details about 
 what is happening.   
-Set the environment variable MGO_DEBUG to "1" in order to turn on verbose log messages for the MGO package.
+Set the DebugLevel configuration option to "5" (extended debugging) in order to turn on verbose log messages for the MGO package.
