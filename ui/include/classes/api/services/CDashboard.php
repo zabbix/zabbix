@@ -184,8 +184,8 @@ class CDashboard extends CDashboardGeneral {
 		}
 		unset($dashboard);
 
-		$this->updateDashboardUser($dashboards, false);
-		$this->updateDashboardUsrgrp($dashboards, false);
+		$this->updateDashboardUser($dashboards, __FUNCTION__);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, self::AUDIT_RESOURCE, $dashboards);
@@ -218,8 +218,8 @@ class CDashboard extends CDashboardGeneral {
 			DB::update('dashboard', $upd_dashboards);
 		}
 
-		$this->updateDashboardUser($dashboards, true);
-		$this->updateDashboardUsrgrp($dashboards, true);
+		$this->updateDashboardUser($dashboards, __FUNCTION__);
+		$this->updateDashboardUsrgrp($dashboards, __FUNCTION__);
 		$this->updatePages($dashboards, $db_dashboards);
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, self::AUDIT_RESOURCE, $dashboards, $db_dashboards);
@@ -487,10 +487,10 @@ class CDashboard extends CDashboardGeneral {
 	/**
 	 * Update table "dashboard_user".
 	 *
-	 * @param array $dashboards
-	 * @param bool  $update
+	 * @param array  $dashboards
+	 * @param string $method
 	 */
-	protected function updateDashboardUser(array $dashboards, bool $update): void {
+	protected function updateDashboardUser(array $dashboards, string $method): void {
 		$dashboards_users = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -509,7 +509,7 @@ class CDashboard extends CDashboardGeneral {
 			return;
 		}
 
-		$db_dashboard_users = $update
+		$db_dashboard_users = ($method === 'update')
 			? DB::select('dashboard_user', [
 				'output' => ['dashboard_userid', 'dashboardid', 'userid', 'permission'],
 				'filter' => ['dashboardid' => array_keys($dashboards_users)]
@@ -579,10 +579,10 @@ class CDashboard extends CDashboardGeneral {
 	/**
 	 * Update table "dashboard_usrgrp".
 	 *
-	 * @param array $dashboards
-	 * @param bool  $update
+	 * @param array  $dashboards
+	 * @param string $method
 	 */
-	protected function updateDashboardUsrgrp(array $dashboards, bool $update): void {
+	protected function updateDashboardUsrgrp(array $dashboards, string $method): void {
 		$dashboards_usrgrps = [];
 
 		foreach ($dashboards as $dashboard) {
@@ -601,7 +601,7 @@ class CDashboard extends CDashboardGeneral {
 			return;
 		}
 
-		$db_dashboard_usrgrps = $update
+		$db_dashboard_usrgrps = ($method === 'update')
 			? DB::select('dashboard_usrgrp', [
 				'output' => ['dashboard_usrgrpid', 'dashboardid', 'usrgrpid', 'permission'],
 				'filter' => ['dashboardid' => array_keys($dashboards_usrgrps)]
