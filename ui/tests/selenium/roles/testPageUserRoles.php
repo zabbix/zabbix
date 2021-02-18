@@ -92,9 +92,9 @@ class testPageUserRoles extends CWebTest {
 		$name_header->click();
 
 		// Check that check boxes for all roles are enabled except Super admin.
-		$roleids = CDBHelper::getAll('SELECT roleid FROM role');
+		$roleids = CDBHelper::getAll('SELECT roleid, name FROM role');
 		foreach ($roleids as $id) {
-			if ($id['roleid'] === '3') {
+			if ($id['name'] === 'Super admin role') {
 				$this->assertFalse($this->query('id:roleids_'.$id['roleid'])->one()->isEnabled());
 			}
 			else {
@@ -103,17 +103,18 @@ class testPageUserRoles extends CWebTest {
 		}
 
 		// Check number of displayed user roles.
-		$this->assertTableStats(CDBHelper::getCount('SELECT roleid FROM role'));
+		$roles_count = CDBHelper::getCount('SELECT roleid FROM role');
+		$this->assertTableStats($roles_count);
 
 		// Check selected rows counter.
 		$this->query('id:all_roles')->asCheckbox()->one()->check();
 		$selected = $table->query('class:row-selected')->all()->count();
-		$this->assertEquals(7, $selected);
+		$this->assertEquals($roles_count-1, $selected);
 		$this->assertEquals($selected.' selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check that number displayed near Users and # columns are equal.
 		foreach ($table->getRows() as $row) {
-			$users_count = $row->getColumn('Users')->query('xpath:./*[contains(@class, "link-alt")]')->count();
+			$users_count = $row->getColumn('Users')->query('xpath:./a[contains(@class, "link-alt")]')->count();
 			if ($users_count !== 0) {
 				$users_amount = $row->getColumn('#')->query('xpath:./sup')->one()->getText();
 				$this->assertEquals($users_count, intval($users_amount));
