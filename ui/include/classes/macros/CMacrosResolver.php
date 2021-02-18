@@ -1130,7 +1130,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		foreach ($triggers as $triggerid => &$trigger) {
 			foreach ($options['sources'] as $source) {
-				if ($trigger[$source] === '' || ($result = $expression_data->parse($trigger[$source])) === false) {
+				if ($trigger[$source] === '' || $expression_data->parse($trigger[$source]) === false) {
 					continue;
 				}
 
@@ -1162,7 +1162,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	private static function makeTriggerExpression(string $source, CTriggerExprParserResult $expression_data,
-			array $macro_values, array $usermacro_values, array $options): array {
+			array &$macro_values, array &$usermacro_values, array $options): array {
 		$expression = [];
 		$pos_left = 0;
 
@@ -1208,9 +1208,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		return $expression;
 	}
 
-	private static function makeTriggerFunctionExpression(CFunctionParserResult $fn, array $macro_values,
-			array $usermacro_values, array $options) {
-		$left = $fn->params_raw['pos'] + 1;
+	private static function makeTriggerFunctionExpression(CFunctionParserResult $fn, array &$macro_values,
+			array &$usermacro_values, array $options) {
+		$left = $fn->params_raw['pos'] + $fn->pos + 1;
 		$expression = [];
 
 		$parameters_str = $fn->parameters;
@@ -1228,8 +1228,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 			elseif ($param instanceof CFunctionParserResult) {
 				array_unshift($expression, self::makeTriggerFunctionExpression($param, $macro_values, $usermacro_values,
-					$options)
-				);
+					$options
+				));
 			}
 		}
 
