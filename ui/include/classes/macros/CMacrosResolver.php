@@ -885,15 +885,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($options['sources'] as $source) {
 				if ($trigger[$source] !== '' && $expression_data->parse($trigger[$source]) !== false) {
 					// TODO miks: both objects and arrays can be mixed. Would be nice to rework to objects only.
-					$functionid_macros = array_map(function ($macro) {
+					$functionid_macros = array_merge($functionid_macros, array_map(function ($macro) {
 						return ($macro instanceof CFunctionIdParserResult) ? $macro->match : $macro['value'];
-					}, $expression_data->result->getFunctionIds());
+					}, $expression_data->result->getFunctionIds()));
 
 					/*
 					 * TODO miks: $texts should contain also tokens of type CTriggerExprParserResult::TOKEN_TYPE_STRING.
 					 * Add once it is clear if I can rework old array tokens as objects.
 					 */
-					$texts = array_column($expression_data->result->getUserMacros(), 'value');
+					$texts = array_merge($texts, array_column($expression_data->result->getUserMacros(), 'value'));
 				}
 			}
 
@@ -1134,8 +1134,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					continue;
 				}
 
-				$expression = self::makeTriggerExpression($expression_data->result, $macro_values[$triggerid],
-					$usermacro_values[$triggerid], $options
+				$expression = self::makeTriggerExpression($trigger[$source], $expression_data->result,
+					$macro_values[$triggerid], $usermacro_values[$triggerid], $options
 				);
 				$trigger[$source] = $options['html'] ? $expression : implode('', $expression);
 			}
@@ -1151,29 +1151,58 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @static
 	 *
 	 * @param CTriggerExprParserResult $expression_data
-	 * @param array $macro_values
-	 * @param array $usermacro_values
-	 * @param array $options
-	 * @param bool  $options['html']
-	 * @param bool  $options['resolve_functionids']
-	 * @param bool  $options['resolve_usermacros']
+	 * @param string $source
+	 * @param array  $macro_values
+	 * @param array  $usermacro_values
+	 * @param array  $options
+	 * @param bool   $options['html']
+	 * @param bool   $options['resolve_functionids']
+	 * @param bool   $options['resolve_usermacros']
 	 *
 	 * @return array
 	 */
-	private static function makeTriggerExpression(CTriggerExprParserResult $expression_data, array $macro_values,
-			array $usermacro_values, array $options): array {
+	private static function makeTriggerExpression(string $source, CTriggerExprParserResult $expression_data,
+			array $macro_values, array $usermacro_values, array $options): array {
 		$expression = [];
+		$pos_left = 0;
 
 		foreach ($expression_data->getTokens() as $token) {
+			if ($token instanceof CParserResult) {
+				$token_pos = $token->pos;
+				$token_length = $token->length;
+			}
+			else {
+				$token_pos = $token['pos'];
+				$token_length = $token['length'];
+			}
+
+			if ($pos_left != $token_pos) {
+				$expression[] = substr($source, $pos_left, $token_pos - $pos_left);
+			}
+
 			if ($token instanceof CFunctionParserResult) {
 				$expression[] = self::makeTriggerFunctionExpression($token, $macro_values, $usermacro_values, $options);
 			}
 			elseif ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO) {
-				$expression[] = $macro_values[$token['value']];
+				$expression[] = $options['resolve_functionids'] ? $macro_values[$token['value']] : $token['value'];
+			}
+			elseif ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO) {
+				if (array_key_exists($token['value'], $usermacro_values)) {
+					$expression[] = CTriggerExpression::quoteString($usermacro_values[$token['value']], false);
+				}
+				else {
+					$expression[] = ($options['resolve_usermacros'] && $options['html'])
+						? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED)
+						: $token['value'];
+				}
 			}
 			elseif (is_array($token)) {
-				$expression[] = $token['value'];
+				$expression[] = ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
+					? CTriggerExpression::quoteString($string, false, true)
+					: $token['value'];
 			}
+
+			$pos_left = $token_pos + $token_length;
 		}
 
 		return $expression;
