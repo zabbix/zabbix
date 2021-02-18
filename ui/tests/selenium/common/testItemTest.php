@@ -256,7 +256,7 @@ class testItemTest extends CWebTest {
 					'host_interface' => '127.0.0.2 : 161',
 					'snmp_fields' => [
 						'version' => 'SNMPv2',
-						'comunity' => 'public'
+						'community' => 'public'
 					]
 				]
 			],
@@ -270,7 +270,7 @@ class testItemTest extends CWebTest {
 					'host_interface' => '127.0.0.5 : 161',
 					'snmp_fields' => [
 						'version' => 'SNMPv1',
-						'comunity' => 'public'
+						'community' => 'public'
 					]
 				]
 			],
@@ -700,7 +700,7 @@ class testItemTest extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertEquals('Test item', $overlay->getTitle());
-				$test_form = $this->query('id:preprocessing-test-form')->waitUntilPresent()->one()->waitUntilReady();
+				$test_form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one()->waitUntilReady();
 				// Check "Get value from host" checkbox.
 				$get_host_value = $test_form->query('id:get_value')->asCheckbox()->one();
 				$this->assertTrue($get_host_value->isEnabled());
@@ -735,7 +735,7 @@ class testItemTest extends CWebTest {
 						'port' => 'id:interface_port',
 						'proxy' => 'id:proxy_hostid',
 						'version' => 'id:interface_details_version',
-						'comunity' => 'id:interface_details_community'
+						'community' => 'id:interface_details_community'
 					];
 				}
 				else {
@@ -826,7 +826,7 @@ class testItemTest extends CWebTest {
 									'port' => $host_interface[1],
 									'proxy' => $proxy,
 									'version' => CTestArrayHelper::get($data, 'snmp_fields.version', 'SNMPv2'),
-									'comunity' => CTestArrayHelper::get($data, 'snmp_fields.comunity', 'public')
+									'community' => CTestArrayHelper::get($data, 'snmp_fields.community', 'public')
 								];
 							}
 							else {
@@ -835,7 +835,7 @@ class testItemTest extends CWebTest {
 									'port' => '',
 									'proxy' => '(no proxy)',
 									'version' => 'SNMPv2',
-									'comunity' => ''
+									'community' => ''
 								];
 							}
 
@@ -844,7 +844,7 @@ class testItemTest extends CWebTest {
 								'port' => true,
 								'proxy' => true,
 								'version' => true,
-								'comunity' => true
+								'community' => true
 							];
 						}
 						break;
@@ -940,6 +940,16 @@ class testItemTest extends CWebTest {
 							? 'Incorrect value for field "SNMP community": cannot be empty.'
 							: 'Incorrect value for field "Host address": cannot be empty.';
 					$this->checkServerMessage($details);
+
+					// Check SNMP empty fields for Template.
+					if (!$is_host && (CTestArrayHelper::get($data, 'snmp_fields.community'))) {
+						$test_form->fill(['id:interface_details_community' => $data['snmp_fields']['community']]);
+						$button->click();
+						$this->checkServerMessage('Incorrect value for field "Host address": cannot be empty.');
+						$elements['address']->fill('127.0.0.1');
+						$button->click();
+						$this->checkServerMessage('Incorrect value for field "Port": cannot be empty.');
+					}
 				}
 
 				// Uncheck "Get value from host" checkbox.
