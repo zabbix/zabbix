@@ -49,6 +49,17 @@ class CFunctionParser extends CParser {
 	public $result;
 
 	/**
+	 * Depth of function in hierarchy of nested functions.
+	 *
+	 * @var int
+	 */
+	public $depth;
+
+	public function __construct(int $depth = 1) {
+		$this->depth = $depth;
+	}
+
+	/**
 	 * Returns true if the char is allowed in the function name, false otherwise.
 	 *
 	 * @param string $c
@@ -66,6 +77,10 @@ class CFunctionParser extends CParser {
 	 * @param int     $pos
 	 */
 	public function parse($source, $pos = 0): int {
+		if ($this->depth > TRIGGER_MAX_FUNCTION_DEPTH) {
+			return self::PARSE_FAIL;
+		}
+
 		$this->result = new CFunctionParserResult();
 		$this->length = 0;
 
@@ -120,7 +135,7 @@ class CFunctionParser extends CParser {
 		$num = 0;
 
 		$query_parser = new CQueryParser();
-		$function_parser = new self();
+		$function_parser = new self($this->depth + 1);
 
 		// TODO miks: invent $this->options['collapsed_expression'] to check if this parser is needed.
 		$functionid_parser = new CFunctionIdParser();
