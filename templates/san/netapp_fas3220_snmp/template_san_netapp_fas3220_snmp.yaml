@@ -887,7 +887,7 @@ zabbix_export:
               recovery_expression: |
                 {NetApp FAS3220 SNMP:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (> {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
