@@ -1,6 +1,7 @@
 Changes for 5.4.0alpha2
 
 New features:
+A.F.I...ST [ZBXNEXT-5868] moved global mappings to host / template (afayantsev, rlataria, Sasha, vso)
 .........T [ZBXNEXT-6385] added template "Apache Ignite by JMX" (ychukina)
 .......PS. [ZBXNEXT-6301] extended set of collected VMware metrics for VM and HV (asestakovs)
 A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption protocols for SNMPv3 (dgoloscapov, talbergs)
@@ -14,6 +15,8 @@ A.F.....S. [ZBXNEXT-6427,ZBXNEXT-6458] added support for strong encryption proto
 .......PS. [ZBXNEXT-6386] raised javascript heap limit from 10 megabytes to 64 megabytes; fixed memory leak when heap limit is reached (vso)
 
 Bug fixes:
+A......... [ZBX-19025] fixed usage of LIMIT in SQL in user.update and user.delete API (vmurzins)
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 ...G...... [ZBX-17543] fixed error in case if wmi.getall returned no items (dgoloscapov)
 ........S. [ZBX-18917] disabled global script webhook execution on proxy (dgoloscapov)
 .........T [ZBX-18377] fixed expression in "Memory usage is too high" trigger of "Template DB Redis" (abakaldin)
