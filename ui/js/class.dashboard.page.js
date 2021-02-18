@@ -3278,6 +3278,8 @@ class CDashboardPage {
 			widget.removeInfoButtons();
 		}
 
+		widget.activate();
+
 		this._makeDraggable(widget);
 		this._makeResizable(widget);
 		this._resizeWidget(widget);

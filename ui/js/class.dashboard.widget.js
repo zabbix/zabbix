@@ -99,9 +99,11 @@ class CDashboardWidget extends CBaseComponent {
 	}
 
 	activate() {
-		this._is_active = true;
+		if (!this._is_active) {
+			this._is_active = true;
 
-		this._registerEvents();
+			this._registerEvents();
+		}
 
 		return this;
 	}
