@@ -7267,6 +7267,11 @@ $range-input-width: 31px;
 		}
 	}
 
+	&:not(:empty) {
+		text-indent: 0px !important;
+		padding-right: 22px;
+	}
+
 	&::after {
 		position: absolute;
 		top: 7px;
