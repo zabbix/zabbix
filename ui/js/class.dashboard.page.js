@@ -373,9 +373,8 @@ class CDashboardPage {
 		return this._options['updated'];
 	}
 
-	saveDashboard(callback) {
+	saveDashboard() {
 		this._doAction('beforeDashboardSave');
-		callback(this._widgets);
 	}
 
 	/**

@@ -119,7 +119,7 @@
 
 			document
 				.getElementById('dashbrd-save')
-				.addEventListener('click', () => ZABBIX.Dashboard.saveDashboard(save.bind(this)));
+				.addEventListener('click', () => save());
 
 			document
 				.getElementById('dashbrd-cancel')
@@ -148,8 +148,10 @@
 			enableNavigationWarning();
 		};
 
-		const save = (widgets) => {
+		const save = () => {
 			clearMessages();
+
+			ZABBIX.Dashboard.saveDashboard();
 
 			const ajax_data = {
 				dashboardid: (data.dashboardid !== null) ? data.dashboardid : undefined,
@@ -159,7 +161,7 @@
 				sharing: data.sharing
 			};
 
-			for (const widget of widgets) {
+			for (const widget of ZABBIX.Dashboard.getWidgets()) {
 				const ajax_widget = {};
 
 				if (widget.widgetid !== '') {

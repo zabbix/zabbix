@@ -241,8 +241,8 @@ class CDashboard extends CBaseComponent {
 		return this._selected_page.isDashboardUpdated();
 	}
 
-	saveDashboard(callback) {
-		return this._selected_page.saveDashboard(callback);
+	saveDashboard() {
+		return this._selected_page.saveDashboard();
 	}
 
 	copyWidget(widget) {

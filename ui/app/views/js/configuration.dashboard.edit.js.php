@@ -74,7 +74,7 @@
 
 			document
 				.getElementById('dashbrd-save')
-				.addEventListener('click', () => ZABBIX.Dashboard.saveDashboard(save.bind(this)));
+				.addEventListener('click', () => save());
 
 			document
 				.getElementById('dashbrd-cancel')
@@ -107,8 +107,10 @@
 			}
 		};
 
-		const save = (widgets) => {
+		const save = () => {
 			clearMessages();
+
+			ZABBIX.Dashboard.saveDashboard();
 
 			const ajax_data = {
 				templateid: data.templateid,
@@ -117,7 +119,7 @@
 				widgets: []
 			};
 
-			for (const widget of widgets) {
+			for (const widget of ZABBIX.Dashboard.getWidgets()) {
 				const ajax_widget = {};
 
 				if (widget.widgetid !== '') {
