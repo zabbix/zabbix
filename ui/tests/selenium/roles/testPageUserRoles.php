@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role
- * @backup role_rule
  * @on-before prepareRoleData
  */
 class testPageUserRoles extends CWebTest {
@@ -66,7 +65,7 @@ class testPageUserRoles extends CWebTest {
 	}
 
 	/**
-	 * Check everything in user roles list.
+	 * Check layout in user roles list.
 	 */
 	public function testPageUserRoles_Layout() {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
@@ -79,7 +78,7 @@ class testPageUserRoles extends CWebTest {
 		array_shift($headers);
 		$this->assertEquals(['Name', '#', 'Users'], $headers);
 
-		// Check that headers is not clickable.
+		// Check that non-sortable headers is not clickable.
 		foreach (['#', 'Users'] as $header) {
 			$this->assertFalse($table->query('xpath://th/a[text()="'.$header.'"]')->one(false)->isValid());
 		}
