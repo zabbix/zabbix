@@ -944,7 +944,6 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		request->value.result_ptr->result = result;
 		zbx_free(request->value.error);
 		request->value.state = ITEM_STATE_NORMAL;
-
 		ret = FAIL;
 
 		goto out;
