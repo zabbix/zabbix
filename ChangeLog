@@ -99,6 +99,13 @@ A.F....... [ZBX-18134] removed ability to read PSK fields of hosts and proxies (
 .........T [ZBXNEXT-6201] added "Template DB Apache Cassandra by JMX" (ychukina)
 
 --------------------------------------------------------------------------------
+Changes for 5.2.5rc2
+
+Bug fixes:
+A......... [ZBX-19025] fixed usage of LIMIT in SQL in user.update and user.delete API (vmurzins)
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
+
+--------------------------------------------------------------------------------
 Changes for 5.2.5rc1
 
 New features:
@@ -514,6 +521,12 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.9rc2
+
+Bug fixes:
+.......PS. [ZBX-19029] fixed Zabbix server and Zabbix proxy not remembering last log size when preprocessing is used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.9rc1
