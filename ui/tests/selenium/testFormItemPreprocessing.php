@@ -104,22 +104,22 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	 * Test copies templated item from one host to another.
 	 */
 	public function testFormItemPreprocessing_CopyItem() {
-		$preprocessing_item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing.
-		$preprocessing_item_name = 'testInheritanceItemPreprocessing';
-		$preprocessing_item_id = 15094;
-		$original_host_id = 15001;											// Template inheritance test host
+		$item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing
+		$item_name = 'testInheritanceItemPreprocessing';
+		$itemid = 15094;									// testInheritanceItemPreprocessing
+		$original_hostid = 15001;							// "Template inheritance test host"
 		$target_hostname = 'Simple form test host';
 
-		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]='.$original_host_id);
+		$this->page->login()->open('items.php?filter_set=1&filter_hostids[0]='.$original_hostid);
 		$table = $this->query('xpath://form[@name="items"]/table')->asTable()->one();
-		$table->findRow('Key', $preprocessing_item_key)->select();
+		$table->findRow('Key', $item_key)->select();
 		$this->query('button:Copy')->one()->click();
-		$form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
-		$form->fill([
+		$mass_update_form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
+		$mass_update_form->fill([
 			'Target type'	=> 'Hosts',
 			'Target' => $target_hostname
 		]);
-		$form->submit();
+		$mass_update_form->submit();
 
 		$this->page->waitUntilReady();
 		$message = CMessageElement::find()->one();
@@ -127,19 +127,20 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 		$this->assertEquals('Item copied', $message->getTitle());
 
 		// Open original item form and get steps text.
-		$this->page->open('items.php?form=update&hostid='.$original_host_id.'&itemid='.$preprocessing_item_id);
+		$this->page->open('items.php?form=update&hostid='.$original_hostid.'&itemid='.$itemid);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
 		// Open copied item form, get steps text and compare to original.
 		$this->page->open('items.php?filter_set=1&filter_hostids[0]='.self::HOST_ID);
-		$this->query('link', $preprocessing_item_name)->one()->click();
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$this->assertEquals($preprocessing_item_name, $form->getField('Name')->getValue());
-		$this->assertEquals($preprocessing_item_key, $form->getField('Key')->getValue());
+		$this->query('link', $item_name)->one()->click();
+		$form->invalidate();
+		$this->assertEquals($item_name, $form->getField('Name')->getValue());
+		$this->assertEquals($item_key, $form->getField('Key')->getValue());
 		$form->selectTab('Preprocessing');
 		$copied_steps = $this->listPreprocessingSteps();
 		$this->assertEquals($original_steps, $copied_steps);
+
 		// Get steps inputs and check if they are not disabled.
 		foreach (array_keys($copied_steps) as $i) {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
