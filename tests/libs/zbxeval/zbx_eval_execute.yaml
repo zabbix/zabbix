@@ -728,5 +728,21 @@ in:
 out:
   result: SUCCEED
   value: 0
+---
+test case: Expression '0.1+0.1 > 0.1'
+in:
+  rules: []
+  expression: '0.1+0.1 > 0.1'
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression '.1+.1 > 0.1'
+in:
+  rules: []
+  expression: '.1+.1 > .1'
+out:
+  result: SUCCEED
+  value: 1
 ...
 
