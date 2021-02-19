@@ -2508,17 +2508,13 @@ int	zbx_tsdb_get_version(void)
 			goto out;
 		}
 
-		if (NULL != (row = zbx_db_fetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)) &&
+				3 == sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch))
 		{
-			if (3 == sscanf((const char*)row[0], "%d.%d.%d", &major, &minor, &patch))
-			{
-				ver = major * 10000;
-				ver += minor * 100;
-				ver += patch;
-				ZBX_TSDB_VERSION = ver;
-			}
-			else
-				ver = ZBX_TSDB_VERSION = 0;
+			ver = major * 10000;
+			ver += minor * 100;
+			ver += patch;
+			ZBX_TSDB_VERSION = ver;
 		}
 		else
 			ver = ZBX_TSDB_VERSION = 0;
