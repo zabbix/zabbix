@@ -18,30 +18,43 @@ GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
 
 dist_sysconf_DATA =
 TARGETS =
+INSTALL_TARGETS =
 
 if AGENT2
 TARGETS += zabbix.com/cmd/zabbix_agent2
+INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_agent2
 DBGTARGETS = zabbix.com/cmd/mock_server
 dist_sysconf_DATA += conf/zabbix_agent2.conf
 endif
 
 if WEBSERVICE
 TARGETS += zabbix.com/cmd/zabbix_web_service
+INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_web_service
 dist_sysconf_DATA += conf/zabbix_web_service.conf
 endif
 
 all: build
 
-build:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -o bin ${TARGETS} ${DBGTARGETS}
+zabbix.com/cmd/zabbix_agent2:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_agent2
+
+zabbix.com/cmd/zabbix_web_service:
+	go build -o bin zabbix.com/cmd/zabbix_web_service
+
+build: ${TARGETS}
 
 clean:
 	go clean ./...
 	rm -f bin/zabbix_agent2 bin/mock_server
 
-install-exec-local:
+install-zabbix.com/cmd/zabbix_agent2:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
 		go install -ldflags="${GOLDFLAGS}" ${TARGETS}
+
+install-zabbix.com/cmd/zabbix_web_service:
+	GOBIN=${GOBIN} 	go install zabbix.com/cmd/zabbix_web_service
+
+install-exec-local: ${INSTALL_TARGETS}
 
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
