@@ -293,6 +293,7 @@ class testPageUserRoles extends CWebTest {
 	public function testPageUserRoles_Delete($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('button:Reset')->one()->click();
+		$hash_before = CDBHelper::getHash('SELECT * FROM role');
 		$before_delete = $this->getTableResult('Name');
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -312,6 +313,7 @@ class testPageUserRoles extends CWebTest {
 		// After deleting role check role list and database.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['message_header'], $data['message_details']);
+			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM role'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, $data['message_header']);
