@@ -47,15 +47,15 @@ if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$col_check_all->addStyle('width: 15px;'),
 		$col_host->addStyle('width: 13%'),
-		$col_name->addStyle('width: 21%'),
+		$col_name->addStyle('width: 15%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
-		(new CColHeader(_('Last check')))->addStyle('width: 11%'),
-		(new CColHeader(_('Last value')))->addStyle('width: 11%'),
-		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addStyle('width: 10%'),
+		(new CColHeader(_('Last check')))->addStyle('width: 8%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 8%'),
+		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 7%'),
+		(new CColHeader(_('Tags')))->addStyle('width: 25%'),
 		(new CColHeader())->addStyle('width: 5%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -64,11 +64,11 @@ else {
 	$table->setHeader([
 		$col_check_all->addStyle('width: 15px'),
 		$col_host->addStyle('width: 17%'),
-		$col_name->addStyle('width: 40%'),
+		$col_name->addStyle('width: 25%'),
 		(new CColHeader(_('Last check')))->addStyle('width: 11%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 11%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addStyle('width: 10%'),
+		(new CColHeader(_('Tags')))->addStyle('width: 25%'),
 		(new CColHeader())->addStyle('width: 5%')
 	]);
 }
