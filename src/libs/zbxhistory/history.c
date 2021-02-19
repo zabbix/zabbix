@@ -51,6 +51,9 @@ int	zbx_history_init(char **error)
 
 	const char	*opts[] = {"dbl", "str", "log", "uint", "text"};
 
+	if (NULL != CONFIG_HISTORY_STORAGE_URL)
+		zbx_elastic_check_version();
+
 	for (i = 0; i < ITEM_VALUE_TYPE_MAX; i++)
 	{
 		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))

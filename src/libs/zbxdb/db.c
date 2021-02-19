@@ -45,7 +45,7 @@ struct zbx_db_result
 	MYSQL_RES	*result;
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp;	/* the statement handle for select operations */
-	int 		ncolumn;
+	int		ncolumn;
 	DB_ROW		values;
 	ub4		*values_alloc;
 	OCILobLocator	**clobs;
@@ -76,6 +76,8 @@ static int	db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
+static int			ZBX_MYSQL_SVERSION = -1;
+static int			ZBX_MARIADB_SFORK = OFF;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -89,6 +91,8 @@ typedef struct
 	zbx_vector_ptr_t	db_results;
 }
 zbx_oracle_db_handle_t;
+
+static int			ZBX_ORACLE_SVERSION = -1;
 
 static zbx_oracle_db_handle_t	oracle;
 
@@ -633,6 +637,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION,"ORACLE OOOOOOOO 111");
+
 		/* allocate an error handle */
 		(void)OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&oracle.errhp, OCI_HTYPE_ERROR,
 				(size_t)0, (dvoid **)0);
@@ -786,8 +792,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ZBX_PG_BYTEAOID = atoi(row[0]);
 	DBfree_result(result);
 
-	ZBX_PG_SVERSION = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
+	zbx_dbms_extract_version();
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
@@ -2443,23 +2448,206 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
 	return zbx_strlen_utf8_nchars(text, maxlen);
 }
 
-#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbms_get_version                                             *
  *                                                                            *
- * Purpose: returns DBMS version as integer: MMmmuu                           *
+ * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
+ *          returns DBMS version as integer: MMmmuu                           *
  *          M = major version part                                            *
  *          m = minor version part                                            *
  *          u = micro version part                                            *
  *                                                                            *
  * Example: 1.2.34 version will be returned as 10234                          *
  *                                                                            *
+* Purpose: For OracleDB:                                                      *
+ *          returns DBMS version as integer: MRruRRiv                         *
+ *          MR = major release version part                                   *
+ *          ru = release update version part                                  *
+ *          RR = release update version revision part                         *
+ *          iv = increment version part                                       *
+ *                                                                            *
+ * Example: 18.1.0.0.7 will be returned as 18010000                           *
+ *                                                                            *
  * Return value: DBMS version or 0 if unknown                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbms_get_version(void)
 {
+#if defined(HAVE_MYSQL)
+	return ZBX_MYSQL_SVERSION;
+#elif defined(HAVE_POSTGRESQL)
 	return ZBX_PG_SVERSION;
+#elif defined(HAVE_ORACLE)
+	return ZBX_ORACLE_SVERSION;
+#else
+	return 0;
+#endif
+}
+
+#ifdef HAVE_MYSQL
+int	zbx_dbms_mariadb_used(void)
+{
+	return ZBX_MARIADB_SFORK;
 }
 #endif
+
+/*********************************************************************************************************
+ *                                                                                                       *
+ * Function: zbx_dbms_extract_version                                                                    *
+ *                                                                                                       *
+ * Purpose: tries to identify ORACLE version from the OCI version function result                        *
+ * Oracle DB format is like 18.1.2.3.0 where                                                             *
+ * 18 - major release version                                                                            *
+ * 1 - release update version                                                                            *
+ * 2 - release update version revision                                                                   *
+ * 3 - increment version                                                                                 *
+ * 0 - unused, reserved for future use                                                                   *
+ *                                                                                                       *
+ * Examples:                                                                                             *
+ * For "Oracle Database 18c Express Edition Release 1.0.0.0.0 - Production"		=> 1000000       *
+ * For "Oracle Database 18c Express Edition Release 18.2.0.0.7 - Production"		=> 18020000      *
+ * For "Oracle Database 18c Express Edition Release 0.0.34.123.7 - Production"		=> 0 (log error) *
+ * For "Oracle Database 18c Express Edition Release 1.0.3.x.7 - Production"		=> 0 (log error) *
+ * For "Oracle Database 18c Expres"							=> 0 (log error) *
+ * For ""										=> 0 (log error) *
+ * For "Oracle Database 18c Express Edition Release 4.42520.34.653610.1560 - Production"=> 0 (log error) *
+ *                                                                                                       *
+ **********************************************************************************************************/
+void	zbx_dbms_extract_version(void)
+{
+#if defined(HAVE_MYSQL)
+	char	*p, *buffer = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
+
+	if (-1 != ZBX_MYSQL_SVERSION)
+		return;
+
+	ZBX_MYSQL_SVERSION = mysql_get_server_version(conn);
+	zabbix_log(LOG_LEVEL_INFORMATION, "VVVADE: %s",mysql_get_server_info(conn));
+
+	zbx_snprintf_alloc(&buffer, &str_alloc, &str_offset, "%s", mysql_get_server_info(conn));
+	zabbix_log(LOG_LEVEL_INFORMATION,"YYY %s",buffer);
+
+	p = strstr(buffer,"MariaDB");
+	if (NULL != p)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "MMM MARIADB DETECTED!");
+		ZBX_MARIADB_SFORK = ON;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "MMM MYSQL DB DETECTED!");
+	}
+
+	zbx_free(buffer);
+#elif defined(HAVE_POSTGRESQL)
+	ZBX_PG_SVERSION = PQserverVersion(conn);
+#elif defined(HAVE_ORACLE)
+#define MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT	200
+#define MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER		3
+
+	char	*start, *end, *match, *release_str = "Release ";
+	char	major_release_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
+	char	release_update_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
+	char	release_update_version_revision[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
+	char	increment_version[MAX_EXPECTED_STORAGE_PER_VERSION_NUMBER];
+
+	int major_release_version_num, release_update_version_num, release_update_version_revision_num,
+			increment_version_num, local_status, overall_status = SUCCEED;
+
+	sword	err;
+
+	char unparsed_version[MAX_EXPECTED_OCI_VERSION_FUNC_RETURN_OUTPUT];
+
+
+	err = OCIServerVersion(oracle.svchp, oracle.errhp, unparsed_version, 100, OCI_HTYPE_SVCCTX);
+
+	if (OCI_SUCCESS != err)
+	{
+		overall_status = FAIL;
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION,"ORACLE VERSION: %s", unparsed_version);
+
+#define DO_IT(a)								\
+local_status = SUCCEED;								\
+a[0] = unparsed_version[next_start_index];					\
+										\
+if ('.' != unparsed_version[next_start_index + 1])				\
+{										\
+	if ('.' == unparsed_version[next_start_index + 2])			\
+	{									\
+		a[1] = unparsed_version[next_start_index + 1];			\
+		a[2] = '\0';							\
+		next_start_index = next_start_index + 3;			\
+										\
+		if (0 == isdigit(a[0]) || 0 == isdigit(a[1]))			\
+			local_status = FAIL;					\
+		else								\
+			a##_num = atoi(a);					\
+	}									\
+	else									\
+		local_status = FAIL;						\
+}										\
+else if ('.' == unparsed_version[next_start_index + 1])				\
+{										\
+	a[1] = '\0';								\
+	next_start_index = next_start_index + 2;				\
+										\
+	if (0 == isdigit(a[0]))							\
+		local_status = FAIL;						\
+	else									\
+		a##_num  = atoi(a);						\
+}										\
+else										\
+	local_status = FAIL;							\
+										\
+if (FAIL == local_status)							\
+{										\
+	zabbix_log(LOG_LEVEL_CRIT,						\
+			"Cannot determine %s in Oracle DB version", #a);	\
+	a##_num = 0;								\
+	overall_status = FAIL;							\
+}
+
+	if (start = strstr(unparsed_version, release_str))
+	{
+		int next_start_index = start - unparsed_version + strlen(release_str);
+
+		DO_IT(major_release_version);
+		DO_IT(release_update_version);
+		DO_IT(release_update_version_revision);
+		DO_IT(increment_version);
+
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot find Release keyword in Oracle DB version.");
+		overall_status = FAIL;
+	}
+out:
+	if (FAIL == overall_status)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Failed to detect OracleDB version from the following query result: %s",
+				unparsed_version);
+		major_release_version_num = 0;
+		release_update_version_num = 0;
+		release_update_version_revision_num = 0;
+		increment_version_num = 0;
+	}
+
+	ZBX_ORACLE_SVERSION = major_release_version_num * 1000000 + release_update_version_num * 10000 +
+			release_update_version_revision_num * 100 + increment_version_num;
+
+	printf("MAJOR_RELEASE_VERSION: %d\n",major_release_version_num);
+	printf("RELEASE_UPDATE_VERSION: %d\n",release_update_version_num);
+	printf("RELEASE_UPDATE_VERSION_REVISION: %d\n",release_update_version_revision_num);
+	printf("INCREMENT_VERSION: %d\n",increment_version_num);
+
+	printf("RESULT_VERSION: %d\n", ZBX_ORACLE_SVERSION);
+#else
+
+#endif
+}

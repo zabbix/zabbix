@@ -151,6 +151,7 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_history_add_values \
 	-Wl,--wrap=zbx_history_sql_init \
 	-Wl,--wrap=zbx_history_elastic_init \
+	-Wl,--wrap=zbx_elastic_check_version \
 	-Wl,--wrap=time \
 	-Wl,--wrap=substitute_simple_macros \
 	-Wl,--wrap=DCget_data_expected_from \

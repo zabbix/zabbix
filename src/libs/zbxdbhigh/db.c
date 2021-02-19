@@ -849,6 +849,82 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
+void	DBextract_DBversion(void)
+{
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	zbx_dbms_extract_version();
+
+	DBclose();
+}
+
+void	DBcheck_version_requirements(void)
+{
+
+#if defined(HAVE_MYSQL)
+	int version = zbx_dbms_get_version();
+/*
+#define MYSQL_MYSQL_MIN_VERSION 50562
+#define MYSQL_MYSQL_MAX_VERSION 80000
+#define MARIA_MYSQL_MIN_VERSION 10037
+*/
+#define MYSQL_MYSQL_MIN_VERSION 90562
+#define MYSQL_MYSQL_MAX_VERSION 80000
+
+#define MARIA_MYSQL_MIN_VERSION 990037
+
+	if (ON == zbx_dbms_mariadb_used())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB Server version: %d", version);
+
+		if (MARIA_MYSQL_MIN_VERSION > version)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! MariaDB version is %d, must be at least %d or higher", version,
+				MARIA_MYSQL_MIN_VERSION);
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "MySQL Server version: %d", version);
+
+		if (MYSQL_MYSQL_MIN_VERSION > version || MYSQL_MYSQL_MAX_VERSION < version)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! MySQL version is %d, must be between %d and %d", version,
+				MYSQL_MYSQL_MIN_VERSION, MYSQL_MYSQL_MAX_VERSION);
+		}
+	}
+
+#elif defined(HAVE_ORACLE)
+	int version = zbx_dbms_get_version();
+
+/*
+define ORACLE_MIN_VERSION 11020000
+*/
+#define ORACLE_MIN_VERSION 999999999
+		if (ORACLE_MIN_VERSION > version)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! ORACLE version is %d, must be at least %d or higher", version,
+				ORACLE_MIN_VERSION);
+		}
+#elif defined(HAVE_POSTGRESQL)
+	int version = zbx_dbms_get_version();
+		/*
+define POSTGRESQL_MIN_VERSION 92924
+*/
+#define POSTGRESQL_MIN_VERSION 999999999
+
+		zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", version);
+
+		if (POSTGRESQL_MIN_VERSION > version)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Unsupported DB! PostgreSQL version is %d, must be at least %d or higher", version,
+				POSTGRESQL_MIN_VERSION);
+		}
+#endif
+
+/*	DBclose();*/
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBcheck_capabilities                                             *

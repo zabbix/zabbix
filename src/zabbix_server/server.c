@@ -1213,6 +1213,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBextract_DBversion();
+	DBcheck_version_requirements();
+
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 	DBcheck_character_set();

@@ -1015,7 +1015,94 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return SUCCEED;
 }
 
+/************************************************************************************
+ *                                                                                  *
+ * Function: elastic_check_version                                                  *
+ *                                                                                  *
+ * Purpose: queries elastic search version and logs a warning if it is invalid      *
+ * format is X.Y.Z where X is the major version, Y is the minor version and Z is    *
+ * the patch level                                                                  *
+ *                                                                                  *
+ ************************************************************************************/
+void	zbx_elastic_check_version(void)
+{
+	int			status = FAIL;
+	size_t			id_alloc = 0;
+	char			errbuf[CURL_ERROR_SIZE], *version_number = NULL, *curl_res = NULL;
+	struct zbx_json_parse	jp, jp_values, jp_sub;
+	struct curl_slist	*curl_headers;
+	CURLcode		err;
+	CURLoption		opt;
+	CURL			*handle;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 != curl_global_init(CURL_GLOBAL_ALL))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize cURL library");
+
+		goto out;
+	}
+
+	if (NULL == (handle = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL session");
+
+		goto out;
+	}
+
+	curl_headers = curl_slist_append(NULL, "Content-Type: application/json");
+
+	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, CONFIG_HISTORY_STORAGE_URL)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &curl_res)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_FAILONERROR, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto clean;
+	}
+
+	*errbuf = '\0';
+
+	if (CURLE_OK != (err = curl_easy_perform(handle)))
+	{
+		elastic_log_error(handle, err, errbuf);
+		goto clean;
+	}
+
+	if (SUCCEED != zbx_json_open(curl_res, &jp) ||
+		SUCCEED != zbx_json_brackets_open(jp.start, &jp_values) ||
+		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
+		SUCCEED != zbx_json_value_by_name_dyn(&jp_sub, "number", &version_number, &id_alloc, NULL))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "failed to parse elasticsearch version result");
+		goto clean;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved: %s", version_number);
+
+	status = SUCCEED;
+clean:
+	curl_easy_cleanup(handle);
+	curl_slist_free_all(curl_headers);
+out:
+#define SUPPORTED_ELASTIC_SEARCH_MAJOR_VERSION 7
+	if (FAIL == status || 0 == isdigit(version_number[0]) || (SUPPORTED_ELASTIC_SEARCH_MAJOR_VERSION !=
+			(version_number[0] - '0')) || ('.' != version_number[1]))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Elasticsearch version is unsupported or it could not be retrieved");
+	}
+
+	zbx_free(version_number);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 #else
+void	zbx_elastic_check_version(void)
+{
+}
 
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
 {
@@ -1023,6 +1110,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	ZBX_UNUSED(value_type);
 
 	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
+
 	return FAIL;
 }
 
