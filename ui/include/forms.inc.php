@@ -1136,7 +1136,8 @@ function getItemFormData(array $item = [], array $options = []) {
 			$db_hosts = API::Host()->get([
 				'output' => ['hostid', 'name'],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			// Overwrite and attach host level tags.
