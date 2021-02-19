@@ -1151,6 +1151,17 @@ class CDiscoveryRule extends CItemGeneral {
 												'trends' => $operation['optrends']['trends']
 											];
 										}
+
+										if (array_key_exists('optag', $operation)) {
+											foreach ($operation['optag'] as $tag) {
+												$optag[] = [
+													'lld_override_operationid' =>
+														$operation['lld_override_operationid'],
+													'tag' => $tag['tag'],
+													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
+												];
+											}
+										}
 										break;
 
 									case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
@@ -1642,7 +1653,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 							switch ($operation['operationobject']) {
 								case OPERATION_OBJECT_ITEM_PROTOTYPE:
-									foreach (['opseverity', 'optag', 'optemplate', 'opinventory'] as $field) {
+									foreach (['opseverity', 'optemplate', 'opinventory'] as $field) {
 										if (array_key_exists($field, $operation)) {
 											self::exception(ZBX_API_ERROR_PARAMETERS,
 												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
@@ -1656,10 +1667,11 @@ class CDiscoveryRule extends CItemGeneral {
 											&& !array_key_exists('opperiod', $operation)
 											&& !array_key_exists('ophistory', $operation)
 											&& !array_key_exists('optrends', $operation)
+											&& !array_key_exists('optag', $operation)
 											&& !array_key_exists('opdiscover', $operation)) {
 										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 											$opr_path, _s('value must be one of %1$s',
-												'opstatus, opdiscover, opperiod, ophistory, optrends'
+												'opstatus, opdiscover, opperiod, ophistory, optrends, optag'
 											)
 										));
 									}
@@ -2939,11 +2951,11 @@ class CDiscoveryRule extends CItemGeneral {
 					]);
 				}
 
-				if ($trigger_prototype_objectids || $host_prototype_objectids) {
+				if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
 					$optag = DB::select('lld_override_optag', [
 						'output' => ['lld_override_operationid', 'tag', 'value'],
 						'filter' => ['lld_override_operationid' => array_keys(
-							$trigger_prototype_objectids + $host_prototype_objectids
+							$trigger_prototype_objectids + $host_prototype_objectids + $item_prototype_objectids
 						)]
 					]);
 				}
@@ -3002,7 +3014,7 @@ class CDiscoveryRule extends CItemGeneral {
 						}
 					}
 
-					if ($trigger_prototype_objectids || $host_prototype_objectids) {
+					if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
 						foreach ($optag as $row) {
 							if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
 								$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
