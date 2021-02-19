@@ -299,8 +299,6 @@ class testSidebarMenu extends CWebTest {
 		$menu__type = ($data['section'] === 'User settings') ? 'user' : 'main';
 		// First level menu.
 		$main_section = $this->query('xpath://ul[@class="menu-'.$menu__type.'"]')->query('link', $data['section']);
-		// Second level menu.
-		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page']);
 
 		// Click on the first level menu and wait for it to fully open.
 		if ($data['section'] !== 'Monitoring') {
@@ -312,17 +310,19 @@ class testSidebarMenu extends CWebTest {
 			});
 		}
 
-		$submenu->waitUntilClickable()->one()->click();
+		// Second level menu.
+		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page'])->one();
+		$submenu->waitUntilClickable()->click();
 
 		// Checking 3rd level menu.
 		if (array_key_exists('third_level', $data)) {
 			foreach ($data['third_level'] as $third_level) {
-				$submenu->one()->parents('tag:li')->query('xpath://ul/li/a[text()="'.$third_level.'"]')
+				$submenu->parents('tag:li')->query('xpath://ul/li/a[text()="'.$third_level.'"]')
 						->waitUntilClickable()->one()->click();
 				$this->assertTrue($this->query('xpath://li[contains(@class, "is-selected")]/a[text()="'.
 						$data['page'].'"]')->exists());
 				$this->page->assertHeader(($third_level === 'Other') ? 'Other configuration parameters' : $third_level);
-				$submenu->waitUntilClickable()->one()->click();
+				$submenu->click();
 			}
 		}
 		else {
@@ -355,7 +355,7 @@ class testSidebarMenu extends CWebTest {
 			if ($view === 'compact') {
 				$this->query('class:zabbix-sidebar-logo')->one(false)->waitUntilNotVisible();
 			}
-			if ($view === 'hidden') {
+			elseif ($view === 'hidden') {
 				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();
 			}
 
@@ -367,7 +367,7 @@ class testSidebarMenu extends CWebTest {
 
 			// Returning standart sidemenu view clicking on unhide, expand button.
 			$this->query('button', $unhide)->one()->waitUntilClickable()->click();
-			$this->assertTrue($this->query('class:sidebar')->exists());
+			$this->assertTrue($this->query('class:sidebar')->one()->isVisible());
 		}
 	}
 
@@ -393,7 +393,8 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Sign out'
+					'section' => 'Sign out',
+					'title' => 'Zabbix'
 				]
 			]
 		];
@@ -409,7 +410,7 @@ class testSidebarMenu extends CWebTest {
 
 		if (array_key_exists('link', $data)) {
 			$this->assertTrue($this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].
-					'" and @href="'.$data['link'].'"]')->exists());
+					'" and @href="'.$data['link'].'"]')->one()->isVisible());
 		}
 		else {
 			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click();
