@@ -610,6 +610,7 @@ class CItemPrototype extends CItemGeneral {
 		$tpl_items = $this->get([
 			'output' => $output,
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
