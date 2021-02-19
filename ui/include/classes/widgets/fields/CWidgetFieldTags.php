@@ -74,7 +74,7 @@ class CWidgetFieldTags extends CWidgetField {
 				'.dynamicRows({template: "#tag-row-tmpl"})'.
 				'.on("afteradd.dynamicRows", function() {'.
 					'var rows = this.querySelectorAll(".form_row");'.
-					'new CTagFilterItem(rows[rows.length- 1]);'.
+					'new CTagFilterItem(rows[rows.length - 1]);'.
 				'});'.
 
 			'tags_table.parent().addClass("has-before");'.

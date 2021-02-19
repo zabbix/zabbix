@@ -847,7 +847,7 @@ ZABBIX.apps.map = (function($) {
 					})
 					.on('afteradd.dynamicRows', function() {
 						var rows = this.querySelectorAll('.form_row');
-						new CTagFilterItem(rows[rows.length- 1]);
+						new CTagFilterItem(rows[rows.length - 1]);
 					});
 
 				// mass update form
@@ -3026,7 +3026,7 @@ ZABBIX.apps.map = (function($) {
 				if (data.elementtype == '0' || data.elementtype == '3') {
 					data.tags = {};
 					$('input, z-select', '#selementForm').filter(function() {
-						return this.name.match(/tags\[\d+\]\[tag\]/i);
+						return this.name.match(/tags\[\d+\]\[tag\]/);
 					}).each(function() {
 						if (this.value !== '') {
 							var nr = parseInt(this.name.match(/^tags\[(\d+)\]\[tag\]$/)[1]);

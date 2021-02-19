@@ -52,7 +52,7 @@
 				.dynamicRows({ template: '#filter-tag-row-tmpl' })
 				.on('afteradd.dynamicRows', function() {
 					var rows = this.querySelectorAll('.form_row');
-					new CTagFilterItem(rows[rows.length- 1]);
+					new CTagFilterItem(rows[rows.length - 1]);
 			});
 
 			// Init existing fields once loaded.

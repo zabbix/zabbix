@@ -486,7 +486,7 @@ if (array_key_exists('render_html', $data)) {
 			})
 			.on('afteradd.dynamicRows', function() {
 				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length- 1]);
+				new CTagFilterItem(rows[rows.length - 1]);
 			});
 
 		// Init existing fields once loaded.
