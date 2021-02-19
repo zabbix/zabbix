@@ -310,7 +310,7 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 
 	if (ZBX_VARIANT_NONE == token->value.type)
 	{
-		if (ZBX_EVAL_TOKEN_VAR_NUM == token->type)
+		if (ZBX_EVAL_TOKEN_VAR_NUM == token->type || ZBX_EVAL_TOKEN_VAR_TIME == token->type)
 		{
 			zbx_variant_set_dbl(&value, atof(ctx->expression + token->loc.l) *
 					suffix2factor(ctx->expression[token->loc.r]));
@@ -1202,6 +1202,7 @@ static int	eval_execute(const zbx_eval_context_t *ctx, zbx_variant_t *value, cha
 			switch (token->type)
 			{
 				case ZBX_EVAL_TOKEN_VAR_NUM:
+				case ZBX_EVAL_TOKEN_VAR_TIME:
 				case ZBX_EVAL_TOKEN_VAR_STR:
 				case ZBX_EVAL_TOKEN_VAR_MACRO:
 				case ZBX_EVAL_TOKEN_VAR_USERMACRO:

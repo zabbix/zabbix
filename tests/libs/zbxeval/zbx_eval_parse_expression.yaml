@@ -1280,6 +1280,17 @@ in:
   expression: '1N'
 out:
   result: FAIL
+---
+test case: Succeed '1m=60s'
+in:
+  rules: []
+  expression: '1m=60s'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '1m', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_TIME, token: '60s', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_OP_EQ, token: '=', opt: 0}
+  result: SUCCEED
 ...
 
 
