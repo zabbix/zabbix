@@ -23,9 +23,10 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
+ * @backup sessions
  * @on-before prepareTokenData
  */
-class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
+class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
 	const update_token = 'Admin reference token';	// Token for update.
 	const delete_token = 'Token to be deleted';		// Token for delete.
@@ -269,14 +270,14 @@ class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
 		];
 	}
 
-	public function testFormAdministrationGeneralApiTokens_Layout() {
+	public function testFormApiTokensAdministrationGeneral_Layout() {
 		$this->checkTokensFormLayout('administration');
 	}
 
 	/**
 	 * @on-before-once getTokenId
 	 */
-	public function testFormAdministrationGeneralApiTokens_RegenerationFormLayout() {
+	public function testFormApiTokensAdministrationGeneral_RegenerationFormLayout() {
 		$this->checkTokensRegenerateFormLayout('administration', self::$tokenid);
 	}
 
@@ -284,7 +285,7 @@ class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
 	 * @backup-once token
 	 * @dataProvider getTokenData
 	 */
-	public function testFormAdministrationGeneralApiTokens_Create($data) {
+	public function testFormApiTokensAdministrationGeneral_Create($data) {
 		$this->checkTokensAction($data, 'zabbix.php?action=token.edit', 'create');
 	}
 
@@ -293,7 +294,7 @@ class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
 	 * @on-before-once getTokenId
 	 * @dataProvider getTokenData
 	 */
-	public function testFormAdministrationGeneralApiTokens_Update($data) {
+	public function testFormApiTokensAdministrationGeneral_Update($data) {
 		// Skip the case with user name change as this field is disabled in token edit mode.
 		if ($data['fields']['User'] !== 'Admin') {
 
@@ -302,7 +303,7 @@ class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
 		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.self::$tokenid, 'update');
 	}
 
-	public function testFormAdministrationGeneralApiTokens_UpdateOtherUserToken() {
+	public function testFormApiTokensAdministrationGeneral_UpdateOtherUserToken() {
 		$data = [
 			'fields' => [
 				'Name' => 'Updated user-zabbix token',
@@ -319,19 +320,19 @@ class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
 	/**
 	 * @on-before-once getTokenId
 	 */
-	public function testFormAdministrationGeneralApiTokens_SimpleUpdate() {
+	public function testFormApiTokensAdministrationGeneral_SimpleUpdate() {
 		$this->checkTokenSimpleUpdate('zabbix.php?action=token.edit&tokenid='.self::$tokenid);
 	}
 
 	/**
 	 * @on-before-once getTokenId
 	 */
-	public function testFormAdministrationGeneralApiTokens_Cancel() {
+	public function testFormApiTokensAdministrationGeneral_Cancel() {
 		$this->checkTokenCancel('zabbix.php?action=token.edit', 'Admin');
 		$this->checkTokenCancel('zabbix.php?action=token.edit&tokenid='.self::$tokenid);
 	}
 
-	public function testFormAdministrationGeneralApiTokens_Delete() {
+	public function testFormApiTokensAdministrationGeneral_Delete() {
 		$token_id = $this->getTokenId(self::delete_token, true);
 		$this->checkTokenDelete('zabbix.php?action=token.edit&tokenid='.$token_id, self::delete_token);
 	}
@@ -339,7 +340,7 @@ class testFormAdministrationGeneralApiTokens extends testFormApiTokens {
 	/**
 	 * @on-before-once getTokenId
 	 */
-	public function testFormAdministrationGeneralApiTokens_Regenerate() {
+	public function testFormApiTokensAdministrationGeneral_Regenerate() {
 		$data = [
 			'fields' => [
 				'Name' => 'Admin reference token',

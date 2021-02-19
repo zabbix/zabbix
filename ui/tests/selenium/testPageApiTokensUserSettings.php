@@ -28,11 +28,11 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @backup profiles
  * @on-before prepareTokenData
  */
-class testPageAdministrationGeneralApiTokens extends CWebTest {
+class testPageApiTokensUserSettings extends CWebTest {
 
 	public static $timestamp;
-	protected $status_change_token = 'Admin: expired token for admin';
-	protected $delete_token = 'filter-create: future token for filter-create';
+	protected $status_change_token = 'Expired token for admin';
+	protected $delete_token = 'Future token for admin';
 
 	use TableTrait;
 
@@ -52,64 +52,37 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 
 		CDataHelper::call('token.create', [
 			[
-				'name' => 'Admin: future token for admin',
+				'name' => 'Future token for admin',
 				'userid' => 1,
 				'description' => 'admin token to be used in update scenarios',
 				'status' => '0',
-				'expires_at' => '1798754399'
+				'expires_at' => self::$timestamp + 864000
 			],
 			[
-				'name' => 'Admin: expired token for admin',
+				'name' => 'Expired token for admin',
 				'userid' => 1,
 				'description' => 'Token to be deleted in the delete scenario',
 				'status' => '0',
 				'expires_at' => '1609452360'
 			],
 			[
-				'name' => 'Admin: aktīvs токен - 頑張って',
+				'name' => 'Aktīvs токен - 頑張って',
 				'userid' => 1,
 				'description' => 'Token that is generated for Admin',
 				'status' => '1'
 			],
 			[
-				'name' => 'Admin: token for filter-create',
-				'userid' => 92,
-				'description' => 'admin token created for filter-create user',
-				'status' => '1',
-				'expires_at' => self::$timestamp
-			],
-			[
-				'name' => 'filter-create: future token for filter-create',
-				'userid' => 92,
-				'description' => 'filter-create token created for filter-create user',
-				'status' => '0',
-				'expires_at' => '1798754399'
-			],
-			[
-				'name' => 'filter-create: expired token for filter-create',
-				'userid' => 92,
-				'description' => 'Token to be deleted in the delete scenario',
-				'status' => '0',
-				'expires_at' => '1609452360'
-			],
-			[
-				'name' => 'filter-create: aktīvs токен - 頑張って',
-				'userid' => 92,
-				'description' => 'Token that is generated for filter-create',
-				'status' => '1'
-			],
-			[
-				'name' => 'filter-create: token for Admin',
+				'name' => 'Token that will expire in 2 days',
 				'userid' => 1,
-				'description' => 'filter-create token created for Admin user',
+				'description' => 'admin token created for filter-create user',
 				'status' => '1',
 				'expires_at' => self::$timestamp
 			]
 		]);
 
-		DBexecute('UPDATE token SET creator_userid=92 WHERE name LIKE \'filter-create: %\'');
 		DBexecute('UPDATE token SET created_at=1609452001');
 
+		// Update token "Last accessed" timestamp to be different for each token.
 		$tokenids = CDBHelper::getAll('SELECT tokenid FROM token ORDER BY tokenid');
 		$i = 1;
 		foreach ($tokenids as $tokenid) {
@@ -118,95 +91,47 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 		}
 	}
 
-	public function testPageAdministrationGeneralApiTokens_Layout() {
+	public function testPageApiTokensUserSettings_Layout() {
 		$token_data = [
 			[
-				'Name' => 'Admin: aktīvs токен - 頑張って',
-				'User' => 'Admin (Zabbix Administrator)',
+				'Name' => 'Aktīvs токен - 頑張って',
 				'Expires at' => 'Never',
 				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:04',
 				'Status' => 'Disabled'
 
 			],
 			[
-				'Name' => 'Admin: expired token for admin',
-				'User' => 'Admin (Zabbix Administrator)',
+				'Name' => 'Expired token for admin',
 				'Expires at' => '2021-01-01 00:06:00',
 				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:03',
 				'Status' => 'Enabled'
 
 			],
 			[
-				'Name' => 'Admin: future token for admin',
-				'User' => 'Admin (Zabbix Administrator)',
-				'Expires at' => '2026-12-31 23:59:59',
+				'Name' => 'Future token for admin',
+				'Expires at' => date('Y-m-d H:i:s', self::$timestamp + 864000),
 				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:02',
 				'Status' => 'Enabled'
 
 			],
 			[
-				'Name' => 'Admin: token for filter-create',
-				'User' => 'filter-create',
+				'Name' => 'Token that will expire in 2 days',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
 				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:05',
-				'Status' => 'Disabled'
-
-			],
-			[
-				'Name' => 'filter-create: aktīvs токен - 頑張って',
-				'User' => 'filter-create',
-				'Expires at' => 'Never',
-				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:08',
-				'Status' => 'Disabled'
-
-			],
-			[
-				'Name' => 'filter-create: expired token for filter-create',
-				'User' => 'filter-create',
-				'Expires at' => '2021-01-01 00:06:00',
-				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:07',
-				'Status' => 'Enabled'
-
-			],
-			[
-				'Name' => 'filter-create: future token for filter-create',
-				'User' => 'filter-create',
-				'Expires at' => '2026-12-31 23:59:59',
-				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:06',
-				'Status' => 'Enabled'
-
-			],
-			[
-				'Name' => 'filter-create: token for Admin',
-				'User' => 'Admin (Zabbix Administrator)',
-				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
-				'Created at' => '2021-01-01 00:00:01',
-				'Created by user' => 'filter-create',
-				'Last accessed at' => '2021-01-01 00:00:09',
 				'Status' => 'Disabled'
 
 			]
 		];
 
 		// Open API tokens page and check header.
-		$this->page->login()->open('zabbix.php?action=token.list');
+		$this->page->login()->open('zabbix.php?action=user.token.list');
 		$this->assertEquals('API tokens', $this->query('tag:h1')->one()->getText());
 
-		// Check status of buttons on the API tokens page.
+		// Check status of buttons on the tokens page.
 		$form_buttons = [
 			'Create API token' => true,
 			'Enable' => false,
@@ -226,12 +151,13 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 		$this->assertFalse($filter->isDisplayed());
 		$filter_tab->click();
 		$this->assertTrue($filter->isDisplayed());
+
 		// Check that all filter fields are present.
-		$filter_fields = ['Name', 'Users', 'Expires in less than', 'Created by users', 'Status'];
+		$filter_fields = ['Name', 'Expires in less than', 'Status'];
 		$this-> assertEquals($filter_fields, $filter_form->getLabels()->asText());
 
 		// Check the count of returned tokens and the count of selected tokens.
-		$count = CDBHelper::getCount('SELECT tokenid FROM token');
+		$count = CDBHelper::getCount('SELECT tokenid FROM token WHERE userid=1');
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
 		$selected_count = $this->query('id:selected_count')->one();
 		$this->assertEquals('0 selected', $selected_count->getText());
@@ -250,7 +176,7 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 		$headers = $table->getHeadersText();
 		// Remove empty element from headers array.
 		array_shift($headers);
-		$reference_headers = ['Name', 'User', 'Expires at', 'Created at', 'Created by user', 'Last accessed at', 'Status'];
+		$reference_headers = ['Name', 'Expires at', 'Created at', 'Last accessed at', 'Status'];
 		$this->assertSame($reference_headers, $headers);
 		foreach ($headers as $header) {
 			if ($header === 'Created at') {
@@ -265,18 +191,19 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 		$this->assertTableData($token_data);
 	}
 
-	public function testPageAdministrationGeneralApiTokens_ChangeStatus() {
-		$this->page->login()->open('zabbix.php?action=token.list');
+	public function testPageApiTokensUserSettings_ChangeStatus() {
+		$this->page->login()->open('zabbix.php?action=user.token.list');
 
 		// Disable API token.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', $this->status_change_token);
-		$row->getColumn('Status')->click();
+		$status = $row->getColumn('Status')->query('xpath:.//a')->one();
+		$status->click();
 		// Check token disabled.
 		$this->checkTokenStatus($row, 'disabled');
 
 		// Enable API token.
-		$row->getColumn('Status')->click();
+		$status->click();
 		// Check token enabled.
 		$this->checkTokenStatus($row, 'enabled');
 
@@ -318,10 +245,10 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'Admin: aktīvs токен - 頑張って'
+						'Name' => 'Aktīvs токен - 頑張って'
 					],
 					'expected' => [
-						'Admin: aktīvs токен - 頑張って'
+						'Aktīvs токен - 頑張って'
 					]
 				]
 			],
@@ -329,13 +256,11 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'Admin:'
+						'Name' => 'admin'
 					],
 					'expected' => [
-						'Admin: aktīvs токен - 頑張って',
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'Admin: token for filter-create'
+						'Expired token for admin',
+						'Future token for admin'
 					]
 				]
 			],
@@ -346,12 +271,8 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 						'Name' => 'ken fo'
 					],
 					'expected' => [
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'Admin: token for filter-create',
-						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create',
-						'filter-create: token for Admin'
+						'Expired token for admin',
+						'Future token for admin'
 					]
 				]
 			],
@@ -360,11 +281,12 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 //			[
 //				[
 //					'filter' => [
-//						'Name' => '   future token   '
+//						'Name' => '   oken   '
 //					],
 //					'expected' => [
-//						'Admin: future token for admin',
-//						'filter-create: future token for filter-create'
+//						'Expired token for admin',
+//						'Future token for admin',
+//						'Token that will expire in 2 days'
 //					]
 //				]
 //			],
@@ -384,10 +306,8 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					'expected' => [
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create'
+						'Expired token for admin',
+						'Future token for admin'
 					]
 				]
 			],
@@ -398,121 +318,20 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
-						'Admin: aktīvs токен - 頑張って',
-						'Admin: token for filter-create',
-						'filter-create: aktīvs токен - 頑張って',
-						'filter-create: token for Admin'
+						'Aktīvs токен - 頑張って',
+						'Token that will expire in 2 days'
 					]
 				]
 			],
-			// Retrieve only tokens that were created by "filter-create" user.
+			// Retrieve tokens that will expire in less that 12 days.
 			[
 				[
-					'filter' => [
-						'Created by users' => 'filter-create'
-					],
+					'filter' => [],
+					'Expires in less than' => 12,
 					'expected' => [
-						'filter-create: aktīvs токен - 頑張って',
-						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create',
-						'filter-create: token for Admin'
+						'Future token for admin',
+						'Token that will expire in 2 days'
 					]
-				]
-			],
-			// Retrieve only tokens that were created by "Admin" user.
-			[
-				[
-					'filter' => [
-						'Created by users' => 'Admin'
-					],
-					'expected' => [
-						'Admin: aktīvs токен - 頑張って',
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'Admin: token for filter-create'
-					]
-				]
-			],
-			// Retrieve tokens that were created by one of the "filter-create" or "Admin" users.
-			[
-				[
-					'filter' => [
-						'Created by users' => ['Admin', 'filter-create']
-					],
-					'expected' => [
-						'Admin: aktīvs токен - 頑張って',
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'Admin: token for filter-create',
-						'filter-create: aktīvs токен - 頑張って',
-						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create',
-						'filter-create: token for Admin'
-					]
-				]
-			],
-			// Retrieve only tokens that were created by "guest" user.
-			[
-				[
-					'filter' => [
-						'Created by users' => 'guest'
-					],
-					'no_data' => true
-				]
-			],
-			// Retrieve only tokens that were created for "Admin" user.
-			[
-				[
-					'filter' => [
-						'Users' => 'Admin'
-					],
-					'expected' => [
-						'Admin: aktīvs токен - 頑張って',
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'filter-create: token for Admin'
-					]
-				]
-			],
-			// Retrieve only tokens that were created for "filter-create" user.
-			[
-				[
-					'filter' => [
-						'Users' => 'filter-create'
-					],
-					'expected' => [
-						'Admin: token for filter-create',
-						'filter-create: aktīvs токен - 頑張って',
-						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create'
-					]
-				]
-			],
-			// Retrieve tokens that were created for one of the "filter-create" or "Admin" users.
-			[
-				[
-					'filter' => [
-						'Users' => ['Admin', 'filter-create']
-					],
-					'expected' => [
-						'Admin: aktīvs токен - 頑張って',
-						'Admin: expired token for admin',
-						'Admin: future token for admin',
-						'Admin: token for filter-create',
-						'filter-create: aktīvs токен - 頑張って',
-						'filter-create: expired token for filter-create',
-						'filter-create: future token for filter-create',
-						'filter-create: token for Admin'
-					]
-				]
-			],
-			// Retrieve only tokens that were created for "guest" user.
-			[
-				[
-					'filter' => [
-						'Users' => 'guest'
-					],
-					'no_data' => true
 				]
 			],
 			// Retrieve tokens that will expire in less that 2 days.
@@ -521,8 +340,7 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 					'filter' => [],
 					'Expires in less than' => 2,
 					'expected' => [
-						'Admin: token for filter-create',
-						'filter-create: token for Admin'
+						'Token that will expire in 2 days'
 					]
 				]
 			],
@@ -534,15 +352,15 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// Retrieve tokens created for "filter-create" user that will expire in less that 2 days.
+			// Retrieve Enabled tokens that will expire in less that 12 days.
 			[
 				[
 					'filter' => [
-						'Users' => 'filter-create'
+						'Status' => 'Enabled',
 					],
-					'Expires in less than' => 2,
+					'Expires in less than' => 12,
 					'expected' => [
-						'Admin: token for filter-create'
+						'Future token for admin'
 					]
 				]
 			]
@@ -552,11 +370,12 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 	/**
 	 * @dataProvider getFilterData
 	 */
-	public function testPageAdministrationGeneralApiTokens_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=token.list');
+	public function testPageApiTokensUserSettings_Filter($data) {
+		$this->page->login()->open('zabbix.php?action=user.token.list');
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		// Place $timestamp variable value in data provider as the data providers are formed befor execution of on-before.
 		if (array_key_exists('Expires in less than', $data)) {
 			$form->query('xpath:.//label[@for="filter-expires-state"]/span')->asCheckbox()->one()->set(true);
 			$form->query('xpath:.//input[@id="filter-expires-days"]')->one()->fill($data['Expires in less than']);
@@ -574,7 +393,7 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 		}
 		// Reset the filter and check that all API tokens are displayed.
 		$this->query('button:Reset')->one()->click();
-		$count = CDBHelper::getCount('SELECT tokenid FROM token');
+		$count = CDBHelper::getCount('SELECT tokenid FROM token WHERE userid=1');
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
 	}
 
@@ -584,29 +403,10 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 				[
 					'sort_field' => 'Name',
 					'expected' => [
-						'filter-create: token for Admin',
-						'filter-create: future token for filter-create',
-						'filter-create: expired token for filter-create',
-						'filter-create: aktīvs токен - 頑張って',
-						'Admin: token for filter-create',
-						'Admin: future token for admin',
-						'Admin: expired token for admin',
-						'Admin: aktīvs токен - 頑張って'
-					]
-				]
-			],
-			[
-				[
-					'sort_field' => 'User',
-					'expected' => [
-						'Admin (Zabbix Administrator)',
-						'Admin (Zabbix Administrator)',
-						'Admin (Zabbix Administrator)',
-						'Admin (Zabbix Administrator)',
-						'filter-create',
-						'filter-create',
-						'filter-create',
-						'filter-create'
+						'Token that will expire in 2 days',
+						'Future token for admin',
+						'Expired token for admin',
+						'Aktīvs токен - 頑張って'
 					]
 				]
 			],
@@ -615,28 +415,9 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 					'sort_field' => 'Expires at',
 					'expected' => [
 						'Never',
-						'Never',
 						'2021-01-01 00:06:00',
-						'2021-01-01 00:06:00',
-						'change_to_timestamp',
-						'change_to_timestamp',
-						'2026-12-31 23:59:59',
-						'2026-12-31 23:59:59'
-					]
-				]
-			],
-			[
-				[
-					'sort_field' => 'Created by user',
-					'expected' => [
-						'Admin (Zabbix Administrator)',
-						'Admin (Zabbix Administrator)',
-						'Admin (Zabbix Administrator)',
-						'Admin (Zabbix Administrator)',
-						'filter-create',
-						'filter-create',
-						'filter-create',
-						'filter-create'
+						'2 days in the future',
+						'12 days in the future'
 					]
 				]
 			],
@@ -647,11 +428,7 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 						'2021-01-01 00:00:02',
 						'2021-01-01 00:00:03',
 						'2021-01-01 00:00:04',
-						'2021-01-01 00:00:05',
-						'2021-01-01 00:00:06',
-						'2021-01-01 00:00:07',
-						'2021-01-01 00:00:08',
-						'2021-01-01 00:00:09'
+						'2021-01-01 00:00:05'
 					]
 				]
 			],
@@ -661,10 +438,6 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 					'expected' => [
 						'Enabled',
 						'Enabled',
-						'Enabled',
-						'Enabled',
-						'Disabled',
-						'Disabled',
 						'Disabled',
 						'Disabled'
 					]
@@ -676,19 +449,22 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 	/**
 	 * @dataProvider getSortData
 	 */
-	public function testPageAdministrationGeneralApiTokens_Sort($data) {
+	public function testPageApiTokensUserSettings_Sort($data) {
 		// Place $timestamp variable value in data provider as the data providers are formed befor execution of on-before.
 		if ($data['sort_field'] === 'Expires at') {
 			foreach ($data['expected'] as $i => $value) {
-				if ($value === 'change_to_timestamp') {
+				if ($value === '2 days in the future') {
 					$data['expected'][$i] = date('Y-m-d H:i:s', self::$timestamp);
+				}
+				elseif ($value === '12 days in the future') {
+					$data['expected'][$i] = date('Y-m-d H:i:s', self::$timestamp + 864000);
 				}
 			}
 		}
 
-		$this->page->login()->open('zabbix.php?action=token.list');
+		$this->page->login()->open('zabbix.php?action=user.token.list');
 		$table = $this->query('class:list-table')->asTable()->one();
-
+		// In user settings API tokens list field Status is too wide, so sorting requires to click on the header link.
 		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
 		$header->click();
 		$sorted_once = [];
@@ -706,10 +482,10 @@ class testPageAdministrationGeneralApiTokens extends CWebTest {
 		$this->assertEquals(array_reverse($data['expected']), $sorted_twice);
 	}
 
-	public function testPageAdministrationGeneralApiTokens_Delete() {
-		$this->page->login()->open('zabbix.php?action=token.list');
+	public function testPageApiTokensUserSettings_Delete() {
+		$this->page->login()->open('zabbix.php?action=user.token.list');
 
-		// Disable API token.
+		// Delete API token.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $this->delete_token)->select();
 
