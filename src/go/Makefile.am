@@ -16,19 +16,32 @@ GOLDFLAGS += -X ${PKG}.compileArch=${GOARCH}
 # GOLDFLAGS += -X ${PKG}.compileMode=daemon
 GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
 
+dist_sysconf_DATA =
+TARGETS =
+
+if AGENT2
+TARGETS += zabbix.com/cmd/zabbix_agent2
+DBGTARGETS = zabbix.com/cmd/mock_server
+dist_sysconf_DATA += conf/zabbix_agent2.conf
+endif
+
+if WEBSERVICE
+TARGETS += zabbix.com/cmd/zabbix_web_service
+dist_sysconf_DATA += conf/zabbix_web_service.conf
+endif
+
 all: build
 
 build:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -o bin ./...
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}" -o bin ${TARGETS} ${DBGTARGETS}
 
 clean:
 	go clean ./...
 	rm -f bin/zabbix_agent2 bin/mock_server
 
-install:
+install-exec-local:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
-		go install -ldflags="${GOLDFLAGS}" zabbix.com/cmd/zabbix_agent2
-	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
+		go install -ldflags="${GOLDFLAGS}" ${TARGETS}
 
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
