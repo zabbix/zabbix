@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-18 11:10+0200\n"
-"PO-Revision-Date: 2020-11-23 10:05+0300\n"
+"PO-Revision-Date: 2021-02-18 23:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,11 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1606118739.000000\n"
+"X-POOTLE-MTIME: 1613684033.000000\n"
 
 #: include/classes/items/CHelpItems.php:1087
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "\tСреднее время чтения с виртуального диска , <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <экземпляр> - экземпляр дискового устройства"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -5607,7 +5607,7 @@ msgstr "Обнаружение файловых систем виртуальн�
 
 #: include/classes/items/CHelpItems.php:999
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
-msgstr "Обнаружение виртуальных машин VMware,  <url> - URL службы VMware. Возвращает JSON"
+msgstr "Обнаружение виртуальных машин VMware, <url> - URL службы VMware. Возвращает JSON"
 
 #: app/controllers/CControllerAuditLogList.php:206
 #: app/views/monitoring.discovery.view.php:49
@@ -11493,7 +11493,7 @@ msgstr "Макс. количество колонок и строк в табл�
 
 #: app/views/administration.gui.edit.php:136
 msgid "Max period for time selector"
-msgstr ""
+msgstr "Макс. период селектора периода времени"
 
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:411
@@ -18286,7 +18286,7 @@ msgstr "Украинский (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:241
 msgid "Unable to change configuration file permissions to 0600."
-msgstr ""
+msgstr "Не удалось изменить права файла конфигурации на 0600."
 
 #: include/classes/core/CConfigFile.php:251
 msgid "Unable to create the configuration file."
@@ -20847,12 +20847,12 @@ msgstr "некорректный синтаксис около \"%1$s\""
 
 #: include/classes/parsers/CTriggerExpression.php:525
 msgid "incorrect trigger expression"
-msgstr ""
+msgstr "некорректное выражение триггера"
 
 #: include/classes/parsers/CTriggerExpression.php:546
 #, c-format
 msgid "incorrect trigger expression starting from \"%1$s\""
-msgstr ""
+msgstr "некорректное выражение триггера начиная с \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -21552,7 +21552,7 @@ msgstr "триггер не позволяет ручное закрытие"
 
 #: include/classes/validators/CApiInputValidator.php:2010
 msgid "trigger expression must contain at least one host:key reference"
-msgstr ""
+msgstr "выражение триггера должно содержать по крайней мере одну ссылку на узел сети:ключ"
 
 #: include/classes/api/services/CTriggerGeneral.php:1644
 msgid "trigger prototype cannot be moved to another template or host"
