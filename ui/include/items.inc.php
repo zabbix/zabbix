@@ -560,6 +560,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 			'allow_traps', 'parameters'
 		],
+		'selectTags' => ['tag', 'value'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'hostids' => $srcHostId,
 		'webitems' => true,
