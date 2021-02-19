@@ -24,8 +24,8 @@
 #define ZBX_FLAG_EXPTYPE_HISTORY	2
 #define ZBX_FLAG_EXPTYPE_TRENDS		4
 
-int	zbx_validate_export_type(void);
-int	zbx_is_export_enabled(int flags);
+int	zbx_validate_export_type(char *export_type, uint32_t *export_mask);
+int	zbx_is_export_enabled(uint32_t flags);
 int	zbx_export_init(char **error);
 
 void	zbx_problems_export_init(const char *process_name, int process_num);
@@ -33,9 +33,10 @@ void	zbx_problems_export_write(const char *buf, size_t count);
 void	zbx_problems_export_flush(void);
 
 void	zbx_history_export_init(const char *process_name, int process_num);
-void	zbx_trends_export_init(const char *process_name, int process_num);
 void	zbx_history_export_write(const char *buf, size_t count);
 void	zbx_history_export_flush(void);
+
+void	zbx_trends_export_init(const char *process_name, int process_num);
 void	zbx_trends_export_write(const char *buf, size_t count);
 void	zbx_trends_export_flush(void);
 

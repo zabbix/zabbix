@@ -574,7 +574,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != 	zbx_validate_export_type())
+	if (SUCCEED != 	zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s", CONFIG_EXPORT_TYPE);
 		err = 1;
