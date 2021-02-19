@@ -3,6 +3,7 @@ Changes for 5.4.0beta1
 New features:
 
 Bug fixes:
+...G...... [ZBX-19031] fixed build failure on HP-UX and AIX (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 5.4.0alpha2
