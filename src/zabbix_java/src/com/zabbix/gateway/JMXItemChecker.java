@@ -135,6 +135,7 @@ class JMXItemChecker extends ItemChecker
 			}
 
 			mbsc = jmxc.getMBeanServerConnection();
+			logger.debug("using RMI SSL for " + url.getURLPath() + ": " + useRMISSLforURLHintCache.get(url.getURLPath()));
 
 			for (String key : keys)
 				values.put(getJSONValue(key));
