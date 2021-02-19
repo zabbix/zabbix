@@ -174,21 +174,27 @@ class CControllerPopupTestTriggerExpr extends CController {
 					$pos_left = 0;
 
 					foreach ($result->getTokens() as $token) {
-						if (!array_key_exists($token['type'], $this->supported_token_types)) {
+						if (!($token instanceof CFunctionParserResult)
+								&& !array_key_exists($token['type'], $this->supported_token_types)) {
 							continue;
 						}
 
-						if ($pos_left != $token['pos']) {
-							$expression[] = substr($original_expression, $pos_left, $token['pos'] - $pos_left);
-						}
-						$pos_left = $token['pos'] + $token['length'];
+						$pos = is_array($token) ? $token['pos'] : $token->pos;
+						$length = is_array($token) ? $token['length'] : $token->length;
 
-						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
+						if ($pos_left != $pos) {
+							$expression[] = substr($original_expression, $pos_left, $pos - $pos_left);
+						}
+						$pos_left = $pos + $length;
+
+						if (is_array($token) && $token['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING) {
 							$value = strtr($token['data']['string'], $this->macros_data);
 							$expression[] = CTriggerExpression::quoteString($value, false, true);
 						}
 						else {
-							$value = strtr($token['value'], $this->macros_data);
+							$value = is_array($token)
+								? strtr($token['value'], $this->macros_data)
+								: strtr($token->match, $this->macros_data);
 							$expression[] = CTriggerExpression::quoteString($value, false);
 						}
 					}
