@@ -178,13 +178,13 @@ class CUser extends CApiService {
 		$userIds = [];
 
 		if (is_array($options['output']) && in_array('alias', $options['output'])) {
-			trigger_error(_s('Parameter "%1$s" is deprecated.', '/output/alias'), E_USER_NOTICE);
+			$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/output/alias'));
 			$options['output'][] = 'username';
 		}
 
 		$options['sortfield'] = (array) $options['sortfield'];
 		if (in_array('alias', $options['sortfield'])) {
-			trigger_error(_s('Parameter "%1$s" is deprecated.', '/sortfield/alias'), E_USER_NOTICE);
+			$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/sortfield/alias'));
 			$options['sortfield'][] = 'username';
 			$options['sortfield'] = array_unique(array_diff($options['sortfield'], ['alias']));
 		}
