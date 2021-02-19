@@ -1111,65 +1111,60 @@ function getItemFormData(array $item = [], array $options = []) {
 				])
 				: [];
 
-			$db_host = API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid'],
-				'templated_hosts' => true
-			]);
-			$db_host_tags = $db_host[0]['tags'];
-			$db_host = [
-				'permission' => PERM_READ_WRITE,
-				'hostid' => $db_host[0]['hostid'],
-				'name' => $db_host[0]['name']
-			];
+			$inherited_tags = [];
 
 			// Make list of template tags.
-			$inherited_tags = [];
 			foreach ($parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
+						if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+								$templateid => $template
 							];
 						}
 						else {
-							$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-								$templateid => $template
+							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
 							];
 						}
 					}
 				}
 			}
 
-			// Overwrite and attache host level tags.
-			foreach ($db_host_tags as $tag) {
-				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-						'parent_templates' => [$db_host['hostid'] => $db_host],
-						'type' => ZBX_PROPERTY_INHERITED
-					];
-				}
-				else {
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-						$db_host['hostid'] => $db_host
-					];
+			$db_hosts = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'selectTags' => ['tag', 'value'],
+				'hostids' => $data['hostid']
+			]);
+
+			// Overwrite and attach host level tags.
+			if ($db_hosts) {
+				foreach ($db_hosts[0]['tags'] as $tag) {
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
 				}
 			}
 
-			// Overwrite and attache item's own tags.
+			// Overwrite and attach item's own tags.
 			foreach ($data['tags'] as $tag) {
-				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 				}
 				else {
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 				}
 			}
 
-			$data['tags'] = array_values($inherited_tags);
+			$data['tags'] = [];
+
+			foreach ($inherited_tags as $tag) {
+				foreach ($tag as $value) {
+					$data['tags'][] = $value;
+				}
+			}
 		}
 
 		if (!$data['tags']) {

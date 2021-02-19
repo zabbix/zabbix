@@ -452,8 +452,6 @@ function getHttpTestTags(array $data): array {
 	$tags = array_key_exists('tags', $data) ? $data['tags'] : [];
 
 	if ($data['show_inherited_tags']) {
-		unset($data['templates'][0]);
-
 		$db_templates = $data['templates']
 			? API::Template()->get([
 				'output' => ['templateid'],
@@ -463,71 +461,59 @@ function getHttpTestTags(array $data): array {
 			])
 			: [];
 
-		$db_host = API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'selectTags' => ['tag', 'value'],
-			'hostids' => $data['hostid'],
-			'templated_hosts' => true
-		]);
-
-		if ($db_host) {
-			$db_host_tags = $db_host[0]['tags'];
-			$db_host = [
-				'permission' => PERM_READ_WRITE,
-				'hostid' => $db_host[0]['hostid'],
-				'name' => $db_host[0]['name']
-			];
-		}
-		else {
-			$db_host_tags = [];
-		}
+		$inherited_tags = [];
 
 		// Make list of template tags.
-		$inherited_tags = [];
 		foreach ($data['templates'] as $templateid => $template) {
 			if (array_key_exists($templateid, $db_templates)) {
 				foreach ($db_templates[$templateid]['tags'] as $tag) {
-					if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-						$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-							'parent_templates' => [$templateid => $template],
-							'type' => ZBX_PROPERTY_INHERITED
+					if (array_key_exists($tag['tag'], $inherited_tags)
+							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+							$templateid => $template
 						];
 					}
 					else {
-						$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-							$templateid => $template
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
 						];
 					}
 				}
 			}
 		}
 
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid']
+		]);
+
 		// Overwrite and attach host level tags.
-		foreach ($db_host_tags as $tag) {
-			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-					'parent_templates' => [$db_host['hostid'] => $db_host],
-					'type' => ZBX_PROPERTY_INHERITED
-				];
-			}
-			else {
-				$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
-					$db_host['hostid'] => $db_host
-				];
+		if ($db_hosts) {
+			foreach ($db_hosts[0]['tags'] as $tag) {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
 			}
 		}
 
 		// Overwrite and attach http test's own tags.
 		foreach ($data['tags'] as $tag) {
-			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			if (array_key_exists($tag['tag'], $inherited_tags)
+					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 			}
 			else {
-				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
 			}
 		}
 
-		$tags = array_values($inherited_tags);
+		$tags = [];
+		foreach ($inherited_tags as $tag) {
+			foreach ($tag as $value) {
+				$tags[] = $value;
+			}
+		}
 	}
 
 	return $tags;

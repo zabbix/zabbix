@@ -534,6 +534,7 @@ if (isset($_REQUEST['form'])) {
 
 	$host = API::Host()->get([
 		'output' => ['status'],
+		'selectParentTemplates' => ['templateid', 'name'],
 		'hostids' => $data['hostid'],
 		'templated_hosts' => true
 	]);
@@ -707,13 +708,30 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($db_httptest) {
-		$linked_templates = getHttpTestParentTemplates($db_httptests);
-		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'], $linked_templates,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
+		$parent_templates = zbx_toHash($data['host']['parentTemplates'], 'templateid');
+
+		$rw_templates = $data['host']['parentTemplates']
+			? API::Template()->get([
+				'output' => [],
+				'templateids' => array_keys($parent_templates),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		foreach ($parent_templates as $templateid => &$template) {
+			if (array_key_exists($templateid, $rw_templates)) {
+				$template['permission'] = PERM_READ_WRITE;
+			}
+			else {
+				$template['name'] = _('Inaccessible template');
+				$template['permission'] = PERM_DENY;
+			}
+		}
+		unset($template);
 
 		$tags = getHttpTestTags([
-			'templates' => $linked_templates['templates'],
+			'templates' => $parent_templates,
 			'hostid' => getRequest('hostid'),
 			'tags' => hasRequest('form_refresh') ? $tags : $db_httptest['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags']
