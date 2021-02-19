@@ -178,11 +178,15 @@ class CUser extends CApiService {
 		$userIds = [];
 
 		if (is_array($options['output']) && in_array('alias', $options['output'])) {
+			trigger_error(_s('Parameter "%1$s" is deprecated.', '/output/alias'), E_USER_NOTICE);
 			$options['output'][] = 'username';
 		}
 
-		if ($options['sortfield'] === 'alias') {
-			$options['sortfield'] = 'username';
+		$options['sortfield'] = (array) $options['sortfield'];
+		if (in_array('alias', $options['sortfield'])) {
+			trigger_error(_s('Parameter "%1$s" is deprecated.', '/sortfield/alias'), E_USER_NOTICE);
+			$options['sortfield'][] = 'username';
+			$options['sortfield'] = array_unique(array_diff($options['sortfield'], ['alias']));
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
