@@ -23,13 +23,13 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
- * @backup sessions
+ *
  * @on-before prepareUserTokenData
  */
 class testFormApiTokensUserSettings extends testFormApiTokens {
 
-	const update_token = 'Admin reference token';	// Token for update.
-	const delete_token = 'Token to be deleted';		// Token for deletion.
+	const UPDATE_TOKEN = 'Admin reference token';	// Token for update.
+	const DELETE_TOKEN = 'Token to be deleted';		// Token for deletion.
 
 	public static $tokenid;
 
@@ -37,7 +37,9 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 	 * Function creates the given API tokens in the test branch.
 	 */
 	public static function prepareUserTokenData() {
-		CDataHelper::call('token.create', [
+		CDataHelper::setSessionId(null);
+
+		$responce = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin reference token',
 				'userid' => 1,
@@ -55,9 +57,8 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 		]);
 
 		// Generate token strings for the created tokens.
-		$tokenids = CDBHelper::getAll('SELECT tokenid FROM token');
-		foreach ($tokenids as $tokenid) {
-			CDataHelper::call('token.generate', ['tokenids' => $tokenid['tokenid']]);
+		foreach ($responce['tokenids'] as $tokenid) {
+			CDataHelper::call('token.generate', ['tokenids' => $tokenid]);
 		}
 	}
 
@@ -66,9 +67,10 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 	 *
 	 * @param string $token_name	The name of the token for which the ID is obtained.
 	 * @param boolean $return		Flag that specifies whether token id should be returned by this method.
+	 *
 	 * @return string
 	 */
-	public function getTokenId($token_name = self::update_token, $return = false) {
+	public function getTokenId($token_name = self::UPDATE_TOKEN, $return = false) {
 		self::$tokenid = CDBHelper::getValue('SELECT tokenid FROM token WHERE name = \''.$token_name.'\'');
 
 		if ($return) {
@@ -235,6 +237,7 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 
 	/**
 	 * @backup-once token
+	 *
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensUserSettings_Create($data) {
@@ -243,7 +246,9 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 
 	/**
 	 * @backup-once token
+	 *
 	 * @on-before-once getTokenId
+	 *
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensUserSettings_Update($data) {
@@ -266,8 +271,8 @@ class testFormApiTokensUserSettings extends testFormApiTokens {
 	}
 
 	public function testFormApiTokensUserSettings_Delete() {
-		$token_id = $this->getTokenId(self::delete_token, true);
-		$this->checkTokenDelete('zabbix.php?action=user.token.edit&tokenid='.$token_id, self::delete_token);
+		$token_id = $this->getTokenId(self::DELETE_TOKEN, true);
+		$this->checkTokenDelete('zabbix.php?action=user.token.edit&tokenid='.$token_id, self::DELETE_TOKEN);
 	}
 
 	/**

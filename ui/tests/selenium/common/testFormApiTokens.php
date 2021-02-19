@@ -63,6 +63,7 @@ class testFormApiTokens extends CWebTest {
 		else {
 			$this->assertFalse($form->query('xpath://label[text()="User"]')->one(false)->isDisplayed());
 		}
+
 		// Check that "Set expiration date and time" checkbox is set by default.
 		$expiration_checkbox = $form->getField('Set expiration date and time');
 		$this->assertTrue($expiration_checkbox->getValue());
@@ -78,7 +79,6 @@ class testFormApiTokens extends CWebTest {
 		// Check that "Expires at" field is removed if "Set expiration date and time" is not set.
 		$expiration_checkbox->set(false);
 		$this->assertFalse($form->getField('Expires at')->isVisible());
-
 		$this->assertTrue($form->getField('Enabled')->getValue());
 
 		foreach($form->query('button', ['Add', 'Cancel'])->all() as $button) {
@@ -101,6 +101,7 @@ class testFormApiTokens extends CWebTest {
 			'Description:' => 'admin token to be used in update scenarios',
 			'Expires at:' => '2026-12-31 23:59:59'
 		];
+
 		// User field is not present in User settings => Api tokens configuration form.
 		if ($source === 'user settings') {
 			unset($values['User:']);
@@ -114,7 +115,7 @@ class testFormApiTokens extends CWebTest {
 		$this->assertEquals('API tokens', $this->page->getTitle());
 		$this->assertMessage(TEST_GOOD, 'API token updated');
 		$form = $this->query('id:token_form')->asForm()->one();
-
+		$this->assertEquals(true, $form->getField('Enabled:')->getValue());
 
 		foreach ($values as $name => $value) {
 			$this->assertEquals($value, $form->getField($name)->getText());
@@ -124,17 +125,15 @@ class testFormApiTokens extends CWebTest {
 			$this->assertFalse($form->query('xpath://label[text()="User"]')->one(false)->isDisplayed());
 		}
 
-		$this->assertEquals(true, $form->getField('Enabled:')->getValue());
-
 		// Check Auth token field.
 		$auth_token = $form->getField('Auth token:');
 		$this->checkAuthToken($auth_token, null);
+
 		// Check the hintbox text in the Auth token field.
 		$auth_token->query('xpath:./span[@data-hintbox]')->one()->click();
 		$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilReady()->getText();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
 				$hintbox_text);
-
 		$this->assertTrue($form->query('button:Close')->one()->isClickable());
 	}
 
@@ -150,6 +149,7 @@ class testFormApiTokens extends CWebTest {
 			$sql = 'SELECT * FROM token ORDER BY tokenid';
 			$old_hash = CDBHelper::getHash($sql);
 		}
+
 		if ($action === 'regenerate') {
 			$old_token = CDBHelper::getValue('SELECT token FROM token WHERE tokenid ='.$data['tokenid']);
 		}
@@ -164,7 +164,8 @@ class testFormApiTokens extends CWebTest {
 		}
 		elseif ($action === 'update' && array_key_exists('User', $data['fields'])) {
 			$userless_data = $data['fields'];
-			// Fiels "User" is read only when editing an API token.
+
+			// Field "User" is read only when editing an API token.
 			$this->assertFalse($form->getField('User')->isEnabled());
 			unset($userless_data['User']);
 			$form->fill($userless_data);
@@ -178,6 +179,7 @@ class testFormApiTokens extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$title = ($action === 'create') ? 'Cannot add API token' : 'Cannot update API token';
 			$this->assertMessage(TEST_BAD, $title, $data['error_details']);
+
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
@@ -185,7 +187,7 @@ class testFormApiTokens extends CWebTest {
 			$title = ($action === 'create') ? 'API token added' : 'API token updated';
 			$this->assertMessage(TEST_GOOD, $title);
 
-			// Substitute user name with full name in the data provider for reference
+			// Substitute user name with full name in the data provider for reference.
 			if (array_key_exists('full_name', $data)) {
 				$data['fields']['User'] = $data['full_name'];
 			}
@@ -215,11 +217,11 @@ class testFormApiTokens extends CWebTest {
 						$this->assertEquals($value, $form->getField($name.':')->getText());
 					}
 				}
+
 				// Check Auth token field.
 				$original_token = ($action === 'regenerate') ? $old_token : null;
 				$auth_token = $form->getField('Auth token:');
 				$this->checkAuthToken($auth_token, $original_token);
-
 				$form->query('button:Close')->one()->click();
 			}
 
@@ -227,9 +229,11 @@ class testFormApiTokens extends CWebTest {
 			$this->query('xpath://a[text()="'.$data['fields']['Name'].'"]')->one()->waitUntilVisible()->click();
 			$this->page->waitUntilReady();
 			$form->invalidate();
+
 			if (array_key_exists('User', $data['fields'])) {
 				$this->assertFalse($form->getField('User')->isEnabled());
 			}
+
 			$form->checkValue($data['fields']);
 		}
 	}
@@ -245,6 +249,7 @@ class testFormApiTokens extends CWebTest {
 
 		$this->page->login()->open($url);
 		$this->query('button:Update')->one()->waitUntilClickable()->click();
+
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
@@ -269,12 +274,14 @@ class testFormApiTokens extends CWebTest {
 
 		$this->page->login()->open($url);
 		$form = $this->query('id:token_form')->asForm()->one();
+
 		if ($username) {
 			$data['User'] = $username;
 		}
-		$form->fill($data);
 
+		$form->fill($data);
 		$this->query('button:Cancel')->one()->waitUntilClickable()->click();
+
 		// Check that DB hash is not changed.
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
@@ -292,6 +299,7 @@ class testFormApiTokens extends CWebTest {
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+
 		// Check that DB hash is not changed.
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
@@ -299,16 +307,18 @@ class testFormApiTokens extends CWebTest {
 	/**
 	 * Function that checks the token string.
 	 *
-	 * @param CElement $auth_token
-	 * @param string $original_token
+	 * @param CElement $auth_token		page element that contains the token string.
+	 * @param string $original_token	token string that belonged to the token before token regeneration.
 	 */
 	private function checkAuthToken($auth_token, $original_token) {
 		// Get token text.
 		$token_text = str_replace('  Copy to clipboard', '', $auth_token->getText());
 		$this->assertEquals(64, strlen($token_text));
+
 		if ($original_token) {
 			$this->assertFalse($original_token === $token_text);
 		}
+
 		// Check that token string will be copied to clipboard.
 		$clipboard_element = $auth_token->query('xpath:./a[text()="Copy to clipboard"]')->one();
 		$this->assertEquals('writeTextClipboard("'.$token_text.'")', $clipboard_element->getAttribute('onclick'));

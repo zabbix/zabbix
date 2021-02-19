@@ -26,13 +26,15 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * @backup token
  * @backup profiles
+ *
  * @on-before prepareTokenData
  */
 class testPageApiTokensAdministrationGeneral extends CWebTest {
 
 	public static $timestamp;
-	protected $status_change_token = 'Admin: expired token for admin';
-	protected $delete_token = 'filter-create: future token for filter-create';
+
+	const STATUS_CHANGE_TOKEN = 'Admin: expired token for admin';
+	const DELETE_TOKEN = 'filter-create: future token for filter-create';
 
 	use TableTrait;
 
@@ -48,9 +50,11 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 	}
 
 	public static function prepareTokenData() {
+		CDataHelper::setSessionId(null);
+
 		self::$timestamp = time() + 172800;
 
-		CDataHelper::call('token.create', [
+		$responce = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin: future token for admin',
 				'userid' => 1,
@@ -110,10 +114,10 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 		DBexecute('UPDATE token SET creator_userid=92 WHERE name LIKE \'filter-create: %\'');
 		DBexecute('UPDATE token SET created_at=1609452001');
 
-		$tokenids = CDBHelper::getAll('SELECT tokenid FROM token ORDER BY tokenid');
+		// Update token "Last accessed" timestamp to be different for each token.
 		$i = 1;
-		foreach ($tokenids as $tokenid) {
-			DBexecute('UPDATE token SET lastaccess='.(1609452001+$i).' WHERE tokenid='.$tokenid['tokenid']);
+		foreach ($responce['tokenids'] as $tokenid) {
+			DBexecute('UPDATE token SET lastaccess='.(1609452001+$i).' WHERE tokenid='.$tokenid);
 			$i++;
 		}
 	}
@@ -213,6 +217,7 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 			'Disable' => false,
 			'Delete' => false
 		];
+
 		foreach ($form_buttons as $button => $enabled) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
 		}
@@ -226,32 +231,37 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 		$this->assertFalse($filter->isDisplayed());
 		$filter_tab->click();
 		$this->assertTrue($filter->isDisplayed());
+
 		// Check that all filter fields are present.
 		$filter_fields = ['Name', 'Users', 'Expires in less than', 'Created by users', 'Status'];
-		$this-> assertEquals($filter_fields, $filter_form->getLabels()->asText());
+		$this->assertEquals($filter_fields, $filter_form->getLabels()->asText());
 
 		// Check the count of returned tokens and the count of selected tokens.
 		$count = CDBHelper::getCount('SELECT tokenid FROM token');
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
+		$this->assertTableStats($count);
 		$selected_count = $this->query('id:selected_count')->one();
 		$this->assertEquals('0 selected', $selected_count->getText());
 		$all_tokens = $this->query('id:all_tokens')->one()->asCheckbox();
 		$all_tokens->set(true);
 		$this->assertEquals($count.' selected', $selected_count->getText());
+
 		// Check that buttons became enabled.
 		foreach (['Enable', 'Disable', 'Delete'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
 		}
+
 		$all_tokens->set(false);
 		$this->assertEquals('0 selected', $selected_count->getText());
 
 		// Check tokens table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = $table->getHeadersText();
+
 		// Remove empty element from headers array.
 		array_shift($headers);
 		$reference_headers = ['Name', 'User', 'Expires at', 'Created at', 'Created by user', 'Last accessed at', 'Status'];
 		$this->assertSame($reference_headers, $headers);
+
 		foreach ($headers as $header) {
 			if ($header === 'Created at') {
 				$this->assertFalse($table->query('xpath:.//a[text()="'.$header.'"]')->one(false)->isValid());
@@ -269,14 +279,14 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=token.list');
 
 		// Disable API token.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', $this->status_change_token);
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::STATUS_CHANGE_TOKEN);
 		$row->getColumn('Status')->click();
 		// Check token disabled.
 		$this->checkTokenStatus($row, 'disabled');
 
 		// Enable API token.
 		$row->getColumn('Status')->click();
+
 		// Check token enabled.
 		$this->checkTokenStatus($row, 'enabled');
 
@@ -309,7 +319,7 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, $message_title );
 		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
-		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name=\''.$this->status_change_token.'\''));
+		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM token WHERE name=\''.self::STATUS_CHANGE_TOKEN.'\''));
 	}
 
 	public function getFilterData() {
@@ -557,25 +567,28 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+
 		if (array_key_exists('Expires in less than', $data)) {
 			$form->query('xpath:.//label[@for="filter-expires-state"]/span')->asCheckbox()->one()->set(true);
 			$form->query('xpath:.//input[@id="filter-expires-days"]')->one()->fill($data['Expires in less than']);
 		}
+
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
+
 		if (CTestArrayHelper::get($data, 'no_data')) {
-			$table_content = $this->query('class:list-table')->asTable()->one()->getRows()->asText();
-			$this->assertEquals(['No data found.'], $table_content);
+			$this->assertTableData();
 		}
 		else {
 			// Using token name check that only the expected filters are returned in the list.
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
 		}
+
 		// Reset the filter and check that all API tokens are displayed.
 		$this->query('button:Reset')->one()->click();
 		$count = CDBHelper::getCount('SELECT tokenid FROM token');
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
+		$this->assertTableStats($count);
 	}
 
 	public function getSortData() {
@@ -677,7 +690,7 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 	 * @dataProvider getSortData
 	 */
 	public function testPageApiTokensAdministrationGeneral_Sort($data) {
-		// Place $timestamp variable value in data provider as the data providers are formed befor execution of on-before.
+		// Place $timestamp variable value in data provider as the data providers are formed before execution of on-before.
 		if ($data['sort_field'] === 'Expires at') {
 			foreach ($data['expected'] as $i => $value) {
 				if ($value === 'change_to_timestamp') {
@@ -688,9 +701,9 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=token.list');
 		$table = $this->query('class:list-table')->asTable()->one();
-
 		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
 		$header->click();
+
 		$sorted_once = [];
 		foreach ($table->getRows() as $row) {
 			$sorted_once[] = $row->getColumn($data['sort_field'])->getText();
@@ -709,15 +722,13 @@ class testPageApiTokensAdministrationGeneral extends CWebTest {
 	public function testPageApiTokensAdministrationGeneral_Delete() {
 		$this->page->login()->open('zabbix.php?action=token.list');
 
-		// Disable API token.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', $this->delete_token)->select();
-
+		// Delete API token.
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', self::DELETE_TOKEN)->select();
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Check that token is deleted from DB.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name = \''.$this->delete_token.'\''));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT tokenid FROM token WHERE name = \''.self::DELETE_TOKEN.'\''));
 	}
 }

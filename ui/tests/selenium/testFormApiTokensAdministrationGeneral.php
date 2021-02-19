@@ -23,14 +23,14 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup token
- * @backup sessions
+ *
  * @on-before prepareTokenData
  */
 class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
-	const update_token = 'Admin reference token';	// Token for update.
-	const delete_token = 'Token to be deleted';		// Token for delete.
-	const user_zabbix_token = 'user-zabbix token';	// Token to be updated that belongs to user-zabbix.
+	const UPDATE_TOKEN = 'Admin reference token';	// Token for update.
+	const DELETE_TOKEN = 'Token to be deleted';		// Token for delete.
+	const USER_ZABBIX_TOKEN = 'user-zabbix token';	// Token to be updated that belongs to user-zabbix.
 
 	public static $tokenid;
 
@@ -38,7 +38,9 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 * Function creates the given API tokens in the test branch.
 	 */
 	public static function prepareTokenData() {
-		CDataHelper::call('token.create', [
+		CDataHelper::setSessionId(null);
+
+		$responce = CDataHelper::call('token.create', [
 			[
 				'name' => 'Admin reference token',
 				'userid' => 1,
@@ -63,9 +65,8 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 		]);
 
 		// Generate token strings for the created tokens.
-		$tokenids = CDBHelper::getAll('SELECT tokenid FROM token');
-		foreach ($tokenids as $tokenid) {
-			CDataHelper::call('token.generate', ['tokenids' => $tokenid['tokenid']]);
+		foreach ($responce['tokenids'] as $tokenid) {
+			CDataHelper::call('token.generate', ['tokenids' => $tokenid]);
 		}
 	}
 
@@ -74,9 +75,10 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	 *
 	 * @param string $token_name	The name of the token for which the ID is obtained.
 	 * @param boolean $return		Flag that specifies whether token id should be returned by this method.
+	 *
 	 * @return string
 	 */
-	public function getTokenId($token_name = self::update_token, $return = false) {
+	public function getTokenId($token_name = self::UPDATE_TOKEN, $return = false) {
 		self::$tokenid = CDBHelper::getValue('SELECT tokenid FROM token WHERE name = \''.$token_name.'\'');
 
 		if ($return) {
@@ -283,6 +285,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
 	/**
 	 * @backup-once token
+	 *
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensAdministrationGeneral_Create($data) {
@@ -291,7 +294,9 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
 	/**
 	 * @backup-once token
+	 *
 	 * @on-before-once getTokenId
+	 *
 	 * @dataProvider getTokenData
 	 */
 	public function testFormApiTokensAdministrationGeneral_Update($data) {
@@ -300,6 +305,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
 			return;
 		}
+
 		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.self::$tokenid, 'update');
 	}
 
@@ -313,8 +319,8 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 				'Enabled' => false
 			]
 		];
-		$token_id = $this->getTokenId(self::user_zabbix_token, true);
-		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.self::$tokenid, 'update');
+		$token_id = $this->getTokenId(self::USER_ZABBIX_TOKEN, true);
+		$this->checkTokensAction($data, 'zabbix.php?action=token.edit&tokenid='.$token_id, 'update');
 	}
 
 	/**
@@ -333,8 +339,8 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 	}
 
 	public function testFormApiTokensAdministrationGeneral_Delete() {
-		$token_id = $this->getTokenId(self::delete_token, true);
-		$this->checkTokenDelete('zabbix.php?action=token.edit&tokenid='.$token_id, self::delete_token);
+		$token_id = $this->getTokenId(self::DELETE_TOKEN, true);
+		$this->checkTokenDelete('zabbix.php?action=token.edit&tokenid='.$token_id, self::DELETE_TOKEN);
 	}
 
 	/**
