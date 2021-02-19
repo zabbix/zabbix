@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-23T09:06:48Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: 'Templates/Network devices'
@@ -431,58 +431,58 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '50'
-  value_maps:
-    -
-      name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
-      mappings:
+      valuemaps:
         -
-          value: '1'
-          newvalue: notSupported
-        -
-          value: '2'
-          newvalue: normal
-        -
-          value: '3'
-          newvalue: postFailure
-        -
-          value: '4'
-          newvalue: entityAbsent
-        -
-          value: '11'
-          newvalue: poeError
-        -
-          value: '21'
-          newvalue: stackError
-        -
-          value: '22'
-          newvalue: stackPortBlocked
-        -
-          value: '23'
-          newvalue: stackPortFailed
-        -
-          value: '31'
-          newvalue: sfpRecvError
-        -
-          value: '32'
-          newvalue: sfpSendError
-        -
-          value: '33'
-          newvalue: sfpBothError
-        -
-          value: '41'
-          newvalue: fanError
-        -
-          value: '51'
-          newvalue: psuError
-        -
-          value: '61'
-          newvalue: rpsError
-        -
-          value: '71'
-          newvalue: moduleFaulty
-        -
-          value: '81'
-          newvalue: sensorError
-        -
-          value: '91'
-          newvalue: hardwareFaulty
+          name: 'HH3C-ENTITY-EXT-MIB::hh3cEntityExtErrorStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: notSupported
+            -
+              value: '2'
+              newvalue: normal
+            -
+              value: '3'
+              newvalue: postFailure
+            -
+              value: '4'
+              newvalue: entityAbsent
+            -
+              value: '11'
+              newvalue: poeError
+            -
+              value: '21'
+              newvalue: stackError
+            -
+              value: '22'
+              newvalue: stackPortBlocked
+            -
+              value: '23'
+              newvalue: stackPortFailed
+            -
+              value: '31'
+              newvalue: sfpRecvError
+            -
+              value: '32'
+              newvalue: sfpSendError
+            -
+              value: '33'
+              newvalue: sfpBothError
+            -
+              value: '41'
+              newvalue: fanError
+            -
+              value: '51'
+              newvalue: psuError
+            -
+              value: '61'
+              newvalue: rpsError
+            -
+              value: '71'
+              newvalue: moduleFaulty
+            -
+              value: '81'
+              newvalue: sensorError
+            -
+              value: '91'
+              newvalue: hardwareFaulty

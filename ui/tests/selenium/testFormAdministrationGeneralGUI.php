@@ -74,8 +74,8 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public function testFormAdministrationGeneralGUI_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$this->assertPageTitle('Configuration of GUI');
-		$this->assertPageHeader('GUI');
+		$this->page->assertTitle('Configuration of GUI');
+		$this->page->assertHeader('GUI');
 
 		$limits = [
 			'search_limit' => 6,

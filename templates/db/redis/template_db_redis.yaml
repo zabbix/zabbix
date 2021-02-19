@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.2'
-  date: '2020-10-16T09:33:23Z'
+  version: '5.4'
+  date: '2021-02-17T05:00:00Z'
   groups:
     -
       name: Templates/Databases
@@ -1878,7 +1878,7 @@ zabbix_export:
                 key: 'redis.info["{$REDIS.CONN.URI}"]'
           trigger_prototypes:
             -
-              expression: '{Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}/{Redis:redis.memory.used_memory.last()}*100>{$REDIS.MEM.PUSED.MAX.WARN}'
+              expression: '{Redis:redis.memory.used_memory.last()}/{Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}*100>{$REDIS.MEM.PUSED.MAX.WARN}'
               name: 'Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
               priority: WARNING
           master_item:
@@ -2848,6 +2848,46 @@ zabbix_export:
                   value:
                     name: 'Redis: Memory fragmentation'
                     host: Redis
+      valuemaps:
+        -
+          name: 'Redis bgsave time'
+          mappings:
+            -
+              value: '- 1s'
+              newvalue: Inactive
+        -
+          name: 'Redis bgwrite status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Error
+            -
+              value: '1'
+              newvalue: Ok
+        -
+          name: 'Redis flag'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
+        -
+          name: 'Redis repl offset'
+          mappings:
+            -
+              value: '-1 B'
+              newvalue: Undefined
+        -
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
   triggers:
     -
       expression: '{Redis:redis.clients.connected.min(5m)}/{Redis:redis.config.maxclients.last()}*100>{$REDIS.CLIENTS.PRC.MAX.WARN}'
@@ -3030,43 +3070,3 @@ zabbix_export:
           item:
             host: Redis
             key: redis.server.uptime
-  value_maps:
-    -
-      name: 'Redis bgsave time'
-      mappings:
-        -
-          value: '- 1s'
-          newvalue: Inactive
-    -
-      name: 'Redis bgwrite status'
-      mappings:
-        -
-          value: '0'
-          newvalue: Error
-        -
-          value: '1'
-          newvalue: Ok
-    -
-      name: 'Redis flag'
-      mappings:
-        -
-          value: '0'
-          newvalue: 'No'
-        -
-          value: '1'
-          newvalue: 'Yes'
-    -
-      name: 'Redis repl offset'
-      mappings:
-        -
-          value: '-1 B'
-          newvalue: Undefined
-    -
-      name: 'Service state'
-      mappings:
-        -
-          value: '0'
-          newvalue: Down
-        -
-          value: '1'
-          newvalue: Up

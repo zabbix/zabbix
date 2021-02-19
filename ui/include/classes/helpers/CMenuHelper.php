@@ -250,9 +250,6 @@ class CMenuHelper {
 							->setAliases(['regex.edit']),
 						(new CMenuItem(_('Macros')))
 							->setAction('macros.edit'),
-						(new CMenuItem(_('Value mapping')))
-							->setAction('valuemap.list')
-							->setAliases(['valuemap.edit']),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Modules')))

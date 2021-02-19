@@ -877,6 +877,35 @@ static void	preprocessor_add_test_request(zbx_preprocessing_manager_t *manager, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: create_result_with_meta                                          *
+ *                                                                            *
+ * Purpose: create new result and copy meta information from previous result  *
+ *                                                                            *
+ * Parameters: result_old - [IN] result that can contain meta information     *
+ *                                                                            *
+ * Return value: pointer newly allocated result                               *
+ *                                                                            *
+ ******************************************************************************/
+static AGENT_RESULT	*create_result_with_meta(const AGENT_RESULT *result_old)
+{
+	AGENT_RESULT	*result;
+
+	result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+
+	init_result(result);
+
+	if (0 == ISSET_META(result_old))
+		return result;
+
+	result->type = AR_META;
+	result->lastlogsize = result_old->lastlogsize;
+	result->mtime = result_old->mtime;
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: preprocessor_set_variant_result                                  *
  *                                                                            *
  * Purpose: get result data from variant and error message                    *
@@ -905,11 +934,14 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
+		AGENT_RESULT	*result;
+
+		result = create_result_with_meta(request->value.result_ptr->result);
+
 		preproc_item_result_free(&request->value);
 		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
 		request->value.result_ptr->refcount = 1;
-		request->value.result_ptr->result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
-		init_result(request->value.result_ptr->result);
+		request->value.result_ptr->result = result;
 		zbx_free(request->value.error);
 		request->value.state = ITEM_STATE_NORMAL;
 		ret = FAIL;
@@ -933,9 +965,9 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
 	{
 		/* old result is shared between dependent and master items, it cannot be modified, create new result */
-		AGENT_RESULT	*result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+		AGENT_RESULT	*result;
 
-		init_result(result);
+		result = create_result_with_meta(request->value.result_ptr->result);
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
 			request->value.state = ITEM_STATE_NORMAL;

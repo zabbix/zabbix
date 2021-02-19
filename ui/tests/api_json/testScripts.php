@@ -487,7 +487,7 @@ class testScripts extends CAPITest {
 					'error' => null,
 					'has.scriptid' => ['201'],
 					'!has.scriptid' => ['200'],
-					'result_keys' => ['scriptid'],
+					'result_keys' => ['scriptid']
 				]
 			]
 		];

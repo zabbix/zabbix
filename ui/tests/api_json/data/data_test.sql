@@ -36,16 +36,21 @@ INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (1900,900,40067);
 
 -- valuemap
-INSERT INTO valuemaps (valuemapid,name) VALUES (399,'API value map for update');
-INSERT INTO valuemaps (valuemapid,name) VALUES (400,'API value map for update with mappings');
-INSERT INTO valuemaps (valuemapid,name) VALUES (401,'API value map delete');
-INSERT INTO valuemaps (valuemapid,name) VALUES (402,'API value map delete2');
-INSERT INTO valuemaps (valuemapid,name) VALUES (403,'API value map delete3');
-INSERT INTO valuemaps (valuemapid,name) VALUES (404,'API value map delete4');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9904,400,'One','Online');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9905,400,'Two','Offline');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9906,402,'Three','Other');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9907,403,'Four','Unknown');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (399,50009,'API value map for update');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (400,50009,'API value map for update with mappings');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (401,50009,'API value map delete');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (402,50009,'API value map delete2');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (403,50009,'API value map delete3');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (404,50009,'API value map delete4');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (405,50009,'API value duplicate');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9904,399,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9905,400,'One','Online');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9906,400,'Two','Offline');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9907,401,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9908,402,'Three','Other');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9909,403,'Four','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9910,404,'1','Unknown');
+INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (9911,405,'1','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
@@ -1600,3 +1605,17 @@ INSERT INTO script_param (script_paramid, scriptid, name, value) VALUES (101, 20
 
 INSERT INTO scripts (scriptid, type, name, command, host_access, usrgrpid, groupid, description) VALUES (201, 1, 'Script for Get2','test',2,NULL,NULL,'Get2 description');
 
+-- test trigger validation
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Trigger validation test host', 'Trigger validation test host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99029, 'Trigger validation test template', 'Trigger validation test template', 3, '');
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50028, 'Trigger validation test host group', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50038, 99028, 50028);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50039, 99029, 50028);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58737, 99028, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58738, 99029, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '', '', '', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50176, 'test-trigger-1', '{50236}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50236, 50176, 58737, 'last', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50177, 'test-trigger-2', '{50237}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50237, 50177, 58737, 'last', '');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50178, 'template-trigger', '{50238}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 58738, 'last', '');

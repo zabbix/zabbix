@@ -260,7 +260,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_user_t
 		if (NULL != event && ZBX_SCRIPT_CTX_HOST != ctx && ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 			zbx_db_free_event(event);
 
-		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
+		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			ret = zbx_script_execute(&script, &host, user, event, ctx, result, error, sizeof(error), debug);
 		}

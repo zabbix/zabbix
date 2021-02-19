@@ -43,7 +43,7 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 	char	hash_res[ZBX_SID_AUTH_TOKEN_LENGTH];
 	int	i;
 
-	sha512_hash(auth_token, hash_res);
+	zbx_sha512_hash(auth_token, hash_res);
 
 	for (i = 0 ; i < ZBX_SID_AUTH_TOKEN_LENGTH; i++)
 	{

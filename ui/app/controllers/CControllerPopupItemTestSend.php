@@ -102,7 +102,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'url'					=> 'string',
 			'value'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
-			'valuemapid'			=> 'int32',
+			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
 			'not_supported'			=> 'in 1'
@@ -253,6 +253,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
+		$valuemap = ($this->getInput('valuemapid', 0) != 0)
+			? API::ValueMap()->get([
+				'output' => [],
+				'selectMappings' => ['newvalue', 'value'],
+				'valuemapids' => $this->getInput('valuemapid')
+			])[0]
+			: [];
+
 		// Get value from host.
 		if ($this->get_value_from_host) {
 			// Get post data for particular item type.
@@ -401,11 +409,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							'result' => $result['result']
 						];
 
-						if ($this->getInput('valuemapid', 0)) {
-							$mapped_value = getMappedValue($result['result'], $this->getInput('valuemapid'));
-							if ($mapped_value !== false) {
-								$output['mapped_value'] = $mapped_value;
-							}
+						if ($valuemap) {
+							$output['mapped_value'] = CValueMapHelper::applyValueMap($result['result'], $valuemap);
 						}
 					}
 					elseif (array_key_exists('error', $result)) {

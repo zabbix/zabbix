@@ -77,6 +77,7 @@ class CTriggerExpression {
 	 *
 	 * Supported options:
 	 *   'lldmacros' => true             Enable low-level discovery macros usage in trigger expression.
+	 *   'lowercase_errors' => false     Return error messages in lowercase.
 	 *   'allow_func_only' => true       Allow trigger expression without host:key pair, i.e. {func(param)}.
 	 *   'collapsed_expression' => true  Short trigger expression.
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
@@ -87,6 +88,7 @@ class CTriggerExpression {
 	 */
 	public $options = [
 		'lldmacros' => true,
+		'lowercase_errors' => false,
 		'allow_func_only' => false,
 		'collapsed_expression' => false,
 		'calculated' => false,
@@ -201,6 +203,7 @@ class CTriggerExpression {
 	/**
 	 * @param array $options
 	 * @param bool  $options['lldmacros']
+	 * @param bool  $options['lowercase_errors']
 	 * @param bool  $options['allow_func_only']
 	 * @param bool  $options['collapsed_expression']
 	 * @param bool  $options['calculated']
@@ -514,9 +517,14 @@ class CTriggerExpression {
 		}
 
 		if ($this->pos == 0) {
-			$this->error = $this->options['calculated']
-				? _('incorrect calculated item formula')
-				: _('Incorrect trigger expression.');
+			if ($this->options['calculated']) {
+				$this->error = _('incorrect calculated item formula');
+			}
+			else {
+				$this->error = $this->options['lowercase_errors']
+					? _('incorrect trigger expression')
+					: _('Incorrect trigger expression.');
+			}
 			$this->isValid = false;
 		}
 
@@ -530,9 +538,15 @@ class CTriggerExpression {
 
 		if ($error) {
 			$exp_part = substr($this->expression, ($this->pos == 0) ? 0 : $this->pos - 1);
-			$this->error = $this->options['calculated']
-				? _s('incorrect calculated item formula starting from "%1$s"', $exp_part)
-				: _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".', $exp_part);
+			if ($this->options['calculated']) {
+				$this->error = _s('incorrect calculated item formula starting from "%1$s"', $exp_part);
+			}
+			else {
+				$this->error = $this->options['lowercase_errors']
+					? _s('incorrect trigger expression starting from "%1$s"', $exp_part)
+					: _('Incorrect trigger expression.').' '.
+						_s('Check expression part starting from "%1$s".', $exp_part);
+			}
 			$this->error_type = $error;
 			$this->error_pos = $this->pos;
 			$this->isValid = false;

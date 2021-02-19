@@ -277,6 +277,75 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		.dispatchEvent(new CustomEvent('change', {}));
 })();
 
+// Value maps.
+(() => {
+	const valuemap = document.querySelector('#valuemap-div');
+	const form = document.querySelector('#massupdate-form');
+	const action = form.querySelector('#action').value;
+
+	if (!valuemap) {
+		return false;
+	}
+
+	let obj = valuemap;
+	if (valuemap.tagName === 'SPAN') {
+		obj = valuemap.originalObject;
+	}
+
+	obj.querySelectorAll('[name=valuemap_massupdate]').forEach((elem) => elem.addEventListener('click',
+		(event) => toggleVisible(obj, event.currentTarget.value)
+	));
+	obj.querySelectorAll('.element-table-addfrom').forEach(elm => elm.addEventListener('click',
+		(event) => openAddfromPopup(event.target)
+	));
+
+	$('#valuemap-rename-table').dynamicRows({
+		template: '#valuemap-rename-row-tmpl',
+		row: '.form_row',
+		rows: [{from: '', to: ''}]
+	});
+
+	let overlay = overlays_stack.end();
+
+	$(overlay.$dialogue||document).on('remove', () => {
+		$(document).off('add.popup', processAddfromPopup);
+	});
+	$(document).on('add.popup', processAddfromPopup);
+
+	function processAddfromPopup(ev, data) {
+		let value = data.values[0];
+
+		if (data.parentId === null) {
+			new AddValueMap({
+				name: value.name,
+				mappings: value.mappings
+			});
+		}
+	}
+
+	function openAddfromPopup(elm) {
+		let disable_names = [];
+		let valuemap_table = elm.closest('table');
+
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
+		PopUp('popup.generic', {
+			srctbl: 'valuemaps',
+			srcfld1: 'valuemapid',
+			disable_names: disable_names,
+			editable: true
+		}, null, elm);
+	}
+
+	function toggleVisible(obj, data_type) {
+		obj.querySelectorAll('[data-type]').forEach((elm) => {
+			elm.style.display = (elm.getAttribute('data-type').split(',').indexOf(data_type) != -1) ? '' : 'none';
+		});
+		$(window).resize();
+	}
+
+	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);
+})();
+
 function visibility_status_changeds(value, obj_id, replace_to) {
 	const obj = document.getElementById(obj_id);
 	if (obj === null) {
@@ -320,31 +389,44 @@ function submitPopup(overlay) {
 	const form = document.querySelector('#massupdate-form');
 	const action = form.querySelector('#action').value;
 	const location_url = form.querySelector('#location_url').value;
+	let macros_removeall_warning = (form.querySelector('#visible_macros:checked')
+		&& form.querySelector('[name="mass_update_macros"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
+		&& (form.querySelector('#macros_remove_all').checked === false)
+	);
+	let valuemaps_removeall_warning = (form.querySelector('#visible_valuemaps:checked')
+		&& form.querySelector('[name="valuemap_massupdate"][value="<?= ZBX_ACTION_REMOVE_ALL ?>"]:checked')
+		&& (form.querySelector('#valuemap_remove_all').checked === false)
+	);
+	let warning_message = '';
 
-	// Check "remove all" checkbox in macro tab.
-	const macro_tab_visible = form.querySelector('#visible_macros');
-	if (macro_tab_visible && macro_tab_visible.checked) {
-		const is_checked = form.querySelector('#macros_remove_all').checked;
-		const is_remove_block =
-				form.querySelector('[name=mass_update_macros]:checked').value == <?= ZBX_ACTION_REMOVE_ALL ?>;
-		if (is_remove_block && !is_checked) {
-			overlayDialogue({
-				'title': <?= json_encode(_('Warning')) ?>,
-				'type': 'popup',
-				'class': 'modal-popup modal-popup-medium',
-				'content': $('<span>').text(<?= json_encode(_('Please confirm that you want to remove all macros.')) ?>),
-				'buttons': [
-					{
-						'title': <?= json_encode(_('Ok')) ?>,
-						'focused': true,
-						'action': () => {}
-					}
-				]
-			}, overlay);
+	if (macros_removeall_warning) {
+		warning_message = <?= json_encode(_('Please confirm that you want to remove all macros.')) ?>;
+	}
+	else if (valuemaps_removeall_warning) {
+		warning_message = <?= json_encode(_('Please confirm that you want to remove all value mappings.')) ?>;
+	}
 
-			overlay.unsetLoading();
-			return false;
-		}
+	if (warning_message !== '') {
+		overlayDialogue({
+			'title': <?= json_encode(_('Warning')) ?>,
+			'type': 'popup',
+			'class': 'modal-popup modal-popup-medium',
+			'content': $('<span>').text(warning_message),
+			'buttons': [
+				{
+					'title': <?= json_encode(_('Ok')) ?>,
+					'focused': true,
+					'action': () => {}
+				}
+			]
+		}, overlay);
+
+		overlay.unsetLoading();
+		return false;
+	}
+
+	if (form.querySelector('#visible_valuemaps:checked')) {
+		$(form).trimValues(['[name^="valuemap_rename["]']);
 	}
 
 	if (action == 'popup.massupdate.host') {
