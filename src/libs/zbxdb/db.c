@@ -2516,6 +2516,8 @@ int	zbx_tsdb_get_version(void)
 			else
 				ver = ZBX_TSDB_VERSION = 0;
 		}
+		else
+			ver = ZBX_TSDB_VERSION = 0;
 
 		DBfree_result(result);
 	}
