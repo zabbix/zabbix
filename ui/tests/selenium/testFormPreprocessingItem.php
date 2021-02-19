@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 /**
  * @backup items
  */
-class testFormItemPreprocessing extends testFormPreprocessing {
+class testFormPreprocessingItem extends testFormPreprocessing {
 	const HOST_ID = 40001;							// 'Simple form test host'
 	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
 	const INHERITANCE_HOST_ID		= 15001;		// 'Template inheritance test host'
@@ -89,21 +89,21 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemPreprocessingPrometheusData
 	 * @dataProvider getCustomOnFailValidationData
 	 */
-	public function testFormItemPreprocessing_CreateAllSteps($data) {
+	public function testFormPreprocessingItem_CreateAllSteps($data) {
 		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
-	public function testFormItemPreprocessing_TrailingSpaces($data) {
+	public function testFormPreprocessingItem_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
 	}
 
 	/**
 	 * Test copies templated item from one host to another.
 	 */
-	public function testFormItemPreprocessing_CopyItem() {
+	public function testFormPreprocessingItem_CopyItem() {
 		$item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing
 		$item_name = 'testInheritanceItemPreprocessing';
 		$itemid = 15094;									// testInheritanceItemPreprocessing
@@ -151,14 +151,14 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	/**
 	 * @dataProvider getItemCustomOnFailData
 	 */
-	public function testFormItemPreprocessing_CustomOnFail($data) {
+	public function testFormPreprocessingItem_CustomOnFail($data) {
 		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
-	public function testFormItemPreprocessing_PreprocessingInheritanceFromTemplate($data) {
+	public function testFormPreprocessingItem_PreprocessingInheritanceFromTemplate($data) {
 		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATE_ID;
 		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
 

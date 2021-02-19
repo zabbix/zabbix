@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
  *
  * @backup items
  */
-class testFormItemPrototypePreprocessing extends testFormPreprocessing {
+class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 
 	const DISCOVERY_RULE_ID = 33800;			// 'Simple form test host' => 'testFormDiscoveryRule'
 	const TEMPL_DISCOVERY_RULE_ID = 15011;	// 'testInheritanceDiscoveryRule'
@@ -96,28 +96,28 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemPrototypePrometheusData
 	 * @dataProvider getCustomOnFailValidationData
 	 */
-	public function testFormItemPrototypePreprocessing_CreateAllSteps($data) {
+	public function testFormPreprocessingItemPrototype_CreateAllSteps($data) {
 		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getItemCustomOnFailData
 	 */
-	public function testFormItemPrototypePreprocessing_CustomOnFail($data) {
+	public function testFormPreprocessingItemPrototype_CustomOnFail($data) {
 		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
-	public function testFormItemPrototypePreprocessing_TrailingSpaces($data) {
+	public function testFormPreprocessingItemPrototype_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
 	}
 
 	/**
 	 * @dataProvider getItemInheritancePreprocessing
 	 */
-	public function testFormItemPrototypePreprocessing_PreprocessingInheritanceFromTemplate($data) {
+	public function testFormPreprocessingItemPrototype_PreprocessingInheritanceFromTemplate($data) {
 		$this->link = 'disc_prototypes.php?parent_discoveryid='.self::TEMPL_DISCOVERY_RULE_ID;
 		$host_link = 'disc_prototypes.php?parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID;
 

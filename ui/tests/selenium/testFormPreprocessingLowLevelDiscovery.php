@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 /**
  * @backup items
  */
-class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
+class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 
 	const HOST_ID = 40001;
 	const INHERITANCE_TEMPLATE_ID	= 15000;		// 'Inheritance test template'
@@ -199,28 +199,28 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getLLDPrometheusData
 	 * @dataProvider getCustomOnFailValidationData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CreateAllSteps($data) {
+	public function testFormPreprocessingLowLevelDiscovery_CreateAllSteps($data) {
 		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getCommonPreprocessingTrailingSpacesData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_TrailingSpaces($data) {
+	public function testFormPreprocessingLowLevelDiscovery_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
 	}
 
 	/**
 	 * @dataProvider getCommonCustomOnFailData
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFail($data) {
+	public function testFormPreprocessingLowLevelDiscovery_CustomOnFail($data) {
 		$this->checkCustomOnFail($data);
 	}
 
 	/**
 	 * @dataProvider getCommonInheritancePreprocessing
 	 */
-	public function testFormLowLevelDiscoveryPreprocessing_PreprocessingInheritanceFromTemplate($data) {
+	public function testFormPreprocessingLowLevelDiscovery_PreprocessingInheritanceFromTemplate($data) {
 		$this->link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_TEMPLATE_ID;
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::INHERITANCE_HOST_ID;
 
