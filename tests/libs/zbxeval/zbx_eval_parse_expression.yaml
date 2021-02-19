@@ -28,12 +28,16 @@ out:
     opt: 0
   result: SUCCEED
 ---
-test case: Fail '.1'
+test case: Succeed '.1'
 in:
   rules: []
   expression: '.1'
 out:
-  result: FAIL
+  stack: 
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '.1'
+    opt: 0
+  result: SUCCEED
 ---
 test case: Succeed '1.'
 in:

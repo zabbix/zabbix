@@ -596,8 +596,9 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			{
 				return eval_parse_time_token(ctx, pos, token, error);
 			}
-			else
-				return eval_parse_number_token(ctx, pos, token, error);
+			ZBX_FALLTHROUGH;
+		case '.':
+			return eval_parse_number_token(ctx, pos, token, error);
 		case ',':
 			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION))
 			{
