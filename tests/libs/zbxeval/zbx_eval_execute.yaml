@@ -744,5 +744,13 @@ in:
 out:
   result: SUCCEED
   value: 1
+---
+test case: Expression '1m=60s'
+in:
+  rules: []
+  expression: '1m=60s'
+out:
+  result: SUCCEED
+  value: 1
 ...
 
