@@ -31,15 +31,13 @@ class CTagFilterFieldHelper {
 	 * @param array  $options
 	 * @param string $options['tag_field_name']       (optional)
 	 * @param string $options['evaltype_field_name']  (optional)
-	 * @param string $options['table_id']             (optional)
 	 *
-	 * @return CTagFilterFieldHelper
+	 * @return CTable
 	 */
-	public static function getTagFilterField(array $data = [], array $options = []) {
+	public static function getTagFilterField(array $data = [], array $options = []): CTable {
 		$options += [
 			'tag_field_name' => 'filter_tags',
-			'evaltype_field_name' => 'filter_evaltype',
-			'table_id' => 'filter-tags'
+			'evaltype_field_name' => 'filter_evaltype'
 		];
 
 		$data += [
@@ -47,7 +45,7 @@ class CTagFilterFieldHelper {
 			'tags' => []
 		];
 
-		$tags_table = (new CTable())->setId($options['table_id']);
+		$tags_table = (new CTable())->setId('filter-tags');
 
 		$tags_table->addRow(
 			(new CCol(
