@@ -586,6 +586,85 @@ static int	DBpatch_5030051(void)
 
 	return DBadd_foreign_key("widget", 1, &field);
 }
+
+static int	DBpatch_5030052(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	result = DBselect("select screenid,name,userid,private from screens");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		uint64_t	screenid, userid;
+		int		private;
+
+		ZBX_DBROW2UINT64(screenid, row[0]);
+		ZBX_DBROW2UINT64(userid, row[2]);
+		private = atoi(row[3]);
+
+		if (SUCCEED == (ret = DBpatch_convert_screen(screenid, row[1], 0, userid, private)))
+			ret = DBpatch_delete_screen(screenid);
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_5030053(void)
+{
+	int		ret = SUCCEED;
+
+	ret = 	DBpatch_convert_slideshow();
+
+	return ret;
+}
+
+static int	DBpatch_5030054(void)
+{
+	return DBdrop_table("slides");
+}
+
+static int	DBpatch_5030055(void)
+{
+	return DBdrop_table("slideshow_user");
+}
+
+static int	DBpatch_5030056(void)
+{
+	return DBdrop_table("slideshow_usrgrp");
+}
+
+static int	DBpatch_5030057(void)
+{
+	return DBdrop_table("slideshows");
+
+}
+
+static int	DBpatch_5030058(void)
+{
+	return DBdrop_table("screen_usrgrp");
+}
+
+static int	DBpatch_5030059(void)
+{
+	return DBdrop_table("screens_items");
+}
+
+static int	DBpatch_5030060(void)
+{
+	return DBdrop_table("screen_user");
+}
+
+static int	DBpatch_5030061(void)
+{
+	return DBdrop_table("screens");
+}
 #endif
 
 DBPATCH_START(5030)
@@ -644,5 +723,15 @@ DBPATCH_ADD(5030048, 0, 1)
 DBPATCH_ADD(5030049, 0, 1)
 DBPATCH_ADD(5030050, 0, 1)
 DBPATCH_ADD(5030051, 0, 1)
+DBPATCH_ADD(5030052, 0, 1)
+DBPATCH_ADD(5030053, 0, 1)
+DBPATCH_ADD(5030054, 0, 1)
+DBPATCH_ADD(5030055, 0, 1)
+DBPATCH_ADD(5030056, 0, 1)
+DBPATCH_ADD(5030057, 0, 1)
+DBPATCH_ADD(5030058, 0, 1)
+DBPATCH_ADD(5030059, 0, 1)
+DBPATCH_ADD(5030060, 0, 1)
+DBPATCH_ADD(5030061, 0, 1)
 
 DBPATCH_END()
