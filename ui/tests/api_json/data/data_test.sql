@@ -1009,7 +1009,7 @@ INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, ol
 
 -- LLD with overrides to delete
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1001,133763,'override',1,3,'{101} or {102} or {103}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1001,133763,'override',1,3,'{1001} or {1002} or {1003}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1002,133763,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1001,1001,8,'{#MACRO1}','d{3}$');
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1002,1001,8,'{#MACRO2}','d{2}$');
@@ -1044,7 +1044,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1006
 
 -- LLD with overrides to copy
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',50009,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1003,133764,'override',1,3,'{104} or {105} or {106}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1003,133764,'override',1,3,'{1004} or {1005} or {1006}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1004,133764,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1004,1003,8,'{#MACRO1}','d{3}$');
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1005,1003,8,'{#MACRO2}','d{2}$');
@@ -1079,7 +1079,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1012
 
 -- LLD with overrides to update
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',50009,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1005,133765,'override',1,3,'{107} or {108} or {109}',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1005,133765,'override',1,3,'{1007} or {1008} or {1009}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1006,133765,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1007,1005,8,'{#MACRO1}','d{3}$');
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1008,1005,8,'{#MACRO2}','d{2}$');
