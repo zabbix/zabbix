@@ -379,7 +379,7 @@ if (hasRequest('filter_set')) {
 		$filter_tags['values'][] = $tag['value'];
 		$filter_tags['operators'][] = $tag['operator'];
 	}
-	CProfile::update($prefix.'items.filter.evaltype', getRequest('evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
+	CProfile::update($prefix.'items.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR), PROFILE_TYPE_INT);
 	CProfile::updateArray($prefix.'items.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
 	CProfile::updateArray($prefix.'items.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 	CProfile::updateArray($prefix.'items.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
@@ -1616,6 +1616,9 @@ else {
 			'subfilter_discovered' => getRequest('subfilter_discovered')
 		];
 	}
+
+	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
+
 	if (!$data['filter_data']['filter_tags']) {
 		$data['filter_data']['filter_tags'] = [[
 			'tag' => '',
@@ -1623,8 +1626,6 @@ else {
 			'operator' => TAG_OPERATOR_LIKE
 		]];
 	}
-
-	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
 
 	// Replace hash keys by numeric index used in subfilter.
 	foreach ($data['filter_data']['subfilter_tags'] as $hash => $tag) {
