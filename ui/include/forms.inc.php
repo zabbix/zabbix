@@ -177,32 +177,25 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 	$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 	$simple_interval_parser = new CSimpleIntervalParser();
 
-	// Unset empty fields.
-	$filter_data['filter_tags'] = array_filter($filter_data['filter_tags'], function ($tag) {
-		return ($tag['tag'] !== '' || $tag['value'] !== '');
-	});
-
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
 		// tags
-		if (!$filter_data['filter_tags']) {
-			foreach ($item['tags'] as $tag) {
-				$tag_hash = json_encode([$tag['tag'], $tag['value']]);
-				if (!array_key_exists($tag_hash, $item_params['tags'])) {
-					$item_params['tags'][$tag_hash] = $tag + ['count' => 0];
-				}
+		foreach ($item['tags'] as $tag) {
+			$tag_hash = json_encode([$tag['tag'], $tag['value']]);
+			if (!array_key_exists($tag_hash, $item_params['tags'])) {
+				$item_params['tags'][$tag_hash] = $tag + ['count' => 0];
+			}
 
-				$show_item = true;
-				foreach ($item['subfilters'] as $name => $value) {
-					if ($name == 'subfilter_tags') {
-						continue;
-					}
-					$show_item &= $value;
+			$show_item = true;
+			foreach ($item['subfilters'] as $name => $value) {
+				if ($name == 'subfilter_tags') {
+					continue;
 				}
+				$show_item &= $value;
+			}
 
-				if ($show_item) {
-					$item_params['tags'][$tag_hash]['count']++;
-				}
+			if ($show_item) {
+				$item_params['tags'][$tag_hash]['count']++;
 			}
 		}
 
@@ -490,7 +483,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 	}
 
 	// output
-	if (!$filter_data['filter_tags'] && count($item_params['tags']) > 1) {
+	if (count($item_params['tags']) > 1) {
 		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags'],
 			'subfilter_tags'
 		);
