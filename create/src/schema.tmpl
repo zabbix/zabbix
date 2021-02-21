@@ -1893,7 +1893,44 @@ UNIQUE	|2		|userid,name
 UNIQUE	|3		|token
 INDEX	|4		|creator_userid
 
+TABLE|report|reportid|ZBX_DATA
+FIELD		|reportid	|t_id		|	|NOT NULL	|0
+FIELD		|userid		|t_id		|	|NOT NULL	|0		|1|users|userid
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|dashboardid	|t_id		|	|NOT NULL	|0		|2|dashboard|dashboardid
+FIELD		|period		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|cycle		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|weekdays	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|send_time	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|active_since	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|lastsent	|t_time	|'0'		|NOT NULL	|ZBX_NODATA
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
+
+TABLE|report_param|reportparamid|ZBX_DATA
+FIELD		|reportparamid	|t_id		|	|NOT NULL	|0
+FIELD		|reportid	|t_id		|	|NOT NULL	|0		|1|report|reportid
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_shorttext	|''	|NOT NULL	|0
+INDEX		|1		|reportid
+
+TABLE|report_user|reportuserid|ZBX_DATA
+FIELD		|reportuserid	|t_id		|	|NOT NULL	|0
+FIELD		|reportid	|t_id		|	|NOT NULL	|0		|1|report|reportid
+FIELD		|userid		|t_id		|	|NOT NULL	|0		|2|users|userid
+FIELD		|exclude	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|reportid
+
+TABLE|report_usrgrp|reportusrgrpid|ZBX_DATA
+FIELD		|reportusrgrpid|t_id		|	|NOT NULL	|0
+FIELD		|reportid	|t_id		|	|NOT NULL	|0		|1|report|reportid
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0		|2|usrgrp|usrgrpid
+INDEX		|1		|reportid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5030038	|5030038
+ROW		|5030052	|5030052

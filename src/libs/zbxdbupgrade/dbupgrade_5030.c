@@ -476,6 +476,150 @@ static int	DBpatch_5030038(void)
 
 	return DBset_default("scripts", &field);
 }
+
+static int	DBpatch_5030039(void)
+{
+	const ZBX_TABLE	table =
+			{"report", "reportid", 0,
+				{
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"period", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"cycle", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"weekdays", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"send_time", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_since", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active_till", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastsent", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030040(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report", 1, &field);
+}
+
+static int	DBpatch_5030041(void)
+{
+	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report", 2, &field);
+}
+
+static int	DBpatch_5030042(void)
+{
+	const ZBX_TABLE	table =
+			{"report_param", "reportparamid", 0,
+				{
+					{"reportparamid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030043(void)
+{
+	return DBcreate_index("report_param", "report_param_1", "reportid", 0);
+}
+
+static int	DBpatch_5030044(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_param", 1, &field);
+}
+
+static int	DBpatch_5030045(void)
+{
+	const ZBX_TABLE	table =
+			{"report_user", "reportuserid", 0,
+				{
+					{"reportuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"exclude", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030046(void)
+{
+	return DBcreate_index("report_user", "report_user_1", "reportid", 0);
+}
+
+static int	DBpatch_5030047(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_user", 1, &field);
+}
+
+static int	DBpatch_5030048(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_user", 2, &field);
+}
+
+static int	DBpatch_5030049(void)
+{
+	const ZBX_TABLE	table =
+			{"report_usrgrp", "reportusrgrpid", 0,
+				{
+					{"reportusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_5030050(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_1", "reportid", 0);
+}
+
+static int	DBpatch_5030051(void)
+{
+	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_usrgrp", 1, &field);
+}
+
+static int	DBpatch_5030052(void)
+{
+	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("report_usrgrp", 2, &field);
+}
+
+
 #endif
 
 DBPATCH_START(5030)
@@ -521,5 +665,19 @@ DBPATCH_ADD(5030035, 0, 1)
 DBPATCH_ADD(5030036, 0, 1)
 DBPATCH_ADD(5030037, 0, 1)
 DBPATCH_ADD(5030038, 0, 1)
+DBPATCH_ADD(5030039, 0, 1)
+DBPATCH_ADD(5030040, 0, 1)
+DBPATCH_ADD(5030041, 0, 1)
+DBPATCH_ADD(5030042, 0, 1)
+DBPATCH_ADD(5030043, 0, 1)
+DBPATCH_ADD(5030044, 0, 1)
+DBPATCH_ADD(5030045, 0, 1)
+DBPATCH_ADD(5030046, 0, 1)
+DBPATCH_ADD(5030047, 0, 1)
+DBPATCH_ADD(5030048, 0, 1)
+DBPATCH_ADD(5030049, 0, 1)
+DBPATCH_ADD(5030050, 0, 1)
+DBPATCH_ADD(5030051, 0, 1)
+DBPATCH_ADD(5030052, 0, 1)
 
 DBPATCH_END()
