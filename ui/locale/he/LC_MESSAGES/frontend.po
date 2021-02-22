@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-18 11:11+0200\n"
-"PO-Revision-Date: 2021-02-07 23:44+0300\n"
+"PO-Revision-Date: 2021-02-21 20:35+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1612734245.000000\n"
+"X-POOTLE-MTIME: 1613932509.000000\n"
 
 #: include/classes/items/CHelpItems.php:1091
 msgid "\tThe average time a read from the virtual disk takes , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -846,7 +846,7 @@ msgstr "הוספת פריט צאצא"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "הוספה מתוך"
 
 #: include/actions.inc.php:635 include/actions.inc.php:1053
 msgid "Add host"
@@ -8229,7 +8229,7 @@ msgstr "הסרת תסריטי המאקרו מקובלת עלי"
 
 #: app/partials/massupdate.valuemaps.tab.php:84
 msgid "I confirm to remove all value mappings"
-msgstr ""
+msgstr "הסרת כל מיפויי הערכים מקובלת עלי"
 
 #: include/discovery.inc.php:60
 msgid "ICMP ping"
@@ -11527,7 +11527,7 @@ msgstr "ממופה אל"
 
 #: app/controllers/CControllerPopupGeneric.php:429
 msgid "Mapping"
-msgstr ""
+msgstr "מיפוי"
 
 #: app/controllers/CControllerPopupValueMapEdit.php:85
 #: app/views/administration.iconmap.edit.php:124
@@ -14261,7 +14261,7 @@ msgstr "נא לאשר שברצונך להסיר את כל תסריטי המאק�
 
 #: app/views/js/popup.massupdate.js.php:406
 msgid "Please confirm that you want to remove all value mappings."
-msgstr ""
+msgstr "נא לאשר שברצונך להסיר את כל מיפויי הערכים."
 
 #: include/classes/setup/CSetupWizard.php:429
 #, c-format
@@ -15161,7 +15161,7 @@ msgstr "הוסר, %1$s"
 
 #: app/partials/massupdate.valuemaps.tab.php:96
 msgid "Rename"
-msgstr ""
+msgstr "שינוי השם"
 
 #: app/views/popup.massupdate.host.php:52
 #: app/views/popup.massupdate.host.php:114
@@ -17578,7 +17578,7 @@ msgstr "היישום לא מתגלה עוד והוא יימחק בפעם הבא�
 
 #: include/classes/items/CHelpItems.php:1095
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "משך זמן בממוצע לכתיבה לכונן הווירטואלי, <url> - כתובת שירות ה־VMware,‏ <uuid> שם מארח המכונה הווירטואלית ב־VMware,‏ <instance> - מופע התקן הכונן"
 
 #: hosts.php:325
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -17913,7 +17913,7 @@ msgstr "זמן ה־SQL הכללי: %1$s"
 
 #: include/classes/items/CHelpItems.php:1011
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "סך כל הזמן שעבר, בשניות, מאשר העלייה האחרונה של מערכת ההפעלה, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware"
 
 #: include/classes/debug/CProfiler.php:147
 #, c-format
@@ -19558,7 +19558,7 @@ msgstr "ערך: אין נתונים"
 #: include/classes/api/services/CItemGeneral.php:2784
 #, c-format
 msgid "Valuemap with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "מפת ערכים עם המזהה „%1$s” אינה זמינה תחת „%2$s”."
 
 #: app/views/monitoring.charts.view.php:57
 #: include/views/monitoring.history.php:78
